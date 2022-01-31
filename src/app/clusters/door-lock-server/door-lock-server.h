@@ -33,6 +33,7 @@ using chip::Optional;
 using chip::app::Clusters::DoorLock::DlCredentialRule;
 using chip::app::Clusters::DoorLock::DlCredentialType;
 using chip::app::Clusters::DoorLock::DlDataOperationType;
+using chip::app::Clusters::DoorLock::DlDaysMaskMap;
 using chip::app::Clusters::DoorLock::DlDoorState;
 using chip::app::Clusters::DoorLock::DlLockDataType;
 using chip::app::Clusters::DoorLock::DlLockOperationType;
@@ -78,6 +79,12 @@ public:
     bool SetOneTouchLocking(chip::EndpointId endpointId, bool isEnabled);
     bool SetPrivacyModeButton(chip::EndpointId endpointId, bool isEnabled);
 
+    bool GetNumberOfUserSupported(chip::EndpointId endpointId, uint16_t & numberOfUsersSupported);
+    bool GetNumberOfPINCredentialsSupported(chip::EndpointId endpointId, uint16_t & numberOfPINCredentials);
+    bool GetNumberOfRFIDCredentialsSupported(chip::EndpointId endpointId, uint16_t & numberOfRFIDCredentials);
+    bool GetNumberOfWeekDaySchedulesPerUserSupported(chip::EndpointId endpointId, uint8_t & numberOfWeekDaySchedulesPerUser);
+    bool GetNumberOfYearDaySchedulesPerUserSupported(chip::EndpointId endpointId, uint8_t & numberOfYearDaySchedulesPerUser);
+
     void SetUserCommandHandler(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                const chip::app::Clusters::DoorLock::Commands::SetUser::DecodableType & commandData);
 
@@ -100,6 +107,26 @@ public:
     void LockUnlockDoorCommandHandler(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                       DlLockOperationType operationType, const chip::Optional<chip::ByteSpan> & pinCode);
 
+    void SetWeekDayScheduleCommandHandler(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::DecodableType & commandData);
+    void GetWeekDayScheduleCommandHandler(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::DecodableType & commandData);
+    void ClearWeekDayScheduleCommandHandler(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::DecodableType & commandData);
+
+    void SetYearDayScheduleCommandHandler(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::DecodableType & commandData);
+    void GetYearDayScheduleCommandHandler(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::DecodableType & commandData);
+    void ClearYearDayScheduleCommandHandler(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::DecodableType & commandData);
+
     bool HasFeature(chip::EndpointId endpointId, DoorLockFeature feature);
 
     inline bool SupportsPIN(chip::EndpointId endpointId) { return HasFeature(endpointId, DoorLockFeature::kPINCredentials); }
@@ -109,6 +136,8 @@ public:
     inline bool SupportsFingers(chip::EndpointId endpointId) { return HasFeature(endpointId, DoorLockFeature::kFingerCredentials); }
 
     inline bool SupportsFace(chip::EndpointId endpointId) { return HasFeature(endpointId, DoorLockFeature::kFaceCredentials); }
+
+    inline bool SupportsSchedules(chip::EndpointId endpointId) { return HasFeature(endpointId, DoorLockFeature::kAccessSchedules); }
 
     inline bool SupportsUSR(chip::EndpointId endpointId)
     {
@@ -123,6 +152,7 @@ private:
 
     bool userIndexValid(chip::EndpointId endpointId, uint16_t userIndex);
     bool userIndexValid(chip::EndpointId endpointId, uint16_t userIndex, uint16_t & maxNumberOfUser);
+    bool userExists(chip::EndpointId endpointId, uint16_t userIndex);
 
     bool credentialIndexValid(chip::EndpointId endpointId, DlCredentialType type, uint16_t credentialIndex);
     bool credentialIndexValid(chip::EndpointId endpointId, DlCredentialType type, uint16_t credentialIndex,
@@ -194,6 +224,28 @@ private:
     // TODO: Maybe use CHIP_APPLICATION_ERROR instead of boolean in class methods?
     bool credentialTypeSupported(chip::EndpointId endpointId, DlCredentialType type);
 
+    bool weekDayIndexValid(chip::EndpointId endpointId, uint8_t weekDayIndex);
+
+    DlStatus clearWeekDaySchedule(chip::EndpointId endpointId, uint16_t userIndex, uint8_t weekDayIndex);
+    DlStatus clearWeekDaySchedules(chip::EndpointId endpointId, uint16_t userIndex);
+    DlStatus clearSchedules(chip::EndpointId endpointId, uint16_t userIndex);
+
+    CHIP_ERROR sendGetWeekDayScheduleResponse(chip::app::CommandHandler * commandObj,
+                                              const chip::app::ConcreteCommandPath & commandPath, uint8_t weekdayIndex,
+                                              uint16_t userIndex, DlStatus status, DlDaysMaskMap daysMask = DlDaysMaskMap(0),
+                                              uint8_t startHour = 0, uint8_t startMinute = 0, uint8_t endHour = 0,
+                                              uint8_t endMinute = 0);
+
+    bool yearDayIndexValid(chip::EndpointId endpointId, uint8_t yearDayIndex);
+
+    DlStatus clearYearDaySchedule(chip::EndpointId endpointId, uint16_t userIndex, uint8_t weekDayIndex);
+    DlStatus clearYearDaySchedules(chip::EndpointId endpointId, uint16_t userIndex);
+
+    CHIP_ERROR sendGetYearDayScheduleResponse(chip::app::CommandHandler * commandObj,
+                                              const chip::app::ConcreteCommandPath & commandPath, uint8_t yearDayIndex,
+                                              uint16_t userIndex, DlStatus status, uint32_t localStartTime = 0,
+                                              uint32_t localEndTime = 0);
+
     bool sendRemoteLockUserChange(chip::EndpointId endpointId, DlLockDataType dataType, DlDataOperationType operation,
                                   chip::NodeId nodeId, chip::FabricIndex fabricIndex, uint16_t userIndex = 0,
                                   uint16_t dataIndex = 0);
@@ -237,11 +289,145 @@ struct EmberAfPluginDoorLockUserInfo
     chip::FabricIndex lastModifiedBy;           /**< ID of the fabric that modified the user. */
 };
 
-typedef bool (*EmberAfDoorLockLockUnlockCommand)(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode);
+/**
+ * @brief Status of the schedule slot in the schedule database.
+ */
+enum class DlScheduleStatus : uint8_t
+{
+    kAvailable = 0x00, /**< Indicates if schedule slot is available. */
+    kOccupied  = 0x01, /**< Indicates if schedule slot is already occupied. */
+};
 
-bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode);
-bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode);
-bool emberAfPluginDoorLockOnDoorUnlockWithTimeoutCommand(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode,
+/**
+ * @brief Structure that holds week day schedule information.
+ */
+struct EmberAfPluginDoorLockWeekDaySchedule
+{
+    DlDaysMaskMap daysMask; /** Indicates the days of the week the Week Day schedule applies for. */
+    uint8_t startHour;      /** Starting hour for the Week Day schedule. */
+    uint8_t startMinute;    /** Starting minute for the Week Day schedule. */
+    uint8_t endHour;        /** Ending hour for the Week Day schedule. */
+    uint8_t endMinute;      /** Ending minute for the Week Day schedule. */
+};
+
+/**
+ * @brief Structure that holds year day schedule information.
+ */
+struct EmberAfPluginDoorLockYearDaySchedule
+{
+    uint32_t localStartTime; /** The starting time for the Year Day schedule in Epoch Time in Seconds with local time offset based
+                                on the local timezone and DST offset on the day represented by the value. */
+    uint32_t localEndTime;   /** The ending time for the Year Day schedule in Epoch Time in Seconds with local time offset based on
+                              * the local timezone and DST offset on the day represented by the value. */
+};
+
+/**
+ * @brief This callback is called when Door Lock cluster needs to access the Week Day schedule in the schedules database.
+ *
+ * @param endpointId ID of the endpoint which contains the lock.
+ * @param weekdayIndex Index of the week day schedule to access. It is guaranteed to be within limits declared in the spec for
+ *                     week day schedule (from 1 up to NumberOfWeekDaySchedulesSupportedPerUser).
+ * @param userIndex Index of the user to get week day schedule. It is guaranteed to be within limits declared in the spec (from 1 up
+ *                  to the value of NumberOfUsersSupported attribute).
+ * @param[out] schedule Resulting week day schedule.
+ *
+ * @retval DlStatus::kSuccess if schedule was retrieved successfully
+ * @retval DlStatus::kNotFound if the schedule or user does not exist
+ * @retval DlStatus::kFailure in case of any other failure
+ */
+DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
+                                          EmberAfPluginDoorLockWeekDaySchedule & schedule);
+/**
+ * @brief This callback is called when Door Lock cluster needs to access the Year Day schedule in the schedules database.
+ *
+ * @param endpointId ID of the endpoint which contains the lock.
+ * @param yearDayIndex Index of the year day schedule to access. It is guaranteed to be within limits declared in the spec for
+ *                     year day schedule (from 1 up to NumberOfYearDaySchedulesSupportedPerUser)
+ * @param userIndex Index of the user to get year day schedule. It is guaranteed to be within limits declared in the spec (from 1 up
+ *                  to the value of NumberOfUsersSupported attribute).
+ * @param[out] schedule Resulting year day schedule.
+ *
+ * @retval DlStatus::kSuccess if schedule was retrieved successfully
+ * @retval DlStatus::kNotFound if the schedule or user does not exist
+ * @retval DlStatus::kFailure in case of any other failure
+ */
+DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
+                                          EmberAfPluginDoorLockYearDaySchedule & schedule);
+
+/**
+ * @brief This callback is called when Door Lock cluster needs to create, modify or clear the week day schedule in schedules
+ * database.
+ *
+ * @param endpointId ID of the endpoint which contains the lock.
+ * @param weekdayIndex Index of the week day schedule to access. It is guaranteed to be within limits declared in the spec for
+ *                     week day schedule (from 1 up to NumberOfWeekDaySchedulesSupportedPerUser).
+ * @param userIndex Index of the user to get year day schedule. It is guaranteed to be within limits declared in the spec (from 1 up
+ *                  to the value of NumberOfUsersSupported attribute).
+ * @param status New status of the schedule slot (occupied/available). DlScheduleStatus::kAvailable means that the
+ *               schedules must be deleted.
+ * @param daysMask Indicates the days of the week the Week Day schedule applies for.
+ * @param startHour Starting hour for the Week Day schedule.
+ * @param startMinute Starting minute for the Week Day schedule
+ * @param endHour Ending hour for the Week Day schedule. Guaranteed to be greater or equal to \p startHour.
+ * @param endMinute Ending minute for the Week Day schedule. If \p endHour is equal to \p startHour then EndMinute
+ *                  is guaranteed to be greater than \p startMinute.
+ *
+ * @retval DlStatus::kSuccess if schedule was successfully modified
+ * @retval DlStatus::kNotFound if the schedule or user does not exist
+ * @retval DlStatus::kFailure in case of any other failure
+ */
+DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
+                                          DlScheduleStatus status, DlDaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute,
+                                          uint8_t endHour, uint8_t endMinute);
+/**
+ * @brief This callback is called when Door Lock cluster needs to create, modify or clear the year day schedule in schedules
+ * database.
+ *
+ * @param endpointId ID of the endpoint which contains the lock.
+ * @param yearDayIndex Index of the year day schedule to access. It is guaranteed to be within limits declared in the spec for
+ *                     year day schedule (from 1 up to NumberOfYearDaySchedulesSupportedPerUser).
+ * @param userIndex Index of the user to get year day schedule. It is guaranteed to be within limits declared in the spec (from 1 up
+ *                  to the value of NumberOfUsersSupported attribute).
+ * @param status New status of the schedule slot (occupied/available). DlScheduleStatus::kAvailable means that the
+ *               schedules must be deleted.
+ * @param localStartTime The starting time for the Year Day schedule in Epoch Time in Seconds with local time offset based on the
+ *                       local timezone and DST offset on the day represented by the value.
+ * @param localEndTime The ending time for the Year Day schedule in Epoch Time in Seconds with local time offset based on the local
+ *                     timezone and DST offset on the day represented by the value. \p localEndTime is guaranteed to be greater than
+ *                     \p localStartTime.
+ *
+ * @retval DlStatus::kSuccess if schedule was successfully modified
+ * @retval DlStatus::kNotFound if the schedule or user does not exist
+ * @retval DlStatus::kFailure in case of any other failure
+ */
+DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
+                                          DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime);
+
+typedef bool (*EmberAfDoorLockLockUnlockCommand)(chip::EndpointId endpointId, const chip::Optional<chip::ByteSpan> & pinCode);
+
+/**
+ * @brief This callback is called when Door Lock cluster needs to issue command to lock the door.
+ *
+ * @param endpointId ID of the endpoint which contains the lock.
+ * @param[in] pinCode PIN code that is used to lock the door. Could be absent if attribute RequirePINforRemoteOperation is not set
+ * or set to false.
+ *
+ * @return true if the door was locked, false in case of any failure.
+ */
+bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pinCode);
+
+/**
+ * @brief This callback is called when Door Lock cluster needs to issue command to unlock the door.
+ *
+ * @param endpointId ID of the endpoint which contains the lock.
+ * @param[in[ pinCode PIN code that is used to unlock the door. Could be absent if attribute RequirePINforRemoteOperation is not set
+ * or set to false.
+ *
+ * @return true if the door was unlocked, false in case of any failure.
+ */
+bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pinCode);
+
+bool emberAfPluginDoorLockOnDoorUnlockWithTimeoutCommand(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pinCode,
                                                          uint16_t timeout);
 
 // =============================================================================

@@ -35,11 +35,17 @@ CHIP_ERROR CASEClient::EstablishSession(PeerId peer, const Transport::PeerAddres
     Optional<SessionHandle> session = mInitParams.sessionManager->CreateUnauthenticatedSession(peerAddress, mrpConfig);
     VerifyOrReturnError(session.HasValue(), CHIP_ERROR_NO_MEMORY);
 
-    Messaging::ExchangeContext * exchange = mInitParams.exchangeMgr->NewContext(session.Value(), &mCASESession);
-    VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_INTERNAL);
-
     uint16_t keyID = 0;
     ReturnErrorOnFailure(mInitParams.idAllocator->Allocate(keyID));
+
+    // Allocate the exchange immediately before calling CASESession::EstablishSession.
+    //
+    // CASESession::EstablishSession takes ownership of the exchange and will
+    // free it on error, but can only do this if it is actually called.
+    // Allocating the exchange context right before calling EstablishSession
+    // ensures that if allocation succeeds, CASESession has taken ownership.
+    Messaging::ExchangeContext * exchange = mInitParams.exchangeMgr->NewContext(session.Value(), &mCASESession);
+    VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_INTERNAL);
 
     ReturnErrorOnFailure(mCASESession.EstablishSession(peerAddress, mInitParams.fabricInfo, peer.GetNodeId(), keyID, exchange, this,
                                                        mInitParams.mrpLocalConfig));

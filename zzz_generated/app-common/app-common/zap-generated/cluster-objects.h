@@ -11935,6 +11935,15 @@ enum class ThreadConnectionStatus : uint8_t
     kNotConnected = 0x01,
 };
 
+// Bitmap for ThreadNetworkDiagnosticsFeature
+enum class ThreadNetworkDiagnosticsFeature : uint32_t
+{
+    kPacketCounts = 0x1,
+    kErrorCounts  = 0x2,
+    kMLECounts    = 0x4,
+    kMACCounts    = 0x8,
+};
+
 namespace Structs {
 namespace NeighborTable {
 enum class Fields
@@ -12156,9 +12165,9 @@ struct TypeInfo
 namespace NetworkName {
 struct TypeInfo
 {
-    using Type             = chip::ByteSpan;
-    using DecodableType    = chip::ByteSpan;
-    using DecodableArgType = chip::ByteSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NetworkName::Id; }
@@ -14564,7 +14573,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -14601,7 +14610,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -14630,7 +14639,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -17360,7 +17369,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -17392,7 +17401,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -17426,7 +17435,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -17547,7 +17556,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -17655,7 +17664,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -17684,7 +17693,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -17903,14 +17912,14 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GetWeekDayScheduleResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t weekDayIndex                   = static_cast<uint8_t>(0);
-    uint16_t userIndex                     = static_cast<uint16_t>(0);
-    DlStatus status                        = static_cast<DlStatus>(0);
-    chip::BitFlags<DlDaysMaskMap> daysMask = static_cast<chip::BitFlags<DlDaysMaskMap>>(0);
-    uint8_t startHour                      = static_cast<uint8_t>(0);
-    uint8_t startMinute                    = static_cast<uint8_t>(0);
-    uint8_t endHour                        = static_cast<uint8_t>(0);
-    uint8_t endMinute                      = static_cast<uint8_t>(0);
+    uint8_t weekDayIndex = static_cast<uint8_t>(0);
+    uint16_t userIndex   = static_cast<uint16_t>(0);
+    DlStatus status      = static_cast<DlStatus>(0);
+    Optional<chip::BitFlags<DlDaysMaskMap>> daysMask;
+    Optional<uint8_t> startHour;
+    Optional<uint8_t> startMinute;
+    Optional<uint8_t> endHour;
+    Optional<uint8_t> endMinute;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -17925,14 +17934,14 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GetWeekDayScheduleResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t weekDayIndex                   = static_cast<uint8_t>(0);
-    uint16_t userIndex                     = static_cast<uint16_t>(0);
-    DlStatus status                        = static_cast<DlStatus>(0);
-    chip::BitFlags<DlDaysMaskMap> daysMask = static_cast<chip::BitFlags<DlDaysMaskMap>>(0);
-    uint8_t startHour                      = static_cast<uint8_t>(0);
-    uint8_t startMinute                    = static_cast<uint8_t>(0);
-    uint8_t endHour                        = static_cast<uint8_t>(0);
-    uint8_t endMinute                      = static_cast<uint8_t>(0);
+    uint8_t weekDayIndex = static_cast<uint8_t>(0);
+    uint16_t userIndex   = static_cast<uint16_t>(0);
+    DlStatus status      = static_cast<DlStatus>(0);
+    Optional<chip::BitFlags<DlDaysMaskMap>> daysMask;
+    Optional<uint8_t> startHour;
+    Optional<uint8_t> startMinute;
+    Optional<uint8_t> endHour;
+    Optional<uint8_t> endMinute;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetWeekDayScheduleResponse
@@ -18064,11 +18073,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GetYearDayScheduleResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t yearDayIndex    = static_cast<uint8_t>(0);
-    uint16_t userIndex      = static_cast<uint16_t>(0);
-    DlStatus status         = static_cast<DlStatus>(0);
-    uint32_t localStartTime = static_cast<uint32_t>(0);
-    uint32_t localEndTime   = static_cast<uint32_t>(0);
+    uint8_t yearDayIndex = static_cast<uint8_t>(0);
+    uint16_t userIndex   = static_cast<uint16_t>(0);
+    DlStatus status      = static_cast<DlStatus>(0);
+    Optional<uint32_t> localStartTime;
+    Optional<uint32_t> localEndTime;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -18083,11 +18092,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GetYearDayScheduleResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t yearDayIndex    = static_cast<uint8_t>(0);
-    uint16_t userIndex      = static_cast<uint16_t>(0);
-    DlStatus status         = static_cast<DlStatus>(0);
-    uint32_t localStartTime = static_cast<uint32_t>(0);
-    uint32_t localEndTime   = static_cast<uint32_t>(0);
+    uint8_t yearDayIndex = static_cast<uint8_t>(0);
+    uint16_t userIndex   = static_cast<uint16_t>(0);
+    DlStatus status      = static_cast<DlStatus>(0);
+    Optional<uint32_t> localStartTime;
+    Optional<uint32_t> localEndTime;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetYearDayScheduleResponse
@@ -18216,11 +18225,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GetHolidayScheduleResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t holidayIndex          = static_cast<uint8_t>(0);
-    DlStatus status               = static_cast<DlStatus>(0);
-    uint32_t localStartTime       = static_cast<uint32_t>(0);
-    uint32_t localEndTime         = static_cast<uint32_t>(0);
-    DlOperatingMode operatingMode = static_cast<DlOperatingMode>(0);
+    uint8_t holidayIndex = static_cast<uint8_t>(0);
+    DlStatus status      = static_cast<DlStatus>(0);
+    Optional<uint32_t> localStartTime;
+    Optional<uint32_t> localEndTime;
+    Optional<DlOperatingMode> operatingMode;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -18235,11 +18244,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GetHolidayScheduleResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t holidayIndex          = static_cast<uint8_t>(0);
-    DlStatus status               = static_cast<DlStatus>(0);
-    uint32_t localStartTime       = static_cast<uint32_t>(0);
-    uint32_t localEndTime         = static_cast<uint32_t>(0);
-    DlOperatingMode operatingMode = static_cast<DlOperatingMode>(0);
+    uint8_t holidayIndex = static_cast<uint8_t>(0);
+    DlStatus status      = static_cast<DlStatus>(0);
+    Optional<uint32_t> localStartTime;
+    Optional<uint32_t> localEndTime;
+    Optional<DlOperatingMode> operatingMode;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetHolidayScheduleResponse
@@ -18402,7 +18411,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -18510,7 +18519,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -18539,7 +18548,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -18582,7 +18591,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -18711,7 +18720,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -18853,7 +18862,7 @@ public:
 
     using ResponseType = Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -18998,7 +19007,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -19150,9 +19159,9 @@ struct TypeInfo
 namespace NumberOfWeekDaySchedulesSupportedPerUser {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfWeekDaySchedulesSupportedPerUser::Id; }
@@ -19162,9 +19171,9 @@ struct TypeInfo
 namespace NumberOfYearDaySchedulesSupportedPerUser {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfYearDaySchedulesSupportedPerUser::Id; }
@@ -19174,9 +19183,9 @@ struct TypeInfo
 namespace NumberOfHolidaySchedulesSupported {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfHolidaySchedulesSupported::Id; }
@@ -19613,11 +19622,11 @@ struct TypeInfo
         Attributes::NumberOfPINUsersSupported::TypeInfo::DecodableType numberOfPINUsersSupported     = static_cast<uint16_t>(0);
         Attributes::NumberOfRFIDUsersSupported::TypeInfo::DecodableType numberOfRFIDUsersSupported   = static_cast<uint16_t>(0);
         Attributes::NumberOfWeekDaySchedulesSupportedPerUser::TypeInfo::DecodableType numberOfWeekDaySchedulesSupportedPerUser =
-            static_cast<uint16_t>(0);
+            static_cast<uint8_t>(0);
         Attributes::NumberOfYearDaySchedulesSupportedPerUser::TypeInfo::DecodableType numberOfYearDaySchedulesSupportedPerUser =
-            static_cast<uint16_t>(0);
+            static_cast<uint8_t>(0);
         Attributes::NumberOfHolidaySchedulesSupported::TypeInfo::DecodableType numberOfHolidaySchedulesSupported =
-            static_cast<uint16_t>(0);
+            static_cast<uint8_t>(0);
         Attributes::MaxPINCodeLength::TypeInfo::DecodableType maxPINCodeLength             = static_cast<uint8_t>(0);
         Attributes::MinPINCodeLength::TypeInfo::DecodableType minPINCodeLength             = static_cast<uint8_t>(0);
         Attributes::MaxRFIDCodeLength::TypeInfo::DecodableType maxRFIDCodeLength           = static_cast<uint8_t>(0);
@@ -19742,7 +19751,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::LockOperation::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = true;
+    static constexpr bool kIsFabricScoped = false;
 
     DlLockOperationType lockOperationType = static_cast<DlLockOperationType>(0);
     DlOperationSource operationSource     = static_cast<DlOperationSource>(0);
@@ -19750,8 +19759,6 @@ public:
     DataModel::Nullable<chip::FabricIndex> fabricIndex;
     DataModel::Nullable<chip::NodeId> sourceNode;
     Optional<DataModel::Nullable<DataModel::List<const Structs::DlCredential::Type>>> credentials;
-
-    auto GetFabricIndex() const { return fabricIndex; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -19793,7 +19800,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::LockOperationError::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = true;
+    static constexpr bool kIsFabricScoped = false;
 
     DlLockOperationType lockOperationType = static_cast<DlLockOperationType>(0);
     DlOperationSource operationSource     = static_cast<DlOperationSource>(0);
@@ -19802,8 +19809,6 @@ public:
     DataModel::Nullable<chip::FabricIndex> fabricIndex;
     DataModel::Nullable<chip::NodeId> sourceNode;
     Optional<DataModel::Nullable<DataModel::List<const Structs::DlCredential::Type>>> credentials;
-
-    auto GetFabricIndex() const { return fabricIndex; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -19846,7 +19851,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::LockUserChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = true;
+    static constexpr bool kIsFabricScoped = false;
 
     DlLockDataType lockDataType           = static_cast<DlLockDataType>(0);
     DlDataOperationType dataOperationType = static_cast<DlDataOperationType>(0);
@@ -19855,8 +19860,6 @@ public:
     DataModel::Nullable<chip::FabricIndex> fabricIndex;
     DataModel::Nullable<chip::NodeId> sourceNode;
     DataModel::Nullable<uint16_t> dataIndex;
-
-    auto GetFabricIndex() const { return fabricIndex; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -33802,7 +33805,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return true; }
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -33836,7 +33839,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType

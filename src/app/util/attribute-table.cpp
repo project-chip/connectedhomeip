@@ -48,7 +48,6 @@
 // for pulling in defines dealing with EITHER server or client
 #include "app/util/common.h"
 #include <app-common/zap-generated/callback.h>
-#include <app/util/af-main.h>
 #include <app/util/error-mapping.h>
 #include <app/util/odd-sized-integers.h>
 
@@ -164,11 +163,11 @@ void emberAfPrintAttributeTable(void)
         emberAfAttributesFlush();
         for (clusterIndex = 0; clusterIndex < ep->endpointType->clusterCount; clusterIndex++)
         {
-            EmberAfCluster * cluster = &(ep->endpointType->cluster[clusterIndex]);
+            const EmberAfCluster * cluster = &(ep->endpointType->cluster[clusterIndex]);
 
             for (attributeIndex = 0; attributeIndex < cluster->attributeCount; attributeIndex++)
             {
-                EmberAfAttributeMetadata * metaData = &(cluster->attributes[attributeIndex]);
+                const EmberAfAttributeMetadata * metaData = &(cluster->attributes[attributeIndex]);
 
                 // Depending on user config, this loop can take a very long time to
                 // run and watchdog reset will  kick in. As a workaround, we'll
@@ -300,7 +299,7 @@ static bool IsNullValue(const uint8_t * data, uint16_t dataLen, bool isAttribute
 EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t mask, uint8_t * data,
                                  EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType, bool justTest)
 {
-    EmberAfAttributeMetadata * metadata = NULL;
+    const EmberAfAttributeMetadata * metadata = NULL;
     EmberAfAttributeSearchRecord record;
     record.endpoint    = endpoint;
     record.clusterId   = cluster;
@@ -445,7 +444,7 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
 EmberAfStatus emAfReadAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t mask, uint8_t * dataPtr,
                                 uint16_t readLength, EmberAfAttributeType * dataType)
 {
-    EmberAfAttributeMetadata * metadata = NULL;
+    const EmberAfAttributeMetadata * metadata = NULL;
     EmberAfAttributeSearchRecord record;
     EmberAfStatus status;
     record.endpoint    = endpoint;

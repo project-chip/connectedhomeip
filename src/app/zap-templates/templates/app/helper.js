@@ -230,6 +230,25 @@ function chip_endpoint_cluster_list()
   return ret.concat('}\n');
 }
 
+/**
+ * Return the number of data versions we need for our fixed endpoints.
+ *
+ * This is just the count of server clusters on those endpoints.
+ */
+function chip_endpoint_data_version_count()
+{
+  let serverCount = 0;
+  for (const ep of this.endpoints) {
+    let epType = this.endpointTypes.find(type => type.id == ep.endpointTypeRef);
+    for (const cluster of epType.clusters) {
+      if (cluster.side == "server") {
+        ++serverCount;
+      }
+    }
+  }
+  return serverCount;
+}
+
 //  End of Endpoint-config specific helpers
 
 function asPrintFormat(type)
@@ -750,6 +769,7 @@ exports.asPrintFormat                       = asPrintFormat;
 exports.asReadType                          = asReadType;
 exports.chip_endpoint_generated_functions   = chip_endpoint_generated_functions
 exports.chip_endpoint_cluster_list          = chip_endpoint_cluster_list
+exports.chip_endpoint_data_version_count    = chip_endpoint_data_version_count;
 exports.asTypedLiteral                      = asTypedLiteral;
 exports.asLowerCamelCase                    = asLowerCamelCase;
 exports.asUpperCamelCase                    = asUpperCamelCase;

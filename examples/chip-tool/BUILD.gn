@@ -33,6 +33,8 @@ config("config") {
   ]
 
   defines = [ "CONFIG_USE_SEPARATE_EVENTLOOP=${config_use_separate_eventloop}" ]
+
+  cflags = [ "-Wconversion" ]
 }
 
 static_library("chip-tool-utils") {
@@ -65,7 +67,7 @@ static_library("chip-tool-utils") {
     "config/PersistentStorage.cpp",
   ]
 
-  deps = [
+  public_deps = [
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/tests/suites/commands/log",
     "${chip_root}/src/app/tests/suites/pics",
@@ -76,12 +78,10 @@ static_library("chip-tool-utils") {
     "${chip_root}/third_party/jsoncpp",
   ]
 
-  cflags = [ "-Wconversion" ]
-
   public_configs = [ ":config" ]
 
   if (chip_enable_transport_trace) {
-    deps += [ "${chip_root}/examples/common/tracing:trace_handlers" ]
+    public_deps += [ "${chip_root}/examples/common/tracing:trace_handlers" ]
   }
 
   output_dir = root_out_dir
@@ -90,25 +90,7 @@ static_library("chip-tool-utils") {
 executable("chip-tool") {
   sources = [ "main.cpp" ]
 
-  deps = [
-    ":chip-tool-utils",
-    "${chip_root}/src/app/server",
-    "${chip_root}/src/app/tests/suites/commands/log",
-    "${chip_root}/src/app/tests/suites/pics",
-    "${chip_root}/src/controller/data_model",
-    "${chip_root}/src/lib",
-    "${chip_root}/src/platform",
-    "${chip_root}/third_party/inipp",
-    "${chip_root}/third_party/jsoncpp",
-  ]
-
-  cflags = [ "-Wconversion" ]
-
-  public_configs = [ ":config" ]
-
-  if (chip_enable_transport_trace) {
-    deps += [ "${chip_root}/examples/common/tracing:trace_handlers" ]
-  }
+  deps = [ ":chip-tool-utils" ]
 
   output_dir = root_out_dir
 }

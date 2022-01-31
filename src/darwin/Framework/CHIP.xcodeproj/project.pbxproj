@@ -20,12 +20,10 @@
 		1E85732826551A490050A4D9 /* attribute-table.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E85731826551A490050A4D9 /* attribute-table.cpp */; };
 		1E85732926551A490050A4D9 /* af-event.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E85731926551A490050A4D9 /* af-event.cpp */; };
 		1E85732A26551A490050A4D9 /* ember-compatibility-functions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E85731A26551A490050A4D9 /* ember-compatibility-functions.cpp */; };
-		1E85732B26551A490050A4D9 /* af-main-common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E85731B26551A490050A4D9 /* af-main-common.cpp */; };
 		1E85732C26551A490050A4D9 /* DataModelHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E85731C26551A490050A4D9 /* DataModelHandler.cpp */; };
 		1E85732D26551A490050A4D9 /* util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E85731D26551A490050A4D9 /* util.cpp */; };
 		1E85732E26551A490050A4D9 /* ember-print.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E85731E26551A490050A4D9 /* ember-print.cpp */; };
 		1E85732F26551A490050A4D9 /* attribute-size-util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E85731F26551A490050A4D9 /* attribute-size-util.cpp */; };
-		1E85733126551A490050A4D9 /* chip-message-send.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E85732126551A490050A4D9 /* chip-message-send.cpp */; };
 		1EB41B7B263C4CC60048E4C1 /* CHIPClustersTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1EB41B7A263C4CC60048E4C1 /* CHIPClustersTests.m */; };
 		1EC3238D271999E2002A8BF0 /* cluster-objects.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1EC3238C271999E2002A8BF0 /* cluster-objects.cpp */; };
 		1EC4CE5D25CC26E900D7304F /* CHIPClustersObjc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1EC4CE5925CC26E900D7304F /* CHIPClustersObjc.mm */; };
@@ -110,12 +108,10 @@
 		1E85731826551A490050A4D9 /* attribute-table.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "attribute-table.cpp"; path = "../../../app/util/attribute-table.cpp"; sourceTree = "<group>"; };
 		1E85731926551A490050A4D9 /* af-event.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "af-event.cpp"; path = "../../../app/util/af-event.cpp"; sourceTree = "<group>"; };
 		1E85731A26551A490050A4D9 /* ember-compatibility-functions.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "ember-compatibility-functions.cpp"; path = "../../../app/util/ember-compatibility-functions.cpp"; sourceTree = "<group>"; };
-		1E85731B26551A490050A4D9 /* af-main-common.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "af-main-common.cpp"; path = "../../../app/util/af-main-common.cpp"; sourceTree = "<group>"; };
 		1E85731C26551A490050A4D9 /* DataModelHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DataModelHandler.cpp; path = ../../../app/util/DataModelHandler.cpp; sourceTree = "<group>"; };
 		1E85731D26551A490050A4D9 /* util.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = util.cpp; path = ../../../app/util/util.cpp; sourceTree = "<group>"; };
 		1E85731E26551A490050A4D9 /* ember-print.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "ember-print.cpp"; path = "../../../app/util/ember-print.cpp"; sourceTree = "<group>"; };
 		1E85731F26551A490050A4D9 /* attribute-size-util.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "attribute-size-util.cpp"; path = "../../../app/util/attribute-size-util.cpp"; sourceTree = "<group>"; };
-		1E85732126551A490050A4D9 /* chip-message-send.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "chip-message-send.cpp"; path = "../../../app/util/chip-message-send.cpp"; sourceTree = "<group>"; };
 		1EB41B7A263C4CC60048E4C1 /* CHIPClustersTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHIPClustersTests.m; sourceTree = "<group>"; };
 		1EC3238C271999E2002A8BF0 /* cluster-objects.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "cluster-objects.cpp"; path = "../../../../zzz_generated/app-common/app-common/zap-generated/cluster-objects.cpp"; sourceTree = "<group>"; };
 		1EC4CE5925CC26E900D7304F /* CHIPClustersObjc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CHIPClustersObjc.mm; path = "zap-generated/CHIPClustersObjc.mm"; sourceTree = "<group>"; };
@@ -207,12 +203,10 @@
 				2F79A67626CE6672006377B0 /* im-client-callbacks.cpp */,
 				2FD775542695557E00FF4B12 /* error-mapping.cpp */,
 				1E85731926551A490050A4D9 /* af-event.cpp */,
-				1E85731B26551A490050A4D9 /* af-main-common.cpp */,
 				1E85731F26551A490050A4D9 /* attribute-size-util.cpp */,
 				1E85731626551A490050A4D9 /* attribute-storage.cpp */,
 				1E85731826551A490050A4D9 /* attribute-table.cpp */,
 				1E85731226551A490050A4D9 /* binding-table.cpp */,
-				1E85732126551A490050A4D9 /* chip-message-send.cpp */,
 				1E85731726551A490050A4D9 /* client-api.cpp */,
 				1E85731C26551A490050A4D9 /* DataModelHandler.cpp */,
 				1E85731A26551A490050A4D9 /* ember-compatibility-functions.cpp */,
@@ -522,7 +516,6 @@
 				1ED276E026C57CF000547A89 /* CHIPCallbackBridge.mm in Sources */,
 				1E85732D26551A490050A4D9 /* util.cpp in Sources */,
 				513DDB8A2761F6F900DAA01A /* CHIPAttributeTLVValueDecoder.mm in Sources */,
-				1E85732B26551A490050A4D9 /* af-main-common.cpp in Sources */,
 				2FD775552695557E00FF4B12 /* error-mapping.cpp in Sources */,
 				1E85732A26551A490050A4D9 /* ember-compatibility-functions.cpp in Sources */,
 				B289D4222639C0D300D4E314 /* CHIPOnboardingPayloadParser.m in Sources */,
@@ -534,7 +527,6 @@
 				1E85732826551A490050A4D9 /* attribute-table.cpp in Sources */,
 				1E85732626551A490050A4D9 /* attribute-storage.cpp in Sources */,
 				1E85732C26551A490050A4D9 /* DataModelHandler.cpp in Sources */,
-				1E85733126551A490050A4D9 /* chip-message-send.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

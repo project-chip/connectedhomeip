@@ -323,7 +323,7 @@ CHIP_ERROR ShutdownCommissioner()
 class PairingCommand : public Controller::DevicePairingDelegate, public Controller::DeviceAddressUpdateDelegate
 {
 public:
-    PairingCommand() : mSuccessCallback(OnSuccessResponse, this), mFailureCallback(OnFailureResponse, this){};
+    PairingCommand(){};
 
     /////////// DevicePairingDelegate Interface /////////
     void OnStatusUpdate(Controller::DevicePairingDelegate::Status status) override;
@@ -337,12 +337,9 @@ public:
     CHIP_ERROR UpdateNetworkAddress();
 
     /* Callback when command results in success */
-    static void OnSuccessResponse(void * context);
+    static void OnSuccessResponse(void * context, const chip::app::DataModel::NullObjectType &);
     /* Callback when command results in failure */
-    static void OnFailureResponse(void * context, uint8_t status);
-
-    Callback::Callback<DefaultSuccessCallback> mSuccessCallback;
-    Callback::Callback<DefaultFailureCallback> mFailureCallback;
+    static void OnFailureResponse(void * context, CHIP_ERROR error);
 };
 
 PairingCommand gPairingCommand;
@@ -401,12 +398,12 @@ void PairingCommand::OnPairingDeleted(CHIP_ERROR err)
     }
 }
 
-void PairingCommand::OnSuccessResponse(void * context)
+void PairingCommand::OnSuccessResponse(void * context, const chip::app::DataModel::NullObjectType &)
 {
     ChipLogProgress(Controller, "OnSuccessResponse");
 }
 
-void PairingCommand::OnFailureResponse(void * context, uint8_t status)
+void PairingCommand::OnFailureResponse(void * context, CHIP_ERROR error)
 {
     ChipLogProgress(Controller, "OnFailureResponse");
 }
@@ -423,15 +420,12 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
         // - the cluster(s) chosen should come from the App Platform
         constexpr EndpointId kBindingClusterEndpoint = 0;
 
-        Callback::Cancelable * successCallback = mSuccessCallback.Cancel();
-        Callback::Cancelable * failureCallback = mFailureCallback.Cancel();
-
         GroupId groupId       = kUndefinedGroupId;
         EndpointId endpointId = 1;
         ClusterId clusterId   = kInvalidClusterId;
 
         gCommissioner.CreateBindingWithCallback(nodeId, kBindingClusterEndpoint, gLocalId, groupId, endpointId, clusterId,
-                                                successCallback, failureCallback);
+                                                OnSuccessResponse, OnFailureResponse);
     }
     else
     {

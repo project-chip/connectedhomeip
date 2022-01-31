@@ -168,17 +168,20 @@ public:
         printf("TestDescriptorCluster\n");
         printf("TestBasicInformation\n");
         printf("TestIdentifyCluster\n");
-        printf("TestGroupsCluster\n");
-        printf("TestGroupKeyManagementCluster\n");
         printf("TestOperationalCredentialsCluster\n");
         printf("TestModeSelectCluster\n");
-        printf("TestGroupMessaging\n");
         printf("Test_TC_SWDIAG_1_1\n");
         printf("Test_TC_SWDIAG_2_1\n");
         printf("Test_TC_SWDIAG_3_1\n");
         printf("TestSubscribe_OnOff\n");
         printf("DL_UsersAndCredentials\n");
         printf("DL_LockUnlock\n");
+        printf("DL_Schedules\n");
+        printf("TestGroupMessaging\n");
+        printf("TestGroupsCluster\n");
+        printf("TestGroupDemoCommand\n");
+        printf("TestGroupDemoConfig\n");
+        printf("TestGroupKeyManagementCluster\n");
 
         return CHIP_NO_ERROR;
     }
@@ -187,7 +190,7 @@ public:
 class Test_TC_BI_1_1 : public TestCommand
 {
 public:
-    Test_TC_BI_1_1() : TestCommand("Test_TC_BI_1_1"), mTestIndex(0)
+    Test_TC_BI_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_BI_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -439,7 +442,7 @@ private:
 class Test_TC_BI_2_1 : public TestCommand
 {
 public:
-    Test_TC_BI_2_1() : TestCommand("Test_TC_BI_2_1"), mTestIndex(0)
+    Test_TC_BI_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_BI_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -912,7 +915,7 @@ private:
 class Test_TC_BI_2_2 : public TestCommand
 {
 public:
-    Test_TC_BI_2_2() : TestCommand("Test_TC_BI_2_2"), mTestIndex(0)
+    Test_TC_BI_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_BI_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -1323,7 +1326,8 @@ private:
 class Test_TC_BOOL_1_1 : public TestCommand
 {
 public:
-    Test_TC_BOOL_1_1() : TestCommand("Test_TC_BOOL_1_1"), mTestIndex(0)
+    Test_TC_BOOL_1_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_BOOL_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -1575,7 +1579,8 @@ private:
 class Test_TC_BOOL_2_1 : public TestCommand
 {
 public:
-    Test_TC_BOOL_2_1() : TestCommand("Test_TC_BOOL_2_1"), mTestIndex(0)
+    Test_TC_BOOL_2_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_BOOL_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -1790,7 +1795,8 @@ private:
 class Test_TC_BRAC_1_1 : public TestCommand
 {
 public:
-    Test_TC_BRAC_1_1() : TestCommand("Test_TC_BRAC_1_1"), mTestIndex(0)
+    Test_TC_BRAC_1_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_BRAC_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -1932,7 +1938,7 @@ private:
 class Test_TC_CC_1_1 : public TestCommand
 {
 public:
-    Test_TC_CC_1_1() : TestCommand("Test_TC_CC_1_1"), mTestIndex(0)
+    Test_TC_CC_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -2108,7 +2114,7 @@ private:
 class Test_TC_CC_2_1 : public TestCommand
 {
 public:
-    Test_TC_CC_2_1() : TestCommand("Test_TC_CC_2_1"), mTestIndex(0)
+    Test_TC_CC_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -7842,7 +7848,7 @@ private:
 class Test_TC_CC_3_1 : public TestCommand
 {
 public:
-    Test_TC_CC_3_1() : TestCommand("Test_TC_CC_3_1"), mTestIndex(0)
+    Test_TC_CC_3_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_3_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -8191,7 +8197,7 @@ private:
 class Test_TC_CC_3_2 : public TestCommand
 {
 public:
-    Test_TC_CC_3_2() : TestCommand("Test_TC_CC_3_2"), mTestIndex(0)
+    Test_TC_CC_3_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_3_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -8536,7 +8542,7 @@ private:
 class Test_TC_CC_3_3 : public TestCommand
 {
 public:
-    Test_TC_CC_3_3() : TestCommand("Test_TC_CC_3_3"), mTestIndex(0)
+    Test_TC_CC_3_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_3_3", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -8813,7 +8819,7 @@ private:
 class Test_TC_CC_4_1 : public TestCommand
 {
 public:
-    Test_TC_CC_4_1() : TestCommand("Test_TC_CC_4_1"), mTestIndex(0)
+    Test_TC_CC_4_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_4_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -9053,7 +9059,7 @@ private:
 class Test_TC_CC_4_2 : public TestCommand
 {
 public:
-    Test_TC_CC_4_2() : TestCommand("Test_TC_CC_4_2"), mTestIndex(0)
+    Test_TC_CC_4_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_4_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -9468,7 +9474,7 @@ private:
 class Test_TC_CC_4_3 : public TestCommand
 {
 public:
-    Test_TC_CC_4_3() : TestCommand("Test_TC_CC_4_3"), mTestIndex(0)
+    Test_TC_CC_4_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_4_3", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -9745,7 +9751,7 @@ private:
 class Test_TC_CC_4_4 : public TestCommand
 {
 public:
-    Test_TC_CC_4_4() : TestCommand("Test_TC_CC_4_4"), mTestIndex(0)
+    Test_TC_CC_4_4(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_4_4", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -9986,7 +9992,7 @@ private:
 class Test_TC_CC_5_1 : public TestCommand
 {
 public:
-    Test_TC_CC_5_1() : TestCommand("Test_TC_CC_5_1"), mTestIndex(0)
+    Test_TC_CC_5_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_5_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -10227,7 +10233,7 @@ private:
 class Test_TC_CC_5_2 : public TestCommand
 {
 public:
-    Test_TC_CC_5_2() : TestCommand("Test_TC_CC_5_2"), mTestIndex(0)
+    Test_TC_CC_5_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_5_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -10500,7 +10506,7 @@ private:
 class Test_TC_CC_5_3 : public TestCommand
 {
 public:
-    Test_TC_CC_5_3() : TestCommand("Test_TC_CC_5_3"), mTestIndex(0)
+    Test_TC_CC_5_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_5_3", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -10741,7 +10747,7 @@ private:
 class Test_TC_CC_6_1 : public TestCommand
 {
 public:
-    Test_TC_CC_6_1() : TestCommand("Test_TC_CC_6_1"), mTestIndex(0)
+    Test_TC_CC_6_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_6_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -10981,7 +10987,7 @@ private:
 class Test_TC_CC_6_2 : public TestCommand
 {
 public:
-    Test_TC_CC_6_2() : TestCommand("Test_TC_CC_6_2"), mTestIndex(0)
+    Test_TC_CC_6_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_6_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -11297,7 +11303,7 @@ private:
 class Test_TC_CC_6_3 : public TestCommand
 {
 public:
-    Test_TC_CC_6_3() : TestCommand("Test_TC_CC_6_3"), mTestIndex(0)
+    Test_TC_CC_6_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_6_3", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -11578,7 +11584,7 @@ private:
 class Test_TC_CC_7_1 : public TestCommand
 {
 public:
-    Test_TC_CC_7_1() : TestCommand("Test_TC_CC_7_1"), mTestIndex(0)
+    Test_TC_CC_7_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_7_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -11858,7 +11864,7 @@ private:
 class Test_TC_CC_7_2 : public TestCommand
 {
 public:
-    Test_TC_CC_7_2() : TestCommand("Test_TC_CC_7_2"), mTestIndex(0)
+    Test_TC_CC_7_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_7_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -12203,7 +12209,7 @@ private:
 class Test_TC_CC_7_3 : public TestCommand
 {
 public:
-    Test_TC_CC_7_3() : TestCommand("Test_TC_CC_7_3"), mTestIndex(0)
+    Test_TC_CC_7_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_7_3", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -12480,7 +12486,7 @@ private:
 class Test_TC_CC_7_4 : public TestCommand
 {
 public:
-    Test_TC_CC_7_4() : TestCommand("Test_TC_CC_7_4"), mTestIndex(0)
+    Test_TC_CC_7_4(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_7_4", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -12721,7 +12727,7 @@ private:
 class Test_TC_CC_8_1 : public TestCommand
 {
 public:
-    Test_TC_CC_8_1() : TestCommand("Test_TC_CC_8_1"), mTestIndex(0)
+    Test_TC_CC_8_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_8_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -13383,7 +13389,7 @@ private:
 class Test_TC_CC_9_1 : public TestCommand
 {
 public:
-    Test_TC_CC_9_1() : TestCommand("Test_TC_CC_9_1"), mTestIndex(0)
+    Test_TC_CC_9_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_9_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -14935,7 +14941,7 @@ private:
 class Test_TC_CC_9_2 : public TestCommand
 {
 public:
-    Test_TC_CC_9_2() : TestCommand("Test_TC_CC_9_2"), mTestIndex(0)
+    Test_TC_CC_9_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_9_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -15576,7 +15582,7 @@ private:
 class Test_TC_CC_9_3 : public TestCommand
 {
 public:
-    Test_TC_CC_9_3() : TestCommand("Test_TC_CC_9_3"), mTestIndex(0)
+    Test_TC_CC_9_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_9_3", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -16217,7 +16223,7 @@ private:
 class Test_TC_DD_1_5 : public TestCommand
 {
 public:
-    Test_TC_DD_1_5() : TestCommand("Test_TC_DD_1_5"), mTestIndex(0)
+    Test_TC_DD_1_5(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_5", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -16285,7 +16291,7 @@ private:
 class Test_TC_DD_1_6 : public TestCommand
 {
 public:
-    Test_TC_DD_1_6() : TestCommand("Test_TC_DD_1_6"), mTestIndex(0)
+    Test_TC_DD_1_6(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_6", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -16374,7 +16380,7 @@ private:
 class Test_TC_DD_1_7 : public TestCommand
 {
 public:
-    Test_TC_DD_1_7() : TestCommand("Test_TC_DD_1_7"), mTestIndex(0)
+    Test_TC_DD_1_7(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_7", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -16452,7 +16458,7 @@ private:
 class Test_TC_DD_1_8 : public TestCommand
 {
 public:
-    Test_TC_DD_1_8() : TestCommand("Test_TC_DD_1_8"), mTestIndex(0)
+    Test_TC_DD_1_8(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_8", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -16529,7 +16535,7 @@ private:
 class Test_TC_DD_1_9 : public TestCommand
 {
 public:
-    Test_TC_DD_1_9() : TestCommand("Test_TC_DD_1_9"), mTestIndex(0)
+    Test_TC_DD_1_9(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_9", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -16617,7 +16623,7 @@ private:
 class Test_TC_DM_1_1 : public TestCommand
 {
 public:
-    Test_TC_DM_1_1() : TestCommand("Test_TC_DM_1_1"), mTestIndex(0)
+    Test_TC_DM_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DM_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -17416,7 +17422,7 @@ private:
 class Test_TC_DM_3_1 : public TestCommand
 {
 public:
-    Test_TC_DM_3_1() : TestCommand("Test_TC_DM_3_1"), mTestIndex(0)
+    Test_TC_DM_3_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DM_3_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -17483,7 +17489,7 @@ private:
 class Test_TC_DM_2_2 : public TestCommand
 {
 public:
-    Test_TC_DM_2_2() : TestCommand("Test_TC_DM_2_2"), mTestIndex(0)
+    Test_TC_DM_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DM_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -17714,7 +17720,7 @@ private:
 class Test_TC_EMR_1_1 : public TestCommand
 {
 public:
-    Test_TC_EMR_1_1() : TestCommand("Test_TC_EMR_1_1"), mTestIndex(0)
+    Test_TC_EMR_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_EMR_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -17970,7 +17976,8 @@ private:
 class Test_TC_ETHDIAG_1_1 : public TestCommand
 {
 public:
-    Test_TC_ETHDIAG_1_1() : TestCommand("Test_TC_ETHDIAG_1_1"), mTestIndex(0)
+    Test_TC_ETHDIAG_1_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_ETHDIAG_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -18037,7 +18044,8 @@ private:
 class Test_TC_ETHDIAG_2_1 : public TestCommand
 {
 public:
-    Test_TC_ETHDIAG_2_1() : TestCommand("Test_TC_ETHDIAG_2_1"), mTestIndex(0)
+    Test_TC_ETHDIAG_2_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_ETHDIAG_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -18104,7 +18112,7 @@ private:
 class Test_TC_FLW_1_1 : public TestCommand
 {
 public:
-    Test_TC_FLW_1_1() : TestCommand("Test_TC_FLW_1_1"), mTestIndex(0)
+    Test_TC_FLW_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_FLW_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -18280,7 +18288,7 @@ private:
 class Test_TC_FLW_2_1 : public TestCommand
 {
 public:
-    Test_TC_FLW_2_1() : TestCommand("Test_TC_FLW_2_1"), mTestIndex(0)
+    Test_TC_FLW_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_FLW_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -18820,7 +18828,7 @@ private:
 class Test_TC_FLW_2_2 : public TestCommand
 {
 public:
-    Test_TC_FLW_2_2() : TestCommand("Test_TC_FLW_2_2"), mTestIndex(0)
+    Test_TC_FLW_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_FLW_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -18961,7 +18969,7 @@ private:
 class Test_TC_ILL_1_1 : public TestCommand
 {
 public:
-    Test_TC_ILL_1_1() : TestCommand("Test_TC_ILL_1_1"), mTestIndex(0)
+    Test_TC_ILL_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ILL_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -19218,7 +19226,7 @@ private:
 class Test_TC_LVL_1_1 : public TestCommand
 {
 public:
-    Test_TC_LVL_1_1() : TestCommand("Test_TC_LVL_1_1"), mTestIndex(0)
+    Test_TC_LVL_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LVL_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -19541,7 +19549,7 @@ private:
 class Test_TC_LVL_2_1 : public TestCommand
 {
 public:
-    Test_TC_LVL_2_1() : TestCommand("Test_TC_LVL_2_1"), mTestIndex(0)
+    Test_TC_LVL_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LVL_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -20142,7 +20150,7 @@ private:
 class Test_TC_LVL_2_2 : public TestCommand
 {
 public:
-    Test_TC_LVL_2_2() : TestCommand("Test_TC_LVL_2_2"), mTestIndex(0)
+    Test_TC_LVL_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LVL_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -20755,7 +20763,7 @@ private:
 class Test_TC_LVL_3_1 : public TestCommand
 {
 public:
-    Test_TC_LVL_3_1() : TestCommand("Test_TC_LVL_3_1"), mTestIndex(0)
+    Test_TC_LVL_3_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LVL_3_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -21268,7 +21276,7 @@ private:
 class Test_TC_LVL_4_1 : public TestCommand
 {
 public:
-    Test_TC_LVL_4_1() : TestCommand("Test_TC_LVL_4_1"), mTestIndex(0)
+    Test_TC_LVL_4_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LVL_4_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -21816,7 +21824,7 @@ private:
 class Test_TC_LVL_5_1 : public TestCommand
 {
 public:
-    Test_TC_LVL_5_1() : TestCommand("Test_TC_LVL_5_1"), mTestIndex(0)
+    Test_TC_LVL_5_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LVL_5_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -22242,7 +22250,7 @@ private:
 class Test_TC_LVL_6_1 : public TestCommand
 {
 public:
-    Test_TC_LVL_6_1() : TestCommand("Test_TC_LVL_6_1"), mTestIndex(0)
+    Test_TC_LVL_6_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LVL_6_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -22615,7 +22623,7 @@ private:
 class Test_TC_MC_1_1 : public TestCommand
 {
 public:
-    Test_TC_MC_1_1() : TestCommand("Test_TC_MC_1_1"), mTestIndex(0)
+    Test_TC_MC_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -22791,7 +22799,7 @@ private:
 class Test_TC_MC_2_1 : public TestCommand
 {
 public:
-    Test_TC_MC_2_1() : TestCommand("Test_TC_MC_2_1"), mTestIndex(0)
+    Test_TC_MC_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -22889,7 +22897,7 @@ private:
 class Test_TC_MC_3_1 : public TestCommand
 {
 public:
-    Test_TC_MC_3_1() : TestCommand("Test_TC_MC_3_1"), mTestIndex(0)
+    Test_TC_MC_3_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -22956,7 +22964,7 @@ private:
 class Test_TC_MC_3_2 : public TestCommand
 {
 public:
-    Test_TC_MC_3_2() : TestCommand("Test_TC_MC_3_2"), mTestIndex(0)
+    Test_TC_MC_3_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23023,7 +23031,7 @@ private:
 class Test_TC_MC_3_3 : public TestCommand
 {
 public:
-    Test_TC_MC_3_3() : TestCommand("Test_TC_MC_3_3"), mTestIndex(0)
+    Test_TC_MC_3_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_3", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23090,7 +23098,7 @@ private:
 class Test_TC_MC_3_4 : public TestCommand
 {
 public:
-    Test_TC_MC_3_4() : TestCommand("Test_TC_MC_3_4"), mTestIndex(0)
+    Test_TC_MC_3_4(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_4", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23157,7 +23165,7 @@ private:
 class Test_TC_MC_3_5 : public TestCommand
 {
 public:
-    Test_TC_MC_3_5() : TestCommand("Test_TC_MC_3_5"), mTestIndex(0)
+    Test_TC_MC_3_5(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_5", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23224,7 +23232,7 @@ private:
 class Test_TC_MC_3_6 : public TestCommand
 {
 public:
-    Test_TC_MC_3_6() : TestCommand("Test_TC_MC_3_6"), mTestIndex(0)
+    Test_TC_MC_3_6(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_6", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23291,7 +23299,7 @@ private:
 class Test_TC_MC_3_7 : public TestCommand
 {
 public:
-    Test_TC_MC_3_7() : TestCommand("Test_TC_MC_3_7"), mTestIndex(0)
+    Test_TC_MC_3_7(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_7", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23358,7 +23366,7 @@ private:
 class Test_TC_MC_3_8 : public TestCommand
 {
 public:
-    Test_TC_MC_3_8() : TestCommand("Test_TC_MC_3_8"), mTestIndex(0)
+    Test_TC_MC_3_8(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_8", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23425,7 +23433,7 @@ private:
 class Test_TC_MC_3_9 : public TestCommand
 {
 public:
-    Test_TC_MC_3_9() : TestCommand("Test_TC_MC_3_9"), mTestIndex(0)
+    Test_TC_MC_3_9(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_9", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23492,7 +23500,7 @@ private:
 class Test_TC_MC_3_10 : public TestCommand
 {
 public:
-    Test_TC_MC_3_10() : TestCommand("Test_TC_MC_3_10"), mTestIndex(0)
+    Test_TC_MC_3_10(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_10", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23559,7 +23567,7 @@ private:
 class Test_TC_MC_3_11 : public TestCommand
 {
 public:
-    Test_TC_MC_3_11() : TestCommand("Test_TC_MC_3_11"), mTestIndex(0)
+    Test_TC_MC_3_11(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_11", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23626,7 +23634,7 @@ private:
 class Test_TC_MC_5_1 : public TestCommand
 {
 public:
-    Test_TC_MC_5_1() : TestCommand("Test_TC_MC_5_1"), mTestIndex(0)
+    Test_TC_MC_5_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_5_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23733,7 +23741,7 @@ private:
 class Test_TC_MC_5_2 : public TestCommand
 {
 public:
-    Test_TC_MC_5_2() : TestCommand("Test_TC_MC_5_2"), mTestIndex(0)
+    Test_TC_MC_5_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_5_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23810,7 +23818,7 @@ private:
 class Test_TC_MC_5_3 : public TestCommand
 {
 public:
-    Test_TC_MC_5_3() : TestCommand("Test_TC_MC_5_3"), mTestIndex(0)
+    Test_TC_MC_5_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_5_3", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23887,7 +23895,7 @@ private:
 class Test_TC_MC_6_1 : public TestCommand
 {
 public:
-    Test_TC_MC_6_1() : TestCommand("Test_TC_MC_6_1"), mTestIndex(0)
+    Test_TC_MC_6_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_6_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -24032,7 +24040,7 @@ private:
 class Test_TC_MC_6_2 : public TestCommand
 {
 public:
-    Test_TC_MC_6_2() : TestCommand("Test_TC_MC_6_2"), mTestIndex(0)
+    Test_TC_MC_6_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_6_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -24207,7 +24215,7 @@ private:
 class Test_TC_MC_6_3 : public TestCommand
 {
 public:
-    Test_TC_MC_6_3() : TestCommand("Test_TC_MC_6_3"), mTestIndex(0)
+    Test_TC_MC_6_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_6_3", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -24304,7 +24312,7 @@ private:
 class Test_TC_MC_6_4 : public TestCommand
 {
 public:
-    Test_TC_MC_6_4() : TestCommand("Test_TC_MC_6_4"), mTestIndex(0)
+    Test_TC_MC_6_4(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_6_4", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -24545,7 +24553,7 @@ private:
 class Test_TC_MC_7_1 : public TestCommand
 {
 public:
-    Test_TC_MC_7_1() : TestCommand("Test_TC_MC_7_1"), mTestIndex(0)
+    Test_TC_MC_7_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_7_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -24612,7 +24620,7 @@ private:
 class Test_TC_MC_7_2 : public TestCommand
 {
 public:
-    Test_TC_MC_7_2() : TestCommand("Test_TC_MC_7_2"), mTestIndex(0)
+    Test_TC_MC_7_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_7_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -24679,7 +24687,7 @@ private:
 class Test_TC_MC_8_1 : public TestCommand
 {
 public:
-    Test_TC_MC_8_1() : TestCommand("Test_TC_MC_8_1"), mTestIndex(0)
+    Test_TC_MC_8_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_8_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -24829,7 +24837,7 @@ private:
 class Test_TC_MC_9_1 : public TestCommand
 {
 public:
-    Test_TC_MC_9_1() : TestCommand("Test_TC_MC_9_1"), mTestIndex(0)
+    Test_TC_MC_9_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_9_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -25132,7 +25140,7 @@ private:
 class Test_TC_OCC_1_1 : public TestCommand
 {
 public:
-    Test_TC_OCC_1_1() : TestCommand("Test_TC_OCC_1_1"), mTestIndex(0)
+    Test_TC_OCC_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OCC_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -25346,7 +25354,7 @@ private:
 class Test_TC_OCC_2_1 : public TestCommand
 {
 public:
-    Test_TC_OCC_2_1() : TestCommand("Test_TC_OCC_2_1"), mTestIndex(0)
+    Test_TC_OCC_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OCC_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -25756,7 +25764,7 @@ private:
 class Test_TC_OCC_2_2 : public TestCommand
 {
 public:
-    Test_TC_OCC_2_2() : TestCommand("Test_TC_OCC_2_2"), mTestIndex(0)
+    Test_TC_OCC_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OCC_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -25907,7 +25915,7 @@ private:
 class Test_TC_OO_1_1 : public TestCommand
 {
 public:
-    Test_TC_OO_1_1() : TestCommand("Test_TC_OO_1_1"), mTestIndex(0)
+    Test_TC_OO_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OO_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -26316,7 +26324,7 @@ private:
 class Test_TC_OO_2_1 : public TestCommand
 {
 public:
-    Test_TC_OO_2_1() : TestCommand("Test_TC_OO_2_1"), mTestIndex(0)
+    Test_TC_OO_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OO_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -26930,7 +26938,7 @@ private:
 class Test_TC_OO_2_2 : public TestCommand
 {
 public:
-    Test_TC_OO_2_2() : TestCommand("Test_TC_OO_2_2"), mTestIndex(0)
+    Test_TC_OO_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OO_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -27480,7 +27488,7 @@ private:
 class Test_TC_OO_2_3 : public TestCommand
 {
 public:
-    Test_TC_OO_2_3() : TestCommand("Test_TC_OO_2_3"), mTestIndex(0)
+    Test_TC_OO_2_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OO_2_3", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -29356,7 +29364,7 @@ private:
 class Test_TC_PS_1_1 : public TestCommand
 {
 public:
-    Test_TC_PS_1_1() : TestCommand("Test_TC_PS_1_1"), mTestIndex(0)
+    Test_TC_PS_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_PS_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -29608,7 +29616,7 @@ private:
 class Test_TC_PRS_1_1 : public TestCommand
 {
 public:
-    Test_TC_PRS_1_1() : TestCommand("Test_TC_PRS_1_1"), mTestIndex(0)
+    Test_TC_PRS_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_PRS_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -29785,7 +29793,7 @@ private:
 class Test_TC_PRS_2_1 : public TestCommand
 {
 public:
-    Test_TC_PRS_2_1() : TestCommand("Test_TC_PRS_2_1"), mTestIndex(0)
+    Test_TC_PRS_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_PRS_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -30185,7 +30193,7 @@ private:
 class Test_TC_PCC_1_1 : public TestCommand
 {
 public:
-    Test_TC_PCC_1_1() : TestCommand("Test_TC_PCC_1_1"), mTestIndex(0)
+    Test_TC_PCC_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_PCC_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -30402,7 +30410,7 @@ private:
 class Test_TC_PCC_2_1 : public TestCommand
 {
 public:
-    Test_TC_PCC_2_1() : TestCommand("Test_TC_PCC_2_1"), mTestIndex(0)
+    Test_TC_PCC_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_PCC_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -32336,7 +32344,7 @@ private:
 class Test_TC_PCC_2_2 : public TestCommand
 {
 public:
-    Test_TC_PCC_2_2() : TestCommand("Test_TC_PCC_2_2"), mTestIndex(0)
+    Test_TC_PCC_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_PCC_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -32520,7 +32528,7 @@ private:
 class Test_TC_PCC_2_3 : public TestCommand
 {
 public:
-    Test_TC_PCC_2_3() : TestCommand("Test_TC_PCC_2_3"), mTestIndex(0)
+    Test_TC_PCC_2_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_PCC_2_3", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -32948,7 +32956,7 @@ private:
 class Test_TC_RH_1_1 : public TestCommand
 {
 public:
-    Test_TC_RH_1_1() : TestCommand("Test_TC_RH_1_1"), mTestIndex(0)
+    Test_TC_RH_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_RH_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -33127,7 +33135,7 @@ private:
 class Test_TC_RH_2_1 : public TestCommand
 {
 public:
-    Test_TC_RH_2_1() : TestCommand("Test_TC_RH_2_1"), mTestIndex(0)
+    Test_TC_RH_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_RH_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -33351,7 +33359,7 @@ private:
 class Test_TC_RH_2_2 : public TestCommand
 {
 public:
-    Test_TC_RH_2_2() : TestCommand("Test_TC_RH_2_2"), mTestIndex(0)
+    Test_TC_RH_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_RH_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -33504,7 +33512,8 @@ private:
 class Test_TC_SWTCH_2_1 : public TestCommand
 {
 public:
-    Test_TC_SWTCH_2_1() : TestCommand("Test_TC_SWTCH_2_1"), mTestIndex(0)
+    Test_TC_SWTCH_2_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_SWTCH_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -33799,7 +33808,8 @@ private:
 class Test_TC_SWTCH_2_2 : public TestCommand
 {
 public:
-    Test_TC_SWTCH_2_2() : TestCommand("Test_TC_SWTCH_2_2"), mTestIndex(0)
+    Test_TC_SWTCH_2_2(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_SWTCH_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -34292,7 +34302,7 @@ private:
 class Test_TC_TM_1_1 : public TestCommand
 {
 public:
-    Test_TC_TM_1_1() : TestCommand("Test_TC_TM_1_1"), mTestIndex(0)
+    Test_TC_TM_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TM_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -34549,7 +34559,7 @@ private:
 class Test_TC_TM_2_1 : public TestCommand
 {
 public:
-    Test_TC_TM_2_1() : TestCommand("Test_TC_TM_2_1"), mTestIndex(0)
+    Test_TC_TM_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TM_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -34693,7 +34703,7 @@ private:
 class Test_TC_TM_2_2 : public TestCommand
 {
 public:
-    Test_TC_TM_2_2() : TestCommand("Test_TC_TM_2_2"), mTestIndex(0)
+    Test_TC_TM_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TM_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -34846,7 +34856,8 @@ private:
 class Test_TC_TSTAT_1_1 : public TestCommand
 {
 public:
-    Test_TC_TSTAT_1_1() : TestCommand("Test_TC_TSTAT_1_1"), mTestIndex(0)
+    Test_TC_TSTAT_1_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_TSTAT_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -35059,7 +35070,8 @@ private:
 class Test_TC_TSTAT_2_1 : public TestCommand
 {
 public:
-    Test_TC_TSTAT_2_1() : TestCommand("Test_TC_TSTAT_2_1"), mTestIndex(0)
+    Test_TC_TSTAT_2_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_TSTAT_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -37397,7 +37409,8 @@ private:
 class Test_TC_TSTAT_2_2 : public TestCommand
 {
 public:
-    Test_TC_TSTAT_2_2() : TestCommand("Test_TC_TSTAT_2_2"), mTestIndex(0)
+    Test_TC_TSTAT_2_2(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_TSTAT_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -39480,7 +39493,8 @@ private:
 class Test_TC_TSUIC_1_1 : public TestCommand
 {
 public:
-    Test_TC_TSUIC_1_1() : TestCommand("Test_TC_TSUIC_1_1"), mTestIndex(0)
+    Test_TC_TSUIC_1_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_TSUIC_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -39660,7 +39674,8 @@ private:
 class Test_TC_TSUIC_2_1 : public TestCommand
 {
 public:
-    Test_TC_TSUIC_2_1() : TestCommand("Test_TC_TSUIC_2_1"), mTestIndex(0)
+    Test_TC_TSUIC_2_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_TSUIC_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -40301,7 +40316,8 @@ private:
 class Test_TC_TSUIC_2_2 : public TestCommand
 {
 public:
-    Test_TC_TSUIC_2_2() : TestCommand("Test_TC_TSUIC_2_2"), mTestIndex(0)
+    Test_TC_TSUIC_2_2(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_TSUIC_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -40764,7 +40780,8 @@ private:
 class Test_TC_DIAGTH_1_1 : public TestCommand
 {
 public:
-    Test_TC_DIAGTH_1_1() : TestCommand("Test_TC_DIAGTH_1_1"), mTestIndex(0)
+    Test_TC_DIAGTH_1_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_DIAGTH_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -41021,7 +41038,8 @@ private:
 class Test_TC_WIFIDIAG_1_1 : public TestCommand
 {
 public:
-    Test_TC_WIFIDIAG_1_1() : TestCommand("Test_TC_WIFIDIAG_1_1"), mTestIndex(0)
+    Test_TC_WIFIDIAG_1_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WIFIDIAG_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -41165,7 +41183,8 @@ private:
 class Test_TC_WIFIDIAG_3_1 : public TestCommand
 {
 public:
-    Test_TC_WIFIDIAG_3_1() : TestCommand("Test_TC_WIFIDIAG_3_1"), mTestIndex(0)
+    Test_TC_WIFIDIAG_3_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WIFIDIAG_3_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -41232,7 +41251,8 @@ private:
 class Test_TC_WNCV_1_1 : public TestCommand
 {
 public:
-    Test_TC_WNCV_1_1() : TestCommand("Test_TC_WNCV_1_1"), mTestIndex(0)
+    Test_TC_WNCV_1_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WNCV_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -41562,7 +41582,8 @@ private:
 class Test_TC_WNCV_2_1 : public TestCommand
 {
 public:
-    Test_TC_WNCV_2_1() : TestCommand("Test_TC_WNCV_2_1"), mTestIndex(0)
+    Test_TC_WNCV_2_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WNCV_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -43734,7 +43755,8 @@ private:
 class Test_TC_WNCV_2_2 : public TestCommand
 {
 public:
-    Test_TC_WNCV_2_2() : TestCommand("Test_TC_WNCV_2_2"), mTestIndex(0)
+    Test_TC_WNCV_2_2(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WNCV_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -43801,7 +43823,8 @@ private:
 class Test_TC_WNCV_2_4 : public TestCommand
 {
 public:
-    Test_TC_WNCV_2_4() : TestCommand("Test_TC_WNCV_2_4"), mTestIndex(0)
+    Test_TC_WNCV_2_4(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WNCV_2_4", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -43955,7 +43978,8 @@ private:
 class Test_TC_WNCV_2_5 : public TestCommand
 {
 public:
-    Test_TC_WNCV_2_5() : TestCommand("Test_TC_WNCV_2_5"), mTestIndex(0)
+    Test_TC_WNCV_2_5(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WNCV_2_5", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -44109,7 +44133,8 @@ private:
 class Test_TC_WNCV_3_1 : public TestCommand
 {
 public:
-    Test_TC_WNCV_3_1() : TestCommand("Test_TC_WNCV_3_1"), mTestIndex(0)
+    Test_TC_WNCV_3_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WNCV_3_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -44276,7 +44301,8 @@ private:
 class Test_TC_WNCV_3_2 : public TestCommand
 {
 public:
-    Test_TC_WNCV_3_2() : TestCommand("Test_TC_WNCV_3_2"), mTestIndex(0)
+    Test_TC_WNCV_3_2(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WNCV_3_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -44443,7 +44469,8 @@ private:
 class Test_TC_WNCV_3_3 : public TestCommand
 {
 public:
-    Test_TC_WNCV_3_3() : TestCommand("Test_TC_WNCV_3_3"), mTestIndex(0)
+    Test_TC_WNCV_3_3(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WNCV_3_3", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -44610,7 +44637,8 @@ private:
 class TV_TargetNavigatorCluster : public TestCommand
 {
 public:
-    TV_TargetNavigatorCluster() : TestCommand("TV_TargetNavigatorCluster"), mTestIndex(0)
+    TV_TargetNavigatorCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TV_TargetNavigatorCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -44810,7 +44838,8 @@ private:
 class TV_AudioOutputCluster : public TestCommand
 {
 public:
-    TV_AudioOutputCluster() : TestCommand("TV_AudioOutputCluster"), mTestIndex(0)
+    TV_AudioOutputCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TV_AudioOutputCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -45041,7 +45070,8 @@ private:
 class TV_ApplicationLauncherCluster : public TestCommand
 {
 public:
-    TV_ApplicationLauncherCluster() : TestCommand("TV_ApplicationLauncherCluster"), mTestIndex(0)
+    TV_ApplicationLauncherCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TV_ApplicationLauncherCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -45278,7 +45308,8 @@ private:
 class TV_KeypadInputCluster : public TestCommand
 {
 public:
-    TV_KeypadInputCluster() : TestCommand("TV_KeypadInputCluster"), mTestIndex(0)
+    TV_KeypadInputCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TV_KeypadInputCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -45382,7 +45413,8 @@ private:
 class TV_AccountLoginCluster : public TestCommand
 {
 public:
-    TV_AccountLoginCluster() : TestCommand("TV_AccountLoginCluster"), mTestIndex(0)
+    TV_AccountLoginCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TV_AccountLoginCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -45553,7 +45585,8 @@ private:
 class TV_WakeOnLanCluster : public TestCommand
 {
 public:
-    TV_WakeOnLanCluster() : TestCommand("TV_WakeOnLanCluster"), mTestIndex(0)
+    TV_WakeOnLanCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TV_WakeOnLanCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -45658,7 +45691,8 @@ private:
 class TV_ApplicationBasicCluster : public TestCommand
 {
 public:
-    TV_ApplicationBasicCluster() : TestCommand("TV_ApplicationBasicCluster"), mTestIndex(0)
+    TV_ApplicationBasicCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TV_ApplicationBasicCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -45953,7 +45987,8 @@ private:
 class TV_MediaPlaybackCluster : public TestCommand
 {
 public:
-    TV_MediaPlaybackCluster() : TestCommand("TV_MediaPlaybackCluster"), mTestIndex(0)
+    TV_MediaPlaybackCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TV_MediaPlaybackCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -46647,7 +46682,8 @@ private:
 class TV_ChannelCluster : public TestCommand
 {
 public:
-    TV_ChannelCluster() : TestCommand("TV_ChannelCluster"), mTestIndex(0)
+    TV_ChannelCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TV_ChannelCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -46884,7 +46920,8 @@ private:
 class TV_LowPowerCluster : public TestCommand
 {
 public:
-    TV_LowPowerCluster() : TestCommand("TV_LowPowerCluster"), mTestIndex(0)
+    TV_LowPowerCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TV_LowPowerCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -46982,7 +47019,8 @@ private:
 class TV_ContentLauncherCluster : public TestCommand
 {
 public:
-    TV_ContentLauncherCluster() : TestCommand("TV_ContentLauncherCluster"), mTestIndex(0)
+    TV_ContentLauncherCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TV_ContentLauncherCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -47253,7 +47291,8 @@ private:
 class TV_MediaInputCluster : public TestCommand
 {
 public:
-    TV_MediaInputCluster() : TestCommand("TV_MediaInputCluster"), mTestIndex(0)
+    TV_MediaInputCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TV_MediaInputCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -47543,7 +47582,7 @@ private:
 class TestCluster : public TestCommand
 {
 public:
-    TestCluster() : TestCommand("TestCluster"), mTestIndex(0)
+    TestCluster(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -65598,7 +65637,8 @@ private:
 class TestClusterComplexTypes : public TestCommand
 {
 public:
-    TestClusterComplexTypes() : TestCommand("TestClusterComplexTypes"), mTestIndex(0)
+    TestClusterComplexTypes(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestClusterComplexTypes", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -66498,7 +66538,7 @@ private:
 class TestConstraints : public TestCommand
 {
 public:
-    TestConstraints() : TestCommand("TestConstraints"), mTestIndex(0)
+    TestConstraints(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestConstraints", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -67313,7 +67353,8 @@ private:
 class TestDelayCommands : public TestCommand
 {
 public:
-    TestDelayCommands() : TestCommand("TestDelayCommands"), mTestIndex(0)
+    TestDelayCommands(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestDelayCommands", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -67390,7 +67431,7 @@ private:
 class TestLogCommands : public TestCommand
 {
 public:
-    TestLogCommands() : TestCommand("TestLogCommands"), mTestIndex(0)
+    TestLogCommands(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestLogCommands", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -67477,7 +67518,7 @@ private:
 class TestSaveAs : public TestCommand
 {
 public:
-    TestSaveAs() : TestCommand("TestSaveAs"), mTestIndex(0)
+    TestSaveAs(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestSaveAs", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -71579,7 +71620,8 @@ private:
 class TestConfigVariables : public TestCommand
 {
 public:
-    TestConfigVariables() : TestCommand("TestConfigVariables"), mTestIndex(0)
+    TestConfigVariables(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestConfigVariables", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -71729,7 +71771,8 @@ private:
 class TestDescriptorCluster : public TestCommand
 {
 public:
-    TestDescriptorCluster() : TestCommand("TestDescriptorCluster"), mTestIndex(0)
+    TestDescriptorCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestDescriptorCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -72022,7 +72065,8 @@ private:
 class TestBasicInformation : public TestCommand
 {
 public:
-    TestBasicInformation() : TestCommand("TestBasicInformation"), mTestIndex(0)
+    TestBasicInformation(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestBasicInformation", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -72314,7 +72358,8 @@ private:
 class TestIdentifyCluster : public TestCommand
 {
 public:
-    TestIdentifyCluster() : TestCommand("TestIdentifyCluster"), mTestIndex(0)
+    TestIdentifyCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestIdentifyCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -72410,10 +72455,11072 @@ private:
     void OnSuccessResponse_1() { NextTest(); }
 };
 
+class TestOperationalCredentialsCluster : public TestCommand
+{
+public:
+    TestOperationalCredentialsCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestOperationalCredentialsCluster", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~TestOperationalCredentialsCluster() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: TestOperationalCredentialsCluster\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: TestOperationalCredentialsCluster\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Read number of supported fabrics\n");
+            err = TestReadNumberOfSupportedFabrics_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read number of commissioned fabrics\n");
+            err = TestReadNumberOfCommissionedFabrics_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read current fabric index\n");
+            err = TestReadCurrentFabricIndex_3();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 4;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    static void OnFailureCallback_1(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestOperationalCredentialsCluster *>(context))->OnFailureResponse_1(error);
+    }
+
+    static void OnSuccessCallback_1(void * context, uint8_t supportedFabrics)
+    {
+        (static_cast<TestOperationalCredentialsCluster *>(context))->OnSuccessResponse_1(supportedFabrics);
+    }
+
+    static void OnFailureCallback_2(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestOperationalCredentialsCluster *>(context))->OnFailureResponse_2(error);
+    }
+
+    static void OnSuccessCallback_2(void * context, uint8_t commissionedFabrics)
+    {
+        (static_cast<TestOperationalCredentialsCluster *>(context))->OnSuccessResponse_2(commissionedFabrics);
+    }
+
+    static void OnFailureCallback_3(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestOperationalCredentialsCluster *>(context))->OnFailureResponse_3(error);
+    }
+
+    static void OnSuccessCallback_3(void * context, chip::FabricIndex currentFabricIndex)
+    {
+        (static_cast<TestOperationalCredentialsCluster *>(context))->OnSuccessResponse_3(currentFabricIndex);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestReadNumberOfSupportedFabrics_1()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::OperationalCredentialsClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::SupportedFabrics::TypeInfo>(
+                this, OnSuccessCallback_1, OnFailureCallback_1));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_1(uint8_t supportedFabrics)
+    {
+        VerifyOrReturn(CheckConstraintType("supportedFabrics", "", "uint8"));
+        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("supportedFabrics", supportedFabrics, 4));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadNumberOfCommissionedFabrics_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::OperationalCredentialsClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::CommissionedFabrics::TypeInfo>(
+                this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_2(uint8_t commissionedFabrics)
+    {
+        VerifyOrReturn(CheckConstraintType("commissionedFabrics", "", "uint8"));
+        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("commissionedFabrics", commissionedFabrics, 1));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadCurrentFabricIndex_3()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::OperationalCredentialsClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::CurrentFabricIndex::TypeInfo>(
+                this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_3(chip::FabricIndex currentFabricIndex)
+    {
+        VerifyOrReturn(CheckConstraintType("currentFabricIndex", "", "uint8"));
+        VerifyOrReturn(CheckConstraintMinValue<chip::FabricIndex>("currentFabricIndex", currentFabricIndex, 1));
+        NextTest();
+    }
+};
+
+class TestModeSelectCluster : public TestCommand
+{
+public:
+    TestModeSelectCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestModeSelectCluster", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~TestModeSelectCluster() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: TestModeSelectCluster\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: TestModeSelectCluster\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Read CurrentMode\n");
+            err = TestReadCurrentMode_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read OnMode\n");
+            err = TestReadOnMode_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read StartUpMode\n");
+            err = TestReadStartUpMode_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Read Description\n");
+            err = TestReadDescription_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Read SupportedModes\n");
+            err = TestReadSupportedModes_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Change to Supported Mode\n");
+            err = TestChangeToSupportedMode_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Verify Current Mode Change\n");
+            err = TestVerifyCurrentModeChange_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Change to Unsupported Mode\n");
+            err = TestChangeToUnsupportedMode_8();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 9;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    static void OnFailureCallback_1(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestModeSelectCluster *>(context))->OnFailureResponse_1(error);
+    }
+
+    static void OnSuccessCallback_1(void * context, uint8_t currentMode)
+    {
+        (static_cast<TestModeSelectCluster *>(context))->OnSuccessResponse_1(currentMode);
+    }
+
+    static void OnFailureCallback_2(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestModeSelectCluster *>(context))->OnFailureResponse_2(error);
+    }
+
+    static void OnSuccessCallback_2(void * context, uint8_t onMode)
+    {
+        (static_cast<TestModeSelectCluster *>(context))->OnSuccessResponse_2(onMode);
+    }
+
+    static void OnFailureCallback_3(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestModeSelectCluster *>(context))->OnFailureResponse_3(error);
+    }
+
+    static void OnSuccessCallback_3(void * context, uint8_t startUpMode)
+    {
+        (static_cast<TestModeSelectCluster *>(context))->OnSuccessResponse_3(startUpMode);
+    }
+
+    static void OnFailureCallback_4(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestModeSelectCluster *>(context))->OnFailureResponse_4(error);
+    }
+
+    static void OnSuccessCallback_4(void * context, chip::CharSpan description)
+    {
+        (static_cast<TestModeSelectCluster *>(context))->OnSuccessResponse_4(description);
+    }
+
+    static void OnFailureCallback_5(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestModeSelectCluster *>(context))->OnFailureResponse_5(error);
+    }
+
+    static void OnSuccessCallback_5(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> &
+            supportedModes)
+    {
+        (static_cast<TestModeSelectCluster *>(context))->OnSuccessResponse_5(supportedModes);
+    }
+
+    static void OnFailureCallback_7(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestModeSelectCluster *>(context))->OnFailureResponse_7(error);
+    }
+
+    static void OnSuccessCallback_7(void * context, uint8_t currentMode)
+    {
+        (static_cast<TestModeSelectCluster *>(context))->OnSuccessResponse_7(currentMode);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestReadCurrentMode_1()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::ModeSelectClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ModeSelect::Attributes::CurrentMode::TypeInfo>(
+            this, OnSuccessCallback_1, OnFailureCallback_1));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_1(uint8_t currentMode)
+    {
+        VerifyOrReturn(CheckValue("currentMode", currentMode, 0));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadOnMode_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::ModeSelectClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ModeSelect::Attributes::OnMode::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_2(uint8_t onMode)
+    {
+        VerifyOrReturn(CheckValue("onMode", onMode, 0));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadStartUpMode_3()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::ModeSelectClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ModeSelect::Attributes::StartUpMode::TypeInfo>(
+            this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_3(uint8_t startUpMode)
+    {
+        VerifyOrReturn(CheckValue("startUpMode", startUpMode, 0));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadDescription_4()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::ModeSelectClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ModeSelect::Attributes::Description::TypeInfo>(
+            this, OnSuccessCallback_4, OnFailureCallback_4));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_4(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_4(chip::CharSpan description)
+    {
+        VerifyOrReturn(CheckValueAsString("description", description, chip::CharSpan("Coffee", 6)));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadSupportedModes_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::ModeSelectClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ModeSelect::Attributes::SupportedModes::TypeInfo>(
+            this, OnSuccessCallback_5, OnFailureCallback_5));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_5(
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> &
+            supportedModes)
+    {
+        {
+            auto iter_0 = supportedModes.begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(supportedModes)>("supportedModes", iter_0, 0));
+            VerifyOrReturn(CheckValueAsString("supportedModes[0].label", iter_0.GetValue().label, chip::CharSpan("Black", 5)));
+            VerifyOrReturn(CheckValue("supportedModes[0].mode", iter_0.GetValue().mode, 0));
+            VerifyOrReturn(CheckValue("supportedModes[0].semanticTag", iter_0.GetValue().semanticTag, 0UL));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(supportedModes)>("supportedModes", iter_0, 1));
+            VerifyOrReturn(
+                CheckValueAsString("supportedModes[1].label", iter_0.GetValue().label, chip::CharSpan("Cappuccino", 10)));
+            VerifyOrReturn(CheckValue("supportedModes[1].mode", iter_0.GetValue().mode, 4));
+            VerifyOrReturn(CheckValue("supportedModes[1].semanticTag", iter_0.GetValue().semanticTag, 0UL));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(supportedModes)>("supportedModes", iter_0, 2));
+            VerifyOrReturn(CheckValueAsString("supportedModes[2].label", iter_0.GetValue().label, chip::CharSpan("Espresso", 8)));
+            VerifyOrReturn(CheckValue("supportedModes[2].mode", iter_0.GetValue().mode, 7));
+            VerifyOrReturn(CheckValue("supportedModes[2].semanticTag", iter_0.GetValue().semanticTag, 0UL));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(supportedModes)>("supportedModes", iter_0, 3));
+        }
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestChangeToSupportedMode_6()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type;
+
+        RequestType request;
+        request.newMode = 4;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestModeSelectCluster *>(context))->OnSuccessResponse_6();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestModeSelectCluster *>(context))->OnFailureResponse_6(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_6() { NextTest(); }
+
+    CHIP_ERROR TestVerifyCurrentModeChange_7()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::ModeSelectClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ModeSelect::Attributes::CurrentMode::TypeInfo>(
+            this, OnSuccessCallback_7, OnFailureCallback_7));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_7(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_7(uint8_t currentMode)
+    {
+        VerifyOrReturn(CheckValue("currentMode", currentMode, 4));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestChangeToUnsupportedMode_8()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type;
+
+        RequestType request;
+        request.newMode = 2;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestModeSelectCluster *>(context))->OnSuccessResponse_8();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestModeSelectCluster *>(context))->OnFailureResponse_8(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_8(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
+        NextTest();
+    }
+
+    void OnSuccessResponse_8() { ThrowSuccessResponse(); }
+};
+
+class Test_TC_SWDIAG_1_1 : public TestCommand
+{
+public:
+    Test_TC_SWDIAG_1_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_SWDIAG_1_1", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_SWDIAG_1_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_SWDIAG_1_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_SWDIAG_1_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Reads CurrentHeapFree non-global attribute value from DUT\n");
+            err = TestReadsCurrentHeapFreeNonGlobalAttributeValueFromDut_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Reads CurrentHeapUsed non-global attribute value from DUT\n");
+            if (ShouldSkip("A_CURRENTHEAPUSED"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsCurrentHeapUsedNonGlobalAttributeValueFromDut_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Reads CurrentHeapHighWaterMark non-global attribute value from DUT\n");
+            if (ShouldSkip("A_CURRENTHEAPHIGHWATERMARK"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsCurrentHeapHighWaterMarkNonGlobalAttributeValueFromDut_3();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 4;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    static void OnFailureCallback_1(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_SWDIAG_1_1 *>(context))->OnFailureResponse_1(error);
+    }
+
+    static void OnSuccessCallback_1(void * context, uint64_t currentHeapFree)
+    {
+        (static_cast<Test_TC_SWDIAG_1_1 *>(context))->OnSuccessResponse_1(currentHeapFree);
+    }
+
+    static void OnFailureCallback_2(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_SWDIAG_1_1 *>(context))->OnFailureResponse_2(error);
+    }
+
+    static void OnSuccessCallback_2(void * context, uint64_t currentHeapUsed)
+    {
+        (static_cast<Test_TC_SWDIAG_1_1 *>(context))->OnSuccessResponse_2(currentHeapUsed);
+    }
+
+    static void OnFailureCallback_3(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_SWDIAG_1_1 *>(context))->OnFailureResponse_3(error);
+    }
+
+    static void OnSuccessCallback_3(void * context, uint64_t currentHeapHighWatermark)
+    {
+        (static_cast<Test_TC_SWDIAG_1_1 *>(context))->OnSuccessResponse_3(currentHeapHighWatermark);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestReadsCurrentHeapFreeNonGlobalAttributeValueFromDut_1()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::SoftwareDiagnosticsClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapFree::TypeInfo>(
+            this, OnSuccessCallback_1, OnFailureCallback_1));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_1(uint64_t currentHeapFree)
+    {
+        VerifyOrReturn(CheckConstraintType("currentHeapFree", "", "uint64"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsCurrentHeapUsedNonGlobalAttributeValueFromDut_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::SoftwareDiagnosticsClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapUsed::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_2(uint64_t currentHeapUsed)
+    {
+        VerifyOrReturn(CheckConstraintType("currentHeapUsed", "", "uint64"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsCurrentHeapHighWaterMarkNonGlobalAttributeValueFromDut_3()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::SoftwareDiagnosticsClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::TypeInfo>(
+                this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_3(uint64_t currentHeapHighWatermark)
+    {
+        VerifyOrReturn(CheckConstraintType("currentHeapHighWatermark", "", "uint64"));
+        NextTest();
+    }
+};
+
+class Test_TC_SWDIAG_2_1 : public TestCommand
+{
+public:
+    Test_TC_SWDIAG_2_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_SWDIAG_2_1", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_SWDIAG_2_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_SWDIAG_2_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_SWDIAG_2_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 0;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    //
+    // Tests methods
+    //
+};
+
+class Test_TC_SWDIAG_3_1 : public TestCommand
+{
+public:
+    Test_TC_SWDIAG_3_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_SWDIAG_3_1", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_SWDIAG_3_1() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_SWDIAG_3_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_SWDIAG_3_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Reads CurrentHeapUsed attribute value from DUT\n");
+            if (ShouldSkip("A_CURRENTHEAPUSED"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsCurrentHeapUsedAttributeValueFromDut_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Reads CurrentHeapHighWaterMark attribute value from DUT\n");
+            if (ShouldSkip("A_CURRENTHEAPHIGHWATERMARK"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsCurrentHeapHighWaterMarkAttributeValueFromDut_2();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 3;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    static void OnFailureCallback_1(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_SWDIAG_3_1 *>(context))->OnFailureResponse_1(error);
+    }
+
+    static void OnSuccessCallback_1(void * context, uint64_t currentHeapUsed)
+    {
+        (static_cast<Test_TC_SWDIAG_3_1 *>(context))->OnSuccessResponse_1(currentHeapUsed);
+    }
+
+    static void OnFailureCallback_2(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_SWDIAG_3_1 *>(context))->OnFailureResponse_2(error);
+    }
+
+    static void OnSuccessCallback_2(void * context, uint64_t currentHeapHighWatermark)
+    {
+        (static_cast<Test_TC_SWDIAG_3_1 *>(context))->OnSuccessResponse_2(currentHeapHighWatermark);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestReadsCurrentHeapUsedAttributeValueFromDut_1()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::SoftwareDiagnosticsClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapUsed::TypeInfo>(
+            this, OnSuccessCallback_1, OnFailureCallback_1));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_1(uint64_t currentHeapUsed)
+    {
+        VerifyOrReturn(CheckValue("currentHeapUsed", currentHeapUsed, 0ULL));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsCurrentHeapHighWaterMarkAttributeValueFromDut_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::SoftwareDiagnosticsClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::TypeInfo>(
+                this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_2(uint64_t currentHeapHighWatermark)
+    {
+        VerifyOrReturn(CheckValue("currentHeapHighWatermark", currentHeapHighWatermark, 0ULL));
+
+        NextTest();
+    }
+};
+
+class TestSubscribe_OnOff : public TestCommand
+{
+public:
+    TestSubscribe_OnOff(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestSubscribe_OnOff", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~TestSubscribe_OnOff() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: TestSubscribe_OnOff\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: TestSubscribe_OnOff\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Set OnOff Attribute to false\n");
+            err = TestSetOnOffAttributeToFalse_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Report: Subscribe OnOff Attribute\n");
+            err = TestReportSubscribeOnOffAttribute_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Subscribe OnOff Attribute\n");
+            err = TestSubscribeOnOffAttribute_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Turn On the light to see attribute change\n");
+            err = TestTurnOnTheLightToSeeAttributeChange_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Check for attribute report\n");
+            err = TestCheckForAttributeReport_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Turn Off the light to see attribute change\n");
+            err = TestTurnOffTheLightToSeeAttributeChange_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Check for attribute report\n");
+            err = TestCheckForAttributeReport_7();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 8;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    typedef void (*Test_TestSubscribe_OnOff_OnOff_ReportCallback)(void * context, bool value);
+    Test_TestSubscribe_OnOff_OnOff_ReportCallback mTest_TestSubscribe_OnOff_OnOff_Reported = nullptr;
+
+    static void OnFailureCallback_2(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestSubscribe_OnOff *>(context))->OnFailureResponse_2(error);
+    }
+
+    static void OnSuccessCallback_2(void * context, bool onOff)
+    {
+        (static_cast<TestSubscribe_OnOff *>(context))->OnSuccessResponse_2(onOff);
+    }
+
+    bool mReceivedReport_2 = false;
+
+    static void OnFailureCallback_3(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestSubscribe_OnOff *>(context))->OnFailureResponse_3(error);
+    }
+
+    static void OnSuccessCallback_3(void * context, bool onOff)
+    {
+        (static_cast<TestSubscribe_OnOff *>(context))->OnSuccessResponse_3(onOff);
+    }
+
+    static void OnSubscriptionEstablished_3(void * context)
+    {
+        (static_cast<TestSubscribe_OnOff *>(context))->OnSubscriptionEstablishedResponse_3();
+    }
+
+    static void OnFailureCallback_5(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestSubscribe_OnOff *>(context))->OnFailureResponse_5(error);
+    }
+
+    static void OnSuccessCallback_5(void * context, bool onOff)
+    {
+        (static_cast<TestSubscribe_OnOff *>(context))->OnSuccessResponse_5(onOff);
+    }
+
+    bool mReceivedReport_5 = false;
+
+    static void OnFailureCallback_7(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestSubscribe_OnOff *>(context))->OnFailureResponse_7(error);
+    }
+
+    static void OnSuccessCallback_7(void * context, bool onOff)
+    {
+        (static_cast<TestSubscribe_OnOff *>(context))->OnSuccessResponse_7(onOff);
+    }
+
+    bool mReceivedReport_7 = false;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestSetOnOffAttributeToFalse_1()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestSubscribe_OnOff *>(context))->OnSuccessResponse_1();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestSubscribe_OnOff *>(context))->OnFailureResponse_1(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_1() { NextTest(); }
+
+    CHIP_ERROR TestReportSubscribeOnOffAttribute_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::OnOffClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        mTest_TestSubscribe_OnOff_OnOff_Reported = OnSuccessCallback_2;
+        return WaitForMs(0);
+    }
+
+    void OnFailureResponse_2(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_2(bool onOff)
+    {
+        mReceivedReport_2 = true;
+
+        VerifyOrReturn(CheckValue("onOff", onOff, false));
+    }
+
+    CHIP_ERROR TestSubscribeOnOffAttribute_3()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::OnOffClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        uint16_t minIntervalArgument;
+        minIntervalArgument = 2U;
+        uint16_t maxIntervalArgument;
+        maxIntervalArgument = 10U;
+
+        ReturnErrorOnFailure(cluster.SubscribeAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
+            this, OnSuccessCallback_3, OnFailureCallback_3, minIntervalArgument, maxIntervalArgument, OnSubscriptionEstablished_3));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_3(bool value)
+    {
+        if (mTest_TestSubscribe_OnOff_OnOff_Reported)
+        {
+            auto callback                            = mTest_TestSubscribe_OnOff_OnOff_Reported;
+            mTest_TestSubscribe_OnOff_OnOff_Reported = nullptr;
+            callback(this, value);
+        }
+    }
+
+    void OnSubscriptionEstablishedResponse_3()
+    {
+        VerifyOrReturn(mReceivedReport_2, Exit("Initial report not received!"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_4()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::OnOff::Commands::On::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestSubscribe_OnOff *>(context))->OnSuccessResponse_4();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestSubscribe_OnOff *>(context))->OnFailureResponse_4(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_4(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_4() { NextTest(); }
+
+    CHIP_ERROR TestCheckForAttributeReport_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::OnOffClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        mTest_TestSubscribe_OnOff_OnOff_Reported = OnSuccessCallback_5;
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_5(bool onOff)
+    {
+        mReceivedReport_5 = true;
+
+        VerifyOrReturn(CheckValue("onOff", onOff, true));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestTurnOffTheLightToSeeAttributeChange_6()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestSubscribe_OnOff *>(context))->OnSuccessResponse_6();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestSubscribe_OnOff *>(context))->OnFailureResponse_6(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_6() { NextTest(); }
+
+    CHIP_ERROR TestCheckForAttributeReport_7()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::OnOffClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        mTest_TestSubscribe_OnOff_OnOff_Reported = OnSuccessCallback_7;
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_7(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_7(bool onOff)
+    {
+        mReceivedReport_7 = true;
+
+        VerifyOrReturn(CheckValue("onOff", onOff, false));
+
+        NextTest();
+    }
+};
+
+class DL_UsersAndCredentials : public TestCommand
+{
+public:
+    DL_UsersAndCredentials(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("DL_UsersAndCredentials", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~DL_UsersAndCredentials() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: DL_UsersAndCredentials\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: DL_UsersAndCredentials\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Read available user slot and verify response fields\n");
+            err = TestReadAvailableUserSlotAndVerifyResponseFields_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Get number of supported users and verify default value\n");
+            err = TestGetNumberOfSupportedUsersAndVerifyDefaultValue_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read fails for user with index 0\n");
+            err = TestReadFailsForUserWithIndex0_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 4 : Read fails for user with index greater than Number Of Users Supported\n");
+            err = TestReadFailsForUserWithIndexGreaterThanNumberOfUsersSupported_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Create new user with default parameters\n");
+            err = TestCreateNewUserWithDefaultParameters_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Read the user back and verify its fields\n");
+            err = TestReadTheUserBackAndVerifyItsFields_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Set user at the occupied index fails with appropriate response\n");
+            err = TestSetUserAtTheOccupiedIndexFailsWithAppropriateResponse_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Modify userName for existing user\n");
+            err = TestModifyUserNameForExistingUser_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Read the modified user back and verify its fields\n");
+            err = TestReadTheModifiedUserBackAndVerifyItsFields_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Modify userUniqueId for existing user\n");
+            err = TestModifyUserUniqueIdForExistingUser_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Read the modified user back and verify its fields\n");
+            err = TestReadTheModifiedUserBackAndVerifyItsFields_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Modify userStatus for existing user\n");
+            err = TestModifyUserStatusForExistingUser_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : Read the modified user back and verify its fields\n");
+            err = TestReadTheModifiedUserBackAndVerifyItsFields_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : Modify userType for existing user\n");
+            err = TestModifyUserTypeForExistingUser_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool, " ***** Test Step 15 : Read the modified user back and verify its fields\n");
+            err = TestReadTheModifiedUserBackAndVerifyItsFields_15();
+            break;
+        case 16:
+            ChipLogProgress(chipTool, " ***** Test Step 16 : Modify credentialRule for existing user\n");
+            err = TestModifyCredentialRuleForExistingUser_16();
+            break;
+        case 17:
+            ChipLogProgress(chipTool, " ***** Test Step 17 : Read the modified user back and verify its fields\n");
+            err = TestReadTheModifiedUserBackAndVerifyItsFields_17();
+            break;
+        case 18:
+            ChipLogProgress(chipTool, " ***** Test Step 18 : Modify all fields for existing user\n");
+            err = TestModifyAllFieldsForExistingUser_18();
+            break;
+        case 19:
+            ChipLogProgress(chipTool, " ***** Test Step 19 : Read the modified user back and verify its fields\n");
+            err = TestReadTheModifiedUserBackAndVerifyItsFields_19();
+            break;
+        case 20:
+            ChipLogProgress(chipTool, " ***** Test Step 20 : Add another user with non-default fields\n");
+            err = TestAddAnotherUserWithNonDefaultFields_20();
+            break;
+        case 21:
+            ChipLogProgress(chipTool, " ***** Test Step 21 : Read the new user back and verify its fields\n");
+            err = TestReadTheNewUserBackAndVerifyItsFields_21();
+            break;
+        case 22:
+            ChipLogProgress(chipTool, " ***** Test Step 22 : Create user in the last slot\n");
+            err = TestCreateUserInTheLastSlot_22();
+            break;
+        case 23:
+            ChipLogProgress(chipTool, " ***** Test Step 23 : Read the last user back and verify its fields\n");
+            err = TestReadTheLastUserBackAndVerifyItsFields_23();
+            break;
+        case 24:
+            ChipLogProgress(chipTool, " ***** Test Step 24 : User creation in the 0 slot fails\n");
+            err = TestUserCreationInThe0SlotFails_24();
+            break;
+        case 25:
+            ChipLogProgress(chipTool, " ***** Test Step 25 : User creation in the out-of-bounds slot fails\n");
+            err = TestUserCreationInTheOutOfBoundsSlotFails_25();
+            break;
+        case 26:
+            ChipLogProgress(chipTool, " ***** Test Step 26 : Clear first user\n");
+            err = TestClearFirstUser_26();
+            break;
+        case 27:
+            ChipLogProgress(chipTool, " ***** Test Step 27 : Read cleared user and verify it is available\n");
+            err = TestReadClearedUserAndVerifyItIsAvailable_27();
+            break;
+        case 28:
+            ChipLogProgress(chipTool, " ***** Test Step 28 : Create new user in the cleared slot\n");
+            err = TestCreateNewUserInTheClearedSlot_28();
+            break;
+        case 29:
+            ChipLogProgress(chipTool, " ***** Test Step 29 : Read the user in the previously cleared slot and verify its fields\n");
+            err = TestReadTheUserInThePreviouslyClearedSlotAndVerifyItsFields_29();
+            break;
+        case 30:
+            ChipLogProgress(chipTool, " ***** Test Step 30 : Clear user with index 0 fails\n");
+            err = TestClearUserWithIndex0Fails_30();
+            break;
+        case 31:
+            ChipLogProgress(chipTool, " ***** Test Step 31 : Clear user with out-of-bounds index fails\n");
+            err = TestClearUserWithOutOfBoundsIndexFails_31();
+            break;
+        case 32:
+            ChipLogProgress(chipTool, " ***** Test Step 32 : Clear all users\n");
+            err = TestClearAllUsers_32();
+            break;
+        case 33:
+            ChipLogProgress(chipTool, " ***** Test Step 33 : Read first cleared user and verify it is available\n");
+            err = TestReadFirstClearedUserAndVerifyItIsAvailable_33();
+            break;
+        case 34:
+            ChipLogProgress(chipTool, " ***** Test Step 34 : Read last cleared user and verify it is available\n");
+            err = TestReadLastClearedUserAndVerifyItIsAvailable_34();
+            break;
+        case 35:
+            ChipLogProgress(chipTool, " ***** Test Step 35 : Get number of supported PIN credentials and verify default value\n");
+            err = TestGetNumberOfSupportedPinCredentialsAndVerifyDefaultValue_35();
+            break;
+        case 36:
+            ChipLogProgress(chipTool, " ***** Test Step 36 : Check that PIN credential does not exist\n");
+            err = TestCheckThatPinCredentialDoesNotExist_36();
+            break;
+        case 37:
+            ChipLogProgress(chipTool, " ***** Test Step 37 : Reading PIN credential with index 0 fails\n");
+            err = TestReadingPinCredentialWithIndex0Fails_37();
+            break;
+        case 38:
+            ChipLogProgress(chipTool, " ***** Test Step 38 : Reading PIN credential with out-of-bounds index fails\n");
+            err = TestReadingPinCredentialWithOutOfBoundsIndexFails_38();
+            break;
+        case 39:
+            ChipLogProgress(chipTool, " ***** Test Step 39 : Create new PIN credential and user\n");
+            err = TestCreateNewPinCredentialAndUser_39();
+            break;
+        case 40:
+            ChipLogProgress(chipTool, " ***** Test Step 40 : Verify created user\n");
+            err = TestVerifyCreatedUser_40();
+            break;
+        case 41:
+            ChipLogProgress(chipTool, " ***** Test Step 41 : Verify created PIN credential\n");
+            err = TestVerifyCreatedPinCredential_41();
+            break;
+        case 42:
+            ChipLogProgress(chipTool, " ***** Test Step 42 : Create new PIN credential and user with index 0 fails\n");
+            err = TestCreateNewPinCredentialAndUserWithIndex0Fails_42();
+            break;
+        case 43:
+            ChipLogProgress(chipTool, " ***** Test Step 43 : Create new PIN credential and user with out-of-bounds index fails\n");
+            err = TestCreateNewPinCredentialAndUserWithOutOfBoundsIndexFails_43();
+            break;
+        case 44:
+            ChipLogProgress(chipTool, " ***** Test Step 44 : Get number of supported RFID credentials and verify default value\n");
+            err = TestGetNumberOfSupportedRfidCredentialsAndVerifyDefaultValue_44();
+            break;
+        case 45:
+            ChipLogProgress(chipTool, " ***** Test Step 45 : Reading RFID credential with index 0 fails\n");
+            err = TestReadingRfidCredentialWithIndex0Fails_45();
+            break;
+        case 46:
+            ChipLogProgress(chipTool, " ***** Test Step 46 : Reading RFID credential with out-of-bounds index fails\n");
+            err = TestReadingRfidCredentialWithOutOfBoundsIndexFails_46();
+            break;
+        case 47:
+            ChipLogProgress(chipTool, " ***** Test Step 47 : Check that RFID credential does not exist\n");
+            err = TestCheckThatRfidCredentialDoesNotExist_47();
+            break;
+        case 48:
+            ChipLogProgress(chipTool, " ***** Test Step 48 : Create new RFID credential and add it to existing user\n");
+            err = TestCreateNewRfidCredentialAndAddItToExistingUser_48();
+            break;
+        case 49:
+            ChipLogProgress(chipTool, " ***** Test Step 49 : Verify modified user\n");
+            err = TestVerifyModifiedUser_49();
+            break;
+        case 50:
+            ChipLogProgress(chipTool, " ***** Test Step 50 : Verify created credential\n");
+            err = TestVerifyCreatedCredential_50();
+            break;
+        case 51:
+            ChipLogProgress(chipTool, " ***** Test Step 51 : Create new RFID credential and user with index 0 fails\n");
+            err = TestCreateNewRfidCredentialAndUserWithIndex0Fails_51();
+            break;
+        case 52:
+            ChipLogProgress(chipTool, " ***** Test Step 52 : Create new RFID credential and user with out-of-bounds index fails\n");
+            err = TestCreateNewRfidCredentialAndUserWithOutOfBoundsIndexFails_52();
+            break;
+        case 53:
+            ChipLogProgress(chipTool, " ***** Test Step 53 : Create new PIN credential and try to add it to existing user\n");
+            err = TestCreateNewPinCredentialAndTryToAddItToExistingUser_53();
+            break;
+        case 54:
+            ChipLogProgress(chipTool, " ***** Test Step 54 : Create new credential and try to add it to 0 user\n");
+            err = TestCreateNewCredentialAndTryToAddItTo0User_54();
+            break;
+        case 55:
+            ChipLogProgress(chipTool, " ***** Test Step 55 : Create new credential and try to add it to out-of-bounds user\n");
+            err = TestCreateNewCredentialAndTryToAddItToOutOfBoundsUser_55();
+            break;
+        case 56:
+            ChipLogProgress(chipTool, " ***** Test Step 56 : Create new PIN with too short data\n");
+            err = TestCreateNewPinWithTooShortData_56();
+            break;
+        case 57:
+            ChipLogProgress(chipTool, " ***** Test Step 57 : Create new PIN with too long data\n");
+            err = TestCreateNewPinWithTooLongData_57();
+            break;
+        case 58:
+            ChipLogProgress(chipTool, " ***** Test Step 58 : Create new RFID with too short data\n");
+            err = TestCreateNewRfidWithTooShortData_58();
+            break;
+        case 59:
+            ChipLogProgress(chipTool, " ***** Test Step 59 : Create new PIN with Programming user type fails\n");
+            err = TestCreateNewPinWithProgrammingUserTypeFails_59();
+            break;
+        case 60:
+            ChipLogProgress(chipTool, " ***** Test Step 60 : Create new RFID with too short data\n");
+            err = TestCreateNewRfidWithTooShortData_60();
+            break;
+        case 61:
+            ChipLogProgress(chipTool, " ***** Test Step 61 : Create new PIN credential with data the would cause duplicate\n");
+            err = TestCreateNewPinCredentialWithDataTheWouldCauseDuplicate_61();
+            break;
+        case 62:
+            ChipLogProgress(chipTool, " ***** Test Step 62 : Create new RFID credential with data the would cause duplicate\n");
+            err = TestCreateNewRfidCredentialWithDataTheWouldCauseDuplicate_62();
+            break;
+        case 63:
+            ChipLogProgress(chipTool, " ***** Test Step 63 : Modify credentialData of existing PIN credential\n");
+            err = TestModifyCredentialDataOfExistingPinCredential_63();
+            break;
+        case 64:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 64 : Verify that credential was changed by creating new credential with old data\n");
+            err = TestVerifyThatCredentialWasChangedByCreatingNewCredentialWithOldData_64();
+            break;
+        case 65:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 65 : Verify that credential was changed by creating new credential with new data\n");
+            err = TestVerifyThatCredentialWasChangedByCreatingNewCredentialWithNewData_65();
+            break;
+        case 66:
+            ChipLogProgress(chipTool, " ***** Test Step 66 : Clear first PIN credential\n");
+            err = TestClearFirstPinCredential_66();
+            break;
+        case 67:
+            ChipLogProgress(chipTool, " ***** Test Step 67 : Read back the credential and make sure it is deleted\n");
+            err = TestReadBackTheCredentialAndMakeSureItIsDeleted_67();
+            break;
+        case 68:
+            ChipLogProgress(chipTool, " ***** Test Step 68 : Read the user back and make sure PIN credential is deleted\n");
+            err = TestReadTheUserBackAndMakeSurePinCredentialIsDeleted_68();
+            break;
+        case 69:
+            ChipLogProgress(chipTool, " ***** Test Step 69 : Clear the second PIN credential\n");
+            err = TestClearTheSecondPinCredential_69();
+            break;
+        case 70:
+            ChipLogProgress(chipTool, " ***** Test Step 70 : Read back the credential and make sure it is deleted\n");
+            err = TestReadBackTheCredentialAndMakeSureItIsDeleted_70();
+            break;
+        case 71:
+            ChipLogProgress(chipTool, " ***** Test Step 71 : Read the user back and make sure related user is deleted\n");
+            err = TestReadTheUserBackAndMakeSureRelatedUserIsDeleted_71();
+            break;
+        case 72:
+            ChipLogProgress(chipTool, " ***** Test Step 72 : Create new RFID credential with user\n");
+            err = TestCreateNewRfidCredentialWithUser_72();
+            break;
+        case 73:
+            ChipLogProgress(chipTool, " ***** Test Step 73 : Clear all the RFID credentials\n");
+            err = TestClearAllTheRfidCredentials_73();
+            break;
+        case 74:
+            ChipLogProgress(chipTool, " ***** Test Step 74 : Read back the fist RFID credential and make sure it is deleted\n");
+            err = TestReadBackTheFistRfidCredentialAndMakeSureItIsDeleted_74();
+            break;
+        case 75:
+            ChipLogProgress(chipTool, " ***** Test Step 75 : Read back the second RFID credential and make sure it is deleted\n");
+            err = TestReadBackTheSecondRfidCredentialAndMakeSureItIsDeleted_75();
+            break;
+        case 76:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 76 : Read the user related with first RFID back and make sure it is deleted\n");
+            err = TestReadTheUserRelatedWithFirstRfidBackAndMakeSureItIsDeleted_76();
+            break;
+        case 77:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 77 : Read the user related with second RFID back and make sure it is deleted\n");
+            err = TestReadTheUserRelatedWithSecondRfidBackAndMakeSureItIsDeleted_77();
+            break;
+        case 78:
+            ChipLogProgress(chipTool, " ***** Test Step 78 : Create new PIN credential with user\n");
+            err = TestCreateNewPinCredentialWithUser_78();
+            break;
+        case 79:
+            ChipLogProgress(chipTool, " ***** Test Step 79 : Create new RFID credential with user\n");
+            err = TestCreateNewRfidCredentialWithUser_79();
+            break;
+        case 80:
+            ChipLogProgress(chipTool, " ***** Test Step 80 : Create another RFID credential with user\n");
+            err = TestCreateAnotherRfidCredentialWithUser_80();
+            break;
+        case 81:
+            ChipLogProgress(chipTool, " ***** Test Step 81 : Clear all the credentials\n");
+            err = TestClearAllTheCredentials_81();
+            break;
+        case 82:
+            ChipLogProgress(chipTool, " ***** Test Step 82 : Read back the first PIN credential and make sure it is deleted\n");
+            err = TestReadBackTheFirstPinCredentialAndMakeSureItIsDeleted_82();
+            break;
+        case 83:
+            ChipLogProgress(chipTool, " ***** Test Step 83 : Read back the first RFID credential and make sure it is deleted\n");
+            err = TestReadBackTheFirstRfidCredentialAndMakeSureItIsDeleted_83();
+            break;
+        case 84:
+            ChipLogProgress(chipTool, " ***** Test Step 84 : Read back the second PIN credential and make sure it is deleted\n");
+            err = TestReadBackTheSecondPinCredentialAndMakeSureItIsDeleted_84();
+            break;
+        case 85:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 85 : Read the user related with first PIN back and make sure it is deleted\n");
+            err = TestReadTheUserRelatedWithFirstPinBackAndMakeSureItIsDeleted_85();
+            break;
+        case 86:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 86 : Read the user related with first RFID back and make sure it is deleted\n");
+            err = TestReadTheUserRelatedWithFirstRfidBackAndMakeSureItIsDeleted_86();
+            break;
+        case 87:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 87 : Read the user related with second PIN back and make sure it is deleted\n");
+            err = TestReadTheUserRelatedWithSecondPinBackAndMakeSureItIsDeleted_87();
+            break;
+        case 88:
+            ChipLogProgress(chipTool, " ***** Test Step 88 : Create new Programming PIN credential with invalid index\n");
+            err = TestCreateNewProgrammingPinCredentialWithInvalidIndex_88();
+            break;
+        case 89:
+            ChipLogProgress(chipTool, " ***** Test Step 89 : Create new Programming PIN credential with valid index\n");
+            err = TestCreateNewProgrammingPinCredentialWithValidIndex_89();
+            break;
+        case 90:
+            ChipLogProgress(chipTool, " ***** Test Step 90 : Verify created user\n");
+            err = TestVerifyCreatedUser_90();
+            break;
+        case 91:
+            ChipLogProgress(chipTool, " ***** Test Step 91 : Verify created programming PIN credential\n");
+            err = TestVerifyCreatedProgrammingPinCredential_91();
+            break;
+        case 92:
+            ChipLogProgress(chipTool, " ***** Test Step 92 : Modify the Programming PIN credential\n");
+            err = TestModifyTheProgrammingPinCredential_92();
+            break;
+        case 93:
+            ChipLogProgress(chipTool, " ***** Test Step 93 : Clearing Programming PIN fails\n");
+            err = TestClearingProgrammingPinFails_93();
+            break;
+        case 94:
+            ChipLogProgress(chipTool, " ***** Test Step 94 : Clearing Programming PIN with invalid index fails\n");
+            err = TestClearingProgrammingPinWithInvalidIndexFails_94();
+            break;
+        case 95:
+            ChipLogProgress(chipTool, " ***** Test Step 95 : Clearing PIN credential with zero index fails\n");
+            err = TestClearingPinCredentialWithZeroIndexFails_95();
+            break;
+        case 96:
+            ChipLogProgress(chipTool, " ***** Test Step 96 : Clearing PIN credential with out-of-bound index fails\n");
+            err = TestClearingPinCredentialWithOutOfBoundIndexFails_96();
+            break;
+        case 97:
+            ChipLogProgress(chipTool, " ***** Test Step 97 : Clearing RFID credential with zero index fails\n");
+            err = TestClearingRfidCredentialWithZeroIndexFails_97();
+            break;
+        case 98:
+            ChipLogProgress(chipTool, " ***** Test Step 98 : Clearing RFID credential with out-of-bound index fails\n");
+            err = TestClearingRfidCredentialWithOutOfBoundIndexFails_98();
+            break;
+        case 99:
+            ChipLogProgress(chipTool, " ***** Test Step 99 : Clear the Programming PIN user\n");
+            err = TestClearTheProgrammingPinUser_99();
+            break;
+        case 100:
+            ChipLogProgress(chipTool, " ***** Test Step 100 : Make sure Programming PIN user is deleted\n");
+            err = TestMakeSureProgrammingPinUserIsDeleted_100();
+            break;
+        case 101:
+            ChipLogProgress(chipTool, " ***** Test Step 101 : Make sure programming PIN credential is deleted\n");
+            err = TestMakeSureProgrammingPinCredentialIsDeleted_101();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 102;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    uint16_t NumberOfTotalUsersSupported;
+    uint16_t NumberOfPINUsersSupported;
+    uint16_t NumberOfRFIDUsersSupported;
+
+    static void OnFailureCallback_2(void * context, CHIP_ERROR error)
+    {
+        (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_2(error);
+    }
+
+    static void OnSuccessCallback_2(void * context, uint16_t numberOfTotalUsersSupported)
+    {
+        (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_2(numberOfTotalUsersSupported);
+    }
+
+    static void OnFailureCallback_35(void * context, CHIP_ERROR error)
+    {
+        (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_35(error);
+    }
+
+    static void OnSuccessCallback_35(void * context, uint16_t numberOfPINUsersSupported)
+    {
+        (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_35(numberOfPINUsersSupported);
+    }
+
+    static void OnFailureCallback_44(void * context, CHIP_ERROR error)
+    {
+        (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_44(error);
+    }
+
+    static void OnSuccessCallback_44(void * context, uint16_t numberOfRFIDUsersSupported)
+    {
+        (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_44(numberOfRFIDUsersSupported);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestReadAvailableUserSlotAndVerifyResponseFields_1()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
+
+        RequestType request;
+        request.userIndex = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_1(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
+                                      data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
+                                      data.nextUserIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_1(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_1(
+        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
+        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
+        const chip::app::DataModel::Nullable<
+            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
+        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
+    {
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValueNull("userName", userName));
+
+        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
+
+        VerifyOrReturn(CheckValueNull("userStatus", userStatus));
+
+        VerifyOrReturn(CheckValueNull("userType", userType));
+
+        VerifyOrReturn(CheckValueNull("credentialRule", credentialRule));
+
+        VerifyOrReturn(CheckValueNull("credentials", credentials));
+
+        VerifyOrReturn(CheckValueNull("creatorFabricIndex", creatorFabricIndex));
+
+        VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
+
+        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
+        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 2U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestGetNumberOfSupportedUsersAndVerifyDefaultValue_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::DoorLockClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::NumberOfTotalUsersSupported::TypeInfo>(
+                this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_2(uint16_t numberOfTotalUsersSupported)
+    {
+        VerifyOrReturn(CheckValue("numberOfTotalUsersSupported", numberOfTotalUsersSupported, 10U));
+
+        NumberOfTotalUsersSupported = numberOfTotalUsersSupported;
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadFailsForUserWithIndex0_3()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
+
+        RequestType request;
+        request.userIndex = 0U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_3(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
+                                      data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
+                                      data.nextUserIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_3(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
+        NextTest();
+    }
+
+    void OnSuccessResponse_3(
+        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
+        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
+        const chip::app::DataModel::Nullable<
+            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
+        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
+    {
+        ThrowSuccessResponse();
+    }
+
+    CHIP_ERROR TestReadFailsForUserWithIndexGreaterThanNumberOfUsersSupported_4()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
+
+        RequestType request;
+        request.userIndex = static_cast<uint16_t>(NumberOfTotalUsersSupported + 1);
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_4(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
+                                      data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
+                                      data.nextUserIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_4(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_4(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
+        NextTest();
+    }
+
+    void OnSuccessResponse_4(
+        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
+        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
+        const chip::app::DataModel::Nullable<
+            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
+        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
+    {
+        ThrowSuccessResponse();
+    }
+
+    CHIP_ERROR TestCreateNewUserWithDefaultParameters_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetUser::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+        request.userIndex     = 1U;
+        request.userName.SetNull();
+        request.userUniqueId.SetNull();
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+        request.credentialRule.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_5();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_5(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_5() { NextTest(); }
+
+    CHIP_ERROR TestReadTheUserBackAndVerifyItsFields_6()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
+
+        RequestType request;
+        request.userIndex = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_6(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
+                                      data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
+                                      data.nextUserIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_6(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_6(
+        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
+        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
+        const chip::app::DataModel::Nullable<
+            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
+        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
+    {
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValueNonNull("userName", userName));
+        VerifyOrReturn(CheckValueAsString("userName.Value()", userName.Value(), chip::CharSpan("", 0)));
+
+        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
+
+        VerifyOrReturn(CheckValueNonNull("userStatus", userStatus));
+        VerifyOrReturn(CheckValue("userStatus.Value()", userStatus.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("userType", userType));
+        VerifyOrReturn(CheckValue("userType.Value()", userType.Value(), 0));
+
+        VerifyOrReturn(CheckValueNonNull("credentialRule", credentialRule));
+        VerifyOrReturn(CheckValue("credentialRule.Value()", credentialRule.Value(), 0));
+
+        VerifyOrReturn(CheckValueNull("credentials", credentials));
+
+        VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", creatorFabricIndex));
+        VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", creatorFabricIndex.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
+        VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", lastModifiedFabricIndex.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
+        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 2U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestSetUserAtTheOccupiedIndexFailsWithAppropriateResponse_7()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetUser::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+        request.userIndex     = 1U;
+        request.userName.SetNull();
+        request.userUniqueId.SetNull();
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+        request.credentialRule.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_7();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_7(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_7(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 1));
+        NextTest();
+    }
+
+    void OnSuccessResponse_7() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestModifyUserNameForExistingUser_8()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetUser::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(2);
+        request.userIndex     = 1U;
+        request.userName.SetNonNull();
+        request.userName.Value() = chip::Span<const char>("new_usergarbage: not in length on purpose", 8);
+        request.userUniqueId.SetNull();
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+        request.credentialRule.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_8();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_8(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_8(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_8() { NextTest(); }
+
+    CHIP_ERROR TestReadTheModifiedUserBackAndVerifyItsFields_9()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
+
+        RequestType request;
+        request.userIndex = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_9(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
+                                      data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
+                                      data.nextUserIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_9(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_9(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_9(
+        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
+        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
+        const chip::app::DataModel::Nullable<
+            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
+        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
+    {
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValueNonNull("userName", userName));
+        VerifyOrReturn(CheckValueAsString("userName.Value()", userName.Value(), chip::CharSpan("new_user", 8)));
+
+        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
+
+        VerifyOrReturn(CheckValueNonNull("userStatus", userStatus));
+        VerifyOrReturn(CheckValue("userStatus.Value()", userStatus.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("userType", userType));
+        VerifyOrReturn(CheckValue("userType.Value()", userType.Value(), 0));
+
+        VerifyOrReturn(CheckValueNonNull("credentialRule", credentialRule));
+        VerifyOrReturn(CheckValue("credentialRule.Value()", credentialRule.Value(), 0));
+
+        VerifyOrReturn(CheckValueNull("credentials", credentials));
+
+        VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", creatorFabricIndex));
+        VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", creatorFabricIndex.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
+        VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", lastModifiedFabricIndex.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
+        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 2U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestModifyUserUniqueIdForExistingUser_10()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetUser::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(2);
+        request.userIndex     = 1U;
+        request.userName.SetNull();
+        request.userUniqueId.SetNonNull();
+        request.userUniqueId.Value() = 305441741UL;
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+        request.credentialRule.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_10();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_10(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_10(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_10() { NextTest(); }
+
+    CHIP_ERROR TestReadTheModifiedUserBackAndVerifyItsFields_11()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
+
+        RequestType request;
+        request.userIndex = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_11(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
+                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
+                                       data.nextUserIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_11(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_11(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_11(
+        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
+        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
+        const chip::app::DataModel::Nullable<
+            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
+        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
+    {
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValueNonNull("userName", userName));
+        VerifyOrReturn(CheckValueAsString("userName.Value()", userName.Value(), chip::CharSpan("new_user", 8)));
+
+        VerifyOrReturn(CheckValueNonNull("userUniqueId", userUniqueId));
+        VerifyOrReturn(CheckValue("userUniqueId.Value()", userUniqueId.Value(), 305441741UL));
+
+        VerifyOrReturn(CheckValueNonNull("userStatus", userStatus));
+        VerifyOrReturn(CheckValue("userStatus.Value()", userStatus.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("userType", userType));
+        VerifyOrReturn(CheckValue("userType.Value()", userType.Value(), 0));
+
+        VerifyOrReturn(CheckValueNonNull("credentialRule", credentialRule));
+        VerifyOrReturn(CheckValue("credentialRule.Value()", credentialRule.Value(), 0));
+
+        VerifyOrReturn(CheckValueNull("credentials", credentials));
+
+        VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", creatorFabricIndex));
+        VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", creatorFabricIndex.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
+        VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", lastModifiedFabricIndex.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
+        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 2U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestModifyUserStatusForExistingUser_12()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetUser::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(2);
+        request.userIndex     = 1U;
+        request.userName.SetNull();
+        request.userUniqueId.SetNull();
+        request.userStatus.SetNonNull();
+        request.userStatus.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserStatus>(3);
+        request.userType.SetNull();
+        request.credentialRule.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_12();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_12(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_12(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_12() { NextTest(); }
+
+    CHIP_ERROR TestReadTheModifiedUserBackAndVerifyItsFields_13()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
+
+        RequestType request;
+        request.userIndex = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_13(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
+                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
+                                       data.nextUserIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_13(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_13(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_13(
+        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
+        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
+        const chip::app::DataModel::Nullable<
+            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
+        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
+    {
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValueNonNull("userName", userName));
+        VerifyOrReturn(CheckValueAsString("userName.Value()", userName.Value(), chip::CharSpan("new_user", 8)));
+
+        VerifyOrReturn(CheckValueNonNull("userUniqueId", userUniqueId));
+        VerifyOrReturn(CheckValue("userUniqueId.Value()", userUniqueId.Value(), 305441741UL));
+
+        VerifyOrReturn(CheckValueNonNull("userStatus", userStatus));
+        VerifyOrReturn(CheckValue("userStatus.Value()", userStatus.Value(), 3));
+
+        VerifyOrReturn(CheckValueNonNull("userType", userType));
+        VerifyOrReturn(CheckValue("userType.Value()", userType.Value(), 0));
+
+        VerifyOrReturn(CheckValueNonNull("credentialRule", credentialRule));
+        VerifyOrReturn(CheckValue("credentialRule.Value()", credentialRule.Value(), 0));
+
+        VerifyOrReturn(CheckValueNull("credentials", credentials));
+
+        VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", creatorFabricIndex));
+        VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", creatorFabricIndex.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
+        VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", lastModifiedFabricIndex.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
+        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 2U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestModifyUserTypeForExistingUser_14()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetUser::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(2);
+        request.userIndex     = 1U;
+        request.userName.SetNull();
+        request.userUniqueId.SetNull();
+        request.userStatus.SetNull();
+        request.userType.SetNonNull();
+        request.userType.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserType>(6);
+        request.credentialRule.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_14();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_14(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_14(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_14() { NextTest(); }
+
+    CHIP_ERROR TestReadTheModifiedUserBackAndVerifyItsFields_15()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
+
+        RequestType request;
+        request.userIndex = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_15(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
+                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
+                                       data.nextUserIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_15(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_15(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_15(
+        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
+        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
+        const chip::app::DataModel::Nullable<
+            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
+        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
+    {
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValueNonNull("userName", userName));
+        VerifyOrReturn(CheckValueAsString("userName.Value()", userName.Value(), chip::CharSpan("new_user", 8)));
+
+        VerifyOrReturn(CheckValueNonNull("userUniqueId", userUniqueId));
+        VerifyOrReturn(CheckValue("userUniqueId.Value()", userUniqueId.Value(), 305441741UL));
+
+        VerifyOrReturn(CheckValueNonNull("userStatus", userStatus));
+        VerifyOrReturn(CheckValue("userStatus.Value()", userStatus.Value(), 3));
+
+        VerifyOrReturn(CheckValueNonNull("userType", userType));
+        VerifyOrReturn(CheckValue("userType.Value()", userType.Value(), 6));
+
+        VerifyOrReturn(CheckValueNonNull("credentialRule", credentialRule));
+        VerifyOrReturn(CheckValue("credentialRule.Value()", credentialRule.Value(), 0));
+
+        VerifyOrReturn(CheckValueNull("credentials", credentials));
+
+        VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", creatorFabricIndex));
+        VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", creatorFabricIndex.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
+        VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", lastModifiedFabricIndex.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
+        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 2U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestModifyCredentialRuleForExistingUser_16()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetUser::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(2);
+        request.userIndex     = 1U;
+        request.userName.SetNull();
+        request.userUniqueId.SetNull();
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+        request.credentialRule.SetNonNull();
+        request.credentialRule.Value() = static_cast<chip::app::Clusters::DoorLock::DlCredentialRule>(2);
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_16();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_16(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_16(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_16() { NextTest(); }
+
+    CHIP_ERROR TestReadTheModifiedUserBackAndVerifyItsFields_17()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
+
+        RequestType request;
+        request.userIndex = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_17(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
+                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
+                                       data.nextUserIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_17(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_17(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_17(
+        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
+        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
+        const chip::app::DataModel::Nullable<
+            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
+        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
+    {
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValueNonNull("userName", userName));
+        VerifyOrReturn(CheckValueAsString("userName.Value()", userName.Value(), chip::CharSpan("new_user", 8)));
+
+        VerifyOrReturn(CheckValueNonNull("userUniqueId", userUniqueId));
+        VerifyOrReturn(CheckValue("userUniqueId.Value()", userUniqueId.Value(), 305441741UL));
+
+        VerifyOrReturn(CheckValueNonNull("userStatus", userStatus));
+        VerifyOrReturn(CheckValue("userStatus.Value()", userStatus.Value(), 3));
+
+        VerifyOrReturn(CheckValueNonNull("userType", userType));
+        VerifyOrReturn(CheckValue("userType.Value()", userType.Value(), 6));
+
+        VerifyOrReturn(CheckValueNonNull("credentialRule", credentialRule));
+        VerifyOrReturn(CheckValue("credentialRule.Value()", credentialRule.Value(), 2));
+
+        VerifyOrReturn(CheckValueNull("credentials", credentials));
+
+        VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", creatorFabricIndex));
+        VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", creatorFabricIndex.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
+        VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", lastModifiedFabricIndex.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
+        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 2U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestModifyAllFieldsForExistingUser_18()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetUser::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(2);
+        request.userIndex     = 1U;
+        request.userName.SetNonNull();
+        request.userName.Value() = chip::Span<const char>("test_usergarbage: not in length on purpose", 9);
+        request.userUniqueId.SetNonNull();
+        request.userUniqueId.Value() = 466460832UL;
+        request.userStatus.SetNonNull();
+        request.userStatus.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserStatus>(1);
+        request.userType.SetNonNull();
+        request.userType.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserType>(0);
+        request.credentialRule.SetNonNull();
+        request.credentialRule.Value() = static_cast<chip::app::Clusters::DoorLock::DlCredentialRule>(1);
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_18();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_18(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_18(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_18() { NextTest(); }
+
+    CHIP_ERROR TestReadTheModifiedUserBackAndVerifyItsFields_19()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
+
+        RequestType request;
+        request.userIndex = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_19(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
+                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
+                                       data.nextUserIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_19(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_19(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_19(
+        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
+        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
+        const chip::app::DataModel::Nullable<
+            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
+        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
+    {
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValueNonNull("userName", userName));
+        VerifyOrReturn(CheckValueAsString("userName.Value()", userName.Value(), chip::CharSpan("test_user", 9)));
+
+        VerifyOrReturn(CheckValueNonNull("userUniqueId", userUniqueId));
+        VerifyOrReturn(CheckValue("userUniqueId.Value()", userUniqueId.Value(), 466460832UL));
+
+        VerifyOrReturn(CheckValueNonNull("userStatus", userStatus));
+        VerifyOrReturn(CheckValue("userStatus.Value()", userStatus.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("userType", userType));
+        VerifyOrReturn(CheckValue("userType.Value()", userType.Value(), 0));
+
+        VerifyOrReturn(CheckValueNonNull("credentialRule", credentialRule));
+        VerifyOrReturn(CheckValue("credentialRule.Value()", credentialRule.Value(), 1));
+
+        VerifyOrReturn(CheckValueNull("credentials", credentials));
+
+        VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", creatorFabricIndex));
+        VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", creatorFabricIndex.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
+        VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", lastModifiedFabricIndex.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
+        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 2U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestAddAnotherUserWithNonDefaultFields_20()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetUser::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+        request.userIndex     = 2U;
+        request.userName.SetNonNull();
+        request.userName.Value() = chip::Span<const char>("test_user2garbage: not in length on purpose", 10);
+        request.userUniqueId.SetNonNull();
+        request.userUniqueId.Value() = 12648430UL;
+        request.userStatus.SetNonNull();
+        request.userStatus.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserStatus>(1);
+        request.userType.SetNonNull();
+        request.userType.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserType>(1);
+        request.credentialRule.SetNonNull();
+        request.credentialRule.Value() = static_cast<chip::app::Clusters::DoorLock::DlCredentialRule>(2);
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_20();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_20(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_20(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_20() { NextTest(); }
+
+    CHIP_ERROR TestReadTheNewUserBackAndVerifyItsFields_21()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
+
+        RequestType request;
+        request.userIndex = 2U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_21(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
+                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
+                                       data.nextUserIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_21(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_21(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_21(
+        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
+        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
+        const chip::app::DataModel::Nullable<
+            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
+        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
+    {
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 2U));
+
+        VerifyOrReturn(CheckValueNonNull("userName", userName));
+        VerifyOrReturn(CheckValueAsString("userName.Value()", userName.Value(), chip::CharSpan("test_user2", 10)));
+
+        VerifyOrReturn(CheckValueNonNull("userUniqueId", userUniqueId));
+        VerifyOrReturn(CheckValue("userUniqueId.Value()", userUniqueId.Value(), 12648430UL));
+
+        VerifyOrReturn(CheckValueNonNull("userStatus", userStatus));
+        VerifyOrReturn(CheckValue("userStatus.Value()", userStatus.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("userType", userType));
+        VerifyOrReturn(CheckValue("userType.Value()", userType.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("credentialRule", credentialRule));
+        VerifyOrReturn(CheckValue("credentialRule.Value()", credentialRule.Value(), 2));
+
+        VerifyOrReturn(CheckValueNull("credentials", credentials));
+
+        VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", creatorFabricIndex));
+        VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", creatorFabricIndex.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
+        VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", lastModifiedFabricIndex.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
+        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 3U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateUserInTheLastSlot_22()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetUser::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+        request.userIndex     = NumberOfTotalUsersSupported;
+        request.userName.SetNonNull();
+        request.userName.Value() = chip::Span<const char>("last_usergarbage: not in length on purpose", 9);
+        request.userUniqueId.SetNull();
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+        request.credentialRule.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_22();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_22(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_22(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_22() { NextTest(); }
+
+    CHIP_ERROR TestReadTheLastUserBackAndVerifyItsFields_23()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
+
+        RequestType request;
+        request.userIndex = NumberOfTotalUsersSupported;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_23(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
+                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
+                                       data.nextUserIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_23(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_23(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_23(
+        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
+        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
+        const chip::app::DataModel::Nullable<
+            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
+        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
+    {
+        VerifyOrReturn(CheckValue("userIndex", userIndex, NumberOfTotalUsersSupported));
+
+        VerifyOrReturn(CheckValueNonNull("userName", userName));
+        VerifyOrReturn(CheckValueAsString("userName.Value()", userName.Value(), chip::CharSpan("last_user", 9)));
+
+        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
+
+        VerifyOrReturn(CheckValueNonNull("userStatus", userStatus));
+        VerifyOrReturn(CheckValue("userStatus.Value()", userStatus.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("userType", userType));
+        VerifyOrReturn(CheckValue("userType.Value()", userType.Value(), 0));
+
+        VerifyOrReturn(CheckValueNonNull("credentialRule", credentialRule));
+        VerifyOrReturn(CheckValue("credentialRule.Value()", credentialRule.Value(), 0));
+
+        VerifyOrReturn(CheckValueNull("credentials", credentials));
+
+        VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", creatorFabricIndex));
+        VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", creatorFabricIndex.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
+        VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", lastModifiedFabricIndex.Value(), 1));
+
+        VerifyOrReturn(CheckValueNull("nextUserIndex", nextUserIndex));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestUserCreationInThe0SlotFails_24()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetUser::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+        request.userIndex     = 0U;
+        request.userName.SetNull();
+        request.userUniqueId.SetNull();
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+        request.credentialRule.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_24();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_24(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_24(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
+        NextTest();
+    }
+
+    void OnSuccessResponse_24() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestUserCreationInTheOutOfBoundsSlotFails_25()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetUser::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+        request.userIndex     = static_cast<uint16_t>(NumberOfTotalUsersSupported + 1);
+        request.userName.SetNull();
+        request.userUniqueId.SetNull();
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+        request.credentialRule.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_25();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_25(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_25(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
+        NextTest();
+    }
+
+    void OnSuccessResponse_25() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestClearFirstUser_26()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearUser::Type;
+
+        RequestType request;
+        request.userIndex = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_26();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_26(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_26(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_26() { NextTest(); }
+
+    CHIP_ERROR TestReadClearedUserAndVerifyItIsAvailable_27()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
+
+        RequestType request;
+        request.userIndex = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_27(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
+                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
+                                       data.nextUserIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_27(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_27(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_27(
+        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
+        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
+        const chip::app::DataModel::Nullable<
+            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
+        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
+    {
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValueNull("userName", userName));
+
+        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
+
+        VerifyOrReturn(CheckValueNull("userStatus", userStatus));
+
+        VerifyOrReturn(CheckValueNull("userType", userType));
+
+        VerifyOrReturn(CheckValueNull("credentialRule", credentialRule));
+
+        VerifyOrReturn(CheckValueNull("credentials", credentials));
+
+        VerifyOrReturn(CheckValueNull("creatorFabricIndex", creatorFabricIndex));
+
+        VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
+
+        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
+        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 3U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateNewUserInTheClearedSlot_28()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetUser::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+        request.userIndex     = 1U;
+        request.userName.SetNull();
+        request.userUniqueId.SetNull();
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+        request.credentialRule.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_28();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_28(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_28(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_28() { NextTest(); }
+
+    CHIP_ERROR TestReadTheUserInThePreviouslyClearedSlotAndVerifyItsFields_29()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
+
+        RequestType request;
+        request.userIndex = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_29(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
+                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
+                                       data.nextUserIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_29(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_29(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_29(
+        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
+        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
+        const chip::app::DataModel::Nullable<
+            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
+        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
+    {
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValueNonNull("userName", userName));
+        VerifyOrReturn(CheckValueAsString("userName.Value()", userName.Value(), chip::CharSpan("", 0)));
+
+        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
+
+        VerifyOrReturn(CheckValueNonNull("userStatus", userStatus));
+        VerifyOrReturn(CheckValue("userStatus.Value()", userStatus.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("userType", userType));
+        VerifyOrReturn(CheckValue("userType.Value()", userType.Value(), 0));
+
+        VerifyOrReturn(CheckValueNonNull("credentialRule", credentialRule));
+        VerifyOrReturn(CheckValue("credentialRule.Value()", credentialRule.Value(), 0));
+
+        VerifyOrReturn(CheckValueNull("credentials", credentials));
+
+        VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", creatorFabricIndex));
+        VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", creatorFabricIndex.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
+        VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", lastModifiedFabricIndex.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
+        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 3U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestClearUserWithIndex0Fails_30()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearUser::Type;
+
+        RequestType request;
+        request.userIndex = 0U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_30();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_30(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_30(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
+        NextTest();
+    }
+
+    void OnSuccessResponse_30() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestClearUserWithOutOfBoundsIndexFails_31()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearUser::Type;
+
+        RequestType request;
+        request.userIndex = static_cast<uint16_t>(NumberOfTotalUsersSupported + 1);
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_31();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_31(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_31(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
+        NextTest();
+    }
+
+    void OnSuccessResponse_31() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestClearAllUsers_32()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearUser::Type;
+
+        RequestType request;
+        request.userIndex = 65534U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_32();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_32(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_32(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_32() { NextTest(); }
+
+    CHIP_ERROR TestReadFirstClearedUserAndVerifyItIsAvailable_33()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
+
+        RequestType request;
+        request.userIndex = 2U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_33(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
+                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
+                                       data.nextUserIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_33(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_33(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_33(
+        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
+        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
+        const chip::app::DataModel::Nullable<
+            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
+        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
+    {
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 2U));
+
+        VerifyOrReturn(CheckValueNull("userName", userName));
+
+        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
+
+        VerifyOrReturn(CheckValueNull("userStatus", userStatus));
+
+        VerifyOrReturn(CheckValueNull("userType", userType));
+
+        VerifyOrReturn(CheckValueNull("credentialRule", credentialRule));
+
+        VerifyOrReturn(CheckValueNull("credentials", credentials));
+
+        VerifyOrReturn(CheckValueNull("creatorFabricIndex", creatorFabricIndex));
+
+        VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
+
+        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
+        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 3U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadLastClearedUserAndVerifyItIsAvailable_34()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
+
+        RequestType request;
+        request.userIndex = NumberOfTotalUsersSupported;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_34(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
+                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
+                                       data.nextUserIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_34(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_34(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_34(
+        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
+        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
+        const chip::app::DataModel::Nullable<
+            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
+        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
+    {
+        VerifyOrReturn(CheckValue("userIndex", userIndex, NumberOfTotalUsersSupported));
+
+        VerifyOrReturn(CheckValueNull("userName", userName));
+
+        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
+
+        VerifyOrReturn(CheckValueNull("userStatus", userStatus));
+
+        VerifyOrReturn(CheckValueNull("userType", userType));
+
+        VerifyOrReturn(CheckValueNull("credentialRule", credentialRule));
+
+        VerifyOrReturn(CheckValueNull("credentials", credentials));
+
+        VerifyOrReturn(CheckValueNull("creatorFabricIndex", creatorFabricIndex));
+
+        VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
+
+        VerifyOrReturn(CheckValueNull("nextUserIndex", nextUserIndex));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestGetNumberOfSupportedPinCredentialsAndVerifyDefaultValue_35()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::DoorLockClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::NumberOfPINUsersSupported::TypeInfo>(
+            this, OnSuccessCallback_35, OnFailureCallback_35));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_35(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_35(uint16_t numberOfPINUsersSupported)
+    {
+        VerifyOrReturn(CheckValue("numberOfPINUsersSupported", numberOfPINUsersSupported, 10U));
+
+        NumberOfPINUsersSupported = numberOfPINUsersSupported;
+        NextTest();
+    }
+
+    CHIP_ERROR TestCheckThatPinCredentialDoesNotExist_36()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type;
+
+        RequestType request;
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+        request.credential.credentialIndex = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_36(data.credentialExists, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_36(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_36(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_36(bool credentialExists, const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("credentialExists", credentialExists, false));
+
+        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
+
+        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
+        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 2U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadingPinCredentialWithIndex0Fails_37()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type;
+
+        RequestType request;
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+        request.credential.credentialIndex = 0U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_37(data.credentialExists, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_37(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_37(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
+        NextTest();
+    }
+
+    void OnSuccessResponse_37(bool credentialExists, const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        ThrowSuccessResponse();
+    }
+
+    CHIP_ERROR TestReadingPinCredentialWithOutOfBoundsIndexFails_38()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type;
+
+        RequestType request;
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+        request.credential.credentialIndex = static_cast<uint16_t>(NumberOfPINUsersSupported + 1);
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_38(data.credentialExists, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_38(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_38(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
+        NextTest();
+    }
+
+    void OnSuccessResponse_38(bool credentialExists, const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        ThrowSuccessResponse();
+    }
+
+    CHIP_ERROR TestCreateNewPinCredentialAndUser_39()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+        request.credential.credentialIndex = 1U;
+
+        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("000000garbage: not in length on purpose"), 6);
+        request.userIndex.SetNull();
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_39(data.status, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_39(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_39(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_39(chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValueNonNull("userIndex", userIndex));
+        VerifyOrReturn(CheckValue("userIndex.Value()", userIndex.Value(), 1U));
+
+        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
+        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 2U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestVerifyCreatedUser_40()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
+
+        RequestType request;
+        request.userIndex = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_40(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
+                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
+                                       data.nextUserIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_40(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_40(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_40(
+        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
+        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
+        const chip::app::DataModel::Nullable<
+            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
+        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
+    {
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValueNonNull("userName", userName));
+        VerifyOrReturn(CheckValueAsString("userName.Value()", userName.Value(), chip::CharSpan("", 0)));
+
+        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
+
+        VerifyOrReturn(CheckValueNonNull("userStatus", userStatus));
+        VerifyOrReturn(CheckValue("userStatus.Value()", userStatus.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("userType", userType));
+        VerifyOrReturn(CheckValue("userType.Value()", userType.Value(), 0));
+
+        VerifyOrReturn(CheckValueNonNull("credentialRule", credentialRule));
+        VerifyOrReturn(CheckValue("credentialRule.Value()", credentialRule.Value(), 0));
+
+        VerifyOrReturn(CheckValueNonNull("credentials", credentials));
+        {
+            auto iter_1 = credentials.Value().begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(credentials.Value())>("credentials.Value()", iter_1, 0));
+            VerifyOrReturn(CheckValue("credentials.Value()[0].credentialType", iter_1.GetValue().credentialType, 1));
+            VerifyOrReturn(CheckValue("credentials.Value()[0].credentialIndex", iter_1.GetValue().credentialIndex, 1U));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(credentials.Value())>("credentials.Value()", iter_1, 1));
+        }
+
+        VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", creatorFabricIndex));
+        VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", creatorFabricIndex.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
+        VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", lastModifiedFabricIndex.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
+        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 2U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestVerifyCreatedPinCredential_41()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type;
+
+        RequestType request;
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+        request.credential.credentialIndex = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_41(data.credentialExists, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_41(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_41(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_41(bool credentialExists, const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("credentialExists", credentialExists, true));
+
+        VerifyOrReturn(CheckValueNonNull("userIndex", userIndex));
+        VerifyOrReturn(CheckValue("userIndex.Value()", userIndex.Value(), 1U));
+
+        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
+        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 2U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateNewPinCredentialAndUserWithIndex0Fails_42()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+        request.credential.credentialIndex = 0U;
+
+        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
+        request.userIndex.SetNull();
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_42(data.status, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_42(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_42(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_42(chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("status", status, 133));
+
+        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
+
+        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
+        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 2U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateNewPinCredentialAndUserWithOutOfBoundsIndexFails_43()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+        request.credential.credentialIndex = static_cast<uint16_t>(NumberOfPINUsersSupported + 1);
+
+        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
+        request.userIndex.SetNull();
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_43(data.status, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_43(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_43(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_43(chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("status", status, 133));
+
+        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
+
+        VerifyOrReturn(CheckValueNull("nextCredentialIndex", nextCredentialIndex));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestGetNumberOfSupportedRfidCredentialsAndVerifyDefaultValue_44()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::DoorLockClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::NumberOfRFIDUsersSupported::TypeInfo>(
+            this, OnSuccessCallback_44, OnFailureCallback_44));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_44(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_44(uint16_t numberOfRFIDUsersSupported)
+    {
+        VerifyOrReturn(CheckValue("numberOfRFIDUsersSupported", numberOfRFIDUsersSupported, 10U));
+
+        NumberOfRFIDUsersSupported = numberOfRFIDUsersSupported;
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadingRfidCredentialWithIndex0Fails_45()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type;
+
+        RequestType request;
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
+        request.credential.credentialIndex = 0U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_45(data.credentialExists, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_45(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_45(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
+        NextTest();
+    }
+
+    void OnSuccessResponse_45(bool credentialExists, const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        ThrowSuccessResponse();
+    }
+
+    CHIP_ERROR TestReadingRfidCredentialWithOutOfBoundsIndexFails_46()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type;
+
+        RequestType request;
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
+        request.credential.credentialIndex = static_cast<uint16_t>(NumberOfRFIDUsersSupported + 1);
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_46(data.credentialExists, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_46(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_46(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
+        NextTest();
+    }
+
+    void OnSuccessResponse_46(bool credentialExists, const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        ThrowSuccessResponse();
+    }
+
+    CHIP_ERROR TestCheckThatRfidCredentialDoesNotExist_47()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type;
+
+        RequestType request;
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
+        request.credential.credentialIndex = 2U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_47(data.credentialExists, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_47(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_47(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_47(bool credentialExists, const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("credentialExists", credentialExists, false));
+
+        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
+
+        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
+        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 3U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateNewRfidCredentialAndAddItToExistingUser_48()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
+        request.credential.credentialIndex = 2U;
+
+        request.credentialData =
+            chip::ByteSpan(chip::Uint8::from_const_char("rfid_data_123456garbage: not in length on purpose"), 16);
+        request.userIndex.SetNonNull();
+        request.userIndex.Value() = 1U;
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_48(data.status, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_48(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_48(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_48(chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
+
+        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
+        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 3U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestVerifyModifiedUser_49()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
+
+        RequestType request;
+        request.userIndex = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_49(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
+                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
+                                       data.nextUserIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_49(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_49(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_49(
+        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
+        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
+        const chip::app::DataModel::Nullable<
+            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
+        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
+    {
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValueNonNull("userName", userName));
+        VerifyOrReturn(CheckValueAsString("userName.Value()", userName.Value(), chip::CharSpan("", 0)));
+
+        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
+
+        VerifyOrReturn(CheckValueNonNull("userStatus", userStatus));
+        VerifyOrReturn(CheckValue("userStatus.Value()", userStatus.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("userType", userType));
+        VerifyOrReturn(CheckValue("userType.Value()", userType.Value(), 0));
+
+        VerifyOrReturn(CheckValueNonNull("credentialRule", credentialRule));
+        VerifyOrReturn(CheckValue("credentialRule.Value()", credentialRule.Value(), 0));
+
+        VerifyOrReturn(CheckValueNonNull("credentials", credentials));
+        {
+            auto iter_1 = credentials.Value().begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(credentials.Value())>("credentials.Value()", iter_1, 0));
+            VerifyOrReturn(CheckValue("credentials.Value()[0].credentialType", iter_1.GetValue().credentialType, 1));
+            VerifyOrReturn(CheckValue("credentials.Value()[0].credentialIndex", iter_1.GetValue().credentialIndex, 1U));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(credentials.Value())>("credentials.Value()", iter_1, 1));
+            VerifyOrReturn(CheckValue("credentials.Value()[1].credentialType", iter_1.GetValue().credentialType, 2));
+            VerifyOrReturn(CheckValue("credentials.Value()[1].credentialIndex", iter_1.GetValue().credentialIndex, 2U));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(credentials.Value())>("credentials.Value()", iter_1, 2));
+        }
+
+        VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", creatorFabricIndex));
+        VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", creatorFabricIndex.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
+        VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", lastModifiedFabricIndex.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
+        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 2U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestVerifyCreatedCredential_50()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type;
+
+        RequestType request;
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
+        request.credential.credentialIndex = 2U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_50(data.credentialExists, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_50(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_50(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_50(bool credentialExists, const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("credentialExists", credentialExists, true));
+
+        VerifyOrReturn(CheckValueNonNull("userIndex", userIndex));
+        VerifyOrReturn(CheckValue("userIndex.Value()", userIndex.Value(), 1U));
+
+        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
+        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 3U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateNewRfidCredentialAndUserWithIndex0Fails_51()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
+        request.credential.credentialIndex = 0U;
+
+        request.credentialData =
+            chip::ByteSpan(chip::Uint8::from_const_char("new_rfid_data_fieldgarbage: not in length on purpose"), 19);
+        request.userIndex.SetNull();
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_51(data.status, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_51(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_51(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_51(chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("status", status, 133));
+
+        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
+
+        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
+        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 3U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateNewRfidCredentialAndUserWithOutOfBoundsIndexFails_52()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
+        request.credential.credentialIndex = static_cast<uint16_t>(NumberOfRFIDUsersSupported + 1);
+
+        request.credentialData =
+            chip::ByteSpan(chip::Uint8::from_const_char("new_rfid_data_fieldgarbage: not in length on purpose"), 19);
+        request.userIndex.SetNull();
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_52(data.status, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_52(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_52(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_52(chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("status", status, 133));
+
+        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
+
+        VerifyOrReturn(CheckValueNull("nextCredentialIndex", nextCredentialIndex));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateNewPinCredentialAndTryToAddItToExistingUser_53()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+        request.credential.credentialIndex = 3U;
+
+        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123465garbage: not in length on purpose"), 6);
+        request.userIndex.SetNonNull();
+        request.userIndex.Value() = 1U;
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_53(data.status, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_53(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_53(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_53(chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("status", status, 3));
+
+        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
+
+        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
+        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 4U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateNewCredentialAndTryToAddItTo0User_54()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+        request.credential.credentialIndex = 3U;
+
+        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123465garbage: not in length on purpose"), 6);
+        request.userIndex.SetNonNull();
+        request.userIndex.Value() = 0U;
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_54(data.status, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_54(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_54(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_54(chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("status", status, 133));
+
+        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
+
+        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
+        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 4U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateNewCredentialAndTryToAddItToOutOfBoundsUser_55()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+        request.credential.credentialIndex = 3U;
+
+        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123465garbage: not in length on purpose"), 6);
+        request.userIndex.SetNonNull();
+        request.userIndex.Value() = static_cast<uint16_t>(NumberOfTotalUsersSupported + 1);
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_55(data.status, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_55(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_55(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_55(chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("status", status, 133));
+
+        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
+
+        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
+        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 4U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateNewPinWithTooShortData_56()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+        request.credential.credentialIndex = 3U;
+
+        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("12345garbage: not in length on purpose"), 5);
+        request.userIndex.SetNonNull();
+        request.userIndex.Value() = 0U;
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_56(data.status, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_56(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_56(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_56(chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("status", status, 133));
+
+        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
+
+        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
+        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 4U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateNewPinWithTooLongData_57()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+        request.credential.credentialIndex = 3U;
+
+        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123456789garbage: not in length on purpose"), 9);
+        request.userIndex.SetNonNull();
+        request.userIndex.Value() = 0U;
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_57(data.status, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_57(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_57(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_57(chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("status", status, 133));
+
+        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
+
+        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
+        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 4U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateNewRfidWithTooShortData_58()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
+        request.credential.credentialIndex = 3U;
+
+        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("rfid_datagarbage: not in length on purpose"), 9);
+        request.userIndex.SetNonNull();
+        request.userIndex.Value() = 0U;
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_58(data.status, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_58(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_58(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_58(chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("status", status, 133));
+
+        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
+
+        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
+        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 4U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateNewPinWithProgrammingUserTypeFails_59()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+        request.credential.credentialIndex = 3U;
+
+        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
+        request.userIndex.SetNonNull();
+        request.userIndex.Value() = 0U;
+        request.userStatus.SetNull();
+        request.userType.SetNonNull();
+        request.userType.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserType>(3);
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_59(data.status, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_59(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_59(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_59(chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("status", status, 133));
+
+        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
+
+        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
+        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 4U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateNewRfidWithTooShortData_60()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
+        request.credential.credentialIndex = 3U;
+
+        request.credentialData = chip::ByteSpan(
+            chip::Uint8::from_const_char("very_long_rfid_data_to_test_boundariesgarbage: not in length on purpose"), 38);
+        request.userIndex.SetNonNull();
+        request.userIndex.Value() = 0U;
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_60(data.status, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_60(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_60(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_60(chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("status", status, 133));
+
+        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
+
+        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
+        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 4U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateNewPinCredentialWithDataTheWouldCauseDuplicate_61()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+        request.credential.credentialIndex = 4U;
+
+        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("000000garbage: not in length on purpose"), 6);
+        request.userIndex.SetNull();
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_61(data.status, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_61(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_61(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_61(chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("status", status, 2));
+
+        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
+
+        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
+        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 5U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateNewRfidCredentialWithDataTheWouldCauseDuplicate_62()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
+        request.credential.credentialIndex = 4U;
+
+        request.credentialData =
+            chip::ByteSpan(chip::Uint8::from_const_char("rfid_data_123456garbage: not in length on purpose"), 16);
+        request.userIndex.SetNull();
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_62(data.status, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_62(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_62(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_62(chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("status", status, 2));
+
+        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
+
+        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
+        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 5U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestModifyCredentialDataOfExistingPinCredential_63()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(2);
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+        request.credential.credentialIndex = 1U;
+
+        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
+        request.userIndex.SetNonNull();
+        request.userIndex.Value() = 1U;
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_63(data.status, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_63(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_63(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_63(chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
+
+        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
+        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 3U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestVerifyThatCredentialWasChangedByCreatingNewCredentialWithOldData_64()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+        request.credential.credentialIndex = 3U;
+
+        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("000000garbage: not in length on purpose"), 6);
+        request.userIndex.SetNull();
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_64(data.status, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_64(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_64(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_64(chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValueNonNull("userIndex", userIndex));
+        VerifyOrReturn(CheckValue("userIndex.Value()", userIndex.Value(), 2U));
+
+        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
+        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 4U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestVerifyThatCredentialWasChangedByCreatingNewCredentialWithNewData_65()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+        request.credential.credentialIndex = 4U;
+
+        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
+        request.userIndex.SetNull();
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_65(data.status, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_65(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_65(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_65(chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("status", status, 2));
+
+        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
+
+        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
+        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 5U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestClearFirstPinCredential_66()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearCredential::Type;
+
+        RequestType request;
+        request.credential.SetNonNull();
+
+        request.credential.Value().credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+        request.credential.Value().credentialIndex = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_66();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_66(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_66(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_66() { NextTest(); }
+
+    CHIP_ERROR TestReadBackTheCredentialAndMakeSureItIsDeleted_67()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type;
+
+        RequestType request;
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+        request.credential.credentialIndex = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_67(data.credentialExists, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_67(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_67(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_67(bool credentialExists, const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("credentialExists", credentialExists, false));
+
+        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
+
+        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
+        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 4U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheUserBackAndMakeSurePinCredentialIsDeleted_68()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
+
+        RequestType request;
+        request.userIndex = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_68(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
+                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
+                                       data.nextUserIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_68(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_68(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_68(
+        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
+        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
+        const chip::app::DataModel::Nullable<
+            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
+        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
+    {
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValueNonNull("userName", userName));
+        VerifyOrReturn(CheckValueAsString("userName.Value()", userName.Value(), chip::CharSpan("", 0)));
+
+        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
+
+        VerifyOrReturn(CheckValueNonNull("userStatus", userStatus));
+        VerifyOrReturn(CheckValue("userStatus.Value()", userStatus.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("userType", userType));
+        VerifyOrReturn(CheckValue("userType.Value()", userType.Value(), 0));
+
+        VerifyOrReturn(CheckValueNonNull("credentialRule", credentialRule));
+        VerifyOrReturn(CheckValue("credentialRule.Value()", credentialRule.Value(), 0));
+
+        VerifyOrReturn(CheckValueNonNull("credentials", credentials));
+        {
+            auto iter_1 = credentials.Value().begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(credentials.Value())>("credentials.Value()", iter_1, 0));
+            VerifyOrReturn(CheckValue("credentials.Value()[0].credentialType", iter_1.GetValue().credentialType, 2));
+            VerifyOrReturn(CheckValue("credentials.Value()[0].credentialIndex", iter_1.GetValue().credentialIndex, 2U));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(credentials.Value())>("credentials.Value()", iter_1, 1));
+        }
+
+        VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", creatorFabricIndex));
+        VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", creatorFabricIndex.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
+        VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", lastModifiedFabricIndex.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
+        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 3U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestClearTheSecondPinCredential_69()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearCredential::Type;
+
+        RequestType request;
+        request.credential.SetNonNull();
+
+        request.credential.Value().credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+        request.credential.Value().credentialIndex = 3U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_69();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_69(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_69(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_69() { NextTest(); }
+
+    CHIP_ERROR TestReadBackTheCredentialAndMakeSureItIsDeleted_70()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type;
+
+        RequestType request;
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+        request.credential.credentialIndex = 3U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_70(data.credentialExists, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_70(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_70(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_70(bool credentialExists, const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("credentialExists", credentialExists, false));
+
+        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
+
+        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
+        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 4U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheUserBackAndMakeSureRelatedUserIsDeleted_71()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
+
+        RequestType request;
+        request.userIndex = 2U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_71(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
+                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
+                                       data.nextUserIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_71(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_71(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_71(
+        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
+        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
+        const chip::app::DataModel::Nullable<
+            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
+        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
+    {
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 2U));
+
+        VerifyOrReturn(CheckValueNull("userName", userName));
+
+        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
+
+        VerifyOrReturn(CheckValueNull("userStatus", userStatus));
+
+        VerifyOrReturn(CheckValueNull("userType", userType));
+
+        VerifyOrReturn(CheckValueNull("credentialRule", credentialRule));
+
+        VerifyOrReturn(CheckValueNull("credentials", credentials));
+
+        VerifyOrReturn(CheckValueNull("creatorFabricIndex", creatorFabricIndex));
+
+        VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
+
+        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
+        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 3U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateNewRfidCredentialWithUser_72()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
+        request.credential.credentialIndex = 1U;
+
+        request.credentialData =
+            chip::ByteSpan(chip::Uint8::from_const_char("rfid_data_12345garbage: not in length on purpose"), 15);
+        request.userIndex.SetNull();
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_72(data.status, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_72(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_72(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_72(chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValueNonNull("userIndex", userIndex));
+        VerifyOrReturn(CheckValue("userIndex.Value()", userIndex.Value(), 2U));
+
+        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
+        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 3U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestClearAllTheRfidCredentials_73()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearCredential::Type;
+
+        RequestType request;
+        request.credential.SetNonNull();
+
+        request.credential.Value().credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
+        request.credential.Value().credentialIndex = 65534U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_73();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_73(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_73(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_73() { NextTest(); }
+
+    CHIP_ERROR TestReadBackTheFistRfidCredentialAndMakeSureItIsDeleted_74()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type;
+
+        RequestType request;
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
+        request.credential.credentialIndex = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_74(data.credentialExists, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_74(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_74(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_74(bool credentialExists, const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("credentialExists", credentialExists, false));
+
+        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
+
+        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
+        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 2U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadBackTheSecondRfidCredentialAndMakeSureItIsDeleted_75()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type;
+
+        RequestType request;
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
+        request.credential.credentialIndex = 2U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_75(data.credentialExists, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_75(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_75(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_75(bool credentialExists, const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("credentialExists", credentialExists, false));
+
+        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
+
+        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
+        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 3U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheUserRelatedWithFirstRfidBackAndMakeSureItIsDeleted_76()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
+
+        RequestType request;
+        request.userIndex = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_76(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
+                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
+                                       data.nextUserIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_76(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_76(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_76(
+        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
+        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
+        const chip::app::DataModel::Nullable<
+            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
+        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
+    {
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValueNull("userName", userName));
+
+        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
+
+        VerifyOrReturn(CheckValueNull("userStatus", userStatus));
+
+        VerifyOrReturn(CheckValueNull("userType", userType));
+
+        VerifyOrReturn(CheckValueNull("credentialRule", credentialRule));
+
+        VerifyOrReturn(CheckValueNull("credentials", credentials));
+
+        VerifyOrReturn(CheckValueNull("creatorFabricIndex", creatorFabricIndex));
+
+        VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
+
+        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
+        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 2U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheUserRelatedWithSecondRfidBackAndMakeSureItIsDeleted_77()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
+
+        RequestType request;
+        request.userIndex = 2U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_77(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
+                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
+                                       data.nextUserIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_77(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_77(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_77(
+        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
+        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
+        const chip::app::DataModel::Nullable<
+            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
+        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
+    {
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 2U));
+
+        VerifyOrReturn(CheckValueNull("userName", userName));
+
+        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
+
+        VerifyOrReturn(CheckValueNull("userStatus", userStatus));
+
+        VerifyOrReturn(CheckValueNull("userType", userType));
+
+        VerifyOrReturn(CheckValueNull("credentialRule", credentialRule));
+
+        VerifyOrReturn(CheckValueNull("credentials", credentials));
+
+        VerifyOrReturn(CheckValueNull("creatorFabricIndex", creatorFabricIndex));
+
+        VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
+
+        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
+        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 3U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateNewPinCredentialWithUser_78()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+        request.credential.credentialIndex = 1U;
+
+        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
+        request.userIndex.SetNull();
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_78(data.status, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_78(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_78(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_78(chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValueNonNull("userIndex", userIndex));
+        VerifyOrReturn(CheckValue("userIndex.Value()", userIndex.Value(), 1U));
+
+        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
+        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 2U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateNewRfidCredentialWithUser_79()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
+        request.credential.credentialIndex = 2U;
+
+        request.credentialData =
+            chip::ByteSpan(chip::Uint8::from_const_char("rfid_data_1234garbage: not in length on purpose"), 14);
+        request.userIndex.SetNull();
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_79(data.status, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_79(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_79(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_79(chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValueNonNull("userIndex", userIndex));
+        VerifyOrReturn(CheckValue("userIndex.Value()", userIndex.Value(), 2U));
+
+        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
+        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 3U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateAnotherRfidCredentialWithUser_80()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
+        request.credential.credentialIndex = 6U;
+
+        request.credentialData =
+            chip::ByteSpan(chip::Uint8::from_const_char("rfid_data_9876garbage: not in length on purpose"), 14);
+        request.userIndex.SetNull();
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_80(data.status, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_80(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_80(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_80(chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValueNonNull("userIndex", userIndex));
+        VerifyOrReturn(CheckValue("userIndex.Value()", userIndex.Value(), 3U));
+
+        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
+        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 7U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestClearAllTheCredentials_81()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearCredential::Type;
+
+        RequestType request;
+        request.credential.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_81();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_81(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_81(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_81() { NextTest(); }
+
+    CHIP_ERROR TestReadBackTheFirstPinCredentialAndMakeSureItIsDeleted_82()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type;
+
+        RequestType request;
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+        request.credential.credentialIndex = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_82(data.credentialExists, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_82(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_82(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_82(bool credentialExists, const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("credentialExists", credentialExists, false));
+
+        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
+
+        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
+        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 2U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadBackTheFirstRfidCredentialAndMakeSureItIsDeleted_83()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type;
+
+        RequestType request;
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
+        request.credential.credentialIndex = 2U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_83(data.credentialExists, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_83(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_83(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_83(bool credentialExists, const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("credentialExists", credentialExists, false));
+
+        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
+
+        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
+        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 3U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadBackTheSecondPinCredentialAndMakeSureItIsDeleted_84()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type;
+
+        RequestType request;
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+        request.credential.credentialIndex = 6U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_84(data.credentialExists, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_84(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_84(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_84(bool credentialExists, const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("credentialExists", credentialExists, false));
+
+        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
+
+        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
+        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 7U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheUserRelatedWithFirstPinBackAndMakeSureItIsDeleted_85()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
+
+        RequestType request;
+        request.userIndex = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_85(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
+                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
+                                       data.nextUserIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_85(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_85(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_85(
+        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
+        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
+        const chip::app::DataModel::Nullable<
+            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
+        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
+    {
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValueNull("userName", userName));
+
+        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
+
+        VerifyOrReturn(CheckValueNull("userStatus", userStatus));
+
+        VerifyOrReturn(CheckValueNull("userType", userType));
+
+        VerifyOrReturn(CheckValueNull("credentialRule", credentialRule));
+
+        VerifyOrReturn(CheckValueNull("credentials", credentials));
+
+        VerifyOrReturn(CheckValueNull("creatorFabricIndex", creatorFabricIndex));
+
+        VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
+
+        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
+        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 2U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheUserRelatedWithFirstRfidBackAndMakeSureItIsDeleted_86()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
+
+        RequestType request;
+        request.userIndex = 2U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_86(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
+                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
+                                       data.nextUserIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_86(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_86(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_86(
+        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
+        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
+        const chip::app::DataModel::Nullable<
+            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
+        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
+    {
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 2U));
+
+        VerifyOrReturn(CheckValueNull("userName", userName));
+
+        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
+
+        VerifyOrReturn(CheckValueNull("userStatus", userStatus));
+
+        VerifyOrReturn(CheckValueNull("userType", userType));
+
+        VerifyOrReturn(CheckValueNull("credentialRule", credentialRule));
+
+        VerifyOrReturn(CheckValueNull("credentials", credentials));
+
+        VerifyOrReturn(CheckValueNull("creatorFabricIndex", creatorFabricIndex));
+
+        VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
+
+        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
+        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 3U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheUserRelatedWithSecondPinBackAndMakeSureItIsDeleted_87()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
+
+        RequestType request;
+        request.userIndex = 3U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_87(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
+                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
+                                       data.nextUserIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_87(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_87(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_87(
+        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
+        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
+        const chip::app::DataModel::Nullable<
+            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
+        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
+    {
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 3U));
+
+        VerifyOrReturn(CheckValueNull("userName", userName));
+
+        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
+
+        VerifyOrReturn(CheckValueNull("userStatus", userStatus));
+
+        VerifyOrReturn(CheckValueNull("userType", userType));
+
+        VerifyOrReturn(CheckValueNull("credentialRule", credentialRule));
+
+        VerifyOrReturn(CheckValueNull("credentials", credentials));
+
+        VerifyOrReturn(CheckValueNull("creatorFabricIndex", creatorFabricIndex));
+
+        VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
+
+        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
+        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 4U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateNewProgrammingPinCredentialWithInvalidIndex_88()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(0);
+        request.credential.credentialIndex = 1U;
+
+        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
+        request.userIndex.SetNull();
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_88(data.status, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_88(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_88(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_88(chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("status", status, 133));
+
+        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
+
+        VerifyOrReturn(CheckValueNull("nextCredentialIndex", nextCredentialIndex));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateNewProgrammingPinCredentialWithValidIndex_89()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(0);
+        request.credential.credentialIndex = 0U;
+
+        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
+        request.userIndex.SetNull();
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_89(data.status, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_89(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_89(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_89(chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValueNonNull("userIndex", userIndex));
+        VerifyOrReturn(CheckValue("userIndex.Value()", userIndex.Value(), 1U));
+
+        VerifyOrReturn(CheckValueNull("nextCredentialIndex", nextCredentialIndex));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestVerifyCreatedUser_90()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
+
+        RequestType request;
+        request.userIndex = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_90(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
+                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
+                                       data.nextUserIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_90(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_90(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_90(
+        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
+        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
+        const chip::app::DataModel::Nullable<
+            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
+        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
+    {
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValueNonNull("userName", userName));
+        VerifyOrReturn(CheckValueAsString("userName.Value()", userName.Value(), chip::CharSpan("", 0)));
+
+        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
+
+        VerifyOrReturn(CheckValueNonNull("userStatus", userStatus));
+        VerifyOrReturn(CheckValue("userStatus.Value()", userStatus.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("userType", userType));
+        VerifyOrReturn(CheckValue("userType.Value()", userType.Value(), 0));
+
+        VerifyOrReturn(CheckValueNonNull("credentialRule", credentialRule));
+        VerifyOrReturn(CheckValue("credentialRule.Value()", credentialRule.Value(), 0));
+
+        VerifyOrReturn(CheckValueNonNull("credentials", credentials));
+        {
+            auto iter_1 = credentials.Value().begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(credentials.Value())>("credentials.Value()", iter_1, 0));
+            VerifyOrReturn(CheckValue("credentials.Value()[0].credentialType", iter_1.GetValue().credentialType, 0));
+            VerifyOrReturn(CheckValue("credentials.Value()[0].credentialIndex", iter_1.GetValue().credentialIndex, 0U));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(credentials.Value())>("credentials.Value()", iter_1, 1));
+        }
+
+        VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", creatorFabricIndex));
+        VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", creatorFabricIndex.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
+        VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", lastModifiedFabricIndex.Value(), 1));
+
+        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
+        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 2U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestVerifyCreatedProgrammingPinCredential_91()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type;
+
+        RequestType request;
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(0);
+        request.credential.credentialIndex = 0U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_91(data.credentialExists, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_91(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_91(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_91(bool credentialExists, const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("credentialExists", credentialExists, true));
+
+        VerifyOrReturn(CheckValueNonNull("userIndex", userIndex));
+        VerifyOrReturn(CheckValue("userIndex.Value()", userIndex.Value(), 1U));
+
+        VerifyOrReturn(CheckValueNull("nextCredentialIndex", nextCredentialIndex));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestModifyTheProgrammingPinCredential_92()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(2);
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(0);
+        request.credential.credentialIndex = 0U;
+
+        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("654321garbage: not in length on purpose"), 6);
+        request.userIndex.SetNull();
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_92(data.status, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_92(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_92(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_92(chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
+
+        VerifyOrReturn(CheckValueNull("nextCredentialIndex", nextCredentialIndex));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestClearingProgrammingPinFails_93()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearCredential::Type;
+
+        RequestType request;
+        request.credential.SetNonNull();
+
+        request.credential.Value().credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(0);
+        request.credential.Value().credentialIndex = 0U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_93();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_93(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_93(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
+        NextTest();
+    }
+
+    void OnSuccessResponse_93() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestClearingProgrammingPinWithInvalidIndexFails_94()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearCredential::Type;
+
+        RequestType request;
+        request.credential.SetNonNull();
+
+        request.credential.Value().credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(0);
+        request.credential.Value().credentialIndex = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_94();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_94(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_94(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
+        NextTest();
+    }
+
+    void OnSuccessResponse_94() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestClearingPinCredentialWithZeroIndexFails_95()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearCredential::Type;
+
+        RequestType request;
+        request.credential.SetNonNull();
+
+        request.credential.Value().credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+        request.credential.Value().credentialIndex = 0U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_95();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_95(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_95(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
+        NextTest();
+    }
+
+    void OnSuccessResponse_95() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestClearingPinCredentialWithOutOfBoundIndexFails_96()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearCredential::Type;
+
+        RequestType request;
+        request.credential.SetNonNull();
+
+        request.credential.Value().credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+        request.credential.Value().credentialIndex = static_cast<uint16_t>(NumberOfPINUsersSupported + 1);
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_96();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_96(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_96(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
+        NextTest();
+    }
+
+    void OnSuccessResponse_96() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestClearingRfidCredentialWithZeroIndexFails_97()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearCredential::Type;
+
+        RequestType request;
+        request.credential.SetNonNull();
+
+        request.credential.Value().credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
+        request.credential.Value().credentialIndex = 0U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_97();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_97(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_97(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
+        NextTest();
+    }
+
+    void OnSuccessResponse_97() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestClearingRfidCredentialWithOutOfBoundIndexFails_98()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearCredential::Type;
+
+        RequestType request;
+        request.credential.SetNonNull();
+
+        request.credential.Value().credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
+        request.credential.Value().credentialIndex = static_cast<uint16_t>(NumberOfRFIDUsersSupported + 1);
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_98();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_98(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_98(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
+        NextTest();
+    }
+
+    void OnSuccessResponse_98() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestClearTheProgrammingPinUser_99()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearUser::Type;
+
+        RequestType request;
+        request.userIndex = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_99();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_99(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_99(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_99() { NextTest(); }
+
+    CHIP_ERROR TestMakeSureProgrammingPinUserIsDeleted_100()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
+
+        RequestType request;
+        request.userIndex = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_100(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
+                                        data.credentialRule, data.credentials, data.creatorFabricIndex,
+                                        data.lastModifiedFabricIndex, data.nextUserIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_100(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_100(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_100(
+        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
+        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
+        const chip::app::DataModel::Nullable<
+            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
+        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
+        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
+    {
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValueNull("userName", userName));
+
+        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
+
+        VerifyOrReturn(CheckValueNull("userStatus", userStatus));
+
+        VerifyOrReturn(CheckValueNull("userType", userType));
+
+        VerifyOrReturn(CheckValueNull("credentialRule", credentialRule));
+
+        VerifyOrReturn(CheckValueNull("credentials", credentials));
+
+        VerifyOrReturn(CheckValueNull("creatorFabricIndex", creatorFabricIndex));
+
+        VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
+
+        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
+        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 2U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestMakeSureProgrammingPinCredentialIsDeleted_101()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type;
+
+        RequestType request;
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(0);
+        request.credential.credentialIndex = 0U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_UsersAndCredentials *>(context))
+                ->OnSuccessResponse_101(data.credentialExists, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_101(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_101(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_101(bool credentialExists, const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                               const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("credentialExists", credentialExists, false));
+
+        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
+
+        VerifyOrReturn(CheckValueNull("nextCredentialIndex", nextCredentialIndex));
+
+        NextTest();
+    }
+};
+
+class DL_LockUnlock : public TestCommand
+{
+public:
+    DL_LockUnlock(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("DL_LockUnlock", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~DL_LockUnlock() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: DL_LockUnlock\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: DL_LockUnlock\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Create new PIN credential and lock/unlock user\n");
+            err = TestCreateNewPinCredentialAndLockUnlockUser_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Try to unlock the door with invalid PIN\n");
+            err = TestTryToUnlockTheDoorWithInvalidPin_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Verify that lock state attribute value is set to Locked\n");
+            err = TestVerifyThatLockStateAttributeValueIsSetToLocked_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Try to unlock the door with valid PIN\n");
+            err = TestTryToUnlockTheDoorWithValidPin_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Verify that lock state attribute value is set to Unlocked\n");
+            err = TestVerifyThatLockStateAttributeValueIsSetToUnlocked_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Try to lock the door with invalid PIN\n");
+            err = TestTryToLockTheDoorWithInvalidPin_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Verify that lock state attribute value is set to Unlocked\n");
+            err = TestVerifyThatLockStateAttributeValueIsSetToUnlocked_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Try to unlock the door with valid PIN\n");
+            err = TestTryToUnlockTheDoorWithValidPin_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Verify that lock state attribute value is set to Locked\n");
+            err = TestVerifyThatLockStateAttributeValueIsSetToLocked_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Clean the created credential\n");
+            err = TestCleanTheCreatedCredential_10();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 11;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    static void OnFailureCallback_3(void * context, CHIP_ERROR error)
+    {
+        (static_cast<DL_LockUnlock *>(context))->OnFailureResponse_3(error);
+    }
+
+    static void OnSuccessCallback_3(void * context,
+                                    const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> & lockState)
+    {
+        (static_cast<DL_LockUnlock *>(context))->OnSuccessResponse_3(lockState);
+    }
+
+    static void OnFailureCallback_5(void * context, CHIP_ERROR error)
+    {
+        (static_cast<DL_LockUnlock *>(context))->OnFailureResponse_5(error);
+    }
+
+    static void OnSuccessCallback_5(void * context,
+                                    const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> & lockState)
+    {
+        (static_cast<DL_LockUnlock *>(context))->OnSuccessResponse_5(lockState);
+    }
+
+    static void OnFailureCallback_7(void * context, CHIP_ERROR error)
+    {
+        (static_cast<DL_LockUnlock *>(context))->OnFailureResponse_7(error);
+    }
+
+    static void OnSuccessCallback_7(void * context,
+                                    const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> & lockState)
+    {
+        (static_cast<DL_LockUnlock *>(context))->OnSuccessResponse_7(lockState);
+    }
+
+    static void OnFailureCallback_9(void * context, CHIP_ERROR error)
+    {
+        (static_cast<DL_LockUnlock *>(context))->OnFailureResponse_9(error);
+    }
+
+    static void OnSuccessCallback_9(void * context,
+                                    const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> & lockState)
+    {
+        (static_cast<DL_LockUnlock *>(context))->OnSuccessResponse_9(lockState);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestCreateNewPinCredentialAndLockUnlockUser_1()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+        request.credential.credentialIndex = 1U;
+
+        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
+        request.userIndex.SetNull();
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_LockUnlock *>(context))->OnSuccessResponse_1(data.status, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_LockUnlock *>(context))->OnFailureResponse_1(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_1(chip::app::Clusters::DoorLock::DlStatus status,
+                             const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                             const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValueNonNull("userIndex", userIndex));
+        VerifyOrReturn(CheckValue("userIndex.Value()", userIndex.Value(), 1U));
+
+        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
+        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 2U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestTryToUnlockTheDoorWithInvalidPin_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::UnlockDoor::Type;
+
+        RequestType request;
+        request.pinCode.Emplace();
+        request.pinCode.Value() = chip::ByteSpan(chip::Uint8::from_const_char("000000garbage: not in length on purpose"), 6);
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_LockUnlock *>(context))->OnSuccessResponse_2();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_LockUnlock *>(context))->OnFailureResponse_2(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILURE));
+        NextTest();
+    }
+
+    void OnSuccessResponse_2() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestVerifyThatLockStateAttributeValueIsSetToLocked_3()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::DoorLockClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::LockState::TypeInfo>(
+            this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_3(const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> & lockState)
+    {
+        VerifyOrReturn(CheckValueNonNull("lockState", lockState));
+        VerifyOrReturn(CheckValue("lockState.Value()", lockState.Value(), 1));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestTryToUnlockTheDoorWithValidPin_4()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::UnlockDoor::Type;
+
+        RequestType request;
+        request.pinCode.Emplace();
+        request.pinCode.Value() = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_LockUnlock *>(context))->OnSuccessResponse_4();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_LockUnlock *>(context))->OnFailureResponse_4(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_4(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_4() { NextTest(); }
+
+    CHIP_ERROR TestVerifyThatLockStateAttributeValueIsSetToUnlocked_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::DoorLockClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::LockState::TypeInfo>(
+            this, OnSuccessCallback_5, OnFailureCallback_5));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_5(const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> & lockState)
+    {
+        VerifyOrReturn(CheckValueNonNull("lockState", lockState));
+        VerifyOrReturn(CheckValue("lockState.Value()", lockState.Value(), 2));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestTryToLockTheDoorWithInvalidPin_6()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::LockDoor::Type;
+
+        RequestType request;
+        request.pinCode.Emplace();
+        request.pinCode.Value() = chip::ByteSpan(chip::Uint8::from_const_char("000000garbage: not in length on purpose"), 6);
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_LockUnlock *>(context))->OnSuccessResponse_6();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_LockUnlock *>(context))->OnFailureResponse_6(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILURE));
+        NextTest();
+    }
+
+    void OnSuccessResponse_6() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestVerifyThatLockStateAttributeValueIsSetToUnlocked_7()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::DoorLockClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::LockState::TypeInfo>(
+            this, OnSuccessCallback_7, OnFailureCallback_7));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_7(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_7(const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> & lockState)
+    {
+        VerifyOrReturn(CheckValueNonNull("lockState", lockState));
+        VerifyOrReturn(CheckValue("lockState.Value()", lockState.Value(), 2));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestTryToUnlockTheDoorWithValidPin_8()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::LockDoor::Type;
+
+        RequestType request;
+        request.pinCode.Emplace();
+        request.pinCode.Value() = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_LockUnlock *>(context))->OnSuccessResponse_8();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_LockUnlock *>(context))->OnFailureResponse_8(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_8(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_8() { NextTest(); }
+
+    CHIP_ERROR TestVerifyThatLockStateAttributeValueIsSetToLocked_9()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::DoorLockClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::LockState::TypeInfo>(
+            this, OnSuccessCallback_9, OnFailureCallback_9));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_9(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_9(const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> & lockState)
+    {
+        VerifyOrReturn(CheckValueNonNull("lockState", lockState));
+        VerifyOrReturn(CheckValue("lockState.Value()", lockState.Value(), 1));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCleanTheCreatedCredential_10()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearCredential::Type;
+
+        RequestType request;
+        request.credential.SetNonNull();
+
+        request.credential.Value().credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+        request.credential.Value().credentialIndex = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_LockUnlock *>(context))->OnSuccessResponse_10();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_LockUnlock *>(context))->OnFailureResponse_10(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_10(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_10() { NextTest(); }
+};
+
+class DL_Schedules : public TestCommand
+{
+public:
+    DL_Schedules(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("DL_Schedules", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~DL_Schedules() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: DL_Schedules\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: DL_Schedules\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Create new PIN credential and schedule user\n");
+            err = TestCreateNewPinCredentialAndScheduleUser_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Get number of supported users\n");
+            err = TestGetNumberOfSupportedUsers_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 3 : Get Max number of Week Day schedules for user and verify default value\n");
+            err = TestGetMaxNumberOfWeekDaySchedulesForUserAndVerifyDefaultValue_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 4 : Get Max number of Year Day schedules for user and verify default value\n");
+            err = TestGetMaxNumberOfYearDaySchedulesForUserAndVerifyDefaultValue_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Create Week Day schedule with 0 index\n");
+            err = TestCreateWeekDayScheduleWith0Index_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Create Week Day schedule with out-of-bounds index\n");
+            err = TestCreateWeekDayScheduleWithOutOfBoundsIndex_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Create Week Day schedule with 0 user index\n");
+            err = TestCreateWeekDayScheduleWith0UserIndex_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Create Week Day schedule with out-of-bounds user index\n");
+            err = TestCreateWeekDayScheduleWithOutOfBoundsUserIndex_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Create Week Day schedule for non-existing user\n");
+            err = TestCreateWeekDayScheduleForNonExistingUser_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Create Week Day schedule with 0 days mask\n");
+            err = TestCreateWeekDayScheduleWith0DaysMask_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Create Week Day schedule for Sunday and Monday\n");
+            err = TestCreateWeekDayScheduleForSundayAndMonday_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Create Week Day schedule for Sunday Wednesday and Saturday\n");
+            err = TestCreateWeekDayScheduleForSundayWednesdayAndSaturday_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : Create Week Day schedule with invalid start hour\n");
+            err = TestCreateWeekDayScheduleWithInvalidStartHour_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : Create Week Day schedule with invalid start minute\n");
+            err = TestCreateWeekDayScheduleWithInvalidStartMinute_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool, " ***** Test Step 15 : Create Week Day schedule with invalid end hour\n");
+            err = TestCreateWeekDayScheduleWithInvalidEndHour_15();
+            break;
+        case 16:
+            ChipLogProgress(chipTool, " ***** Test Step 16 : Create Week Day schedule with invalid end minute\n");
+            err = TestCreateWeekDayScheduleWithInvalidEndMinute_16();
+            break;
+        case 17:
+            ChipLogProgress(chipTool, " ***** Test Step 17 : Create Week Day schedule with start hour later that end hour\n");
+            err = TestCreateWeekDayScheduleWithStartHourLaterThatEndHour_17();
+            break;
+        case 18:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 18 : Create Week Day schedule with start minute later that end minute when hours are equal\n");
+            err = TestCreateWeekDayScheduleWithStartMinuteLaterThatEndMinuteWhenHoursAreEqual_18();
+            break;
+        case 19:
+            ChipLogProgress(chipTool, " ***** Test Step 19 : Make sure that previous operations did not create a schedule\n");
+            err = TestMakeSureThatPreviousOperationsDidNotCreateASchedule_19();
+            break;
+        case 20:
+            ChipLogProgress(chipTool, " ***** Test Step 20 : Get Week Day schedule with 0 index\n");
+            err = TestGetWeekDayScheduleWith0Index_20();
+            break;
+        case 21:
+            ChipLogProgress(chipTool, " ***** Test Step 21 : Get Week Day schedule with out-of-bounds index\n");
+            err = TestGetWeekDayScheduleWithOutOfBoundsIndex_21();
+            break;
+        case 22:
+            ChipLogProgress(chipTool, " ***** Test Step 22 : Get Week Day schedule with 0 user index\n");
+            err = TestGetWeekDayScheduleWith0UserIndex_22();
+            break;
+        case 23:
+            ChipLogProgress(chipTool, " ***** Test Step 23 : Get Week Day schedule with out-of-bounds user index\n");
+            err = TestGetWeekDayScheduleWithOutOfBoundsUserIndex_23();
+            break;
+        case 24:
+            ChipLogProgress(chipTool, " ***** Test Step 24 : Get Week Day schedule with non-existing user index\n");
+            err = TestGetWeekDayScheduleWithNonExistingUserIndex_24();
+            break;
+        case 25:
+            ChipLogProgress(chipTool, " ***** Test Step 25 : Create Year Day schedule with 0 index\n");
+            err = TestCreateYearDayScheduleWith0Index_25();
+            break;
+        case 26:
+            ChipLogProgress(chipTool, " ***** Test Step 26 : Create Year Day schedule with out-of-bounds index\n");
+            err = TestCreateYearDayScheduleWithOutOfBoundsIndex_26();
+            break;
+        case 27:
+            ChipLogProgress(chipTool, " ***** Test Step 27 : Create Year Day schedule with 0 user index\n");
+            err = TestCreateYearDayScheduleWith0UserIndex_27();
+            break;
+        case 28:
+            ChipLogProgress(chipTool, " ***** Test Step 28 : Create Year Day schedule with out-of-bounds user index\n");
+            err = TestCreateYearDayScheduleWithOutOfBoundsUserIndex_28();
+            break;
+        case 29:
+            ChipLogProgress(chipTool, " ***** Test Step 29 : Create Year Day schedule for non-existing user\n");
+            err = TestCreateYearDayScheduleForNonExistingUser_29();
+            break;
+        case 30:
+            ChipLogProgress(chipTool, " ***** Test Step 30 : Create Year Day schedule with start hour later that end hour\n");
+            err = TestCreateYearDayScheduleWithStartHourLaterThatEndHour_30();
+            break;
+        case 31:
+            ChipLogProgress(chipTool, " ***** Test Step 31 : Make sure that previous operations did not create a schedule\n");
+            err = TestMakeSureThatPreviousOperationsDidNotCreateASchedule_31();
+            break;
+        case 32:
+            ChipLogProgress(chipTool, " ***** Test Step 32 : Get Year Day schedule with 0 index\n");
+            err = TestGetYearDayScheduleWith0Index_32();
+            break;
+        case 33:
+            ChipLogProgress(chipTool, " ***** Test Step 33 : Get Year Day schedule with out-of-bounds index\n");
+            err = TestGetYearDayScheduleWithOutOfBoundsIndex_33();
+            break;
+        case 34:
+            ChipLogProgress(chipTool, " ***** Test Step 34 : Get Year Day schedule with 0 user index\n");
+            err = TestGetYearDayScheduleWith0UserIndex_34();
+            break;
+        case 35:
+            ChipLogProgress(chipTool, " ***** Test Step 35 : Get Year Day schedule with out-of-bounds user index\n");
+            err = TestGetYearDayScheduleWithOutOfBoundsUserIndex_35();
+            break;
+        case 36:
+            ChipLogProgress(chipTool, " ***** Test Step 36 : Get Year Day schedule with non-existing user index\n");
+            err = TestGetYearDayScheduleWithNonExistingUserIndex_36();
+            break;
+        case 37:
+            ChipLogProgress(chipTool, " ***** Test Step 37 : Create Week Day schedule with valid parameters\n");
+            err = TestCreateWeekDayScheduleWithValidParameters_37();
+            break;
+        case 38:
+            ChipLogProgress(chipTool, " ***** Test Step 38 : Verify created schedule\n");
+            err = TestVerifyCreatedSchedule_38();
+            break;
+        case 39:
+            ChipLogProgress(chipTool, " ***** Test Step 39 : Create Year Day schedule with valid parameters\n");
+            err = TestCreateYearDayScheduleWithValidParameters_39();
+            break;
+        case 40:
+            ChipLogProgress(chipTool, " ***** Test Step 40 : Verify created schedule\n");
+            err = TestVerifyCreatedSchedule_40();
+            break;
+        case 41:
+            ChipLogProgress(chipTool, " ***** Test Step 41 : Clear Week Day schedule with 0 index\n");
+            err = TestClearWeekDayScheduleWith0Index_41();
+            break;
+        case 42:
+            ChipLogProgress(chipTool, " ***** Test Step 42 : Clear Week Day schedule with out-of-bounds index\n");
+            err = TestClearWeekDayScheduleWithOutOfBoundsIndex_42();
+            break;
+        case 43:
+            ChipLogProgress(chipTool, " ***** Test Step 43 : Clear Week Day schedule with 0 user index\n");
+            err = TestClearWeekDayScheduleWith0UserIndex_43();
+            break;
+        case 44:
+            ChipLogProgress(chipTool, " ***** Test Step 44 : Clear Week Day schedule with out-of-bounds user index\n");
+            err = TestClearWeekDayScheduleWithOutOfBoundsUserIndex_44();
+            break;
+        case 45:
+            ChipLogProgress(chipTool, " ***** Test Step 45 : Clear Week Day schedule with non-existing user\n");
+            err = TestClearWeekDayScheduleWithNonExistingUser_45();
+            break;
+        case 46:
+            ChipLogProgress(chipTool, " ***** Test Step 46 : Clear Year Day schedule with 0 index\n");
+            err = TestClearYearDayScheduleWith0Index_46();
+            break;
+        case 47:
+            ChipLogProgress(chipTool, " ***** Test Step 47 : Clear Year Day schedule with out-of-bounds index\n");
+            err = TestClearYearDayScheduleWithOutOfBoundsIndex_47();
+            break;
+        case 48:
+            ChipLogProgress(chipTool, " ***** Test Step 48 : Clear Year Day schedule with 0 user index\n");
+            err = TestClearYearDayScheduleWith0UserIndex_48();
+            break;
+        case 49:
+            ChipLogProgress(chipTool, " ***** Test Step 49 : Clear Year Day schedule with out-of-bounds user index\n");
+            err = TestClearYearDayScheduleWithOutOfBoundsUserIndex_49();
+            break;
+        case 50:
+            ChipLogProgress(chipTool, " ***** Test Step 50 : Clear Year Day schedule with non-existing user\n");
+            err = TestClearYearDayScheduleWithNonExistingUser_50();
+            break;
+        case 51:
+            ChipLogProgress(chipTool, " ***** Test Step 51 : Make sure that week day schedule was not deleted\n");
+            err = TestMakeSureThatWeekDayScheduleWasNotDeleted_51();
+            break;
+        case 52:
+            ChipLogProgress(chipTool, " ***** Test Step 52 : Make sure that year day schedule was not deleted\n");
+            err = TestMakeSureThatYearDayScheduleWasNotDeleted_52();
+            break;
+        case 53:
+            ChipLogProgress(chipTool, " ***** Test Step 53 : Create another Week Day schedule with valid parameters\n");
+            err = TestCreateAnotherWeekDayScheduleWithValidParameters_53();
+            break;
+        case 54:
+            ChipLogProgress(chipTool, " ***** Test Step 54 : Verify created week day schedule\n");
+            err = TestVerifyCreatedWeekDaySchedule_54();
+            break;
+        case 55:
+            ChipLogProgress(chipTool, " ***** Test Step 55 : Create another Year Day schedule with valid parameters\n");
+            err = TestCreateAnotherYearDayScheduleWithValidParameters_55();
+            break;
+        case 56:
+            ChipLogProgress(chipTool, " ***** Test Step 56 : Verify created year day schedule\n");
+            err = TestVerifyCreatedYearDaySchedule_56();
+            break;
+        case 57:
+            ChipLogProgress(chipTool, " ***** Test Step 57 : Clear a single week day schedule for the first user\n");
+            err = TestClearASingleWeekDayScheduleForTheFirstUser_57();
+            break;
+        case 58:
+            ChipLogProgress(chipTool, " ***** Test Step 58 : Verify cleared week day schedule\n");
+            err = TestVerifyClearedWeekDaySchedule_58();
+            break;
+        case 59:
+            ChipLogProgress(chipTool, " ***** Test Step 59 : Clear all remaining week day schedules for the first user\n");
+            err = TestClearAllRemainingWeekDaySchedulesForTheFirstUser_59();
+            break;
+        case 60:
+            ChipLogProgress(chipTool, " ***** Test Step 60 : Verify cleared week schedule\n");
+            err = TestVerifyClearedWeekSchedule_60();
+            break;
+        case 61:
+            ChipLogProgress(chipTool, " ***** Test Step 61 : Make sure that first year day schedule was not deleted\n");
+            err = TestMakeSureThatFirstYearDayScheduleWasNotDeleted_61();
+            break;
+        case 62:
+            ChipLogProgress(chipTool, " ***** Test Step 62 : Make sure that second year day schedule was not deleted\n");
+            err = TestMakeSureThatSecondYearDayScheduleWasNotDeleted_62();
+            break;
+        case 63:
+            ChipLogProgress(chipTool, " ***** Test Step 63 : Create another Week Day schedule with valid parameters\n");
+            err = TestCreateAnotherWeekDayScheduleWithValidParameters_63();
+            break;
+        case 64:
+            ChipLogProgress(chipTool, " ***** Test Step 64 : Clear a single year day schedule for the first user\n");
+            err = TestClearASingleYearDayScheduleForTheFirstUser_64();
+            break;
+        case 65:
+            ChipLogProgress(chipTool, " ***** Test Step 65 : Verify cleared year day schedule\n");
+            err = TestVerifyClearedYearDaySchedule_65();
+            break;
+        case 66:
+            ChipLogProgress(chipTool, " ***** Test Step 66 : Clear all remaining year schedules for the first user\n");
+            err = TestClearAllRemainingYearSchedulesForTheFirstUser_66();
+            break;
+        case 67:
+            ChipLogProgress(chipTool, " ***** Test Step 67 : Verify that second year day schedule was cleared\n");
+            err = TestVerifyThatSecondYearDayScheduleWasCleared_67();
+            break;
+        case 68:
+            ChipLogProgress(chipTool, " ***** Test Step 68 : Verify created week day schedule\n");
+            err = TestVerifyCreatedWeekDaySchedule_68();
+            break;
+        case 69:
+            ChipLogProgress(chipTool, " ***** Test Step 69 : Clear all remaining week day schedules for the first user\n");
+            err = TestClearAllRemainingWeekDaySchedulesForTheFirstUser_69();
+            break;
+        case 70:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 70 : Create new user without credential so we can add more schedules to it\n");
+            err = TestCreateNewUserWithoutCredentialSoWeCanAddMoreSchedulesToIt_70();
+            break;
+        case 71:
+            ChipLogProgress(chipTool, " ***** Test Step 71 : Create Week Day schedule with valid parameters for first user\n");
+            err = TestCreateWeekDayScheduleWithValidParametersForFirstUser_71();
+            break;
+        case 72:
+            ChipLogProgress(chipTool, " ***** Test Step 72 : Verify created week day schedule for first user\n");
+            err = TestVerifyCreatedWeekDayScheduleForFirstUser_72();
+            break;
+        case 73:
+            ChipLogProgress(chipTool, " ***** Test Step 73 : Create Year Day schedule for first user\n");
+            err = TestCreateYearDayScheduleForFirstUser_73();
+            break;
+        case 74:
+            ChipLogProgress(chipTool, " ***** Test Step 74 : Verify created year day schedule for first\n");
+            err = TestVerifyCreatedYearDayScheduleForFirst_74();
+            break;
+        case 75:
+            ChipLogProgress(chipTool, " ***** Test Step 75 : Create Week Day schedule with valid parameters for second user\n");
+            err = TestCreateWeekDayScheduleWithValidParametersForSecondUser_75();
+            break;
+        case 76:
+            ChipLogProgress(chipTool, " ***** Test Step 76 : Verify created week day schedule for first user\n");
+            err = TestVerifyCreatedWeekDayScheduleForFirstUser_76();
+            break;
+        case 77:
+            ChipLogProgress(chipTool, " ***** Test Step 77 : Create Year Day schedule for second user\n");
+            err = TestCreateYearDayScheduleForSecondUser_77();
+            break;
+        case 78:
+            ChipLogProgress(chipTool, " ***** Test Step 78 : Verify created year day schedule for first\n");
+            err = TestVerifyCreatedYearDayScheduleForFirst_78();
+            break;
+        case 79:
+            ChipLogProgress(chipTool, " ***** Test Step 79 : Cleanup\n");
+            err = TestCleanup_79();
+            break;
+        case 80:
+            ChipLogProgress(chipTool, " ***** Test Step 80 : Make sure clearing first user also cleared week day schedules\n");
+            err = TestMakeSureClearingFirstUserAlsoClearedWeekDaySchedules_80();
+            break;
+        case 81:
+            ChipLogProgress(chipTool, " ***** Test Step 81 : Make sure clearing first user also cleared year day schedules\n");
+            err = TestMakeSureClearingFirstUserAlsoClearedYearDaySchedules_81();
+            break;
+        case 82:
+            ChipLogProgress(chipTool, " ***** Test Step 82 : Make sure clearing second user also cleared week day schedules\n");
+            err = TestMakeSureClearingSecondUserAlsoClearedWeekDaySchedules_82();
+            break;
+        case 83:
+            ChipLogProgress(chipTool, " ***** Test Step 83 : Make sure clearing second user also cleared year day schedules\n");
+            err = TestMakeSureClearingSecondUserAlsoClearedYearDaySchedules_83();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 84;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    uint16_t NumberOfTotalUsersSupported;
+    uint8_t NumberOfWeekDaySchedulesSupportedPerUser;
+    uint8_t NumberOfYearDaySchedulesSupportedPerUser;
+
+    static void OnFailureCallback_2(void * context, CHIP_ERROR error)
+    {
+        (static_cast<DL_Schedules *>(context))->OnFailureResponse_2(error);
+    }
+
+    static void OnSuccessCallback_2(void * context, uint16_t numberOfTotalUsersSupported)
+    {
+        (static_cast<DL_Schedules *>(context))->OnSuccessResponse_2(numberOfTotalUsersSupported);
+    }
+
+    static void OnFailureCallback_3(void * context, CHIP_ERROR error)
+    {
+        (static_cast<DL_Schedules *>(context))->OnFailureResponse_3(error);
+    }
+
+    static void OnSuccessCallback_3(void * context, uint8_t numberOfWeekDaySchedulesSupportedPerUser)
+    {
+        (static_cast<DL_Schedules *>(context))->OnSuccessResponse_3(numberOfWeekDaySchedulesSupportedPerUser);
+    }
+
+    static void OnFailureCallback_4(void * context, CHIP_ERROR error)
+    {
+        (static_cast<DL_Schedules *>(context))->OnFailureResponse_4(error);
+    }
+
+    static void OnSuccessCallback_4(void * context, uint8_t numberOfYearDaySchedulesSupportedPerUser)
+    {
+        (static_cast<DL_Schedules *>(context))->OnSuccessResponse_4(numberOfYearDaySchedulesSupportedPerUser);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestCreateNewPinCredentialAndScheduleUser_1()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+        request.credential.credentialIndex = 1U;
+
+        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
+        request.userIndex.SetNull();
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_1(data.status, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) { (static_cast<DL_Schedules *>(context))->OnFailureResponse_1(error); };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_1(chip::app::Clusters::DoorLock::DlStatus status,
+                             const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                             const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValueNonNull("userIndex", userIndex));
+        VerifyOrReturn(CheckValue("userIndex.Value()", userIndex.Value(), 1U));
+
+        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
+        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 2U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestGetNumberOfSupportedUsers_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::DoorLockClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::NumberOfTotalUsersSupported::TypeInfo>(
+                this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_2(uint16_t numberOfTotalUsersSupported)
+    {
+        VerifyOrReturn(CheckValue("numberOfTotalUsersSupported", numberOfTotalUsersSupported, 10U));
+
+        NumberOfTotalUsersSupported = numberOfTotalUsersSupported;
+        NextTest();
+    }
+
+    CHIP_ERROR TestGetMaxNumberOfWeekDaySchedulesForUserAndVerifyDefaultValue_3()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::DoorLockClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::NumberOfWeekDaySchedulesSupportedPerUser::TypeInfo>(
+                this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_3(uint8_t numberOfWeekDaySchedulesSupportedPerUser)
+    {
+        VerifyOrReturn(CheckValue("numberOfWeekDaySchedulesSupportedPerUser", numberOfWeekDaySchedulesSupportedPerUser, 10));
+
+        NumberOfWeekDaySchedulesSupportedPerUser = numberOfWeekDaySchedulesSupportedPerUser;
+        NextTest();
+    }
+
+    CHIP_ERROR TestGetMaxNumberOfYearDaySchedulesForUserAndVerifyDefaultValue_4()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::DoorLockClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::NumberOfYearDaySchedulesSupportedPerUser::TypeInfo>(
+                this, OnSuccessCallback_4, OnFailureCallback_4));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_4(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_4(uint8_t numberOfYearDaySchedulesSupportedPerUser)
+    {
+        VerifyOrReturn(CheckValue("numberOfYearDaySchedulesSupportedPerUser", numberOfYearDaySchedulesSupportedPerUser, 10));
+
+        NumberOfYearDaySchedulesSupportedPerUser = numberOfYearDaySchedulesSupportedPerUser;
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateWeekDayScheduleWith0Index_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 0;
+        request.userIndex    = 1U;
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+        request.startHour    = 15;
+        request.startMinute  = 16;
+        request.endHour      = 18;
+        request.endMinute    = 0;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_5();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) { (static_cast<DL_Schedules *>(context))->OnFailureResponse_5(error); };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_5() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestCreateWeekDayScheduleWithOutOfBoundsIndex_6()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = static_cast<uint8_t>(NumberOfWeekDaySchedulesSupportedPerUser + 1);
+        request.userIndex    = 1U;
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+        request.startHour    = 15;
+        request.startMinute  = 16;
+        request.endHour      = 18;
+        request.endMinute    = 0;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_6();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) { (static_cast<DL_Schedules *>(context))->OnFailureResponse_6(error); };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_6() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestCreateWeekDayScheduleWith0UserIndex_7()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 0U;
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+        request.startHour    = 15;
+        request.startMinute  = 16;
+        request.endHour      = 18;
+        request.endMinute    = 0;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_7();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) { (static_cast<DL_Schedules *>(context))->OnFailureResponse_7(error); };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_7(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_7() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestCreateWeekDayScheduleWithOutOfBoundsUserIndex_8()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = static_cast<uint8_t>(NumberOfTotalUsersSupported + 1);
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+        request.startHour    = 15;
+        request.startMinute  = 16;
+        request.endHour      = 18;
+        request.endMinute    = 0;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_8();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) { (static_cast<DL_Schedules *>(context))->OnFailureResponse_8(error); };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_8(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_8() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestCreateWeekDayScheduleForNonExistingUser_9()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 2U;
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+        request.startHour    = 15;
+        request.startMinute  = 16;
+        request.endHour      = 18;
+        request.endMinute    = 0;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_9();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) { (static_cast<DL_Schedules *>(context))->OnFailureResponse_9(error); };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_9(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_NOT_FOUND));
+        NextTest();
+    }
+
+    void OnSuccessResponse_9() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestCreateWeekDayScheduleWith0DaysMask_10()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(0);
+        request.startHour    = 15;
+        request.startMinute  = 16;
+        request.endHour      = 18;
+        request.endMinute    = 0;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_10();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_10(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_10(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_10() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestCreateWeekDayScheduleForSundayAndMonday_11()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(3);
+        request.startHour    = 15;
+        request.startMinute  = 16;
+        request.endHour      = 18;
+        request.endMinute    = 0;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_11();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_11(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_11(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_11() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestCreateWeekDayScheduleForSundayWednesdayAndSaturday_12()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(73);
+        request.startHour    = 15;
+        request.startMinute  = 16;
+        request.endHour      = 18;
+        request.endMinute    = 0;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_12();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_12(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_12(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_12() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestCreateWeekDayScheduleWithInvalidStartHour_13()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+        request.startHour    = 24;
+        request.startMinute  = 16;
+        request.endHour      = 18;
+        request.endMinute    = 0;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_13();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_13(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_13(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_13() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestCreateWeekDayScheduleWithInvalidStartMinute_14()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+        request.startHour    = 15;
+        request.startMinute  = 60;
+        request.endHour      = 18;
+        request.endMinute    = 0;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_14();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_14(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_14(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_14() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestCreateWeekDayScheduleWithInvalidEndHour_15()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+        request.startHour    = 15;
+        request.startMinute  = 16;
+        request.endHour      = 24;
+        request.endMinute    = 0;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_15();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_15(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_15(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_15() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestCreateWeekDayScheduleWithInvalidEndMinute_16()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+        request.startHour    = 15;
+        request.startMinute  = 16;
+        request.endHour      = 18;
+        request.endMinute    = 60;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_16();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_16(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_16(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_16() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestCreateWeekDayScheduleWithStartHourLaterThatEndHour_17()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+        request.startHour    = 19;
+        request.startMinute  = 16;
+        request.endHour      = 18;
+        request.endMinute    = 0;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_17();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_17(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_17(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_17() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestCreateWeekDayScheduleWithStartMinuteLaterThatEndMinuteWhenHoursAreEqual_18()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+        request.startHour    = 15;
+        request.startMinute  = 50;
+        request.endHour      = 15;
+        request.endMinute    = 49;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_18();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_18(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_18(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_18() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestMakeSureThatPreviousOperationsDidNotCreateASchedule_19()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_19(data.weekDayIndex, data.userIndex, data.status, data.daysMask, data.startHour,
+                                       data.startMinute, data.endHour, data.endMinute);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_19(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_19(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_19(uint8_t weekDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>> & daysMask,
+                              const chip::Optional<uint8_t> & startHour, const chip::Optional<uint8_t> & startMinute,
+                              const chip::Optional<uint8_t> & endHour, const chip::Optional<uint8_t> & endMinute)
+    {
+        VerifyOrReturn(CheckValue("weekDayIndex", weekDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 139));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestGetWeekDayScheduleWith0Index_20()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 0;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_20(data.weekDayIndex, data.userIndex, data.status, data.daysMask, data.startHour,
+                                       data.startMinute, data.endHour, data.endMinute);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_20(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_20(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_20(uint8_t weekDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>> & daysMask,
+                              const chip::Optional<uint8_t> & startHour, const chip::Optional<uint8_t> & startMinute,
+                              const chip::Optional<uint8_t> & endHour, const chip::Optional<uint8_t> & endMinute)
+    {
+        VerifyOrReturn(CheckValue("weekDayIndex", weekDayIndex, 0));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 133));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestGetWeekDayScheduleWithOutOfBoundsIndex_21()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = static_cast<uint8_t>(NumberOfWeekDaySchedulesSupportedPerUser + 1);
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_21(data.weekDayIndex, data.userIndex, data.status, data.daysMask, data.startHour,
+                                       data.startMinute, data.endHour, data.endMinute);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_21(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_21(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_21(uint8_t weekDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>> & daysMask,
+                              const chip::Optional<uint8_t> & startHour, const chip::Optional<uint8_t> & startMinute,
+                              const chip::Optional<uint8_t> & endHour, const chip::Optional<uint8_t> & endMinute)
+    {
+        VerifyOrReturn(
+            CheckValue("weekDayIndex", weekDayIndex, static_cast<uint8_t>(NumberOfWeekDaySchedulesSupportedPerUser + 1)));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 133));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestGetWeekDayScheduleWith0UserIndex_22()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 0U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_22(data.weekDayIndex, data.userIndex, data.status, data.daysMask, data.startHour,
+                                       data.startMinute, data.endHour, data.endMinute);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_22(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_22(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_22(uint8_t weekDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>> & daysMask,
+                              const chip::Optional<uint8_t> & startHour, const chip::Optional<uint8_t> & startMinute,
+                              const chip::Optional<uint8_t> & endHour, const chip::Optional<uint8_t> & endMinute)
+    {
+        VerifyOrReturn(CheckValue("weekDayIndex", weekDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 0U));
+
+        VerifyOrReturn(CheckValue("status", status, 133));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestGetWeekDayScheduleWithOutOfBoundsUserIndex_23()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = static_cast<uint8_t>(NumberOfTotalUsersSupported + 1);
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_23(data.weekDayIndex, data.userIndex, data.status, data.daysMask, data.startHour,
+                                       data.startMinute, data.endHour, data.endMinute);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_23(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_23(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_23(uint8_t weekDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>> & daysMask,
+                              const chip::Optional<uint8_t> & startHour, const chip::Optional<uint8_t> & startMinute,
+                              const chip::Optional<uint8_t> & endHour, const chip::Optional<uint8_t> & endMinute)
+    {
+        VerifyOrReturn(CheckValue("weekDayIndex", weekDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, static_cast<uint8_t>(NumberOfTotalUsersSupported + 1)));
+
+        VerifyOrReturn(CheckValue("status", status, 133));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestGetWeekDayScheduleWithNonExistingUserIndex_24()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 2U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_24(data.weekDayIndex, data.userIndex, data.status, data.daysMask, data.startHour,
+                                       data.startMinute, data.endHour, data.endMinute);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_24(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_24(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_24(uint8_t weekDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>> & daysMask,
+                              const chip::Optional<uint8_t> & startHour, const chip::Optional<uint8_t> & startMinute,
+                              const chip::Optional<uint8_t> & endHour, const chip::Optional<uint8_t> & endMinute)
+    {
+        VerifyOrReturn(CheckValue("weekDayIndex", weekDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 2U));
+
+        VerifyOrReturn(CheckValue("status", status, 139));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateYearDayScheduleWith0Index_25()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex   = 0;
+        request.userIndex      = 1U;
+        request.localStartTime = 12345UL;
+        request.localEndTime   = 12345689UL;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_25();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_25(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_25(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_25() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestCreateYearDayScheduleWithOutOfBoundsIndex_26()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex   = static_cast<uint8_t>(NumberOfYearDaySchedulesSupportedPerUser + 1);
+        request.userIndex      = 1U;
+        request.localStartTime = 12345UL;
+        request.localEndTime   = 12345689UL;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_26();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_26(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_26(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_26() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestCreateYearDayScheduleWith0UserIndex_27()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex   = 1;
+        request.userIndex      = 0U;
+        request.localStartTime = 12345UL;
+        request.localEndTime   = 12345689UL;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_27();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_27(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_27(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_27() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestCreateYearDayScheduleWithOutOfBoundsUserIndex_28()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex   = 1;
+        request.userIndex      = static_cast<uint8_t>(NumberOfTotalUsersSupported + 1);
+        request.localStartTime = 12345UL;
+        request.localEndTime   = 12345689UL;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_28();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_28(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_28(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_28() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestCreateYearDayScheduleForNonExistingUser_29()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex   = 1;
+        request.userIndex      = 2U;
+        request.localStartTime = 12345UL;
+        request.localEndTime   = 12345689UL;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_29();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_29(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_29(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_NOT_FOUND));
+        NextTest();
+    }
+
+    void OnSuccessResponse_29() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestCreateYearDayScheduleWithStartHourLaterThatEndHour_30()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex   = 1;
+        request.userIndex      = 1U;
+        request.localStartTime = 12345689UL;
+        request.localEndTime   = 12345688UL;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_30();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_30(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_30(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_30() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestMakeSureThatPreviousOperationsDidNotCreateASchedule_31()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 1;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_31(data.yearDayIndex, data.userIndex, data.status, data.localStartTime, data.localEndTime);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_31(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_31(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_31(uint8_t yearDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<uint32_t> & localStartTime, const chip::Optional<uint32_t> & localEndTime)
+    {
+        VerifyOrReturn(CheckValue("yearDayIndex", yearDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 139));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestGetYearDayScheduleWith0Index_32()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 0;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_32(data.yearDayIndex, data.userIndex, data.status, data.localStartTime, data.localEndTime);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_32(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_32(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_32(uint8_t yearDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<uint32_t> & localStartTime, const chip::Optional<uint32_t> & localEndTime)
+    {
+        VerifyOrReturn(CheckValue("yearDayIndex", yearDayIndex, 0));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 133));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestGetYearDayScheduleWithOutOfBoundsIndex_33()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = static_cast<uint8_t>(NumberOfYearDaySchedulesSupportedPerUser + 1);
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_33(data.yearDayIndex, data.userIndex, data.status, data.localStartTime, data.localEndTime);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_33(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_33(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_33(uint8_t yearDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<uint32_t> & localStartTime, const chip::Optional<uint32_t> & localEndTime)
+    {
+        VerifyOrReturn(
+            CheckValue("yearDayIndex", yearDayIndex, static_cast<uint8_t>(NumberOfYearDaySchedulesSupportedPerUser + 1)));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 133));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestGetYearDayScheduleWith0UserIndex_34()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 1;
+        request.userIndex    = 0U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_34(data.yearDayIndex, data.userIndex, data.status, data.localStartTime, data.localEndTime);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_34(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_34(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_34(uint8_t yearDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<uint32_t> & localStartTime, const chip::Optional<uint32_t> & localEndTime)
+    {
+        VerifyOrReturn(CheckValue("yearDayIndex", yearDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 0U));
+
+        VerifyOrReturn(CheckValue("status", status, 133));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestGetYearDayScheduleWithOutOfBoundsUserIndex_35()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 1;
+        request.userIndex    = static_cast<uint8_t>(NumberOfTotalUsersSupported + 1);
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_35(data.yearDayIndex, data.userIndex, data.status, data.localStartTime, data.localEndTime);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_35(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_35(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_35(uint8_t yearDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<uint32_t> & localStartTime, const chip::Optional<uint32_t> & localEndTime)
+    {
+        VerifyOrReturn(CheckValue("yearDayIndex", yearDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, static_cast<uint8_t>(NumberOfTotalUsersSupported + 1)));
+
+        VerifyOrReturn(CheckValue("status", status, 133));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestGetYearDayScheduleWithNonExistingUserIndex_36()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 1;
+        request.userIndex    = 2U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_36(data.yearDayIndex, data.userIndex, data.status, data.localStartTime, data.localEndTime);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_36(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_36(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_36(uint8_t yearDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<uint32_t> & localStartTime, const chip::Optional<uint32_t> & localEndTime)
+    {
+        VerifyOrReturn(CheckValue("yearDayIndex", yearDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 2U));
+
+        VerifyOrReturn(CheckValue("status", status, 139));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateWeekDayScheduleWithValidParameters_37()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+        request.startHour    = 15;
+        request.startMinute  = 16;
+        request.endHour      = 18;
+        request.endMinute    = 0;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_37();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_37(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_37(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_37() { NextTest(); }
+
+    CHIP_ERROR TestVerifyCreatedSchedule_38()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_38(data.weekDayIndex, data.userIndex, data.status, data.daysMask, data.startHour,
+                                       data.startMinute, data.endHour, data.endMinute);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_38(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_38(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_38(uint8_t weekDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>> & daysMask,
+                              const chip::Optional<uint8_t> & startHour, const chip::Optional<uint8_t> & startMinute,
+                              const chip::Optional<uint8_t> & endHour, const chip::Optional<uint8_t> & endMinute)
+    {
+        VerifyOrReturn(CheckValue("weekDayIndex", weekDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("daysMask", daysMask));
+        VerifyOrReturn(CheckValue("daysMask.Value()", daysMask.Value(), 1));
+
+        VerifyOrReturn(CheckValuePresent("startHour", startHour));
+        VerifyOrReturn(CheckValue("startHour.Value()", startHour.Value(), 15));
+
+        VerifyOrReturn(CheckValuePresent("startMinute", startMinute));
+        VerifyOrReturn(CheckValue("startMinute.Value()", startMinute.Value(), 16));
+
+        VerifyOrReturn(CheckValuePresent("endHour", endHour));
+        VerifyOrReturn(CheckValue("endHour.Value()", endHour.Value(), 18));
+
+        VerifyOrReturn(CheckValuePresent("endMinute", endMinute));
+        VerifyOrReturn(CheckValue("endMinute.Value()", endMinute.Value(), 0));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateYearDayScheduleWithValidParameters_39()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex   = 1;
+        request.userIndex      = 1U;
+        request.localStartTime = 12345UL;
+        request.localEndTime   = 12345689UL;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_39();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_39(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_39(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_39() { NextTest(); }
+
+    CHIP_ERROR TestVerifyCreatedSchedule_40()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 1;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_40(data.yearDayIndex, data.userIndex, data.status, data.localStartTime, data.localEndTime);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_40(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_40(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_40(uint8_t yearDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<uint32_t> & localStartTime, const chip::Optional<uint32_t> & localEndTime)
+    {
+        VerifyOrReturn(CheckValue("yearDayIndex", yearDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("localStartTime", localStartTime));
+        VerifyOrReturn(CheckValue("localStartTime.Value()", localStartTime.Value(), 12345UL));
+
+        VerifyOrReturn(CheckValuePresent("localEndTime", localEndTime));
+        VerifyOrReturn(CheckValue("localEndTime.Value()", localEndTime.Value(), 12345689UL));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestClearWeekDayScheduleWith0Index_41()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 0;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_41();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_41(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_41(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_41() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestClearWeekDayScheduleWithOutOfBoundsIndex_42()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = static_cast<uint8_t>(NumberOfWeekDaySchedulesSupportedPerUser + 1);
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_42();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_42(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_42(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_42() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestClearWeekDayScheduleWith0UserIndex_43()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 0U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_43();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_43(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_43(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_43() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestClearWeekDayScheduleWithOutOfBoundsUserIndex_44()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = static_cast<uint8_t>(NumberOfTotalUsersSupported + 1);
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_44();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_44(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_44(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_44() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestClearWeekDayScheduleWithNonExistingUser_45()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 2U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_45();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_45(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_45(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_NOT_FOUND));
+        NextTest();
+    }
+
+    void OnSuccessResponse_45() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestClearYearDayScheduleWith0Index_46()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 0;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_46();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_46(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_46(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_46() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestClearYearDayScheduleWithOutOfBoundsIndex_47()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = static_cast<uint8_t>(NumberOfYearDaySchedulesSupportedPerUser + 1);
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_47();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_47(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_47(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_47() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestClearYearDayScheduleWith0UserIndex_48()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 1;
+        request.userIndex    = 0U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_48();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_48(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_48(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_48() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestClearYearDayScheduleWithOutOfBoundsUserIndex_49()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 1;
+        request.userIndex    = static_cast<uint8_t>(NumberOfTotalUsersSupported + 1);
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_49();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_49(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_49(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_49() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestClearYearDayScheduleWithNonExistingUser_50()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 1;
+        request.userIndex    = 2U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_50();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_50(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_50(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_NOT_FOUND));
+        NextTest();
+    }
+
+    void OnSuccessResponse_50() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestMakeSureThatWeekDayScheduleWasNotDeleted_51()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_51(data.weekDayIndex, data.userIndex, data.status, data.daysMask, data.startHour,
+                                       data.startMinute, data.endHour, data.endMinute);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_51(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_51(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_51(uint8_t weekDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>> & daysMask,
+                              const chip::Optional<uint8_t> & startHour, const chip::Optional<uint8_t> & startMinute,
+                              const chip::Optional<uint8_t> & endHour, const chip::Optional<uint8_t> & endMinute)
+    {
+        VerifyOrReturn(CheckValue("weekDayIndex", weekDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("daysMask", daysMask));
+        VerifyOrReturn(CheckValue("daysMask.Value()", daysMask.Value(), 1));
+
+        VerifyOrReturn(CheckValuePresent("startHour", startHour));
+        VerifyOrReturn(CheckValue("startHour.Value()", startHour.Value(), 15));
+
+        VerifyOrReturn(CheckValuePresent("startMinute", startMinute));
+        VerifyOrReturn(CheckValue("startMinute.Value()", startMinute.Value(), 16));
+
+        VerifyOrReturn(CheckValuePresent("endHour", endHour));
+        VerifyOrReturn(CheckValue("endHour.Value()", endHour.Value(), 18));
+
+        VerifyOrReturn(CheckValuePresent("endMinute", endMinute));
+        VerifyOrReturn(CheckValue("endMinute.Value()", endMinute.Value(), 0));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestMakeSureThatYearDayScheduleWasNotDeleted_52()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 1;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_52(data.yearDayIndex, data.userIndex, data.status, data.localStartTime, data.localEndTime);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_52(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_52(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_52(uint8_t yearDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<uint32_t> & localStartTime, const chip::Optional<uint32_t> & localEndTime)
+    {
+        VerifyOrReturn(CheckValue("yearDayIndex", yearDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("localStartTime", localStartTime));
+        VerifyOrReturn(CheckValue("localStartTime.Value()", localStartTime.Value(), 12345UL));
+
+        VerifyOrReturn(CheckValuePresent("localEndTime", localEndTime));
+        VerifyOrReturn(CheckValue("localEndTime.Value()", localEndTime.Value(), 12345689UL));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateAnotherWeekDayScheduleWithValidParameters_53()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 2;
+        request.userIndex    = 1U;
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(2);
+        request.startHour    = 0;
+        request.startMinute  = 0;
+        request.endHour      = 23;
+        request.endMinute    = 59;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_53();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_53(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_53(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_53() { NextTest(); }
+
+    CHIP_ERROR TestVerifyCreatedWeekDaySchedule_54()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 2;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_54(data.weekDayIndex, data.userIndex, data.status, data.daysMask, data.startHour,
+                                       data.startMinute, data.endHour, data.endMinute);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_54(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_54(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_54(uint8_t weekDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>> & daysMask,
+                              const chip::Optional<uint8_t> & startHour, const chip::Optional<uint8_t> & startMinute,
+                              const chip::Optional<uint8_t> & endHour, const chip::Optional<uint8_t> & endMinute)
+    {
+        VerifyOrReturn(CheckValue("weekDayIndex", weekDayIndex, 2));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("daysMask", daysMask));
+        VerifyOrReturn(CheckValue("daysMask.Value()", daysMask.Value(), 2));
+
+        VerifyOrReturn(CheckValuePresent("startHour", startHour));
+        VerifyOrReturn(CheckValue("startHour.Value()", startHour.Value(), 0));
+
+        VerifyOrReturn(CheckValuePresent("startMinute", startMinute));
+        VerifyOrReturn(CheckValue("startMinute.Value()", startMinute.Value(), 0));
+
+        VerifyOrReturn(CheckValuePresent("endHour", endHour));
+        VerifyOrReturn(CheckValue("endHour.Value()", endHour.Value(), 23));
+
+        VerifyOrReturn(CheckValuePresent("endMinute", endMinute));
+        VerifyOrReturn(CheckValue("endMinute.Value()", endMinute.Value(), 59));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateAnotherYearDayScheduleWithValidParameters_55()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex   = 2;
+        request.userIndex      = 1U;
+        request.localStartTime = 9000UL;
+        request.localEndTime   = 888888888UL;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_55();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_55(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_55(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_55() { NextTest(); }
+
+    CHIP_ERROR TestVerifyCreatedYearDaySchedule_56()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 2;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_56(data.yearDayIndex, data.userIndex, data.status, data.localStartTime, data.localEndTime);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_56(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_56(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_56(uint8_t yearDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<uint32_t> & localStartTime, const chip::Optional<uint32_t> & localEndTime)
+    {
+        VerifyOrReturn(CheckValue("yearDayIndex", yearDayIndex, 2));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("localStartTime", localStartTime));
+        VerifyOrReturn(CheckValue("localStartTime.Value()", localStartTime.Value(), 9000UL));
+
+        VerifyOrReturn(CheckValuePresent("localEndTime", localEndTime));
+        VerifyOrReturn(CheckValue("localEndTime.Value()", localEndTime.Value(), 888888888UL));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestClearASingleWeekDayScheduleForTheFirstUser_57()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_57();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_57(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_57(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_57() { NextTest(); }
+
+    CHIP_ERROR TestVerifyClearedWeekDaySchedule_58()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_58(data.weekDayIndex, data.userIndex, data.status, data.daysMask, data.startHour,
+                                       data.startMinute, data.endHour, data.endMinute);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_58(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_58(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_58(uint8_t weekDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>> & daysMask,
+                              const chip::Optional<uint8_t> & startHour, const chip::Optional<uint8_t> & startMinute,
+                              const chip::Optional<uint8_t> & endHour, const chip::Optional<uint8_t> & endMinute)
+    {
+        VerifyOrReturn(CheckValue("weekDayIndex", weekDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 139));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestClearAllRemainingWeekDaySchedulesForTheFirstUser_59()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 254;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_59();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_59(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_59(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_59() { NextTest(); }
+
+    CHIP_ERROR TestVerifyClearedWeekSchedule_60()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 2;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_60(data.weekDayIndex, data.userIndex, data.status, data.daysMask, data.startHour,
+                                       data.startMinute, data.endHour, data.endMinute);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_60(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_60(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_60(uint8_t weekDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>> & daysMask,
+                              const chip::Optional<uint8_t> & startHour, const chip::Optional<uint8_t> & startMinute,
+                              const chip::Optional<uint8_t> & endHour, const chip::Optional<uint8_t> & endMinute)
+    {
+        VerifyOrReturn(CheckValue("weekDayIndex", weekDayIndex, 2));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 139));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestMakeSureThatFirstYearDayScheduleWasNotDeleted_61()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 1;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_61(data.yearDayIndex, data.userIndex, data.status, data.localStartTime, data.localEndTime);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_61(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_61(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_61(uint8_t yearDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<uint32_t> & localStartTime, const chip::Optional<uint32_t> & localEndTime)
+    {
+        VerifyOrReturn(CheckValue("yearDayIndex", yearDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("localStartTime", localStartTime));
+        VerifyOrReturn(CheckValue("localStartTime.Value()", localStartTime.Value(), 12345UL));
+
+        VerifyOrReturn(CheckValuePresent("localEndTime", localEndTime));
+        VerifyOrReturn(CheckValue("localEndTime.Value()", localEndTime.Value(), 12345689UL));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestMakeSureThatSecondYearDayScheduleWasNotDeleted_62()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 2;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_62(data.yearDayIndex, data.userIndex, data.status, data.localStartTime, data.localEndTime);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_62(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_62(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_62(uint8_t yearDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<uint32_t> & localStartTime, const chip::Optional<uint32_t> & localEndTime)
+    {
+        VerifyOrReturn(CheckValue("yearDayIndex", yearDayIndex, 2));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("localStartTime", localStartTime));
+        VerifyOrReturn(CheckValue("localStartTime.Value()", localStartTime.Value(), 9000UL));
+
+        VerifyOrReturn(CheckValuePresent("localEndTime", localEndTime));
+        VerifyOrReturn(CheckValue("localEndTime.Value()", localEndTime.Value(), 888888888UL));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateAnotherWeekDayScheduleWithValidParameters_63()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(2);
+        request.startHour    = 0;
+        request.startMinute  = 0;
+        request.endHour      = 23;
+        request.endMinute    = 59;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_63();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_63(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_63(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_63() { NextTest(); }
+
+    CHIP_ERROR TestClearASingleYearDayScheduleForTheFirstUser_64()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 1;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_64();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_64(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_64(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_64() { NextTest(); }
+
+    CHIP_ERROR TestVerifyClearedYearDaySchedule_65()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 1;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_65(data.yearDayIndex, data.userIndex, data.status, data.localStartTime, data.localEndTime);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_65(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_65(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_65(uint8_t yearDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<uint32_t> & localStartTime, const chip::Optional<uint32_t> & localEndTime)
+    {
+        VerifyOrReturn(CheckValue("yearDayIndex", yearDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 139));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestClearAllRemainingYearSchedulesForTheFirstUser_66()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 254;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_66();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_66(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_66(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_66() { NextTest(); }
+
+    CHIP_ERROR TestVerifyThatSecondYearDayScheduleWasCleared_67()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 2;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_67(data.yearDayIndex, data.userIndex, data.status, data.localStartTime, data.localEndTime);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_67(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_67(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_67(uint8_t yearDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<uint32_t> & localStartTime, const chip::Optional<uint32_t> & localEndTime)
+    {
+        VerifyOrReturn(CheckValue("yearDayIndex", yearDayIndex, 2));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 139));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestVerifyCreatedWeekDaySchedule_68()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_68(data.weekDayIndex, data.userIndex, data.status, data.daysMask, data.startHour,
+                                       data.startMinute, data.endHour, data.endMinute);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_68(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_68(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_68(uint8_t weekDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>> & daysMask,
+                              const chip::Optional<uint8_t> & startHour, const chip::Optional<uint8_t> & startMinute,
+                              const chip::Optional<uint8_t> & endHour, const chip::Optional<uint8_t> & endMinute)
+    {
+        VerifyOrReturn(CheckValue("weekDayIndex", weekDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("daysMask", daysMask));
+        VerifyOrReturn(CheckValue("daysMask.Value()", daysMask.Value(), 2));
+
+        VerifyOrReturn(CheckValuePresent("startHour", startHour));
+        VerifyOrReturn(CheckValue("startHour.Value()", startHour.Value(), 0));
+
+        VerifyOrReturn(CheckValuePresent("startMinute", startMinute));
+        VerifyOrReturn(CheckValue("startMinute.Value()", startMinute.Value(), 0));
+
+        VerifyOrReturn(CheckValuePresent("endHour", endHour));
+        VerifyOrReturn(CheckValue("endHour.Value()", endHour.Value(), 23));
+
+        VerifyOrReturn(CheckValuePresent("endMinute", endMinute));
+        VerifyOrReturn(CheckValue("endMinute.Value()", endMinute.Value(), 59));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestClearAllRemainingWeekDaySchedulesForTheFirstUser_69()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 254;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_69();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_69(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_69(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_69() { NextTest(); }
+
+    CHIP_ERROR TestCreateNewUserWithoutCredentialSoWeCanAddMoreSchedulesToIt_70()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetUser::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+        request.userIndex     = 2U;
+        request.userName.SetNull();
+        request.userUniqueId.SetNull();
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+        request.credentialRule.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_70();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_70(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_70(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_70() { NextTest(); }
+
+    CHIP_ERROR TestCreateWeekDayScheduleWithValidParametersForFirstUser_71()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+        request.startHour    = 0;
+        request.startMinute  = 0;
+        request.endHour      = 23;
+        request.endMinute    = 59;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_71();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_71(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_71(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_71() { NextTest(); }
+
+    CHIP_ERROR TestVerifyCreatedWeekDayScheduleForFirstUser_72()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_72(data.weekDayIndex, data.userIndex, data.status, data.daysMask, data.startHour,
+                                       data.startMinute, data.endHour, data.endMinute);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_72(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_72(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_72(uint8_t weekDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>> & daysMask,
+                              const chip::Optional<uint8_t> & startHour, const chip::Optional<uint8_t> & startMinute,
+                              const chip::Optional<uint8_t> & endHour, const chip::Optional<uint8_t> & endMinute)
+    {
+        VerifyOrReturn(CheckValue("weekDayIndex", weekDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("daysMask", daysMask));
+        VerifyOrReturn(CheckValue("daysMask.Value()", daysMask.Value(), 1));
+
+        VerifyOrReturn(CheckValuePresent("startHour", startHour));
+        VerifyOrReturn(CheckValue("startHour.Value()", startHour.Value(), 0));
+
+        VerifyOrReturn(CheckValuePresent("startMinute", startMinute));
+        VerifyOrReturn(CheckValue("startMinute.Value()", startMinute.Value(), 0));
+
+        VerifyOrReturn(CheckValuePresent("endHour", endHour));
+        VerifyOrReturn(CheckValue("endHour.Value()", endHour.Value(), 23));
+
+        VerifyOrReturn(CheckValuePresent("endMinute", endMinute));
+        VerifyOrReturn(CheckValue("endMinute.Value()", endMinute.Value(), 59));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateYearDayScheduleForFirstUser_73()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex   = 4;
+        request.userIndex      = 1U;
+        request.localStartTime = 9000UL;
+        request.localEndTime   = 888888888UL;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_73();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_73(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_73(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_73() { NextTest(); }
+
+    CHIP_ERROR TestVerifyCreatedYearDayScheduleForFirst_74()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 4;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_74(data.yearDayIndex, data.userIndex, data.status, data.localStartTime, data.localEndTime);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_74(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_74(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_74(uint8_t yearDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<uint32_t> & localStartTime, const chip::Optional<uint32_t> & localEndTime)
+    {
+        VerifyOrReturn(CheckValue("yearDayIndex", yearDayIndex, 4));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("localStartTime", localStartTime));
+        VerifyOrReturn(CheckValue("localStartTime.Value()", localStartTime.Value(), 9000UL));
+
+        VerifyOrReturn(CheckValuePresent("localEndTime", localEndTime));
+        VerifyOrReturn(CheckValue("localEndTime.Value()", localEndTime.Value(), 888888888UL));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateWeekDayScheduleWithValidParametersForSecondUser_75()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 4;
+        request.userIndex    = 2U;
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(64);
+        request.startHour    = 23;
+        request.startMinute  = 0;
+        request.endHour      = 23;
+        request.endMinute    = 59;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_75();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_75(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_75(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_75() { NextTest(); }
+
+    CHIP_ERROR TestVerifyCreatedWeekDayScheduleForFirstUser_76()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 4;
+        request.userIndex    = 2U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_76(data.weekDayIndex, data.userIndex, data.status, data.daysMask, data.startHour,
+                                       data.startMinute, data.endHour, data.endMinute);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_76(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_76(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_76(uint8_t weekDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>> & daysMask,
+                              const chip::Optional<uint8_t> & startHour, const chip::Optional<uint8_t> & startMinute,
+                              const chip::Optional<uint8_t> & endHour, const chip::Optional<uint8_t> & endMinute)
+    {
+        VerifyOrReturn(CheckValue("weekDayIndex", weekDayIndex, 4));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 2U));
+
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("daysMask", daysMask));
+        VerifyOrReturn(CheckValue("daysMask.Value()", daysMask.Value(), 64));
+
+        VerifyOrReturn(CheckValuePresent("startHour", startHour));
+        VerifyOrReturn(CheckValue("startHour.Value()", startHour.Value(), 23));
+
+        VerifyOrReturn(CheckValuePresent("startMinute", startMinute));
+        VerifyOrReturn(CheckValue("startMinute.Value()", startMinute.Value(), 0));
+
+        VerifyOrReturn(CheckValuePresent("endHour", endHour));
+        VerifyOrReturn(CheckValue("endHour.Value()", endHour.Value(), 23));
+
+        VerifyOrReturn(CheckValuePresent("endMinute", endMinute));
+        VerifyOrReturn(CheckValue("endMinute.Value()", endMinute.Value(), 59));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateYearDayScheduleForSecondUser_77()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex   = 1;
+        request.userIndex      = 1U;
+        request.localStartTime = 55555UL;
+        request.localEndTime   = 7777777UL;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_77();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_77(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_77(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_77() { NextTest(); }
+
+    CHIP_ERROR TestVerifyCreatedYearDayScheduleForFirst_78()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 1;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_78(data.yearDayIndex, data.userIndex, data.status, data.localStartTime, data.localEndTime);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_78(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_78(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_78(uint8_t yearDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<uint32_t> & localStartTime, const chip::Optional<uint32_t> & localEndTime)
+    {
+        VerifyOrReturn(CheckValue("yearDayIndex", yearDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("localStartTime", localStartTime));
+        VerifyOrReturn(CheckValue("localStartTime.Value()", localStartTime.Value(), 55555UL));
+
+        VerifyOrReturn(CheckValuePresent("localEndTime", localEndTime));
+        VerifyOrReturn(CheckValue("localEndTime.Value()", localEndTime.Value(), 7777777UL));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCleanup_79()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearUser::Type;
+
+        RequestType request;
+        request.userIndex = 65534U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_79();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_79(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_79(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_79() { NextTest(); }
+
+    CHIP_ERROR TestMakeSureClearingFirstUserAlsoClearedWeekDaySchedules_80()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_80(data.weekDayIndex, data.userIndex, data.status, data.daysMask, data.startHour,
+                                       data.startMinute, data.endHour, data.endMinute);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_80(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_80(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_80(uint8_t weekDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>> & daysMask,
+                              const chip::Optional<uint8_t> & startHour, const chip::Optional<uint8_t> & startMinute,
+                              const chip::Optional<uint8_t> & endHour, const chip::Optional<uint8_t> & endMinute)
+    {
+        VerifyOrReturn(CheckValue("weekDayIndex", weekDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 139));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestMakeSureClearingFirstUserAlsoClearedYearDaySchedules_81()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 4;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_81(data.yearDayIndex, data.userIndex, data.status, data.localStartTime, data.localEndTime);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_81(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_81(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_81(uint8_t yearDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<uint32_t> & localStartTime, const chip::Optional<uint32_t> & localEndTime)
+    {
+        VerifyOrReturn(CheckValue("yearDayIndex", yearDayIndex, 4));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 139));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestMakeSureClearingSecondUserAlsoClearedWeekDaySchedules_82()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 4;
+        request.userIndex    = 2U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_82(data.weekDayIndex, data.userIndex, data.status, data.daysMask, data.startHour,
+                                       data.startMinute, data.endHour, data.endMinute);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_82(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_82(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_82(uint8_t weekDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>> & daysMask,
+                              const chip::Optional<uint8_t> & startHour, const chip::Optional<uint8_t> & startMinute,
+                              const chip::Optional<uint8_t> & endHour, const chip::Optional<uint8_t> & endMinute)
+    {
+        VerifyOrReturn(CheckValue("weekDayIndex", weekDayIndex, 4));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 2U));
+
+        VerifyOrReturn(CheckValue("status", status, 139));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestMakeSureClearingSecondUserAlsoClearedYearDaySchedules_83()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 1;
+        request.userIndex    = 2U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_83(data.yearDayIndex, data.userIndex, data.status, data.localStartTime, data.localEndTime);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_83(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_83(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_83(uint8_t yearDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<uint32_t> & localStartTime, const chip::Optional<uint32_t> & localEndTime)
+    {
+        VerifyOrReturn(CheckValue("yearDayIndex", yearDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 2U));
+
+        VerifyOrReturn(CheckValue("status", status, 139));
+
+        NextTest();
+    }
+};
+
+class TestGroupMessaging : public TestCommand
+{
+public:
+    TestGroupMessaging(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestGroupMessaging", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~TestGroupMessaging() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: TestGroupMessaging\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: TestGroupMessaging\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Add Group 1 - endpoint 1\n");
+            err = TestAddGroup1Endpoint1_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Add Group 2 - endpoint 0\n");
+            err = TestAddGroup2Endpoint0_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Group Write Attribute\n");
+            err = TestGroupWriteAttribute_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Read back Attribute\n");
+            err = TestReadBackAttribute_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Restore initial location value\n");
+            err = TestRestoreInitialLocationValue_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Read back Attribute\n");
+            err = TestReadBackAttribute_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Turn On the light to see attribute change\n");
+            err = TestTurnOnTheLightToSeeAttributeChange_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 8 : Check on/off attribute value is true after on command for endpoint 1\n");
+            err = TestCheckOnOffAttributeValueIsTrueAfterOnCommandForEndpoint1_8();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 9;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    static void OnDoneCallback_3(void * context) { (static_cast<TestGroupMessaging *>(context))->OnDoneResponse_3(); }
+
+    static void OnFailureCallback_3(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_3(error);
+    }
+
+    static void OnSuccessCallback_3(void * context) { (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_3(); }
+
+    static void OnFailureCallback_4(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_4(error);
+    }
+
+    static void OnSuccessCallback_4(void * context, chip::CharSpan location)
+    {
+        (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_4(location);
+    }
+
+    static void OnDoneCallback_5(void * context) { (static_cast<TestGroupMessaging *>(context))->OnDoneResponse_5(); }
+
+    static void OnFailureCallback_5(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_5(error);
+    }
+
+    static void OnSuccessCallback_5(void * context) { (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_5(); }
+
+    static void OnFailureCallback_6(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_6(error);
+    }
+
+    static void OnSuccessCallback_6(void * context, chip::CharSpan location)
+    {
+        (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_6(location);
+    }
+
+    static void OnFailureCallback_8(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_8(error);
+    }
+
+    static void OnSuccessCallback_8(void * context, bool onOff)
+    {
+        (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_8(onOff);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestAddGroup1Endpoint1_1()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::Groups::Commands::AddGroup::Type;
+
+        RequestType request;
+        request.groupId   = 4660U;
+        request.groupName = chip::Span<const char>("Group #1garbage: not in length on purpose", 8);
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_1(data.status, data.groupId);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_1(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_1(uint8_t status, uint16_t groupId)
+    {
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValue("groupId", groupId, 4660U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestAddGroup2Endpoint0_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        using RequestType               = chip::app::Clusters::Groups::Commands::AddGroup::Type;
+
+        RequestType request;
+        request.groupId   = 1U;
+        request.groupName = chip::Span<const char>("Group #2garbage: not in length on purpose", 8);
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_2(data.status, data.groupId);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_2(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_2(uint8_t status, uint16_t groupId)
+    {
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValue("groupId", groupId, 1U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestGroupWriteAttribute_3()
+    {
+        const chip::GroupId groupId = 1;
+        chip::Controller::BasicClusterTest cluster;
+        cluster.AssociateWithGroup(mDevices[kIdentityAlpha], groupId);
+
+        chip::CharSpan locationArgument;
+        locationArgument = chip::Span<const char>("USgarbage: not in length on purpose", 2);
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
+            locationArgument, this, OnSuccessCallback_3, OnFailureCallback_3, OnDoneCallback_3));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_3() { NextTest(); }
+
+    void OnDoneResponse_3() { NextTest(); }
+
+    CHIP_ERROR TestReadBackAttribute_4()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::BasicClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
+            this, OnSuccessCallback_4, OnFailureCallback_4));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_4(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_4(chip::CharSpan location)
+    {
+        VerifyOrReturn(CheckValueAsString("location", location, chip::CharSpan("US", 2)));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestRestoreInitialLocationValue_5()
+    {
+        const chip::GroupId groupId = 1;
+        chip::Controller::BasicClusterTest cluster;
+        cluster.AssociateWithGroup(mDevices[kIdentityAlpha], groupId);
+
+        chip::CharSpan locationArgument;
+        locationArgument = chip::Span<const char>("XXgarbage: not in length on purpose", 2);
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
+            locationArgument, this, OnSuccessCallback_5, OnFailureCallback_5, OnDoneCallback_5));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_5() { NextTest(); }
+
+    void OnDoneResponse_5() { NextTest(); }
+
+    CHIP_ERROR TestReadBackAttribute_6()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::BasicClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
+            this, OnSuccessCallback_6, OnFailureCallback_6));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_6(chip::CharSpan location)
+    {
+        VerifyOrReturn(CheckValueAsString("location", location, chip::CharSpan("XX", 2)));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_7()
+    {
+        const chip::GroupId groupId = 4660;
+        using RequestType           = chip::app::Clusters::OnOff::Commands::On::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_7();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_7(error);
+        };
+
+        auto done = [](void * context) { (static_cast<TestGroupMessaging *>(context))->OnDoneResponse_7(); };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_7(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_7() { NextTest(); }
+
+    void OnDoneResponse_7() { NextTest(); }
+
+    CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommandForEndpoint1_8()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::OnOffClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
+            this, OnSuccessCallback_8, OnFailureCallback_8));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_8(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_8(bool onOff)
+    {
+        VerifyOrReturn(CheckValue("onOff", onOff, 1));
+
+        NextTest();
+    }
+};
+
 class TestGroupsCluster : public TestCommand
 {
 public:
-    TestGroupsCluster() : TestCommand("TestGroupsCluster"), mTestIndex(0)
+    TestGroupsCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestGroupsCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -73205,10 +84312,647 @@ private:
     }
 };
 
+class TestGroupDemoCommand : public TestCommand
+{
+public:
+    TestGroupDemoCommand(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestGroupDemoCommand", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~TestGroupDemoCommand() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: TestGroupDemoCommand\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: TestGroupDemoCommand\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Turn On the light to see attribute change\n");
+            err = TestTurnOnTheLightToSeeAttributeChange_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Wait 100ms\n");
+            err = TestWait100ms_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Turn Off the light to see attribute change\n");
+            err = TestTurnOffTheLightToSeeAttributeChange_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Wait 100ms\n");
+            err = TestWait100ms_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Turn On the light to see attribute change\n");
+            err = TestTurnOnTheLightToSeeAttributeChange_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Wait 100ms\n");
+            err = TestWait100ms_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Turn Off the light to see attribute change\n");
+            err = TestTurnOffTheLightToSeeAttributeChange_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Wait 100ms\n");
+            err = TestWait100ms_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Turn On the light to see attribute change\n");
+            err = TestTurnOnTheLightToSeeAttributeChange_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Wait 100ms\n");
+            err = TestWait100ms_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Turn Off the light to see attribute change\n");
+            err = TestTurnOffTheLightToSeeAttributeChange_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Wait 100ms\n");
+            err = TestWait100ms_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : Turn On the light to see attribute change\n");
+            err = TestTurnOnTheLightToSeeAttributeChange_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : Wait 100ms\n");
+            err = TestWait100ms_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool, " ***** Test Step 15 : Turn Off the light to see attribute change\n");
+            err = TestTurnOffTheLightToSeeAttributeChange_15();
+            break;
+        case 16:
+            ChipLogProgress(chipTool, " ***** Test Step 16 : Wait 100ms\n");
+            err = TestWait100ms_16();
+            break;
+        case 17:
+            ChipLogProgress(chipTool, " ***** Test Step 17 : Turn On the light to see attribute change\n");
+            err = TestTurnOnTheLightToSeeAttributeChange_17();
+            break;
+        case 18:
+            ChipLogProgress(chipTool, " ***** Test Step 18 : Wait 100ms\n");
+            err = TestWait100ms_18();
+            break;
+        case 19:
+            ChipLogProgress(chipTool, " ***** Test Step 19 : Turn Off the light to see attribute change\n");
+            err = TestTurnOffTheLightToSeeAttributeChange_19();
+            break;
+        case 20:
+            ChipLogProgress(chipTool, " ***** Test Step 20 : Wait 100ms\n");
+            err = TestWait100ms_20();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 21;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_1()
+    {
+        const chip::GroupId groupId = 4660;
+        using RequestType           = chip::app::Clusters::OnOff::Commands::On::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnSuccessResponse_1();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnFailureResponse_1(error);
+        };
+
+        auto done = [](void * context) { (static_cast<TestGroupDemoCommand *>(context))->OnDoneResponse_1(); };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_1() { NextTest(); }
+
+    void OnDoneResponse_1() { NextTest(); }
+
+    CHIP_ERROR TestWait100ms_2()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(1000);
+    }
+
+    CHIP_ERROR TestTurnOffTheLightToSeeAttributeChange_3()
+    {
+        const chip::GroupId groupId = 4660;
+        using RequestType           = chip::app::Clusters::OnOff::Commands::Off::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnSuccessResponse_3();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnFailureResponse_3(error);
+        };
+
+        auto done = [](void * context) { (static_cast<TestGroupDemoCommand *>(context))->OnDoneResponse_3(); };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_3() { NextTest(); }
+
+    void OnDoneResponse_3() { NextTest(); }
+
+    CHIP_ERROR TestWait100ms_4()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(1000);
+    }
+
+    CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_5()
+    {
+        const chip::GroupId groupId = 4660;
+        using RequestType           = chip::app::Clusters::OnOff::Commands::On::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnSuccessResponse_5();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnFailureResponse_5(error);
+        };
+
+        auto done = [](void * context) { (static_cast<TestGroupDemoCommand *>(context))->OnDoneResponse_5(); };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_5() { NextTest(); }
+
+    void OnDoneResponse_5() { NextTest(); }
+
+    CHIP_ERROR TestWait100ms_6()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(1000);
+    }
+
+    CHIP_ERROR TestTurnOffTheLightToSeeAttributeChange_7()
+    {
+        const chip::GroupId groupId = 4660;
+        using RequestType           = chip::app::Clusters::OnOff::Commands::Off::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnSuccessResponse_7();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnFailureResponse_7(error);
+        };
+
+        auto done = [](void * context) { (static_cast<TestGroupDemoCommand *>(context))->OnDoneResponse_7(); };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_7(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_7() { NextTest(); }
+
+    void OnDoneResponse_7() { NextTest(); }
+
+    CHIP_ERROR TestWait100ms_8()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(1000);
+    }
+
+    CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_9()
+    {
+        const chip::GroupId groupId = 4660;
+        using RequestType           = chip::app::Clusters::OnOff::Commands::On::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnSuccessResponse_9();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnFailureResponse_9(error);
+        };
+
+        auto done = [](void * context) { (static_cast<TestGroupDemoCommand *>(context))->OnDoneResponse_9(); };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_9(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_9() { NextTest(); }
+
+    void OnDoneResponse_9() { NextTest(); }
+
+    CHIP_ERROR TestWait100ms_10()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(1000);
+    }
+
+    CHIP_ERROR TestTurnOffTheLightToSeeAttributeChange_11()
+    {
+        const chip::GroupId groupId = 4660;
+        using RequestType           = chip::app::Clusters::OnOff::Commands::Off::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnSuccessResponse_11();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnFailureResponse_11(error);
+        };
+
+        auto done = [](void * context) { (static_cast<TestGroupDemoCommand *>(context))->OnDoneResponse_11(); };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_11(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_11() { NextTest(); }
+
+    void OnDoneResponse_11() { NextTest(); }
+
+    CHIP_ERROR TestWait100ms_12()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(1000);
+    }
+
+    CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_13()
+    {
+        const chip::GroupId groupId = 4660;
+        using RequestType           = chip::app::Clusters::OnOff::Commands::On::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnSuccessResponse_13();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnFailureResponse_13(error);
+        };
+
+        auto done = [](void * context) { (static_cast<TestGroupDemoCommand *>(context))->OnDoneResponse_13(); };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_13(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_13() { NextTest(); }
+
+    void OnDoneResponse_13() { NextTest(); }
+
+    CHIP_ERROR TestWait100ms_14()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(1000);
+    }
+
+    CHIP_ERROR TestTurnOffTheLightToSeeAttributeChange_15()
+    {
+        const chip::GroupId groupId = 4660;
+        using RequestType           = chip::app::Clusters::OnOff::Commands::Off::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnSuccessResponse_15();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnFailureResponse_15(error);
+        };
+
+        auto done = [](void * context) { (static_cast<TestGroupDemoCommand *>(context))->OnDoneResponse_15(); };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_15(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_15() { NextTest(); }
+
+    void OnDoneResponse_15() { NextTest(); }
+
+    CHIP_ERROR TestWait100ms_16()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(1000);
+    }
+
+    CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_17()
+    {
+        const chip::GroupId groupId = 4660;
+        using RequestType           = chip::app::Clusters::OnOff::Commands::On::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnSuccessResponse_17();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnFailureResponse_17(error);
+        };
+
+        auto done = [](void * context) { (static_cast<TestGroupDemoCommand *>(context))->OnDoneResponse_17(); };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_17(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_17() { NextTest(); }
+
+    void OnDoneResponse_17() { NextTest(); }
+
+    CHIP_ERROR TestWait100ms_18()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(1000);
+    }
+
+    CHIP_ERROR TestTurnOffTheLightToSeeAttributeChange_19()
+    {
+        const chip::GroupId groupId = 4660;
+        using RequestType           = chip::app::Clusters::OnOff::Commands::Off::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnSuccessResponse_19();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnFailureResponse_19(error);
+        };
+
+        auto done = [](void * context) { (static_cast<TestGroupDemoCommand *>(context))->OnDoneResponse_19(); };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_19(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_19() { NextTest(); }
+
+    void OnDoneResponse_19() { NextTest(); }
+
+    CHIP_ERROR TestWait100ms_20()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(1000);
+    }
+};
+
+class TestGroupDemoConfig : public TestCommand
+{
+public:
+    TestGroupDemoConfig(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestGroupDemoConfig", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~TestGroupDemoConfig() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: TestGroupDemoConfig\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: TestGroupDemoConfig\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Add Group 1 - endpoint 1\n");
+            err = TestAddGroup1Endpoint1_1();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 2;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestAddGroup1Endpoint1_1()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::Groups::Commands::AddGroup::Type;
+
+        RequestType request;
+        request.groupId   = 4660U;
+        request.groupName = chip::Span<const char>("Group #1garbage: not in length on purpose", 8);
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupDemoConfig *>(context))->OnSuccessResponse_1(data.status, data.groupId);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupDemoConfig *>(context))->OnFailureResponse_1(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_1(uint8_t status, uint16_t groupId)
+    {
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValue("groupId", groupId, 4660U));
+
+        NextTest();
+    }
+};
+
 class TestGroupKeyManagementCluster : public TestCommand
 {
 public:
-    TestGroupKeyManagementCluster() : TestCommand("TestGroupKeyManagementCluster"), mTestIndex(0)
+    TestGroupKeyManagementCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestGroupKeyManagementCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -73350,7611 +85094,162 @@ private:
     }
 };
 
-class TestOperationalCredentialsCluster : public TestCommand
-{
-public:
-    TestOperationalCredentialsCluster() : TestCommand("TestOperationalCredentialsCluster"), mTestIndex(0)
-    {
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-    }
-
-    ~TestOperationalCredentialsCluster() {}
-
-    /////////// TestCommand Interface /////////
-    void NextTest() override
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        if (0 == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Start: TestOperationalCredentialsCluster\n");
-        }
-
-        if (mTestCount == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Complete: TestOperationalCredentialsCluster\n");
-            SetCommandExitStatus(CHIP_NO_ERROR);
-            return;
-        }
-
-        Wait();
-
-        // Ensure we increment mTestIndex before we start running the relevant
-        // command.  That way if we lose the timeslice after we send the message
-        // but before our function call returns, we won't end up with an
-        // incorrect mTestIndex value observed when we get the response.
-        switch (mTestIndex++)
-        {
-        case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
-            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
-            break;
-        case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Read number of supported fabrics\n");
-            err = TestReadNumberOfSupportedFabrics_1();
-            break;
-        case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Read number of commissioned fabrics\n");
-            err = TestReadNumberOfCommissionedFabrics_2();
-            break;
-        case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Read current fabric index\n");
-            err = TestReadCurrentFabricIndex_3();
-            break;
-        }
-
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }
-    }
-
-private:
-    std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 4;
-
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-
-    static void OnFailureCallback_1(void * context, CHIP_ERROR error)
-    {
-        (static_cast<TestOperationalCredentialsCluster *>(context))->OnFailureResponse_1(error);
-    }
-
-    static void OnSuccessCallback_1(void * context, uint8_t supportedFabrics)
-    {
-        (static_cast<TestOperationalCredentialsCluster *>(context))->OnSuccessResponse_1(supportedFabrics);
-    }
-
-    static void OnFailureCallback_2(void * context, CHIP_ERROR error)
-    {
-        (static_cast<TestOperationalCredentialsCluster *>(context))->OnFailureResponse_2(error);
-    }
-
-    static void OnSuccessCallback_2(void * context, uint8_t commissionedFabrics)
-    {
-        (static_cast<TestOperationalCredentialsCluster *>(context))->OnSuccessResponse_2(commissionedFabrics);
-    }
-
-    static void OnFailureCallback_3(void * context, CHIP_ERROR error)
-    {
-        (static_cast<TestOperationalCredentialsCluster *>(context))->OnFailureResponse_3(error);
-    }
-
-    static void OnSuccessCallback_3(void * context, chip::FabricIndex currentFabricIndex)
-    {
-        (static_cast<TestOperationalCredentialsCluster *>(context))->OnSuccessResponse_3(currentFabricIndex);
-    }
-
-    //
-    // Tests methods
-    //
-
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
-    {
-        SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
-    }
-
-    CHIP_ERROR TestReadNumberOfSupportedFabrics_1()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
-        chip::Controller::OperationalCredentialsClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(
-            cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::SupportedFabrics::TypeInfo>(
-                this, OnSuccessCallback_1, OnFailureCallback_1));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_1(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_1(uint8_t supportedFabrics)
-    {
-        VerifyOrReturn(CheckConstraintType("supportedFabrics", "", "uint8"));
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("supportedFabrics", supportedFabrics, 4));
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadNumberOfCommissionedFabrics_2()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
-        chip::Controller::OperationalCredentialsClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(
-            cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::CommissionedFabrics::TypeInfo>(
-                this, OnSuccessCallback_2, OnFailureCallback_2));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_2(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_2(uint8_t commissionedFabrics)
-    {
-        VerifyOrReturn(CheckConstraintType("commissionedFabrics", "", "uint8"));
-        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("commissionedFabrics", commissionedFabrics, 1));
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadCurrentFabricIndex_3()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
-        chip::Controller::OperationalCredentialsClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(
-            cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::CurrentFabricIndex::TypeInfo>(
-                this, OnSuccessCallback_3, OnFailureCallback_3));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_3(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_3(chip::FabricIndex currentFabricIndex)
-    {
-        VerifyOrReturn(CheckConstraintType("currentFabricIndex", "", "uint8"));
-        VerifyOrReturn(CheckConstraintMinValue<chip::FabricIndex>("currentFabricIndex", currentFabricIndex, 1));
-        NextTest();
-    }
-};
-
-class TestModeSelectCluster : public TestCommand
-{
-public:
-    TestModeSelectCluster() : TestCommand("TestModeSelectCluster"), mTestIndex(0)
-    {
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-    }
-
-    ~TestModeSelectCluster() {}
-
-    /////////// TestCommand Interface /////////
-    void NextTest() override
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        if (0 == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Start: TestModeSelectCluster\n");
-        }
-
-        if (mTestCount == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Complete: TestModeSelectCluster\n");
-            SetCommandExitStatus(CHIP_NO_ERROR);
-            return;
-        }
-
-        Wait();
-
-        // Ensure we increment mTestIndex before we start running the relevant
-        // command.  That way if we lose the timeslice after we send the message
-        // but before our function call returns, we won't end up with an
-        // incorrect mTestIndex value observed when we get the response.
-        switch (mTestIndex++)
-        {
-        case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
-            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
-            break;
-        case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Read CurrentMode\n");
-            err = TestReadCurrentMode_1();
-            break;
-        case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Read OnMode\n");
-            err = TestReadOnMode_2();
-            break;
-        case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Read StartUpMode\n");
-            err = TestReadStartUpMode_3();
-            break;
-        case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Read Description\n");
-            err = TestReadDescription_4();
-            break;
-        case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Read SupportedModes\n");
-            err = TestReadSupportedModes_5();
-            break;
-        case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Change to Supported Mode\n");
-            err = TestChangeToSupportedMode_6();
-            break;
-        case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Verify Current Mode Change\n");
-            err = TestVerifyCurrentModeChange_7();
-            break;
-        case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Change to Unsupported Mode\n");
-            err = TestChangeToUnsupportedMode_8();
-            break;
-        }
-
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }
-    }
-
-private:
-    std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 9;
-
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-
-    static void OnFailureCallback_1(void * context, CHIP_ERROR error)
-    {
-        (static_cast<TestModeSelectCluster *>(context))->OnFailureResponse_1(error);
-    }
-
-    static void OnSuccessCallback_1(void * context, uint8_t currentMode)
-    {
-        (static_cast<TestModeSelectCluster *>(context))->OnSuccessResponse_1(currentMode);
-    }
-
-    static void OnFailureCallback_2(void * context, CHIP_ERROR error)
-    {
-        (static_cast<TestModeSelectCluster *>(context))->OnFailureResponse_2(error);
-    }
-
-    static void OnSuccessCallback_2(void * context, uint8_t onMode)
-    {
-        (static_cast<TestModeSelectCluster *>(context))->OnSuccessResponse_2(onMode);
-    }
-
-    static void OnFailureCallback_3(void * context, CHIP_ERROR error)
-    {
-        (static_cast<TestModeSelectCluster *>(context))->OnFailureResponse_3(error);
-    }
-
-    static void OnSuccessCallback_3(void * context, uint8_t startUpMode)
-    {
-        (static_cast<TestModeSelectCluster *>(context))->OnSuccessResponse_3(startUpMode);
-    }
-
-    static void OnFailureCallback_4(void * context, CHIP_ERROR error)
-    {
-        (static_cast<TestModeSelectCluster *>(context))->OnFailureResponse_4(error);
-    }
-
-    static void OnSuccessCallback_4(void * context, chip::CharSpan description)
-    {
-        (static_cast<TestModeSelectCluster *>(context))->OnSuccessResponse_4(description);
-    }
-
-    static void OnFailureCallback_5(void * context, CHIP_ERROR error)
-    {
-        (static_cast<TestModeSelectCluster *>(context))->OnFailureResponse_5(error);
-    }
-
-    static void OnSuccessCallback_5(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> &
-            supportedModes)
-    {
-        (static_cast<TestModeSelectCluster *>(context))->OnSuccessResponse_5(supportedModes);
-    }
-
-    static void OnFailureCallback_7(void * context, CHIP_ERROR error)
-    {
-        (static_cast<TestModeSelectCluster *>(context))->OnFailureResponse_7(error);
-    }
-
-    static void OnSuccessCallback_7(void * context, uint8_t currentMode)
-    {
-        (static_cast<TestModeSelectCluster *>(context))->OnSuccessResponse_7(currentMode);
-    }
-
-    //
-    // Tests methods
-    //
-
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
-    {
-        SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
-    }
-
-    CHIP_ERROR TestReadCurrentMode_1()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::ModeSelectClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ModeSelect::Attributes::CurrentMode::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_1(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_1(uint8_t currentMode)
-    {
-        VerifyOrReturn(CheckValue("currentMode", currentMode, 0));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadOnMode_2()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::ModeSelectClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ModeSelect::Attributes::OnMode::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_2(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_2(uint8_t onMode)
-    {
-        VerifyOrReturn(CheckValue("onMode", onMode, 0));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadStartUpMode_3()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::ModeSelectClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ModeSelect::Attributes::StartUpMode::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_3(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_3(uint8_t startUpMode)
-    {
-        VerifyOrReturn(CheckValue("startUpMode", startUpMode, 0));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadDescription_4()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::ModeSelectClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ModeSelect::Attributes::Description::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_4(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_4(chip::CharSpan description)
-    {
-        VerifyOrReturn(CheckValueAsString("description", description, chip::CharSpan("Coffee", 6)));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadSupportedModes_5()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::ModeSelectClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ModeSelect::Attributes::SupportedModes::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_5(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_5(
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> &
-            supportedModes)
-    {
-        {
-            auto iter_0 = supportedModes.begin();
-            VerifyOrReturn(CheckNextListItemDecodes<decltype(supportedModes)>("supportedModes", iter_0, 0));
-            VerifyOrReturn(CheckValueAsString("supportedModes[0].label", iter_0.GetValue().label, chip::CharSpan("Black", 5)));
-            VerifyOrReturn(CheckValue("supportedModes[0].mode", iter_0.GetValue().mode, 0));
-            VerifyOrReturn(CheckValue("supportedModes[0].semanticTag", iter_0.GetValue().semanticTag, 0UL));
-            VerifyOrReturn(CheckNextListItemDecodes<decltype(supportedModes)>("supportedModes", iter_0, 1));
-            VerifyOrReturn(
-                CheckValueAsString("supportedModes[1].label", iter_0.GetValue().label, chip::CharSpan("Cappuccino", 10)));
-            VerifyOrReturn(CheckValue("supportedModes[1].mode", iter_0.GetValue().mode, 4));
-            VerifyOrReturn(CheckValue("supportedModes[1].semanticTag", iter_0.GetValue().semanticTag, 0UL));
-            VerifyOrReturn(CheckNextListItemDecodes<decltype(supportedModes)>("supportedModes", iter_0, 2));
-            VerifyOrReturn(CheckValueAsString("supportedModes[2].label", iter_0.GetValue().label, chip::CharSpan("Espresso", 8)));
-            VerifyOrReturn(CheckValue("supportedModes[2].mode", iter_0.GetValue().mode, 7));
-            VerifyOrReturn(CheckValue("supportedModes[2].semanticTag", iter_0.GetValue().semanticTag, 0UL));
-            VerifyOrReturn(CheckNoMoreListItems<decltype(supportedModes)>("supportedModes", iter_0, 3));
-        }
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestChangeToSupportedMode_6()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type;
-
-        RequestType request;
-        request.newMode = 4;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestModeSelectCluster *>(context))->OnSuccessResponse_6();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<TestModeSelectCluster *>(context))->OnFailureResponse_6(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_6(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_6() { NextTest(); }
-
-    CHIP_ERROR TestVerifyCurrentModeChange_7()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::ModeSelectClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ModeSelect::Attributes::CurrentMode::TypeInfo>(
-            this, OnSuccessCallback_7, OnFailureCallback_7));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_7(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_7(uint8_t currentMode)
-    {
-        VerifyOrReturn(CheckValue("currentMode", currentMode, 4));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestChangeToUnsupportedMode_8()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type;
-
-        RequestType request;
-        request.newMode = 2;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestModeSelectCluster *>(context))->OnSuccessResponse_8();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<TestModeSelectCluster *>(context))->OnFailureResponse_8(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_8(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
-        NextTest();
-    }
-
-    void OnSuccessResponse_8() { ThrowSuccessResponse(); }
-};
-
-class TestGroupMessaging : public TestCommand
-{
-public:
-    TestGroupMessaging() : TestCommand("TestGroupMessaging"), mTestIndex(0)
-    {
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-    }
-
-    ~TestGroupMessaging() {}
-
-    /////////// TestCommand Interface /////////
-    void NextTest() override
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        if (0 == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Start: TestGroupMessaging\n");
-        }
-
-        if (mTestCount == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Complete: TestGroupMessaging\n");
-            SetCommandExitStatus(CHIP_NO_ERROR);
-            return;
-        }
-
-        Wait();
-
-        // Ensure we increment mTestIndex before we start running the relevant
-        // command.  That way if we lose the timeslice after we send the message
-        // but before our function call returns, we won't end up with an
-        // incorrect mTestIndex value observed when we get the response.
-        switch (mTestIndex++)
-        {
-        case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
-            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
-            break;
-        case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Add Group 1 - endpoint 1\n");
-            err = TestAddGroup1Endpoint1_1();
-            break;
-        case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Add Group 2 - endpoint 0\n");
-            err = TestAddGroup2Endpoint0_2();
-            break;
-        case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Group Write Attribute\n");
-            err = TestGroupWriteAttribute_3();
-            break;
-        case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Read back Attribute\n");
-            err = TestReadBackAttribute_4();
-            break;
-        case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Restore initial location value\n");
-            err = TestRestoreInitialLocationValue_5();
-            break;
-        case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Read back Attribute\n");
-            err = TestReadBackAttribute_6();
-            break;
-        case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Turn On the light to see attribute change\n");
-            err = TestTurnOnTheLightToSeeAttributeChange_7();
-            break;
-        case 8:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 8 : Check on/off attribute value is true after on command for endpoint 1\n");
-            err = TestCheckOnOffAttributeValueIsTrueAfterOnCommandForEndpoint1_8();
-            break;
-        }
-
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }
-    }
-
-private:
-    std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 9;
-
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-
-    static void OnDoneCallback_3(void * context) { (static_cast<TestGroupMessaging *>(context))->OnDoneResponse_3(); }
-
-    static void OnFailureCallback_3(void * context, CHIP_ERROR error)
-    {
-        (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_3(error);
-    }
-
-    static void OnSuccessCallback_3(void * context) { (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_3(); }
-
-    static void OnFailureCallback_4(void * context, CHIP_ERROR error)
-    {
-        (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_4(error);
-    }
-
-    static void OnSuccessCallback_4(void * context, chip::CharSpan location)
-    {
-        (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_4(location);
-    }
-
-    static void OnDoneCallback_5(void * context) { (static_cast<TestGroupMessaging *>(context))->OnDoneResponse_5(); }
-
-    static void OnFailureCallback_5(void * context, CHIP_ERROR error)
-    {
-        (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_5(error);
-    }
-
-    static void OnSuccessCallback_5(void * context) { (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_5(); }
-
-    static void OnFailureCallback_6(void * context, CHIP_ERROR error)
-    {
-        (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_6(error);
-    }
-
-    static void OnSuccessCallback_6(void * context, chip::CharSpan location)
-    {
-        (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_6(location);
-    }
-
-    static void OnFailureCallback_8(void * context, CHIP_ERROR error)
-    {
-        (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_8(error);
-    }
-
-    static void OnSuccessCallback_8(void * context, bool onOff)
-    {
-        (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_8(onOff);
-    }
-
-    //
-    // Tests methods
-    //
-
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
-    {
-        SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
-    }
-
-    CHIP_ERROR TestAddGroup1Endpoint1_1()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::Groups::Commands::AddGroup::Type;
-
-        RequestType request;
-        request.groupId   = 4660U;
-        request.groupName = chip::Span<const char>("Group #1garbage: not in length on purpose", 8);
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_1(data.status, data.groupId);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_1(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_1(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_1(uint8_t status, uint16_t groupId)
-    {
-        VerifyOrReturn(CheckValue("status", status, 0));
-
-        VerifyOrReturn(CheckValue("groupId", groupId, 4660U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestAddGroup2Endpoint0_2()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
-        using RequestType               = chip::app::Clusters::Groups::Commands::AddGroup::Type;
-
-        RequestType request;
-        request.groupId   = 1U;
-        request.groupName = chip::Span<const char>("Group #2garbage: not in length on purpose", 8);
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_2(data.status, data.groupId);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_2(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_2(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_2(uint8_t status, uint16_t groupId)
-    {
-        VerifyOrReturn(CheckValue("status", status, 0));
-
-        VerifyOrReturn(CheckValue("groupId", groupId, 1U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestGroupWriteAttribute_3()
-    {
-        const chip::GroupId groupId = 1;
-        chip::Controller::BasicClusterTest cluster;
-        cluster.AssociateWithGroup(mDevices[kIdentityAlpha], groupId);
-
-        chip::CharSpan locationArgument;
-        locationArgument = chip::Span<const char>("USgarbage: not in length on purpose", 2);
-
-        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
-            locationArgument, this, OnSuccessCallback_3, OnFailureCallback_3, OnDoneCallback_3));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_3(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_3() { NextTest(); }
-
-    void OnDoneResponse_3() { NextTest(); }
-
-    CHIP_ERROR TestReadBackAttribute_4()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
-        chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_4(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_4(chip::CharSpan location)
-    {
-        VerifyOrReturn(CheckValueAsString("location", location, chip::CharSpan("US", 2)));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestRestoreInitialLocationValue_5()
-    {
-        const chip::GroupId groupId = 1;
-        chip::Controller::BasicClusterTest cluster;
-        cluster.AssociateWithGroup(mDevices[kIdentityAlpha], groupId);
-
-        chip::CharSpan locationArgument;
-        locationArgument = chip::Span<const char>("XXgarbage: not in length on purpose", 2);
-
-        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
-            locationArgument, this, OnSuccessCallback_5, OnFailureCallback_5, OnDoneCallback_5));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_5(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_5() { NextTest(); }
-
-    void OnDoneResponse_5() { NextTest(); }
-
-    CHIP_ERROR TestReadBackAttribute_6()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
-        chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
-            this, OnSuccessCallback_6, OnFailureCallback_6));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_6(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_6(chip::CharSpan location)
-    {
-        VerifyOrReturn(CheckValueAsString("location", location, chip::CharSpan("XX", 2)));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_7()
-    {
-        const chip::GroupId groupId = 4660;
-        using RequestType           = chip::app::Clusters::OnOff::Commands::On::Type;
-
-        RequestType request;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_7();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_7(error);
-        };
-
-        auto done = [](void * context) { (static_cast<TestGroupMessaging *>(context))->OnDoneResponse_7(); };
-
-        ReturnErrorOnFailure(
-            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_7(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_7() { NextTest(); }
-
-    void OnDoneResponse_7() { NextTest(); }
-
-    CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommandForEndpoint1_8()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_8, OnFailureCallback_8));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_8(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_8(bool onOff)
-    {
-        VerifyOrReturn(CheckValue("onOff", onOff, 1));
-
-        NextTest();
-    }
-};
-
-class Test_TC_SWDIAG_1_1 : public TestCommand
-{
-public:
-    Test_TC_SWDIAG_1_1() : TestCommand("Test_TC_SWDIAG_1_1"), mTestIndex(0)
-    {
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-    }
-
-    ~Test_TC_SWDIAG_1_1() {}
-
-    /////////// TestCommand Interface /////////
-    void NextTest() override
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        if (0 == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Start: Test_TC_SWDIAG_1_1\n");
-        }
-
-        if (mTestCount == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_SWDIAG_1_1\n");
-            SetCommandExitStatus(CHIP_NO_ERROR);
-            return;
-        }
-
-        Wait();
-
-        // Ensure we increment mTestIndex before we start running the relevant
-        // command.  That way if we lose the timeslice after we send the message
-        // but before our function call returns, we won't end up with an
-        // incorrect mTestIndex value observed when we get the response.
-        switch (mTestIndex++)
-        {
-        case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
-            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
-            break;
-        case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Reads CurrentHeapFree non-global attribute value from DUT\n");
-            err = TestReadsCurrentHeapFreeNonGlobalAttributeValueFromDut_1();
-            break;
-        case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Reads CurrentHeapUsed non-global attribute value from DUT\n");
-            if (ShouldSkip("A_CURRENTHEAPUSED"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestReadsCurrentHeapUsedNonGlobalAttributeValueFromDut_2();
-            break;
-        case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Reads CurrentHeapHighWaterMark non-global attribute value from DUT\n");
-            if (ShouldSkip("A_CURRENTHEAPHIGHWATERMARK"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestReadsCurrentHeapHighWaterMarkNonGlobalAttributeValueFromDut_3();
-            break;
-        }
-
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }
-    }
-
-private:
-    std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 4;
-
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-
-    static void OnFailureCallback_1(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_SWDIAG_1_1 *>(context))->OnFailureResponse_1(error);
-    }
-
-    static void OnSuccessCallback_1(void * context, uint64_t currentHeapFree)
-    {
-        (static_cast<Test_TC_SWDIAG_1_1 *>(context))->OnSuccessResponse_1(currentHeapFree);
-    }
-
-    static void OnFailureCallback_2(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_SWDIAG_1_1 *>(context))->OnFailureResponse_2(error);
-    }
-
-    static void OnSuccessCallback_2(void * context, uint64_t currentHeapUsed)
-    {
-        (static_cast<Test_TC_SWDIAG_1_1 *>(context))->OnSuccessResponse_2(currentHeapUsed);
-    }
-
-    static void OnFailureCallback_3(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_SWDIAG_1_1 *>(context))->OnFailureResponse_3(error);
-    }
-
-    static void OnSuccessCallback_3(void * context, uint64_t currentHeapHighWatermark)
-    {
-        (static_cast<Test_TC_SWDIAG_1_1 *>(context))->OnSuccessResponse_3(currentHeapHighWatermark);
-    }
-
-    //
-    // Tests methods
-    //
-
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
-    {
-        SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
-    }
-
-    CHIP_ERROR TestReadsCurrentHeapFreeNonGlobalAttributeValueFromDut_1()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::SoftwareDiagnosticsClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapFree::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_1(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_1(uint64_t currentHeapFree)
-    {
-        VerifyOrReturn(CheckConstraintType("currentHeapFree", "", "uint64"));
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadsCurrentHeapUsedNonGlobalAttributeValueFromDut_2()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::SoftwareDiagnosticsClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapUsed::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_2(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_2(uint64_t currentHeapUsed)
-    {
-        VerifyOrReturn(CheckConstraintType("currentHeapUsed", "", "uint64"));
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadsCurrentHeapHighWaterMarkNonGlobalAttributeValueFromDut_3()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::SoftwareDiagnosticsClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(
-            cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::TypeInfo>(
-                this, OnSuccessCallback_3, OnFailureCallback_3));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_3(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_3(uint64_t currentHeapHighWatermark)
-    {
-        VerifyOrReturn(CheckConstraintType("currentHeapHighWatermark", "", "uint64"));
-        NextTest();
-    }
-};
-
-class Test_TC_SWDIAG_2_1 : public TestCommand
-{
-public:
-    Test_TC_SWDIAG_2_1() : TestCommand("Test_TC_SWDIAG_2_1"), mTestIndex(0)
-    {
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-    }
-
-    ~Test_TC_SWDIAG_2_1() {}
-
-    /////////// TestCommand Interface /////////
-    void NextTest() override
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        if (0 == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Start: Test_TC_SWDIAG_2_1\n");
-        }
-
-        if (mTestCount == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_SWDIAG_2_1\n");
-            SetCommandExitStatus(CHIP_NO_ERROR);
-            return;
-        }
-
-        Wait();
-
-        // Ensure we increment mTestIndex before we start running the relevant
-        // command.  That way if we lose the timeslice after we send the message
-        // but before our function call returns, we won't end up with an
-        // incorrect mTestIndex value observed when we get the response.
-        switch (mTestIndex++)
-        {
-        }
-
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }
-    }
-
-private:
-    std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 0;
-
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-
-    //
-    // Tests methods
-    //
-};
-
-class Test_TC_SWDIAG_3_1 : public TestCommand
-{
-public:
-    Test_TC_SWDIAG_3_1() : TestCommand("Test_TC_SWDIAG_3_1"), mTestIndex(0)
-    {
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-    }
-
-    ~Test_TC_SWDIAG_3_1() {}
-
-    /////////// TestCommand Interface /////////
-    void NextTest() override
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        if (0 == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Start: Test_TC_SWDIAG_3_1\n");
-        }
-
-        if (mTestCount == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_SWDIAG_3_1\n");
-            SetCommandExitStatus(CHIP_NO_ERROR);
-            return;
-        }
-
-        Wait();
-
-        // Ensure we increment mTestIndex before we start running the relevant
-        // command.  That way if we lose the timeslice after we send the message
-        // but before our function call returns, we won't end up with an
-        // incorrect mTestIndex value observed when we get the response.
-        switch (mTestIndex++)
-        {
-        case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
-            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
-            break;
-        case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Reads CurrentHeapUsed attribute value from DUT\n");
-            if (ShouldSkip("A_CURRENTHEAPUSED"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestReadsCurrentHeapUsedAttributeValueFromDut_1();
-            break;
-        case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Reads CurrentHeapHighWaterMark attribute value from DUT\n");
-            if (ShouldSkip("A_CURRENTHEAPHIGHWATERMARK"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestReadsCurrentHeapHighWaterMarkAttributeValueFromDut_2();
-            break;
-        }
-
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }
-    }
-
-private:
-    std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 3;
-
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-
-    static void OnFailureCallback_1(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_SWDIAG_3_1 *>(context))->OnFailureResponse_1(error);
-    }
-
-    static void OnSuccessCallback_1(void * context, uint64_t currentHeapUsed)
-    {
-        (static_cast<Test_TC_SWDIAG_3_1 *>(context))->OnSuccessResponse_1(currentHeapUsed);
-    }
-
-    static void OnFailureCallback_2(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_SWDIAG_3_1 *>(context))->OnFailureResponse_2(error);
-    }
-
-    static void OnSuccessCallback_2(void * context, uint64_t currentHeapHighWatermark)
-    {
-        (static_cast<Test_TC_SWDIAG_3_1 *>(context))->OnSuccessResponse_2(currentHeapHighWatermark);
-    }
-
-    //
-    // Tests methods
-    //
-
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
-    {
-        SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
-    }
-
-    CHIP_ERROR TestReadsCurrentHeapUsedAttributeValueFromDut_1()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::SoftwareDiagnosticsClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapUsed::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_1(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_1(uint64_t currentHeapUsed)
-    {
-        VerifyOrReturn(CheckValue("currentHeapUsed", currentHeapUsed, 0ULL));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadsCurrentHeapHighWaterMarkAttributeValueFromDut_2()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::SoftwareDiagnosticsClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(
-            cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::TypeInfo>(
-                this, OnSuccessCallback_2, OnFailureCallback_2));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_2(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_2(uint64_t currentHeapHighWatermark)
-    {
-        VerifyOrReturn(CheckValue("currentHeapHighWatermark", currentHeapHighWatermark, 0ULL));
-
-        NextTest();
-    }
-};
-
-class TestSubscribe_OnOff : public TestCommand
-{
-public:
-    TestSubscribe_OnOff() : TestCommand("TestSubscribe_OnOff"), mTestIndex(0)
-    {
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-    }
-
-    ~TestSubscribe_OnOff() {}
-
-    /////////// TestCommand Interface /////////
-    void NextTest() override
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        if (0 == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Start: TestSubscribe_OnOff\n");
-        }
-
-        if (mTestCount == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Complete: TestSubscribe_OnOff\n");
-            SetCommandExitStatus(CHIP_NO_ERROR);
-            return;
-        }
-
-        Wait();
-
-        // Ensure we increment mTestIndex before we start running the relevant
-        // command.  That way if we lose the timeslice after we send the message
-        // but before our function call returns, we won't end up with an
-        // incorrect mTestIndex value observed when we get the response.
-        switch (mTestIndex++)
-        {
-        case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
-            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
-            break;
-        case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Set OnOff Attribute to false\n");
-            err = TestSetOnOffAttributeToFalse_1();
-            break;
-        case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Report: Subscribe OnOff Attribute\n");
-            err = TestReportSubscribeOnOffAttribute_2();
-            break;
-        case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Subscribe OnOff Attribute\n");
-            err = TestSubscribeOnOffAttribute_3();
-            break;
-        case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Turn On the light to see attribute change\n");
-            err = TestTurnOnTheLightToSeeAttributeChange_4();
-            break;
-        case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Check for attribute report\n");
-            err = TestCheckForAttributeReport_5();
-            break;
-        case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Turn Off the light to see attribute change\n");
-            err = TestTurnOffTheLightToSeeAttributeChange_6();
-            break;
-        case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Check for attribute report\n");
-            err = TestCheckForAttributeReport_7();
-            break;
-        }
-
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }
-    }
-
-private:
-    std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 8;
-
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-
-    typedef void (*Test_TestSubscribe_OnOff_OnOff_ReportCallback)(void * context, bool value);
-    Test_TestSubscribe_OnOff_OnOff_ReportCallback mTest_TestSubscribe_OnOff_OnOff_Reported = nullptr;
-
-    static void OnFailureCallback_2(void * context, CHIP_ERROR error)
-    {
-        (static_cast<TestSubscribe_OnOff *>(context))->OnFailureResponse_2(error);
-    }
-
-    static void OnSuccessCallback_2(void * context, bool onOff)
-    {
-        (static_cast<TestSubscribe_OnOff *>(context))->OnSuccessResponse_2(onOff);
-    }
-
-    bool mReceivedReport_2 = false;
-
-    static void OnFailureCallback_3(void * context, CHIP_ERROR error)
-    {
-        (static_cast<TestSubscribe_OnOff *>(context))->OnFailureResponse_3(error);
-    }
-
-    static void OnSuccessCallback_3(void * context, bool onOff)
-    {
-        (static_cast<TestSubscribe_OnOff *>(context))->OnSuccessResponse_3(onOff);
-    }
-
-    static void OnSubscriptionEstablished_3(void * context)
-    {
-        (static_cast<TestSubscribe_OnOff *>(context))->OnSubscriptionEstablishedResponse_3();
-    }
-
-    static void OnFailureCallback_5(void * context, CHIP_ERROR error)
-    {
-        (static_cast<TestSubscribe_OnOff *>(context))->OnFailureResponse_5(error);
-    }
-
-    static void OnSuccessCallback_5(void * context, bool onOff)
-    {
-        (static_cast<TestSubscribe_OnOff *>(context))->OnSuccessResponse_5(onOff);
-    }
-
-    bool mReceivedReport_5 = false;
-
-    static void OnFailureCallback_7(void * context, CHIP_ERROR error)
-    {
-        (static_cast<TestSubscribe_OnOff *>(context))->OnFailureResponse_7(error);
-    }
-
-    static void OnSuccessCallback_7(void * context, bool onOff)
-    {
-        (static_cast<TestSubscribe_OnOff *>(context))->OnSuccessResponse_7(onOff);
-    }
-
-    bool mReceivedReport_7 = false;
-
-    //
-    // Tests methods
-    //
-
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
-    {
-        SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
-    }
-
-    CHIP_ERROR TestSetOnOffAttributeToFalse_1()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
-
-        RequestType request;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestSubscribe_OnOff *>(context))->OnSuccessResponse_1();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<TestSubscribe_OnOff *>(context))->OnFailureResponse_1(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_1(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_1() { NextTest(); }
-
-    CHIP_ERROR TestReportSubscribeOnOffAttribute_2()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        mTest_TestSubscribe_OnOff_OnOff_Reported = OnSuccessCallback_2;
-        return WaitForMs(0);
-    }
-
-    void OnFailureResponse_2(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_2(bool onOff)
-    {
-        mReceivedReport_2 = true;
-
-        VerifyOrReturn(CheckValue("onOff", onOff, false));
-    }
-
-    CHIP_ERROR TestSubscribeOnOffAttribute_3()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        uint16_t minIntervalArgument;
-        minIntervalArgument = 2U;
-        uint16_t maxIntervalArgument;
-        maxIntervalArgument = 10U;
-
-        ReturnErrorOnFailure(cluster.SubscribeAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3, minIntervalArgument, maxIntervalArgument, OnSubscriptionEstablished_3));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_3(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_3(bool value)
-    {
-        if (mTest_TestSubscribe_OnOff_OnOff_Reported)
-        {
-            auto callback                            = mTest_TestSubscribe_OnOff_OnOff_Reported;
-            mTest_TestSubscribe_OnOff_OnOff_Reported = nullptr;
-            callback(this, value);
-        }
-    }
-
-    void OnSubscriptionEstablishedResponse_3()
-    {
-        VerifyOrReturn(mReceivedReport_2, Exit("Initial report not received!"));
-        NextTest();
-    }
-
-    CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_4()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::OnOff::Commands::On::Type;
-
-        RequestType request;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestSubscribe_OnOff *>(context))->OnSuccessResponse_4();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<TestSubscribe_OnOff *>(context))->OnFailureResponse_4(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_4(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_4() { NextTest(); }
-
-    CHIP_ERROR TestCheckForAttributeReport_5()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        mTest_TestSubscribe_OnOff_OnOff_Reported = OnSuccessCallback_5;
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_5(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_5(bool onOff)
-    {
-        mReceivedReport_5 = true;
-
-        VerifyOrReturn(CheckValue("onOff", onOff, true));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestTurnOffTheLightToSeeAttributeChange_6()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
-
-        RequestType request;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestSubscribe_OnOff *>(context))->OnSuccessResponse_6();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<TestSubscribe_OnOff *>(context))->OnFailureResponse_6(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_6(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_6() { NextTest(); }
-
-    CHIP_ERROR TestCheckForAttributeReport_7()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        mTest_TestSubscribe_OnOff_OnOff_Reported = OnSuccessCallback_7;
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_7(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_7(bool onOff)
-    {
-        mReceivedReport_7 = true;
-
-        VerifyOrReturn(CheckValue("onOff", onOff, false));
-
-        NextTest();
-    }
-};
-
-class DL_UsersAndCredentials : public TestCommand
-{
-public:
-    DL_UsersAndCredentials() : TestCommand("DL_UsersAndCredentials"), mTestIndex(0)
-    {
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-    }
-
-    ~DL_UsersAndCredentials() {}
-
-    /////////// TestCommand Interface /////////
-    void NextTest() override
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        if (0 == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Start: DL_UsersAndCredentials\n");
-        }
-
-        if (mTestCount == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Complete: DL_UsersAndCredentials\n");
-            SetCommandExitStatus(CHIP_NO_ERROR);
-            return;
-        }
-
-        Wait();
-
-        // Ensure we increment mTestIndex before we start running the relevant
-        // command.  That way if we lose the timeslice after we send the message
-        // but before our function call returns, we won't end up with an
-        // incorrect mTestIndex value observed when we get the response.
-        switch (mTestIndex++)
-        {
-        case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
-            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
-            break;
-        case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Read available user slot and verify response fields\n");
-            err = TestReadAvailableUserSlotAndVerifyResponseFields_1();
-            break;
-        case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Get number of supported users and verify default value\n");
-            err = TestGetNumberOfSupportedUsersAndVerifyDefaultValue_2();
-            break;
-        case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Read fails for user with index 0\n");
-            err = TestReadFailsForUserWithIndex0_3();
-            break;
-        case 4:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 4 : Read fails for user with index greater than Number Of Users Supported\n");
-            err = TestReadFailsForUserWithIndexGreaterThanNumberOfUsersSupported_4();
-            break;
-        case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Create new user with default parameters\n");
-            err = TestCreateNewUserWithDefaultParameters_5();
-            break;
-        case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Read the user back and verify its fields\n");
-            err = TestReadTheUserBackAndVerifyItsFields_6();
-            break;
-        case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Set user at the occupied index fails with appropriate response\n");
-            err = TestSetUserAtTheOccupiedIndexFailsWithAppropriateResponse_7();
-            break;
-        case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Modify userName for existing user\n");
-            err = TestModifyUserNameForExistingUser_8();
-            break;
-        case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : Read the modified user back and verify its fields\n");
-            err = TestReadTheModifiedUserBackAndVerifyItsFields_9();
-            break;
-        case 10:
-            ChipLogProgress(chipTool, " ***** Test Step 10 : Modify userUniqueId for existing user\n");
-            err = TestModifyUserUniqueIdForExistingUser_10();
-            break;
-        case 11:
-            ChipLogProgress(chipTool, " ***** Test Step 11 : Read the modified user back and verify its fields\n");
-            err = TestReadTheModifiedUserBackAndVerifyItsFields_11();
-            break;
-        case 12:
-            ChipLogProgress(chipTool, " ***** Test Step 12 : Modify userStatus for existing user\n");
-            err = TestModifyUserStatusForExistingUser_12();
-            break;
-        case 13:
-            ChipLogProgress(chipTool, " ***** Test Step 13 : Read the modified user back and verify its fields\n");
-            err = TestReadTheModifiedUserBackAndVerifyItsFields_13();
-            break;
-        case 14:
-            ChipLogProgress(chipTool, " ***** Test Step 14 : Modify userType for existing user\n");
-            err = TestModifyUserTypeForExistingUser_14();
-            break;
-        case 15:
-            ChipLogProgress(chipTool, " ***** Test Step 15 : Read the modified user back and verify its fields\n");
-            err = TestReadTheModifiedUserBackAndVerifyItsFields_15();
-            break;
-        case 16:
-            ChipLogProgress(chipTool, " ***** Test Step 16 : Modify credentialRule for existing user\n");
-            err = TestModifyCredentialRuleForExistingUser_16();
-            break;
-        case 17:
-            ChipLogProgress(chipTool, " ***** Test Step 17 : Read the modified user back and verify its fields\n");
-            err = TestReadTheModifiedUserBackAndVerifyItsFields_17();
-            break;
-        case 18:
-            ChipLogProgress(chipTool, " ***** Test Step 18 : Modify all fields for existing user\n");
-            err = TestModifyAllFieldsForExistingUser_18();
-            break;
-        case 19:
-            ChipLogProgress(chipTool, " ***** Test Step 19 : Read the modified user back and verify its fields\n");
-            err = TestReadTheModifiedUserBackAndVerifyItsFields_19();
-            break;
-        case 20:
-            ChipLogProgress(chipTool, " ***** Test Step 20 : Add another user with non-default fields\n");
-            err = TestAddAnotherUserWithNonDefaultFields_20();
-            break;
-        case 21:
-            ChipLogProgress(chipTool, " ***** Test Step 21 : Read the new user back and verify its fields\n");
-            err = TestReadTheNewUserBackAndVerifyItsFields_21();
-            break;
-        case 22:
-            ChipLogProgress(chipTool, " ***** Test Step 22 : Create user in the last slot\n");
-            err = TestCreateUserInTheLastSlot_22();
-            break;
-        case 23:
-            ChipLogProgress(chipTool, " ***** Test Step 23 : Read the last user back and verify its fields\n");
-            err = TestReadTheLastUserBackAndVerifyItsFields_23();
-            break;
-        case 24:
-            ChipLogProgress(chipTool, " ***** Test Step 24 : User creation in the 0 slot fails\n");
-            err = TestUserCreationInThe0SlotFails_24();
-            break;
-        case 25:
-            ChipLogProgress(chipTool, " ***** Test Step 25 : User creation in the out-of-bounds slot fails\n");
-            err = TestUserCreationInTheOutOfBoundsSlotFails_25();
-            break;
-        case 26:
-            ChipLogProgress(chipTool, " ***** Test Step 26 : Clear first user\n");
-            err = TestClearFirstUser_26();
-            break;
-        case 27:
-            ChipLogProgress(chipTool, " ***** Test Step 27 : Read cleared user and verify it is available\n");
-            err = TestReadClearedUserAndVerifyItIsAvailable_27();
-            break;
-        case 28:
-            ChipLogProgress(chipTool, " ***** Test Step 28 : Create new user in the cleared slot\n");
-            err = TestCreateNewUserInTheClearedSlot_28();
-            break;
-        case 29:
-            ChipLogProgress(chipTool, " ***** Test Step 29 : Read the user in the previously cleared slot and verify its fields\n");
-            err = TestReadTheUserInThePreviouslyClearedSlotAndVerifyItsFields_29();
-            break;
-        case 30:
-            ChipLogProgress(chipTool, " ***** Test Step 30 : Clear user with index 0 fails\n");
-            err = TestClearUserWithIndex0Fails_30();
-            break;
-        case 31:
-            ChipLogProgress(chipTool, " ***** Test Step 31 : Clear user with out-of-bounds index fails\n");
-            err = TestClearUserWithOutOfBoundsIndexFails_31();
-            break;
-        case 32:
-            ChipLogProgress(chipTool, " ***** Test Step 32 : Clear all users\n");
-            err = TestClearAllUsers_32();
-            break;
-        case 33:
-            ChipLogProgress(chipTool, " ***** Test Step 33 : Read first cleared user and verify it is available\n");
-            err = TestReadFirstClearedUserAndVerifyItIsAvailable_33();
-            break;
-        case 34:
-            ChipLogProgress(chipTool, " ***** Test Step 34 : Read last cleared user and verify it is available\n");
-            err = TestReadLastClearedUserAndVerifyItIsAvailable_34();
-            break;
-        case 35:
-            ChipLogProgress(chipTool, " ***** Test Step 35 : Get number of supported PIN credentials and verify default value\n");
-            err = TestGetNumberOfSupportedPinCredentialsAndVerifyDefaultValue_35();
-            break;
-        case 36:
-            ChipLogProgress(chipTool, " ***** Test Step 36 : Check that PIN credential does not exist\n");
-            err = TestCheckThatPinCredentialDoesNotExist_36();
-            break;
-        case 37:
-            ChipLogProgress(chipTool, " ***** Test Step 37 : Reading PIN credential with index 0 fails\n");
-            err = TestReadingPinCredentialWithIndex0Fails_37();
-            break;
-        case 38:
-            ChipLogProgress(chipTool, " ***** Test Step 38 : Reading PIN credential with out-of-bounds index fails\n");
-            err = TestReadingPinCredentialWithOutOfBoundsIndexFails_38();
-            break;
-        case 39:
-            ChipLogProgress(chipTool, " ***** Test Step 39 : Create new PIN credential and user\n");
-            err = TestCreateNewPinCredentialAndUser_39();
-            break;
-        case 40:
-            ChipLogProgress(chipTool, " ***** Test Step 40 : Verify created user\n");
-            err = TestVerifyCreatedUser_40();
-            break;
-        case 41:
-            ChipLogProgress(chipTool, " ***** Test Step 41 : Verify created PIN credential\n");
-            err = TestVerifyCreatedPinCredential_41();
-            break;
-        case 42:
-            ChipLogProgress(chipTool, " ***** Test Step 42 : Create new PIN credential and user with index 0 fails\n");
-            err = TestCreateNewPinCredentialAndUserWithIndex0Fails_42();
-            break;
-        case 43:
-            ChipLogProgress(chipTool, " ***** Test Step 43 : Create new PIN credential and user with out-of-bounds index fails\n");
-            err = TestCreateNewPinCredentialAndUserWithOutOfBoundsIndexFails_43();
-            break;
-        case 44:
-            ChipLogProgress(chipTool, " ***** Test Step 44 : Get number of supported RFID credentials and verify default value\n");
-            err = TestGetNumberOfSupportedRfidCredentialsAndVerifyDefaultValue_44();
-            break;
-        case 45:
-            ChipLogProgress(chipTool, " ***** Test Step 45 : Reading RFID credential with index 0 fails\n");
-            err = TestReadingRfidCredentialWithIndex0Fails_45();
-            break;
-        case 46:
-            ChipLogProgress(chipTool, " ***** Test Step 46 : Reading RFID credential with out-of-bounds index fails\n");
-            err = TestReadingRfidCredentialWithOutOfBoundsIndexFails_46();
-            break;
-        case 47:
-            ChipLogProgress(chipTool, " ***** Test Step 47 : Check that RFID credential does not exist\n");
-            err = TestCheckThatRfidCredentialDoesNotExist_47();
-            break;
-        case 48:
-            ChipLogProgress(chipTool, " ***** Test Step 48 : Create new RFID credential and add it to existing user\n");
-            err = TestCreateNewRfidCredentialAndAddItToExistingUser_48();
-            break;
-        case 49:
-            ChipLogProgress(chipTool, " ***** Test Step 49 : Verify modified user\n");
-            err = TestVerifyModifiedUser_49();
-            break;
-        case 50:
-            ChipLogProgress(chipTool, " ***** Test Step 50 : Verify created credential\n");
-            err = TestVerifyCreatedCredential_50();
-            break;
-        case 51:
-            ChipLogProgress(chipTool, " ***** Test Step 51 : Create new RFID credential and user with index 0 fails\n");
-            err = TestCreateNewRfidCredentialAndUserWithIndex0Fails_51();
-            break;
-        case 52:
-            ChipLogProgress(chipTool, " ***** Test Step 52 : Create new RFID credential and user with out-of-bounds index fails\n");
-            err = TestCreateNewRfidCredentialAndUserWithOutOfBoundsIndexFails_52();
-            break;
-        case 53:
-            ChipLogProgress(chipTool, " ***** Test Step 53 : Create new PIN credential and try to add it to existing user\n");
-            err = TestCreateNewPinCredentialAndTryToAddItToExistingUser_53();
-            break;
-        case 54:
-            ChipLogProgress(chipTool, " ***** Test Step 54 : Create new credential and try to add it to 0 user\n");
-            err = TestCreateNewCredentialAndTryToAddItTo0User_54();
-            break;
-        case 55:
-            ChipLogProgress(chipTool, " ***** Test Step 55 : Create new credential and try to add it to out-of-bounds user\n");
-            err = TestCreateNewCredentialAndTryToAddItToOutOfBoundsUser_55();
-            break;
-        case 56:
-            ChipLogProgress(chipTool, " ***** Test Step 56 : Create new PIN with too short data\n");
-            err = TestCreateNewPinWithTooShortData_56();
-            break;
-        case 57:
-            ChipLogProgress(chipTool, " ***** Test Step 57 : Create new PIN with too long data\n");
-            err = TestCreateNewPinWithTooLongData_57();
-            break;
-        case 58:
-            ChipLogProgress(chipTool, " ***** Test Step 58 : Create new RFID with too short data\n");
-            err = TestCreateNewRfidWithTooShortData_58();
-            break;
-        case 59:
-            ChipLogProgress(chipTool, " ***** Test Step 59 : Create new PIN with Programming user type fails\n");
-            err = TestCreateNewPinWithProgrammingUserTypeFails_59();
-            break;
-        case 60:
-            ChipLogProgress(chipTool, " ***** Test Step 60 : Create new RFID with too short data\n");
-            err = TestCreateNewRfidWithTooShortData_60();
-            break;
-        case 61:
-            ChipLogProgress(chipTool, " ***** Test Step 61 : Create new PIN credential with data the would cause duplicate\n");
-            err = TestCreateNewPinCredentialWithDataTheWouldCauseDuplicate_61();
-            break;
-        case 62:
-            ChipLogProgress(chipTool, " ***** Test Step 62 : Create new RFID credential with data the would cause duplicate\n");
-            err = TestCreateNewRfidCredentialWithDataTheWouldCauseDuplicate_62();
-            break;
-        case 63:
-            ChipLogProgress(chipTool, " ***** Test Step 63 : Modify credentialData of existing PIN credential\n");
-            err = TestModifyCredentialDataOfExistingPinCredential_63();
-            break;
-        case 64:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 64 : Verify that credential was changed by creating new credential with old data\n");
-            err = TestVerifyThatCredentialWasChangedByCreatingNewCredentialWithOldData_64();
-            break;
-        case 65:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 65 : Verify that credential was changed by creating new credential with new data\n");
-            err = TestVerifyThatCredentialWasChangedByCreatingNewCredentialWithNewData_65();
-            break;
-        case 66:
-            ChipLogProgress(chipTool, " ***** Test Step 66 : Clear first PIN credential\n");
-            err = TestClearFirstPinCredential_66();
-            break;
-        case 67:
-            ChipLogProgress(chipTool, " ***** Test Step 67 : Read back the credential and make sure it is deleted\n");
-            err = TestReadBackTheCredentialAndMakeSureItIsDeleted_67();
-            break;
-        case 68:
-            ChipLogProgress(chipTool, " ***** Test Step 68 : Read the user back and make sure PIN credential is deleted\n");
-            err = TestReadTheUserBackAndMakeSurePinCredentialIsDeleted_68();
-            break;
-        case 69:
-            ChipLogProgress(chipTool, " ***** Test Step 69 : Clear the second PIN credential\n");
-            err = TestClearTheSecondPinCredential_69();
-            break;
-        case 70:
-            ChipLogProgress(chipTool, " ***** Test Step 70 : Read back the credential and make sure it is deleted\n");
-            err = TestReadBackTheCredentialAndMakeSureItIsDeleted_70();
-            break;
-        case 71:
-            ChipLogProgress(chipTool, " ***** Test Step 71 : Read the user back and make sure related user is deleted\n");
-            err = TestReadTheUserBackAndMakeSureRelatedUserIsDeleted_71();
-            break;
-        case 72:
-            ChipLogProgress(chipTool, " ***** Test Step 72 : Create new RFID credential with user\n");
-            err = TestCreateNewRfidCredentialWithUser_72();
-            break;
-        case 73:
-            ChipLogProgress(chipTool, " ***** Test Step 73 : Clear all the RFID credentials\n");
-            err = TestClearAllTheRfidCredentials_73();
-            break;
-        case 74:
-            ChipLogProgress(chipTool, " ***** Test Step 74 : Read back the fist RFID credential and make sure it is deleted\n");
-            err = TestReadBackTheFistRfidCredentialAndMakeSureItIsDeleted_74();
-            break;
-        case 75:
-            ChipLogProgress(chipTool, " ***** Test Step 75 : Read back the second RFID credential and make sure it is deleted\n");
-            err = TestReadBackTheSecondRfidCredentialAndMakeSureItIsDeleted_75();
-            break;
-        case 76:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 76 : Read the user related with first RFID back and make sure it is deleted\n");
-            err = TestReadTheUserRelatedWithFirstRfidBackAndMakeSureItIsDeleted_76();
-            break;
-        case 77:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 77 : Read the user related with second RFID back and make sure it is deleted\n");
-            err = TestReadTheUserRelatedWithSecondRfidBackAndMakeSureItIsDeleted_77();
-            break;
-        case 78:
-            ChipLogProgress(chipTool, " ***** Test Step 78 : Create new PIN credential with user\n");
-            err = TestCreateNewPinCredentialWithUser_78();
-            break;
-        case 79:
-            ChipLogProgress(chipTool, " ***** Test Step 79 : Create new RFID credential with user\n");
-            err = TestCreateNewRfidCredentialWithUser_79();
-            break;
-        case 80:
-            ChipLogProgress(chipTool, " ***** Test Step 80 : Create another RFID credential with user\n");
-            err = TestCreateAnotherRfidCredentialWithUser_80();
-            break;
-        case 81:
-            ChipLogProgress(chipTool, " ***** Test Step 81 : Clear all the credentials\n");
-            err = TestClearAllTheCredentials_81();
-            break;
-        case 82:
-            ChipLogProgress(chipTool, " ***** Test Step 82 : Read back the first PIN credential and make sure it is deleted\n");
-            err = TestReadBackTheFirstPinCredentialAndMakeSureItIsDeleted_82();
-            break;
-        case 83:
-            ChipLogProgress(chipTool, " ***** Test Step 83 : Read back the first RFID credential and make sure it is deleted\n");
-            err = TestReadBackTheFirstRfidCredentialAndMakeSureItIsDeleted_83();
-            break;
-        case 84:
-            ChipLogProgress(chipTool, " ***** Test Step 84 : Read back the second PIN credential and make sure it is deleted\n");
-            err = TestReadBackTheSecondPinCredentialAndMakeSureItIsDeleted_84();
-            break;
-        case 85:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 85 : Read the user related with first PIN back and make sure it is deleted\n");
-            err = TestReadTheUserRelatedWithFirstPinBackAndMakeSureItIsDeleted_85();
-            break;
-        case 86:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 86 : Read the user related with first RFID back and make sure it is deleted\n");
-            err = TestReadTheUserRelatedWithFirstRfidBackAndMakeSureItIsDeleted_86();
-            break;
-        case 87:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 87 : Read the user related with second PIN back and make sure it is deleted\n");
-            err = TestReadTheUserRelatedWithSecondPinBackAndMakeSureItIsDeleted_87();
-            break;
-        case 88:
-            ChipLogProgress(chipTool, " ***** Test Step 88 : Create new Programming PIN credential with invalid index\n");
-            err = TestCreateNewProgrammingPinCredentialWithInvalidIndex_88();
-            break;
-        case 89:
-            ChipLogProgress(chipTool, " ***** Test Step 89 : Create new Programming PIN credential with valid index\n");
-            err = TestCreateNewProgrammingPinCredentialWithValidIndex_89();
-            break;
-        case 90:
-            ChipLogProgress(chipTool, " ***** Test Step 90 : Verify created user\n");
-            err = TestVerifyCreatedUser_90();
-            break;
-        case 91:
-            ChipLogProgress(chipTool, " ***** Test Step 91 : Verify created programming PIN credential\n");
-            err = TestVerifyCreatedProgrammingPinCredential_91();
-            break;
-        case 92:
-            ChipLogProgress(chipTool, " ***** Test Step 92 : Modify the Programming PIN credential\n");
-            err = TestModifyTheProgrammingPinCredential_92();
-            break;
-        case 93:
-            ChipLogProgress(chipTool, " ***** Test Step 93 : Clearing Programming PIN fails\n");
-            err = TestClearingProgrammingPinFails_93();
-            break;
-        case 94:
-            ChipLogProgress(chipTool, " ***** Test Step 94 : Clearing Programming PIN with invalid index fails\n");
-            err = TestClearingProgrammingPinWithInvalidIndexFails_94();
-            break;
-        case 95:
-            ChipLogProgress(chipTool, " ***** Test Step 95 : Clearing PIN credential with zero index fails\n");
-            err = TestClearingPinCredentialWithZeroIndexFails_95();
-            break;
-        case 96:
-            ChipLogProgress(chipTool, " ***** Test Step 96 : Clearing PIN credential with out-of-bound index fails\n");
-            err = TestClearingPinCredentialWithOutOfBoundIndexFails_96();
-            break;
-        case 97:
-            ChipLogProgress(chipTool, " ***** Test Step 97 : Clearing RFID credential with zero index fails\n");
-            err = TestClearingRfidCredentialWithZeroIndexFails_97();
-            break;
-        case 98:
-            ChipLogProgress(chipTool, " ***** Test Step 98 : Clearing RFID credential with out-of-bound index fails\n");
-            err = TestClearingRfidCredentialWithOutOfBoundIndexFails_98();
-            break;
-        case 99:
-            ChipLogProgress(chipTool, " ***** Test Step 99 : Clear the Programming PIN user\n");
-            err = TestClearTheProgrammingPinUser_99();
-            break;
-        case 100:
-            ChipLogProgress(chipTool, " ***** Test Step 100 : Make sure Programming PIN user is deleted\n");
-            err = TestMakeSureProgrammingPinUserIsDeleted_100();
-            break;
-        case 101:
-            ChipLogProgress(chipTool, " ***** Test Step 101 : Make sure programming PIN credential is deleted\n");
-            err = TestMakeSureProgrammingPinCredentialIsDeleted_101();
-            break;
-        }
-
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }
-    }
-
-private:
-    std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 102;
-
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-
-    uint16_t NumberOfTotalUsersSupported;
-    uint16_t NumberOfPINUsersSupported;
-    uint16_t NumberOfRFIDUsersSupported;
-
-    static void OnFailureCallback_2(void * context, CHIP_ERROR error)
-    {
-        (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_2(error);
-    }
-
-    static void OnSuccessCallback_2(void * context, uint16_t numberOfTotalUsersSupported)
-    {
-        (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_2(numberOfTotalUsersSupported);
-    }
-
-    static void OnFailureCallback_35(void * context, CHIP_ERROR error)
-    {
-        (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_35(error);
-    }
-
-    static void OnSuccessCallback_35(void * context, uint16_t numberOfPINUsersSupported)
-    {
-        (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_35(numberOfPINUsersSupported);
-    }
-
-    static void OnFailureCallback_44(void * context, CHIP_ERROR error)
-    {
-        (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_44(error);
-    }
-
-    static void OnSuccessCallback_44(void * context, uint16_t numberOfRFIDUsersSupported)
-    {
-        (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_44(numberOfRFIDUsersSupported);
-    }
-
-    //
-    // Tests methods
-    //
-
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
-    {
-        SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
-    }
-
-    CHIP_ERROR TestReadAvailableUserSlotAndVerifyResponseFields_1()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
-
-        RequestType request;
-        request.userIndex = 1U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_1(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
-                                      data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
-                                      data.nextUserIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_1(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_1(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_1(
-        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
-        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
-        const chip::app::DataModel::Nullable<
-            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
-        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
-    {
-        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
-
-        VerifyOrReturn(CheckValueNull("userName", userName));
-
-        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
-
-        VerifyOrReturn(CheckValueNull("userStatus", userStatus));
-
-        VerifyOrReturn(CheckValueNull("userType", userType));
-
-        VerifyOrReturn(CheckValueNull("credentialRule", credentialRule));
-
-        VerifyOrReturn(CheckValueNull("credentials", credentials));
-
-        VerifyOrReturn(CheckValueNull("creatorFabricIndex", creatorFabricIndex));
-
-        VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
-
-        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
-        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 2U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestGetNumberOfSupportedUsersAndVerifyDefaultValue_2()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::DoorLockClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(
-            cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::NumberOfTotalUsersSupported::TypeInfo>(
-                this, OnSuccessCallback_2, OnFailureCallback_2));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_2(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_2(uint16_t numberOfTotalUsersSupported)
-    {
-        VerifyOrReturn(CheckValue("numberOfTotalUsersSupported", numberOfTotalUsersSupported, 10U));
-
-        NumberOfTotalUsersSupported = numberOfTotalUsersSupported;
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadFailsForUserWithIndex0_3()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
-
-        RequestType request;
-        request.userIndex = 0U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_3(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
-                                      data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
-                                      data.nextUserIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_3(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_3(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
-        NextTest();
-    }
-
-    void OnSuccessResponse_3(
-        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
-        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
-        const chip::app::DataModel::Nullable<
-            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
-        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
-    {
-        ThrowSuccessResponse();
-    }
-
-    CHIP_ERROR TestReadFailsForUserWithIndexGreaterThanNumberOfUsersSupported_4()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
-
-        RequestType request;
-        request.userIndex = static_cast<uint16_t>(NumberOfTotalUsersSupported + 1);
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_4(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
-                                      data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
-                                      data.nextUserIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_4(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_4(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
-        NextTest();
-    }
-
-    void OnSuccessResponse_4(
-        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
-        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
-        const chip::app::DataModel::Nullable<
-            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
-        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
-    {
-        ThrowSuccessResponse();
-    }
-
-    CHIP_ERROR TestCreateNewUserWithDefaultParameters_5()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetUser::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-        request.userIndex     = 1U;
-        request.userName.SetNull();
-        request.userUniqueId.SetNull();
-        request.userStatus.SetNull();
-        request.userType.SetNull();
-        request.credentialRule.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_5();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_5(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_5(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_5() { NextTest(); }
-
-    CHIP_ERROR TestReadTheUserBackAndVerifyItsFields_6()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
-
-        RequestType request;
-        request.userIndex = 1U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_6(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
-                                      data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
-                                      data.nextUserIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_6(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_6(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_6(
-        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
-        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
-        const chip::app::DataModel::Nullable<
-            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
-        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
-    {
-        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
-
-        VerifyOrReturn(CheckValueNonNull("userName", userName));
-        VerifyOrReturn(CheckValueAsString("userName.Value()", userName.Value(), chip::CharSpan("", 0)));
-
-        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
-
-        VerifyOrReturn(CheckValueNonNull("userStatus", userStatus));
-        VerifyOrReturn(CheckValue("userStatus.Value()", userStatus.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("userType", userType));
-        VerifyOrReturn(CheckValue("userType.Value()", userType.Value(), 0));
-
-        VerifyOrReturn(CheckValueNonNull("credentialRule", credentialRule));
-        VerifyOrReturn(CheckValue("credentialRule.Value()", credentialRule.Value(), 0));
-
-        VerifyOrReturn(CheckValueNull("credentials", credentials));
-
-        VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", creatorFabricIndex));
-        VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", creatorFabricIndex.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
-        VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", lastModifiedFabricIndex.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
-        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 2U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestSetUserAtTheOccupiedIndexFailsWithAppropriateResponse_7()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetUser::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-        request.userIndex     = 1U;
-        request.userName.SetNull();
-        request.userUniqueId.SetNull();
-        request.userStatus.SetNull();
-        request.userType.SetNull();
-        request.credentialRule.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_7();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_7(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_7(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 1));
-        NextTest();
-    }
-
-    void OnSuccessResponse_7() { ThrowSuccessResponse(); }
-
-    CHIP_ERROR TestModifyUserNameForExistingUser_8()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetUser::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(2);
-        request.userIndex     = 1U;
-        request.userName.SetNonNull();
-        request.userName.Value() = chip::Span<const char>("new_usergarbage: not in length on purpose", 8);
-        request.userUniqueId.SetNull();
-        request.userStatus.SetNull();
-        request.userType.SetNull();
-        request.credentialRule.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_8();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_8(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_8(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_8() { NextTest(); }
-
-    CHIP_ERROR TestReadTheModifiedUserBackAndVerifyItsFields_9()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
-
-        RequestType request;
-        request.userIndex = 1U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_9(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
-                                      data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
-                                      data.nextUserIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_9(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_9(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_9(
-        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
-        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
-        const chip::app::DataModel::Nullable<
-            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
-        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
-    {
-        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
-
-        VerifyOrReturn(CheckValueNonNull("userName", userName));
-        VerifyOrReturn(CheckValueAsString("userName.Value()", userName.Value(), chip::CharSpan("new_user", 8)));
-
-        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
-
-        VerifyOrReturn(CheckValueNonNull("userStatus", userStatus));
-        VerifyOrReturn(CheckValue("userStatus.Value()", userStatus.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("userType", userType));
-        VerifyOrReturn(CheckValue("userType.Value()", userType.Value(), 0));
-
-        VerifyOrReturn(CheckValueNonNull("credentialRule", credentialRule));
-        VerifyOrReturn(CheckValue("credentialRule.Value()", credentialRule.Value(), 0));
-
-        VerifyOrReturn(CheckValueNull("credentials", credentials));
-
-        VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", creatorFabricIndex));
-        VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", creatorFabricIndex.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
-        VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", lastModifiedFabricIndex.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
-        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 2U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestModifyUserUniqueIdForExistingUser_10()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetUser::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(2);
-        request.userIndex     = 1U;
-        request.userName.SetNull();
-        request.userUniqueId.SetNonNull();
-        request.userUniqueId.Value() = 305441741UL;
-        request.userStatus.SetNull();
-        request.userType.SetNull();
-        request.credentialRule.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_10();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_10(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_10(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_10() { NextTest(); }
-
-    CHIP_ERROR TestReadTheModifiedUserBackAndVerifyItsFields_11()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
-
-        RequestType request;
-        request.userIndex = 1U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_11(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
-                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
-                                       data.nextUserIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_11(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_11(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_11(
-        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
-        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
-        const chip::app::DataModel::Nullable<
-            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
-        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
-    {
-        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
-
-        VerifyOrReturn(CheckValueNonNull("userName", userName));
-        VerifyOrReturn(CheckValueAsString("userName.Value()", userName.Value(), chip::CharSpan("new_user", 8)));
-
-        VerifyOrReturn(CheckValueNonNull("userUniqueId", userUniqueId));
-        VerifyOrReturn(CheckValue("userUniqueId.Value()", userUniqueId.Value(), 305441741UL));
-
-        VerifyOrReturn(CheckValueNonNull("userStatus", userStatus));
-        VerifyOrReturn(CheckValue("userStatus.Value()", userStatus.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("userType", userType));
-        VerifyOrReturn(CheckValue("userType.Value()", userType.Value(), 0));
-
-        VerifyOrReturn(CheckValueNonNull("credentialRule", credentialRule));
-        VerifyOrReturn(CheckValue("credentialRule.Value()", credentialRule.Value(), 0));
-
-        VerifyOrReturn(CheckValueNull("credentials", credentials));
-
-        VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", creatorFabricIndex));
-        VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", creatorFabricIndex.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
-        VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", lastModifiedFabricIndex.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
-        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 2U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestModifyUserStatusForExistingUser_12()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetUser::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(2);
-        request.userIndex     = 1U;
-        request.userName.SetNull();
-        request.userUniqueId.SetNull();
-        request.userStatus.SetNonNull();
-        request.userStatus.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserStatus>(3);
-        request.userType.SetNull();
-        request.credentialRule.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_12();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_12(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_12(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_12() { NextTest(); }
-
-    CHIP_ERROR TestReadTheModifiedUserBackAndVerifyItsFields_13()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
-
-        RequestType request;
-        request.userIndex = 1U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_13(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
-                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
-                                       data.nextUserIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_13(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_13(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_13(
-        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
-        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
-        const chip::app::DataModel::Nullable<
-            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
-        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
-    {
-        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
-
-        VerifyOrReturn(CheckValueNonNull("userName", userName));
-        VerifyOrReturn(CheckValueAsString("userName.Value()", userName.Value(), chip::CharSpan("new_user", 8)));
-
-        VerifyOrReturn(CheckValueNonNull("userUniqueId", userUniqueId));
-        VerifyOrReturn(CheckValue("userUniqueId.Value()", userUniqueId.Value(), 305441741UL));
-
-        VerifyOrReturn(CheckValueNonNull("userStatus", userStatus));
-        VerifyOrReturn(CheckValue("userStatus.Value()", userStatus.Value(), 3));
-
-        VerifyOrReturn(CheckValueNonNull("userType", userType));
-        VerifyOrReturn(CheckValue("userType.Value()", userType.Value(), 0));
-
-        VerifyOrReturn(CheckValueNonNull("credentialRule", credentialRule));
-        VerifyOrReturn(CheckValue("credentialRule.Value()", credentialRule.Value(), 0));
-
-        VerifyOrReturn(CheckValueNull("credentials", credentials));
-
-        VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", creatorFabricIndex));
-        VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", creatorFabricIndex.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
-        VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", lastModifiedFabricIndex.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
-        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 2U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestModifyUserTypeForExistingUser_14()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetUser::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(2);
-        request.userIndex     = 1U;
-        request.userName.SetNull();
-        request.userUniqueId.SetNull();
-        request.userStatus.SetNull();
-        request.userType.SetNonNull();
-        request.userType.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserType>(6);
-        request.credentialRule.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_14();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_14(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_14(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_14() { NextTest(); }
-
-    CHIP_ERROR TestReadTheModifiedUserBackAndVerifyItsFields_15()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
-
-        RequestType request;
-        request.userIndex = 1U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_15(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
-                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
-                                       data.nextUserIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_15(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_15(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_15(
-        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
-        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
-        const chip::app::DataModel::Nullable<
-            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
-        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
-    {
-        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
-
-        VerifyOrReturn(CheckValueNonNull("userName", userName));
-        VerifyOrReturn(CheckValueAsString("userName.Value()", userName.Value(), chip::CharSpan("new_user", 8)));
-
-        VerifyOrReturn(CheckValueNonNull("userUniqueId", userUniqueId));
-        VerifyOrReturn(CheckValue("userUniqueId.Value()", userUniqueId.Value(), 305441741UL));
-
-        VerifyOrReturn(CheckValueNonNull("userStatus", userStatus));
-        VerifyOrReturn(CheckValue("userStatus.Value()", userStatus.Value(), 3));
-
-        VerifyOrReturn(CheckValueNonNull("userType", userType));
-        VerifyOrReturn(CheckValue("userType.Value()", userType.Value(), 6));
-
-        VerifyOrReturn(CheckValueNonNull("credentialRule", credentialRule));
-        VerifyOrReturn(CheckValue("credentialRule.Value()", credentialRule.Value(), 0));
-
-        VerifyOrReturn(CheckValueNull("credentials", credentials));
-
-        VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", creatorFabricIndex));
-        VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", creatorFabricIndex.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
-        VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", lastModifiedFabricIndex.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
-        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 2U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestModifyCredentialRuleForExistingUser_16()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetUser::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(2);
-        request.userIndex     = 1U;
-        request.userName.SetNull();
-        request.userUniqueId.SetNull();
-        request.userStatus.SetNull();
-        request.userType.SetNull();
-        request.credentialRule.SetNonNull();
-        request.credentialRule.Value() = static_cast<chip::app::Clusters::DoorLock::DlCredentialRule>(2);
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_16();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_16(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_16(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_16() { NextTest(); }
-
-    CHIP_ERROR TestReadTheModifiedUserBackAndVerifyItsFields_17()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
-
-        RequestType request;
-        request.userIndex = 1U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_17(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
-                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
-                                       data.nextUserIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_17(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_17(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_17(
-        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
-        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
-        const chip::app::DataModel::Nullable<
-            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
-        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
-    {
-        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
-
-        VerifyOrReturn(CheckValueNonNull("userName", userName));
-        VerifyOrReturn(CheckValueAsString("userName.Value()", userName.Value(), chip::CharSpan("new_user", 8)));
-
-        VerifyOrReturn(CheckValueNonNull("userUniqueId", userUniqueId));
-        VerifyOrReturn(CheckValue("userUniqueId.Value()", userUniqueId.Value(), 305441741UL));
-
-        VerifyOrReturn(CheckValueNonNull("userStatus", userStatus));
-        VerifyOrReturn(CheckValue("userStatus.Value()", userStatus.Value(), 3));
-
-        VerifyOrReturn(CheckValueNonNull("userType", userType));
-        VerifyOrReturn(CheckValue("userType.Value()", userType.Value(), 6));
-
-        VerifyOrReturn(CheckValueNonNull("credentialRule", credentialRule));
-        VerifyOrReturn(CheckValue("credentialRule.Value()", credentialRule.Value(), 2));
-
-        VerifyOrReturn(CheckValueNull("credentials", credentials));
-
-        VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", creatorFabricIndex));
-        VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", creatorFabricIndex.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
-        VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", lastModifiedFabricIndex.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
-        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 2U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestModifyAllFieldsForExistingUser_18()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetUser::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(2);
-        request.userIndex     = 1U;
-        request.userName.SetNonNull();
-        request.userName.Value() = chip::Span<const char>("test_usergarbage: not in length on purpose", 9);
-        request.userUniqueId.SetNonNull();
-        request.userUniqueId.Value() = 466460832UL;
-        request.userStatus.SetNonNull();
-        request.userStatus.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserStatus>(1);
-        request.userType.SetNonNull();
-        request.userType.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserType>(0);
-        request.credentialRule.SetNonNull();
-        request.credentialRule.Value() = static_cast<chip::app::Clusters::DoorLock::DlCredentialRule>(1);
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_18();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_18(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_18(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_18() { NextTest(); }
-
-    CHIP_ERROR TestReadTheModifiedUserBackAndVerifyItsFields_19()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
-
-        RequestType request;
-        request.userIndex = 1U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_19(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
-                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
-                                       data.nextUserIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_19(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_19(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_19(
-        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
-        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
-        const chip::app::DataModel::Nullable<
-            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
-        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
-    {
-        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
-
-        VerifyOrReturn(CheckValueNonNull("userName", userName));
-        VerifyOrReturn(CheckValueAsString("userName.Value()", userName.Value(), chip::CharSpan("test_user", 9)));
-
-        VerifyOrReturn(CheckValueNonNull("userUniqueId", userUniqueId));
-        VerifyOrReturn(CheckValue("userUniqueId.Value()", userUniqueId.Value(), 466460832UL));
-
-        VerifyOrReturn(CheckValueNonNull("userStatus", userStatus));
-        VerifyOrReturn(CheckValue("userStatus.Value()", userStatus.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("userType", userType));
-        VerifyOrReturn(CheckValue("userType.Value()", userType.Value(), 0));
-
-        VerifyOrReturn(CheckValueNonNull("credentialRule", credentialRule));
-        VerifyOrReturn(CheckValue("credentialRule.Value()", credentialRule.Value(), 1));
-
-        VerifyOrReturn(CheckValueNull("credentials", credentials));
-
-        VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", creatorFabricIndex));
-        VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", creatorFabricIndex.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
-        VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", lastModifiedFabricIndex.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
-        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 2U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestAddAnotherUserWithNonDefaultFields_20()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetUser::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-        request.userIndex     = 2U;
-        request.userName.SetNonNull();
-        request.userName.Value() = chip::Span<const char>("test_user2garbage: not in length on purpose", 10);
-        request.userUniqueId.SetNonNull();
-        request.userUniqueId.Value() = 12648430UL;
-        request.userStatus.SetNonNull();
-        request.userStatus.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserStatus>(1);
-        request.userType.SetNonNull();
-        request.userType.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserType>(1);
-        request.credentialRule.SetNonNull();
-        request.credentialRule.Value() = static_cast<chip::app::Clusters::DoorLock::DlCredentialRule>(2);
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_20();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_20(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_20(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_20() { NextTest(); }
-
-    CHIP_ERROR TestReadTheNewUserBackAndVerifyItsFields_21()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
-
-        RequestType request;
-        request.userIndex = 2U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_21(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
-                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
-                                       data.nextUserIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_21(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_21(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_21(
-        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
-        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
-        const chip::app::DataModel::Nullable<
-            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
-        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
-    {
-        VerifyOrReturn(CheckValue("userIndex", userIndex, 2U));
-
-        VerifyOrReturn(CheckValueNonNull("userName", userName));
-        VerifyOrReturn(CheckValueAsString("userName.Value()", userName.Value(), chip::CharSpan("test_user2", 10)));
-
-        VerifyOrReturn(CheckValueNonNull("userUniqueId", userUniqueId));
-        VerifyOrReturn(CheckValue("userUniqueId.Value()", userUniqueId.Value(), 12648430UL));
-
-        VerifyOrReturn(CheckValueNonNull("userStatus", userStatus));
-        VerifyOrReturn(CheckValue("userStatus.Value()", userStatus.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("userType", userType));
-        VerifyOrReturn(CheckValue("userType.Value()", userType.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("credentialRule", credentialRule));
-        VerifyOrReturn(CheckValue("credentialRule.Value()", credentialRule.Value(), 2));
-
-        VerifyOrReturn(CheckValueNull("credentials", credentials));
-
-        VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", creatorFabricIndex));
-        VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", creatorFabricIndex.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
-        VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", lastModifiedFabricIndex.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
-        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 3U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestCreateUserInTheLastSlot_22()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetUser::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-        request.userIndex     = NumberOfTotalUsersSupported;
-        request.userName.SetNonNull();
-        request.userName.Value() = chip::Span<const char>("last_usergarbage: not in length on purpose", 9);
-        request.userUniqueId.SetNull();
-        request.userStatus.SetNull();
-        request.userType.SetNull();
-        request.credentialRule.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_22();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_22(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_22(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_22() { NextTest(); }
-
-    CHIP_ERROR TestReadTheLastUserBackAndVerifyItsFields_23()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
-
-        RequestType request;
-        request.userIndex = NumberOfTotalUsersSupported;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_23(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
-                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
-                                       data.nextUserIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_23(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_23(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_23(
-        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
-        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
-        const chip::app::DataModel::Nullable<
-            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
-        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
-    {
-        VerifyOrReturn(CheckValue("userIndex", userIndex, NumberOfTotalUsersSupported));
-
-        VerifyOrReturn(CheckValueNonNull("userName", userName));
-        VerifyOrReturn(CheckValueAsString("userName.Value()", userName.Value(), chip::CharSpan("last_user", 9)));
-
-        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
-
-        VerifyOrReturn(CheckValueNonNull("userStatus", userStatus));
-        VerifyOrReturn(CheckValue("userStatus.Value()", userStatus.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("userType", userType));
-        VerifyOrReturn(CheckValue("userType.Value()", userType.Value(), 0));
-
-        VerifyOrReturn(CheckValueNonNull("credentialRule", credentialRule));
-        VerifyOrReturn(CheckValue("credentialRule.Value()", credentialRule.Value(), 0));
-
-        VerifyOrReturn(CheckValueNull("credentials", credentials));
-
-        VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", creatorFabricIndex));
-        VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", creatorFabricIndex.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
-        VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", lastModifiedFabricIndex.Value(), 1));
-
-        VerifyOrReturn(CheckValueNull("nextUserIndex", nextUserIndex));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestUserCreationInThe0SlotFails_24()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetUser::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-        request.userIndex     = 0U;
-        request.userName.SetNull();
-        request.userUniqueId.SetNull();
-        request.userStatus.SetNull();
-        request.userType.SetNull();
-        request.credentialRule.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_24();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_24(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_24(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
-        NextTest();
-    }
-
-    void OnSuccessResponse_24() { ThrowSuccessResponse(); }
-
-    CHIP_ERROR TestUserCreationInTheOutOfBoundsSlotFails_25()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetUser::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-        request.userIndex     = static_cast<uint16_t>(NumberOfTotalUsersSupported + 1);
-        request.userName.SetNull();
-        request.userUniqueId.SetNull();
-        request.userStatus.SetNull();
-        request.userType.SetNull();
-        request.credentialRule.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_25();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_25(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_25(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
-        NextTest();
-    }
-
-    void OnSuccessResponse_25() { ThrowSuccessResponse(); }
-
-    CHIP_ERROR TestClearFirstUser_26()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearUser::Type;
-
-        RequestType request;
-        request.userIndex = 1U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_26();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_26(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_26(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_26() { NextTest(); }
-
-    CHIP_ERROR TestReadClearedUserAndVerifyItIsAvailable_27()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
-
-        RequestType request;
-        request.userIndex = 1U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_27(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
-                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
-                                       data.nextUserIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_27(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_27(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_27(
-        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
-        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
-        const chip::app::DataModel::Nullable<
-            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
-        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
-    {
-        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
-
-        VerifyOrReturn(CheckValueNull("userName", userName));
-
-        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
-
-        VerifyOrReturn(CheckValueNull("userStatus", userStatus));
-
-        VerifyOrReturn(CheckValueNull("userType", userType));
-
-        VerifyOrReturn(CheckValueNull("credentialRule", credentialRule));
-
-        VerifyOrReturn(CheckValueNull("credentials", credentials));
-
-        VerifyOrReturn(CheckValueNull("creatorFabricIndex", creatorFabricIndex));
-
-        VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
-
-        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
-        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 3U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestCreateNewUserInTheClearedSlot_28()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetUser::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-        request.userIndex     = 1U;
-        request.userName.SetNull();
-        request.userUniqueId.SetNull();
-        request.userStatus.SetNull();
-        request.userType.SetNull();
-        request.credentialRule.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_28();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_28(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_28(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_28() { NextTest(); }
-
-    CHIP_ERROR TestReadTheUserInThePreviouslyClearedSlotAndVerifyItsFields_29()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
-
-        RequestType request;
-        request.userIndex = 1U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_29(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
-                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
-                                       data.nextUserIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_29(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_29(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_29(
-        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
-        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
-        const chip::app::DataModel::Nullable<
-            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
-        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
-    {
-        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
-
-        VerifyOrReturn(CheckValueNonNull("userName", userName));
-        VerifyOrReturn(CheckValueAsString("userName.Value()", userName.Value(), chip::CharSpan("", 0)));
-
-        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
-
-        VerifyOrReturn(CheckValueNonNull("userStatus", userStatus));
-        VerifyOrReturn(CheckValue("userStatus.Value()", userStatus.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("userType", userType));
-        VerifyOrReturn(CheckValue("userType.Value()", userType.Value(), 0));
-
-        VerifyOrReturn(CheckValueNonNull("credentialRule", credentialRule));
-        VerifyOrReturn(CheckValue("credentialRule.Value()", credentialRule.Value(), 0));
-
-        VerifyOrReturn(CheckValueNull("credentials", credentials));
-
-        VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", creatorFabricIndex));
-        VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", creatorFabricIndex.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
-        VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", lastModifiedFabricIndex.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
-        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 3U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestClearUserWithIndex0Fails_30()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearUser::Type;
-
-        RequestType request;
-        request.userIndex = 0U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_30();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_30(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_30(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
-        NextTest();
-    }
-
-    void OnSuccessResponse_30() { ThrowSuccessResponse(); }
-
-    CHIP_ERROR TestClearUserWithOutOfBoundsIndexFails_31()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearUser::Type;
-
-        RequestType request;
-        request.userIndex = static_cast<uint16_t>(NumberOfTotalUsersSupported + 1);
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_31();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_31(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_31(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
-        NextTest();
-    }
-
-    void OnSuccessResponse_31() { ThrowSuccessResponse(); }
-
-    CHIP_ERROR TestClearAllUsers_32()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearUser::Type;
-
-        RequestType request;
-        request.userIndex = 65534U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_32();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_32(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_32(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_32() { NextTest(); }
-
-    CHIP_ERROR TestReadFirstClearedUserAndVerifyItIsAvailable_33()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
-
-        RequestType request;
-        request.userIndex = 2U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_33(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
-                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
-                                       data.nextUserIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_33(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_33(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_33(
-        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
-        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
-        const chip::app::DataModel::Nullable<
-            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
-        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
-    {
-        VerifyOrReturn(CheckValue("userIndex", userIndex, 2U));
-
-        VerifyOrReturn(CheckValueNull("userName", userName));
-
-        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
-
-        VerifyOrReturn(CheckValueNull("userStatus", userStatus));
-
-        VerifyOrReturn(CheckValueNull("userType", userType));
-
-        VerifyOrReturn(CheckValueNull("credentialRule", credentialRule));
-
-        VerifyOrReturn(CheckValueNull("credentials", credentials));
-
-        VerifyOrReturn(CheckValueNull("creatorFabricIndex", creatorFabricIndex));
-
-        VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
-
-        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
-        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 3U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadLastClearedUserAndVerifyItIsAvailable_34()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
-
-        RequestType request;
-        request.userIndex = NumberOfTotalUsersSupported;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_34(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
-                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
-                                       data.nextUserIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_34(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_34(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_34(
-        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
-        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
-        const chip::app::DataModel::Nullable<
-            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
-        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
-    {
-        VerifyOrReturn(CheckValue("userIndex", userIndex, NumberOfTotalUsersSupported));
-
-        VerifyOrReturn(CheckValueNull("userName", userName));
-
-        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
-
-        VerifyOrReturn(CheckValueNull("userStatus", userStatus));
-
-        VerifyOrReturn(CheckValueNull("userType", userType));
-
-        VerifyOrReturn(CheckValueNull("credentialRule", credentialRule));
-
-        VerifyOrReturn(CheckValueNull("credentials", credentials));
-
-        VerifyOrReturn(CheckValueNull("creatorFabricIndex", creatorFabricIndex));
-
-        VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
-
-        VerifyOrReturn(CheckValueNull("nextUserIndex", nextUserIndex));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestGetNumberOfSupportedPinCredentialsAndVerifyDefaultValue_35()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::DoorLockClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::NumberOfPINUsersSupported::TypeInfo>(
-            this, OnSuccessCallback_35, OnFailureCallback_35));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_35(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_35(uint16_t numberOfPINUsersSupported)
-    {
-        VerifyOrReturn(CheckValue("numberOfPINUsersSupported", numberOfPINUsersSupported, 10U));
-
-        NumberOfPINUsersSupported = numberOfPINUsersSupported;
-        NextTest();
-    }
-
-    CHIP_ERROR TestCheckThatPinCredentialDoesNotExist_36()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type;
-
-        RequestType request;
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-        request.credential.credentialIndex = 1U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_36(data.credentialExists, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_36(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_36(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_36(bool credentialExists, const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("credentialExists", credentialExists, false));
-
-        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
-
-        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
-        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 2U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadingPinCredentialWithIndex0Fails_37()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type;
-
-        RequestType request;
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-        request.credential.credentialIndex = 0U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_37(data.credentialExists, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_37(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_37(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
-        NextTest();
-    }
-
-    void OnSuccessResponse_37(bool credentialExists, const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        ThrowSuccessResponse();
-    }
-
-    CHIP_ERROR TestReadingPinCredentialWithOutOfBoundsIndexFails_38()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type;
-
-        RequestType request;
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-        request.credential.credentialIndex = static_cast<uint16_t>(NumberOfPINUsersSupported + 1);
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_38(data.credentialExists, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_38(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_38(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
-        NextTest();
-    }
-
-    void OnSuccessResponse_38(bool credentialExists, const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        ThrowSuccessResponse();
-    }
-
-    CHIP_ERROR TestCreateNewPinCredentialAndUser_39()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-        request.credential.credentialIndex = 1U;
-
-        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("000000garbage: not in length on purpose"), 6);
-        request.userIndex.SetNull();
-        request.userStatus.SetNull();
-        request.userType.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_39(data.status, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_39(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_39(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_39(chip::app::Clusters::DoorLock::DlStatus status,
-                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("status", status, 0));
-
-        VerifyOrReturn(CheckValueNonNull("userIndex", userIndex));
-        VerifyOrReturn(CheckValue("userIndex.Value()", userIndex.Value(), 1U));
-
-        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
-        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 2U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestVerifyCreatedUser_40()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
-
-        RequestType request;
-        request.userIndex = 1U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_40(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
-                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
-                                       data.nextUserIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_40(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_40(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_40(
-        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
-        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
-        const chip::app::DataModel::Nullable<
-            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
-        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
-    {
-        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
-
-        VerifyOrReturn(CheckValueNonNull("userName", userName));
-        VerifyOrReturn(CheckValueAsString("userName.Value()", userName.Value(), chip::CharSpan("", 0)));
-
-        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
-
-        VerifyOrReturn(CheckValueNonNull("userStatus", userStatus));
-        VerifyOrReturn(CheckValue("userStatus.Value()", userStatus.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("userType", userType));
-        VerifyOrReturn(CheckValue("userType.Value()", userType.Value(), 0));
-
-        VerifyOrReturn(CheckValueNonNull("credentialRule", credentialRule));
-        VerifyOrReturn(CheckValue("credentialRule.Value()", credentialRule.Value(), 0));
-
-        VerifyOrReturn(CheckValueNonNull("credentials", credentials));
-        {
-            auto iter_1 = credentials.Value().begin();
-            VerifyOrReturn(CheckNextListItemDecodes<decltype(credentials.Value())>("credentials.Value()", iter_1, 0));
-            VerifyOrReturn(CheckValue("credentials.Value()[0].credentialType", iter_1.GetValue().credentialType, 1));
-            VerifyOrReturn(CheckValue("credentials.Value()[0].credentialIndex", iter_1.GetValue().credentialIndex, 1U));
-            VerifyOrReturn(CheckNoMoreListItems<decltype(credentials.Value())>("credentials.Value()", iter_1, 1));
-        }
-
-        VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", creatorFabricIndex));
-        VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", creatorFabricIndex.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
-        VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", lastModifiedFabricIndex.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
-        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 2U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestVerifyCreatedPinCredential_41()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type;
-
-        RequestType request;
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-        request.credential.credentialIndex = 1U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_41(data.credentialExists, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_41(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_41(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_41(bool credentialExists, const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("credentialExists", credentialExists, true));
-
-        VerifyOrReturn(CheckValueNonNull("userIndex", userIndex));
-        VerifyOrReturn(CheckValue("userIndex.Value()", userIndex.Value(), 1U));
-
-        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
-        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 2U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestCreateNewPinCredentialAndUserWithIndex0Fails_42()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-        request.credential.credentialIndex = 0U;
-
-        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
-        request.userIndex.SetNull();
-        request.userStatus.SetNull();
-        request.userType.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_42(data.status, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_42(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_42(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_42(chip::app::Clusters::DoorLock::DlStatus status,
-                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("status", status, 133));
-
-        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
-
-        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
-        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 2U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestCreateNewPinCredentialAndUserWithOutOfBoundsIndexFails_43()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-        request.credential.credentialIndex = static_cast<uint16_t>(NumberOfPINUsersSupported + 1);
-
-        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
-        request.userIndex.SetNull();
-        request.userStatus.SetNull();
-        request.userType.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_43(data.status, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_43(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_43(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_43(chip::app::Clusters::DoorLock::DlStatus status,
-                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("status", status, 133));
-
-        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
-
-        VerifyOrReturn(CheckValueNull("nextCredentialIndex", nextCredentialIndex));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestGetNumberOfSupportedRfidCredentialsAndVerifyDefaultValue_44()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::DoorLockClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::NumberOfRFIDUsersSupported::TypeInfo>(
-            this, OnSuccessCallback_44, OnFailureCallback_44));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_44(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_44(uint16_t numberOfRFIDUsersSupported)
-    {
-        VerifyOrReturn(CheckValue("numberOfRFIDUsersSupported", numberOfRFIDUsersSupported, 10U));
-
-        NumberOfRFIDUsersSupported = numberOfRFIDUsersSupported;
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadingRfidCredentialWithIndex0Fails_45()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type;
-
-        RequestType request;
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
-        request.credential.credentialIndex = 0U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_45(data.credentialExists, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_45(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_45(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
-        NextTest();
-    }
-
-    void OnSuccessResponse_45(bool credentialExists, const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        ThrowSuccessResponse();
-    }
-
-    CHIP_ERROR TestReadingRfidCredentialWithOutOfBoundsIndexFails_46()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type;
-
-        RequestType request;
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
-        request.credential.credentialIndex = static_cast<uint16_t>(NumberOfRFIDUsersSupported + 1);
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_46(data.credentialExists, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_46(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_46(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
-        NextTest();
-    }
-
-    void OnSuccessResponse_46(bool credentialExists, const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        ThrowSuccessResponse();
-    }
-
-    CHIP_ERROR TestCheckThatRfidCredentialDoesNotExist_47()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type;
-
-        RequestType request;
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
-        request.credential.credentialIndex = 2U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_47(data.credentialExists, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_47(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_47(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_47(bool credentialExists, const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("credentialExists", credentialExists, false));
-
-        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
-
-        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
-        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 3U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestCreateNewRfidCredentialAndAddItToExistingUser_48()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
-        request.credential.credentialIndex = 2U;
-
-        request.credentialData =
-            chip::ByteSpan(chip::Uint8::from_const_char("rfid_data_123456garbage: not in length on purpose"), 16);
-        request.userIndex.SetNonNull();
-        request.userIndex.Value() = 1U;
-        request.userStatus.SetNull();
-        request.userType.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_48(data.status, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_48(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_48(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_48(chip::app::Clusters::DoorLock::DlStatus status,
-                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("status", status, 0));
-
-        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
-
-        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
-        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 3U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestVerifyModifiedUser_49()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
-
-        RequestType request;
-        request.userIndex = 1U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_49(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
-                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
-                                       data.nextUserIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_49(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_49(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_49(
-        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
-        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
-        const chip::app::DataModel::Nullable<
-            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
-        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
-    {
-        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
-
-        VerifyOrReturn(CheckValueNonNull("userName", userName));
-        VerifyOrReturn(CheckValueAsString("userName.Value()", userName.Value(), chip::CharSpan("", 0)));
-
-        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
-
-        VerifyOrReturn(CheckValueNonNull("userStatus", userStatus));
-        VerifyOrReturn(CheckValue("userStatus.Value()", userStatus.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("userType", userType));
-        VerifyOrReturn(CheckValue("userType.Value()", userType.Value(), 0));
-
-        VerifyOrReturn(CheckValueNonNull("credentialRule", credentialRule));
-        VerifyOrReturn(CheckValue("credentialRule.Value()", credentialRule.Value(), 0));
-
-        VerifyOrReturn(CheckValueNonNull("credentials", credentials));
-        {
-            auto iter_1 = credentials.Value().begin();
-            VerifyOrReturn(CheckNextListItemDecodes<decltype(credentials.Value())>("credentials.Value()", iter_1, 0));
-            VerifyOrReturn(CheckValue("credentials.Value()[0].credentialType", iter_1.GetValue().credentialType, 1));
-            VerifyOrReturn(CheckValue("credentials.Value()[0].credentialIndex", iter_1.GetValue().credentialIndex, 1U));
-            VerifyOrReturn(CheckNextListItemDecodes<decltype(credentials.Value())>("credentials.Value()", iter_1, 1));
-            VerifyOrReturn(CheckValue("credentials.Value()[1].credentialType", iter_1.GetValue().credentialType, 2));
-            VerifyOrReturn(CheckValue("credentials.Value()[1].credentialIndex", iter_1.GetValue().credentialIndex, 2U));
-            VerifyOrReturn(CheckNoMoreListItems<decltype(credentials.Value())>("credentials.Value()", iter_1, 2));
-        }
-
-        VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", creatorFabricIndex));
-        VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", creatorFabricIndex.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
-        VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", lastModifiedFabricIndex.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
-        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 2U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestVerifyCreatedCredential_50()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type;
-
-        RequestType request;
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
-        request.credential.credentialIndex = 2U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_50(data.credentialExists, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_50(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_50(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_50(bool credentialExists, const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("credentialExists", credentialExists, true));
-
-        VerifyOrReturn(CheckValueNonNull("userIndex", userIndex));
-        VerifyOrReturn(CheckValue("userIndex.Value()", userIndex.Value(), 1U));
-
-        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
-        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 3U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestCreateNewRfidCredentialAndUserWithIndex0Fails_51()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
-        request.credential.credentialIndex = 0U;
-
-        request.credentialData =
-            chip::ByteSpan(chip::Uint8::from_const_char("new_rfid_data_fieldgarbage: not in length on purpose"), 19);
-        request.userIndex.SetNull();
-        request.userStatus.SetNull();
-        request.userType.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_51(data.status, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_51(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_51(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_51(chip::app::Clusters::DoorLock::DlStatus status,
-                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("status", status, 133));
-
-        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
-
-        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
-        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 3U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestCreateNewRfidCredentialAndUserWithOutOfBoundsIndexFails_52()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
-        request.credential.credentialIndex = static_cast<uint16_t>(NumberOfRFIDUsersSupported + 1);
-
-        request.credentialData =
-            chip::ByteSpan(chip::Uint8::from_const_char("new_rfid_data_fieldgarbage: not in length on purpose"), 19);
-        request.userIndex.SetNull();
-        request.userStatus.SetNull();
-        request.userType.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_52(data.status, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_52(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_52(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_52(chip::app::Clusters::DoorLock::DlStatus status,
-                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("status", status, 133));
-
-        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
-
-        VerifyOrReturn(CheckValueNull("nextCredentialIndex", nextCredentialIndex));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestCreateNewPinCredentialAndTryToAddItToExistingUser_53()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-        request.credential.credentialIndex = 3U;
-
-        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123465garbage: not in length on purpose"), 6);
-        request.userIndex.SetNonNull();
-        request.userIndex.Value() = 1U;
-        request.userStatus.SetNull();
-        request.userType.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_53(data.status, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_53(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_53(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_53(chip::app::Clusters::DoorLock::DlStatus status,
-                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("status", status, 3));
-
-        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
-
-        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
-        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 4U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestCreateNewCredentialAndTryToAddItTo0User_54()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-        request.credential.credentialIndex = 3U;
-
-        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123465garbage: not in length on purpose"), 6);
-        request.userIndex.SetNonNull();
-        request.userIndex.Value() = 0U;
-        request.userStatus.SetNull();
-        request.userType.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_54(data.status, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_54(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_54(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_54(chip::app::Clusters::DoorLock::DlStatus status,
-                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("status", status, 133));
-
-        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
-
-        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
-        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 4U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestCreateNewCredentialAndTryToAddItToOutOfBoundsUser_55()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-        request.credential.credentialIndex = 3U;
-
-        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123465garbage: not in length on purpose"), 6);
-        request.userIndex.SetNonNull();
-        request.userIndex.Value() = static_cast<uint16_t>(NumberOfTotalUsersSupported + 1);
-        request.userStatus.SetNull();
-        request.userType.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_55(data.status, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_55(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_55(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_55(chip::app::Clusters::DoorLock::DlStatus status,
-                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("status", status, 133));
-
-        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
-
-        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
-        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 4U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestCreateNewPinWithTooShortData_56()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-        request.credential.credentialIndex = 3U;
-
-        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("12345garbage: not in length on purpose"), 5);
-        request.userIndex.SetNonNull();
-        request.userIndex.Value() = 0U;
-        request.userStatus.SetNull();
-        request.userType.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_56(data.status, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_56(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_56(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_56(chip::app::Clusters::DoorLock::DlStatus status,
-                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("status", status, 133));
-
-        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
-
-        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
-        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 4U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestCreateNewPinWithTooLongData_57()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-        request.credential.credentialIndex = 3U;
-
-        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123456789garbage: not in length on purpose"), 9);
-        request.userIndex.SetNonNull();
-        request.userIndex.Value() = 0U;
-        request.userStatus.SetNull();
-        request.userType.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_57(data.status, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_57(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_57(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_57(chip::app::Clusters::DoorLock::DlStatus status,
-                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("status", status, 133));
-
-        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
-
-        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
-        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 4U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestCreateNewRfidWithTooShortData_58()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
-        request.credential.credentialIndex = 3U;
-
-        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("rfid_datagarbage: not in length on purpose"), 9);
-        request.userIndex.SetNonNull();
-        request.userIndex.Value() = 0U;
-        request.userStatus.SetNull();
-        request.userType.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_58(data.status, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_58(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_58(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_58(chip::app::Clusters::DoorLock::DlStatus status,
-                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("status", status, 133));
-
-        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
-
-        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
-        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 4U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestCreateNewPinWithProgrammingUserTypeFails_59()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-        request.credential.credentialIndex = 3U;
-
-        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
-        request.userIndex.SetNonNull();
-        request.userIndex.Value() = 0U;
-        request.userStatus.SetNull();
-        request.userType.SetNonNull();
-        request.userType.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserType>(3);
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_59(data.status, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_59(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_59(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_59(chip::app::Clusters::DoorLock::DlStatus status,
-                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("status", status, 133));
-
-        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
-
-        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
-        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 4U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestCreateNewRfidWithTooShortData_60()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
-        request.credential.credentialIndex = 3U;
-
-        request.credentialData = chip::ByteSpan(
-            chip::Uint8::from_const_char("very_long_rfid_data_to_test_boundariesgarbage: not in length on purpose"), 38);
-        request.userIndex.SetNonNull();
-        request.userIndex.Value() = 0U;
-        request.userStatus.SetNull();
-        request.userType.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_60(data.status, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_60(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_60(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_60(chip::app::Clusters::DoorLock::DlStatus status,
-                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("status", status, 133));
-
-        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
-
-        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
-        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 4U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestCreateNewPinCredentialWithDataTheWouldCauseDuplicate_61()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-        request.credential.credentialIndex = 4U;
-
-        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("000000garbage: not in length on purpose"), 6);
-        request.userIndex.SetNull();
-        request.userStatus.SetNull();
-        request.userType.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_61(data.status, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_61(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_61(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_61(chip::app::Clusters::DoorLock::DlStatus status,
-                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("status", status, 2));
-
-        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
-
-        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
-        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 5U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestCreateNewRfidCredentialWithDataTheWouldCauseDuplicate_62()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
-        request.credential.credentialIndex = 4U;
-
-        request.credentialData =
-            chip::ByteSpan(chip::Uint8::from_const_char("rfid_data_123456garbage: not in length on purpose"), 16);
-        request.userIndex.SetNull();
-        request.userStatus.SetNull();
-        request.userType.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_62(data.status, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_62(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_62(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_62(chip::app::Clusters::DoorLock::DlStatus status,
-                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("status", status, 2));
-
-        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
-
-        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
-        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 5U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestModifyCredentialDataOfExistingPinCredential_63()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(2);
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-        request.credential.credentialIndex = 1U;
-
-        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
-        request.userIndex.SetNonNull();
-        request.userIndex.Value() = 1U;
-        request.userStatus.SetNull();
-        request.userType.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_63(data.status, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_63(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_63(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_63(chip::app::Clusters::DoorLock::DlStatus status,
-                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("status", status, 0));
-
-        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
-
-        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
-        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 3U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestVerifyThatCredentialWasChangedByCreatingNewCredentialWithOldData_64()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-        request.credential.credentialIndex = 3U;
-
-        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("000000garbage: not in length on purpose"), 6);
-        request.userIndex.SetNull();
-        request.userStatus.SetNull();
-        request.userType.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_64(data.status, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_64(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_64(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_64(chip::app::Clusters::DoorLock::DlStatus status,
-                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("status", status, 0));
-
-        VerifyOrReturn(CheckValueNonNull("userIndex", userIndex));
-        VerifyOrReturn(CheckValue("userIndex.Value()", userIndex.Value(), 2U));
-
-        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
-        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 4U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestVerifyThatCredentialWasChangedByCreatingNewCredentialWithNewData_65()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-        request.credential.credentialIndex = 4U;
-
-        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
-        request.userIndex.SetNull();
-        request.userStatus.SetNull();
-        request.userType.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_65(data.status, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_65(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_65(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_65(chip::app::Clusters::DoorLock::DlStatus status,
-                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("status", status, 2));
-
-        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
-
-        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
-        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 5U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestClearFirstPinCredential_66()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearCredential::Type;
-
-        RequestType request;
-        request.credential.SetNonNull();
-
-        request.credential.Value().credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-        request.credential.Value().credentialIndex = 1U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_66();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_66(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_66(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_66() { NextTest(); }
-
-    CHIP_ERROR TestReadBackTheCredentialAndMakeSureItIsDeleted_67()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type;
-
-        RequestType request;
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-        request.credential.credentialIndex = 1U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_67(data.credentialExists, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_67(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_67(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_67(bool credentialExists, const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("credentialExists", credentialExists, false));
-
-        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
-
-        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
-        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 4U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadTheUserBackAndMakeSurePinCredentialIsDeleted_68()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
-
-        RequestType request;
-        request.userIndex = 1U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_68(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
-                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
-                                       data.nextUserIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_68(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_68(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_68(
-        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
-        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
-        const chip::app::DataModel::Nullable<
-            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
-        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
-    {
-        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
-
-        VerifyOrReturn(CheckValueNonNull("userName", userName));
-        VerifyOrReturn(CheckValueAsString("userName.Value()", userName.Value(), chip::CharSpan("", 0)));
-
-        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
-
-        VerifyOrReturn(CheckValueNonNull("userStatus", userStatus));
-        VerifyOrReturn(CheckValue("userStatus.Value()", userStatus.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("userType", userType));
-        VerifyOrReturn(CheckValue("userType.Value()", userType.Value(), 0));
-
-        VerifyOrReturn(CheckValueNonNull("credentialRule", credentialRule));
-        VerifyOrReturn(CheckValue("credentialRule.Value()", credentialRule.Value(), 0));
-
-        VerifyOrReturn(CheckValueNonNull("credentials", credentials));
-        {
-            auto iter_1 = credentials.Value().begin();
-            VerifyOrReturn(CheckNextListItemDecodes<decltype(credentials.Value())>("credentials.Value()", iter_1, 0));
-            VerifyOrReturn(CheckValue("credentials.Value()[0].credentialType", iter_1.GetValue().credentialType, 2));
-            VerifyOrReturn(CheckValue("credentials.Value()[0].credentialIndex", iter_1.GetValue().credentialIndex, 2U));
-            VerifyOrReturn(CheckNoMoreListItems<decltype(credentials.Value())>("credentials.Value()", iter_1, 1));
-        }
-
-        VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", creatorFabricIndex));
-        VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", creatorFabricIndex.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
-        VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", lastModifiedFabricIndex.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
-        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 3U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestClearTheSecondPinCredential_69()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearCredential::Type;
-
-        RequestType request;
-        request.credential.SetNonNull();
-
-        request.credential.Value().credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-        request.credential.Value().credentialIndex = 3U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_69();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_69(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_69(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_69() { NextTest(); }
-
-    CHIP_ERROR TestReadBackTheCredentialAndMakeSureItIsDeleted_70()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type;
-
-        RequestType request;
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-        request.credential.credentialIndex = 3U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_70(data.credentialExists, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_70(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_70(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_70(bool credentialExists, const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("credentialExists", credentialExists, false));
-
-        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
-
-        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
-        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 4U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadTheUserBackAndMakeSureRelatedUserIsDeleted_71()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
-
-        RequestType request;
-        request.userIndex = 2U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_71(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
-                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
-                                       data.nextUserIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_71(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_71(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_71(
-        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
-        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
-        const chip::app::DataModel::Nullable<
-            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
-        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
-    {
-        VerifyOrReturn(CheckValue("userIndex", userIndex, 2U));
-
-        VerifyOrReturn(CheckValueNull("userName", userName));
-
-        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
-
-        VerifyOrReturn(CheckValueNull("userStatus", userStatus));
-
-        VerifyOrReturn(CheckValueNull("userType", userType));
-
-        VerifyOrReturn(CheckValueNull("credentialRule", credentialRule));
-
-        VerifyOrReturn(CheckValueNull("credentials", credentials));
-
-        VerifyOrReturn(CheckValueNull("creatorFabricIndex", creatorFabricIndex));
-
-        VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
-
-        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
-        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 3U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestCreateNewRfidCredentialWithUser_72()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
-        request.credential.credentialIndex = 1U;
-
-        request.credentialData =
-            chip::ByteSpan(chip::Uint8::from_const_char("rfid_data_12345garbage: not in length on purpose"), 15);
-        request.userIndex.SetNull();
-        request.userStatus.SetNull();
-        request.userType.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_72(data.status, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_72(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_72(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_72(chip::app::Clusters::DoorLock::DlStatus status,
-                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("status", status, 0));
-
-        VerifyOrReturn(CheckValueNonNull("userIndex", userIndex));
-        VerifyOrReturn(CheckValue("userIndex.Value()", userIndex.Value(), 2U));
-
-        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
-        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 3U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestClearAllTheRfidCredentials_73()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearCredential::Type;
-
-        RequestType request;
-        request.credential.SetNonNull();
-
-        request.credential.Value().credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
-        request.credential.Value().credentialIndex = 65534U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_73();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_73(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_73(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_73() { NextTest(); }
-
-    CHIP_ERROR TestReadBackTheFistRfidCredentialAndMakeSureItIsDeleted_74()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type;
-
-        RequestType request;
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
-        request.credential.credentialIndex = 1U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_74(data.credentialExists, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_74(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_74(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_74(bool credentialExists, const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("credentialExists", credentialExists, false));
-
-        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
-
-        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
-        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 2U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadBackTheSecondRfidCredentialAndMakeSureItIsDeleted_75()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type;
-
-        RequestType request;
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
-        request.credential.credentialIndex = 2U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_75(data.credentialExists, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_75(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_75(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_75(bool credentialExists, const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("credentialExists", credentialExists, false));
-
-        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
-
-        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
-        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 3U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadTheUserRelatedWithFirstRfidBackAndMakeSureItIsDeleted_76()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
-
-        RequestType request;
-        request.userIndex = 1U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_76(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
-                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
-                                       data.nextUserIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_76(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_76(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_76(
-        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
-        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
-        const chip::app::DataModel::Nullable<
-            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
-        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
-    {
-        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
-
-        VerifyOrReturn(CheckValueNull("userName", userName));
-
-        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
-
-        VerifyOrReturn(CheckValueNull("userStatus", userStatus));
-
-        VerifyOrReturn(CheckValueNull("userType", userType));
-
-        VerifyOrReturn(CheckValueNull("credentialRule", credentialRule));
-
-        VerifyOrReturn(CheckValueNull("credentials", credentials));
-
-        VerifyOrReturn(CheckValueNull("creatorFabricIndex", creatorFabricIndex));
-
-        VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
-
-        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
-        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 2U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadTheUserRelatedWithSecondRfidBackAndMakeSureItIsDeleted_77()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
-
-        RequestType request;
-        request.userIndex = 2U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_77(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
-                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
-                                       data.nextUserIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_77(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_77(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_77(
-        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
-        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
-        const chip::app::DataModel::Nullable<
-            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
-        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
-    {
-        VerifyOrReturn(CheckValue("userIndex", userIndex, 2U));
-
-        VerifyOrReturn(CheckValueNull("userName", userName));
-
-        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
-
-        VerifyOrReturn(CheckValueNull("userStatus", userStatus));
-
-        VerifyOrReturn(CheckValueNull("userType", userType));
-
-        VerifyOrReturn(CheckValueNull("credentialRule", credentialRule));
-
-        VerifyOrReturn(CheckValueNull("credentials", credentials));
-
-        VerifyOrReturn(CheckValueNull("creatorFabricIndex", creatorFabricIndex));
-
-        VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
-
-        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
-        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 3U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestCreateNewPinCredentialWithUser_78()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-        request.credential.credentialIndex = 1U;
-
-        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
-        request.userIndex.SetNull();
-        request.userStatus.SetNull();
-        request.userType.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_78(data.status, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_78(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_78(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_78(chip::app::Clusters::DoorLock::DlStatus status,
-                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("status", status, 0));
-
-        VerifyOrReturn(CheckValueNonNull("userIndex", userIndex));
-        VerifyOrReturn(CheckValue("userIndex.Value()", userIndex.Value(), 1U));
-
-        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
-        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 2U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestCreateNewRfidCredentialWithUser_79()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
-        request.credential.credentialIndex = 2U;
-
-        request.credentialData =
-            chip::ByteSpan(chip::Uint8::from_const_char("rfid_data_1234garbage: not in length on purpose"), 14);
-        request.userIndex.SetNull();
-        request.userStatus.SetNull();
-        request.userType.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_79(data.status, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_79(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_79(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_79(chip::app::Clusters::DoorLock::DlStatus status,
-                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("status", status, 0));
-
-        VerifyOrReturn(CheckValueNonNull("userIndex", userIndex));
-        VerifyOrReturn(CheckValue("userIndex.Value()", userIndex.Value(), 2U));
-
-        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
-        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 3U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestCreateAnotherRfidCredentialWithUser_80()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
-        request.credential.credentialIndex = 6U;
-
-        request.credentialData =
-            chip::ByteSpan(chip::Uint8::from_const_char("rfid_data_9876garbage: not in length on purpose"), 14);
-        request.userIndex.SetNull();
-        request.userStatus.SetNull();
-        request.userType.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_80(data.status, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_80(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_80(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_80(chip::app::Clusters::DoorLock::DlStatus status,
-                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("status", status, 0));
-
-        VerifyOrReturn(CheckValueNonNull("userIndex", userIndex));
-        VerifyOrReturn(CheckValue("userIndex.Value()", userIndex.Value(), 3U));
-
-        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
-        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 7U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestClearAllTheCredentials_81()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearCredential::Type;
-
-        RequestType request;
-        request.credential.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_81();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_81(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_81(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_81() { NextTest(); }
-
-    CHIP_ERROR TestReadBackTheFirstPinCredentialAndMakeSureItIsDeleted_82()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type;
-
-        RequestType request;
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-        request.credential.credentialIndex = 1U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_82(data.credentialExists, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_82(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_82(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_82(bool credentialExists, const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("credentialExists", credentialExists, false));
-
-        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
-
-        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
-        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 2U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadBackTheFirstRfidCredentialAndMakeSureItIsDeleted_83()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type;
-
-        RequestType request;
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
-        request.credential.credentialIndex = 2U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_83(data.credentialExists, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_83(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_83(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_83(bool credentialExists, const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("credentialExists", credentialExists, false));
-
-        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
-
-        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
-        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 3U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadBackTheSecondPinCredentialAndMakeSureItIsDeleted_84()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type;
-
-        RequestType request;
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-        request.credential.credentialIndex = 6U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_84(data.credentialExists, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_84(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_84(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_84(bool credentialExists, const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("credentialExists", credentialExists, false));
-
-        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
-
-        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
-        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 7U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadTheUserRelatedWithFirstPinBackAndMakeSureItIsDeleted_85()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
-
-        RequestType request;
-        request.userIndex = 1U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_85(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
-                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
-                                       data.nextUserIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_85(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_85(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_85(
-        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
-        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
-        const chip::app::DataModel::Nullable<
-            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
-        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
-    {
-        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
-
-        VerifyOrReturn(CheckValueNull("userName", userName));
-
-        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
-
-        VerifyOrReturn(CheckValueNull("userStatus", userStatus));
-
-        VerifyOrReturn(CheckValueNull("userType", userType));
-
-        VerifyOrReturn(CheckValueNull("credentialRule", credentialRule));
-
-        VerifyOrReturn(CheckValueNull("credentials", credentials));
-
-        VerifyOrReturn(CheckValueNull("creatorFabricIndex", creatorFabricIndex));
-
-        VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
-
-        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
-        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 2U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadTheUserRelatedWithFirstRfidBackAndMakeSureItIsDeleted_86()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
-
-        RequestType request;
-        request.userIndex = 2U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_86(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
-                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
-                                       data.nextUserIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_86(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_86(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_86(
-        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
-        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
-        const chip::app::DataModel::Nullable<
-            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
-        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
-    {
-        VerifyOrReturn(CheckValue("userIndex", userIndex, 2U));
-
-        VerifyOrReturn(CheckValueNull("userName", userName));
-
-        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
-
-        VerifyOrReturn(CheckValueNull("userStatus", userStatus));
-
-        VerifyOrReturn(CheckValueNull("userType", userType));
-
-        VerifyOrReturn(CheckValueNull("credentialRule", credentialRule));
-
-        VerifyOrReturn(CheckValueNull("credentials", credentials));
-
-        VerifyOrReturn(CheckValueNull("creatorFabricIndex", creatorFabricIndex));
-
-        VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
-
-        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
-        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 3U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadTheUserRelatedWithSecondPinBackAndMakeSureItIsDeleted_87()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
-
-        RequestType request;
-        request.userIndex = 3U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_87(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
-                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
-                                       data.nextUserIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_87(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_87(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_87(
-        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
-        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
-        const chip::app::DataModel::Nullable<
-            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
-        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
-    {
-        VerifyOrReturn(CheckValue("userIndex", userIndex, 3U));
-
-        VerifyOrReturn(CheckValueNull("userName", userName));
-
-        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
-
-        VerifyOrReturn(CheckValueNull("userStatus", userStatus));
-
-        VerifyOrReturn(CheckValueNull("userType", userType));
-
-        VerifyOrReturn(CheckValueNull("credentialRule", credentialRule));
-
-        VerifyOrReturn(CheckValueNull("credentials", credentials));
-
-        VerifyOrReturn(CheckValueNull("creatorFabricIndex", creatorFabricIndex));
-
-        VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
-
-        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
-        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 4U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestCreateNewProgrammingPinCredentialWithInvalidIndex_88()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(0);
-        request.credential.credentialIndex = 1U;
-
-        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
-        request.userIndex.SetNull();
-        request.userStatus.SetNull();
-        request.userType.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_88(data.status, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_88(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_88(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_88(chip::app::Clusters::DoorLock::DlStatus status,
-                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("status", status, 133));
-
-        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
-
-        VerifyOrReturn(CheckValueNull("nextCredentialIndex", nextCredentialIndex));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestCreateNewProgrammingPinCredentialWithValidIndex_89()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(0);
-        request.credential.credentialIndex = 0U;
-
-        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
-        request.userIndex.SetNull();
-        request.userStatus.SetNull();
-        request.userType.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_89(data.status, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_89(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_89(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_89(chip::app::Clusters::DoorLock::DlStatus status,
-                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("status", status, 0));
-
-        VerifyOrReturn(CheckValueNonNull("userIndex", userIndex));
-        VerifyOrReturn(CheckValue("userIndex.Value()", userIndex.Value(), 1U));
-
-        VerifyOrReturn(CheckValueNull("nextCredentialIndex", nextCredentialIndex));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestVerifyCreatedUser_90()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
-
-        RequestType request;
-        request.userIndex = 1U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_90(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
-                                       data.credentialRule, data.credentials, data.creatorFabricIndex, data.lastModifiedFabricIndex,
-                                       data.nextUserIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_90(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_90(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_90(
-        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
-        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
-        const chip::app::DataModel::Nullable<
-            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
-        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
-    {
-        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
-
-        VerifyOrReturn(CheckValueNonNull("userName", userName));
-        VerifyOrReturn(CheckValueAsString("userName.Value()", userName.Value(), chip::CharSpan("", 0)));
-
-        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
-
-        VerifyOrReturn(CheckValueNonNull("userStatus", userStatus));
-        VerifyOrReturn(CheckValue("userStatus.Value()", userStatus.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("userType", userType));
-        VerifyOrReturn(CheckValue("userType.Value()", userType.Value(), 0));
-
-        VerifyOrReturn(CheckValueNonNull("credentialRule", credentialRule));
-        VerifyOrReturn(CheckValue("credentialRule.Value()", credentialRule.Value(), 0));
-
-        VerifyOrReturn(CheckValueNonNull("credentials", credentials));
-        {
-            auto iter_1 = credentials.Value().begin();
-            VerifyOrReturn(CheckNextListItemDecodes<decltype(credentials.Value())>("credentials.Value()", iter_1, 0));
-            VerifyOrReturn(CheckValue("credentials.Value()[0].credentialType", iter_1.GetValue().credentialType, 0));
-            VerifyOrReturn(CheckValue("credentials.Value()[0].credentialIndex", iter_1.GetValue().credentialIndex, 0U));
-            VerifyOrReturn(CheckNoMoreListItems<decltype(credentials.Value())>("credentials.Value()", iter_1, 1));
-        }
-
-        VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", creatorFabricIndex));
-        VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", creatorFabricIndex.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
-        VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", lastModifiedFabricIndex.Value(), 1));
-
-        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
-        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 2U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestVerifyCreatedProgrammingPinCredential_91()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type;
-
-        RequestType request;
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(0);
-        request.credential.credentialIndex = 0U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_91(data.credentialExists, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_91(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_91(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_91(bool credentialExists, const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("credentialExists", credentialExists, true));
-
-        VerifyOrReturn(CheckValueNonNull("userIndex", userIndex));
-        VerifyOrReturn(CheckValue("userIndex.Value()", userIndex.Value(), 1U));
-
-        VerifyOrReturn(CheckValueNull("nextCredentialIndex", nextCredentialIndex));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestModifyTheProgrammingPinCredential_92()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(2);
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(0);
-        request.credential.credentialIndex = 0U;
-
-        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("654321garbage: not in length on purpose"), 6);
-        request.userIndex.SetNull();
-        request.userStatus.SetNull();
-        request.userType.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_92(data.status, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_92(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_92(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_92(chip::app::Clusters::DoorLock::DlStatus status,
-                              const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                              const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("status", status, 0));
-
-        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
-
-        VerifyOrReturn(CheckValueNull("nextCredentialIndex", nextCredentialIndex));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestClearingProgrammingPinFails_93()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearCredential::Type;
-
-        RequestType request;
-        request.credential.SetNonNull();
-
-        request.credential.Value().credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(0);
-        request.credential.Value().credentialIndex = 0U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_93();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_93(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_93(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
-        NextTest();
-    }
-
-    void OnSuccessResponse_93() { ThrowSuccessResponse(); }
-
-    CHIP_ERROR TestClearingProgrammingPinWithInvalidIndexFails_94()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearCredential::Type;
-
-        RequestType request;
-        request.credential.SetNonNull();
-
-        request.credential.Value().credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(0);
-        request.credential.Value().credentialIndex = 1U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_94();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_94(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_94(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
-        NextTest();
-    }
-
-    void OnSuccessResponse_94() { ThrowSuccessResponse(); }
-
-    CHIP_ERROR TestClearingPinCredentialWithZeroIndexFails_95()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearCredential::Type;
-
-        RequestType request;
-        request.credential.SetNonNull();
-
-        request.credential.Value().credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-        request.credential.Value().credentialIndex = 0U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_95();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_95(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_95(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
-        NextTest();
-    }
-
-    void OnSuccessResponse_95() { ThrowSuccessResponse(); }
-
-    CHIP_ERROR TestClearingPinCredentialWithOutOfBoundIndexFails_96()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearCredential::Type;
-
-        RequestType request;
-        request.credential.SetNonNull();
-
-        request.credential.Value().credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-        request.credential.Value().credentialIndex = static_cast<uint16_t>(NumberOfPINUsersSupported + 1);
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_96();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_96(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_96(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
-        NextTest();
-    }
-
-    void OnSuccessResponse_96() { ThrowSuccessResponse(); }
-
-    CHIP_ERROR TestClearingRfidCredentialWithZeroIndexFails_97()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearCredential::Type;
-
-        RequestType request;
-        request.credential.SetNonNull();
-
-        request.credential.Value().credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
-        request.credential.Value().credentialIndex = 0U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_97();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_97(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_97(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
-        NextTest();
-    }
-
-    void OnSuccessResponse_97() { ThrowSuccessResponse(); }
-
-    CHIP_ERROR TestClearingRfidCredentialWithOutOfBoundIndexFails_98()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearCredential::Type;
-
-        RequestType request;
-        request.credential.SetNonNull();
-
-        request.credential.Value().credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
-        request.credential.Value().credentialIndex = static_cast<uint16_t>(NumberOfRFIDUsersSupported + 1);
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_98();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_98(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_98(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
-        NextTest();
-    }
-
-    void OnSuccessResponse_98() { ThrowSuccessResponse(); }
-
-    CHIP_ERROR TestClearTheProgrammingPinUser_99()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearUser::Type;
-
-        RequestType request;
-        request.userIndex = 1U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnSuccessResponse_99();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_99(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_99(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_99() { NextTest(); }
-
-    CHIP_ERROR TestMakeSureProgrammingPinUserIsDeleted_100()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetUser::Type;
-
-        RequestType request;
-        request.userIndex = 1U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_100(data.userIndex, data.userName, data.userUniqueId, data.userStatus, data.userType,
-                                        data.credentialRule, data.credentials, data.creatorFabricIndex,
-                                        data.lastModifiedFabricIndex, data.nextUserIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_100(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_100(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_100(
-        uint16_t userIndex, const chip::app::DataModel::Nullable<chip::CharSpan> & userName,
-        const chip::app::DataModel::Nullable<uint32_t> & userUniqueId,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & userStatus,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & userType,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & credentialRule,
-        const chip::app::DataModel::Nullable<
-            chip::app::DataModel::DecodableList<chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType>> & credentials,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & creatorFabricIndex,
-        const chip::app::DataModel::Nullable<chip::FabricIndex> & lastModifiedFabricIndex,
-        const chip::app::DataModel::Nullable<uint16_t> & nextUserIndex)
-    {
-        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
-
-        VerifyOrReturn(CheckValueNull("userName", userName));
-
-        VerifyOrReturn(CheckValueNull("userUniqueId", userUniqueId));
-
-        VerifyOrReturn(CheckValueNull("userStatus", userStatus));
-
-        VerifyOrReturn(CheckValueNull("userType", userType));
-
-        VerifyOrReturn(CheckValueNull("credentialRule", credentialRule));
-
-        VerifyOrReturn(CheckValueNull("credentials", credentials));
-
-        VerifyOrReturn(CheckValueNull("creatorFabricIndex", creatorFabricIndex));
-
-        VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", lastModifiedFabricIndex));
-
-        VerifyOrReturn(CheckValueNonNull("nextUserIndex", nextUserIndex));
-        VerifyOrReturn(CheckValue("nextUserIndex.Value()", nextUserIndex.Value(), 2U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestMakeSureProgrammingPinCredentialIsDeleted_101()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type;
-
-        RequestType request;
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(0);
-        request.credential.credentialIndex = 0U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_UsersAndCredentials *>(context))
-                ->OnSuccessResponse_101(data.credentialExists, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_101(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_101(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_101(bool credentialExists, const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                               const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("credentialExists", credentialExists, false));
-
-        VerifyOrReturn(CheckValueNull("userIndex", userIndex));
-
-        VerifyOrReturn(CheckValueNull("nextCredentialIndex", nextCredentialIndex));
-
-        NextTest();
-    }
-};
-
-class DL_LockUnlock : public TestCommand
-{
-public:
-    DL_LockUnlock() : TestCommand("DL_LockUnlock"), mTestIndex(0)
-    {
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-    }
-
-    ~DL_LockUnlock() {}
-
-    /////////// TestCommand Interface /////////
-    void NextTest() override
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        if (0 == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Start: DL_LockUnlock\n");
-        }
-
-        if (mTestCount == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Complete: DL_LockUnlock\n");
-            SetCommandExitStatus(CHIP_NO_ERROR);
-            return;
-        }
-
-        Wait();
-
-        // Ensure we increment mTestIndex before we start running the relevant
-        // command.  That way if we lose the timeslice after we send the message
-        // but before our function call returns, we won't end up with an
-        // incorrect mTestIndex value observed when we get the response.
-        switch (mTestIndex++)
-        {
-        case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
-            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
-            break;
-        case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Create new PIN credential and lock/unlock user\n");
-            err = TestCreateNewPinCredentialAndLockUnlockUser_1();
-            break;
-        case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Try to unlock the door with invalid PIN\n");
-            err = TestTryToUnlockTheDoorWithInvalidPin_2();
-            break;
-        case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Verify that lock state attribute value is set to Locked\n");
-            err = TestVerifyThatLockStateAttributeValueIsSetToLocked_3();
-            break;
-        case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Try to unlock the door with valid PIN\n");
-            err = TestTryToUnlockTheDoorWithValidPin_4();
-            break;
-        case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Verify that lock state attribute value is set to Unlocked\n");
-            err = TestVerifyThatLockStateAttributeValueIsSetToUnlocked_5();
-            break;
-        case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Try to lock the door with invalid PIN\n");
-            err = TestTryToLockTheDoorWithInvalidPin_6();
-            break;
-        case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Verify that lock state attribute value is set to Unlocked\n");
-            err = TestVerifyThatLockStateAttributeValueIsSetToUnlocked_7();
-            break;
-        case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Try to unlock the door with valid PIN\n");
-            err = TestTryToUnlockTheDoorWithValidPin_8();
-            break;
-        case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : Verify that lock state attribute value is set to Locked\n");
-            err = TestVerifyThatLockStateAttributeValueIsSetToLocked_9();
-            break;
-        case 10:
-            ChipLogProgress(chipTool, " ***** Test Step 10 : Clean the created credential\n");
-            err = TestCleanTheCreatedCredential_10();
-            break;
-        }
-
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }
-    }
-
-private:
-    std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 11;
-
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-
-    static void OnFailureCallback_3(void * context, CHIP_ERROR error)
-    {
-        (static_cast<DL_LockUnlock *>(context))->OnFailureResponse_3(error);
-    }
-
-    static void OnSuccessCallback_3(void * context,
-                                    const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> & lockState)
-    {
-        (static_cast<DL_LockUnlock *>(context))->OnSuccessResponse_3(lockState);
-    }
-
-    static void OnFailureCallback_5(void * context, CHIP_ERROR error)
-    {
-        (static_cast<DL_LockUnlock *>(context))->OnFailureResponse_5(error);
-    }
-
-    static void OnSuccessCallback_5(void * context,
-                                    const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> & lockState)
-    {
-        (static_cast<DL_LockUnlock *>(context))->OnSuccessResponse_5(lockState);
-    }
-
-    static void OnFailureCallback_7(void * context, CHIP_ERROR error)
-    {
-        (static_cast<DL_LockUnlock *>(context))->OnFailureResponse_7(error);
-    }
-
-    static void OnSuccessCallback_7(void * context,
-                                    const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> & lockState)
-    {
-        (static_cast<DL_LockUnlock *>(context))->OnSuccessResponse_7(lockState);
-    }
-
-    static void OnFailureCallback_9(void * context, CHIP_ERROR error)
-    {
-        (static_cast<DL_LockUnlock *>(context))->OnFailureResponse_9(error);
-    }
-
-    static void OnSuccessCallback_9(void * context,
-                                    const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> & lockState)
-    {
-        (static_cast<DL_LockUnlock *>(context))->OnSuccessResponse_9(lockState);
-    }
-
-    //
-    // Tests methods
-    //
-
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
-    {
-        SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
-    }
-
-    CHIP_ERROR TestCreateNewPinCredentialAndLockUnlockUser_1()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
-
-        RequestType request;
-        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-
-        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-        request.credential.credentialIndex = 1U;
-
-        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
-        request.userIndex.SetNull();
-        request.userStatus.SetNull();
-        request.userType.SetNull();
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_LockUnlock *>(context))->OnSuccessResponse_1(data.status, data.userIndex, data.nextCredentialIndex);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_LockUnlock *>(context))->OnFailureResponse_1(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_1(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_1(chip::app::Clusters::DoorLock::DlStatus status,
-                             const chip::app::DataModel::Nullable<uint16_t> & userIndex,
-                             const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
-    {
-        VerifyOrReturn(CheckValue("status", status, 0));
-
-        VerifyOrReturn(CheckValueNonNull("userIndex", userIndex));
-        VerifyOrReturn(CheckValue("userIndex.Value()", userIndex.Value(), 1U));
-
-        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
-        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 2U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestTryToUnlockTheDoorWithInvalidPin_2()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::UnlockDoor::Type;
-
-        RequestType request;
-        request.pinCode.Emplace();
-        request.pinCode.Value() = chip::ByteSpan(chip::Uint8::from_const_char("000000garbage: not in length on purpose"), 6);
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_LockUnlock *>(context))->OnSuccessResponse_2();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_LockUnlock *>(context))->OnFailureResponse_2(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_2(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILURE));
-        NextTest();
-    }
-
-    void OnSuccessResponse_2() { ThrowSuccessResponse(); }
-
-    CHIP_ERROR TestVerifyThatLockStateAttributeValueIsSetToLocked_3()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::DoorLockClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::LockState::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_3(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_3(const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> & lockState)
-    {
-        VerifyOrReturn(CheckValueNonNull("lockState", lockState));
-        VerifyOrReturn(CheckValue("lockState.Value()", lockState.Value(), 1));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestTryToUnlockTheDoorWithValidPin_4()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::UnlockDoor::Type;
-
-        RequestType request;
-        request.pinCode.Emplace();
-        request.pinCode.Value() = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_LockUnlock *>(context))->OnSuccessResponse_4();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_LockUnlock *>(context))->OnFailureResponse_4(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_4(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_4() { NextTest(); }
-
-    CHIP_ERROR TestVerifyThatLockStateAttributeValueIsSetToUnlocked_5()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::DoorLockClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::LockState::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_5(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_5(const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> & lockState)
-    {
-        VerifyOrReturn(CheckValueNonNull("lockState", lockState));
-        VerifyOrReturn(CheckValue("lockState.Value()", lockState.Value(), 2));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestTryToLockTheDoorWithInvalidPin_6()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::LockDoor::Type;
-
-        RequestType request;
-        request.pinCode.Emplace();
-        request.pinCode.Value() = chip::ByteSpan(chip::Uint8::from_const_char("000000garbage: not in length on purpose"), 6);
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_LockUnlock *>(context))->OnSuccessResponse_6();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_LockUnlock *>(context))->OnFailureResponse_6(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_6(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILURE));
-        NextTest();
-    }
-
-    void OnSuccessResponse_6() { ThrowSuccessResponse(); }
-
-    CHIP_ERROR TestVerifyThatLockStateAttributeValueIsSetToUnlocked_7()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::DoorLockClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::LockState::TypeInfo>(
-            this, OnSuccessCallback_7, OnFailureCallback_7));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_7(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_7(const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> & lockState)
-    {
-        VerifyOrReturn(CheckValueNonNull("lockState", lockState));
-        VerifyOrReturn(CheckValue("lockState.Value()", lockState.Value(), 2));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestTryToUnlockTheDoorWithValidPin_8()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::LockDoor::Type;
-
-        RequestType request;
-        request.pinCode.Emplace();
-        request.pinCode.Value() = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_LockUnlock *>(context))->OnSuccessResponse_8();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_LockUnlock *>(context))->OnFailureResponse_8(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_8(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_8() { NextTest(); }
-
-    CHIP_ERROR TestVerifyThatLockStateAttributeValueIsSetToLocked_9()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::DoorLockClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::LockState::TypeInfo>(
-            this, OnSuccessCallback_9, OnFailureCallback_9));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_9(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_9(const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> & lockState)
-    {
-        VerifyOrReturn(CheckValueNonNull("lockState", lockState));
-        VerifyOrReturn(CheckValue("lockState.Value()", lockState.Value(), 1));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestCleanTheCreatedCredential_10()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearCredential::Type;
-
-        RequestType request;
-        request.credential.SetNonNull();
-
-        request.credential.Value().credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-        request.credential.Value().credentialIndex = 1U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<DL_LockUnlock *>(context))->OnSuccessResponse_10();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<DL_LockUnlock *>(context))->OnFailureResponse_10(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_10(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_10() { NextTest(); }
-};
-
-void registerCommandsTests(Commands & commands)
+void registerCommandsTests(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     const char * clusterName = "Tests";
 
     commands_list clusterCommands = {
         make_unique<TestList>(),
-        make_unique<Test_TC_BI_1_1>(),
-        make_unique<Test_TC_BI_2_1>(),
-        make_unique<Test_TC_BI_2_2>(),
-        make_unique<Test_TC_BOOL_1_1>(),
-        make_unique<Test_TC_BOOL_2_1>(),
-        make_unique<Test_TC_BRAC_1_1>(),
-        make_unique<Test_TC_CC_1_1>(),
-        make_unique<Test_TC_CC_2_1>(),
-        make_unique<Test_TC_CC_3_1>(),
-        make_unique<Test_TC_CC_3_2>(),
-        make_unique<Test_TC_CC_3_3>(),
-        make_unique<Test_TC_CC_4_1>(),
-        make_unique<Test_TC_CC_4_2>(),
-        make_unique<Test_TC_CC_4_3>(),
-        make_unique<Test_TC_CC_4_4>(),
-        make_unique<Test_TC_CC_5_1>(),
-        make_unique<Test_TC_CC_5_2>(),
-        make_unique<Test_TC_CC_5_3>(),
-        make_unique<Test_TC_CC_6_1>(),
-        make_unique<Test_TC_CC_6_2>(),
-        make_unique<Test_TC_CC_6_3>(),
-        make_unique<Test_TC_CC_7_1>(),
-        make_unique<Test_TC_CC_7_2>(),
-        make_unique<Test_TC_CC_7_3>(),
-        make_unique<Test_TC_CC_7_4>(),
-        make_unique<Test_TC_CC_8_1>(),
-        make_unique<Test_TC_CC_9_1>(),
-        make_unique<Test_TC_CC_9_2>(),
-        make_unique<Test_TC_CC_9_3>(),
-        make_unique<Test_TC_DD_1_5>(),
-        make_unique<Test_TC_DD_1_6>(),
-        make_unique<Test_TC_DD_1_7>(),
-        make_unique<Test_TC_DD_1_8>(),
-        make_unique<Test_TC_DD_1_9>(),
-        make_unique<Test_TC_DM_1_1>(),
-        make_unique<Test_TC_DM_3_1>(),
-        make_unique<Test_TC_DM_2_2>(),
-        make_unique<Test_TC_EMR_1_1>(),
-        make_unique<Test_TC_ETHDIAG_1_1>(),
-        make_unique<Test_TC_ETHDIAG_2_1>(),
-        make_unique<Test_TC_FLW_1_1>(),
-        make_unique<Test_TC_FLW_2_1>(),
-        make_unique<Test_TC_FLW_2_2>(),
-        make_unique<Test_TC_ILL_1_1>(),
-        make_unique<Test_TC_LVL_1_1>(),
-        make_unique<Test_TC_LVL_2_1>(),
-        make_unique<Test_TC_LVL_2_2>(),
-        make_unique<Test_TC_LVL_3_1>(),
-        make_unique<Test_TC_LVL_4_1>(),
-        make_unique<Test_TC_LVL_5_1>(),
-        make_unique<Test_TC_LVL_6_1>(),
-        make_unique<Test_TC_MC_1_1>(),
-        make_unique<Test_TC_MC_2_1>(),
-        make_unique<Test_TC_MC_3_1>(),
-        make_unique<Test_TC_MC_3_2>(),
-        make_unique<Test_TC_MC_3_3>(),
-        make_unique<Test_TC_MC_3_4>(),
-        make_unique<Test_TC_MC_3_5>(),
-        make_unique<Test_TC_MC_3_6>(),
-        make_unique<Test_TC_MC_3_7>(),
-        make_unique<Test_TC_MC_3_8>(),
-        make_unique<Test_TC_MC_3_9>(),
-        make_unique<Test_TC_MC_3_10>(),
-        make_unique<Test_TC_MC_3_11>(),
-        make_unique<Test_TC_MC_5_1>(),
-        make_unique<Test_TC_MC_5_2>(),
-        make_unique<Test_TC_MC_5_3>(),
-        make_unique<Test_TC_MC_6_1>(),
-        make_unique<Test_TC_MC_6_2>(),
-        make_unique<Test_TC_MC_6_3>(),
-        make_unique<Test_TC_MC_6_4>(),
-        make_unique<Test_TC_MC_7_1>(),
-        make_unique<Test_TC_MC_7_2>(),
-        make_unique<Test_TC_MC_8_1>(),
-        make_unique<Test_TC_MC_9_1>(),
-        make_unique<Test_TC_OCC_1_1>(),
-        make_unique<Test_TC_OCC_2_1>(),
-        make_unique<Test_TC_OCC_2_2>(),
-        make_unique<Test_TC_OO_1_1>(),
-        make_unique<Test_TC_OO_2_1>(),
-        make_unique<Test_TC_OO_2_2>(),
-        make_unique<Test_TC_OO_2_3>(),
-        make_unique<Test_TC_PS_1_1>(),
-        make_unique<Test_TC_PRS_1_1>(),
-        make_unique<Test_TC_PRS_2_1>(),
-        make_unique<Test_TC_PCC_1_1>(),
-        make_unique<Test_TC_PCC_2_1>(),
-        make_unique<Test_TC_PCC_2_2>(),
-        make_unique<Test_TC_PCC_2_3>(),
-        make_unique<Test_TC_RH_1_1>(),
-        make_unique<Test_TC_RH_2_1>(),
-        make_unique<Test_TC_RH_2_2>(),
-        make_unique<Test_TC_SWTCH_2_1>(),
-        make_unique<Test_TC_SWTCH_2_2>(),
-        make_unique<Test_TC_TM_1_1>(),
-        make_unique<Test_TC_TM_2_1>(),
-        make_unique<Test_TC_TM_2_2>(),
-        make_unique<Test_TC_TSTAT_1_1>(),
-        make_unique<Test_TC_TSTAT_2_1>(),
-        make_unique<Test_TC_TSTAT_2_2>(),
-        make_unique<Test_TC_TSUIC_1_1>(),
-        make_unique<Test_TC_TSUIC_2_1>(),
-        make_unique<Test_TC_TSUIC_2_2>(),
-        make_unique<Test_TC_DIAGTH_1_1>(),
-        make_unique<Test_TC_WIFIDIAG_1_1>(),
-        make_unique<Test_TC_WIFIDIAG_3_1>(),
-        make_unique<Test_TC_WNCV_1_1>(),
-        make_unique<Test_TC_WNCV_2_1>(),
-        make_unique<Test_TC_WNCV_2_2>(),
-        make_unique<Test_TC_WNCV_2_4>(),
-        make_unique<Test_TC_WNCV_2_5>(),
-        make_unique<Test_TC_WNCV_3_1>(),
-        make_unique<Test_TC_WNCV_3_2>(),
-        make_unique<Test_TC_WNCV_3_3>(),
-        make_unique<TV_TargetNavigatorCluster>(),
-        make_unique<TV_AudioOutputCluster>(),
-        make_unique<TV_ApplicationLauncherCluster>(),
-        make_unique<TV_KeypadInputCluster>(),
-        make_unique<TV_AccountLoginCluster>(),
-        make_unique<TV_WakeOnLanCluster>(),
-        make_unique<TV_ApplicationBasicCluster>(),
-        make_unique<TV_MediaPlaybackCluster>(),
-        make_unique<TV_ChannelCluster>(),
-        make_unique<TV_LowPowerCluster>(),
-        make_unique<TV_ContentLauncherCluster>(),
-        make_unique<TV_MediaInputCluster>(),
-        make_unique<TestCluster>(),
-        make_unique<TestClusterComplexTypes>(),
-        make_unique<TestConstraints>(),
-        make_unique<TestDelayCommands>(),
-        make_unique<TestLogCommands>(),
-        make_unique<TestSaveAs>(),
-        make_unique<TestConfigVariables>(),
-        make_unique<TestDescriptorCluster>(),
-        make_unique<TestBasicInformation>(),
-        make_unique<TestIdentifyCluster>(),
-        make_unique<TestGroupsCluster>(),
-        make_unique<TestGroupKeyManagementCluster>(),
-        make_unique<TestOperationalCredentialsCluster>(),
-        make_unique<TestModeSelectCluster>(),
-        make_unique<TestGroupMessaging>(),
-        make_unique<Test_TC_SWDIAG_1_1>(),
-        make_unique<Test_TC_SWDIAG_2_1>(),
-        make_unique<Test_TC_SWDIAG_3_1>(),
-        make_unique<TestSubscribe_OnOff>(),
-        make_unique<DL_UsersAndCredentials>(),
-        make_unique<DL_LockUnlock>(),
+        make_unique<Test_TC_BI_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_BI_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_BI_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_BOOL_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_BOOL_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_BRAC_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_CC_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_CC_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_CC_3_1>(credsIssuerConfig),
+        make_unique<Test_TC_CC_3_2>(credsIssuerConfig),
+        make_unique<Test_TC_CC_3_3>(credsIssuerConfig),
+        make_unique<Test_TC_CC_4_1>(credsIssuerConfig),
+        make_unique<Test_TC_CC_4_2>(credsIssuerConfig),
+        make_unique<Test_TC_CC_4_3>(credsIssuerConfig),
+        make_unique<Test_TC_CC_4_4>(credsIssuerConfig),
+        make_unique<Test_TC_CC_5_1>(credsIssuerConfig),
+        make_unique<Test_TC_CC_5_2>(credsIssuerConfig),
+        make_unique<Test_TC_CC_5_3>(credsIssuerConfig),
+        make_unique<Test_TC_CC_6_1>(credsIssuerConfig),
+        make_unique<Test_TC_CC_6_2>(credsIssuerConfig),
+        make_unique<Test_TC_CC_6_3>(credsIssuerConfig),
+        make_unique<Test_TC_CC_7_1>(credsIssuerConfig),
+        make_unique<Test_TC_CC_7_2>(credsIssuerConfig),
+        make_unique<Test_TC_CC_7_3>(credsIssuerConfig),
+        make_unique<Test_TC_CC_7_4>(credsIssuerConfig),
+        make_unique<Test_TC_CC_8_1>(credsIssuerConfig),
+        make_unique<Test_TC_CC_9_1>(credsIssuerConfig),
+        make_unique<Test_TC_CC_9_2>(credsIssuerConfig),
+        make_unique<Test_TC_CC_9_3>(credsIssuerConfig),
+        make_unique<Test_TC_DD_1_5>(credsIssuerConfig),
+        make_unique<Test_TC_DD_1_6>(credsIssuerConfig),
+        make_unique<Test_TC_DD_1_7>(credsIssuerConfig),
+        make_unique<Test_TC_DD_1_8>(credsIssuerConfig),
+        make_unique<Test_TC_DD_1_9>(credsIssuerConfig),
+        make_unique<Test_TC_DM_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_DM_3_1>(credsIssuerConfig),
+        make_unique<Test_TC_DM_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_EMR_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_ETHDIAG_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_ETHDIAG_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_FLW_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_FLW_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_FLW_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_ILL_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_LVL_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_LVL_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_LVL_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_LVL_3_1>(credsIssuerConfig),
+        make_unique<Test_TC_LVL_4_1>(credsIssuerConfig),
+        make_unique<Test_TC_LVL_5_1>(credsIssuerConfig),
+        make_unique<Test_TC_LVL_6_1>(credsIssuerConfig),
+        make_unique<Test_TC_MC_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_MC_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_MC_3_1>(credsIssuerConfig),
+        make_unique<Test_TC_MC_3_2>(credsIssuerConfig),
+        make_unique<Test_TC_MC_3_3>(credsIssuerConfig),
+        make_unique<Test_TC_MC_3_4>(credsIssuerConfig),
+        make_unique<Test_TC_MC_3_5>(credsIssuerConfig),
+        make_unique<Test_TC_MC_3_6>(credsIssuerConfig),
+        make_unique<Test_TC_MC_3_7>(credsIssuerConfig),
+        make_unique<Test_TC_MC_3_8>(credsIssuerConfig),
+        make_unique<Test_TC_MC_3_9>(credsIssuerConfig),
+        make_unique<Test_TC_MC_3_10>(credsIssuerConfig),
+        make_unique<Test_TC_MC_3_11>(credsIssuerConfig),
+        make_unique<Test_TC_MC_5_1>(credsIssuerConfig),
+        make_unique<Test_TC_MC_5_2>(credsIssuerConfig),
+        make_unique<Test_TC_MC_5_3>(credsIssuerConfig),
+        make_unique<Test_TC_MC_6_1>(credsIssuerConfig),
+        make_unique<Test_TC_MC_6_2>(credsIssuerConfig),
+        make_unique<Test_TC_MC_6_3>(credsIssuerConfig),
+        make_unique<Test_TC_MC_6_4>(credsIssuerConfig),
+        make_unique<Test_TC_MC_7_1>(credsIssuerConfig),
+        make_unique<Test_TC_MC_7_2>(credsIssuerConfig),
+        make_unique<Test_TC_MC_8_1>(credsIssuerConfig),
+        make_unique<Test_TC_MC_9_1>(credsIssuerConfig),
+        make_unique<Test_TC_OCC_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_OCC_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_OCC_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_OO_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_OO_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_OO_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_OO_2_3>(credsIssuerConfig),
+        make_unique<Test_TC_PS_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_PRS_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_PRS_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_PCC_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_PCC_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_PCC_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_PCC_2_3>(credsIssuerConfig),
+        make_unique<Test_TC_RH_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_RH_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_RH_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_SWTCH_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_SWTCH_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_TM_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_TM_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_TM_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_TSTAT_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_TSTAT_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_TSTAT_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_TSUIC_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_TSUIC_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_TSUIC_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_DIAGTH_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_WIFIDIAG_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_WIFIDIAG_3_1>(credsIssuerConfig),
+        make_unique<Test_TC_WNCV_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_WNCV_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_WNCV_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_WNCV_2_4>(credsIssuerConfig),
+        make_unique<Test_TC_WNCV_2_5>(credsIssuerConfig),
+        make_unique<Test_TC_WNCV_3_1>(credsIssuerConfig),
+        make_unique<Test_TC_WNCV_3_2>(credsIssuerConfig),
+        make_unique<Test_TC_WNCV_3_3>(credsIssuerConfig),
+        make_unique<TV_TargetNavigatorCluster>(credsIssuerConfig),
+        make_unique<TV_AudioOutputCluster>(credsIssuerConfig),
+        make_unique<TV_ApplicationLauncherCluster>(credsIssuerConfig),
+        make_unique<TV_KeypadInputCluster>(credsIssuerConfig),
+        make_unique<TV_AccountLoginCluster>(credsIssuerConfig),
+        make_unique<TV_WakeOnLanCluster>(credsIssuerConfig),
+        make_unique<TV_ApplicationBasicCluster>(credsIssuerConfig),
+        make_unique<TV_MediaPlaybackCluster>(credsIssuerConfig),
+        make_unique<TV_ChannelCluster>(credsIssuerConfig),
+        make_unique<TV_LowPowerCluster>(credsIssuerConfig),
+        make_unique<TV_ContentLauncherCluster>(credsIssuerConfig),
+        make_unique<TV_MediaInputCluster>(credsIssuerConfig),
+        make_unique<TestCluster>(credsIssuerConfig),
+        make_unique<TestClusterComplexTypes>(credsIssuerConfig),
+        make_unique<TestConstraints>(credsIssuerConfig),
+        make_unique<TestDelayCommands>(credsIssuerConfig),
+        make_unique<TestLogCommands>(credsIssuerConfig),
+        make_unique<TestSaveAs>(credsIssuerConfig),
+        make_unique<TestConfigVariables>(credsIssuerConfig),
+        make_unique<TestDescriptorCluster>(credsIssuerConfig),
+        make_unique<TestBasicInformation>(credsIssuerConfig),
+        make_unique<TestIdentifyCluster>(credsIssuerConfig),
+        make_unique<TestOperationalCredentialsCluster>(credsIssuerConfig),
+        make_unique<TestModeSelectCluster>(credsIssuerConfig),
+        make_unique<Test_TC_SWDIAG_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_SWDIAG_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_SWDIAG_3_1>(credsIssuerConfig),
+        make_unique<TestSubscribe_OnOff>(credsIssuerConfig),
+        make_unique<DL_UsersAndCredentials>(credsIssuerConfig),
+        make_unique<DL_LockUnlock>(credsIssuerConfig),
+        make_unique<DL_Schedules>(credsIssuerConfig),
+        make_unique<TestGroupMessaging>(credsIssuerConfig),
+        make_unique<TestGroupsCluster>(credsIssuerConfig),
+        make_unique<TestGroupDemoCommand>(credsIssuerConfig),
+        make_unique<TestGroupDemoConfig>(credsIssuerConfig),
+        make_unique<TestGroupKeyManagementCluster>(credsIssuerConfig),
     };
 
     commands.Register(clusterName, clusterCommands);

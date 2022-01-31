@@ -30,6 +30,20 @@
 namespace chip {
 namespace Controller {
 
+class DLL_EXPORT GeneralCommissioningCluster : public ClusterBase
+{
+public:
+    GeneralCommissioningCluster() : ClusterBase(app::Clusters::GeneralCommissioning::Id) {}
+    ~GeneralCommissioningCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR ArmFailSafe(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                           uint16_t expiryLengthSeconds, uint64_t breadcrumb, uint32_t timeoutMs);
+    CHIP_ERROR CommissioningComplete(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR SetRegulatoryConfig(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                   uint8_t location, chip::CharSpan countryCode, uint64_t breadcrumb, uint32_t timeoutMs);
+};
+
 class DLL_EXPORT OperationalCredentialsCluster : public ClusterBase
 {
 public:
