@@ -452,7 +452,7 @@ void WindowApp::Cover::Finish()
     WindowApp::Instance().DestroyTimer(mTiltTimer);
 }
 
-void WindowApp::Cover::LiftUp()
+void WindowApp::Cover::LiftDown()
 {
     EmberAfStatus status;
     chip::app::DataModel::Nullable<chip::Percent100ths> current;
@@ -474,7 +474,7 @@ void WindowApp::Cover::LiftUp()
     LiftPositionSet(mEndpoint, percent100ths);
 }
 
-void WindowApp::Cover::LiftDown()
+void WindowApp::Cover::LiftUp()
 {
     EmberAfStatus status;
     chip::app::DataModel::Nullable<chip::Percent100ths> current;
@@ -544,7 +544,7 @@ void WindowApp::Cover::LiftUpdate(bool newTarget)
     }
 }
 
-void WindowApp::Cover::TiltUp()
+void WindowApp::Cover::TiltDown()
 {
     EmberAfStatus status;
     chip::app::DataModel::Nullable<chip::Percent100ths> current;
@@ -566,7 +566,7 @@ void WindowApp::Cover::TiltUp()
     TiltPositionSet(mEndpoint, percent100ths);
 }
 
-void WindowApp::Cover::TiltDown()
+void WindowApp::Cover::TiltUp()
 {
     EmberAfStatus status;
     chip::app::DataModel::Nullable<chip::Percent100ths> current;
