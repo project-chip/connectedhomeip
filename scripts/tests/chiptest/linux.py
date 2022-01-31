@@ -68,6 +68,7 @@ def CreateNamespacesForAppTest():
         # create links for switch to net connections
         "ip link add eth-app type veth peer name eth-app-switch",
         "ip link add eth-tool type veth peer name eth-tool-switch",
+        "ip link add eth-ci type veth peer name eth-ci-switch",
 
         # link the connections together
         "ip link set eth-app netns app",
@@ -77,6 +78,7 @@ def CreateNamespacesForAppTest():
         "ip link set br1 up",
         "ip link set eth-app-switch master br1",
         "ip link set eth-tool-switch master br1",
+        "ip link set eth-ci-switch master br1",
 
         # mark connections up
         "ip netns exec app ip addr add 10.10.10.1/24 dev eth-app",
@@ -94,6 +96,11 @@ def CreateNamespacesForAppTest():
         "ip netns exec app ip -6 addr flush eth-app",
         "ip netns exec tool ip -6 a add fd00:0:1:1::2/64 dev eth-tool",
         "ip netns exec app ip -6 a add fd00:0:1:1::3/64 dev eth-app",
+
+        # create link between virtual host 'tool' and the test runner
+        "ip addr add 10.10.10.5/24 dev eth-ci",
+        "ip link set dev eth-ci up",
+        "ip link set dev eth-ci-switch up",
     ]
 
     for command in COMMANDS:

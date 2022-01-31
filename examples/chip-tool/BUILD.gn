@@ -70,6 +70,7 @@ static_library("chip-tool-utils") {
   public_deps = [
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/tests/suites/commands/log",
+    "${chip_root}/src/app/tests/suites/commands/system",
     "${chip_root}/src/app/tests/suites/pics",
     "${chip_root}/src/controller/data_model",
     "${chip_root}/src/lib",
