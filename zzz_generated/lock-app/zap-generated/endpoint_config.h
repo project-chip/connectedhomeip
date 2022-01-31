@@ -730,7 +730,7 @@
             /* Endpoint: 0, Cluster: Thread Network Diagnostics (server) */                                                        \
             { 0x00000000, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },                                   /* channel */           \
             { 0x00000001, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },                                    /* RoutingRole */       \
-            { 0x00000002, ZAP_TYPE(OCTET_STRING), 17, 0, ZAP_LONG_DEFAULTS_INDEX(344) },                   /* NetworkName */       \
+            { 0x00000002, ZAP_TYPE(CHAR_STRING), 17, 0, ZAP_LONG_DEFAULTS_INDEX(344) },                    /* NetworkName */       \
             { 0x00000003, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },                            /* PanId */             \
             { 0x00000004, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(346) },                          /* ExtendedPanId */     \
             { 0x00000005, ZAP_TYPE(OCTET_STRING), 18, 0, ZAP_EMPTY_DEFAULT() },                            /* MeshLocalPrefix */   \
@@ -882,7 +882,7 @@
     }
 
 // This is an array of EmberAfCluster structures.
-#define ZAP_ATTRIBUTE_INDEX(index) ((EmberAfAttributeMetadata *) (&generatedAttributes[index]))
+#define ZAP_ATTRIBUTE_INDEX(index) (&generatedAttributes[index])
 
 #define ZAP_GENERATED_COMMANDS_INDEX(index) ((chip::CommandId *) (&generatedCommands[index]))
 
@@ -1214,7 +1214,9 @@
 
 // clang-format on
 
-#define ZAP_CLUSTER_INDEX(index) ((EmberAfCluster *) (&generatedClusters[index]))
+#define ZAP_CLUSTER_INDEX(index) (&generatedClusters[index])
+
+#define ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT 21
 
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \

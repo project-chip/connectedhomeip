@@ -8722,6 +8722,70 @@
               "outgoing": 1
             },
             {
+              "name": "UnlockWithTimeout",
+              "code": 3,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "SetWeekDaySchedule",
+              "code": 11,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "GetWeekDaySchedule",
+              "code": 12,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "ClearWeekDaySchedule",
+              "code": 13,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "SetYearDaySchedule",
+              "code": 14,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "GetYearDaySchedule",
+              "code": 15,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "ClearYearDaySchedule",
+              "code": 16,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "SetHolidaySchedule",
+              "code": 17,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 0
+            },
+            {
               "name": "SetUser",
               "code": 26,
               "mfgCode": null,
@@ -8771,6 +8835,21 @@
             }
           ],
           "attributes": [
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "client",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
             {
               "name": "ClusterRevision",
               "code": 65533,
@@ -8825,7 +8904,7 @@
               "code": 12,
               "mfgCode": null,
               "source": "server",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
             },
             {
@@ -8833,7 +8912,7 @@
               "code": 15,
               "mfgCode": null,
               "source": "server",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
             },
             {
@@ -9052,6 +9131,51 @@
               "reportableChange": 0
             },
             {
+              "name": "NumberOfWeekDaySchedulesSupportedPerUser",
+              "code": 20,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "NumberOfYearDaySchedulesSupportedPerUser",
+              "code": 21,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "NumberOfHolidaySchedulesSupported",
+              "code": 22,
+              "mfgCode": null,
+              "side": "server",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "MaxPINCodeLength",
               "code": 23,
               "mfgCode": null,
@@ -9107,6 +9231,36 @@
               "bounded": 0,
               "defaultValue": "",
               "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "CredentialRulesSupport",
+              "code": 27,
+              "mfgCode": null,
+              "side": "server",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "EnableLogging",
+              "code": 32,
+              "mfgCode": null,
+              "side": "server",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 0,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0

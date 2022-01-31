@@ -997,7 +997,7 @@
             /* Endpoint: 0, Cluster: Thread Network Diagnostics (server) */                                                        \
             { 0x00000000, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },                                   /* channel */           \
             { 0x00000001, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },                                    /* RoutingRole */       \
-            { 0x00000002, ZAP_TYPE(OCTET_STRING), 17, 0, ZAP_LONG_DEFAULTS_INDEX(336) },                   /* NetworkName */       \
+            { 0x00000002, ZAP_TYPE(CHAR_STRING), 17, 0, ZAP_LONG_DEFAULTS_INDEX(336) },                    /* NetworkName */       \
             { 0x00000003, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },                            /* PanId */             \
             { 0x00000004, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(338) },                          /* ExtendedPanId */     \
             { 0x00000005, ZAP_TYPE(OCTET_STRING), 18, 0, ZAP_EMPTY_DEFAULT() },                            /* MeshLocalPrefix */   \
@@ -1249,9 +1249,9 @@
             { 0x00000006, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_EMPTY_DEFAULT() }, /* OpenPeriod */               \
             { 0x00000011, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(10) }, /* NumberOfTotalUsersSupported */                      \
             { 0x00000012, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(10) }, /* NumberOfPINUsersSupported */                        \
-            { 0x00000014, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0) },  /* NumberOfWeekDaySchedulesSupportedPerUser */         \
-            { 0x00000015, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0) },  /* NumberOfYearDaySchedulesSupportedPerUser */         \
-            { 0x00000016, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0) },  /* NumberOfHolidaySchedulesSupported */                \
+            { 0x00000014, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0) },   /* NumberOfWeekDaySchedulesSupportedPerUser */         \
+            { 0x00000015, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0) },   /* NumberOfYearDaySchedulesSupportedPerUser */         \
+            { 0x00000016, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0) },   /* NumberOfHolidaySchedulesSupported */                \
             { 0x00000017, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(6) },   /* MaxPINCodeLength */                                 \
             { 0x00000018, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(6) },   /* MinPINCodeLength */                                 \
             { 0x0000001B, ZAP_TYPE(BITMAP8), 1, 0, ZAP_SIMPLE_DEFAULT(1) }, /* CredentialRulesSupport */                           \
@@ -1504,7 +1504,7 @@
     }
 
 // This is an array of EmberAfCluster structures.
-#define ZAP_ATTRIBUTE_INDEX(index) ((EmberAfAttributeMetadata *) (&generatedAttributes[index]))
+#define ZAP_ATTRIBUTE_INDEX(index) (&generatedAttributes[index])
 
 #define ZAP_GENERATED_COMMANDS_INDEX(index) ((chip::CommandId *) (&generatedCommands[index]))
 
@@ -2193,7 +2193,7 @@
       .clusterId = 0x00000101,  \
       .attributes = ZAP_ATTRIBUTE_INDEX(243), \
       .attributeCount = 28, \
-      .clusterSize = 49, \
+      .clusterSize = 46, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION), \
       .functions = chipFuncArrayDoorLockServer, \
       .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 103 ) ,\
@@ -2467,12 +2467,14 @@
 
 // clang-format on
 
-#define ZAP_CLUSTER_INDEX(index) ((EmberAfCluster *) (&generatedClusters[index]))
+#define ZAP_CLUSTER_INDEX(index) (&generatedClusters[index])
+
+#define ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT 47
 
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 21, 1359 }, { ZAP_CLUSTER_INDEX(21), 33, 2480 }, { ZAP_CLUSTER_INDEX(54), 3, 8 },                  \
+        { ZAP_CLUSTER_INDEX(0), 21, 1359 }, { ZAP_CLUSTER_INDEX(21), 33, 2477 }, { ZAP_CLUSTER_INDEX(54), 3, 8 },                  \
     }
 
 // Largest attribute size is needed for various buffers
@@ -2482,7 +2484,7 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (75)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (3847)
+#define ATTRIBUTE_MAX_SIZE (3844)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (3)

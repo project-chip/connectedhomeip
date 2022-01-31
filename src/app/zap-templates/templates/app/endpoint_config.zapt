@@ -34,7 +34,7 @@
 #define GENERATED_ATTRIBUTES {{ endpoint_attribute_list }}
 
 // This is an array of EmberAfCluster structures.
-#define ZAP_ATTRIBUTE_INDEX(index) ((EmberAfAttributeMetadata *)(&generatedAttributes[index]))
+#define ZAP_ATTRIBUTE_INDEX(index) (&generatedAttributes[index])
 
 #define ZAP_GENERATED_COMMANDS_INDEX(index) ((chip::CommandId *) (&generatedCommands[index]))
 
@@ -53,8 +53,9 @@
 #define GENERATED_CLUSTERS {{chip_endpoint_cluster_list}}
 // clang-format on
 
-#define ZAP_CLUSTER_INDEX(index) ((EmberAfCluster*)(&generatedClusters[index]))
+#define ZAP_CLUSTER_INDEX(index) (&generatedClusters[index])
 
+#define ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT {{chip_endpoint_data_version_count}}
 
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES {{endpoint_types_list}}

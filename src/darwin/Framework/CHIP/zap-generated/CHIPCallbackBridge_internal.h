@@ -44,6 +44,10 @@ typedef void (*CHIPDoorLockClusterGetCredentialStatusResponseCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType &);
 typedef void (*CHIPDoorLockClusterGetUserResponseCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterGetYearDayScheduleResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType &);
 typedef void (*CHIPDoorLockClusterSetCredentialResponseCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType &);
 typedef void (*CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackType)(
@@ -7640,6 +7644,32 @@ public:
         CHIPCallbackBridge<CHIPDoorLockClusterGetUserResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType & data);
+};
+
+class CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType>
+{
+public:
+    CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                      keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType & data);
+};
+
+class CHIPDoorLockClusterGetYearDayScheduleResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPDoorLockClusterGetYearDayScheduleResponseCallbackType>
+{
+public:
+    CHIPDoorLockClusterGetYearDayScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPDoorLockClusterGetYearDayScheduleResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                      keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType & data);
 };
 
 class CHIPDoorLockClusterSetCredentialResponseCallbackBridge

@@ -408,6 +408,10 @@ typedef void (*CHIPDoorLockClusterGetCredentialStatusResponseCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType &);
 typedef void (*CHIPDoorLockClusterGetUserResponseCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterGetYearDayScheduleResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType &);
 typedef void (*CHIPDoorLockClusterSetCredentialResponseCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType &);
 
@@ -425,6 +429,10 @@ typedef void (*CHIPDoorLockClusterNumberOfPINUsersSupportedAttributeCallbackType
     void *, chip::app::Clusters::DoorLock::Attributes::NumberOfPINUsersSupported::TypeInfo::DecodableArgType);
 typedef void (*CHIPDoorLockClusterNumberOfRFIDUsersSupportedAttributeCallbackType)(
     void *, chip::app::Clusters::DoorLock::Attributes::NumberOfRFIDUsersSupported::TypeInfo::DecodableArgType);
+typedef void (*CHIPDoorLockClusterNumberOfWeekDaySchedulesSupportedPerUserAttributeCallbackType)(
+    void *, chip::app::Clusters::DoorLock::Attributes::NumberOfWeekDaySchedulesSupportedPerUser::TypeInfo::DecodableArgType);
+typedef void (*CHIPDoorLockClusterNumberOfYearDaySchedulesSupportedPerUserAttributeCallbackType)(
+    void *, chip::app::Clusters::DoorLock::Attributes::NumberOfYearDaySchedulesSupportedPerUser::TypeInfo::DecodableArgType);
 typedef void (*CHIPDoorLockClusterMaxPINCodeLengthAttributeCallbackType)(
     void *, chip::app::Clusters::DoorLock::Attributes::MaxPINCodeLength::TypeInfo::DecodableArgType);
 typedef void (*CHIPDoorLockClusterMinPINCodeLengthAttributeCallbackType)(

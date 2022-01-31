@@ -1749,6 +1749,22 @@ class ChipClusters:
                         "userIndex": "int",
                     },
                 },
+            0x0000000D: {
+                    "commandId": 0x0000000D,
+                    "commandName": "ClearWeekDaySchedule",
+                    "args": {
+                        "weekDayIndex": "int",
+                        "userIndex": "int",
+                    },
+                },
+            0x00000010: {
+                    "commandId": 0x00000010,
+                    "commandName": "ClearYearDaySchedule",
+                    "args": {
+                        "yearDayIndex": "int",
+                        "userIndex": "int",
+                    },
+                },
             0x00000024: {
                     "commandId": 0x00000024,
                     "commandName": "GetCredentialStatus",
@@ -1761,6 +1777,22 @@ class ChipClusters:
                     "commandId": 0x0000001B,
                     "commandName": "GetUser",
                     "args": {
+                        "userIndex": "int",
+                    },
+                },
+            0x0000000C: {
+                    "commandId": 0x0000000C,
+                    "commandName": "GetWeekDaySchedule",
+                    "args": {
+                        "weekDayIndex": "int",
+                        "userIndex": "int",
+                    },
+                },
+            0x0000000F: {
+                    "commandId": 0x0000000F,
+                    "commandName": "GetYearDaySchedule",
+                    "args": {
+                        "yearDayIndex": "int",
                         "userIndex": "int",
                     },
                 },
@@ -1797,10 +1829,41 @@ class ChipClusters:
                         "credentialRule": "int",
                     },
                 },
+            0x0000000B: {
+                    "commandId": 0x0000000B,
+                    "commandName": "SetWeekDaySchedule",
+                    "args": {
+                        "weekDayIndex": "int",
+                        "userIndex": "int",
+                        "daysMask": "int",
+                        "startHour": "int",
+                        "startMinute": "int",
+                        "endHour": "int",
+                        "endMinute": "int",
+                    },
+                },
+            0x0000000E: {
+                    "commandId": 0x0000000E,
+                    "commandName": "SetYearDaySchedule",
+                    "args": {
+                        "yearDayIndex": "int",
+                        "userIndex": "int",
+                        "localStartTime": "int",
+                        "localEndTime": "int",
+                    },
+                },
             0x00000001: {
                     "commandId": 0x00000001,
                     "commandName": "UnlockDoor",
                     "args": {
+                        "pinCode": "bytes",
+                    },
+                },
+            0x00000003: {
+                    "commandId": 0x00000003,
+                    "commandName": "UnlockWithTimeout",
+                    "args": {
+                        "timeout": "int",
                         "pinCode": "bytes",
                     },
                 },
@@ -1845,6 +1908,18 @@ class ChipClusters:
                 0x00000013: {
                     "attributeName": "NumberOfRFIDUsersSupported",
                     "attributeId": 0x00000013,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x00000014: {
+                    "attributeName": "NumberOfWeekDaySchedulesSupportedPerUser",
+                    "attributeId": 0x00000014,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x00000015: {
+                    "attributeName": "NumberOfYearDaySchedulesSupportedPerUser",
+                    "attributeId": 0x00000015,
                     "type": "int",
                     "reportable": True,
                 },
@@ -5636,7 +5711,7 @@ class ChipClusters:
                 0x00000002: {
                     "attributeName": "NetworkName",
                     "attributeId": 0x00000002,
-                    "type": "bytes",
+                    "type": "str",
                     "reportable": True,
                 },
                 0x00000003: {

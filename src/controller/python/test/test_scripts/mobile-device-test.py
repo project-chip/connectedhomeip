@@ -80,14 +80,18 @@ def main():
     FailIfNot(test.TestDiscovery(discriminator=TEST_DISCRIMINATOR),
               "Failed to discover any devices.")
 
-    FailIfNot(test.SetNetworkCommissioningParameters(dataset=TEST_THREAD_NETWORK_DATASET_TLV),
-              "Failed to finish network commissioning")
+    # FailIfNot(test.SetNetworkCommissioningParameters(dataset=TEST_THREAD_NETWORK_DATASET_TLV),
+    #           "Failed to finish network commissioning")
 
     logger.info("Testing key exchange")
     FailIfNot(test.TestKeyExchange(ip=options.deviceAddress,
                                    setuppin=20202021,
                                    nodeid=1),
               "Failed to finish key exchange")
+
+    asyncio.run(test.TestMultiFabric(ip=options.deviceAddress,
+                                     setuppin=20202021,
+                                     nodeid=1))
 
     logger.info("Testing closing sessions")
     FailIfNot(test.TestCloseSession(nodeid=1), "Failed to close sessions")
@@ -146,9 +150,6 @@ def main():
     FailIfNot(test.TestOnOffCluster(nodeid=1,
                                     endpoint=LIGHTING_ENDPOINT_ID,
                                     group=GROUP_ID), "Failed to test on off cluster")
-
-    logger.info("Testing non-controller APIs")
-    FailIfNot(test.TestNonControllerAPIs(), "Non controller API test failed")
 
     timeoutTicker.stop()
 

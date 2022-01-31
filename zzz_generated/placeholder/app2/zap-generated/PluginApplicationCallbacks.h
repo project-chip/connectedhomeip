@@ -25,6 +25,7 @@
     MatterBasicPluginServerInitCallback();                                                                                         \
     MatterColorControlPluginServerInitCallback();                                                                                  \
     MatterDescriptorPluginServerInitCallback();                                                                                    \
+    MatterGeneralCommissioningPluginClientInitCallback();                                                                          \
     MatterGeneralCommissioningPluginServerInitCallback();                                                                          \
     MatterGroupsPluginServerInitCallback();                                                                                        \
     MatterIdentifyPluginServerInitCallback();                                                                                      \

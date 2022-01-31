@@ -400,6 +400,10 @@ NS_ASSUME_NONNULL_BEGIN
                                        completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeNumberOfRFIDUsersSupportedWithValue:(NSNumber * _Nonnull)value
                                         completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeNumberOfWeekDaySchedulesSupportedPerUserWithValue:(NSNumber * _Nonnull)value
+                                                      completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeNumberOfYearDaySchedulesSupportedPerUserWithValue:(NSNumber * _Nonnull)value
+                                                      completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeMaxPINCodeLengthWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeMinPINCodeLengthWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeMaxRFIDCodeLengthWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -1139,7 +1143,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)writeAttributeChannelWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeRoutingRoleWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeNetworkNameWithValue:(NSData * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeNetworkNameWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributePanIdWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeExtendedPanIdWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeMeshLocalPrefixWithValue:(NSData * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;

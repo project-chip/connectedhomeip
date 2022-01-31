@@ -3336,6 +3336,28 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = [NSNumber numberWithUnsignedShort:cppValue];
             return value;
         }
+        case Attributes::NumberOfWeekDaySchedulesSupportedPerUser::Id: {
+            using TypeInfo = Attributes::NumberOfWeekDaySchedulesSupportedPerUser::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::NumberOfYearDaySchedulesSupportedPerUser::Id: {
+            using TypeInfo = Attributes::NumberOfYearDaySchedulesSupportedPerUser::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
         case Attributes::MaxPINCodeLength::Id: {
             using TypeInfo = Attributes::MaxPINCodeLength::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -10758,8 +10780,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSData * _Nonnull value;
-            value = [NSData dataWithBytes:cppValue.data() length:cppValue.size()];
+            NSString * _Nonnull value;
+            value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
             return value;
         }
         case Attributes::PanId::Id: {

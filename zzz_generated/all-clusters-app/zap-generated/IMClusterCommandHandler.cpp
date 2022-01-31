@@ -55,6 +55,11 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         switch (aCommandPath.mCommandId)
         {
         case Commands::OpenBasicCommissioningWindow::Id: {
+            if (!apCommandObj->IsTimedInvoke())
+            {
+                apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::NeedsTimedInteraction);
+                return;
+            }
             Commands::OpenBasicCommissioningWindow::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -65,6 +70,11 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::OpenCommissioningWindow::Id: {
+            if (!apCommandObj->IsTimedInvoke())
+            {
+                apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::NeedsTimedInteraction);
+                return;
+            }
             Commands::OpenCommissioningWindow::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -75,6 +85,11 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::RevokeCommissioning::Id: {
+            if (!apCommandObj->IsTimedInvoke())
+            {
+                apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::NeedsTimedInteraction);
+                return;
+            }
             Commands::RevokeCommissioning::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -462,6 +477,11 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         switch (aCommandPath.mCommandId)
         {
         case Commands::ClearCredential::Id: {
+            if (!apCommandObj->IsTimedInvoke())
+            {
+                apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::NeedsTimedInteraction);
+                return;
+            }
             Commands::ClearCredential::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -471,6 +491,11 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::ClearUser::Id: {
+            if (!apCommandObj->IsTimedInvoke())
+            {
+                apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::NeedsTimedInteraction);
+                return;
+            }
             Commands::ClearUser::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -498,6 +523,11 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::LockDoor::Id: {
+            if (!apCommandObj->IsTimedInvoke())
+            {
+                apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::NeedsTimedInteraction);
+                return;
+            }
             Commands::LockDoor::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -507,6 +537,11 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::SetCredential::Id: {
+            if (!apCommandObj->IsTimedInvoke())
+            {
+                apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::NeedsTimedInteraction);
+                return;
+            }
             Commands::SetCredential::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -516,6 +551,11 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::SetUser::Id: {
+            if (!apCommandObj->IsTimedInvoke())
+            {
+                apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::NeedsTimedInteraction);
+                return;
+            }
             Commands::SetUser::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -525,6 +565,11 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::UnlockDoor::Id: {
+            if (!apCommandObj->IsTimedInvoke())
+            {
+                apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::NeedsTimedInteraction);
+                return;
+            }
             Commands::UnlockDoor::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)

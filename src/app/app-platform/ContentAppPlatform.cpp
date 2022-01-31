@@ -46,7 +46,7 @@ using GetSetupPINResponseType = app::Clusters::AccountLogin::Commands::GetSetupP
 #define DEVICE_VERSION_DEFAULT 1
 
 EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
-                                                   EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
+                                                   const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
                                                    uint16_t maxReadLength)
 {
     uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
@@ -65,7 +65,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
 }
 
 EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
-                                                    EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
+                                                    const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
 {
     uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
 
@@ -85,7 +85,8 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
 namespace chip {
 namespace AppPlatform {
 
-EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep, uint16_t deviceType)
+EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep, uint16_t deviceType,
+                                             const Span<DataVersion> & dataVersionStorage)
 {
     CatalogVendorApp vendorApp = app->GetApplicationBasicDelegate()->GetCatalogVendorApp();
 
@@ -111,7 +112,8 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
             EmberAfStatus ret;
             while (1)
             {
-                ret = emberAfSetDynamicEndpoint(index, mCurrentEndpointId, ep, deviceType, DEVICE_VERSION_DEFAULT);
+                ret = emberAfSetDynamicEndpoint(index, mCurrentEndpointId, ep, deviceType, DEVICE_VERSION_DEFAULT,
+                                                dataVersionStorage);
                 if (ret == EMBER_ZCL_STATUS_SUCCESS)
                 {
                     ChipLogProgress(DeviceLayer, "Added ContentApp %s to dynamic endpoint %d (index=%d)", vendorApp.applicationId,

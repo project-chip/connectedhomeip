@@ -323,7 +323,7 @@
     }
 
 // This is an array of EmberAfCluster structures.
-#define ZAP_ATTRIBUTE_INDEX(index) ((EmberAfAttributeMetadata *) (&generatedAttributes[index]))
+#define ZAP_ATTRIBUTE_INDEX(index) (&generatedAttributes[index])
 
 #define ZAP_GENERATED_COMMANDS_INDEX(index) ((chip::CommandId *) (&generatedCommands[index]))
 
@@ -509,6 +509,13 @@
   0x00000001 /* UnlockDoor */, \
   chip::kInvalidCommandId /* end of list */, \
   /*   server_generated */ \
+  0x0000000B /* SetWeekDaySchedule */, \
+  0x0000000C /* GetWeekDaySchedule */, \
+  0x0000000C /* GetWeekDayScheduleResponse */, \
+  0x0000000E /* SetYearDaySchedule */, \
+  0x0000000F /* GetYearDaySchedule */, \
+  0x0000000F /* GetYearDayScheduleResponse */, \
+  0x00000010 /* ClearYearDaySchedule */, \
   0x0000001C /* GetUserResponse */, \
   0x00000023 /* SetCredentialResponse */, \
   0x00000025 /* GetCredentialStatusResponse */, \
@@ -1087,7 +1094,7 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 133 ) ,\
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 140 ) ,\
       .serverGeneratedCommandList = nullptr ,\
     },\
   { \
@@ -1098,7 +1105,7 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 137 ) ,\
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 144 ) ,\
       .serverGeneratedCommandList = nullptr ,\
     },\
   { \
@@ -1120,8 +1127,8 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 140 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 142 ) ,\
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 147 ) ,\
+      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 149 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Thermostat User Interface Configuration (client) */ \
@@ -1142,8 +1149,8 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 145 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 149 ) ,\
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 152 ) ,\
+      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 156 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Illuminance Measurement (client) */ \
@@ -1230,8 +1237,8 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 161 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 165 ) ,\
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 168 ) ,\
+      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 172 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Target Navigator (client) */ \
@@ -1241,8 +1248,8 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 167 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 169 ) ,\
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 174 ) ,\
+      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 176 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Media Playback (client) */ \
@@ -1252,8 +1259,8 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 171 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 183 ) ,\
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 178 ) ,\
+      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 190 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Media Input (client) */ \
@@ -1263,7 +1270,7 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 185 ) ,\
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 192 ) ,\
       .serverGeneratedCommandList = nullptr ,\
     },\
   { \
@@ -1274,7 +1281,7 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 190 ) ,\
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 197 ) ,\
       .serverGeneratedCommandList = nullptr ,\
     },\
   { \
@@ -1285,8 +1292,8 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 192 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 194 ) ,\
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 199 ) ,\
+      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 201 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Content Launcher (client) */ \
@@ -1296,8 +1303,8 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 196 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 199 ) ,\
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 203 ) ,\
+      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 206 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Audio Output (client) */ \
@@ -1307,7 +1314,7 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 201 ) ,\
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 208 ) ,\
       .serverGeneratedCommandList = nullptr ,\
     },\
   { \
@@ -1318,8 +1325,8 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 204 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 208 ) ,\
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 211 ) ,\
+      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 215 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Application Basic (client) */ \
@@ -1340,8 +1347,8 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 210 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 214 ) ,\
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 217 ) ,\
+      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 221 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Test Cluster (client) */ \
@@ -1351,8 +1358,8 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 216 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 234 ) ,\
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 223 ) ,\
+      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 241 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Electrical Measurement (client) */ \
@@ -1369,7 +1376,9 @@
 
 // clang-format on
 
-#define ZAP_CLUSTER_INDEX(index) ((EmberAfCluster *) (&generatedClusters[index]))
+#define ZAP_CLUSTER_INDEX(index) (&generatedClusters[index])
+
+#define ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT 0
 
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \

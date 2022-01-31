@@ -27,6 +27,16 @@
 
 namespace chip {
 namespace app {
+/**
+ * @brief Used to specify the re-subscription policy. Namely, the method is invoked and provided the number of
+ * retries that have occurred so far.
+ *
+ * aShouldResubscribe and aNextSubscriptionIntervalMsec are outparams indicating whether and how long into
+ * the future a re-subscription should happen.
+ */
+typedef void (*OnResubscribePolicyCB)(uint32_t aNumCumulativeRetries, uint32_t & aNextSubscriptionIntervalMsec,
+                                      bool & aShouldResubscribe);
+
 struct ReadPrepareParams
 {
     SessionHolder mSessionHolder;
@@ -40,7 +50,9 @@ struct ReadPrepareParams
     uint16_t mMaxIntervalCeilingSeconds             = 0;
     bool mKeepSubscriptions                         = true;
     bool mIsFabricFiltered                          = false;
+    OnResubscribePolicyCB mResubscribePolicy        = nullptr;
 
+    ReadPrepareParams() {}
     ReadPrepareParams(const SessionHandle & sessionHandle) { mSessionHolder.Grab(sessionHandle); }
     ReadPrepareParams(ReadPrepareParams && other) : mSessionHolder(other.mSessionHolder)
     {
@@ -58,6 +70,7 @@ struct ReadPrepareParams
         other.mEventPathParamsListSize     = 0;
         other.mpAttributePathParamsList    = nullptr;
         other.mAttributePathParamsListSize = 0;
+        mResubscribePolicy                 = other.mResubscribePolicy;
     }
 
     ReadPrepareParams & operator=(ReadPrepareParams && other)
@@ -80,7 +93,7 @@ struct ReadPrepareParams
         other.mEventPathParamsListSize     = 0;
         other.mpAttributePathParamsList    = nullptr;
         other.mAttributePathParamsListSize = 0;
-
+        mResubscribePolicy                 = other.mResubscribePolicy;
         return *this;
     }
 };
