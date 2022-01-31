@@ -71,7 +71,7 @@ limitations under the License.
     <item name="FabricConnected" type="BOOLEAN"/>
     <item name="OffPremiseServicesReachableIPv4" type="BOOLEAN" isNullable="true"/>
     <item name="OffPremiseServicesReachableIPv6" type="BOOLEAN" isNullable="true"/>
-    <!-- TODO: HWADR not supported yet -->
+    <!-- TODO(#14075): HWADR not supported yet -->
     <item name="HardwareAddress" type="OCTET_STRING" length="8"/>
     <item name="Type" type="InterfaceType"/>
   </struct>
