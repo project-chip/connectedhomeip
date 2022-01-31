@@ -77,9 +77,14 @@ char GetAuthModeStringForLogging(AuthMode authMode)
     return 'u';
 }
 
+constexpr int kCharsPerCatForLogging = 11; // including final null terminator
+
 char * GetCatStringForLogging(char * buf, size_t size, const CATValues & cats)
 {
-    VerifyOrDie(size >= 16);
+    if (size == 0)
+    {
+        return nullptr;
+    }
     char * p         = buf;
     char * const end = buf + size;
     *p               = '\0';
@@ -87,6 +92,7 @@ char * GetCatStringForLogging(char * buf, size_t size, const CATValues & cats)
     //   1 for comma (optional)
     //   2 for 0x prefix
     //   8 for 32-bit hex value
+    //   1 for null terminator (at end)
     constexpr char fmtWithoutComma[] = "0x%08" PRIX32;
     constexpr char fmtWithComma[]    = ",0x%08" PRIX32;
     constexpr int countWithoutComma  = 10;
@@ -102,11 +108,13 @@ char * GetCatStringForLogging(char * buf, size_t size, const CATValues & cats)
         p += withComma ? countWithComma : countWithoutComma;
         if (p >= end)
         {
-            // Indicate output was truncated
-            p    = end - 2;
-            *p-- = '.';
-            *p-- = '.';
-            *p-- = '.';
+            // Output was truncated.
+            p = end - ((size < 4) ? size : 4);
+            while (*p)
+            {
+                // Indicate truncation if possible.
+                *p++ = '.';
+            }
             break;
         }
         withComma = true;
@@ -160,7 +168,7 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
     ReturnErrorCodeIf(&mDelegate == &mDefaultDelegate, CHIP_NO_ERROR);
 
     {
-        char buf[64]; // fits 5 cats
+        char buf[6 * kCharsPerCatForLogging];
         ChipLogDetail(DataManagement,
                       "AccessControl: checking f=%" PRIu8 " a=%c s=0x" ChipLogFormatX64 " t=%s c=" ChipLogFormatMEI " e=%" PRIu16
                       " p=%c",
