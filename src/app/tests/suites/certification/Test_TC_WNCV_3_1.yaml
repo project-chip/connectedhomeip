@@ -107,7 +107,7 @@ tests:
     - label: "2a: TH sends UpOrOpen command to DUT"
       command: "UpOrOpen"
 
-    ### Depends on a sleep/wait command how to do this with a real device for CI keep at 100ms
+    ### Depending on the DUT specs we might prefer a arguments here
     - label: "2b: DUT updates its attributes"
       cluster: "DelayCommands"
       command: "WaitForMs"
@@ -150,7 +150,7 @@ tests:
     ### Depends on the FeatureMap
     # The value of bit 0..1 must be 01b & if (LF) value of bit 2..3 must be 01b else 00b & if (TL) value of bit 4..5 must be 01b else 00b
     # Only 3 possibilities are possible here : 05h =  5, 11h = 17 or 15h = 21 then check a range for simplicity [5  - 21]
-    - label: "3a: Verify DUT reports OperationalStatus attribute to TH after a UpOrOpen"
+    - label: "3a1: Verify DUT reports OperationalStatus attribute to TH after a UpOrOpen"
       command: "waitForReport"
       attribute: "OperationalStatus"
       response:
@@ -158,6 +158,15 @@ tests:
               type: map8
               minValue: 5
               maxValue: 21
+
+    ### Depending on the DUT specs we might prefer a arguments here
+    - label: "3a2: DUT updates its attributes"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
 
     ### Mandatory Depends on the FeatureMap
     - label:
@@ -223,7 +232,7 @@ tests:
       arguments:
           values:
               - name: "ms"
-                value: 3000
+                value: 2000
 
     ### Must Be ZERO
     # The value of bit 0..1 must be 00b & if (LF) value of bit 2..3 must be 00b & if (TL) value of bit 4..5 must be 00b
