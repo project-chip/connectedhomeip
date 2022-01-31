@@ -341,7 +341,7 @@ private:
     //
     void OnReportBegin() override;
     void OnReportEnd() override;
-    void OnAttributeData(const ConcreteDataAttributePath & aPath, Optional<DataVersion> & aVersion, TLV::TLVReader * apData,
+    void OnAttributeData(const ConcreteDataAttributePath & aPath, DataVersion aVersion, TLV::TLVReader * apData,
                          const StatusIB & aStatus) override;
     void OnError(CHIP_ERROR aError) override { return mCallback.OnError(aError); }
 

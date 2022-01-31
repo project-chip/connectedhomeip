@@ -222,12 +222,11 @@ CHIP_ERROR BufferedReadCallback::DispatchBufferedData(const ConcreteAttributePat
     //
     mBufferedList.clear();
     mBufferedPath = ConcreteDataAttributePath();
-    mDataVersion.ClearValue();
     return CHIP_NO_ERROR;
 }
 
-void BufferedReadCallback::OnAttributeData(const ConcreteDataAttributePath & aPath, Optional<DataVersion> & aVersion,
-                                           TLV::TLVReader * apData, const StatusIB & aStatus)
+void BufferedReadCallback::OnAttributeData(const ConcreteDataAttributePath & aPath, DataVersion aVersion, TLV::TLVReader * apData,
+                                           const StatusIB & aStatus)
 {
     CHIP_ERROR err;
 

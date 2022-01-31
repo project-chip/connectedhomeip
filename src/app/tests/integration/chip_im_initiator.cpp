@@ -146,7 +146,7 @@ public:
             }
         }
     }
-    void OnAttributeData(const chip::app::ConcreteDataAttributePath & aPath, chip::Optional<chip::DataVersion> & aVersion,
+    void OnAttributeData(const chip::app::ConcreteDataAttributePath & aPath, chip::DataVersion aVersion,
                          chip::TLV::TLVReader * aData, const chip::app::StatusIB & status) override
     {}
 

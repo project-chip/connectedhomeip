@@ -569,8 +569,8 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
         TLV::TLVReader reader = aAttributeReportIBsReader;
         ReturnErrorOnFailure(report.Init(reader));
 
-        Optional<DataVersion> dataVersion;
-        err = report.GetAttributeStatus(&status);
+        DataVersion version = 0;
+        err                 = report.GetAttributeStatus(&status);
         if (CHIP_NO_ERROR == err)
         {
             StatusIB::Parser errorStatus;
@@ -578,24 +578,14 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
             ReturnErrorOnFailure(ProcessAttributePath(path, attributePath));
             ReturnErrorOnFailure(status.GetErrorStatus(&errorStatus));
             ReturnErrorOnFailure(errorStatus.DecodeStatusIB(statusIB));
-            mpCallback.OnAttributeData(attributePath, dataVersion, nullptr, statusIB);
+            mpCallback.OnAttributeData(attributePath, version, nullptr, statusIB);
         }
         else if (CHIP_END_OF_TLV == err)
         {
             ReturnErrorOnFailure(report.GetAttributeData(&data));
             ReturnErrorOnFailure(data.GetPath(&path));
             ReturnErrorOnFailure(ProcessAttributePath(path, attributePath));
-            DataVersion version = 0;
-            err                 = data.GetDataVersion(&version);
-            if (err == CHIP_NO_ERROR)
-            {
-                dataVersion.SetValue(version);
-            }
-            else if (err == CHIP_END_OF_TLV)
-            {
-                err = CHIP_NO_ERROR;
-            }
-            ReturnErrorOnFailure(err);
+            ReturnErrorOnFailure(data.GetDataVersion(&version));
             ReturnErrorOnFailure(data.GetData(&dataReader));
 
             // The element in an array may be another array -- so we should only set the list operation when we are handling the
@@ -605,7 +595,7 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
                 attributePath.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
             }
 
-            mpCallback.OnAttributeData(attributePath, dataVersion, &dataReader, statusIB);
+            mpCallback.OnAttributeData(attributePath, version, &dataReader, statusIB);
         }
     }
 

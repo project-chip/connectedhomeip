@@ -126,7 +126,7 @@ void DataSeriesGenerator::Generate()
     System::PacketBufferTLVReader reader;
     ReadClient::Callback * callback = mReadCallback;
     StatusIB status;
-    Optional<DataVersion> version;
+    DataVersion version = 0;
     callback->OnReportBegin();
 
     uint8_t index = 0;

@@ -80,7 +80,7 @@ public:
 
     void OnReportBegin() override;
     void OnReportEnd() override;
-    void OnAttributeData(const ConcreteDataAttributePath & aPath, Optional<DataVersion> & aVersion, TLV::TLVReader * apData,
+    void OnAttributeData(const ConcreteDataAttributePath & aPath, DataVersion aVersion, TLV::TLVReader * apData,
                          const StatusIB & aStatus) override;
     void OnDone() override {}
 
@@ -95,8 +95,8 @@ void DataSeriesValidator::OnReportBegin()
 
 void DataSeriesValidator::OnReportEnd() {}
 
-void DataSeriesValidator::OnAttributeData(const ConcreteDataAttributePath & aPath, Optional<DataVersion> & aVersion,
-                                          TLV::TLVReader * apData, const StatusIB & aStatus)
+void DataSeriesValidator::OnAttributeData(const ConcreteDataAttributePath & aPath, DataVersion aVersion, TLV::TLVReader * apData,
+                                          const StatusIB & aStatus)
 {
     uint32_t expectedListLength;
 
@@ -302,7 +302,7 @@ void DataSeriesGenerator::Generate()
     ReadClient::Callback * callback = &mReadCallback;
     StatusIB status;
     bool hasData;
-    Optional<DataVersion> version;
+    DataVersion version = 0;
 
     callback->OnReportBegin();
 

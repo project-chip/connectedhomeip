@@ -78,7 +78,7 @@ public:
 
     app::BufferedReadCallback * GetBufferedReadCallback() { return &mBufferedReadCallback; }
 
-    void OnAttributeData(const ConcreteDataAttributePath & aPath, Optional<DataVersion> & aVersion, TLV::TLVReader * apData,
+    void OnAttributeData(const ConcreteDataAttributePath & aPath, DataVersion aVersion, TLV::TLVReader * apData,
                          const StatusIB & aStatus) override
     {
         //
@@ -89,7 +89,6 @@ public:
         size_t bufferLen                  = (apData == nullptr ? 0 : apData->GetRemainingLength() + apData->GetLengthRead());
         std::unique_ptr<uint8_t[]> buffer = std::unique_ptr<uint8_t[]>(apData == nullptr ? nullptr : new uint8_t[bufferLen]);
         uint32_t size                     = 0;
-        DataVersion version               = 0;
         // When the apData is nullptr, means we did not receive a valid attribute data from server, status will be some error
         // status.
         if (apData != nullptr)
@@ -106,13 +105,9 @@ public:
                 return;
             }
             size = writer.GetLengthWritten();
-            if (aVersion.HasValue())
-            {
-                version = aVersion.Value();
-            }
         }
 
-        gOnReadAttributeDataCallback(mAppContext, version, aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId,
+        gOnReadAttributeDataCallback(mAppContext, aVersion, aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId,
                                      to_underlying(aStatus.mStatus), buffer.get(), size);
     }
 
