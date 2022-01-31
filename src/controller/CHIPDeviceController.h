@@ -30,7 +30,6 @@
 
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
-#include <app/DeviceControllerInteractionModelDelegate.h>
 #include <app/InteractionModelDelegate.h>
 #include <app/OperationalDeviceProxy.h>
 #include <app/OperationalDeviceProxyPool.h>

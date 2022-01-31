@@ -30,10 +30,4 @@
 #include <lib/support/FunctionTraits.h>
 #include <lib/support/Span.h>
 
-// Note: The IMDefaultResponseCallback is a bridge to the old CallbackMgr before IM is landed, so it still accepts EmberAfStatus
-// instead of IM status code.
-// #6308 should handle IM error code on the application side, either modify this function or remove this.
-
-// Cluster Specific Response Callbacks
-
 // List specific responses
