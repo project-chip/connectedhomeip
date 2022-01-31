@@ -235,16 +235,23 @@ PICS:
     - label: "Does Dnssd advertisment broadcast Device Type ID"
       id: DEVTYPE_SUBTYPE
 
-    - label: "The optional key CRI indicates the MRP_RETRY_INTERVAL_IDLE of the Node"
+    - label:
+          "The optional key CRI indicates the MRP_RETRY_INTERVAL_IDLE of the
+          Node"
       id: CRI_COMM_DISCOVERY_KEY
 
-    - label: "The optional key CRA indicates the MRP_RETRY_INTERVAL_ACTIVE of the Node"
+    - label:
+          "The optional key CRA indicates the MRP_RETRY_INTERVAL_ACTIVE of the
+          Node"
       id: CRA_COMM_DISCOVERY_KEY
 
-    - label: "The optional key VP, if present, MAY provide Vendor ID and Product ID information of the device"
+    - label:
+          "The optional key VP, if present, MAY provide Vendor ID and Product ID
+          information of the device"
       id: VP_KEY
 
-    - label: "The optional key DT MAY provide the publisher’s primary device type."
+    - label:
+          "The optional key DT MAY provide the publisher’s primary device type."
       id: DT_KEY
 
     - label: "The optional key DN MAY provide a device advertisement name."
@@ -256,5 +263,6 @@ PICS:
     - label: "The optional key PH MAY provide a pairing hint."
       id: PH_KEY
 
-    - label: "The optional key PI MAY provide additional information for pairing."
+    - label:
+          "The optional key PI MAY provide additional information for pairing."
       id: PI_KEY
