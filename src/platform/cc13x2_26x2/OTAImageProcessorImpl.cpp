@@ -87,8 +87,8 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
  * have multiple images ready to be programmed into the internal flash of the
  * device. This design is only concerned with managing 1 image in external
  * flash starting at `IMG_START` and being defined by a meta header at address
- * 0.  Future designs may be able to take advantage of other images for
- * rollback functionality.
+ * 0. Future designs may be able to take advantage of other images for rollback
+ * functionality, however this will require a larger external flash chip.
  */
 
 #define IMG_START (4 * EFL_SIZE_META)

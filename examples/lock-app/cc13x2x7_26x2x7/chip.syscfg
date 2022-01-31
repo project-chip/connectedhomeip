@@ -102,8 +102,6 @@ NVS1.internalFlash.regionSize = 0x4000;
 NVS2.$name                                 = "CONFIG_NVSEXTERNAL";
 NVS2.nvsType                               = "External"; // NVS Region Type
 NVS2.$hardware                             = system.deviceData.board.components.MX25R8035F;
-NVS2.externalFlash.verifyBufferSize        = 64; // Write Verification Buffer size (in bytes)
-NVS2.externalFlash.regionSize              = 0x256000; // Size of Region (in bytes)
 
 /* RF */
 /* if an antenna component exists, assign it to the rf instance */
