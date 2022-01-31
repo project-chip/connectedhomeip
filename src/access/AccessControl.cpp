@@ -167,6 +167,7 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
     // Don't check if using default delegate (e.g. test code that isn't testing access control)
     ReturnErrorCodeIf(&mDelegate == &mDefaultDelegate, CHIP_NO_ERROR);
 
+#if CHIP_DETAIL_LOGGING
     {
         char buf[6 * kCharsPerCatForLogging];
         ChipLogDetail(DataManagement,
@@ -176,6 +177,7 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
                       ChipLogValueX64(subjectDescriptor.subject), GetCatStringForLogging(buf, sizeof(buf), subjectDescriptor.cats),
                       ChipLogValueMEI(requestPath.cluster), requestPath.endpoint, GetPrivilegeStringForLogging(requestPrivilege));
     }
+#endif
 
     // Operational PASE not supported for v1.0, so PASE implies commissioning, which has highest privilege.
     ReturnErrorCodeIf(subjectDescriptor.authMode == AuthMode::kPase, CHIP_NO_ERROR);
