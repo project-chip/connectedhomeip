@@ -283,5 +283,3 @@ tests:
       attribute: "OperationalStatus"
       response:
           value: 0
-
-
