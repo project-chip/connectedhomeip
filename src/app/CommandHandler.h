@@ -193,7 +193,7 @@ public:
      */
     Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }
 
-    NodeId SourceNodeId() const { return mpExchangeCtx->GetSessionHandle()->GetSubjectDescriptor().subject; }
+    Access::SubjectDescriptor GetSubjectDescriptor() const { return mpExchangeCtx->GetSessionHandle()->GetSubjectDescriptor(); }
 
 private:
     friend class TestCommandInteraction;

@@ -18,6 +18,7 @@
 #pragma once
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/NodeId.h>
+#include <lib/support/Span.h>
 
 namespace chip {
 namespace ota {
@@ -30,6 +31,27 @@ enum UserConsentState
     kObtaining,
     // User consent is denied.
     kDenied,
+    kUnknown,
+};
+
+struct UserConsentSubject
+{
+    FabricId fabricId;
+    NodeId nodeId;
+    EndpointId endpointId;
+    uint16_t vendorId;
+    uint16_t productId;
+    uint32_t currentVersion;
+    uint32_t targetVersion;
+    ByteSpan metadata;
+
+    bool operator==(const UserConsentSubject & other) const
+    {
+        return (fabricId == other.fabricId && nodeId == other.nodeId && endpointId == other.endpointId &&
+                vendorId == other.vendorId && productId == other.productId && currentVersion == other.currentVersion &&
+                targetVersion == other.targetVersion);
+        // Ignoring medatada comparison
+    }
 };
 
 class UserConsentDelegate
@@ -37,8 +59,22 @@ class UserConsentDelegate
 public:
     virtual ~UserConsentDelegate() = default;
 
-    virtual UserConsentState GetUserConsentState(NodeId nodeId, EndpointId endpoint, uint32_t currentVersion,
-                                                 uint32_t newVersion) = 0;
+    virtual UserConsentState GetUserConsentState(const UserConsentSubject & subject) = 0;
+
+    const char * UserConsentStateToString(UserConsentState state)
+    {
+        switch (state)
+        {
+        case kGranted:
+            return "Granted";
+        case kObtaining:
+            return "Obtaining";
+        case kDenied:
+            return "Denied";
+        default:
+            return "Unknown";
+        }
+    }
 };
 
 } // namespace ota

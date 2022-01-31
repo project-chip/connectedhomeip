@@ -31,25 +31,54 @@ public:
     ~DefaultUserConsentProvider() = default;
 
     // This method returns kGranted unless explicitly denied by the user by calling RevokeUserConsent()
-    UserConsentState GetUserConsentState(NodeId nodeId, EndpointId endpoint, uint32_t currentVersion, uint32_t newVersion);
+    UserConsentState GetUserConsentState(const UserConsentSubject & subject) override;
 
-    // Grant the user consent for the given node and endpoint for OTA updates
-    CHIP_ERROR GrantUserConsent(NodeId nodeId, EndpointId endpoint);
+    // Grant the user consent for the given subject for OTA updates
+    CHIP_ERROR GrantUserConsent(const UserConsentSubject & subject);
 
-    // Revoke the user consent for the given node and endpoint for OTA updates
-    CHIP_ERROR RevokeUserConsent(NodeId nodeId, EndpointId endpoint);
+    // Revoke the user consent for the given subject for OTA updates
+    CHIP_ERROR RevokeUserConsent(const UserConsentSubject & subject);
+
+    // Set the user consent as deferred for the given subject for OTA updates
+    CHIP_ERROR DeferUserConsent(const UserConsentSubject & subject);
+
+    // Mark the user consent entry as invalid
+    CHIP_ERROR ClearUserConsentEntry(const UserConsentSubject & subject);
+
+    // If this is set to true, all the user consent requests will be replied with global consent.
+    void SetGlobalUserConsentState(UserConsentState state)
+    {
+        mUseGlobalConsent   = true;
+        mGlobalConsentState = state;
+    }
+
+    // state is only valid isGlobalConsentSet is true
+    void GetGlobalUserConsentState(bool & isGlobalConsentSet, UserConsentState & state)
+    {
+        isGlobalConsentSet = mUseGlobalConsent;
+        state              = mGlobalConsentState;
+    }
+
+    // Clear the global user consent state
+    void ClearGlobalUserConsentState() { mUseGlobalConsent = false; }
 
 private:
-    CHIP_ERROR SetUserConsentState(NodeId nodeId, EndpointId endpoint, UserConsentState state);
+    CHIP_ERROR SetUserConsentState(const UserConsentSubject & subject, UserConsentState state);
 
     static constexpr uint8_t kMaxUserConsentEntries = 10;
 
+    bool mUseGlobalConsent = false;
+
+    UserConsentState mGlobalConsentState = UserConsentState::kGranted;
+
     struct UserConsentEntry
     {
-        EndpointId endpoint;
-        NodeId nodeId;
+        bool isEntryValid;
+        UserConsentSubject subject;
         UserConsentState state;
     } mUserConsentEntries[kMaxUserConsentEntries];
+
+    void LogUserConsentSubject(const UserConsentSubject & subject);
 };
 
 } // namespace ota

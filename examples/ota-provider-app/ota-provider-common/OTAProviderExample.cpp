@@ -48,9 +48,10 @@ using namespace chip::ota;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 
-constexpr uint8_t kUpdateTokenLen    = 32;                      // must be between 8 and 32
-constexpr uint8_t kUpdateTokenStrLen = kUpdateTokenLen * 2 + 1; // Hex string needs 2 hex chars for every byte
-constexpr size_t kUriMaxLen          = 256;
+constexpr uint8_t kUpdateTokenLen            = 32;                      // must be between 8 and 32
+constexpr uint8_t kUpdateTokenStrLen         = kUpdateTokenLen * 2 + 1; // Hex string needs 2 hex chars for every byte
+constexpr size_t kUriMaxLen                  = 256;
+constexpr uint32_t kMinimumDelayedActionTime = 120; // Spec mentions delayed action time should be at least 120 seconds
 
 // Arbitrary BDX Transfer Params
 constexpr uint32_t kMaxBdxBlockSize                 = 1024;
@@ -127,6 +128,26 @@ bool OTAProviderExample::SelectOTACandidate(const uint16_t requestorVendorID, co
     return candidateFound;
 }
 
+UserConsentSubject OTAProviderExample::GetUserConsentSubject(const chip::app::CommandHandler * commandObj,
+                                                             const chip::app::ConcreteCommandPath & commandPath,
+                                                             const QueryImage::DecodableType & commandData, uint32_t targetVersion)
+{
+    UserConsentSubject subject;
+    FabricIndex fabricIndex = commandObj->GetSubjectDescriptor().fabricIndex;
+    subject.fabricId        = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex)->GetFabricId();
+    subject.nodeId          = commandObj->GetSubjectDescriptor().subject;
+    subject.endpointId      = commandPath.mEndpointId;
+    subject.vendorId        = commandData.vendorId;
+    subject.productId       = commandData.productId;
+    subject.currentVersion  = commandData.softwareVersion;
+    subject.targetVersion   = targetVersion;
+    if (commandData.metadataForProvider.HasValue())
+    {
+        subject.metadata = commandData.metadataForProvider.Value();
+    }
+    return subject;
+}
+
 EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * commandObj,
                                                    const chip::app::ConcreteCommandPath & commandPath,
                                                    const QueryImage::DecodableType & commandData)
@@ -147,10 +168,10 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
     {
     case kRespondWithUnknown:
         // This use-case is a subset of the ota-candidates-file option.
-        // Can be removed once all other platforms (ESP, etc.)
-        // start using the ota-candidates-file method.
-        if (strlen(mOTAFilePath)) // If OTA file is directly provided
+        // Can be removed once all other platforms start using the ota-candidates-file method.
+        if (strlen(mOTAFilePath) > 0) // If OTA file is directly provided
         {
+            // TODO: Following details shall be read from the OTA file
             newSoftwareVersion = commandData.softwareVersion + 1; // This implementation will always indicate that an update is
                                                                   // available (if the user provides a file).
             newSoftwareVersionString = "Example-Image-V0.1";
@@ -170,8 +191,9 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
 
         if (queryStatus == OTAQueryStatus::kUpdateAvailable && mUserConsentDelegate != nullptr)
         {
-            UserConsentState state = mUserConsentDelegate->GetUserConsentState(commandObj->SourceNodeId(), commandPath.mEndpointId,
-                                                                               commandData.softwareVersion, newSoftwareVersion);
+            UserConsentState state = mUserConsentDelegate->GetUserConsentState(
+                GetUserConsentSubject(commandObj, commandPath, commandData, newSoftwareVersion));
+            ChipLogProgress(SoftwareUpdate, "User Consent state: %s", mUserConsentDelegate->UserConsentStateToString(state));
             switch (state)
             {
             case UserConsentState::kGranted:
@@ -180,12 +202,13 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
 
             case chip::ota::UserConsentState::kObtaining:
                 queryStatus          = OTAQueryStatus::kBusy;
-                delayedActionTimeSec = (delayedActionTimeSec < 120) ? 120 : delayedActionTimeSec;
+                delayedActionTimeSec = std::max(kMinimumDelayedActionTime, delayedActionTimeSec);
                 break;
 
             case chip::ota::UserConsentState::kDenied:
+            case chip::ota::UserConsentState::kUnknown:
                 queryStatus          = OTAQueryStatus::kNotAvailable;
-                delayedActionTimeSec = (delayedActionTimeSec < 120) ? 120 : delayedActionTimeSec;
+                delayedActionTimeSec = std::max(kMinimumDelayedActionTime, delayedActionTimeSec);
                 break;
             }
         }
@@ -197,17 +220,17 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
 
     case kRespondWithBusy:
         queryStatus          = OTAQueryStatus::kBusy;
-        delayedActionTimeSec = (delayedActionTimeSec < 120) ? 120 : delayedActionTimeSec;
+        delayedActionTimeSec = std::max(kMinimumDelayedActionTime, delayedActionTimeSec);
         break;
 
     case kRespondWithNotAvailable:
         queryStatus          = OTAQueryStatus::kNotAvailable;
-        delayedActionTimeSec = (delayedActionTimeSec < 120) ? 120 : delayedActionTimeSec;
+        delayedActionTimeSec = std::max(kMinimumDelayedActionTime, delayedActionTimeSec);
         break;
 
     default:
         queryStatus          = OTAQueryStatus::kNotAvailable;
-        delayedActionTimeSec = (delayedActionTimeSec < 120) ? 120 : delayedActionTimeSec;
+        delayedActionTimeSec = std::max(kMinimumDelayedActionTime, delayedActionTimeSec);
         break;
     }
 
