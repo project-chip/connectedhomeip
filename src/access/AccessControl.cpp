@@ -104,7 +104,7 @@ char * GetCatStringForLogging(char * buf, size_t size, const CATValues & cats)
         {
             break;
         }
-        snprintf(p, end - p, withComma ? fmtWithComma : fmtWithoutComma, cat);
+        snprintf(p, static_cast<size_t>(end - p), withComma ? fmtWithComma : fmtWithoutComma, cat);
         p += withComma ? countWithComma : countWithoutComma;
         if (p >= end)
         {
