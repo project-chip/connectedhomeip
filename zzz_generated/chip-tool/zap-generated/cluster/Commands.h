@@ -7299,6 +7299,29 @@ private:
     int16_t mValue;
 };
 
+class WriteTestClusterListLongOctetString : public WriteAttribute
+{
+public:
+    WriteTestClusterListLongOctetString(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("ListLongOctetString", credsIssuerConfig), mComplex(&mValue)
+    {
+        AddArgument("attr-name", "list-long-octet-string");
+        AddArgument("attr-value", &mComplex);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterListLongOctetString() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000002A, mValue);
+    }
+
+private:
+    chip::app::DataModel::List<const chip::ByteSpan> mValue;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::ByteSpan>> mComplex;
+};
+
 class WriteTestClusterTimedWriteBoolean : public WriteAttribute
 {
 public:
@@ -11717,6 +11740,7 @@ void registerClusterTestCluster(Commands & commands, CredentialIssuerCommands * 
         make_unique<WriteTestClusterRangeRestrictedInt8s>(credsIssuerConfig),                                         //
         make_unique<WriteTestClusterRangeRestrictedInt16u>(credsIssuerConfig),                                        //
         make_unique<WriteTestClusterRangeRestrictedInt16s>(credsIssuerConfig),                                        //
+        make_unique<WriteTestClusterListLongOctetString>(credsIssuerConfig),                                          //
         make_unique<WriteTestClusterTimedWriteBoolean>(credsIssuerConfig),                                            //
         make_unique<WriteTestClusterGeneralErrorBoolean>(credsIssuerConfig),                                          //
         make_unique<WriteTestClusterClusterErrorBoolean>(credsIssuerConfig),                                          //
