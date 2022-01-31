@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <lib/core/CHIPError.h>
 #include <app/clusters/window-covering-server/window-covering-server.h>
+#include <lib/core/CHIPError.h>
 
 using namespace chip::app::Clusters::WindowCovering;
 
@@ -93,7 +93,9 @@ public:
     {
         Event(EventId id) : mId(id), mEndpoint(0) {}
         Event(EventId id, chip::EndpointId endpoint) : mId(id), mEndpoint(endpoint) {}
-        Event(EventId id, chip::EndpointId endpoint, chip::AttributeId attributeId) : mId(id), mEndpoint(endpoint), mAttributeId(attributeId) {}
+        Event(EventId id, chip::EndpointId endpoint, chip::AttributeId attributeId) :
+            mId(id), mEndpoint(endpoint), mAttributeId(attributeId)
+        {}
 
         EventId mId;
         chip::EndpointId mEndpoint;
@@ -129,8 +131,8 @@ public:
                                                  .lift   = OperationalState::Stall,
                                                  .tilt   = OperationalState::Stall };
 
-        Timer * mLiftTimer         = nullptr;
-        Timer * mTiltTimer         = nullptr;
+        Timer * mLiftTimer            = nullptr;
+        Timer * mTiltTimer            = nullptr;
         OperationalState mLiftOpState = OperationalState::Stall;
         OperationalState mTiltOpState = OperationalState::Stall;
     };
@@ -142,7 +144,7 @@ public:
     virtual CHIP_ERROR Start() = 0;
     virtual CHIP_ERROR Run();
     virtual void Finish();
-    virtual void PostEvent(const Event & event) = 0;
+    virtual void PostEvent(const Event & event)                                                = 0;
     virtual void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeId) = 0;
 
 protected:
