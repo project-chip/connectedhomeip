@@ -48,11 +48,9 @@ using namespace chip::app::Clusters::WindowCovering;
  * ConvertValue: Converts values from one range to another
  * Range In  -> from  inputLowValue to   inputHighValue
  * Range Out -> from outputLowValue to outputtHighValue
- * offset true  -> allows to take into account the minimum of each range in the conversion
- * offset false -> applies only the basic "rule of three" for the conversion
  */
 static uint16_t ConvertValue(uint16_t inputLowValue, uint16_t inputHighValue, uint16_t outputLowValue, uint16_t outputHighValue,
-                             uint16_t value, bool offset)
+                             uint16_t value)
 {
     uint16_t inputMin = inputLowValue, inputMax = inputHighValue, inputRange = UINT16_MAX;
     uint16_t outputMin = outputLowValue, outputMax = outputHighValue, outputRange = UINT16_MAX;
@@ -72,29 +70,20 @@ static uint16_t ConvertValue(uint16_t inputLowValue, uint16_t inputHighValue, ui
     inputRange  = static_cast<uint16_t>(inputMax - inputMin);
     outputRange = static_cast<uint16_t>(outputMax - outputMin);
 
-    if (offset)
+
+    if (value < inputMin)
     {
-        if (value < inputMin)
-        {
-            return outputMin;
-        }
-
-        if (value > inputMax)
-        {
-            return outputMax;
-        }
-
-        if (inputRange > 0)
-        {
-            return static_cast<uint16_t>(outputMin + ((outputRange * (value - inputMin) / inputRange)));
-        }
+        return outputMin;
     }
-    else
+
+    if (value > inputMax)
     {
-        if (inputRange > 0)
-        {
-            return static_cast<uint16_t>((outputRange * (value) / inputRange));
-        }
+        return outputMax;
+    }
+
+    if (inputRange > 0)
+    {
+        return static_cast<uint16_t>(outputMin + ((outputRange * (value - inputMin) / inputRange)));
     }
 
     return outputMax;
@@ -102,12 +91,12 @@ static uint16_t ConvertValue(uint16_t inputLowValue, uint16_t inputHighValue, ui
 
 static Percent100ths ValueToPercent100ths(AbsoluteLimits limits, uint16_t absolute)
 {
-    return ConvertValue(limits.open, limits.closed, WC_PERCENT100THS_MIN_OPEN, WC_PERCENT100THS_MAX_CLOSED, absolute, true);
+    return ConvertValue(limits.open, limits.closed, WC_PERCENT100THS_MIN_OPEN, WC_PERCENT100THS_MAX_CLOSED, absolute);
 }
 
 static uint16_t Percent100thsToValue(AbsoluteLimits limits, Percent100ths relative)
 {
-    return ConvertValue(WC_PERCENT100THS_MIN_OPEN, WC_PERCENT100THS_MAX_CLOSED, limits.open, limits.closed, relative, true);
+    return ConvertValue(WC_PERCENT100THS_MIN_OPEN, WC_PERCENT100THS_MAX_CLOSED, limits.open, limits.closed, relative);
 }
 
 static OperationalState ValueToOperationalState(uint8_t value)
