@@ -87,7 +87,6 @@ Server::Server() :
             .idAllocator    = &mSessionIDAllocator,
             .fabricTable    = &mFabrics,
             .clientPool     = &mCASEClientPool,
-            .imDelegate     = nullptr,
         },
         .dnsCache          = nullptr,
         .devicePool        = &mDevicePool,

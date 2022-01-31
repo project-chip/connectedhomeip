@@ -26,7 +26,7 @@
 class WriteAttribute : public ModelCommand, public chip::app::WriteClient::Callback
 {
 public:
-    WriteAttribute() : ModelCommand("write-by-id")
+    WriteAttribute(CredentialIssuerCommands * credsIssuerConfig) : ModelCommand("write-by-id", credsIssuerConfig)
     {
         AddArgument("cluster-id", 0, UINT32_MAX, &mClusterId);
         AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
@@ -35,7 +35,8 @@ public:
         ModelCommand::AddArguments();
     }
 
-    WriteAttribute(chip::ClusterId clusterId) : ModelCommand("write-by-id"), mClusterId(clusterId)
+    WriteAttribute(chip::ClusterId clusterId, CredentialIssuerCommands * credsIssuerConfig) :
+        ModelCommand("write-by-id", credsIssuerConfig), mClusterId(clusterId)
     {
         AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
         AddArgument("attribute-value", &mAttributeValue);
@@ -43,7 +44,8 @@ public:
         ModelCommand::AddArguments();
     }
 
-    WriteAttribute(const char * attributeName) : ModelCommand("write")
+    WriteAttribute(const char * attributeName, CredentialIssuerCommands * credsIssuerConfig) :
+        ModelCommand("write", credsIssuerConfig)
     {
         AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
     }

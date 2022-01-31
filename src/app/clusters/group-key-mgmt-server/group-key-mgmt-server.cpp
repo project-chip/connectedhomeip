@@ -67,6 +67,10 @@ struct GroupTableCodec
         mProvider(provider), mFabric(fabric_index), mInfo(info)
     {}
 
+    static constexpr bool kIsFabricScoped = true;
+
+    auto GetFabricIndex() const { return mFabric; }
+
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     {
         TLV::TLVType outer;

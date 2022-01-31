@@ -162,6 +162,8 @@ class ClusterObjectTests:
         if not updated:
             raise AssertionError("Did not receive updated attribute")
 
+        sub.Shutdown()
+
     @classmethod
     async def TestReadAttributeRequests(cls, devCtrl):
         '''

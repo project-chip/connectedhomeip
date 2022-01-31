@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019-2020 Google LLC.
  *    Copyright (c) 2018 Nest Labs, Inc.
  *
@@ -311,6 +311,68 @@ template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreSetupDiscriminator(uint16_t setupDiscriminator)
 {
     return WriteConfigValue(ConfigClass::kConfigKey_SetupDiscriminator, static_cast<uint32_t>(setupDiscriminator));
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSpake2pIterationCount(uint32_t & iterationCount)
+{
+    CHIP_ERROR err = ReadConfigValue(ConfigClass::kConfigKey_Spake2pIterationCount, iterationCount);
+
+#if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT) && CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        iterationCount = CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT;
+        err            = CHIP_NO_ERROR;
+    }
+#endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT) && CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT
+    SuccessOrExit(err);
+
+exit:
+    return err;
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSpake2pSalt(uint8_t * buf, size_t bufSize, size_t & saltLen)
+{
+    CHIP_ERROR err = ReadConfigValueBin(ConfigClass::kConfigKey_Spake2pSalt, buf, bufSize, saltLen);
+
+#if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT)
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        uint8_t salt[] = CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT;
+        ReturnErrorCodeIf(sizeof(salt) > bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(buf, salt, sizeof(salt));
+        saltLen = sizeof(salt);
+        err     = CHIP_NO_ERROR;
+    }
+#endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT)
+
+    ReturnErrorOnFailure(err);
+    ReturnErrorCodeIf(saltLen > bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    return err;
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSpake2pVerifier(uint8_t * buf, size_t bufSize, size_t & verifierLen)
+{
+    CHIP_ERROR err = ReadConfigValueBin(ConfigClass::kConfigKey_Spake2pVerifier, buf, bufSize, verifierLen);
+
+#if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER)
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        uint8_t verifier[] = CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER;
+        ReturnErrorCodeIf(sizeof(verifier) > bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(buf, verifier, sizeof(verifier));
+        verifierLen = sizeof(verifier);
+        err         = CHIP_NO_ERROR;
+    }
+#endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER)
+
+    ReturnErrorOnFailure(err);
+    ReturnErrorCodeIf(verifierLen > bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    return err;
 }
 
 template <class ConfigClass>

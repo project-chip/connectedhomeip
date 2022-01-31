@@ -96,7 +96,11 @@ buildconfig_header("system_buildconfig") {
     ]
   }
 
-  defines += [ "CHIP_SYSTEM_LAYER_IMPL_CONFIG_FILE=<system/SystemLayerImpl${chip_system_config_event_loop}.h>" ]
+  if (chip_system_layer_impl_config_file != "") {
+    defines += [ "CHIP_SYSTEM_LAYER_IMPL_CONFIG_FILE=${chip_system_layer_impl_config_file}" ]
+  } else {
+    defines += [ "CHIP_SYSTEM_LAYER_IMPL_CONFIG_FILE=<system/SystemLayerImpl${chip_system_config_event_loop}.h>" ]
+  }
 }
 
 config("system_config") {
@@ -135,13 +139,12 @@ static_library("system") {
     "SystemFaultInjection.h",
     "SystemLayer.cpp",
     "SystemLayer.h",
-    "SystemLayerImpl${chip_system_config_event_loop}.cpp",
-    "SystemLayerImpl${chip_system_config_event_loop}.h",
     "SystemLayerImpl.h",
     "SystemMutex.cpp",
     "SystemMutex.h",
     "SystemPacketBuffer.cpp",
     "SystemPacketBuffer.h",
+    "SystemPacketBufferInternal.h",
     "SystemStats.cpp",
     "SystemStats.h",
     "SystemTimer.cpp",
@@ -152,6 +155,13 @@ static_library("system") {
     "WakeEvent.cpp",
     "WakeEvent.h",
   ]
+
+  if (chip_system_layer_impl_config_file == "") {
+    sources += [
+      "SystemLayerImpl${chip_system_config_event_loop}.cpp",
+      "SystemLayerImpl${chip_system_config_event_loop}.h",
+    ]
+  }
 
   cflags = [ "-Wconversion" ]
 
