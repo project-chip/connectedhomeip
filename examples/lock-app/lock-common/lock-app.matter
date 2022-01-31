@@ -147,6 +147,8 @@ server cluster EthernetNetworkDiagnostics = 55 {
   readonly attribute int64u timeSinceReset = 8;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
+
+  command ResetCounts(): DefaultSuccess = 0;
 }
 
 server cluster FixedLabel = 64 {
@@ -810,6 +812,8 @@ server cluster SoftwareDiagnostics = 52 {
   readonly attribute int64u currentHeapHighWatermark = 3;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
+
+  command ResetWatermarks(): DefaultSuccess = 0;
 }
 
 server cluster ThreadNetworkDiagnostics = 53 {
@@ -961,6 +965,8 @@ server cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute NetworkFault activeNetworkFaultsList[] = 62;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
+
+  command ResetCounts(): DefaultSuccess = 0;
 }
 
 server cluster TimeFormatLocalization = 44 {
@@ -1054,6 +1060,8 @@ server cluster WiFiNetworkDiagnostics = 54 {
   readonly attribute int64u overrunCount = 12;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
+
+  command ResetCounts(): DefaultSuccess = 0;
 }
 
 
