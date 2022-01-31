@@ -87,8 +87,8 @@ char * GetCatStringForLogging(char * buf, size_t size, const CATValues & cats)
     //   1 for comma (optional)
     //   2 for 0x prefix
     //   8 for 32-bit hex value
-    constexpr char fmtWithoutComma[] = "0x%08" PRIx32;
-    constexpr char fmtWithComma[]    = ",0x%08" PRIx32;
+    constexpr char fmtWithoutComma[] = "0x%08" PRIX32;
+    constexpr char fmtWithComma[]    = ",0x%08" PRIX32;
     constexpr int countWithoutComma  = 10;
     constexpr int countWithComma     = countWithoutComma + 1;
     bool withComma                   = false;
