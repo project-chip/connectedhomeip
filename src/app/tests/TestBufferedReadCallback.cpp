@@ -302,7 +302,7 @@ void DataSeriesGenerator::Generate()
     ReadClient::Callback * callback = &mReadCallback;
     StatusIB status;
     bool hasData;
-    DataVersion version = 0;
+    DataVersion version = kUndefinedDataVersion;
 
     callback->OnReportBegin();
 

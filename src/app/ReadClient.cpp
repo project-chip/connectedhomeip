@@ -569,7 +569,7 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
         TLV::TLVReader reader = aAttributeReportIBsReader;
         ReturnErrorOnFailure(report.Init(reader));
 
-        DataVersion version = 0;
+        DataVersion version = kUndefinedDataVersion;
         err                 = report.GetAttributeStatus(&status);
         if (CHIP_NO_ERROR == err)
         {

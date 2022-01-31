@@ -318,7 +318,7 @@ class AttributeCache:
     attributeCache: Dict[int, List[Cluster]] = field(
         default_factory=lambda: {})
 
-    def UpdateTLV(self, path: AttributePath, version: int, data: Union[bytes, ValueDecodeFailure]):
+    def UpdateTLV(self, path: AttributePath, dataVersion: int, data: Union[bytes, ValueDecodeFailure]):
         ''' Store data in TLV since that makes it easiest to eventually convert to either the
             cluster or attribute view representations (see below in UpdateCachedData).
         '''
@@ -539,7 +539,7 @@ class AsyncReadTransaction:
     def GetAllEventValues(self):
         return self._events
 
-    def _handleAttributeData(self, path: AttributePathWithListIndex, version: int, status: int, data: bytes):
+    def _handleAttributeData(self, path: AttributePathWithListIndex, dataVersion: int, status: int, data: bytes):
         try:
             imStatus = status
             try:
@@ -554,14 +554,14 @@ class AsyncReadTransaction:
                 tlvData = chip.tlv.TLVReader(data).get().get("Any", {})
                 attributeValue = tlvData
 
-            self._cache.UpdateTLV(path, version, attributeValue)
+            self._cache.UpdateTLV(path, dataVersion, attributeValue)
             self._changedPathSet.add(path)
 
         except Exception as ex:
             logging.exception(ex)
 
-    def handleAttributeData(self, path: AttributePath, version: int, status: int, data: bytes):
-        self._handleAttributeData(path, version, status, data)
+    def handleAttributeData(self, path: AttributePath, dataVersion: int, status: int, data: bytes):
+        self._handleAttributeData(path, dataVersion, status, data)
 
     def _handleEventData(self, header: EventHeader, path: EventPath, data: bytes):
         try:
@@ -702,10 +702,10 @@ _OnReportEndCallbackFunct = CFUNCTYPE(
 
 
 @_OnReadAttributeDataCallbackFunct
-def _OnReadAttributeDataCallback(closure, version: int, endpoint: int, cluster: int, attribute: int, status, data, len):
+def _OnReadAttributeDataCallback(closure, dataVersion: int, endpoint: int, cluster: int, attribute: int, status, data, len):
     dataBytes = ctypes.string_at(data, len)
     closure.handleAttributeData(AttributePath(
-        EndpointId=endpoint, ClusterId=cluster, AttributeId=attribute), version, status, dataBytes[:])
+        EndpointId=endpoint, ClusterId=cluster, AttributeId=attribute), dataVersion, status, dataBytes[:])
 
 
 @_OnReadEventDataCallbackFunct
