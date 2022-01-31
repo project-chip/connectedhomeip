@@ -301,9 +301,6 @@ void WindowApp::DispatchEvent(const WindowApp::Event & event)
     }
 }
 
-
-
-
 void WindowApp::DispatchEventAttributeChange(chip::EndpointId endpoint, chip::AttributeId attribute)
 {
     Cover * cover = GetCover(endpoint);
@@ -496,7 +493,6 @@ void WindowApp::Cover::LiftUp()
     LiftPositionSet(mEndpoint, percent100ths);
 }
 
-
 void WindowApp::Cover::LiftUpdate(bool newTarget)
 {
     NPercent100ths current, target;
@@ -504,12 +500,12 @@ void WindowApp::Cover::LiftUpdate(bool newTarget)
     Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, current);
 
     OperationalStatus opStatus = OperationalStatusGet(mEndpoint);
-    OperationalState opState = ComputeOperationalState(target, current);
+    OperationalState opState   = ComputeOperationalState(target, current);
 
     /* If Triggered by a TARGET update */
     if (newTarget)
     {
-        mLiftTimer->Stop(); //Cancel previous motion if any
+        mLiftTimer->Stop(); // Cancel previous motion if any
         mLiftOpState = opState;
     }
 
@@ -595,7 +591,7 @@ void WindowApp::Cover::TiltUpdate(bool newTarget)
     Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, current);
 
     OperationalStatus opStatus = OperationalStatusGet(mEndpoint);
-    OperationalState opState = ComputeOperationalState(target, current);
+    OperationalState opState   = ComputeOperationalState(target, current);
 
     /* If Triggered by a TARGET update */
     if (newTarget)
