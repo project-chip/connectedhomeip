@@ -29,7 +29,7 @@ namespace app {
 CHIP_ERROR WriteResponseMessage::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
-    int TagPresenceMask = 0;
+    int tagPresenceMask = 0;
     TLV::TLVReader reader;
     AttributeStatusIBs::Parser writeResponses;
     PRETTY_PRINT("WriteResponseMessage =");
@@ -45,14 +45,17 @@ CHIP_ERROR WriteResponseMessage::Parser::CheckSchemaValidity() const
         switch (tagNum)
         {
         case to_underlying(Tag::kWriteResponses):
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kWriteResponses))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kWriteResponses));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kWriteResponses))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kWriteResponses));
             VerifyOrReturnError(TLV::kTLVType_Array == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
             ReturnErrorOnFailure(writeResponses.Init(reader));
 
             PRETTY_PRINT_INCDEPTH();
             ReturnErrorOnFailure(writeResponses.CheckSchemaValidity());
             PRETTY_PRINT_DECDEPTH();
+            break;
+        case kInteractionModelRevisionTag:
+            ReturnErrorOnFailure(MessageParser::CheckInteractionModelRevision(reader));
             break;
         default:
             PRETTY_PRINT("Unknown tag num %" PRIu32, tagNum);
@@ -67,7 +70,7 @@ CHIP_ERROR WriteResponseMessage::Parser::CheckSchemaValidity() const
     {
         const int RequiredFields = (1 << to_underlying(Tag::kWriteResponses));
 
-        if ((TagPresenceMask & RequiredFields) == RequiredFields)
+        if ((tagPresenceMask & RequiredFields) == RequiredFields)
         {
             err = CHIP_NO_ERROR;
         }
@@ -106,7 +109,14 @@ AttributeStatusIBs::Builder & WriteResponseMessage::Builder::GetWriteResponses()
 
 WriteResponseMessage::Builder & WriteResponseMessage::Builder::EndOfWriteResponseMessage()
 {
-    EndOfContainer();
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = MessageBuilder::EncodeInteractionModelRevision();
+    }
+    if (mError == CHIP_NO_ERROR)
+    {
+        EndOfContainer();
+    }
     return *this;
 }
 } // namespace app

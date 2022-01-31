@@ -230,7 +230,6 @@ void DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * event, intptr_t ar
             .idAllocator    = &(server->GetSessionIDAllocator()),
             .fabricTable    = &(server->GetFabricTable()),
             .clientPool     = &gCASEClientPool,
-            .imDelegate     = chip::Platform::New<chip::Controller::DeviceControllerInteractionModelDelegate>(),
         };
 
         PeerId peerID = fabric->GetPeerIdForNode(tvNodeId);

@@ -3449,6 +3449,33 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("weekDayIndex", indent + 1, value.weekDayIndex));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("userIndex", indent + 1, value.userIndex));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("daysMask", indent + 1, value.daysMask));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("startHour", indent + 1, value.startHour));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("startMinute", indent + 1, value.startMinute));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("endHour", indent + 1, value.endHour));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("endMinute", indent + 1, value.endMinute));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const DoorLock::Commands::GetYearDayScheduleResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("yearDayIndex", indent + 1, value.yearDayIndex));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("userIndex", indent + 1, value.userIndex));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("localStartTime", indent + 1, value.localStartTime));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("localEndTime", indent + 1, value.localEndTime));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const DoorLock::Commands::SetCredentialResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -4655,6 +4682,16 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("NumberOfRFIDUsersSupported", 1, value);
+        }
+        case DoorLock::Attributes::NumberOfWeekDaySchedulesSupportedPerUser::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NumberOfWeekDaySchedulesSupportedPerUser", 1, value);
+        }
+        case DoorLock::Attributes::NumberOfYearDaySchedulesSupportedPerUser::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NumberOfYearDaySchedulesSupportedPerUser", 1, value);
         }
         case DoorLock::Attributes::MaxPINCodeLength::Id: {
             uint8_t value;
@@ -6671,7 +6708,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("RoutingRole", 1, value);
         }
         case ThreadNetworkDiagnostics::Attributes::NetworkName::Id: {
-            chip::ByteSpan value;
+            chip::CharSpan value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("NetworkName", 1, value);
         }
@@ -7348,6 +7385,16 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             DoorLock::Commands::GetUserResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GetUserResponse", 1, value);
+        }
+        case DoorLock::Commands::GetWeekDayScheduleResponse::Id: {
+            DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GetWeekDayScheduleResponse", 1, value);
+        }
+        case DoorLock::Commands::GetYearDayScheduleResponse::Id: {
+            DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GetYearDayScheduleResponse", 1, value);
         }
         case DoorLock::Commands::SetCredentialResponse::Id: {
             DoorLock::Commands::SetCredentialResponse::DecodableType value;

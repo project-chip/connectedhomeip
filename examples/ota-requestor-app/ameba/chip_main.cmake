@@ -15,8 +15,6 @@ list(
 
     ${chip_dir}/zzz_generated/ota-requestor-app/zap-generated/callback-stub.cpp
     ${chip_dir}/zzz_generated/ota-requestor-app/zap-generated/IMClusterCommandHandler.cpp
-    ${chip_dir}/zzz_generated/ota-requestor-app/zap-generated/CHIPClusters.cpp
-    ${chip_dir}/zzz_generated/ota-requestor-app/zap-generated/CHIPClientCallbacks.cpp
 
     ${chip_dir}/examples/ota-requestor-app/ameba/main/chipinterface.cpp
     ${chip_dir}/examples/ota-requestor-app/ameba/main/Globals.cpp
@@ -27,7 +25,6 @@ list(
     ${chip_dir}/src/app/clusters/ota-requestor/BDXDownloader.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/OTARequestor.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
-    ${chip_dir}/src/app/util/im-client-callbacks.cpp
 )
 
 add_library(

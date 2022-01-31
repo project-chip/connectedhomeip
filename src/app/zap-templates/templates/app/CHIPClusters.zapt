@@ -20,13 +20,6 @@ class DLL_EXPORT {{asUpperCamelCase name}}Cluster : public ClusterBase
 public:
     {{asUpperCamelCase name}}Cluster() : ClusterBase(app::Clusters::{{asUpperCamelCase name}}::Id) {}
     ~{{asUpperCamelCase name}}Cluster() {}
-    {{#chip_cluster_commands}}
-    {{#first}}
-
-    // Cluster Commands
-    {{/first}}
-    CHIP_ERROR {{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback{{#chip_cluster_command_arguments_with_structs_expanded}}{{#if_is_struct type}}{{else}}, {{chipType}} {{asLowerCamelCase label}}{{/if_is_struct}}{{/chip_cluster_command_arguments_with_structs_expanded}});
-    {{/chip_cluster_commands}}
 };
 
 {{/chip_client_clusters}}

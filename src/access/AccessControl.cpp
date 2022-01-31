@@ -169,6 +169,9 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
                       ChipLogValueMEI(requestPath.cluster), requestPath.endpoint, GetPrivilegeStringForLogging(requestPrivilege));
     }
 
+    // Operational PASE not supported for v1.0, so PASE implies commissioning, which has highest privilege.
+    ReturnErrorCodeIf(subjectDescriptor.authMode == AuthMode::kPase, CHIP_NO_ERROR);
+
     EntryIterator iterator;
     ReturnErrorOnFailure(Entries(iterator, &subjectDescriptor.fabricIndex));
 
@@ -177,6 +180,8 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
     {
         AuthMode authMode = AuthMode::kNone;
         ReturnErrorOnFailure(entry.GetAuthMode(authMode));
+        // Operational PASE not supported for v1.0.
+        VerifyOrReturnError(authMode == AuthMode::kCase || authMode == AuthMode::kGroup, CHIP_ERROR_INCORRECT_STATE);
         if (authMode != subjectDescriptor.authMode)
         {
             continue;
@@ -200,25 +205,7 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
                 ReturnErrorOnFailure(entry.GetSubject(i, subject));
                 if (IsOperationalNodeId(subject))
                 {
-                    if (subject == subjectDescriptor.subject)
-                    {
-                        subjectMatched = true;
-                        break;
-                    }
-                }
-                else if (IsGroupId(subject))
-                {
-                    VerifyOrReturnError(authMode == AuthMode::kGroup, CHIP_ERROR_INVALID_ARGUMENT);
-                    if (subject == subjectDescriptor.subject)
-                    {
-                        subjectMatched = true;
-                        break;
-                    }
-                }
-                // TODO: Add the implicit admit for PASE after the spec is updated.
-                else if (IsPAKEKeyId(subject))
-                {
-                    VerifyOrReturnError(authMode == AuthMode::kPase, CHIP_ERROR_INVALID_ARGUMENT);
+                    VerifyOrReturnError(authMode == AuthMode::kCase, CHIP_ERROR_INCORRECT_STATE);
                     if (subject == subjectDescriptor.subject)
                     {
                         subjectMatched = true;
@@ -227,8 +214,17 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
                 }
                 else if (IsCASEAuthTag(subject))
                 {
-                    VerifyOrReturnError(authMode == AuthMode::kCase, CHIP_ERROR_INVALID_ARGUMENT);
+                    VerifyOrReturnError(authMode == AuthMode::kCase, CHIP_ERROR_INCORRECT_STATE);
                     if (subjectDescriptor.cats.CheckSubjectAgainstCATs(subject))
+                    {
+                        subjectMatched = true;
+                        break;
+                    }
+                }
+                else if (IsGroupId(subject))
+                {
+                    VerifyOrReturnError(authMode == AuthMode::kGroup, CHIP_ERROR_INCORRECT_STATE);
+                    if (subject == subjectDescriptor.subject)
                     {
                         subjectMatched = true;
                         break;
@@ -236,7 +232,8 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
                 }
                 else
                 {
-                    return CHIP_ERROR_INVALID_ARGUMENT;
+                    // Operational PASE not supported for v1.0.
+                    return CHIP_ERROR_INCORRECT_STATE;
                 }
             }
             if (!subjectMatched)

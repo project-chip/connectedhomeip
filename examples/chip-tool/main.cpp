@@ -33,11 +33,11 @@ int main(int argc, char * argv[])
 {
     ExampleCredentialIssuerCommands credIssuerCommands;
     Commands commands;
-    registerCommandsDiscover(commands);
+    registerCommandsDiscover(commands, &credIssuerCommands);
     registerCommandsPayload(commands);
     registerCommandsPairing(commands, &credIssuerCommands);
-    registerCommandsTests(commands);
-    registerClusters(commands);
+    registerCommandsTests(commands, &credIssuerCommands);
+    registerClusters(commands, &credIssuerCommands);
 
     return commands.Run(argc, argv);
 }
