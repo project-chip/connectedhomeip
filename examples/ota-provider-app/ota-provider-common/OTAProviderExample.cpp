@@ -128,8 +128,8 @@ bool OTAProviderExample::SelectOTACandidate(const uint16_t requestorVendorID, co
     return candidateFound;
 }
 
-UserConsentSubject OTAProviderExample::GetUserConsentSubject(const chip::app::CommandHandler * commandObj,
-                                                             const chip::app::ConcreteCommandPath & commandPath,
+UserConsentSubject OTAProviderExample::GetUserConsentSubject(const app::CommandHandler * commandObj,
+                                                             const app::ConcreteCommandPath & commandPath,
                                                              const QueryImage::DecodableType & commandData, uint32_t targetVersion)
 {
     UserConsentSubject subject;
@@ -200,13 +200,13 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
                 queryStatus = OTAQueryStatus::kUpdateAvailable;
                 break;
 
-            case chip::ota::UserConsentState::kObtaining:
+            case UserConsentState::kObtaining:
                 queryStatus          = OTAQueryStatus::kBusy;
                 delayedActionTimeSec = std::max(kMinimumDelayedActionTime, delayedActionTimeSec);
                 break;
 
-            case chip::ota::UserConsentState::kDenied:
-            case chip::ota::UserConsentState::kUnknown:
+            case UserConsentState::kDenied:
+            case UserConsentState::kUnknown:
                 queryStatus          = OTAQueryStatus::kNotAvailable;
                 delayedActionTimeSec = std::max(kMinimumDelayedActionTime, delayedActionTimeSec);
                 break;

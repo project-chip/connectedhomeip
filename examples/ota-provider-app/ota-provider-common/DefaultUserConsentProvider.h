@@ -52,7 +52,7 @@ public:
         mGlobalConsentState = state;
     }
 
-    // state is only valid isGlobalConsentSet is true
+    // state is only valid if isGlobalConsentSet is true
     void GetGlobalUserConsentState(bool & isGlobalConsentSet, UserConsentState & state)
     {
         isGlobalConsentSet = mUseGlobalConsent;
