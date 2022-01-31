@@ -204,7 +204,7 @@ bool IMEmberAfSendDefaultResponseWithCallback(EmberAfStatus status)
 {
     if (currentCommandObject == nullptr)
     {
-        // If this command is not handled by IM, then let ember send response.
+        // We have no idea what we're supposed to respond to.
         return false;
     }
 
@@ -364,8 +364,8 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
     // Check attribute existence. This includes attributes with registered metadata, but also specially handled
     // mandatory global attributes (which just check for cluster on endpoint).
 
-    EmberAfCluster * attributeCluster            = nullptr;
-    EmberAfAttributeMetadata * attributeMetadata = nullptr;
+    const EmberAfCluster * attributeCluster            = nullptr;
+    const EmberAfAttributeMetadata * attributeMetadata = nullptr;
 
     if (aPath.mAttributeId == Clusters::Globals::Attributes::AttributeList::Id)
     {
@@ -647,7 +647,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
         }
         default:
             ChipLogError(DataManagement, "Attribute type 0x%x not handled", static_cast<int>(attributeType));
-            emberStatus = EMBER_ZCL_STATUS_WRITE_ONLY;
+            emberStatus = EMBER_ZCL_STATUS_UNSUPPORTED_READ;
         }
     }
 

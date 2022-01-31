@@ -26,7 +26,7 @@
 class ClusterCommand : public ModelCommand, public chip::app::CommandSender::Callback
 {
 public:
-    ClusterCommand() : ModelCommand("command-by-id")
+    ClusterCommand(CredentialIssuerCommands * credsIssuerConfig) : ModelCommand("command-by-id", credsIssuerConfig)
     {
         AddArgument("cluster-id", 0, UINT32_MAX, &mClusterId);
         AddArgument("command-id", 0, UINT32_MAX, &mCommandId);
@@ -35,7 +35,8 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ClusterCommand(chip::ClusterId clusterId) : ModelCommand("command-by-id"), mClusterId(clusterId)
+    ClusterCommand(chip::ClusterId clusterId, CredentialIssuerCommands * credsIssuerConfig) :
+        ModelCommand("command-by-id", credsIssuerConfig), mClusterId(clusterId)
     {
         AddArgument("command-id", 0, UINT32_MAX, &mCommandId);
         AddArgument("payload", &mPayload);
@@ -43,7 +44,8 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ClusterCommand(const char * commandName) : ModelCommand(commandName)
+    ClusterCommand(const char * commandName, CredentialIssuerCommands * credsIssuerConfig) :
+        ModelCommand(commandName, credsIssuerConfig)
     {
         AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
     }

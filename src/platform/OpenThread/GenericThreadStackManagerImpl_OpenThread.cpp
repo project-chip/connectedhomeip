@@ -881,7 +881,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
 
     case ThreadNetworkDiagnostics::Attributes::NetworkName::Id: {
         const char * networkName = otThreadGetNetworkName(mOTInst);
-        err                      = encoder.Encode(Span<const char>(networkName, strlen(networkName)));
+        err                      = encoder.Encode(CharSpan::fromCharString(networkName));
     }
     break;
 

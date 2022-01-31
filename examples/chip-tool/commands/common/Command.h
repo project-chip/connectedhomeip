@@ -177,6 +177,14 @@ public:
     }
 
     template <typename T>
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, chip::BitFlags<T> * out, uint8_t flags = 0)
+    {
+        // This is a terrible hack that relies on BitFlags only having the one
+        // mValue member.
+        return AddArgument(name, min, max, reinterpret_cast<T *>(out), flags);
+    }
+
+    template <typename T>
     size_t AddArgument(const char * name, chip::Optional<T> * value)
     {
         return AddArgument(name, reinterpret_cast<T *>(value), Argument::kOptional);

@@ -243,7 +243,6 @@ void LEDWidget::SetBrightness(uint32_t led_brightness)
         {
             printf("PWM failed to set dutycycle!");
         }
-        PWM_start();
     }
 }
 

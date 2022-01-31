@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -73,6 +73,9 @@ public:
     static const Key kConfigKey_RegulatoryLocation;
     static const Key kConfigKey_CountryCode;
     static const Key kConfigKey_Breadcrumb;
+    static const Key kConfigKey_Spake2pIterationCount;
+    static const Key kConfigKey_Spake2pSalt;
+    static const Key kConfigKey_Spake2pVerifier;
 
     static const char kGroupKeyNamePrefix[];
 
@@ -104,6 +107,7 @@ protected:
 private:
     // TODO: This is temporary until Darwin implements a proper ReadConfigValue
     static uint16_t mPosixSetupDiscriminator;
+    static char mPosixCountryCode[2 + 1];
 };
 
 struct PosixConfig::Key

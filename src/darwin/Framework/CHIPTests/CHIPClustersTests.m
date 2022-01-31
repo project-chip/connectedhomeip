@@ -40911,7 +40911,7 @@ NSMutableData * readAttributeOctetStringNotDefaultValue;
     XCTAssertNotNil(cluster);
 
     id locationArgument;
-    locationArgument = @"us";
+    locationArgument = @"US";
     [cluster writeAttributeLocationWithValue:locationArgument
                            completionHandler:^(NSError * _Nullable err) {
                                NSLog(@"Write location Error: %@", err);
@@ -40939,7 +40939,7 @@ NSMutableData * readAttributeOctetStringNotDefaultValue;
 
         {
             id actualValue = value;
-            XCTAssertTrue([actualValue isEqualToString:@"us"]);
+            XCTAssertTrue([actualValue isEqualToString:@"US"]);
         }
 
         [expectation fulfill];
@@ -45737,6 +45737,58 @@ ResponseHandler test_TestSubscribe_OnOff_OnOff_Reported = nil;
 
     [cluster readAttributeNumberOfRFIDUsersSupportedWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"DoorLock NumberOfRFIDUsersSupported Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterDoorLockReadAttributeNumberOfWeekDaySchedulesSupportedPerUserWithCompletionHandler
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"DoorLockReadAttributeNumberOfWeekDaySchedulesSupportedPerUserWithCompletionHandler"];
+
+    [cluster readAttributeNumberOfWeekDaySchedulesSupportedPerUserWithCompletionHandler:^(
+        NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"DoorLock NumberOfWeekDaySchedulesSupportedPerUser Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterDoorLockReadAttributeNumberOfYearDaySchedulesSupportedPerUserWithCompletionHandler
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"DoorLockReadAttributeNumberOfYearDaySchedulesSupportedPerUserWithCompletionHandler"];
+
+    [cluster readAttributeNumberOfYearDaySchedulesSupportedPerUserWithCompletionHandler:^(
+        NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"DoorLock NumberOfYearDaySchedulesSupportedPerUser Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
     }];
@@ -52806,7 +52858,7 @@ ResponseHandler test_TestSubscribe_OnOff_OnOff_Reported = nil;
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"ThreadNetworkDiagnosticsReadAttributeNetworkNameWithCompletionHandler"];
 
-    [cluster readAttributeNetworkNameWithCompletionHandler:^(NSData * _Nullable value, NSError * _Nullable err) {
+    [cluster readAttributeNetworkNameWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
         NSLog(@"ThreadNetworkDiagnostics NetworkName Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];

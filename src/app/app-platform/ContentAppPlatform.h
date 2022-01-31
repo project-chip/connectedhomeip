@@ -26,6 +26,7 @@
 #include <app/app-platform/ContentApp.h>
 #include <app/util/attribute-storage.h>
 #include <functional>
+#include <lib/support/Span.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -72,7 +73,11 @@ public:
     // add apps to the platform.
     // This will assign the app to an endpoint (if it is not already added) and make it accessible via Matter
     // returns the global endpoint for this app, or 0 if an error occurred
-    EndpointId AddContentApp(ContentApp * app, EmberAfEndpointType * ep, uint16_t deviceType);
+    //
+    // dataVersionStorage.size() needs to be at least as big as the number of
+    // server clusters in the EmberAfEndpointType passed in.
+    EndpointId AddContentApp(ContentApp * app, EmberAfEndpointType * ep, uint16_t deviceType,
+                             const Span<DataVersion> & dataVersionStorage);
 
     // remove app from the platform.
     // returns the endpoint id where the app was, or 0 if app was not loaded

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019-2020 Google LLC.
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
@@ -59,15 +59,18 @@ const char MbedConfig::kConfigNamespace_ChipConfig[]   = CHIP_CONFIG_KV_STORE_PA
 const char MbedConfig::kConfigNamespace_ChipCounters[] = CHIP_CONFIG_KV_STORE_PARTITION CHIP_CONFIG_COUNTER_PREFIX;
 
 // Keys stored in the chip-factory namespace
-const MbedConfig::Key MbedConfig::kConfigKey_SerialNum           = { FACTORY_KEY("serial-num") };
-const MbedConfig::Key MbedConfig::kConfigKey_MfrDeviceId         = { FACTORY_KEY("device-id") };
-const MbedConfig::Key MbedConfig::kConfigKey_MfrDeviceCert       = { FACTORY_KEY("device-cert") };
-const MbedConfig::Key MbedConfig::kConfigKey_MfrDeviceICACerts   = { FACTORY_KEY("device-ca-certs") };
-const MbedConfig::Key MbedConfig::kConfigKey_MfrDevicePrivateKey = { FACTORY_KEY("device-key") };
-const MbedConfig::Key MbedConfig::kConfigKey_HardwareVersion     = { FACTORY_KEY("hardware-ver") };
-const MbedConfig::Key MbedConfig::kConfigKey_ManufacturingDate   = { FACTORY_KEY("mfg-date") };
-const MbedConfig::Key MbedConfig::kConfigKey_SetupPinCode        = { FACTORY_KEY("pin-code") };
-const MbedConfig::Key MbedConfig::kConfigKey_SetupDiscriminator  = { FACTORY_KEY("discriminator") };
+const MbedConfig::Key MbedConfig::kConfigKey_SerialNum             = { FACTORY_KEY("serial-num") };
+const MbedConfig::Key MbedConfig::kConfigKey_MfrDeviceId           = { FACTORY_KEY("device-id") };
+const MbedConfig::Key MbedConfig::kConfigKey_MfrDeviceCert         = { FACTORY_KEY("device-cert") };
+const MbedConfig::Key MbedConfig::kConfigKey_MfrDeviceICACerts     = { FACTORY_KEY("device-ca-certs") };
+const MbedConfig::Key MbedConfig::kConfigKey_MfrDevicePrivateKey   = { FACTORY_KEY("device-key") };
+const MbedConfig::Key MbedConfig::kConfigKey_HardwareVersion       = { FACTORY_KEY("hardware-ver") };
+const MbedConfig::Key MbedConfig::kConfigKey_ManufacturingDate     = { FACTORY_KEY("mfg-date") };
+const MbedConfig::Key MbedConfig::kConfigKey_SetupPinCode          = { FACTORY_KEY("pin-code") };
+const MbedConfig::Key MbedConfig::kConfigKey_SetupDiscriminator    = { FACTORY_KEY("discriminator") };
+const MbedConfig::Key MbedConfig::kConfigKey_Spake2pIterationCount = { FACTORY_KEY("iteration-count") };
+const MbedConfig::Key MbedConfig::kConfigKey_Spake2pSalt           = { FACTORY_KEY("salt") };
+const MbedConfig::Key MbedConfig::kConfigKey_Spake2pVerifier       = { FACTORY_KEY("verifier") };
 
 // Keys stored in the chip-config namespace
 const MbedConfig::Key MbedConfig::kConfigKey_FabricId           = { CONFIG_KEY("fabric-id") };

@@ -16,6 +16,9 @@ namespace {{asUpperCamelCase name}} {
         {{#unless struct_contains_array}}
         CHIP_ERROR Decode(TLV::TLVReader &reader);
         {{/unless}}
+
+        static constexpr bool kIsFabricScoped = {{struct_is_fabric_scoped}};
+
         {{#if struct_is_fabric_scoped}}
         auto GetFabricIndex() const {
             return {{ asLowerCamelCase struct_fabric_idx_field }};
@@ -30,6 +33,14 @@ namespace {{asUpperCamelCase name}} {
         {{zapTypeToDecodableClusterObjectType type}} {{asLowerCamelCase label}}{{> cluster_objects_field_init}};
         {{/zcl_struct_items}}
         CHIP_ERROR Decode(TLV::TLVReader &reader);
+
+        static constexpr bool kIsFabricScoped = {{struct_is_fabric_scoped}};
+
+        {{#if struct_is_fabric_scoped}}
+        auto GetFabricIndex() const {
+            return {{ asLowerCamelCase struct_fabric_idx_field }};
+        }
+        {{/if}}
     };
     {{else}}
     using DecodableType = Type;
