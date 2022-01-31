@@ -136,8 +136,8 @@ void TestOverwriteFabricIndexInListOfStructs(nlTestSuite * aSuite, void * aConte
     NL_TEST_ASSERT(aSuite, decodeCount == kTestListElements);
     for (auto iter = decodeItems.begin(); iter.Next();)
     {
-        // const auto & entry = iter.GetValue();
-        // NL_TEST_ASSERT(aSuite, entry.fabricIndex == kTestFabricIndex);
+        const auto & entry = iter.GetValue();
+        NL_TEST_ASSERT(aSuite, entry.fabricIndex == kTestFabricIndex);
     }
 }
 

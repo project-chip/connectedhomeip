@@ -82,7 +82,7 @@ private:
         VerifyOrExit(aPath.mClusterId == mClusterId && aPath.mAttributeId == mAttributeId, err = CHIP_ERROR_SCHEMA_MISMATCH);
         VerifyOrExit(apData != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-        SuccessOrExit(app::DataModel::Decode(*apData, value));
+        SuccessOrExit(err = app::DataModel::Decode(*apData, value));
 
         mOnSuccess(aPath, value);
 

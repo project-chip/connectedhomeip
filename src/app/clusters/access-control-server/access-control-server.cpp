@@ -450,7 +450,7 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(AttributeValueDecoder & aDecoder)
     AccessControl::EntryIterator it;
     AccessControl::Entry entry;
     ReturnErrorOnFailure(GetAccessControl().Entries(it, &accessingFabricIndex));
-    if (it.Next(entry) == CHIP_NO_ERROR)
+    while (it.Next(entry) == CHIP_NO_ERROR)
     {
         oldCount++;
     }

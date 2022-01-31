@@ -74,8 +74,7 @@ struct Nullable : protected Optional<T>
         return true;
     }
 
-    // We think nullable struct fields / attributes won't be fabric scoped. As fabric scoped structs will be used in List encoding
-    // and Decoding, and lists won't contain null objects.
+    // The only fabric-scoped objects in the spec are events and structs inside lists, and neither one can be nullable.
     static constexpr bool kIsFabricScoped = false;
 
     bool operator==(const Nullable & other) const { return Optional<T>::operator==(other); }

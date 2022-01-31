@@ -100,48 +100,20 @@ public:
         template <typename T0 = T, std::enable_if_t<!DataModel::IsFabricScoped<T0>::value, bool> = true>
         bool Next()
         {
-            if (mReader.GetContainerType() == TLV::kTLVType_NotSpecified)
-            {
-                return false;
-            }
-
-            if (mStatus == CHIP_NO_ERROR)
-            {
-                mStatus = mReader.Next();
-            }
-
-            if (mStatus == CHIP_NO_ERROR)
-            {
-                mStatus = DataModel::Decode(mReader, mValue);
-            }
-
-            return (mStatus == CHIP_NO_ERROR);
+            return DoNext();
         }
 
         template <typename T0 = T, std::enable_if_t<DataModel::IsFabricScoped<T0>::value, bool> = true>
         bool Next()
         {
-            if (mReader.GetContainerType() == TLV::kTLVType_NotSpecified)
-            {
-                return false;
-            }
+            bool hasNext = DoNext();
 
-            if (mStatus == CHIP_NO_ERROR)
-            {
-                mStatus = mReader.Next();
-            }
-
-            if (mStatus == CHIP_NO_ERROR)
-            {
-                mStatus = DataModel::Decode(mReader, mValue);
-            }
-
-            if (mStatus == CHIP_NO_ERROR && mFabricIndex.HasValue())
+            if (hasNext && mFabricIndex.HasValue())
             {
                 mValue.SetFabricIndex(mFabricIndex.Value());
             }
 
-            return (mStatus == CHIP_NO_ERROR);
+            return hasNext;
         }
 
         /*
@@ -169,9 +141,30 @@ public:
         }
 
     private:
+        bool DoNext()
+        {
+            if (mReader.GetContainerType() == TLV::kTLVType_NotSpecified)
+            {
+                return false;
+            }
+
+            if (mStatus == CHIP_NO_ERROR)
+            {
+                mStatus = mReader.Next();
+            }
+
+            if (mStatus == CHIP_NO_ERROR)
+            {
+                mStatus = DataModel::Decode(mReader, mValue);
+            }
+
+            return (mStatus == CHIP_NO_ERROR);
+        }
+
         T mValue;
         CHIP_ERROR mStatus;
         TLV::TLVReader mReader;
+        // TODO: Consider some method to disable this field when T is not a fabric scoped struct.
         const Optional<FabricIndex> mFabricIndex;
     };
 
