@@ -162,10 +162,11 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
     {
         char buf[64]; // fits 5 cats
         ChipLogDetail(DataManagement,
-                      "AccessControl: checking f=%" PRIu8 " a=%c s=0x%" PRIx64 " t=%s c=0x%" PRIx32 " e=%" PRIu16 " p=%c",
+                      "AccessControl: checking f=%" PRIu8 " a=%c s=0x" ChipLogFormatX64 " t=%s c=" ChipLogFormatMEI " e=%" PRIu16
+                      " p=%c",
                       subjectDescriptor.fabricIndex, GetAuthModeStringForLogging(subjectDescriptor.authMode),
-                      subjectDescriptor.subject, GetCatStringForLogging(buf, sizeof(buf), subjectDescriptor.cats),
-                      requestPath.cluster, requestPath.endpoint, GetPrivilegeStringForLogging(requestPrivilege));
+                      ChipLogValueX64(subjectDescriptor.subject), GetCatStringForLogging(buf, sizeof(buf), subjectDescriptor.cats),
+                      ChipLogValueMEI(requestPath.cluster), requestPath.endpoint, GetPrivilegeStringForLogging(requestPrivilege));
     }
 
     EntryIterator iterator;
