@@ -126,8 +126,7 @@ void HandleSubscribeReportComplete()
            static_cast<double>(transitTime.count()) / 1000);
 }
 
-class MockInteractionModelApp : public chip::app::InteractionModelDelegate,
-                                public ::chip::app::CommandSender::Callback,
+class MockInteractionModelApp : public ::chip::app::CommandSender::Callback,
                                 public ::chip::app::WriteClient::Callback,
                                 public ::chip::app::ReadClient::Callback
 {

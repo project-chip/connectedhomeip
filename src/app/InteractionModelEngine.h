@@ -46,7 +46,6 @@
 #include <app/CommandSender.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/InteractionModelDelegate.h>
 #include <app/ReadClient.h>
 #include <app/ReadHandler.h>
 #include <app/StatusResponse.h>
@@ -58,6 +57,7 @@
 
 namespace chip {
 namespace app {
+
 /**
  * @class InteractionModelEngine
  *
@@ -82,7 +82,6 @@ public:
      *  Initialize the InteractionModel Engine.
      *
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
-     *  @param[in]    apDelegate       InteractionModelDelegate set by application.
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE If the state is not equal to
      *          kState_NotInitialized.

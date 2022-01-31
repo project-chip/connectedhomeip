@@ -58,6 +58,7 @@ static_library("app") {
     "EventPathParams.h",
     "InteractionModelEngine.cpp",
     "InteractionModelRevision.h",
+    "InteractionModelTimeout.h",
     "MessageDef/ArrayBuilder.cpp",
     "MessageDef/ArrayParser.cpp",
     "MessageDef/AttributeDataIB.cpp",
