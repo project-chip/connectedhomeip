@@ -20830,8 +20830,8 @@ public:
             err = TestSendsAMoveToLevelCommand_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Wait 200ms\n");
-            err = TestWait200ms_8();
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Wait a second\n");
+            err = TestWaitASecond_8();
             break;
         case 9:
             ChipLogProgress(chipTool, " ***** Test Step 9 : reads CurrentLevel attribute from DUT\n");
@@ -21121,10 +21121,10 @@ private:
 
     void OnSuccessResponse_7() { NextTest(); }
 
-    CHIP_ERROR TestWait200ms_8()
+    CHIP_ERROR TestWaitASecond_8()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForMs(200);
+        return WaitForMs(1000);
     }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_9()
@@ -21871,8 +21871,8 @@ public:
             err = TestPreconditionDutLevelIsSetTo0x80_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Wait 3000ms\n");
-            err = TestWait3000ms_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Wait 4000ms\n");
+            err = TestWait4000ms_3();
             break;
         case 4:
             ChipLogProgress(chipTool, " ***** Test Step 4 : Reads current level attribute from DUT\n");
@@ -21883,8 +21883,8 @@ public:
             err = TestSendsStepDownCommandToDut_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Wait 3000ms\n");
-            err = TestWait3000ms_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Wait 4000ms\n");
+            err = TestWait4000ms_6();
             break;
         case 7:
             ChipLogProgress(chipTool, " ***** Test Step 7 : Reads current level attribute from DUT\n");
@@ -21895,8 +21895,8 @@ public:
             err = TestSendsAStepUpCommand_8();
             break;
         case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : Wait 3000ms\n");
-            err = TestWait3000ms_9();
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Wait 4000ms\n");
+            err = TestWait4000ms_9();
             break;
         case 10:
             ChipLogProgress(chipTool, " ***** Test Step 10 : Reads current level attribute from DUT\n");
@@ -22029,10 +22029,10 @@ private:
 
     void OnSuccessResponse_2() { NextTest(); }
 
-    CHIP_ERROR TestWait3000ms_3()
+    CHIP_ERROR TestWait4000ms_3()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForMs(3000);
+        return WaitForMs(4000);
     }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_4()
@@ -22091,10 +22091,10 @@ private:
 
     void OnSuccessResponse_5() { NextTest(); }
 
-    CHIP_ERROR TestWait3000ms_6()
+    CHIP_ERROR TestWait4000ms_6()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForMs(3000);
+        return WaitForMs(4000);
     }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_7()
@@ -22153,10 +22153,10 @@ private:
 
     void OnSuccessResponse_8() { NextTest(); }
 
-    CHIP_ERROR TestWait3000ms_9()
+    CHIP_ERROR TestWait4000ms_9()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForMs(3000);
+        return WaitForMs(4000);
     }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_10()
