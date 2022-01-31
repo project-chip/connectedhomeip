@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Window Covering [TC-WNCV-3.1] UpOrOpen Command & Report Verification with server as DUT
+name:
+    Window Covering [TC-WNCV-3.1] UpOrOpen Command & Report Verification with
+    server as DUT
 
 # TC-WNCV tests featuremap conditional dependencies -> use PICS
 
@@ -28,7 +30,9 @@ tests:
     ################ Position Init Phase #############
     ### Step 1x -> Initialize the Covering position before any testing
     ### MANDATORY Init Commands
-    - label: "1a: TH sends DownOrClose command to preposition the DUT in the opposite direction"
+    - label:
+          "1a: TH sends DownOrClose command to preposition the DUT in the
+          opposite direction"
       command: "DownOrClose"
 
     - label: "1b: TH Waits for 10 seconds movement(s) on the device"
@@ -41,8 +45,9 @@ tests:
 
     ###
     ### Mandatory Depends on the FeatureMap
-    - label: "1c: If (PA & LF) TH reads CurrentPositionLiftPercent100ths
-          attribute from DUT"
+    - label:
+          "1c: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute
+          from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
       PICS: WNCV_LF && WNCV_PA_LF
@@ -54,8 +59,8 @@ tests:
 
     ### Optional Depends on the FeatureMap
     - label:
-          "1d: If (PA & LF) TH reads CurrentPositionLiftPercentage
-           optional attribute from DUT"
+          "1d: If (PA & LF) TH reads CurrentPositionLiftPercentage optional
+          attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercentage"
       PICS: WNCV_LF && WNCV_PA_LF && A_CURRENTPOSITIONLIFTPERCENTAGE
@@ -80,8 +85,8 @@ tests:
 
     ### Optional Depends on the FeatureMap
     - label:
-          "1f: If (PA & TL) TH reads CurrentPositionTiltPercentage optional attribute
-          from DUT"
+          "1f: If (PA & TL) TH reads CurrentPositionTiltPercentage optional
+          attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercentage"
       PICS: WNCV_TL && WNCV_PA_TL && A_CURRENTPOSITIONTILTPERCENTAGE
@@ -124,7 +129,7 @@ tests:
       attribute: "TargetPositionLiftPercent100ths"
       PICS: WNCV_LF && WNCV_PA_LF
       response:
-            value: 0
+          value: 0
 
     ### Mandatory Depends on the FeatureMap
     - label:
@@ -135,7 +140,7 @@ tests:
       attribute: "TargetPositionTiltPercent100ths"
       PICS: WNCV_TL && WNCV_PA_TL
       response:
-            value: 0
+          value: 0
 
     - label: "2e: TH leave the device moving for 2 seconds"
       cluster: "DelayCommands"
@@ -150,7 +155,9 @@ tests:
     ### Depends on the FeatureMap
     # The value of bit 0..1 must be 01b & if (LF) value of bit 2..3 must be 01b else 00b & if (TL) value of bit 4..5 must be 01b else 00b
     # Only 3 possibilities are possible here : 05h =  5, 11h = 17 or 15h = 21 then check a range for simplicity [5  - 21]
-    - label: "3a1: Verify DUT reports OperationalStatus attribute to TH after a UpOrOpen"
+    - label:
+          "3a1: Verify DUT reports OperationalStatus attribute to TH after a
+          UpOrOpen"
       command: "waitForReport"
       attribute: "OperationalStatus"
       response:
@@ -183,8 +190,8 @@ tests:
 
     ### Optional Depends on the FeatureMap
     - label:
-          "3c: If (PA & LF) TH reads CurrentPositionLiftPercentage
-           optional attribute from DUT"
+          "3c: If (PA & LF) TH reads CurrentPositionLiftPercentage optional
+          attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercentage"
       PICS: WNCV_LF && WNCV_PA_LF && A_CURRENTPOSITIONLIFTPERCENTAGE
@@ -209,8 +216,8 @@ tests:
 
     ### Optional Depends on the FeatureMap
     - label:
-          "3e: If (PA & LF) TH reads CurrentPositionTiltPercentage
-           optional attribute from DUT"
+          "3e: If (PA & LF) TH reads CurrentPositionTiltPercentage optional
+          attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercentage"
       PICS: WNCV_TL && WNCV_PA_TL && A_CURRENTPOSITIONTILTPERCENTAGE
@@ -226,7 +233,9 @@ tests:
     - label: "4a: TH sends a StopMotion command to DUT"
       command: "StopMotion"
 
-    - label: "4b: TH waits for 3 seconds the end of inertial movement(s) on the device"
+    - label:
+          "4b: TH waits for 3 seconds the end of inertial movement(s) on the
+          device"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -236,7 +245,9 @@ tests:
 
     ### Must Be ZERO
     # The value of bit 0..1 must be 00b & if (LF) value of bit 2..3 must be 00b & if (TL) value of bit 4..5 must be 00b
-    - label: "4c: Verify DUT reports OperationalStatus attribute to TH after a StopMotion"
+    - label:
+          "4c: Verify DUT reports OperationalStatus attribute to TH after a
+          StopMotion"
       command: "waitForReport"
       attribute: "OperationalStatus"
       response:
