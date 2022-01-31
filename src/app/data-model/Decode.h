@@ -135,10 +135,7 @@ CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path, X
  *
  * Decodes an optional value (struct field, command field, event field).
  */
-template <
-    typename X,
-    typename std::enable_if_t<
-        std::is_same<decltype(Decode(std::declval<TLV::TLVReader &>(), std::declval<X &>())), CHIP_ERROR>::value, X> * = nullptr>
+template <typename X>
 CHIP_ERROR Decode(TLV::TLVReader & reader, Optional<X> & x)
 {
     // If we are calling this, it means we found the right tag, so just decode
@@ -151,10 +148,7 @@ CHIP_ERROR Decode(TLV::TLVReader & reader, Optional<X> & x)
  *
  * Decodes a nullable value.
  */
-template <
-    typename X,
-    typename std::enable_if_t<
-        std::is_same<decltype(Decode(std::declval<TLV::TLVReader &>(), std::declval<X &>())), CHIP_ERROR>::value, X> * = nullptr>
+template <typename X>
 CHIP_ERROR Decode(TLV::TLVReader & reader, Nullable<X> & x)
 {
     if (reader.GetType() == TLV::kTLVType_Null)
