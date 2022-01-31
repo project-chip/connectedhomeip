@@ -31,78 +31,18 @@ namespace chip {
 
 namespace Controller {
 
-PythonInteractionModelDelegate gPythonInteractionModelDelegate;
-
-void PythonInteractionModelDelegate::OnResponse(app::CommandSender * apCommandSender, const app::ConcreteCommandPath & aPath,
-                                                const app::StatusIB & aStatus, TLV::TLVReader * aData)
-{
-    CommandStatus status{
-        aStatus.mStatus,
-        aStatus.mClusterStatus.HasValue() ? aStatus.mClusterStatus.Value() : chip::python::kUndefinedClusterStatus,
-        aPath.mEndpointId,
-        aPath.mClusterId,
-        aPath.mCommandId,
-        1
-    }; // This indicates the index of the command if multiple command/status payloads are present in the
-       // message. For now, we don't support this in the IM layer, so just always set this to 1.
-    if (commandResponseStatusFunct != nullptr)
-    {
-        commandResponseStatusFunct(reinterpret_cast<uint64_t>(apCommandSender), &status, sizeof(status));
-    }
-
-    DeviceControllerInteractionModelDelegate::OnResponse(apCommandSender, aPath, aStatus, aData);
-
-    if (commandResponseErrorFunct != nullptr)
-    {
-        commandResponseErrorFunct(reinterpret_cast<uint64_t>(apCommandSender), CHIP_NO_ERROR.AsInteger());
-    }
-}
-
-void PythonInteractionModelDelegate::OnError(const app::CommandSender * apCommandSender, CHIP_ERROR aError)
-{
-    StatusIB serverStatus(aError);
-    CommandStatus status{
-        serverStatus.mStatus, serverStatus.mClusterStatus.ValueOr(chip::python::kUndefinedClusterStatus), 0, 0, 0, 1
-    };
-
-    if (commandResponseStatusFunct != nullptr)
-    {
-        commandResponseStatusFunct(reinterpret_cast<uint64_t>(apCommandSender), &status, sizeof(status));
-    }
-
-    if (commandResponseErrorFunct != nullptr)
-    {
-        commandResponseErrorFunct(reinterpret_cast<uint64_t>(apCommandSender), aError.AsInteger());
-    }
-    DeviceControllerInteractionModelDelegate::OnError(apCommandSender, aError);
-}
-
 void pychip_InteractionModelDelegate_SetCommandResponseStatusCallback(
     PythonInteractionModelDelegate_OnCommandResponseStatusCodeReceivedFunct f)
-{
-    gPythonInteractionModelDelegate.SetOnCommandResponseStatusCodeReceivedCallback(f);
-}
+{}
 
 void pychip_InteractionModelDelegate_SetCommandResponseProtocolErrorCallback(
     PythonInteractionModelDelegate_OnCommandResponseProtocolErrorFunct f)
-{
-    gPythonInteractionModelDelegate.SetOnCommandResponseProtocolErrorCallback(f);
-}
+{}
 
-void pychip_InteractionModelDelegate_SetCommandResponseErrorCallback(PythonInteractionModelDelegate_OnCommandResponseFunct f)
-{
-    gPythonInteractionModelDelegate.SetOnCommandResponseCallback(f);
-}
+void pychip_InteractionModelDelegate_SetCommandResponseErrorCallback(PythonInteractionModelDelegate_OnCommandResponseFunct f) {}
 
 void pychip_InteractionModelDelegate_SetOnWriteResponseStatusCallback(PythonInteractionModelDelegate_OnWriteResponseStatusFunct f)
-{
-    gPythonInteractionModelDelegate.SetOnWriteResponseStatusCallback(f);
-}
-
-PythonInteractionModelDelegate & PythonInteractionModelDelegate::Instance()
-{
-    return gPythonInteractionModelDelegate;
-}
+{}
 
 } // namespace Controller
 } // namespace chip
