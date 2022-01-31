@@ -213,10 +213,14 @@ PICS:
     - label: "Does the device implement the EndProductType attribute?"
       id: A_ENDPRODUCTTYPE
 
-    - label: "Does the device implement the CurrentPositionLiftPercentage attribute?"
+    - label:
+          "Does the device implement the CurrentPositionLiftPercentage
+          attribute?"
       id: A_CURRENTPOSITIONLIFTPERCENTAGE
 
-    - label: "Does the device implement the CurrentPositionTiltPercentage attribute?"
+    - label:
+          "Does the device implement the CurrentPositionTiltPercentage
+          attribute?"
       id: A_CURRENTPOSITIONTILTPERCENTAGE
 
       # On/Off Cluster
