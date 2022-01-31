@@ -31,6 +31,8 @@ void BoundDeviceChangedHandler(const EmberBindingTableEntry & binding, chip::Dev
     using namespace chip;
     using namespace chip::app;
 
+    VerifyOrReturn(context != nullptr, return );
+
     auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
         ChipLogProgress(NotSpecified, "OnOff command succeeds");
     };
@@ -47,16 +49,23 @@ void BoundDeviceChangedHandler(const EmberBindingTableEntry & binding, chip::Dev
     if (binding.type == EMBER_UNICAST_BINDING && binding.local == 1 && binding.clusterId.HasValue() &&
         binding.clusterId.Value() == Clusters::OnOff::Id)
     {
-        Clusters::OnOff::Commands::Toggle::Type toggleCommand;
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         toggleCommand, onSuccess, onFailure);
+        CommandId commandId = *(static_cast<CommandId *>(context));
+        switch (commandId)
+        {
+        case Clusters::OnOff::Commands::Toggle::Id:
+            Clusters::OnOff::Commands::Toggle::Type command;
+            Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
+                                             command, onSuccess, onFailure);
+            break;
+        }
     }
 }
 } // namespace
 
 void SwitchToggleOnOff(intptr_t context)
 {
-    chip::BindingManager::GetInstance().NotifyBoundClusterChanged(1, chip::app::Clusters::OnOff::Id, nullptr);
+    void * command = (void *) (&chip::app::Clusters::OnOff::Commands::Toggle::Id);
+    chip::BindingManager::GetInstance().NotifyBoundClusterChanged(1 /* endpointId */, chip::app::Clusters::OnOff::Id, command);
 }
 
 CHIP_ERROR InitBindingHandler()
