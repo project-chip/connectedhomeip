@@ -25452,7 +25452,7 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
 - (void)testSendClusterTest_TC_WNCV_3_1_000013_WaitForReport
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"3a: Verify DUT reports OperationalStatus attribute to TH after a UpOrOpen"];
+        [self expectationWithDescription:@"3a1: Verify DUT reports OperationalStatus attribute to TH after a UpOrOpen"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -25460,7 +25460,7 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
     XCTAssertNotNil(cluster);
 
     test_Test_TC_WNCV_3_1_OperationalStatus_Reported = ^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"3a: Verify DUT reports OperationalStatus attribute to TH after a UpOrOpen Error: %@", err);
+        NSLog(@"3a1: Verify DUT reports OperationalStatus attribute to TH after a UpOrOpen Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -25482,7 +25482,15 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_1_000014_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_3_1_000014_WaitForMs
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"3a2: DUT updates its attributes"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    WaitForMs(expectation, queue, 1000);
+    [self waitForExpectationsWithTimeout:(1000 / 1000) + kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_3_1_000015_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3b: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT"];
@@ -25516,7 +25524,7 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_1_000015_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_3_1_000016_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3c: If (PA & LF) TH reads CurrentPositionLiftPercentage optional attribute from DUT"];
@@ -25550,7 +25558,7 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_1_000016_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_3_1_000017_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3d: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT"];
@@ -25584,7 +25592,7 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_1_000017_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_3_1_000018_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3e: If (PA & LF) TH reads CurrentPositionTiltPercentage optional attribute from DUT"];
@@ -25618,7 +25626,7 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_1_000018_StopMotion
+- (void)testSendClusterTest_TC_WNCV_3_1_000019_StopMotion
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"4a: TH sends a StopMotion command to DUT"];
 
@@ -25637,16 +25645,16 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_1_000019_WaitForMs
+- (void)testSendClusterTest_TC_WNCV_3_1_000020_WaitForMs
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"4b: TH waits for 3 seconds the end of inertial movement(s) on the device"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 3000);
-    [self waitForExpectationsWithTimeout:(3000 / 1000) + kTimeoutInSeconds handler:nil];
+    WaitForMs(expectation, queue, 2000);
+    [self waitForExpectationsWithTimeout:(2000 / 1000) + kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_1_000020_WaitForReport
+- (void)testSendClusterTest_TC_WNCV_3_1_000021_WaitForReport
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"4c: Verify DUT reports OperationalStatus attribute to TH after a StopMotion"];
@@ -25671,7 +25679,7 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_1_000021_WaitForMs
+- (void)testSendClusterTest_TC_WNCV_3_1_000022_WaitForMs
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"5a: TH waits for x seconds attributes update on the device"];
@@ -25680,7 +25688,7 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
     WaitForMs(expectation, queue, 1000);
     [self waitForExpectationsWithTimeout:(1000 / 1000) + kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_1_000022_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_3_1_000023_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"5b: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute from DUT"];
@@ -25714,7 +25722,7 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_1_000023_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_3_1_000024_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"5c: If (PA & TL) TH reads TargetPositionTiltPercent100ths attribute from DUT"];
@@ -25748,7 +25756,7 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_1_000024_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_3_1_000025_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"5d: TH reads OperationalStatus attribute from DUT must be ZERO"];
@@ -26041,7 +26049,7 @@ ResponseHandler test_Test_TC_WNCV_3_2_OperationalStatus_Reported = nil;
             {
                 id actualValue = value;
                 XCTAssertFalse(actualValue == nil);
-                XCTAssertEqual([actualValue unsignedShortValue], 0U);
+                XCTAssertEqual([actualValue unsignedShortValue], 10000U);
             }
 
             [expectation fulfill];
@@ -26090,7 +26098,15 @@ ResponseHandler test_Test_TC_WNCV_3_2_OperationalStatus_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_2_000014_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_3_2_000014_WaitForMs
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"3a2: DUT updates its attributes"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    WaitForMs(expectation, queue, 1000);
+    [self waitForExpectationsWithTimeout:(1000 / 1000) + kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_3_2_000015_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3b: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT"];
@@ -26124,7 +26140,7 @@ ResponseHandler test_Test_TC_WNCV_3_2_OperationalStatus_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_2_000015_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_3_2_000016_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3c: If (PA & LF) TH reads CurrentPositionLiftPercentage optional attribute from DUT"];
@@ -26158,7 +26174,7 @@ ResponseHandler test_Test_TC_WNCV_3_2_OperationalStatus_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_2_000016_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_3_2_000017_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3d: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT"];
@@ -26192,7 +26208,7 @@ ResponseHandler test_Test_TC_WNCV_3_2_OperationalStatus_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_2_000017_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_3_2_000018_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3e: If (PA & LF) TH reads CurrentPositionTiltPercentage optional attribute from DUT"];
@@ -26226,7 +26242,7 @@ ResponseHandler test_Test_TC_WNCV_3_2_OperationalStatus_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_2_000018_StopMotion
+- (void)testSendClusterTest_TC_WNCV_3_2_000019_StopMotion
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"4a: TH sends a StopMotion command to DUT"];
 
@@ -26245,16 +26261,16 @@ ResponseHandler test_Test_TC_WNCV_3_2_OperationalStatus_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_2_000019_WaitForMs
+- (void)testSendClusterTest_TC_WNCV_3_2_000020_WaitForMs
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"4b: TH waits for 3 seconds the end of inertial movement(s) on the device"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 3000);
-    [self waitForExpectationsWithTimeout:(3000 / 1000) + kTimeoutInSeconds handler:nil];
+    WaitForMs(expectation, queue, 2000);
+    [self waitForExpectationsWithTimeout:(2000 / 1000) + kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_2_000020_WaitForReport
+- (void)testSendClusterTest_TC_WNCV_3_2_000021_WaitForReport
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"4c: Verify DUT reports OperationalStatus attribute to TH after a StopMotion"];
@@ -26279,7 +26295,7 @@ ResponseHandler test_Test_TC_WNCV_3_2_OperationalStatus_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_2_000021_WaitForMs
+- (void)testSendClusterTest_TC_WNCV_3_2_000022_WaitForMs
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"5a: TH waits for x seconds attributes update on the device"];
@@ -26288,7 +26304,7 @@ ResponseHandler test_Test_TC_WNCV_3_2_OperationalStatus_Reported = nil;
     WaitForMs(expectation, queue, 1000);
     [self waitForExpectationsWithTimeout:(1000 / 1000) + kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_2_000022_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_3_2_000023_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"5b: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute from DUT"];
@@ -26322,7 +26338,7 @@ ResponseHandler test_Test_TC_WNCV_3_2_OperationalStatus_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_2_000023_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_3_2_000024_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"5c: If (PA & TL) TH reads TargetPositionTiltPercent100ths attribute from DUT"];
@@ -26356,7 +26372,7 @@ ResponseHandler test_Test_TC_WNCV_3_2_OperationalStatus_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_2_000024_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_3_2_000025_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"5d: TH reads OperationalStatus attribute from DUT must be ZERO"];
@@ -26578,144 +26594,6 @@ ResponseHandler test_Test_TC_WNCV_3_3_OperationalStatus_Reported = nil;
 
         [expectation fulfill];
     }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-uint16_t attrCurrentPositionLift;
-- (void)testSendClusterTest_TC_WNCV_3_3_000012_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"3a: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster
-        readAttributeCurrentPositionLiftPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"3a: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT Error: %@", err);
-
-            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 0U);
-                }
-            }
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 10000U);
-                }
-            }
-            {
-                id actualValue = value;
-                attrCurrentPositionLift = [actualValue unsignedShortValue];
-            }
-
-            [expectation fulfill];
-        }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_3_000013_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"3b: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute 3c: it Must be "
-                                         @"equal with CurrentPositionLiftPercent100ths from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster
-        readAttributeTargetPositionLiftPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"3b: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute 3c: it Must be equal with "
-                  @"CurrentPositionLiftPercent100ths from DUT Error: %@",
-                err);
-
-            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-            {
-                id actualValue = value;
-                XCTAssertFalse(actualValue == nil);
-                XCTAssertEqual([actualValue unsignedShortValue], attrCurrentPositionLift);
-            }
-
-            [expectation fulfill];
-        }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-uint16_t attrCurrentPositionTilt;
-- (void)testSendClusterTest_TC_WNCV_3_3_000014_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"4a: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster
-        readAttributeCurrentPositionTiltPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"4a: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT Error: %@", err);
-
-            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 0U);
-                }
-            }
-            {
-                id actualValue = value;
-                if (actualValue != nil) {
-                    XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 10000U);
-                }
-            }
-            {
-                id actualValue = value;
-                attrCurrentPositionTilt = [actualValue unsignedShortValue];
-            }
-
-            [expectation fulfill];
-        }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_3_000015_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"4b: If (PA & TL) TH reads TargetPositionTiltPercent100ths attribute 4c: it Must be "
-                                         @"equal with CurrentPositionTiltPercent100ths from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster
-        readAttributeTargetPositionTiltPercent100thsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"4b: If (PA & TL) TH reads TargetPositionTiltPercent100ths attribute 4c: it Must be equal with "
-                  @"CurrentPositionTiltPercent100ths from DUT Error: %@",
-                err);
-
-            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-            {
-                id actualValue = value;
-                XCTAssertFalse(actualValue == nil);
-                XCTAssertEqual([actualValue unsignedShortValue], attrCurrentPositionTilt);
-            }
-
-            [expectation fulfill];
-        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }

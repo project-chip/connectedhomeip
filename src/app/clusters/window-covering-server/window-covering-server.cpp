@@ -42,7 +42,7 @@ using namespace chip::app::Clusters::WindowCovering;
 #define CHECK_BOUNDS_INVALID(MIN, VAL, MAX) ((VAL < MIN) || (VAL > MAX))
 #define CHECK_BOUNDS_VALID(MIN, VAL, MAX) (!CHECK_BOUNDS_INVALID(MIN, VAL, MAX))
 
-#define FAKE_MOTION_DELAY_MS 6000
+#define FAKE_MOTION_DELAY_MS 5000
 
 /*
  * ConvertValue: Converts values from one range to another
