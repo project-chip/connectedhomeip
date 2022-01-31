@@ -70,7 +70,6 @@ static uint16_t ConvertValue(uint16_t inputLowValue, uint16_t inputHighValue, ui
     inputRange  = static_cast<uint16_t>(inputMax - inputMin);
     outputRange = static_cast<uint16_t>(outputMax - outputMin);
 
-
     if (value < inputMin)
     {
         return outputMin;
@@ -414,7 +413,6 @@ void TiltPositionSet(chip::EndpointId endpoint, uint16_t percent100ths)
     emberAfWindowCoveringClusterPrint("Tilt Position Set: %u%%", percent);
 }
 
-
 OperationalState ComputeOperationalState(uint16_t target, uint16_t current)
 {
     OperationalState opState = OperationalState::Stall;
@@ -471,7 +469,7 @@ void emberAfPluginWindowCoveringFinalizeFakeMotionEventHandler(EndpointId endpoi
 EmberEventControl * GetEventControl(EndpointId endpoint)
 {
     static EmberEventControl eventControls[EMBER_AF_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT];
-    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, WindowCovering::Id);
+    uint16_t index            = emberAfFindClusterServerEndpointIndex(endpoint, WindowCovering::Id);
     EmberEventControl * event = nullptr;
 
     if (index < ArraySize(eventControls))
@@ -509,28 +507,33 @@ void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeI
     // otherwise it is defined for manufacturer specific implementation */
     NPercent100ths current, target;
     OperationalStatus prevOpStatus = OperationalStatusGet(endpoint);
-    OperationalStatus opStatus = prevOpStatus;
+    OperationalStatus opStatus     = prevOpStatus;
 
-    emberAfWindowCoveringClusterPrint("WC POST ATTRIBUTE=%u OpStatus global=0x%02X lift=0x%02X tilt=0x%02X", (unsigned int) attributeId, (unsigned int) opStatus.global, (unsigned int) opStatus.lift, (unsigned int) opStatus.tilt);
+    emberAfWindowCoveringClusterPrint("WC POST ATTRIBUTE=%u OpStatus global=0x%02X lift=0x%02X tilt=0x%02X",
+                                      (unsigned int) attributeId, (unsigned int) opStatus.global, (unsigned int) opStatus.lift,
+                                      (unsigned int) opStatus.tilt);
 
     switch (attributeId)
     {
     /* RO OperationalStatus */
     case Attributes::OperationalStatus::Id:
-        if (OperationalState::Stall != opStatus.global) {
+        if (OperationalState::Stall != opStatus.global)
+        {
             // Finish the fake motion attribute update:
             emberEventControlSetDelayMS(ConfigureFakeMotionEventControl(endpoint), FAKE_MOTION_DELAY_MS);
         }
         break;
     /* ============= Positions for Position Aware ============= */
     case Attributes::CurrentPositionLiftPercent100ths::Id:
-        if (OperationalState::Stall != opStatus.lift) {
+        if (OperationalState::Stall != opStatus.lift)
+        {
             opStatus.lift = OperationalState::Stall;
             emberAfWindowCoveringClusterPrint("Lift stop");
         }
         break;
     case Attributes::CurrentPositionTiltPercent100ths::Id:
-        if (OperationalState::Stall != opStatus.tilt) {
+        if (OperationalState::Stall != opStatus.tilt)
+        {
             opStatus.tilt = OperationalState::Stall;
             emberAfWindowCoveringClusterPrint("Tilt stop");
         }
@@ -622,7 +625,7 @@ bool emberAfWindowCoveringClusterDownOrCloseCallback(app::CommandHandler * comma
  * @brief  Cluster StopMotion Command callback (from client)
  */
 bool emberAfWindowCoveringClusterStopMotionCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                               const Commands::StopMotion::DecodableType & fields)
+                                                    const Commands::StopMotion::DecodableType & fields)
 {
     emberAfWindowCoveringClusterPrint("StopMotion command received");
     app::DataModel::Nullable<Percent100ths> current;
@@ -764,7 +767,8 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(app::CommandHandler 
 /**
  * @brief Cluster Attribute Changed Callback
  */
-void __attribute__((weak)) MatterWindowCoveringClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
+void __attribute__((weak))
+MatterWindowCoveringClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
 {
     PostAttributeChange(attributePath.mEndpointId, attributePath.mAttributeId);
 }
