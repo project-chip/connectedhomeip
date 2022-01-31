@@ -491,7 +491,7 @@
           "mfgCode": null,
           "define": "GENERAL_COMMISSIONING_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "ArmFailSafe",
@@ -499,7 +499,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 0
+              "outgoing": 1
             },
             {
               "name": "SetRegulatoryConfig",
@@ -507,7 +507,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 0
+              "outgoing": 1
             },
             {
               "name": "CommissioningComplete",
@@ -515,7 +515,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 0
+              "outgoing": 1
             }
           ],
           "attributes": [

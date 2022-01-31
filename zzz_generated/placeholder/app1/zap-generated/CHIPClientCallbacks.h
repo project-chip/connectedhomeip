@@ -37,6 +37,13 @@
 // Cluster Specific Response Callbacks
 
 // List specific responses
+void GeneralCommissioningClusterBasicCommissioningInfoListListAttributeFilter(chip::TLV::TLVReader * data,
+                                                                              chip::Callback::Cancelable * onSuccessCallback,
+                                                                              chip::Callback::Cancelable * onFailureCallback);
+typedef void (*GeneralCommissioningBasicCommissioningInfoListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType> & data);
 void OperationalCredentialsClusterFabricsListListAttributeFilter(chip::TLV::TLVReader * data,
                                                                  chip::Callback::Cancelable * onSuccessCallback,
                                                                  chip::Callback::Cancelable * onFailureCallback);

@@ -327,6 +327,10 @@ NS_ASSUME_NONNULL_BEGIN
                                        completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeNumberOfRFIDUsersSupportedWithValue:(NSNumber * _Nonnull)value
                                         completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeNumberOfWeekDaySchedulesSupportedPerUserWithValue:(NSNumber * _Nonnull)value
+                                                      completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeNumberOfYearDaySchedulesSupportedPerUserWithValue:(NSNumber * _Nonnull)value
+                                                      completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeMaxPINCodeLengthWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeMinPINCodeLengthWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeMaxRFIDCodeLengthWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;

@@ -383,8 +383,10 @@ exit:
     return err.AsInteger();
 }
 
-chip::ChipError::StorageType pychip_ReadClient_ReadEvents(void * appContext, DeviceProxy * device, uint8_t * readParamsBuf,
-                                                          size_t n, ...)
+chip::ChipError::StorageType pychip_ReadClient_ReadEvents(void * appContext, ReadClient ** pReadClient,
+                                                          ReadClientCallback ** pCallback, DeviceProxy * device,
+
+                                                          uint8_t * readParamsBuf, size_t n, ...)
 {
     CHIP_ERROR err                 = CHIP_NO_ERROR;
     PyReadAttributeParams pyParams = {};
@@ -432,8 +434,12 @@ chip::ChipError::StorageType pychip_ReadClient_ReadEvents(void * appContext, Dev
         SuccessOrExit(err);
     }
 
+    *pReadClient = readClient.get();
+    *pCallback   = callback.get();
+
+    callback->AdoptReadClient(std::move(readClient));
+
     callback.release();
-    readClient.release();
 
 exit:
     va_end(args);

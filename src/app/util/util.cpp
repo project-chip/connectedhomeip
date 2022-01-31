@@ -971,8 +971,8 @@ bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId cluster
 bool emberAfIsNonVolatileAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
                                    bool asServer)
 {
-    uint8_t mask                        = asServer ? CLUSTER_MASK_SERVER : CLUSTER_MASK_CLIENT;
-    EmberAfAttributeMetadata * metadata = emberAfLocateAttributeMetadata(endpoint, clusterId, attributeId, mask);
+    uint8_t mask                              = asServer ? CLUSTER_MASK_SERVER : CLUSTER_MASK_CLIENT;
+    const EmberAfAttributeMetadata * metadata = emberAfLocateAttributeMetadata(endpoint, clusterId, attributeId, mask);
 
     if (metadata == nullptr)
     {

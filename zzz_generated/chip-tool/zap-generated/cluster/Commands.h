@@ -2233,12 +2233,19 @@ private:
 | Commands:                                                           |        |
 | * ClearCredential                                                   |   0x26 |
 | * ClearUser                                                         |   0x1D |
+| * ClearWeekDaySchedule                                              |   0x0D |
+| * ClearYearDaySchedule                                              |   0x10 |
 | * GetCredentialStatus                                               |   0x24 |
 | * GetUser                                                           |   0x1B |
+| * GetWeekDaySchedule                                                |   0x0C |
+| * GetYearDaySchedule                                                |   0x0F |
 | * LockDoor                                                          |   0x00 |
 | * SetCredential                                                     |   0x22 |
 | * SetUser                                                           |   0x1A |
+| * SetWeekDaySchedule                                                |   0x0B |
+| * SetYearDaySchedule                                                |   0x0E |
 | * UnlockDoor                                                        |   0x01 |
+| * UnlockWithTimeout                                                 |   0x03 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * LockState                                                         | 0x0000 |
@@ -2248,6 +2255,8 @@ private:
 | * NumberOfTotalUsersSupported                                       | 0x0011 |
 | * NumberOfPINUsersSupported                                         | 0x0012 |
 | * NumberOfRFIDUsersSupported                                        | 0x0013 |
+| * NumberOfWeekDaySchedulesSupportedPerUser                          | 0x0014 |
+| * NumberOfYearDaySchedulesSupportedPerUser                          | 0x0015 |
 | * MaxPINCodeLength                                                  | 0x0017 |
 | * MinPINCodeLength                                                  | 0x0018 |
 | * MaxRFIDCodeLength                                                 | 0x0019 |
@@ -2320,6 +2329,54 @@ private:
 };
 
 /*
+ * Command ClearWeekDaySchedule
+ */
+class DoorLockClearWeekDaySchedule : public ClusterCommand
+{
+public:
+    DoorLockClearWeekDaySchedule() : ClusterCommand("clear-week-day-schedule")
+    {
+        AddArgument("WeekDayIndex", 0, UINT8_MAX, &mRequest.weekDayIndex);
+        AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000D) on endpoint %" PRIu16, endpointId);
+
+        return ClusterCommand::SendCommand(device, endpointId, 0x00000101, 0x0000000D, mRequest);
+    }
+
+private:
+    chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type mRequest;
+};
+
+/*
+ * Command ClearYearDaySchedule
+ */
+class DoorLockClearYearDaySchedule : public ClusterCommand
+{
+public:
+    DoorLockClearYearDaySchedule() : ClusterCommand("clear-year-day-schedule")
+    {
+        AddArgument("YearDayIndex", 0, UINT8_MAX, &mRequest.yearDayIndex);
+        AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000010) on endpoint %" PRIu16, endpointId);
+
+        return ClusterCommand::SendCommand(device, endpointId, 0x00000101, 0x00000010, mRequest);
+    }
+
+private:
+    chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type mRequest;
+};
+
+/*
  * Command GetCredentialStatus
  */
 class DoorLockGetCredentialStatus : public ClusterCommand
@@ -2364,6 +2421,54 @@ public:
 
 private:
     chip::app::Clusters::DoorLock::Commands::GetUser::Type mRequest;
+};
+
+/*
+ * Command GetWeekDaySchedule
+ */
+class DoorLockGetWeekDaySchedule : public ClusterCommand
+{
+public:
+    DoorLockGetWeekDaySchedule() : ClusterCommand("get-week-day-schedule")
+    {
+        AddArgument("WeekDayIndex", 0, UINT8_MAX, &mRequest.weekDayIndex);
+        AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000C) on endpoint %" PRIu16, endpointId);
+
+        return ClusterCommand::SendCommand(device, endpointId, 0x00000101, 0x0000000C, mRequest);
+    }
+
+private:
+    chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type mRequest;
+};
+
+/*
+ * Command GetYearDaySchedule
+ */
+class DoorLockGetYearDaySchedule : public ClusterCommand
+{
+public:
+    DoorLockGetYearDaySchedule() : ClusterCommand("get-year-day-schedule")
+    {
+        AddArgument("YearDayIndex", 0, UINT8_MAX, &mRequest.yearDayIndex);
+        AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000F) on endpoint %" PRIu16, endpointId);
+
+        return ClusterCommand::SendCommand(device, endpointId, 0x00000101, 0x0000000F, mRequest);
+    }
+
+private:
+    chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type mRequest;
 };
 
 /*
@@ -2448,6 +2553,61 @@ private:
 };
 
 /*
+ * Command SetWeekDaySchedule
+ */
+class DoorLockSetWeekDaySchedule : public ClusterCommand
+{
+public:
+    DoorLockSetWeekDaySchedule() : ClusterCommand("set-week-day-schedule")
+    {
+        AddArgument("WeekDayIndex", 0, UINT8_MAX, &mRequest.weekDayIndex);
+        AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
+        AddArgument("DaysMask", 0, UINT8_MAX, &mRequest.daysMask);
+        AddArgument("StartHour", 0, UINT8_MAX, &mRequest.startHour);
+        AddArgument("StartMinute", 0, UINT8_MAX, &mRequest.startMinute);
+        AddArgument("EndHour", 0, UINT8_MAX, &mRequest.endHour);
+        AddArgument("EndMinute", 0, UINT8_MAX, &mRequest.endMinute);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000B) on endpoint %" PRIu16, endpointId);
+
+        return ClusterCommand::SendCommand(device, endpointId, 0x00000101, 0x0000000B, mRequest);
+    }
+
+private:
+    chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type mRequest;
+};
+
+/*
+ * Command SetYearDaySchedule
+ */
+class DoorLockSetYearDaySchedule : public ClusterCommand
+{
+public:
+    DoorLockSetYearDaySchedule() : ClusterCommand("set-year-day-schedule")
+    {
+        AddArgument("YearDayIndex", 0, UINT8_MAX, &mRequest.yearDayIndex);
+        AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
+        AddArgument("LocalStartTime", 0, UINT32_MAX, &mRequest.localStartTime);
+        AddArgument("LocalEndTime", 0, UINT32_MAX, &mRequest.localEndTime);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000E) on endpoint %" PRIu16, endpointId);
+
+        return ClusterCommand::SendCommand(device, endpointId, 0x00000101, 0x0000000E, mRequest);
+    }
+
+private:
+    chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type mRequest;
+};
+
+/*
  * Command UnlockDoor
  */
 class DoorLockUnlockDoor : public ClusterCommand
@@ -2468,6 +2628,30 @@ public:
 
 private:
     chip::app::Clusters::DoorLock::Commands::UnlockDoor::Type mRequest;
+};
+
+/*
+ * Command UnlockWithTimeout
+ */
+class DoorLockUnlockWithTimeout : public ClusterCommand
+{
+public:
+    DoorLockUnlockWithTimeout() : ClusterCommand("unlock-with-timeout")
+    {
+        AddArgument("Timeout", 0, UINT16_MAX, &mRequest.timeout);
+        AddArgument("PinCode", &mRequest.pinCode);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000003) on endpoint %" PRIu16, endpointId);
+
+        return ClusterCommand::SendCommand(device, endpointId, 0x00000101, 0x00000003, mRequest);
+    }
+
+private:
+    chip::app::Clusters::DoorLock::Commands::UnlockWithTimeout::Type mRequest;
 };
 
 class WriteDoorLockLanguage : public WriteAttribute
@@ -9415,26 +9599,37 @@ void registerClusterDoorLock(Commands & commands)
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id),            //
-        make_unique<DoorLockClearCredential>(),     //
-        make_unique<DoorLockClearUser>(),           //
-        make_unique<DoorLockGetCredentialStatus>(), //
-        make_unique<DoorLockGetUser>(),             //
-        make_unique<DoorLockLockDoor>(),            //
-        make_unique<DoorLockSetCredential>(),       //
-        make_unique<DoorLockSetUser>(),             //
-        make_unique<DoorLockUnlockDoor>(),          //
+        make_unique<ClusterCommand>(Id),             //
+        make_unique<DoorLockClearCredential>(),      //
+        make_unique<DoorLockClearUser>(),            //
+        make_unique<DoorLockClearWeekDaySchedule>(), //
+        make_unique<DoorLockClearYearDaySchedule>(), //
+        make_unique<DoorLockGetCredentialStatus>(),  //
+        make_unique<DoorLockGetUser>(),              //
+        make_unique<DoorLockGetWeekDaySchedule>(),   //
+        make_unique<DoorLockGetYearDaySchedule>(),   //
+        make_unique<DoorLockLockDoor>(),             //
+        make_unique<DoorLockSetCredential>(),        //
+        make_unique<DoorLockSetUser>(),              //
+        make_unique<DoorLockSetWeekDaySchedule>(),   //
+        make_unique<DoorLockSetYearDaySchedule>(),   //
+        make_unique<DoorLockUnlockDoor>(),           //
+        make_unique<DoorLockUnlockWithTimeout>(),    //
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id),                                                                                      //
-        make_unique<ReadAttribute>(Id, "lock-state", Attributes::LockState::Id),                                             //
-        make_unique<ReadAttribute>(Id, "lock-type", Attributes::LockType::Id),                                               //
-        make_unique<ReadAttribute>(Id, "actuator-enabled", Attributes::ActuatorEnabled::Id),                                 //
-        make_unique<ReadAttribute>(Id, "door-state", Attributes::DoorState::Id),                                             //
-        make_unique<ReadAttribute>(Id, "number-of-total-users-supported", Attributes::NumberOfTotalUsersSupported::Id),      //
-        make_unique<ReadAttribute>(Id, "number-of-pinusers-supported", Attributes::NumberOfPINUsersSupported::Id),           //
-        make_unique<ReadAttribute>(Id, "number-of-rfidusers-supported", Attributes::NumberOfRFIDUsersSupported::Id),         //
+        make_unique<ReadAttribute>(Id),                                                                                 //
+        make_unique<ReadAttribute>(Id, "lock-state", Attributes::LockState::Id),                                        //
+        make_unique<ReadAttribute>(Id, "lock-type", Attributes::LockType::Id),                                          //
+        make_unique<ReadAttribute>(Id, "actuator-enabled", Attributes::ActuatorEnabled::Id),                            //
+        make_unique<ReadAttribute>(Id, "door-state", Attributes::DoorState::Id),                                        //
+        make_unique<ReadAttribute>(Id, "number-of-total-users-supported", Attributes::NumberOfTotalUsersSupported::Id), //
+        make_unique<ReadAttribute>(Id, "number-of-pinusers-supported", Attributes::NumberOfPINUsersSupported::Id),      //
+        make_unique<ReadAttribute>(Id, "number-of-rfidusers-supported", Attributes::NumberOfRFIDUsersSupported::Id),    //
+        make_unique<ReadAttribute>(Id, "number-of-week-day-schedules-supported-per-user",
+                                   Attributes::NumberOfWeekDaySchedulesSupportedPerUser::Id), //
+        make_unique<ReadAttribute>(Id, "number-of-year-day-schedules-supported-per-user",
+                                   Attributes::NumberOfYearDaySchedulesSupportedPerUser::Id),                                //
         make_unique<ReadAttribute>(Id, "max-pincode-length", Attributes::MaxPINCodeLength::Id),                              //
         make_unique<ReadAttribute>(Id, "min-pincode-length", Attributes::MinPINCodeLength::Id),                              //
         make_unique<ReadAttribute>(Id, "max-rfidcode-length", Attributes::MaxRFIDCodeLength::Id),                            //
@@ -9465,20 +9660,24 @@ void registerClusterDoorLock(Commands & commands)
         make_unique<SubscribeAttribute>(Id, "number-of-total-users-supported", Attributes::NumberOfTotalUsersSupported::Id), //
         make_unique<SubscribeAttribute>(Id, "number-of-pinusers-supported", Attributes::NumberOfPINUsersSupported::Id),      //
         make_unique<SubscribeAttribute>(Id, "number-of-rfidusers-supported", Attributes::NumberOfRFIDUsersSupported::Id),    //
-        make_unique<SubscribeAttribute>(Id, "max-pincode-length", Attributes::MaxPINCodeLength::Id),                         //
-        make_unique<SubscribeAttribute>(Id, "min-pincode-length", Attributes::MinPINCodeLength::Id),                         //
-        make_unique<SubscribeAttribute>(Id, "max-rfidcode-length", Attributes::MaxRFIDCodeLength::Id),                       //
-        make_unique<SubscribeAttribute>(Id, "min-rfidcode-length", Attributes::MinRFIDCodeLength::Id),                       //
-        make_unique<SubscribeAttribute>(Id, "language", Attributes::Language::Id),                                           //
-        make_unique<SubscribeAttribute>(Id, "auto-relock-time", Attributes::AutoRelockTime::Id),                             //
-        make_unique<SubscribeAttribute>(Id, "sound-volume", Attributes::SoundVolume::Id),                                    //
-        make_unique<SubscribeAttribute>(Id, "operating-mode", Attributes::OperatingMode::Id),                                //
-        make_unique<SubscribeAttribute>(Id, "supported-operating-modes", Attributes::SupportedOperatingModes::Id),           //
-        make_unique<SubscribeAttribute>(Id, "enable-one-touch-locking", Attributes::EnableOneTouchLocking::Id),              //
-        make_unique<SubscribeAttribute>(Id, "enable-privacy-mode-button", Attributes::EnablePrivacyModeButton::Id),          //
-        make_unique<SubscribeAttribute>(Id, "wrong-code-entry-limit", Attributes::WrongCodeEntryLimit::Id),                  //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),                                //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),                            //
+        make_unique<SubscribeAttribute>(Id, "number-of-week-day-schedules-supported-per-user",
+                                        Attributes::NumberOfWeekDaySchedulesSupportedPerUser::Id), //
+        make_unique<SubscribeAttribute>(Id, "number-of-year-day-schedules-supported-per-user",
+                                        Attributes::NumberOfYearDaySchedulesSupportedPerUser::Id),                  //
+        make_unique<SubscribeAttribute>(Id, "max-pincode-length", Attributes::MaxPINCodeLength::Id),                //
+        make_unique<SubscribeAttribute>(Id, "min-pincode-length", Attributes::MinPINCodeLength::Id),                //
+        make_unique<SubscribeAttribute>(Id, "max-rfidcode-length", Attributes::MaxRFIDCodeLength::Id),              //
+        make_unique<SubscribeAttribute>(Id, "min-rfidcode-length", Attributes::MinRFIDCodeLength::Id),              //
+        make_unique<SubscribeAttribute>(Id, "language", Attributes::Language::Id),                                  //
+        make_unique<SubscribeAttribute>(Id, "auto-relock-time", Attributes::AutoRelockTime::Id),                    //
+        make_unique<SubscribeAttribute>(Id, "sound-volume", Attributes::SoundVolume::Id),                           //
+        make_unique<SubscribeAttribute>(Id, "operating-mode", Attributes::OperatingMode::Id),                       //
+        make_unique<SubscribeAttribute>(Id, "supported-operating-modes", Attributes::SupportedOperatingModes::Id),  //
+        make_unique<SubscribeAttribute>(Id, "enable-one-touch-locking", Attributes::EnableOneTouchLocking::Id),     //
+        make_unique<SubscribeAttribute>(Id, "enable-privacy-mode-button", Attributes::EnablePrivacyModeButton::Id), //
+        make_unique<SubscribeAttribute>(Id, "wrong-code-entry-limit", Attributes::WrongCodeEntryLimit::Id),         //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id),                       //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id),                   //
         //
         // Events
         //
