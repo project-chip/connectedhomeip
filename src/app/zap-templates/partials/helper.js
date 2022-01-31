@@ -29,7 +29,8 @@ function concat()
     if (typeof arguments[arg] != 'object' || arguments[arg] instanceof String) {
       str += arguments[arg];
     } else {
-      throw new TypeError(`Unexpected object in concat: ${arg}:${Object.prototype.toString.call(arguments[arg])}, ${JSON.stringify(arguments)}`);
+      throw new TypeError(
+          `Unexpected object in concat: ${arg}:${Object.prototype.toString.call(arguments[arg])}, ${JSON.stringify(arguments)}`);
     }
   }
   return str
