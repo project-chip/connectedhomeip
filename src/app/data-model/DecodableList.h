@@ -164,7 +164,8 @@ public:
         T mValue;
         CHIP_ERROR mStatus;
         TLV::TLVReader mReader;
-        // TODO: Consider some method to disable this field when T is not a fabric scoped struct.
+        // TODO: Consider some setup where this field does not exist when T
+        // is not a fabric scoped struct.
         const Optional<FabricIndex> mFabricIndex;
     };
 

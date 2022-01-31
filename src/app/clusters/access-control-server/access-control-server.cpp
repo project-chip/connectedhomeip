@@ -459,7 +459,7 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(AttributeValueDecoder & aDecoder)
     ReturnErrorOnFailure(list.ComputeSize(&newCount));
     ReturnErrorOnFailure(GetAccessControl().GetMaxEntryCount(maxCount));
     VerifyOrReturnError(allCount >= oldCount, CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(static_cast<size_t>(allCount - oldCount + newCount) > maxCount, CHIP_ERROR_INVALID_LIST_LENGTH);
+    VerifyOrReturnError(static_cast<size_t>(allCount - oldCount + newCount) <= maxCount, CHIP_ERROR_INVALID_LIST_LENGTH);
 
     auto iterator = list.begin();
     size_t i      = 0;
