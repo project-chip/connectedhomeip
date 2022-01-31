@@ -107,7 +107,7 @@ tests:
     - label: "2a: TH sends DownOrClose command to DUT"
       command: "DownOrClose"
 
-    ### Depends on a sleep/wait command how to do this with a real device for CI keep at 100ms
+    ### Depending on the DUT specs we might prefer a arguments here
     - label: "2b: DUT updates its attributes"
       cluster: "DelayCommands"
       command: "WaitForMs"
@@ -158,6 +158,15 @@ tests:
               type: map8
               minValue: 10
               maxValue: 42
+
+    ### Depending on the DUT specs we might prefer a arguments here
+    - label: "3a2: DUT updates its attributes"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
 
     ### Mandatory Depends on the FeatureMap
     - label:
@@ -223,7 +232,7 @@ tests:
       arguments:
           values:
               - name: "ms"
-                value: 3000
+                value: 2000
 
     ### Must Be ZERO
     # The value of bit 0..1 must be 00b & if (LF) value of bit 2..3 must be 00b & if (TL) value of bit 4..5 must be 00b
