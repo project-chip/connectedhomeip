@@ -243,9 +243,7 @@ static const nlTest sTests[] =
 int TestPeerConnectionsFn(void)
 {
     nlTestSuite theSuite = { "Transport-SecureSessionTable", &sTests[0], nullptr, nullptr };
-    VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
     nlTestRunner(&theSuite, nullptr);
-    chip::Platform::MemoryShutdown();
     return nlTestRunnerStats(&theSuite);
 }
 

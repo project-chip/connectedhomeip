@@ -441,8 +441,6 @@ static nlTestSuite sSuite =
  */
 int TestSecurePairing_Setup(void * inContext)
 {
-    VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
-
     // Initialize System memory and resources
     VerifyOrReturnError(TestContext::InitializeAsync(inContext) == SUCCESS, FAILURE);
 
@@ -461,12 +459,7 @@ int TestSecurePairing_Setup(void * inContext)
  */
 int TestSecurePairing_Teardown(void * inContext)
 {
-    int status        = TestContext::Finalize(inContext);
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-    ctx.~TestContext();
-
-    chip::Platform::MemoryShutdown();
-    return status;
+    return TestContext::Finalize(inContext);
 }
 
 } // anonymous namespace

@@ -31,6 +31,7 @@ CHIP_ERROR MessagingContext::Init(TransportMgrBase * transport, IOContext * ioCo
     mIOContext = ioContext;
     mTransport = transport;
 
+    ReturnErrorOnFailure(PlatformMemoryUser::Init());
     ReturnErrorOnFailure(mSessionManager.Init(&GetSystemLayer(), transport, &mMessageCounterManager));
 
     ReturnErrorOnFailure(mExchangeManager.Init(&mSessionManager));
