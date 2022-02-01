@@ -76,6 +76,7 @@ class EventPath:
     clusterId: int
     eventId: int
 
+
 @dataclass
 class AttributeReadResult:
     path: AttributePath
