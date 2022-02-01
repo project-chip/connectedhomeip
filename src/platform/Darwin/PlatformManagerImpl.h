@@ -53,6 +53,12 @@ public:
         return mWorkQueue;
     }
 
+    System::Clock::Timestamp GetStartTime() { return mStartTime; }
+
+    void HandleGeneralFault(uint32_t EventId);
+    void HandleSoftwareFault(uint32_t EventId);
+    void HandleSwitchEvent(uint32_t EventId);
+
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
     CHIP_ERROR _InitChipStack();
@@ -62,7 +68,12 @@ private:
     CHIP_ERROR _StartEventLoopTask();
     CHIP_ERROR _StopEventLoopTask();
 
+    CHIP_ERROR
+    _GetFixedLabelList(EndpointId endpoint,
+                       AttributeList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList);
     CHIP_ERROR _SetUserLabelList(EndpointId endpoint,
+                                 AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
+    CHIP_ERROR _GetUserLabelList(EndpointId endpoint,
                                  AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
     CHIP_ERROR _GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales);
     CHIP_ERROR _GetSupportedCalendarTypes(
@@ -86,6 +97,8 @@ private:
 
     static PlatformManagerImpl sInstance;
 
+    System::Clock::Timestamp mStartTime = System::Clock::kZero;
+
     dispatch_queue_t mWorkQueue = nullptr;
     // Semaphore used to implement blocking behavior in _RunEventLoop.
     dispatch_semaphore_t mRunLoopSem;
@@ -93,6 +106,10 @@ private:
     bool mIsWorkQueueRunning = false;
 
     inline ImplClass * Impl() { return static_cast<PlatformManagerImpl *>(this); }
+
+    void SetupSignalHandlers();
+    static void OnDeviceRebooted(intptr_t arg);
+    void OnDeviceShutdown();
 };
 
 /**

@@ -76,6 +76,11 @@ public:
     static const Key kConfigKey_Spake2pIterationCount;
     static const Key kConfigKey_Spake2pSalt;
     static const Key kConfigKey_Spake2pVerifier;
+    static const Key kConfigKey_LocationCapability;
+    static const Key kCounterKey_TotalOperationalHours;
+    static const Key kCounterKey_RebootCount;
+    static const Key kCounterKey_BootReason;
+    static const Key kCounterKey_UpTime;
 
     static const char kGroupKeyNamePrefix[];
 

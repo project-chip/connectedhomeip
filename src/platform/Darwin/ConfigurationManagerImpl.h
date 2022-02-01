@@ -42,8 +42,6 @@ public:
     static ConfigurationManagerImpl & GetDefaultInstance();
 
 private:
-    char mCountryCode[kCountryCodeLength + 1];
-
     // ===== Members that implement the ConfigurationManager public interface.
 
     CHIP_ERROR Init(void) override;
@@ -52,8 +50,14 @@ private:
     void InitiateFactoryReset(void) override;
     CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) override;
     CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value) override;
-    CHIP_ERROR StoreCountryCode(const char * code, size_t codeLen) override;
-    CHIP_ERROR GetCountryCode(char * buf, size_t bufSize, size_t & codeLen) override;
+    CHIP_ERROR GetRebootCount(uint32_t & rebootCount) override;
+    CHIP_ERROR StoreRebootCount(uint32_t rebootCount) override;
+    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
+    CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours) override;
+    CHIP_ERROR GetBootReason(uint32_t & bootReason) override;
+    CHIP_ERROR StoreBootReason(uint32_t bootReason) override;
+    CHIP_ERROR GetRegulatoryLocation(uint8_t & location) override;
+    CHIP_ERROR GetLocationCapability(uint8_t & location) override;
 
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
 

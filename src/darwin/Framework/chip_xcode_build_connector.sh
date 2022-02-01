@@ -113,6 +113,7 @@ declare -a args=(
 [[ $PLATFORM_FAMILY_NAME == macOS ]] && {
     args+=(
         'target_os="mac"'
+        'import("//config/ios/args.gni")'
     )
 }
 
