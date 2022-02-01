@@ -178,7 +178,7 @@ function setDefaultTypeForCommand(test)
   // Only two types of actions can be send to Group : Write attribute, and Commands
   // Spec : Action 8.2.4
   if ((kGroupId in test) && !test.isGroupCommand) {
-    printErrorAndExit(this, 'Wrong Yaml configuration. Action : ' + test.commandName + " can't be send to group " + test[kGroupId]);
+    printErrorAndExit(this, 'Wrong Yaml configuration. Action : ' + test.commandName + " can't be sent to group " + test[kGroupId]);
   }
 
   test.isWait = false;
