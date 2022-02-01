@@ -73301,6 +73301,10 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 3 : Reboot the accessory with an other given discriminator\n");
             err = TestRebootTheAccessoryWithAnOtherGivenDiscriminator_3();
             break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Factory Reset the accessory\n");
+            err = TestFactoryResetTheAccessory_4();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -73312,7 +73316,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 4;
+    const uint16_t mTestCount = 5;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
@@ -73343,6 +73347,12 @@ private:
     {
         SetIdentity(kIdentityAlpha);
         return Reboot(2222);
+    }
+
+    CHIP_ERROR TestFactoryResetTheAccessory_4()
+    {
+        SetIdentity(kIdentityAlpha);
+        return FactoryReset();
     }
 };
 
