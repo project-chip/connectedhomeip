@@ -61,11 +61,6 @@ public:
         printf("Test_TC_CC_9_1\n");
         printf("Test_TC_CC_9_2\n");
         printf("Test_TC_CC_9_3\n");
-        printf("Test_TC_DD_1_5\n");
-        printf("Test_TC_DD_1_6\n");
-        printf("Test_TC_DD_1_7\n");
-        printf("Test_TC_DD_1_8\n");
-        printf("Test_TC_DD_1_9\n");
         printf("Test_TC_DM_1_1\n");
         printf("Test_TC_DM_3_1\n");
         printf("Test_TC_DM_2_2\n");
@@ -183,6 +178,22 @@ public:
         printf("TestGroupDemoCommand\n");
         printf("TestGroupDemoConfig\n");
         printf("TestGroupKeyManagementCluster\n");
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+class ManualTestList : public Command
+{
+public:
+    ManualTestList() : Command("list-manual"){};
+    CHIP_ERROR Run() override
+    {
+        printf("Test_TC_DD_1_5\n");
+        printf("Test_TC_DD_1_6\n");
+        printf("Test_TC_DD_1_7\n");
+        printf("Test_TC_DD_1_8\n");
+        printf("Test_TC_DD_1_9\n");
 
         return CHIP_NO_ERROR;
     }
@@ -16219,406 +16230,6 @@ private:
     }
 
     void OnSuccessResponse_14() { NextTest(); }
-};
-
-class Test_TC_DD_1_5 : public TestCommand
-{
-public:
-    Test_TC_DD_1_5(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_5", credsIssuerConfig), mTestIndex(0)
-    {
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-    }
-
-    ~Test_TC_DD_1_5() {}
-
-    /////////// TestCommand Interface /////////
-    void NextTest() override
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        if (0 == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_1_5\n");
-        }
-
-        if (mTestCount == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_1_5\n");
-            SetCommandExitStatus(CHIP_NO_ERROR);
-            return;
-        }
-
-        Wait();
-
-        // Ensure we increment mTestIndex before we start running the relevant
-        // command.  That way if we lose the timeslice after we send the message
-        // but before our function call returns, we won't end up with an
-        // incorrect mTestIndex value observed when we get the response.
-        switch (mTestIndex++)
-        {
-        case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Step 1\n");
-            err = TestStep1_0();
-            break;
-        }
-
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }
-    }
-
-private:
-    std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 1;
-
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-
-    //
-    // Tests methods
-    //
-
-    CHIP_ERROR TestStep1_0()
-    {
-        SetIdentity(kIdentityAlpha);
-        return Log("Verify that the onboarding payload for NFC tags SHALL use NDEF URI Record Type Definition as defined by NFC "
-                   "Forum in URI Record Type Definition RTD URI");
-    }
-};
-
-class Test_TC_DD_1_6 : public TestCommand
-{
-public:
-    Test_TC_DD_1_6(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_6", credsIssuerConfig), mTestIndex(0)
-    {
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-    }
-
-    ~Test_TC_DD_1_6() {}
-
-    /////////// TestCommand Interface /////////
-    void NextTest() override
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        if (0 == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_1_6\n");
-        }
-
-        if (mTestCount == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_1_6\n");
-            SetCommandExitStatus(CHIP_NO_ERROR);
-            return;
-        }
-
-        Wait();
-
-        // Ensure we increment mTestIndex before we start running the relevant
-        // command.  That way if we lose the timeslice after we send the message
-        // but before our function call returns, we won't end up with an
-        // incorrect mTestIndex value observed when we get the response.
-        switch (mTestIndex++)
-        {
-        case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Step 1\n");
-            err = TestStep1_0();
-            break;
-        case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Step 1 verification\n");
-            err = TestStep1Verification_1();
-            break;
-        case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Step 2 verificaiton\n");
-            err = TestStep2Verificaiton_2();
-            break;
-        }
-
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }
-    }
-
-private:
-    std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 3;
-
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-
-    //
-    // Tests methods
-    //
-
-    CHIP_ERROR TestStep1_0()
-    {
-        SetIdentity(kIdentityAlpha);
-        return Log("Scan the DUTs QR code using a QR code reader");
-    }
-
-    CHIP_ERROR TestStep1Verification_1()
-    {
-        SetIdentity(kIdentityAlpha);
-        return Log(
-            "Verify the QR code gets scanned successfully and the QR code must be of sufficient size and contrast respective to "
-            "surface material as to be readable with standard readers such as smartphones in normal lighting conditions");
-    }
-
-    CHIP_ERROR TestStep2Verificaiton_2()
-    {
-        SetIdentity(kIdentityAlpha);
-        return Log("Verify QR code version is 1 or higher");
-    }
-};
-
-class Test_TC_DD_1_7 : public TestCommand
-{
-public:
-    Test_TC_DD_1_7(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_7", credsIssuerConfig), mTestIndex(0)
-    {
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-    }
-
-    ~Test_TC_DD_1_7() {}
-
-    /////////// TestCommand Interface /////////
-    void NextTest() override
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        if (0 == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_1_7\n");
-        }
-
-        if (mTestCount == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_1_7\n");
-            SetCommandExitStatus(CHIP_NO_ERROR);
-            return;
-        }
-
-        Wait();
-
-        // Ensure we increment mTestIndex before we start running the relevant
-        // command.  That way if we lose the timeslice after we send the message
-        // but before our function call returns, we won't end up with an
-        // incorrect mTestIndex value observed when we get the response.
-        switch (mTestIndex++)
-        {
-        case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Precondition\n");
-            err = TestPrecondition_0();
-            break;
-        case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Step 1\n");
-            err = TestStep1_1();
-            break;
-        }
-
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }
-    }
-
-private:
-    std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 2;
-
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-
-    //
-    // Tests methods
-    //
-
-    CHIP_ERROR TestPrecondition_0()
-    {
-        SetIdentity(kIdentityAlpha);
-        return Log("Verify manual pairing code is printed on the device or in additional provided materials");
-    }
-
-    CHIP_ERROR TestStep1_1()
-    {
-        SetIdentity(kIdentityAlpha);
-        return Log("Verify that the Manual Pairing Code should be printed using a minimum font size of 6 points typically "
-                   "producing a typeface height of 2.1 mm");
-    }
-};
-
-class Test_TC_DD_1_8 : public TestCommand
-{
-public:
-    Test_TC_DD_1_8(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_8", credsIssuerConfig), mTestIndex(0)
-    {
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-    }
-
-    ~Test_TC_DD_1_8() {}
-
-    /////////// TestCommand Interface /////////
-    void NextTest() override
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        if (0 == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_1_8\n");
-        }
-
-        if (mTestCount == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_1_8\n");
-            SetCommandExitStatus(CHIP_NO_ERROR);
-            return;
-        }
-
-        Wait();
-
-        // Ensure we increment mTestIndex before we start running the relevant
-        // command.  That way if we lose the timeslice after we send the message
-        // but before our function call returns, we won't end up with an
-        // incorrect mTestIndex value observed when we get the response.
-        switch (mTestIndex++)
-        {
-        case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Step 1\n");
-            err = TestStep1_0();
-            break;
-        case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Step 1 verification\n");
-            err = TestStep1Verification_1();
-            break;
-        }
-
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }
-    }
-
-private:
-    std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 2;
-
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-
-    //
-    // Tests methods
-    //
-
-    CHIP_ERROR TestStep1_0()
-    {
-        SetIdentity(kIdentityAlpha);
-        return Log("Scan the device QR code using DUT");
-    }
-
-    CHIP_ERROR TestStep1Verification_1()
-    {
-        SetIdentity(kIdentityAlpha);
-        return Log("Verify the DUT is able to scan and parse the QR code successfully to onboard the device onto the CHIP network");
-    }
-};
-
-class Test_TC_DD_1_9 : public TestCommand
-{
-public:
-    Test_TC_DD_1_9(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_9", credsIssuerConfig), mTestIndex(0)
-    {
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-    }
-
-    ~Test_TC_DD_1_9() {}
-
-    /////////// TestCommand Interface /////////
-    void NextTest() override
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        if (0 == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_1_9\n");
-        }
-
-        if (mTestCount == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_1_9\n");
-            SetCommandExitStatus(CHIP_NO_ERROR);
-            return;
-        }
-
-        Wait();
-
-        // Ensure we increment mTestIndex before we start running the relevant
-        // command.  That way if we lose the timeslice after we send the message
-        // but before our function call returns, we won't end up with an
-        // incorrect mTestIndex value observed when we get the response.
-        switch (mTestIndex++)
-        {
-        case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Precondition\n");
-            err = TestPrecondition_0();
-            break;
-        case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Step 1\n");
-            err = TestStep1_1();
-            break;
-        case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Step 1 verification\n");
-            err = TestStep1Verification_2();
-            break;
-        }
-
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }
-    }
-
-private:
-    std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 3;
-
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-
-    //
-    // Tests methods
-    //
-
-    CHIP_ERROR TestPrecondition_0()
-    {
-        SetIdentity(kIdentityAlpha);
-        return Log("Verify that the manual pairing code is printed on the device or in additional provided materials");
-    }
-
-    CHIP_ERROR TestStep1_1()
-    {
-        SetIdentity(kIdentityAlpha);
-        return Log("Provide the 11 digit or 21 digit pairing code from the Device in text speech or any format supported by DUT");
-    }
-
-    CHIP_ERROR TestStep1Verification_2()
-    {
-        SetIdentity(kIdentityAlpha);
-        return Log(
-            "Verify that the manual pairing code can be provided to DUT and parsed to onboard the device onto the CHIP network");
-    }
 };
 
 class Test_TC_DM_1_1 : public TestCommand
@@ -85272,12 +84883,413 @@ private:
     }
 };
 
+class Test_TC_DD_1_5 : public TestCommand
+{
+public:
+    Test_TC_DD_1_5(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_5", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_DD_1_5() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_1_5\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_1_5\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Step 1\n");
+            err = TestStep1_0();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 1;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestStep1_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("Verify that the onboarding payload for NFC tags SHALL use NDEF URI Record Type Definition as defined by NFC "
+                   "Forum in URI Record Type Definition RTD URI");
+    }
+};
+
+class Test_TC_DD_1_6 : public TestCommand
+{
+public:
+    Test_TC_DD_1_6(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_6", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_DD_1_6() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_1_6\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_1_6\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Step 1\n");
+            err = TestStep1_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Step 1 verification\n");
+            err = TestStep1Verification_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Step 2 verificaiton\n");
+            err = TestStep2Verificaiton_2();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 3;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestStep1_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("Scan the DUTs QR code using a QR code reader");
+    }
+
+    CHIP_ERROR TestStep1Verification_1()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log(
+            "Verify the QR code gets scanned successfully and the QR code must be of sufficient size and contrast respective to "
+            "surface material as to be readable with standard readers such as smartphones in normal lighting conditions");
+    }
+
+    CHIP_ERROR TestStep2Verificaiton_2()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("Verify QR code version is 1 or higher");
+    }
+};
+
+class Test_TC_DD_1_7 : public TestCommand
+{
+public:
+    Test_TC_DD_1_7(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_7", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_DD_1_7() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_1_7\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_1_7\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Precondition\n");
+            err = TestPrecondition_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Step 1\n");
+            err = TestStep1_1();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 2;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestPrecondition_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("Verify manual pairing code is printed on the device or in additional provided materials");
+    }
+
+    CHIP_ERROR TestStep1_1()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("Verify that the Manual Pairing Code should be printed using a minimum font size of 6 points typically "
+                   "producing a typeface height of 2.1 mm");
+    }
+};
+
+class Test_TC_DD_1_8 : public TestCommand
+{
+public:
+    Test_TC_DD_1_8(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_8", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_DD_1_8() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_1_8\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_1_8\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Step 1\n");
+            err = TestStep1_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Step 1 verification\n");
+            err = TestStep1Verification_1();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 2;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestStep1_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("Scan the device QR code using DUT");
+    }
+
+    CHIP_ERROR TestStep1Verification_1()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("Verify the DUT is able to scan and parse the QR code successfully to onboard the device onto the CHIP network");
+    }
+};
+
+class Test_TC_DD_1_9 : public TestCommand
+{
+public:
+    Test_TC_DD_1_9(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_9", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_DD_1_9() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_1_9\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_1_9\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Precondition\n");
+            err = TestPrecondition_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Step 1\n");
+            err = TestStep1_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Step 1 verification\n");
+            err = TestStep1Verification_2();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 3;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestPrecondition_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("Verify that the manual pairing code is printed on the device or in additional provided materials");
+    }
+
+    CHIP_ERROR TestStep1_1()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("Provide the 11 digit or 21 digit pairing code from the Device in text speech or any format supported by DUT");
+    }
+
+    CHIP_ERROR TestStep1Verification_2()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log(
+            "Verify that the manual pairing code can be provided to DUT and parsed to onboard the device onto the CHIP network");
+    }
+};
+
 void registerCommandsTests(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     const char * clusterName = "Tests";
 
     commands_list clusterCommands = {
         make_unique<TestList>(),
+        make_unique<ManualTestList>(),
         make_unique<Test_TC_BI_1_1>(credsIssuerConfig),
         make_unique<Test_TC_BI_2_1>(credsIssuerConfig),
         make_unique<Test_TC_BI_2_2>(credsIssuerConfig),
@@ -85307,11 +85319,6 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_CC_9_1>(credsIssuerConfig),
         make_unique<Test_TC_CC_9_2>(credsIssuerConfig),
         make_unique<Test_TC_CC_9_3>(credsIssuerConfig),
-        make_unique<Test_TC_DD_1_5>(credsIssuerConfig),
-        make_unique<Test_TC_DD_1_6>(credsIssuerConfig),
-        make_unique<Test_TC_DD_1_7>(credsIssuerConfig),
-        make_unique<Test_TC_DD_1_8>(credsIssuerConfig),
-        make_unique<Test_TC_DD_1_9>(credsIssuerConfig),
         make_unique<Test_TC_DM_1_1>(credsIssuerConfig),
         make_unique<Test_TC_DM_3_1>(credsIssuerConfig),
         make_unique<Test_TC_DM_2_2>(credsIssuerConfig),
@@ -85429,6 +85436,11 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<TestGroupDemoCommand>(credsIssuerConfig),
         make_unique<TestGroupDemoConfig>(credsIssuerConfig),
         make_unique<TestGroupKeyManagementCluster>(credsIssuerConfig),
+        make_unique<Test_TC_DD_1_5>(credsIssuerConfig),
+        make_unique<Test_TC_DD_1_6>(credsIssuerConfig),
+        make_unique<Test_TC_DD_1_7>(credsIssuerConfig),
+        make_unique<Test_TC_DD_1_8>(credsIssuerConfig),
+        make_unique<Test_TC_DD_1_9>(credsIssuerConfig),
     };
 
     commands.Register(clusterName, clusterCommands);
