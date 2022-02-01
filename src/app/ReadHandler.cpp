@@ -130,6 +130,11 @@ CHIP_ERROR ReadHandler::OnInitialRequest(System::PacketBufferHandle && aPayload)
     {
         Close();
     }
+    else
+    {
+        // Mark read handler dirty for read/subscribe priming stage
+        mDirty = true;
+    }
 
     return err;
 }

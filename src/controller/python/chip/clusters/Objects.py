@@ -12463,6 +12463,10 @@ class AdministratorCommissioning(Cluster):
                             ClusterObjectFieldDescriptor(Label="passcodeID", Tag=5, Type=uint),
                     ])
 
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
+
             commissioningTimeout: 'uint' = 0
             PAKEVerifier: 'bytes' = b""
             discriminator: 'uint' = 0
@@ -12483,6 +12487,10 @@ class AdministratorCommissioning(Cluster):
                             ClusterObjectFieldDescriptor(Label="commissioningTimeout", Tag=0, Type=uint),
                     ])
 
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
+
             commissioningTimeout: 'uint' = 0
 
         @dataclass
@@ -12496,6 +12504,10 @@ class AdministratorCommissioning(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                     ])
+
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
 
 
 
@@ -14545,6 +14557,10 @@ class DoorLock(Cluster):
                             ClusterObjectFieldDescriptor(Label="pinCode", Tag=0, Type=typing.Optional[bytes]),
                     ])
 
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
+
             pinCode: 'typing.Optional[bytes]' = None
 
         @dataclass
@@ -14559,6 +14575,10 @@ class DoorLock(Cluster):
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="pinCode", Tag=0, Type=typing.Optional[bytes]),
                     ])
+
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
 
             pinCode: 'typing.Optional[bytes]' = None
 
@@ -14575,6 +14595,10 @@ class DoorLock(Cluster):
                             ClusterObjectFieldDescriptor(Label="timeout", Tag=0, Type=uint),
                             ClusterObjectFieldDescriptor(Label="pinCode", Tag=1, Type=typing.Optional[bytes]),
                     ])
+
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
 
             timeout: 'uint' = 0
             pinCode: 'typing.Optional[bytes]' = None
@@ -14637,6 +14661,10 @@ class DoorLock(Cluster):
                             ClusterObjectFieldDescriptor(Label="pin", Tag=3, Type=bytes),
                     ])
 
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
+
             userId: 'uint' = 0
             userStatus: 'typing.Union[Nullable, DoorLock.Enums.DlUserStatus]' = NullValue
             userType: 'typing.Union[Nullable, DoorLock.Enums.DlUserType]' = NullValue
@@ -14691,6 +14719,10 @@ class DoorLock(Cluster):
                             ClusterObjectFieldDescriptor(Label="pinSlotIndex", Tag=0, Type=uint),
                     ])
 
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
+
             pinSlotIndex: 'uint' = 0
 
         @dataclass
@@ -14704,6 +14736,10 @@ class DoorLock(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                     ])
+
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
 
 
         @dataclass
@@ -15062,6 +15098,10 @@ class DoorLock(Cluster):
                             ClusterObjectFieldDescriptor(Label="rfidCode", Tag=3, Type=bytes),
                     ])
 
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
+
             userId: 'uint' = 0
             userStatus: 'typing.Union[Nullable, DoorLock.Enums.DlUserStatus]' = NullValue
             userType: 'typing.Union[Nullable, DoorLock.Enums.DlUserType]' = NullValue
@@ -15116,6 +15156,10 @@ class DoorLock(Cluster):
                             ClusterObjectFieldDescriptor(Label="rfidSlotIndex", Tag=0, Type=uint),
                     ])
 
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
+
             rfidSlotIndex: 'uint' = 0
 
         @dataclass
@@ -15129,6 +15173,10 @@ class DoorLock(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                     ])
+
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
 
 
         @dataclass
@@ -15149,6 +15197,10 @@ class DoorLock(Cluster):
                             ClusterObjectFieldDescriptor(Label="userType", Tag=5, Type=typing.Union[Nullable, DoorLock.Enums.DlUserType]),
                             ClusterObjectFieldDescriptor(Label="credentialRule", Tag=6, Type=typing.Union[Nullable, DoorLock.Enums.DlCredentialRule]),
                     ])
+
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
 
             operationType: 'DoorLock.Enums.DlDataOperationType' = 0
             userIndex: 'uint' = 0
@@ -15218,6 +15270,10 @@ class DoorLock(Cluster):
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="userIndex", Tag=0, Type=uint),
                     ])
+
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
 
             userIndex: 'uint' = 0
 
@@ -15293,6 +15349,10 @@ class DoorLock(Cluster):
                             ClusterObjectFieldDescriptor(Label="userType", Tag=5, Type=typing.Union[Nullable, DoorLock.Enums.DlUserType]),
                     ])
 
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
+
             operationType: 'DoorLock.Enums.DlDataOperationType' = 0
             credential: 'DoorLock.Structs.DlCredential' = field(default_factory=lambda: DoorLock.Structs.DlCredential())
             credentialData: 'bytes' = b""
@@ -15365,6 +15425,10 @@ class DoorLock(Cluster):
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="credential", Tag=0, Type=typing.Union[Nullable, DoorLock.Structs.DlCredential]),
                     ])
+
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
 
             credential: 'typing.Union[Nullable, DoorLock.Structs.DlCredential]' = NullValue
 
@@ -29861,10 +29925,6 @@ class AccountLogin(Cluster):
                             ClusterObjectFieldDescriptor(Label="setupPIN", Tag=0, Type=str),
                     ])
 
-            @ChipUtility.classproperty
-            def must_use_timed_invoke(cls) -> bool:
-                return True
-
             setupPIN: 'str' = ""
 
         @dataclass
@@ -29880,6 +29940,10 @@ class AccountLogin(Cluster):
                             ClusterObjectFieldDescriptor(Label="tempAccountIdentifier", Tag=0, Type=str),
                             ClusterObjectFieldDescriptor(Label="setupPIN", Tag=1, Type=str),
                     ])
+
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
 
             tempAccountIdentifier: 'str' = ""
             setupPIN: 'str' = ""

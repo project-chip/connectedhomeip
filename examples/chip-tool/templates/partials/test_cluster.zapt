@@ -2,7 +2,7 @@
 class {{filename}}: public TestCommand
 {
   public:
-    {{filename}}(): TestCommand("{{filename}}"), mTestIndex(0)
+    {{filename}}(CredentialIssuerCommands * credsIssuerConfig): TestCommand("{{filename}}", credsIssuerConfig), mTestIndex(0)
     {
         {{#chip_tests_config}}
           {{#if (isString type)}}

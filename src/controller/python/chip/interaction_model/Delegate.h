@@ -19,7 +19,6 @@
 
 #include <type_traits>
 
-#include <app/InteractionModelDelegate.h>
 #include <controller/CHIPDeviceController.h>
 
 namespace chip {
@@ -89,36 +88,6 @@ void pychip_InteractionModelDelegate_SetCommandResponseProtocolErrorCallback(
 void pychip_InteractionModelDelegate_SetCommandResponseErrorCallback(PythonInteractionModelDelegate_OnCommandResponseFunct f);
 void pychip_InteractionModelDelegate_SetOnWriteResponseStatusCallback(PythonInteractionModelDelegate_OnWriteResponseStatusFunct f);
 }
-
-class PythonInteractionModelDelegate : public chip::Controller::DeviceControllerInteractionModelDelegate
-{
-public:
-    void OnResponse(app::CommandSender * apCommandSender, const app::ConcreteCommandPath & aPath, const app::StatusIB & aStatus,
-                    TLV::TLVReader * aData) override;
-    void OnError(const app::CommandSender * apCommandSender, CHIP_ERROR aError) override;
-
-    static PythonInteractionModelDelegate & Instance();
-
-    void SetOnCommandResponseStatusCodeReceivedCallback(PythonInteractionModelDelegate_OnCommandResponseStatusCodeReceivedFunct f)
-    {
-        commandResponseStatusFunct = f;
-    }
-
-    void SetOnCommandResponseProtocolErrorCallback(PythonInteractionModelDelegate_OnCommandResponseProtocolErrorFunct f)
-    {
-        commandResponseProtocolErrorFunct = f;
-    }
-
-    void SetOnCommandResponseCallback(PythonInteractionModelDelegate_OnCommandResponseFunct f) { commandResponseErrorFunct = f; }
-
-    void SetOnWriteResponseStatusCallback(PythonInteractionModelDelegate_OnWriteResponseStatusFunct f) { onWriteResponseFunct = f; }
-
-private:
-    PythonInteractionModelDelegate_OnCommandResponseStatusCodeReceivedFunct commandResponseStatusFunct   = nullptr;
-    PythonInteractionModelDelegate_OnCommandResponseProtocolErrorFunct commandResponseProtocolErrorFunct = nullptr;
-    PythonInteractionModelDelegate_OnCommandResponseFunct commandResponseErrorFunct                      = nullptr;
-    PythonInteractionModelDelegate_OnWriteResponseStatusFunct onWriteResponseFunct                       = nullptr;
-};
 
 } // namespace Controller
 } // namespace chip

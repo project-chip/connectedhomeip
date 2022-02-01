@@ -58,6 +58,7 @@ static_library("app") {
     "EventPathParams.h",
     "InteractionModelEngine.cpp",
     "InteractionModelRevision.h",
+    "InteractionModelTimeout.h",
     "MessageDef/ArrayBuilder.cpp",
     "MessageDef/ArrayParser.cpp",
     "MessageDef/AttributeDataIB.cpp",
@@ -145,7 +146,6 @@ static_library("app") {
     "TimedRequest.h",
     "WriteClient.cpp",
     "WriteHandler.cpp",
-    "encoder-common.cpp",
     "reporting/Engine.cpp",
     "reporting/Engine.h",
   ]
@@ -153,7 +153,6 @@ static_library("app") {
   public_deps = [
     ":app_buildconfig",
     "${chip_root}/src/access",
-    "${chip_root}/src/app/util:device_callbacks_manager",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
     "${chip_root}/src/protocols/secure_channel",

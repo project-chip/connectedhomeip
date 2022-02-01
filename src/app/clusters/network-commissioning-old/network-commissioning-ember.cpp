@@ -20,20 +20,52 @@
 
 #include <cstring>
 
-#include <app-common/zap-generated/att-storage.h>
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/callback.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/command-id.h>
-#include <app-common/zap-generated/enums.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/util/af.h>
+#include <app/util/attribute-storage.h>
 
 using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters::NetworkCommissioning;
+
+namespace {
+class NetworkCommissioningAttributeAccess : public AttributeAccessInterface
+{
+public:
+    NetworkCommissioningAttributeAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), Id) {}
+
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override
+    {
+        switch (aPath.mAttributeId)
+        {
+        case Attributes::MaxNetworks::Id:
+            return aEncoder.Encode(static_cast<uint8_t>(0));
+        case Attributes::Networks::Id:
+            return aEncoder.EncodeEmptyList();
+        case Attributes::ScanMaxTimeSeconds::Id:
+            return aEncoder.Encode(static_cast<uint8_t>(0));
+        case Attributes::ConnectMaxTimeSeconds::Id:
+            return aEncoder.Encode(static_cast<uint8_t>(0));
+        case Attributes::InterfaceEnabled::Id:
+            return aEncoder.Encode(static_cast<bool>(false));
+        case Attributes::LastNetworkingStatus::Id:
+            return aEncoder.Encode(NetworkCommissioningStatus::kSuccess);
+        case Attributes::LastNetworkID::Id:
+            return aEncoder.Encode(ByteSpan());
+        case Attributes::LastConnectErrorValue::Id:
+            return aEncoder.Encode(Attributes::LastConnectErrorValue::TypeInfo::Type(static_cast<int32_t>(0)));
+        case Attributes::FeatureMap::Id:
+            return aEncoder.Encode(static_cast<uint32_t>(0));
+        default:
+            return CHIP_NO_ERROR;
+        }
+    }
+};
+} // namespace
 
 bool emberAfNetworkCommissioningClusterAddOrUpdateThreadNetworkCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
@@ -96,4 +128,8 @@ bool emberAfNetworkCommissioningClusterReorderNetworkCallback(app::CommandHandle
     return false;
 }
 
-void MatterNetworkCommissioningPluginServerInitCallback() {}
+NetworkCommissioningAttributeAccess gAttrAccess;
+void MatterNetworkCommissioningPluginServerInitCallback()
+{
+    registerAttributeAccessOverride(&gAttrAccess);
+}

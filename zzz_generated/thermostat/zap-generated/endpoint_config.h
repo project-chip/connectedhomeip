@@ -1157,6 +1157,8 @@
 
 #define ZAP_CLUSTER_INDEX(index) (&generatedClusters[index])
 
+#define ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT 26
+
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \

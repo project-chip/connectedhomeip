@@ -25,6 +25,7 @@ tests:
 
     - label: "Create new PIN credential and schedule user"
       command: "SetCredential"
+      timedInteractionTimeoutMs: 10000
       arguments:
           values:
               - name: "operationType"
@@ -1219,6 +1220,7 @@ tests:
     - label:
           "Create new user without credential so we can add more schedules to it"
       command: "SetUser"
+      timedInteractionTimeoutMs: 10000
       arguments:
           values:
               - name: "operationType"
@@ -1398,6 +1400,7 @@ tests:
 
     - label: "Cleanup"
       command: "ClearUser"
+      timedInteractionTimeoutMs: 10000
       arguments:
           values:
               - name: "userIndex"

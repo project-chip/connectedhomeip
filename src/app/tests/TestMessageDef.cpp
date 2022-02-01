@@ -652,7 +652,7 @@ void ParseAttributeDataIB(nlTestSuite * apSuite, AttributeDataIB::Parser & aAttr
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     AttributePathIB::Parser attributePathParser;
-    chip::DataVersion version = 0;
+    chip::DataVersion version = chip::kUndefinedDataVersion;
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = aAttributeDataIBParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);

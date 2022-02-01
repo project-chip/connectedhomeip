@@ -27,7 +27,7 @@
 class Resolve : public DiscoverCommand, public chip::Dnssd::ResolverDelegate
 {
 public:
-    Resolve() : DiscoverCommand("resolve") {}
+    Resolve(CredentialIssuerCommands * credsIssuerConfig) : DiscoverCommand("resolve", credsIssuerConfig) {}
 
     /////////// DiscoverCommand Interface /////////
     CHIP_ERROR RunCommand(NodeId remoteId, uint64_t fabricId) override
@@ -77,7 +77,7 @@ public:
 class Update : public DiscoverCommand
 {
 public:
-    Update() : DiscoverCommand("update") {}
+    Update(CredentialIssuerCommands * credsIssuerConfig) : DiscoverCommand("update", credsIssuerConfig) {}
 
     /////////// DiscoverCommand Interface /////////
     CHIP_ERROR RunCommand(NodeId remoteId, uint64_t fabricId) override
@@ -103,15 +103,15 @@ public:
     }
 };
 
-void registerCommandsDiscover(Commands & commands)
+void registerCommandsDiscover(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     const char * clusterName = "Discover";
 
     commands_list clusterCommands = {
-        make_unique<Resolve>(),
-        make_unique<Update>(),
-        make_unique<DiscoverCommissionablesCommand>(),
-        make_unique<DiscoverCommissionersCommand>(),
+        make_unique<Resolve>(credsIssuerConfig),
+        make_unique<Update>(credsIssuerConfig),
+        make_unique<DiscoverCommissionablesCommand>(credsIssuerConfig),
+        make_unique<DiscoverCommissionersCommand>(credsIssuerConfig),
     };
 
     commands.Register(clusterName, clusterCommands);
