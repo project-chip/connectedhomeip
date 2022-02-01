@@ -26248,7 +26248,7 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
         }
 
         [expectation fulfill];
-    };
+    }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -26257,8 +26257,8 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
     XCTestExpectation * expectation = [self expectationWithDescription:@"3a2: DUT updates its attributes"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 1000);
-    [self waitForExpectationsWithTimeout:(1000 / 1000) + kTimeoutInSeconds handler:nil];
+    WaitForMs(expectation, queue, 2000);
+    [self waitForExpectationsWithTimeout:(2000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WNCV_3_1_000015_ReadAttribute
 {
@@ -26421,21 +26421,21 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
         [self expectationWithDescription:@"4b: TH waits for 3 seconds the end of inertial movement(s) on the device"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 2000);
-    [self waitForExpectationsWithTimeout:(2000 / 1000) + kTimeoutInSeconds handler:nil];
+    WaitForMs(expectation, queue, 3000);
+    [self waitForExpectationsWithTimeout:(3000 / 1000) + kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_1_000021_WaitForReport
+- (void)testSendClusterTest_TC_WNCV_3_1_000021_ReadAttribute
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"4c: Verify DUT reports OperationalStatus attribute to TH after a StopMotion"];
+        [self expectationWithDescription:@"4c: Verify DUT update OperationalStatus attribute to TH after a StopMotion"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
     CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    test_Test_TC_WNCV_3_1_OperationalStatus_Reported = ^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"4c: Verify DUT reports OperationalStatus attribute to TH after a StopMotion Error: %@", err);
+    [cluster readAttributeOperationalStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"4c: Verify DUT update OperationalStatus attribute to TH after a StopMotion Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -26445,7 +26445,7 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
         }
 
         [expectation fulfill];
-    };
+    }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -26523,31 +26523,6 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
 
             [expectation fulfill];
         }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_1_000025_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"5d: TH reads OperationalStatus attribute from DUT must be ZERO"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeOperationalStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"5d: TH reads OperationalStatus attribute from DUT must be ZERO Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], 0);
-        }
-
-        [expectation fulfill];
-    }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -26873,8 +26848,8 @@ ResponseHandler test_Test_TC_WNCV_3_2_OperationalStatus_Reported = nil;
     XCTestExpectation * expectation = [self expectationWithDescription:@"3a2: DUT updates its attributes"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 1000);
-    [self waitForExpectationsWithTimeout:(1000 / 1000) + kTimeoutInSeconds handler:nil];
+    WaitForMs(expectation, queue, 2000);
+    [self waitForExpectationsWithTimeout:(2000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WNCV_3_2_000015_ReadAttribute
 {
@@ -27037,21 +27012,21 @@ ResponseHandler test_Test_TC_WNCV_3_2_OperationalStatus_Reported = nil;
         [self expectationWithDescription:@"4b: TH waits for 3 seconds the end of inertial movement(s) on the device"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 2000);
-    [self waitForExpectationsWithTimeout:(2000 / 1000) + kTimeoutInSeconds handler:nil];
+    WaitForMs(expectation, queue, 3000);
+    [self waitForExpectationsWithTimeout:(3000 / 1000) + kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_2_000021_WaitForReport
+- (void)testSendClusterTest_TC_WNCV_3_2_000021_ReadAttribute
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"4c: Verify DUT reports OperationalStatus attribute to TH after a StopMotion"];
+        [self expectationWithDescription:@"4c: Verify DUT update OperationalStatus attribute to TH after a StopMotion"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
     CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    test_Test_TC_WNCV_3_2_OperationalStatus_Reported = ^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"4c: Verify DUT reports OperationalStatus attribute to TH after a StopMotion Error: %@", err);
+    [cluster readAttributeOperationalStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"4c: Verify DUT update OperationalStatus attribute to TH after a StopMotion Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -27139,31 +27114,6 @@ ResponseHandler test_Test_TC_WNCV_3_2_OperationalStatus_Reported = nil;
 
             [expectation fulfill];
         }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_3_2_000025_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"5d: TH reads OperationalStatus attribute from DUT must be ZERO"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeOperationalStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"5d: TH reads OperationalStatus attribute from DUT must be ZERO Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], 0);
-        }
-
-        [expectation fulfill];
-    }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -27337,11 +27287,11 @@ ResponseHandler test_Test_TC_WNCV_3_3_OperationalStatus_Reported = nil;
 - (void)testSendClusterTest_TC_WNCV_3_3_000010_WaitForMs
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"2d: TH waits for 100-1000ms attributes update on the device"];
+        [self expectationWithDescription:@"2d: TH waits for 100ms - 3s attributes update on the device"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 1000);
-    [self waitForExpectationsWithTimeout:(1000 / 1000) + kTimeoutInSeconds handler:nil];
+    WaitForMs(expectation, queue, 2000);
+    [self waitForExpectationsWithTimeout:(2000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WNCV_3_3_000011_ReadAttribute
 {
