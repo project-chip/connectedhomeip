@@ -2032,7 +2032,7 @@ JNI_METHOD(jlong, BasicCluster, initWithDevice)(JNIEnv * env, jobject self, jlon
     return reinterpret_cast<jlong>(cppCluster);
 }
 
-JNI_METHOD(void, BasicCluster, subscribeInteractionModelVersionAttribute)
+JNI_METHOD(void, BasicCluster, subscribeDataModelRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
     chip::DeviceLayer::StackLock lock;
@@ -2054,9 +2054,9 @@ JNI_METHOD(void, BasicCluster, subscribeInteractionModelVersionAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    using TypeInfo = chip::app::Clusters::Basic::Attributes::InteractionModelVersion::TypeInfo;
+    using TypeInfo = chip::app::Clusters::Basic::Attributes::DataModelRevision::TypeInfo;
     auto successFn =
-        chip::Callback::Callback<CHIPBasicClusterInteractionModelVersionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+        chip::Callback::Callback<CHIPBasicClusterDataModelRevisionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
     err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,

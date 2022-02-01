@@ -7902,7 +7902,7 @@ public:
 
 namespace Attributes {
 
-namespace InteractionModelVersion {
+namespace DataModelRevision {
 struct TypeInfo
 {
     using Type             = uint16_t;
@@ -7910,10 +7910,10 @@ struct TypeInfo
     using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::InteractionModelVersion::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DataModelRevision::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace InteractionModelVersion
+} // namespace DataModelRevision
 namespace VendorName {
 struct TypeInfo
 {
@@ -8187,7 +8187,7 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::InteractionModelVersion::TypeInfo::DecodableType interactionModelVersion = static_cast<uint16_t>(0);
+        Attributes::DataModelRevision::TypeInfo::DecodableType dataModelRevision = static_cast<uint16_t>(0);
         Attributes::VendorName::TypeInfo::DecodableType vendorName;
         Attributes::VendorID::TypeInfo::DecodableType vendorID = static_cast<chip::VendorId>(0);
         Attributes::ProductName::TypeInfo::DecodableType productName;

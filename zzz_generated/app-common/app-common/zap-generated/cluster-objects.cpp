@@ -5719,8 +5719,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::InteractionModelVersion::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, interactionModelVersion));
+    case Attributes::DataModelRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, dataModelRevision));
         break;
     case Attributes::VendorName::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, vendorName));
