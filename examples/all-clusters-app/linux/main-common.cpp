@@ -116,4 +116,3 @@ void emberAfLowPowerClusterInitCallback(EndpointId endpoint)
     ChipLogProgress(Zcl, "TV Linux App: LowPower::SetDefaultDelegate");
     chip::app::Clusters::LowPower::SetDefaultDelegate(endpoint, &lowPowerManager);
 }
-
