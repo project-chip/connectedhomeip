@@ -345,7 +345,7 @@ exit:
 CHIP_ERROR Spake2p::ComputeRoundTwo(const uint8_t * in, size_t in_len, uint8_t * out, size_t * out_len)
 {
     CHIP_ERROR error = CHIP_ERROR_INTERNAL;
-    MutableByteSpan out_span{out, *out_len};
+    MutableByteSpan out_span{ out, *out_len };
     uint8_t point_buffer[kMAX_Point_Length];
     void * MN        = nullptr; // Choose N if a prover, M if a verifier
     void * XY        = nullptr; // Choose Y if a prover, X if a verifier
@@ -421,7 +421,7 @@ CHIP_ERROR Spake2p::GenerateKeys()
 {
     static const uint8_t info_keyconfirm[16] = { 'C', 'o', 'n', 'f', 'i', 'r', 'm', 'a', 't', 'i', 'o', 'n', 'K', 'e', 'y', 's' };
 
-    MutableByteSpan Kae_span{&Kae[0], sizeof(Kae)};
+    MutableByteSpan Kae_span{ &Kae[0], sizeof(Kae) };
 
     ReturnErrorOnFailure(HashFinalize(Kae_span));
     ReturnErrorOnFailure(KDF(Ka, hash_size / 2, nullptr, 0, info_keyconfirm, sizeof(info_keyconfirm), Kcab, hash_size));
