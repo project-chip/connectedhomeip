@@ -27,10 +27,10 @@
             "target.components_add": ["capsense"],
             "ble-button": "USER_BUTTON",
             "mcuboot.primary-slot-address": "0x10022000",
-            "mcuboot.slot-size": "0x140000",
-            "mcuboot.scratch-address": "0x10162000",
+            "mcuboot.slot-size": "0x180000",
+            "mcuboot.scratch-address": "0x101A2000",
             "mcuboot.scratch-size": "0x40000",
-            "mcuboot.max-img-sectors": "0xA00",
+            "mcuboot.max-img-sectors": "0xC00",
             "mcuboot.header-size": "0x400"
         }
     },

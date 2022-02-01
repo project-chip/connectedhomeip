@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.19.0)
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../.. REALPATH)
 get_filename_component(MBED_COMMON ${CHIP_ROOT}/examples/platform/mbed REALPATH)
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
-get_filename_component(NLIO_DIR ${CHIP_ROOT}/third_party/nlio/repo/include REALPATH)
+get_filename_component(NLIO_ROOT ${CHIP_ROOT}/third_party/nlio/repo/include REALPATH)
 
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/config.in
@@ -48,7 +48,7 @@ target_include_directories(${APP_TARGET} PRIVATE
                            main/include/
                            ${GEN_DIR}/app-common
                            ${MBED_COMMON}/util/include
-                           ${NLIO_DIR}
+                           ${NLIO_ROOT}
                            ${GEN_DIR}/ota-requestor-app
 )
 
@@ -58,6 +58,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${GEN_DIR}//ota-requestor-app/zap-generated/callback-stub.cpp
                ${GEN_DIR}/ota-requestor-app/zap-generated/IMClusterCommandHandler.cpp
                ${MBED_COMMON}/util/LEDWidget.cpp
+               ${MBED_COMMON}/util/DFUManager.cpp
 )
 
 chip_configure_data_model(${APP_TARGET}

@@ -34,6 +34,9 @@
 
 #ifdef CAPSENSE_ENABLED
 #include "capsense.h"
+#else
+#include "drivers/InterruptIn.h"
+#include "platform/Callback.h"
 #endif
 
 static bool sIsWiFiStationProvisioned = false;

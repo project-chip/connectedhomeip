@@ -26,5 +26,13 @@
                 "WHD_PRINT_DISABLE"
             ]
         }
+    },
+    "config": {
+        "version-number": {
+            "value": "0"
+        },
+        "version-number-str": {
+            "value": "\"0.1.0\""
+        }
     }
 }
