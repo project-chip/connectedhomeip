@@ -27,7 +27,7 @@ if(APP_TYPE STREQUAL "boot" OR APP_TYPE STREQUAL "upgrade")
 endif()
 
 include(${MBED_PATH}/tools/cmake/app.cmake)
-if(MBED_TARGET STREQUAL "CY8CPROTO_062_4343W" AND BOOT_ENABLED)   
+if(MBED_TARGET STREQUAL "CY8CPROTO_062_4343W" AND BOOT_ENABLED)
     list(REMOVE_ITEM MBED_TARGET_LABELS CM0P_SLEEP)
     list(REMOVE_ITEM MBED_TARGET_DEFINITIONS COMPONENT_CM0P_SLEEP=1)
 endif()
@@ -49,12 +49,15 @@ target_include_directories(${APP_TARGET} PRIVATE
                            ${GEN_DIR}/app-common
                            ${MBED_COMMON}/util/include
                            ${NLIO_DIR}
+                           ${GEN_DIR}/ota-requestor-app
 )
 
 target_sources(${APP_TARGET} PRIVATE
-    main/main.cpp
-    main/AppTask.cpp
-    ${MBED_COMMON}/util/LEDWidget.cpp
+               main/main.cpp
+               main/AppTask.cpp
+               ${GEN_DIR}//ota-requestor-app/zap-generated/callback-stub.cpp
+               ${GEN_DIR}/ota-requestor-app/zap-generated/IMClusterCommandHandler.cpp
+               ${MBED_COMMON}/util/LEDWidget.cpp
 )
 
 chip_configure_data_model(${APP_TARGET}
