@@ -173,7 +173,7 @@ tests:
       arguments:
           values:
               - name: "ms"
-                value: 1000
+                value: 2000
 
     ### Mandatory Depends on the FeatureMap
     - label:
@@ -241,14 +241,14 @@ tests:
       arguments:
           values:
               - name: "ms"
-                value: 2000
+                value: 3000
 
     ### Must Be ZERO
     # The value of bit 0..1 must be 00b & if (LF) value of bit 2..3 must be 00b & if (TL) value of bit 4..5 must be 00b
     - label:
-          "4c: Verify DUT reports OperationalStatus attribute to TH after a
+          "4c: Verify DUT update OperationalStatus attribute to TH after a
           StopMotion"
-      command: "waitForReport"
+      command: "readAttribute"
       attribute: "OperationalStatus"
       response:
           value: 0
@@ -288,9 +288,4 @@ tests:
               minValue: 1
               maxValue: 10000
 
-    ### MANDATORY reads
-    - label: "5d: TH reads OperationalStatus attribute from DUT must be ZERO"
-      command: "readAttribute"
-      attribute: "OperationalStatus"
-      response:
-          value: 0
+

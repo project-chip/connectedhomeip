@@ -92,13 +92,13 @@ tests:
           value: 0
 
     ### DUT updates its attributes
-    - label: "2d: TH waits for 100-1000ms attributes update on the device"
+    - label: "2d: TH waits for 100ms - 3s attributes update on the device"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 1000
+                value: 2000
 
     ### MANDATORY reads
     - label: "2e: TH reads OperationalStatus attribute from DUT"

@@ -44395,8 +44395,8 @@ public:
             break;
         case 21:
             ChipLogProgress(chipTool,
-                            " ***** Test Step 21 : 4c: Verify DUT reports OperationalStatus attribute to TH after a StopMotion\n");
-            err = Test4cVerifyDutReportsOperationalStatusAttributeToThAfterAStopMotion_21();
+                            " ***** Test Step 21 : 4c: Verify DUT update OperationalStatus attribute to TH after a StopMotion\n");
+            err = Test4cVerifyDutUpdateOperationalStatusAttributeToThAfterAStopMotion_21();
             break;
         case 22:
             ChipLogProgress(chipTool, " ***** Test Step 22 : 5a: TH waits for x seconds attributes update on the device\n");
@@ -44422,10 +44422,6 @@ public:
             }
             err = Test5cIfPaTlThReadsTargetPositionTiltPercent100thsAttributeFromDut_24();
             break;
-        case 25:
-            ChipLogProgress(chipTool, " ***** Test Step 25 : 5d: TH reads OperationalStatus attribute from DUT must be ZERO\n");
-            err = Test5dThReadsOperationalStatusAttributeFromDutMustBeZero_25();
-            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -44437,7 +44433,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 26;
+    const uint16_t mTestCount = 25;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
@@ -44593,8 +44589,6 @@ private:
         (static_cast<Test_TC_WNCV_3_1 *>(context))->OnSuccessResponse_21(operationalStatus);
     }
 
-    bool mReceivedReport_21 = false;
-
     static void OnFailureCallback_23(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_WNCV_3_1 *>(context))->OnFailureResponse_23(error);
@@ -44615,16 +44609,6 @@ private:
                                      const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionTiltPercent100ths)
     {
         (static_cast<Test_TC_WNCV_3_1 *>(context))->OnSuccessResponse_24(targetPositionTiltPercent100ths);
-    }
-
-    static void OnFailureCallback_25(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_WNCV_3_1 *>(context))->OnFailureResponse_25(error);
-    }
-
-    static void OnSuccessCallback_25(void * context, uint8_t operationalStatus)
-    {
-        (static_cast<Test_TC_WNCV_3_1 *>(context))->OnSuccessResponse_25(operationalStatus);
     }
 
     //
@@ -44935,7 +44919,7 @@ private:
     CHIP_ERROR Test3a2DutUpdatesItsAttributes_14()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForMs(1000);
+        return WaitForMs(2000);
     }
 
     CHIP_ERROR Test3bIfPaLfThReadsCurrentPositionLiftPercent100thsAttributeFromDut_15()
@@ -45076,16 +45060,17 @@ private:
     CHIP_ERROR Test4bThWaitsFor3SecondsTheEndOfInertialMovementsOnTheDevice_20()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForMs(2000);
+        return WaitForMs(3000);
     }
 
-    CHIP_ERROR Test4cVerifyDutReportsOperationalStatusAttributeToThAfterAStopMotion_21()
+    CHIP_ERROR Test4cVerifyDutUpdateOperationalStatusAttributeToThAfterAStopMotion_21()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        mTest_Test_TC_WNCV_3_1_OperationalStatus_Reported = OnSuccessCallback_21;
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
+            this, OnSuccessCallback_21, OnFailureCallback_21));
         return CHIP_NO_ERROR;
     }
 
@@ -45097,8 +45082,6 @@ private:
 
     void OnSuccessResponse_21(uint8_t operationalStatus)
     {
-        mReceivedReport_21 = true;
-
         VerifyOrReturn(CheckValue("operationalStatus", operationalStatus, 0));
 
         NextTest();
@@ -45163,30 +45146,6 @@ private:
             CheckConstraintMinValue<chip::Percent100ths>("targetPositionTiltPercent100ths", targetPositionTiltPercent100ths, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("targetPositionTiltPercent100ths",
                                                                     targetPositionTiltPercent100ths, 9999U));
-        NextTest();
-    }
-
-    CHIP_ERROR Test5dThReadsOperationalStatusAttributeFromDutMustBeZero_25()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
-            this, OnSuccessCallback_25, OnFailureCallback_25));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_25(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_25(uint8_t operationalStatus)
-    {
-        VerifyOrReturn(CheckValue("operationalStatus", operationalStatus, 0));
-
         NextTest();
     }
 };
@@ -45375,8 +45334,8 @@ public:
             break;
         case 21:
             ChipLogProgress(chipTool,
-                            " ***** Test Step 21 : 4c: Verify DUT reports OperationalStatus attribute to TH after a StopMotion\n");
-            err = Test4cVerifyDutReportsOperationalStatusAttributeToThAfterAStopMotion_21();
+                            " ***** Test Step 21 : 4c: Verify DUT update OperationalStatus attribute to TH after a StopMotion\n");
+            err = Test4cVerifyDutUpdateOperationalStatusAttributeToThAfterAStopMotion_21();
             break;
         case 22:
             ChipLogProgress(chipTool, " ***** Test Step 22 : 5a: TH waits for x seconds attributes update on the device\n");
@@ -45402,10 +45361,6 @@ public:
             }
             err = Test5cIfPaTlThReadsTargetPositionTiltPercent100thsAttributeFromDut_24();
             break;
-        case 25:
-            ChipLogProgress(chipTool, " ***** Test Step 25 : 5d: TH reads OperationalStatus attribute from DUT must be ZERO\n");
-            err = Test5dThReadsOperationalStatusAttributeFromDutMustBeZero_25();
-            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -45417,7 +45372,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 26;
+    const uint16_t mTestCount = 25;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
@@ -45573,8 +45528,6 @@ private:
         (static_cast<Test_TC_WNCV_3_2 *>(context))->OnSuccessResponse_21(operationalStatus);
     }
 
-    bool mReceivedReport_21 = false;
-
     static void OnFailureCallback_23(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_WNCV_3_2 *>(context))->OnFailureResponse_23(error);
@@ -45595,16 +45548,6 @@ private:
                                      const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionTiltPercent100ths)
     {
         (static_cast<Test_TC_WNCV_3_2 *>(context))->OnSuccessResponse_24(targetPositionTiltPercent100ths);
-    }
-
-    static void OnFailureCallback_25(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_WNCV_3_2 *>(context))->OnFailureResponse_25(error);
-    }
-
-    static void OnSuccessCallback_25(void * context, uint8_t operationalStatus)
-    {
-        (static_cast<Test_TC_WNCV_3_2 *>(context))->OnSuccessResponse_25(operationalStatus);
     }
 
     //
@@ -45915,7 +45858,7 @@ private:
     CHIP_ERROR Test3a2DutUpdatesItsAttributes_14()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForMs(1000);
+        return WaitForMs(2000);
     }
 
     CHIP_ERROR Test3bIfPaLfThReadsCurrentPositionLiftPercent100thsAttributeFromDut_15()
@@ -46056,16 +45999,17 @@ private:
     CHIP_ERROR Test4bThWaitsFor3SecondsTheEndOfInertialMovementsOnTheDevice_20()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForMs(2000);
+        return WaitForMs(3000);
     }
 
-    CHIP_ERROR Test4cVerifyDutReportsOperationalStatusAttributeToThAfterAStopMotion_21()
+    CHIP_ERROR Test4cVerifyDutUpdateOperationalStatusAttributeToThAfterAStopMotion_21()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        mTest_Test_TC_WNCV_3_2_OperationalStatus_Reported = OnSuccessCallback_21;
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
+            this, OnSuccessCallback_21, OnFailureCallback_21));
         return CHIP_NO_ERROR;
     }
 
@@ -46077,8 +46021,6 @@ private:
 
     void OnSuccessResponse_21(uint8_t operationalStatus)
     {
-        mReceivedReport_21 = true;
-
         VerifyOrReturn(CheckValue("operationalStatus", operationalStatus, 0));
 
         NextTest();
@@ -46143,30 +46085,6 @@ private:
             CheckConstraintMinValue<chip::Percent100ths>("targetPositionTiltPercent100ths", targetPositionTiltPercent100ths, 1U));
         VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("targetPositionTiltPercent100ths",
                                                                     targetPositionTiltPercent100ths, 10000U));
-        NextTest();
-    }
-
-    CHIP_ERROR Test5dThReadsOperationalStatusAttributeFromDutMustBeZero_25()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
-            this, OnSuccessCallback_25, OnFailureCallback_25));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_25(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_25(uint8_t operationalStatus)
-    {
-        VerifyOrReturn(CheckValue("operationalStatus", operationalStatus, 0));
-
         NextTest();
     }
 };
@@ -46254,8 +46172,8 @@ public:
             err = Test2cVerifyDutReportsOperationalStatusAttributeToThAfterAStopMotion_9();
             break;
         case 10:
-            ChipLogProgress(chipTool, " ***** Test Step 10 : 2d: TH waits for 100-1000ms attributes update on the device\n");
-            err = Test2dThWaitsFor1001000msAttributesUpdateOnTheDevice_10();
+            ChipLogProgress(chipTool, " ***** Test Step 10 : 2d: TH waits for 100ms - 3s attributes update on the device\n");
+            err = Test2dThWaitsFor100ms3sAttributesUpdateOnTheDevice_10();
             break;
         case 11:
             ChipLogProgress(chipTool, " ***** Test Step 11 : 2e: TH reads OperationalStatus attribute from DUT\n");
@@ -46526,10 +46444,10 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR Test2dThWaitsFor1001000msAttributesUpdateOnTheDevice_10()
+    CHIP_ERROR Test2dThWaitsFor100ms3sAttributesUpdateOnTheDevice_10()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForMs(1000);
+        return WaitForMs(2000);
     }
 
     CHIP_ERROR Test2eThReadsOperationalStatusAttributeFromDut_11()
