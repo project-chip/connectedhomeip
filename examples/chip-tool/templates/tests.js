@@ -308,5 +308,5 @@ function getTests()
 //
 // Module exports
 //
-exports.getTests = getTests;
+exports.getTests       = getTests;
 exports.getManualTests = getManualTests;
