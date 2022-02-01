@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include <messaging/ExchangeDelegate.h>
+#include <messaging/ExchangeMgr.h>
 #include <protocols/Protocols.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/MessageCounterManagerInterface.h>
