@@ -55,6 +55,9 @@ constexpr uint16_t kOptionOtaImageList         = 'o';
 constexpr uint16_t kOptionQueryImageBehavior   = 'q';
 constexpr uint16_t kOptionDelayedActionTimeSec = 'd';
 constexpr uint16_t kOptionUserConsent          = 'u';
+constexpr uint16_t kOptionDiscriminator        = 'D';
+constexpr uint16_t kOptionPasscode             = 'p';
+constexpr uint16_t kOptionSoftwareVersion      = 's';
 
 // Global variables used for passing the CLI arguments to the OTAProviderExample object
 static OTAProviderExample::QueryImageBehaviorType gQueryImageBehavior = OTAProviderExample::kRespondWithUnknown;
@@ -62,6 +65,9 @@ static uint32_t gDelayedActionTimeSec                                 = 0;
 static const char * gOtaFilepath                                      = nullptr;
 static const char * gOtaImageListFilepath                             = nullptr;
 static chip::ota::UserConsentState gUserConsentState                  = chip::ota::UserConsentState::kUnknown;
+static chip::Optional<uint16_t> gSetupDiscriminator;
+static chip::Optional<uint32_t> gSetupPasscode;
+static chip::Optional<uint32_t> gSoftwareVersion;
 
 // Parses the JSON filepath and extracts DeviceSoftwareVersionModel parameters
 static bool ParseJsonFileAndPopulateCandidates(const char * filepath,
@@ -209,6 +215,29 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
             retval = false;
         }
         break;
+    case kOptionDiscriminator: {
+        uint16_t discriminator = static_cast<uint16_t>(strtol(aValue, NULL, 0));
+        if (discriminator > 0xFFF)
+        {
+            PrintArgError("%s: Input ERROR: setupDiscriminator value %s is out of range \n", aProgram, aValue);
+            retval = false;
+        }
+        gSetupDiscriminator.SetValue(discriminator);
+        break;
+    }
+    case kOptionPasscode: {
+        uint32_t passcode = static_cast<uint32_t>(strtol(aValue, NULL, 0));
+        if (passcode < 1 || passcode > 99999998)
+        {
+            PrintArgError("%s: Input ERROR: setupPasscode value %s is out of range \n", aProgram, aValue);
+            retval = false;
+        }
+        gSetupPasscode.SetValue(passcode);
+        break;
+    }
+    case kOptionSoftwareVersion:
+        gSoftwareVersion.SetValue(static_cast<uint32_t>(strtol(aValue, NULL, 0)));
+        break;
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
         retval = false;
@@ -224,6 +253,9 @@ OptionDef cmdLineOptionsDef[] = {
     { "QueryImageBehavior", chip::ArgParser::kArgumentRequired, kOptionQueryImageBehavior },
     { "DelayedActionTimeSec", chip::ArgParser::kArgumentRequired, kOptionDelayedActionTimeSec },
     { "UserConsent", chip::ArgParser::kArgumentRequired, kOptionUserConsent },
+    { "discriminator", chip::ArgParser::kArgumentRequired, kOptionDiscriminator },
+    { "passcode", chip::ArgParser::kArgumentRequired, kOptionPasscode },
+    { "softwareVersion", chip::ArgParser::kArgumentRequired, kOptionSoftwareVersion },
     {},
 };
 
@@ -241,7 +273,17 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "        granted: Status value in QueryImageResponse is set to UpdateAvailable\n"
                              "        denied: Status value in QueryImageResponse is set to UpdateNotAvailable\n"
                              "        deferred: Status value in QueryImageResponse is set to Busy\n"
-                             "        -q/--QueryImageBehavior overrides this option\n" };
+                             "        -q/--QueryImageBehavior overrides this option\n"
+                             "  -D/--discriminator <discriminator>\n"
+                             "        A 12-bit value used to discern between multiple commissionable CHIP device\n"
+                             "        advertisements. If none is specified, default value is 3840.\n"
+                             "  -p/--passcode <passcode>\n"
+                             "        A Passcode SHALL be included as a 27-bit unsigned integer,\n"
+                             "        which serves as proof of possession during commissioning.\n"
+                             "        If none is specified, default value is 20202021.\n"
+                             "  -s/--softwareVersion <version>\n"
+                             "        Value of SoftwareVersion in the Query Image Response\n"
+                             "        If provided this will override the value in the OTA image.\n" };
 
 HelpOptions helpOptions("ota-provider-app", "Usage: ota-provider-app [options]", "1.0");
 
@@ -271,6 +313,31 @@ int main(int argc, char * argv[])
     }
 
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
+
+    if (gSetupDiscriminator.HasValue())
+    {
+        // Set discriminator to user specified value
+        ChipLogProgress(SoftwareUpdate, "Setting discriminator to: %" PRIu16, gSetupDiscriminator.Value());
+        err = chip::DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(gSetupDiscriminator.Value());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(SoftwareUpdate, "Setup discriminator setting failed with code: %" CHIP_ERROR_FORMAT, err.Format());
+            return 1;
+        }
+    }
+
+    if (gSetupPasscode.HasValue())
+    {
+        // Set passcode to user specified value
+        ChipLogProgress(SoftwareUpdate, "Setting passcode to: %" PRIu32, gSetupPasscode.Value());
+        err = chip::DeviceLayer::ConfigurationMgr().StoreSetupPinCode(gSetupPasscode.Value());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(SoftwareUpdate, "Setup passcode setting failed with code: %" CHIP_ERROR_FORMAT, err.Format());
+            return 1;
+        }
+    }
+
     chip::Server::GetInstance().Init();
 
     // Initialize device attestation config
@@ -295,6 +362,10 @@ int main(int argc, char * argv[])
 
     otaProvider.SetQueryImageBehavior(gQueryImageBehavior);
     otaProvider.SetDelayedActionTimeSec(gDelayedActionTimeSec);
+    if (gSoftwareVersion.HasValue())
+    {
+        otaProvider.SetSoftwareVersion(gSoftwareVersion.Value());
+    }
 
     if (gUserConsentState != chip::ota::UserConsentState::kUnknown)
     {

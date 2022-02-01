@@ -71,6 +71,7 @@ public:
     void SetQueryImageBehavior(QueryImageBehaviorType behavior) { mQueryImageBehavior = behavior; }
     void SetDelayedActionTimeSec(uint32_t time) { mDelayedActionTimeSec = time; }
     void SetUserConsentDelegate(chip::ota::UserConsentDelegate * delegate) { mUserConsentDelegate = delegate; }
+    void SetSoftwareVersion(uint32_t softwareVersion) { mSoftwareVersion.SetValue(softwareVersion); }
 
 private:
     BdxOtaSender mBdxOtaSender;
@@ -88,4 +89,5 @@ private:
     GetUserConsentSubject(const chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                           const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData,
                           uint32_t targetVersion);
+    chip::Optional<uint32_t> mSoftwareVersion;
 };
