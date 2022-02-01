@@ -68,6 +68,7 @@ public:
     void SetOTACandidates(std::vector<OTAProviderExample::DeviceSoftwareVersionModel> candidates);
     void SetQueryImageBehavior(QueryImageBehaviorType behavior) { mQueryImageBehavior = behavior; }
     void SetDelayedActionTimeSec(uint32_t time) { mDelayedActionTimeSec = time; }
+    void SetSoftwareVersion(uint32_t softwareVersion) { mSoftwareVersion.SetValue(softwareVersion); }
 
 private:
     BdxOtaSender mBdxOtaSender;
@@ -79,4 +80,5 @@ private:
     bool SelectOTACandidate(const uint16_t requestorVendorID, const uint16_t requestorProductID,
                             const uint32_t requestorSoftwareVersion,
                             OTAProviderExample::DeviceSoftwareVersionModel & finalCandidate);
+    chip::Optional<uint32_t> mSoftwareVersion;
 };

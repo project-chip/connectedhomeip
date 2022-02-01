@@ -163,6 +163,10 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
             otaFilePath              = candidate.otaURL;
         }
     }
+    if (mSoftwareVersion.HasValue())
+    {
+        newSoftwareVersion = mSoftwareVersion.Value();
+    }
 
     GenerateUpdateToken(updateToken, kUpdateTokenLen);
     GetUpdateTokenString(ByteSpan(updateToken), strBuf, kUpdateTokenStrLen);
