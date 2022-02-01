@@ -191,15 +191,15 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
             PrintArgError("%s: ERROR: NULL UserConsent parameter\n", aProgram);
             retval = false;
         }
-        else if (strcmp(aValue, "Granted") == 0)
+        else if (strcmp(aValue, "granted") == 0)
         {
             gUserConsentState = chip::ota::UserConsentState::kGranted;
         }
-        else if (strcmp(aValue, "Denied") == 0)
+        else if (strcmp(aValue, "denied") == 0)
         {
             gUserConsentState = chip::ota::UserConsentState::kDenied;
         }
-        else if (strcmp(aValue, "Deferred") == 0)
+        else if (strcmp(aValue, "deferred") == 0)
         {
             gUserConsentState = chip::ota::UserConsentState::kObtaining;
         }
@@ -237,10 +237,10 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "  -d/--DelayedActionTimeSec <time>\n"
                              "        Value in seconds for the DelayedActionTime in the Query Image Response\n"
                              "        and Apply Update Response\n"
-                             "  -u/--UserConsent <Granted | Denied | Deferred>\n"
-                             "        Granted: Status value in QueryImageResponse is set to UpdateAvailable\n"
-                             "        Denied: Status value in QueryImageResponse is set to UpdateNotAvailable\n"
-                             "        Deferred: Status value in QueryImageResponse is set to Busy\n"
+                             "  -u/--UserConsent <granted | denied | deferred>\n"
+                             "        granted: Status value in QueryImageResponse is set to UpdateAvailable\n"
+                             "        denied: Status value in QueryImageResponse is set to UpdateNotAvailable\n"
+                             "        deferred: Status value in QueryImageResponse is set to Busy\n"
                              "        -q/--QueryImageBehavior overrides this option\n" };
 
 HelpOptions helpOptions("ota-provider-app", "Usage: ota-provider-app [options]", "1.0");

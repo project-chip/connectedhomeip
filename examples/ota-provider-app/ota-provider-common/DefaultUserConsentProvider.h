@@ -26,24 +26,12 @@ namespace ota {
 class DefaultUserConsentProvider : public UserConsentDelegate
 {
 public:
-    DefaultUserConsentProvider();
+    DefaultUserConsentProvider() = default;
 
     ~DefaultUserConsentProvider() = default;
 
     // This method returns kGranted unless explicitly denied by the user by calling RevokeUserConsent()
     UserConsentState GetUserConsentState(const UserConsentSubject & subject) override;
-
-    // Grant the user consent for the given subject for OTA updates
-    CHIP_ERROR GrantUserConsent(const UserConsentSubject & subject);
-
-    // Revoke the user consent for the given subject for OTA updates
-    CHIP_ERROR RevokeUserConsent(const UserConsentSubject & subject);
-
-    // Set the user consent as deferred for the given subject for OTA updates
-    CHIP_ERROR DeferUserConsent(const UserConsentSubject & subject);
-
-    // Mark the user consent entry as invalid
-    CHIP_ERROR ClearUserConsentEntry(const UserConsentSubject & subject);
 
     // If this is set to true, all the user consent requests will be replied with global consent.
     void SetGlobalUserConsentState(UserConsentState state)
@@ -63,20 +51,9 @@ public:
     void ClearGlobalUserConsentState() { mUseGlobalConsent = false; }
 
 private:
-    CHIP_ERROR SetUserConsentState(const UserConsentSubject & subject, UserConsentState state);
-
-    static constexpr uint8_t kMaxUserConsentEntries = 10;
-
     bool mUseGlobalConsent = false;
 
     UserConsentState mGlobalConsentState = UserConsentState::kGranted;
-
-    struct UserConsentEntry
-    {
-        bool isEntryValid;
-        UserConsentSubject subject;
-        UserConsentState state;
-    } mUserConsentEntries[kMaxUserConsentEntries];
 
     void LogUserConsentSubject(const UserConsentSubject & subject);
 };

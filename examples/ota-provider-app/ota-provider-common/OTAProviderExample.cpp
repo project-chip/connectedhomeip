@@ -133,14 +133,13 @@ UserConsentSubject OTAProviderExample::GetUserConsentSubject(const app::CommandH
                                                              const QueryImage::DecodableType & commandData, uint32_t targetVersion)
 {
     UserConsentSubject subject;
-    FabricIndex fabricIndex = commandObj->GetSubjectDescriptor().fabricIndex;
-    subject.fabricId        = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex)->GetFabricId();
-    subject.nodeId          = commandObj->GetSubjectDescriptor().subject;
-    subject.endpointId      = commandPath.mEndpointId;
-    subject.vendorId        = commandData.vendorId;
-    subject.productId       = commandData.productId;
-    subject.currentVersion  = commandData.softwareVersion;
-    subject.targetVersion   = targetVersion;
+    subject.fabricIndex             = commandObj->GetSubjectDescriptor().fabricIndex;
+    subject.requestorNodeId         = commandObj->GetSubjectDescriptor().subject;
+    subject.providerEndpointId      = commandPath.mEndpointId;
+    subject.requestorVendorId       = commandData.vendorId;
+    subject.requestorProductId      = commandData.productId;
+    subject.requestorCurrentVersion = commandData.softwareVersion;
+    subject.requestorTargetVersion  = targetVersion;
     if (commandData.metadataForProvider.HasValue())
     {
         subject.metadata = commandData.metadataForProvider.Value();
@@ -272,8 +271,12 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
     response.status = queryStatus;
     response.delayedActionTime.Emplace(delayedActionTimeSec);
     response.userConsentNeeded.Emplace(requestorCanConsent);
-    // Could also just not send metadataForRequestor at all.
-    response.metadataForRequestor.Emplace(chip::ByteSpan());
+
+    // For test coverage, sending empty metadata when (requestorNodeId % 2) == 0 and not sending otherwise.
+    if (commandObj->GetSubjectDescriptor().subject % 2 == 0)
+    {
+        response.metadataForRequestor.Emplace(chip::ByteSpan());
+    }
 
     VerifyOrReturnError(commandObj->AddResponseData(commandPath, response) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
     return EMBER_ZCL_STATUS_SUCCESS;

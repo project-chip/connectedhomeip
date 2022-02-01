@@ -34,24 +34,36 @@ enum UserConsentState
     kUnknown,
 };
 
+/**
+ * @brief User consent subject contains the information of the OTA requestor
+ * that requires obtaining user consent for performing the OTA update.
+ */
 struct UserConsentSubject
 {
-    FabricId fabricId;
-    NodeId nodeId;
-    EndpointId endpointId;
-    uint16_t vendorId;
-    uint16_t productId;
-    uint32_t currentVersion;
-    uint32_t targetVersion;
-    ByteSpan metadata;
+    // Fabric Index
+    FabricIndex fabricIndex;
 
-    bool operator==(const UserConsentSubject & other) const
-    {
-        return (fabricId == other.fabricId && nodeId == other.nodeId && endpointId == other.endpointId &&
-                vendorId == other.vendorId && productId == other.productId && currentVersion == other.currentVersion &&
-                targetVersion == other.targetVersion);
-        // Ignoring medatada comparison
-    }
+    // Node ID of the OTA Requestor
+    NodeId requestorNodeId;
+
+    // Endpoint of the OTA Provider
+    EndpointId providerEndpointId;
+
+    // Vendor ID of the OTA Requestor
+    uint16_t requestorVendorId;
+
+    // Product ID of the OTA Requestor
+    uint16_t requestorProductId;
+
+    // Current software version of the OTA Requestor
+    uint32_t requestorCurrentVersion;
+
+    // Target software version available for the OTA Requestor
+    uint32_t requestorTargetVersion;
+
+    // This data is not owned by UserConsentSubject and therefore any user of this field
+    // has to copy the data and own it if not immediately used from an argument having a UserConsentSubject
+    ByteSpan metadata;
 };
 
 class UserConsentDelegate

@@ -21,24 +21,16 @@
 namespace chip {
 namespace ota {
 
-DefaultUserConsentProvider::DefaultUserConsentProvider()
-{
-    for (uint8_t i = 0; i < kMaxUserConsentEntries; i++)
-    {
-        mUserConsentEntries[i].isEntryValid = false;
-    }
-}
-
 void DefaultUserConsentProvider::LogUserConsentSubject(const UserConsentSubject & subject)
 {
     ChipLogDetail(SoftwareUpdate, "User consent request for:");
-    ChipLogDetail(SoftwareUpdate, ":  FabricId: " ChipLogFormatX64, ChipLogValueX64(subject.fabricId));
-    ChipLogDetail(SoftwareUpdate, ":  NodeId: " ChipLogFormatX64, ChipLogValueX64(subject.nodeId));
-    ChipLogDetail(SoftwareUpdate, ":  EndpointId: %" PRIu16, subject.endpointId);
-    ChipLogDetail(SoftwareUpdate, ":  VendorId: %" PRIu16, subject.vendorId);
-    ChipLogDetail(SoftwareUpdate, ":  ProductId: %" PRIu16, subject.productId);
-    ChipLogDetail(SoftwareUpdate, ":  CurrentVersion: %" PRIu32, subject.currentVersion);
-    ChipLogDetail(SoftwareUpdate, ":  NewVersion: %" PRIu32, subject.targetVersion);
+    ChipLogDetail(SoftwareUpdate, ":  FabricIndex: %" PRIu8, subject.fabricIndex);
+    ChipLogDetail(SoftwareUpdate, ":  RequestorNodeId: " ChipLogFormatX64, ChipLogValueX64(subject.requestorNodeId));
+    ChipLogDetail(SoftwareUpdate, ":  ProviderEndpointId: %" PRIu16, subject.providerEndpointId);
+    ChipLogDetail(SoftwareUpdate, ":  RequestorVendorId: %" PRIu16, subject.requestorVendorId);
+    ChipLogDetail(SoftwareUpdate, ":  RequestorProductId: %" PRIu16, subject.requestorProductId);
+    ChipLogDetail(SoftwareUpdate, ":  RequestorCurrentVersion: %" PRIu32, subject.requestorCurrentVersion);
+    ChipLogDetail(SoftwareUpdate, ":  RequestorTargetVersion: %" PRIu32, subject.requestorTargetVersion);
     ChipLogDetail(SoftwareUpdate, ":  Metadata:");
     ChipLogByteSpan(SoftwareUpdate, subject.metadata);
 }
@@ -52,67 +44,7 @@ UserConsentState DefaultUserConsentProvider::GetUserConsentState(const UserConse
         return mGlobalConsentState;
     }
 
-    for (uint8_t i = 0; i < kMaxUserConsentEntries; i++)
-    {
-        if (mUserConsentEntries[i].isEntryValid && mUserConsentEntries[i].subject == subject)
-        {
-            return mUserConsentEntries[i].state;
-        }
-    }
     return UserConsentState::kGranted;
-}
-
-CHIP_ERROR DefaultUserConsentProvider::SetUserConsentState(const UserConsentSubject & subject, UserConsentState state)
-{
-    for (uint8_t i = 0; i < kMaxUserConsentEntries; i++)
-    {
-        if (mUserConsentEntries[i].isEntryValid && mUserConsentEntries[i].subject == subject)
-        {
-            mUserConsentEntries[i].state = state;
-            return CHIP_NO_ERROR;
-        }
-    }
-
-    for (uint8_t i = 0; i < kMaxUserConsentEntries; i++)
-    {
-        if (mUserConsentEntries[i].isEntryValid == false)
-        {
-            mUserConsentEntries[i].subject      = subject;
-            mUserConsentEntries[i].state        = state;
-            mUserConsentEntries[i].isEntryValid = true;
-            return CHIP_NO_ERROR;
-        }
-    }
-
-    return CHIP_ERROR_NO_MEMORY;
-}
-
-CHIP_ERROR DefaultUserConsentProvider::GrantUserConsent(const UserConsentSubject & subject)
-{
-    return SetUserConsentState(subject, UserConsentState::kGranted);
-}
-
-CHIP_ERROR DefaultUserConsentProvider::RevokeUserConsent(const UserConsentSubject & subject)
-{
-    return SetUserConsentState(subject, UserConsentState::kDenied);
-}
-
-CHIP_ERROR DefaultUserConsentProvider::DeferUserConsent(const UserConsentSubject & subject)
-{
-    return SetUserConsentState(subject, UserConsentState::kObtaining);
-}
-
-CHIP_ERROR DefaultUserConsentProvider::ClearUserConsentEntry(const UserConsentSubject & subject)
-{
-    for (uint8_t i = 0; i < kMaxUserConsentEntries; i++)
-    {
-        if (mUserConsentEntries[i].isEntryValid && mUserConsentEntries[i].subject == subject)
-        {
-            mUserConsentEntries[i].isEntryValid = false;
-            return CHIP_NO_ERROR;
-        }
-    }
-    return CHIP_ERROR_NOT_FOUND;
 }
 
 } // namespace ota
