@@ -31,4 +31,8 @@ public:
     CHIP_ERROR Start(uint16_t discriminator);
     CHIP_ERROR Stop();
     CHIP_ERROR Reboot(uint16_t discriminator);
+    CHIP_ERROR FactoryReset();
+
+private:
+    CHIP_ERROR RunInternal(const char * command);
 };
