@@ -165,8 +165,8 @@ private:
             while (iter->Next(mapping))
             {
                 GroupKeyManagement::Structs::GroupKey::Type key = { .fabricIndex   = fabric_index,
-                                                                    .groupId       = mapping.group_id,
-                                                                    .groupKeySetID = mapping.keyset_id };
+                                                                             .groupId       = mapping.group_id,
+                                                                             .groupKeySetID = mapping.keyset_id };
                 encoder.Encode(key);
             }
             iter->Release();
@@ -267,7 +267,7 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
         return true;
     }
 
-    if (commandData.groupKeySet.epochKey0.empty() || (0 == commandData.groupKeySet.epochStartTime0))
+    if (commandData.groupKeySet.epochKey0.empty() || 0 == commandData.groupKeySet.epochStartTime0)
     {
         // If the EpochKey0 field is null or its associated EpochStartTime0 field is null,
         // then this command SHALL fail with an INVALID_COMMAND
@@ -285,7 +285,8 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
     // Epoch Key 1
     if (!commandData.groupKeySet.epochKey1.empty())
     {
-        if (commandData.groupKeySet.epochStartTime1 <= commandData.groupKeySet.epochStartTime0)
+        if (0 == commandData.groupKeySet.epochStartTime1 ||
+            commandData.groupKeySet.epochStartTime1 <= commandData.groupKeySet.epochStartTime0)
         {
             // If the EpochKey1 field is not null, its associated EpochStartTime1 field SHALL contain
             // a later epoch start time than the epoch start time found in the EpochStartTime0 field.
@@ -293,23 +294,27 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
             return true;
         }
         keyset.epoch_keys[1].start_time = commandData.groupKeySet.epochStartTime1;
-        memcpy(keyset.epoch_keys[1].key, commandData.groupKeySet.epochKey1.data(), GroupDataProvider::EpochKey::kLengthBytes);
+        memcpy(keyset.epoch_keys[1].key, commandData.groupKeySet.epochKey1.data(),
+               GroupDataProvider::EpochKey::kLengthBytes);
         keyset.num_keys_used++;
     }
 
     // Epoch Key 2
     if (!commandData.groupKeySet.epochKey2.empty())
     {
-        keyset.num_keys_used++;
-        if (commandData.groupKeySet.epochStartTime2 <= commandData.groupKeySet.epochStartTime1)
+        if (commandData.groupKeySet.epochKey1.empty() || 0 == commandData.groupKeySet.epochStartTime2 ||
+            commandData.groupKeySet.epochStartTime2 <= commandData.groupKeySet.epochStartTime1)
         {
-            // If the EpochKey1 field is not null, its associated EpochStartTime1 field SHALL contain
-            // a later epoch start time than the epoch start time found in the EpochStartTime0 field.
+            // If the EpochKey2 field is not null then:
+            // * The EpochKey1 field SHALL NOT be null
+            // * Its associated EpochStartTime1 field SHALL contain a later epoch start time
+            //   than the epoch start time found in the EpochStartTime0 field.
             emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
             return true;
         }
         keyset.epoch_keys[2].start_time = commandData.groupKeySet.epochStartTime2;
-        memcpy(keyset.epoch_keys[2].key, commandData.groupKeySet.epochKey2.data(), GroupDataProvider::EpochKey::kLengthBytes);
+        memcpy(keyset.epoch_keys[2].key, commandData.groupKeySet.epochKey2.data(),
+               GroupDataProvider::EpochKey::kLengthBytes);
         keyset.num_keys_used++;
     }
 
@@ -357,42 +362,41 @@ bool emberAfGroupKeyManagementClusterKeySetReadCallback(
 
     // In KeySetReadResponse, EpochKey0, EpochKey1 and EpochKey2 key contents shall be null
     GroupKeyManagement::Commands::KeySetReadResponse::Type response;
-    response.groupKeySet.groupKeySetID  = keyset.keyset_id;
+    response.groupKeySet.groupKeySetID          = keyset.keyset_id;
     response.groupKeySet.securityPolicy = keyset.policy;
 
     // Keyset 0
     if (keyset.num_keys_used > 0)
     {
         response.groupKeySet.epochStartTime0 = keyset.epoch_keys[0].start_time;
-        response.groupKeySet.epochKey0       = chip::ByteSpan(nullptr, 0);
     }
     else
     {
         response.groupKeySet.epochStartTime0 = 0;
-        response.groupKeySet.epochKey0       = chip::ByteSpan(nullptr, 0);
     }
+    response.groupKeySet.epochKey0 = ByteSpan();
+
     // Keyset 1
     if (keyset.num_keys_used > 1)
     {
         response.groupKeySet.epochStartTime1 = keyset.epoch_keys[1].start_time;
-        response.groupKeySet.epochKey1       = chip::ByteSpan(nullptr, 0);
     }
     else
     {
         response.groupKeySet.epochStartTime1 = 0;
-        response.groupKeySet.epochKey1       = chip::ByteSpan(nullptr, 0);
     }
+    response.groupKeySet.epochKey1 = ByteSpan();
+
     // Keyset 2
     if (keyset.num_keys_used > 2)
     {
         response.groupKeySet.epochStartTime2 = keyset.epoch_keys[2].start_time;
-        response.groupKeySet.epochKey2       = chip::ByteSpan(nullptr, 0);
     }
     else
     {
         response.groupKeySet.epochStartTime2 = 0;
-        response.groupKeySet.epochKey2       = chip::ByteSpan(nullptr, 0);
     }
+    response.groupKeySet.epochKey2 = ByteSpan();
 
     CHIP_ERROR err = commandObj->AddResponseData(commandPath, response);
     if (CHIP_NO_ERROR != err)

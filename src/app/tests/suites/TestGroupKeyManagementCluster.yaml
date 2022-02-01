@@ -23,15 +23,27 @@ tests:
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
 
+    - label: "Read maxGroupsPerFabric"
+      command: "readAttribute"
+      attribute: "maxGroupsPerFabric"
+      response:
+          constraints:
+              minValue: 2
+
+    - label: "Read maxGroupKeysPerFabric"
+      command: "readAttribute"
+      attribute: "maxGroupKeysPerFabric"
+      response:
+          value: 2
+
     - label: "Add Group 1"
-      disabled: true
       cluster: "Groups"
       endpoint: 1
       command: "AddGroup"
       arguments:
           values:
               - name: "groupId"
-                value: 11
+                value: 0x0011
               - name: "groupName"
                 value: "Group #1"
       response:
@@ -39,17 +51,16 @@ tests:
               - name: "status"
                 value: 0
               - name: "groupId"
-                value: 11
+                value: 0x0011
 
     - label: "Add Group 2"
-      disabled: true
       cluster: "Groups"
       endpoint: 1
       command: "AddGroup"
       arguments:
           values:
               - name: "groupId"
-                value: 12
+                value: 0x0012
               - name: "groupName"
                 value: "Group #2"
       response:
@@ -57,104 +68,92 @@ tests:
               - name: "status"
                 value: 0
               - name: "groupId"
-                value: 12
+                value: 0x0012
 
-    - label: "KeySetWrite 1"
-      disabled: true
+    - label: "KeySet Write 1"
       command: "KeySetWrite"
       arguments:
           values:
-              - name: "groupKeySet"
+              - name: "GroupKeySet"
                 value:
                     {
-                        groupKeySetID: 101,
+                        groupKeySetID: 0x0101,
                         securityPolicy: 0,
-                        epochKey0:
-                            [
-                                0xa0,
-                                0xa1,
-                                0xa2,
-                                0xa3,
-                                0xa4,
-                                0xa5,
-                                0xa6,
-                                0xa7,
-                                0xa8,
-                                0xa9,
-                                0xaa,
-                                0xab,
-                                0xac,
-                                0xad,
-                                0xae,
-                                0xaf,
-                            ],
+                        epochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
                         epochStartTime0: 1110000,
-                        epochKey1:
-                            [
-                                0xb0,
-                                0xb1,
-                                0xb2,
-                                0xb3,
-                                0xb4,
-                                0xb5,
-                                0xb6,
-                                0xb7,
-                                0xb8,
-                                0xb9,
-                                0xba,
-                                0xbb,
-                                0xbc,
-                                0xbd,
-                                0xbe,
-                                0xbf,
-                            ],
+                        epochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
                         epochStartTime1: 1110001,
-                        epochKey2:
-                            [
-                                0xc0,
-                                0xc1,
-                                0xc2,
-                                0xc3,
-                                0xc4,
-                                0xc5,
-                                0xc6,
-                                0xc7,
-                                0xc8,
-                                0xc9,
-                                0xca,
-                                0xcb,
-                                0xcc,
-                                0xcd,
-                                0xce,
-                                0xcf,
-                            ],
+                        epochKey2: "\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf",
                         epochStartTime2: 1110002,
                     }
 
-    - label: "Write Group Keys"
+    - label: "KeySet Write 2"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        groupKeySetID: 0x0102,
+                        securityPolicy: 1,
+                        epochKey0: "\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf",
+                        epochStartTime0: 2110000,
+                        epochKey1: "\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef",
+                        epochStartTime1: 2110001,
+                        epochKey2: "\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff",
+                        epochStartTime2: 2110002,
+                    }
+
+    - label: "KeySet Read"
+      command: "KeySetRead"
+      arguments:
+          values:
+              - name: "groupKeySetID"
+                value: 0x0101
+      response:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        groupKeySetID: 0x0101,
+                        securityPolicy: 0,
+                        epochKey0: null,
+                        epochStartTime0: 1110000,
+                        epochKey1: null,
+                        epochStartTime1: 1110001,
+                        epochKey2: null,
+                        epochStartTime2: 1110002,
+                    }
+
+    - label: "KeySet Read All Indicers"
       disabled: true
+      command: "KeySetReadAllIndices"
+      response:
+          values:
+              - name: "groupKeySetIDs"
+                value: [0x0101, 0x0102]
+
+    - label: "Write Group Keys"
       command: "writeAttribute"
       attribute: "groupKeyMap"
       arguments:
           value:
               [
-                  { fabricIndex: 1, groupId: 11, groupKeySetID: 101 },
-                  { fabricIndex: 1, groupId: 12, groupKeySetID: 102 },
+                  { fabricIndex: 1, groupId: 0x0011, groupKeySetID: 0x0101 },
+                  { fabricIndex: 1, groupId: 0x0012, groupKeySetID: 0x0102 },
               ]
 
     - label: "Read Group Keys"
-      disabled: true
       command: "readAttribute"
       attribute: "groupKeyMap"
       response:
           value:
               [
-                  { fabricIndex: 1, groupId: 11, groupKeySetID: 101 },
-                  { fabricIndex: 1, groupId: 12, groupKeySetID: 102 },
+                  { fabricIndex: 1, groupId: 0x0011, groupKeySetID: 0x0101 },
+                  { fabricIndex: 1, groupId: 0x0012, groupKeySetID: 0x0102 },
               ]
 
-    - label: "Read GroupTable"
-      disabled: true
+    - label: "Read groupTable"
       command: "readAttribute"
       attribute: "groupTable"
       response:
@@ -162,20 +161,72 @@ tests:
               [
                   {
                       fabricIndex: 1,
-                      groupId: 11,
+                      groupId: 0x0011,
                       endpoints: [1],
                       groupName: "Group #1",
                   },
+                  {
+                      fabricIndex: 1,
+                      groupId: 0x0012,
+                      endpoints: [1],
+                      groupName: "Group #2",
+                  },
               ]
 
-    - label: "Read maxGroupsPerFabric"
-      command: "readAttribute"
-      attribute: "maxGroupsPerFabric"
-      response:
-          value: 1
+    - label: "KeySet Remove 1"
+      command: "KeySetRemove"
+      arguments:
+          values:
+              - name: "groupKeySetID"
+                value: 0x0101
 
-    - label: "Read maxGroupKeysPerFabric"
-      command: "readAttribute"
-      attribute: "maxGroupKeysPerFabric"
+    - label: "KeySet Read (removed)"
+      command: "KeySetRead"
+      arguments:
+          values:
+              - name: "groupKeySetID"
+                value: 0x0101
       response:
-          value: 1
+          error: NOT_FOUND
+
+    - label: "KeySet Read (not removed)"
+      command: "KeySetRead"
+      arguments:
+          values:
+              - name: "groupKeySetID"
+                value: 0x0102
+      response:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        groupKeySetID: 0x0102,
+                        securityPolicy: 1,
+                        epochKey0: null,
+                        epochStartTime0: 2110000,
+                        epochKey1: null,
+                        epochStartTime1: 2110001,
+                        epochKey2: null,
+                        epochStartTime2: 2110002,
+                    }
+
+    - label: "Remove All"
+      cluster: "Groups"
+      endpoint: 1
+      command: "RemoveAllGroups"
+
+    - label: "KeySet Remove 2"
+      command: "KeySetRemove"
+      arguments:
+          values:
+              - name: "groupKeySetID"
+                value: 0x0102
+
+    - label: "KeySet Read (also removed)"
+      command: "KeySetRead"
+      arguments:
+          values:
+              - name: "groupKeySetID"
+                value: 0x0102
+      response:
+          error: NOT_FOUND
