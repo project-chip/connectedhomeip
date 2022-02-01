@@ -501,16 +501,9 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(AttributeValueDecoder & aDecod
 
 AccessControlAttribute gAttribute;
 
-AccessControl gAccessControl(Examples::GetAccessControlDelegate());
-
 } // namespace
 
 void MatterAccessControlPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttribute);
-
-    // TODO: move access control setup to lower level
-    //       (it's OK and convenient here during development)
-    gAccessControl.Init();
-    SetAccessControl(gAccessControl);
 }
