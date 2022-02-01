@@ -45,7 +45,7 @@ template <class ImplClass>
 class GenericPlatformManagerImpl_Zephyr : public GenericPlatformManagerImpl<ImplClass>
 {
 protected:
-    using ThreadStack = k_thread_stack_t*;
+    using ThreadStack = k_thread_stack_t *;
 
     // Members for select() loop
     int mMaxFd;
