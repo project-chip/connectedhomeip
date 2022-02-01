@@ -39,7 +39,7 @@ from .storage import *
 from .exceptions import *
 import builtins
 
-from .interaction_model import InteractionModelError, delegate as im
+from .interaction_model import InteractionModelError
 from .clusters import Command as ClusterCommand
 from .clusters import Attribute as ClusterAttribute
 from .clusters import ClusterObjects as ClusterObjects
@@ -266,7 +266,6 @@ class ChipStack(object):
         if res != 0:
             raise self.ErrorToException(res)
 
-        im.InitIMDelegate()
         ClusterAttribute.Init()
         ClusterCommand.Init()
 

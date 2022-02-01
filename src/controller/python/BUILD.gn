@@ -58,8 +58,6 @@ shared_library("ChipDeviceCtrl") {
       "chip/clusters/attribute.cpp",
       "chip/clusters/command.cpp",
       "chip/discovery/NodeResolution.cpp",
-      "chip/interaction_model/Delegate.cpp",
-      "chip/interaction_model/Delegate.h",
       "chip/internal/ChipThreadWork.cpp",
       "chip/internal/ChipThreadWork.h",
       "chip/internal/CommissionerImpl.cpp",

@@ -22,7 +22,6 @@
 #include <app/DeviceProxy.h>
 #include <lib/support/CodeUtils.h>
 
-#include <controller/python/chip/interaction_model/Delegate.h>
 #include <cstdio>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -53,6 +52,8 @@ using OnCommandSenderDoneCallback     = void (*)(PyObject appContext);
 OnCommandSenderResponseCallback gOnCommandSenderResponseCallback = nullptr;
 OnCommandSenderErrorCallback gOnCommandSenderErrorCallback       = nullptr;
 OnCommandSenderDoneCallback gOnCommandSenderDoneCallback         = nullptr;
+
+static constexpr ClusterStatus kUndefinedClusterStatus = 0xFF;
 
 class CommandSenderCallback : public CommandSender::Callback
 {

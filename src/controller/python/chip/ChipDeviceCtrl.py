@@ -31,7 +31,7 @@ import asyncio
 from ctypes import *
 
 from .ChipStack import *
-from .interaction_model import InteractionModelError, delegate as im
+from .interaction_model import InteractionModelError
 from .exceptions import *
 from .clusters import Command as ClusterCommand
 from .clusters import Attribute as ClusterAttribute
@@ -45,6 +45,9 @@ import builtins
 import ipdb
 import ctypes
 import copy
+from dataclasses import dataclass, field
+
+from rich.pretty import pprint
 
 __all__ = ["ChipDeviceController"]
 
@@ -750,7 +753,10 @@ class ChipDeviceController():
             nodeid, [(endpoint, attributeType)]))
         path = ClusterAttribute.AttributePath(
             EndpointId=endpoint, Attribute=attributeType)
-        return im.AttributeReadResult(path=im.AttributePath(nodeId=nodeid, endpointId=path.EndpointId, clusterId=path.ClusterId, attributeId=path.AttributeId), status=0, value=result[endpoint][clusterType][attributeType])
+
+        print("Result:")
+        pprint(result[endpoint][clusterType][attributeType],
+               expand_all=True, indent_guides=True)
 
     def ZCLWriteAttribute(self, cluster: str, attribute: str, nodeid, endpoint, groupid, value, blocking=True):
         req = None

@@ -44,8 +44,6 @@
 #include "ChipDeviceController-ScriptDevicePairingDelegate.h"
 #include "ChipDeviceController-StorageDelegate.h"
 
-#include "chip/interaction_model/Delegate.h"
-
 #include <app/CommandSender.h>
 #include <app/DeviceProxy.h>
 #include <app/InteractionModelEngine.h>
