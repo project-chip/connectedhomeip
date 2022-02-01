@@ -51,8 +51,8 @@ struct ReportCallback : public app::ReadClient::Callback
 
     void OnReportEnd() override;
 
-    void OnAttributeData(const app::ConcreteDataAttributePath & aPath, DataVersion aVersion,
-                         TLV::TLVReader * apData, const app::StatusIB & aStatus) override;
+    void OnAttributeData(const app::ConcreteDataAttributePath & aPath, DataVersion aVersion, TLV::TLVReader * apData,
+                         const app::StatusIB & aStatus) override;
 
     void OnError(CHIP_ERROR aError) override;
 
@@ -62,7 +62,7 @@ struct ReportCallback : public app::ReadClient::Callback
 
     /** Report errors back to Java layer. attributePath may be nullptr for general errors. */
     void ReportError(jobject attributePath, CHIP_ERROR err);
-    void ReportError(jobject attributePath,  Protocols::InteractionModel::Status status);
+    void ReportError(jobject attributePath, Protocols::InteractionModel::Status status);
     void ReportError(jobject attributePath, const char * message, ChipError::StorageType errorCode);
 
     CHIP_ERROR CreateChipAttributePath(const app::ConcreteDataAttributePath & aPath, jobject & outObj);

@@ -128,7 +128,8 @@ ReportCallback::~ReportCallback()
         env->DeleteGlobalRef(mSubscriptionEstablishedCallbackRef);
     }
     env->DeleteGlobalRef(mReportCallbackRef);
-    if (mReadClient != nullptr) {
+    if (mReadClient != nullptr)
+    {
         Platform::Delete(mReadClient);
     }
 }
@@ -157,8 +158,8 @@ void ReportCallback::OnReportEnd()
     env->CallVoidMethod(mReportCallbackRef, onReportMethod, map);
 }
 
-void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPath, DataVersion aVersion,
-                                     TLV::TLVReader * apData, const app::StatusIB & aStatus)
+void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPath, DataVersion aVersion, TLV::TLVReader * apData,
+                                     const app::StatusIB & aStatus)
 {
     CHIP_ERROR err           = CHIP_NO_ERROR;
     JNIEnv * env             = JniReferences::GetInstance().GetEnvForCurrentThread();
