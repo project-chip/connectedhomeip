@@ -38,9 +38,9 @@ static const chip::KeysetId kKeySet1    = 0x0101;
 
 namespace chip {
 
-namespace GroupTesting { 
+namespace GroupTesting {
 
-    CHIP_ERROR InitGroupData()  
+    CHIP_ERROR InitGroupData()
     {
         ReturnErrorOnFailure(sGroupsProvider.Init());
         chip::Credentials::SetGroupDataProvider(&sGroupsProvider);
