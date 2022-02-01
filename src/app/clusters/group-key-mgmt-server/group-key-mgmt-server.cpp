@@ -165,8 +165,8 @@ private:
             while (iter->Next(mapping))
             {
                 GroupKeyManagement::Structs::GroupKey::Type key = { .fabricIndex   = fabric_index,
-                                                                             .groupId       = mapping.group_id,
-                                                                             .groupKeySetID = mapping.keyset_id };
+                                                                    .groupId       = mapping.group_id,
+                                                                    .groupKeySetID = mapping.keyset_id };
                 encoder.Encode(key);
             }
             iter->Release();
@@ -294,8 +294,7 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
             return true;
         }
         keyset.epoch_keys[1].start_time = commandData.groupKeySet.epochStartTime1;
-        memcpy(keyset.epoch_keys[1].key, commandData.groupKeySet.epochKey1.data(),
-               GroupDataProvider::EpochKey::kLengthBytes);
+        memcpy(keyset.epoch_keys[1].key, commandData.groupKeySet.epochKey1.data(), GroupDataProvider::EpochKey::kLengthBytes);
         keyset.num_keys_used++;
     }
 
@@ -313,8 +312,7 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
             return true;
         }
         keyset.epoch_keys[2].start_time = commandData.groupKeySet.epochStartTime2;
-        memcpy(keyset.epoch_keys[2].key, commandData.groupKeySet.epochKey2.data(),
-               GroupDataProvider::EpochKey::kLengthBytes);
+        memcpy(keyset.epoch_keys[2].key, commandData.groupKeySet.epochKey2.data(), GroupDataProvider::EpochKey::kLengthBytes);
         keyset.num_keys_used++;
     }
 
@@ -362,7 +360,7 @@ bool emberAfGroupKeyManagementClusterKeySetReadCallback(
 
     // In KeySetReadResponse, EpochKey0, EpochKey1 and EpochKey2 key contents shall be null
     GroupKeyManagement::Commands::KeySetReadResponse::Type response;
-    response.groupKeySet.groupKeySetID          = keyset.keyset_id;
+    response.groupKeySet.groupKeySetID  = keyset.keyset_id;
     response.groupKeySet.securityPolicy = keyset.policy;
 
     // Keyset 0

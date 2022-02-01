@@ -593,9 +593,9 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
     bool decrypted = false;
     while (!decrypted && iter->Next(groupContext))
     {
-        msgCopy   = msg.CloneData();
-        decrypted = (CHIP_NO_ERROR ==
-                        SecureMessageCodec::Decrypt(CryptoContext(groupContext.key), payloadHeader, packetHeader, msgCopy));
+        msgCopy = msg.CloneData();
+        decrypted =
+            (CHIP_NO_ERROR == SecureMessageCodec::Decrypt(CryptoContext(groupContext.key), payloadHeader, packetHeader, msgCopy));
     }
     iter->Release();
     VerifyOrReturn(decrypted);

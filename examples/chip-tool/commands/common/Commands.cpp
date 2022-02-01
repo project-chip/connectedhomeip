@@ -27,7 +27,6 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TestGroupData.h>
 
-
 void Commands::Register(const char * clusterName, commands_list commandsList)
 {
     for (auto & command : commandsList)
