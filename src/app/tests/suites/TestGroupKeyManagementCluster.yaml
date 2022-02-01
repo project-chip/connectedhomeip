@@ -23,6 +23,19 @@ tests:
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
 
+    - label: "Read maxGroupsPerFabric"
+      command: "readAttribute"
+      attribute: "maxGroupsPerFabric"
+      response:
+          constraints:
+              minValue: 2
+
+    - label: "Read maxGroupKeysPerFabric"
+      command: "readAttribute"
+      attribute: "maxGroupKeysPerFabric"
+      response:
+          value: 2
+
     - label: "Add Group 1"
       disabled: true
       cluster: "Groups"
@@ -167,15 +180,3 @@ tests:
                       groupName: "Group #1",
                   },
               ]
-
-    - label: "Read maxGroupsPerFabric"
-      command: "readAttribute"
-      attribute: "maxGroupsPerFabric"
-      response:
-          value: 1
-
-    - label: "Read maxGroupKeysPerFabric"
-      command: "readAttribute"
-      attribute: "maxGroupKeysPerFabric"
-      response:
-          value: 1

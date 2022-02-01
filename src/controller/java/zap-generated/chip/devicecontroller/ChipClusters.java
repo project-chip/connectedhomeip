@@ -8381,6 +8381,19 @@ public class ChipClusters {
       readGroupKeyMapAttribute(chipClusterPtr, callback);
     }
 
+    public void writeGroupKeyMapAttribute(
+        DefaultClusterCallback callback,
+        ArrayList<ChipStructs.GroupKeyManagementClusterGroupKey> value) {
+      writeGroupKeyMapAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writeGroupKeyMapAttribute(
+        DefaultClusterCallback callback,
+        ArrayList<ChipStructs.GroupKeyManagementClusterGroupKey> value,
+        int timedWriteTimeoutMs) {
+      writeGroupKeyMapAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    }
+
     public void subscribeGroupKeyMapAttribute(
         GroupKeyMapAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeGroupKeyMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
@@ -8455,6 +8468,12 @@ public class ChipClusters {
 
     private native void readGroupKeyMapAttribute(
         long chipClusterPtr, GroupKeyMapAttributeCallback callback);
+
+    private native void writeGroupKeyMapAttribute(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        ArrayList<ChipStructs.GroupKeyManagementClusterGroupKey> value,
+        @Nullable Integer timedWriteTimeoutMs);
 
     private native void subscribeGroupKeyMapAttribute(
         long chipClusterPtr,

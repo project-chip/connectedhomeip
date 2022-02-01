@@ -1838,7 +1838,7 @@ client cluster GroupKeyManagement = 63 {
     INT64U epochStartTime2 = 7;
   }
 
-  readonly attribute GroupKey groupKeyMap[] = 0;
+  attribute GroupKey groupKeyMap[] = 0;
   readonly attribute GroupInfo groupTable[] = 1;
   readonly attribute int16u maxGroupsPerFabric = 2;
   readonly attribute int16u maxGroupKeysPerFabric = 3;
