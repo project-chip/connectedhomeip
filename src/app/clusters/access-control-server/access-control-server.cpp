@@ -447,12 +447,14 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(AttributeValueDecoder & aDecoder)
     size_t newCount;
     size_t maxCount;
 
-    AccessControl::EntryIterator it;
-    AccessControl::Entry entry;
-    ReturnErrorOnFailure(GetAccessControl().Entries(it, &accessingFabricIndex));
-    while (it.Next(entry) == CHIP_NO_ERROR)
     {
-        oldCount++;
+        AccessControl::EntryIterator it;
+        AccessControl::Entry entry;
+        ReturnErrorOnFailure(GetAccessControl().Entries(it, &accessingFabricIndex));
+        while (it.Next(entry) == CHIP_NO_ERROR)
+        {
+            oldCount++;
+        }
     }
 
     ReturnErrorOnFailure(GetAccessControl().GetEntryCount(allCount));
