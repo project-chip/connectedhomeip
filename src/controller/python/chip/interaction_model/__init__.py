@@ -22,8 +22,6 @@
 
 """Provides Python APIs for CHIP."""
 import enum
-from .delegate import AttributePath, AttributePathIBstruct, EventPath, EventPathIBstruct
-
 from chip.exceptions import ChipStackException
 
 __all__ = ["Status", "InteractionModelError"]
