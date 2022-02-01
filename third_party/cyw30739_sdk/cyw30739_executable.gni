@@ -35,10 +35,14 @@ template("cyw30739_executable") {
     executable_target = ":${flashable_target}.executable"
   }
 
+  cyw30739_sdk_ota_image("${target_name}.ota_image") {
+    deps = [ ":${invoker.target_name}.post_build" ]
+  }
+
   group(target_name) {
     deps = [
       ":${flashable_target}",
-      ":${target_name}.post_build",
+      ":${target_name}.ota_image",
     ]
   }
 

@@ -1,12 +1,13 @@
-# Matter CYW30739 Lock Example
+# Matter CYW30739 OTA Requestor Example
 
-An example showing the use of Matter on the Infineon CYW30739 platform.
+An example showing the use of the Matter OTA Requestor functionality on the
+Infineon CYW30739 platform.
 
 ---
 
 ## Table of Contents
 
--   [CHIP CYW30739 Lock Example](#matter-cyw30739-lock-example)
+-   [CHIP CYW30739 OTA Requestor Example](#matter-cyw30739-ota-requestor-example)
     -   [Introduction](#introduction)
     -   [Building](#building)
     -   [Flashing the Application](#flashing-the-application)
@@ -16,8 +17,8 @@ An example showing the use of Matter on the Infineon CYW30739 platform.
 
 ## Introduction
 
-The CYW30739 lock example provides a baseline demonstration of a Light control
-device, built using Matter and the Infineon Modustoolbox SDK. It can be
+The CYW30739 OTA Requestor example provides a baseline demonstration the Matter
+OTA Requestor functionality built with the Infineon Modustoolbox SDK. It can be
 controlled by a Matter controller over Thread network.
 
 The CYW30739 device can be commissioned over Bluetooth Low Energy where the
@@ -32,7 +33,7 @@ dataset and CASE credentials are then provided.
     ```bash
     $ cd ~/connectedhomeip
     $ git submodule update --init
-    $ ./scripts/examples/gn_build_example.sh examples/lock-app/cyw30739 out/lock-app
+    $ ./scripts/examples/gn_build_example.sh examples/ota-requestor-app/cyw30739 out/ota-requestor-app
     ```
 
 -   To delete generated executable, libraries and object files use:
@@ -45,7 +46,7 @@ dataset and CASE credentials are then provided.
 -   OR use GN/Ninja directly
 
     ```bash
-    $ cd ~/connectedhomeip/examples/lock-app/cyw30739
+    $ cd ~/connectedhomeip/examples/ota-requestor-app/cyw30739
     $ git submodule update --init
     $ source third_party/connectedhomeip/scripts/activate.sh
     $ gn gen out/debug
@@ -55,7 +56,7 @@ dataset and CASE credentials are then provided.
 -   To delete generated executable, libraries and object files use:
 
     ```bash
-    $ cd ~/connectedhomeip/examples/lock-app/cyw30739
+    $ cd ~/connectedhomeip/examples/ota-requestor-app/cyw30739
     $ rm -rf out/
     ```
 
@@ -75,8 +76,8 @@ Put the CYW30739 in to the recovery mode before running the flash script.
 -   On the command line:
 
     ```bash
-    $ cd ~/connectedhomeip/examples/lock-app/cyw30739
-    $ python3 out/debug/chip-cyw30739-lock-example.flash.py
+    $ cd ~/connectedhomeip/examples/ota-requestor-app/cyw30739
+    $ python3 out/debug/chip-cyw30739-ota-requestor-example.flash.py
     ```
 
 ## Running the Complete Example
@@ -86,19 +87,35 @@ Put the CYW30739 in to the recovery mode before running the flash script.
     [Openthread_border_router](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/openthread_border_router_pi.md)
     for more information on how to setup a border router on a raspberryPi.
 
+    -   Get the active dataset hex for the chip-tool.
+        ```bash
+        ot-ctl dataset active -x
+        ```
+
 -   You can provision and control the Chip device using the python controller,
     Chip tool standalone, Android or iOS app
 
-    [Python Controller](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/README.md)
+    [Chip tool](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool/README.md)
 
-    Here is an example with the Python controller:
+    Here is an example with the chip tool:
 
-    ```bash
-    $ chip-device-ctrl
-    chip-device-ctrl > connect -ble 3840 20202021 1234
-    chip-device-ctrl > zcl NetworkCommissioning AddThreadNetwork 1234 0 0 operationalDataset=hex:0e080000000000000000000300000b35060004001fffe00208dead00beef00cafe0708fddead00beef000005108e11d8ea8ffaa875713699f59e8807e0030a4f70656e5468726561640102c2980410edc641eb63b100b87e90a9980959befc0c0402a0fff8 breadcrumb=0 timeoutMs=1000
-    chip-device-ctrl > zcl NetworkCommissioning EnableNetwork 1234 0 0 networkID=hex:dead00beef00cafe breadcrumb=0 timeoutMs=1000
-    chip-device-ctrl > close-ble
-    chip-device-ctrl > resolve 1234
-    chip-device-ctrl > zcl OnOff Toggle 1234 1 0
-    ```
+    -   Start a Linux OTA Provider.
+
+        ```bash
+        # Start the OTA provider server with an OTA binary file
+        chip-ota-provider-app -f <path/to/ota/binary>
+        ```
+
+    -   Setup the CYW30739 OTA Requestor the the Linux OTA Provider by the
+        controller.
+
+        ```bash
+        # Pair the OTA Requestor
+        chip-tool pairing ble-thread 1234 hex:0e080000000000000000000300000b35060004001fffe00208dead00beef00cafe0708fddead00beef000005108e11d8ea8ffaa875713699f59e8807e0030a4f70656e5468726561640102c2980410edc641eb63b100b87e90a9980959befc0c0402a0fff8 20202021 3840
+
+        # Pair the OTA Provider
+        chip-tool pairing onnetwork-vendor 4321 20202021 9050
+
+        # Announce the OTA provider to the requestor
+        chip-tool otasoftwareupdaterequestor announce-ota-provider 4321 9 0 0 1234 0
+        ```

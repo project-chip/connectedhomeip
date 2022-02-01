@@ -17,6 +17,8 @@
  */
 
 #include <app/clusters/ota-requestor/OTADownloader.h>
+#include <ota_fw_upgrade.h>
+#include <wiced_hal_wdog.h>
 
 #include "OTAImageProcessorImpl.h"
 
@@ -24,11 +26,6 @@ namespace chip {
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
-
-    // Get OTA status - under what circumstances does prepared break?
-    // what happens if a prepare is pending and another one is invoked
-    // Should we store the state here and wait til we receive notification
-
     DeviceLayer::PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
@@ -41,11 +38,7 @@ CHIP_ERROR OTAImageProcessorImpl::Finalize()
 
 CHIP_ERROR OTAImageProcessorImpl::Apply()
 {
-    ChipLogProgress(SoftwareUpdate, "Q: Applying - resetting device");
-
-    // Reset into Bootloader
-    qvCHIP_OtaReset();
-
+    DeviceLayer::PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -87,13 +80,12 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
         return;
     }
 
-    // running this in a thread so won't block main event loop
-    ChipLogProgress(SoftwareUpdate, "Q: HandlePrepareDownload");
+    if (!wiced_firmware_upgrade_prepare())
+    {
+        ChipLogError(SoftwareUpdate, "wiced_firmware_upgrade_prepare");
+        return;
+    }
 
-    qvCHIP_OtaEraseArea();
-    qvCHIP_OtaStartWrite();
-
-    // Initialize tracking variables
     imageProcessor->mParams.downloadedBytes = 0;
 
     imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
@@ -107,15 +99,34 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
         return;
     }
 
-    ChipLogProgress(SoftwareUpdate, "Q: HandleFinalize");
-
-    // FIXME - Versions need to be filled in
-    qvCHIP_OtaSetPendingImage(imageProcessor->mSwVer /*swVer*/, imageProcessor->mHwVer /*hwVer*/, qvCHIP_OtaGetAreaStartAddress(),
-                              static_cast<std::uint32_t>(imageProcessor->mParams.downloadedBytes) /*imgSz*/);
+    if (!wiced_firmware_upgrade_finalize())
+    {
+        ChipLogError(SoftwareUpdate, "Failed to finalize OTA upgrade");
+        return;
+    }
 
     imageProcessor->ReleaseBlock();
-    // Start from scratch
-    imageProcessor->mParams.downloadedBytes = 0;
+
+    ChipLogProgress(SoftwareUpdate, "OTA image downloaded");
+}
+
+void OTAImageProcessorImpl::HandleApply(intptr_t context)
+{
+    auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
+    if (imageProcessor == nullptr)
+    {
+        return;
+    }
+
+    if (!wiced_firmware_upgrade_apply())
+    {
+        ChipLogError(SoftwareUpdate, "Failed to apply OTA upgrade");
+        return;
+    }
+
+    ChipLogProgress(SoftwareUpdate, "OTA upgrade completed");
+
+    wiced_hal_wdog_reset_system();
 }
 
 void OTAImageProcessorImpl::HandleAbort(intptr_t context)
@@ -126,16 +137,15 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
         return;
     }
 
-    ChipLogProgress(SoftwareUpdate, "Q: HandleAbort");
+    wiced_firmware_upgrade_abort();
+
+    ChipLogError(SoftwareUpdate, "OTA upgrade was aborted");
 
     imageProcessor->ReleaseBlock();
-    // Start from scratch
-    imageProcessor->mParams.downloadedBytes = 0;
 }
 
 void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 {
-    qvCHIP_OtaStatus_t status;
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
     if (imageProcessor == nullptr)
     {
@@ -148,18 +158,16 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         return;
     }
 
-    ChipLogProgress(SoftwareUpdate, "Q: HandleProcessBlock");
-    // TODO: Process block header if any
-
-    status = qvCHIP_OtaWriteChunk(qvCHIP_OtaGetAreaStartAddress() + imageProcessor->mParams.downloadedBytes,
-                                  static_cast<std::uint16_t>(imageProcessor->mBlock.size()),
-                                  reinterpret_cast<std::uint8_t *>(imageProcessor->mBlock.data()));
-
-    if (status != qvCHIP_OtaStatusSuccess)
+    if (IsSpanUsable(imageProcessor->mBlock))
     {
-        ChipLogError(SoftwareUpdate, "Flash write failed");
-        imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
-        return;
+        const uint32_t written = wiced_firmware_upgrade_process_block(imageProcessor->mParams.downloadedBytes,
+                                                                      imageProcessor->mBlock.data(), imageProcessor->mBlock.size());
+        if (written != imageProcessor->mBlock.size())
+        {
+            ChipLogError(SoftwareUpdate, "wiced_firmware_upgrade_process_block 0x%08lx", written);
+            imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
+            return;
+        }
     }
 
     imageProcessor->mParams.downloadedBytes += imageProcessor->mBlock.size();
@@ -192,7 +200,6 @@ CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
         ChipLogError(SoftwareUpdate, "Cannot copy block data: %" CHIP_ERROR_FORMAT, err.Format());
         return err;
     }
-
     return CHIP_NO_ERROR;
 }
 

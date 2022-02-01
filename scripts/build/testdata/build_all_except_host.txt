@@ -172,6 +172,9 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 # Generating cyw30739-cyw930739m2evb_01-lock
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/cyw30739 {out}/cyw30739-cyw930739m2evb_01-lock
 
+# Generating cyw30739-cyw930739m2evb_01-ota-requestor
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-requestor-app/cyw30739 {out}/cyw30739-cyw930739m2evb_01-ota-requestor
+
 # Generating efr32-brd4161a-light
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-light
 
@@ -879,6 +882,9 @@ ninja -C {out}/cyw30739-cyw930739m2evb_01-light
 
 # Building cyw30739-cyw930739m2evb_01-lock
 ninja -C {out}/cyw30739-cyw930739m2evb_01-lock
+
+# Building cyw30739-cyw930739m2evb_01-ota-requestor
+ninja -C {out}/cyw30739-cyw930739m2evb_01-ota-requestor
 
 # Building efr32-brd4161a-light
 ninja -C {out}/efr32-brd4161a-light
