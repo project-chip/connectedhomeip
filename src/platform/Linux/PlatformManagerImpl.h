@@ -89,7 +89,8 @@ private:
     // The temporary hack for getting IP address change on linux for network provisioning in the rendezvous session.
     // This should be removed or find a better place once we depercate the rendezvous session.
     static void WiFIIPChangeListener();
-    static void HandleDeviceRebooted(intptr_t arg);
+    static void OnDeviceRebooted(intptr_t arg);
+    void OnDeviceShutdown();
 
 #if CHIP_WITH_GIO
     struct GDBusConnectionDeleter
@@ -99,6 +100,8 @@ private:
     using UniqueGDBusConnection = std::unique_ptr<GDBusConnection, GDBusConnectionDeleter>;
     UniqueGDBusConnection mpGDBusConnection;
 #endif
+
+    void SetupSignalHandlers();
 };
 
 /**
