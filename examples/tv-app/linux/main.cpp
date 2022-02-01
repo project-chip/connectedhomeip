@@ -26,8 +26,6 @@
 #include <app/app-platform/ContentAppPlatform.h>
 #include <app/util/af.h>
 
-#include <iostream>
-
 #include "include/account-login/AccountLoginManager.h"
 #include "include/application-basic/ApplicationBasicManager.h"
 #include "include/application-launcher/ApplicationLauncherManager.h"

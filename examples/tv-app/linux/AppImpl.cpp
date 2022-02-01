@@ -168,10 +168,11 @@ CHIP_ERROR ContentAppFactoryImpl::LookupCatalogVendorApp(uint16_t vendorId, uint
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ContentAppFactoryImpl::ConvertToPlatformCatalogVendorApp(CatalogVendorApp sourceApp, CatalogVendorApp * destinationApp)
+CHIP_ERROR ContentAppFactoryImpl::ConvertToPlatformCatalogVendorApp(const CatalogVendorApp * sourceApp,
+                                                                    CatalogVendorApp * destinationApp)
 {
     destinationApp->catalogVendorId = GetPlatformCatalogVendorId();
-    std::string appId(sourceApp.applicationId);
+    std::string appId(sourceApp->applicationId);
     if (appId == "applicationId")
     {
         // test case passes "applicationId", map this to our test suite app
@@ -180,15 +181,15 @@ CHIP_ERROR ContentAppFactoryImpl::ConvertToPlatformCatalogVendorApp(CatalogVendo
     else
     {
         // for now, just return the applicationId passed in
-        Platform::CopyString(destinationApp->applicationId, sizeof(destinationApp->applicationId), sourceApp.applicationId);
+        Platform::CopyString(destinationApp->applicationId, sizeof(destinationApp->applicationId), sourceApp->applicationId);
     }
     return CHIP_NO_ERROR;
 }
 
-ContentApp * ContentAppFactoryImpl::LoadContentApp(CatalogVendorApp vendorApp)
+ContentApp * ContentAppFactoryImpl::LoadContentApp(const CatalogVendorApp * vendorApp)
 {
     ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl: LoadContentAppByAppId catalogVendorId=%d applicationId=%s ",
-                    vendorApp.catalogVendorId, vendorApp.applicationId);
+                    vendorApp->catalogVendorId, vendorApp->applicationId);
 
     for (size_t i = 0; i < ArraySize(mContentApps); ++i)
     {
@@ -202,8 +203,8 @@ ContentApp * ContentAppFactoryImpl::LoadContentApp(CatalogVendorApp vendorApp)
             return &app;
         }
     }
-    ChipLogProgress(DeviceLayer, "LoadContentAppByAppId NOT FOUND catalogVendorId=%d applicationId=%s ", vendorApp.catalogVendorId,
-                    vendorApp.applicationId);
+    ChipLogProgress(DeviceLayer, "LoadContentAppByAppId NOT FOUND catalogVendorId=%d applicationId=%s ", vendorApp->catalogVendorId,
+                    vendorApp->applicationId);
 
     return nullptr;
 }

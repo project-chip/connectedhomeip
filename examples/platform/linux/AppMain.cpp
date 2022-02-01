@@ -16,9 +16,6 @@
  *    limitations under the License.
  */
 
-#include <iostream>
-#include <thread>
-
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
@@ -51,6 +48,7 @@
 #if defined(ENABLE_CHIP_SHELL)
 #include <CommissioneeShellCommands.h>
 #include <lib/shell/Engine.h>
+#include <thread>
 #endif
 
 #if defined(PW_RPC_ENABLED)
