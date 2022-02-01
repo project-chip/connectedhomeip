@@ -39,7 +39,7 @@ public class GetConnectedDeviceCallbackJni {
   @SuppressWarnings("deprecation")
   protected void finalize() throws Throwable {
     super.finalize();
-    
+
     if (callbackHandle != 0) {
       deleteCallback(callbackHandle);
       callbackHandle = 0;
