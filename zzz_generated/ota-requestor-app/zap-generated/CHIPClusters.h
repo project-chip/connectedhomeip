@@ -35,40 +35,7 @@ class DLL_EXPORT OtaSoftwareUpdateProviderCluster : public ClusterBase
 public:
     OtaSoftwareUpdateProviderCluster() : ClusterBase(app::Clusters::OtaSoftwareUpdateProvider::Id) {}
     ~OtaSoftwareUpdateProviderCluster() {}
-<<<<<<< HEAD
-=======
-
-    // Cluster Commands
-    CHIP_ERROR ApplyUpdateRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  chip::ByteSpan updateToken, uint32_t newVersion);
-    CHIP_ERROR NotifyUpdateApplied(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   chip::ByteSpan updateToken, uint32_t softwareVersion);
-    CHIP_ERROR QueryImage(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                          chip::VendorId vendorId, uint16_t productId, uint32_t softwareVersion, uint8_t protocolsSupported,
-                          uint16_t hardwareVersion, chip::CharSpan location, bool requestorCanConsent,
-                          chip::ByteSpan metadataForProvider);
 };
 
-<<<<<<< HEAD
-class DLL_EXPORT OperationalCredentialsCluster : public ClusterBase
-{
-public:
-    OperationalCredentialsCluster() : ClusterBase(app::Clusters::OperationalCredentials::Id) {}
-    ~OperationalCredentialsCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR AttestationResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   chip::ByteSpan attestationElements, chip::ByteSpan signature);
-    CHIP_ERROR CertificateChainResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                        chip::ByteSpan certificate);
-    CHIP_ERROR NOCResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t statusCode,
-                           uint8_t fabricIndex, chip::CharSpan debugText);
-    CHIP_ERROR OpCSRResponse(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                             chip::ByteSpan NOCSRElements, chip::ByteSpan attestationSignature);
->>>>>>> - Adding changes to the zap templates such that the incoming and outgoing commands are generated with determinism. Using the upto date helpers in the *.zapt templates
-};
-
-=======
->>>>>>> - Generation for outgoing commands which originate from the client side only.
 } // namespace Controller
 } // namespace chip
