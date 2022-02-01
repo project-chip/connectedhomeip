@@ -21,7 +21,6 @@
 #import <CHIP/CHIPClustersObjc.h>
 #import <CHIP/CHIPDevicePairingDelegate.h>
 
-
 enum class PairingMode
 {
     None,
