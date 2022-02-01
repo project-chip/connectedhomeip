@@ -39,7 +39,8 @@ class PlatformMemoryUser
 {
 public:
     PlatformMemoryUser() : mInitialized(false) {}
-    ~PlatformMemoryUser() {
+    ~PlatformMemoryUser()
+    {
         if (mInitialized)
         {
             chip::Platform::MemoryShutdown();
@@ -50,7 +51,7 @@ public:
         CHIP_ERROR status = CHIP_NO_ERROR;
         if (!mInitialized)
         {
-            status = chip::Platform::MemoryInit();
+            status       = chip::Platform::MemoryInit();
             mInitialized = (status == CHIP_NO_ERROR);
         }
         return status;
