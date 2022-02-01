@@ -59,7 +59,6 @@ namespace chip {
 namespace app {
 namespace Compatibility {
 namespace {
-constexpr uint32_t kTemporaryDataVersion = 0;
 // On some apps, ATTRIBUTE_LARGEST can as small as 3, making compiler unhappy since data[kAttributeReadBufferSize] cannot hold
 // uint64_t. Make kAttributeReadBufferSize at least 8 so it can fit all basic types.
 constexpr size_t kAttributeReadBufferSize = (ATTRIBUTE_LARGEST >= 8 ? ATTRIBUTE_LARGEST : 8);
@@ -204,7 +203,7 @@ bool IMEmberAfSendDefaultResponseWithCallback(EmberAfStatus status)
 {
     if (currentCommandObject == nullptr)
     {
-        // If this command is not handled by IM, then let ember send response.
+        // We have no idea what we're supposed to respond to.
         return false;
     }
 
@@ -256,6 +255,36 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
 }
 
 namespace {
+
+CHIP_ERROR ReadClusterDataVersion(const EndpointId & aEndpointId, const ClusterId & aClusterId, DataVersion & aDataVersion)
+{
+    DataVersion * version = emberAfDataVersionStorage(aEndpointId, aClusterId);
+    if (version == nullptr)
+    {
+        ChipLogError(DataManagement, "Endpoint %" PRIx16 ", Cluster " ChipLogFormatMEI " not found in ReadClusterDataVersion!",
+                     aEndpointId, ChipLogValueMEI(aClusterId));
+        return CHIP_ERROR_NOT_FOUND;
+    }
+    aDataVersion = *version;
+    return CHIP_NO_ERROR;
+}
+
+void IncreaseClusterDataVersion(const EndpointId & aEndpointId, const ClusterId & aClusterId)
+{
+    DataVersion * version = emberAfDataVersionStorage(aEndpointId, aClusterId);
+    if (version == nullptr)
+    {
+        ChipLogError(DataManagement, "Endpoint %" PRIx16 ", Cluster " ChipLogFormatMEI " not found in IncreaseClusterDataVersion!",
+                     aEndpointId, ChipLogValueMEI(aClusterId));
+    }
+    else
+    {
+        (*(version))++;
+        ChipLogDetail(DataManagement, "Endpoint %" PRIx16 ", Cluster " ChipLogFormatMEI " update version to %" PRIx32, aEndpointId,
+                      ChipLogValueMEI(aClusterId), *(version));
+    }
+    return;
+}
 
 CHIP_ERROR SendSuccessStatus(AttributeReportIB::Builder & aAttributeReport, AttributeDataIB::Builder & aAttributeDataIBBuilder)
 {
@@ -331,8 +360,9 @@ CHIP_ERROR ReadViaAccessInterface(FabricIndex aAccessingFabricIndex, bool aIsFab
 {
     AttributeValueEncoder::AttributeEncodeState state =
         (aEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *aEncoderState);
-    AttributeValueEncoder valueEncoder(aAttributeReports, aAccessingFabricIndex, aPath, kTemporaryDataVersion, aIsFabricFiltered,
-                                       state);
+    DataVersion version = kUndefinedDataVersion;
+    ReturnErrorOnFailure(ReadClusterDataVersion(aPath.mEndpointId, aPath.mClusterId, version));
+    AttributeValueEncoder valueEncoder(aAttributeReports, aAccessingFabricIndex, aPath, version, aIsFabricFiltered, state);
     CHIP_ERROR err = aAccessInterface->Read(aPath, valueEncoder);
 
     if (err != CHIP_NO_ERROR)
@@ -389,7 +419,12 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
         Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
         Access::Privilege requestPrivilege = RequiredPrivilege::ForReadAttribute(aPath);
         CHIP_ERROR err                     = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requestPrivilege);
-        err                                = CHIP_NO_ERROR; // TODO: remove override
+        if (err != CHIP_NO_ERROR)
+        {
+            // Grace period until ACLs are in place
+            ChipLogError(DataManagement, "AccessControl: overriding DENY (for now)");
+            err = CHIP_NO_ERROR;
+        }
         if (err != CHIP_NO_ERROR)
         {
             ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
@@ -430,7 +465,9 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
     AttributeDataIB::Builder & attributeDataIBBuilder = attributeReport.CreateAttributeData();
     ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
 
-    attributeDataIBBuilder.DataVersion(kTemporaryDataVersion);
+    DataVersion version = kUndefinedDataVersion;
+    ReturnErrorOnFailure(ReadClusterDataVersion(aPath.mEndpointId, aPath.mClusterId, version));
+    attributeDataIBBuilder.DataVersion(version);
     ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
 
     AttributePathIB::Builder & attributePathIBBuilder = attributeDataIBBuilder.CreatePath();
@@ -821,7 +858,12 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
         Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
         Access::Privilege requestPrivilege = RequiredPrivilege::ForWriteAttribute(aPath);
         CHIP_ERROR err                     = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requestPrivilege);
-        err                                = CHIP_NO_ERROR; // TODO: remove override
+        if (err != CHIP_NO_ERROR)
+        {
+            // Grace period until ACLs are in place
+            ChipLogError(DataManagement, "AccessControl: overriding DENY (for now)");
+            err = CHIP_NO_ERROR;
+        }
         if (err != CHIP_NO_ERROR)
         {
             ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
@@ -887,6 +929,7 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clust
     info.mAttributeId = attributeId;
     info.mEndpointId  = endpoint;
 
+    IncreaseClusterDataVersion(endpoint, clusterId);
     InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(info);
 
     // Schedule work to run asynchronously on the CHIP thread. The scheduled work won't execute until the current execution context

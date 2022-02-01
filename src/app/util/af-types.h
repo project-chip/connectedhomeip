@@ -387,6 +387,11 @@ typedef struct
      */
     const EmberAfEndpointType * endpointType;
     /**
+     * Pointer to the DataVersion storage for the server clusters on this
+     * endpoint
+     */
+    chip::DataVersion * dataVersions;
+    /**
      * Network index for this endpoint.
      */
     uint8_t networkIndex;

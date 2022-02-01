@@ -4675,7 +4675,8 @@ public class ClusterInfoMapping {
                   .loginRequest(
                       (DefaultClusterCallback) callback,
                       (String) commandArguments.get("tempAccountIdentifier"),
-                      (String) commandArguments.get("setupPIN"));
+                      (String) commandArguments.get("setupPIN"),
+                      10000);
             },
             () -> new DelegatedDefaultClusterCallback(),
             accountLoginloginRequestCommandParams);
@@ -4712,7 +4713,8 @@ public class ClusterInfoMapping {
               ((ChipClusters.AdministratorCommissioningCluster) cluster)
                   .openBasicCommissioningWindow(
                       (DefaultClusterCallback) callback,
-                      (Integer) commandArguments.get("commissioningTimeout"));
+                      (Integer) commandArguments.get("commissioningTimeout"),
+                      10000);
             },
             () -> new DelegatedDefaultClusterCallback(),
             administratorCommissioningopenBasicCommissioningWindowCommandParams);
@@ -4773,7 +4775,8 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("discriminator"),
                       (Long) commandArguments.get("iterations"),
                       (byte[]) commandArguments.get("salt"),
-                      (Integer) commandArguments.get("passcodeID"));
+                      (Integer) commandArguments.get("passcodeID"),
+                      10000);
             },
             () -> new DelegatedDefaultClusterCallback(),
             administratorCommissioningopenCommissioningWindowCommandParams);
@@ -4786,7 +4789,7 @@ public class ClusterInfoMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.AdministratorCommissioningCluster) cluster)
-                  .revokeCommissioning((DefaultClusterCallback) callback);
+                  .revokeCommissioning((DefaultClusterCallback) callback, 10000);
             },
             () -> new DelegatedDefaultClusterCallback(),
             administratorCommissioningrevokeCommissioningCommandParams);
@@ -6301,7 +6304,8 @@ public class ClusterInfoMapping {
               ((ChipClusters.DoorLockCluster) cluster)
                   .clearCredential(
                       (DefaultClusterCallback) callback,
-                      (ChipStructs.DoorLockClusterDlCredential) commandArguments.get("credential"));
+                      (ChipStructs.DoorLockClusterDlCredential) commandArguments.get("credential"),
+                      10000);
             },
             () -> new DelegatedDefaultClusterCallback(),
             doorLockclearCredentialCommandParams);
@@ -6319,7 +6323,8 @@ public class ClusterInfoMapping {
               ((ChipClusters.DoorLockCluster) cluster)
                   .clearUser(
                       (DefaultClusterCallback) callback,
-                      (Integer) commandArguments.get("userIndex"));
+                      (Integer) commandArguments.get("userIndex"),
+                      10000);
             },
             () -> new DelegatedDefaultClusterCallback(),
             doorLockclearUserCommandParams);
@@ -6467,7 +6472,8 @@ public class ClusterInfoMapping {
               ((ChipClusters.DoorLockCluster) cluster)
                   .lockDoor(
                       (DefaultClusterCallback) callback,
-                      (Optional<byte[]>) commandArguments.get("pinCode"));
+                      (Optional<byte[]>) commandArguments.get("pinCode"),
+                      10000);
             },
             () -> new DelegatedDefaultClusterCallback(),
             doorLocklockDoorCommandParams);
@@ -6510,7 +6516,8 @@ public class ClusterInfoMapping {
                       (byte[]) commandArguments.get("credentialData"),
                       (Integer) commandArguments.get("userIndex"),
                       (Integer) commandArguments.get("userStatus"),
-                      (Integer) commandArguments.get("userType"));
+                      (Integer) commandArguments.get("userType"),
+                      10000);
             },
             () -> new DelegatedSetCredentialResponseCallback(),
             doorLocksetCredentialCommandParams);
@@ -6560,7 +6567,8 @@ public class ClusterInfoMapping {
                       (Long) commandArguments.get("userUniqueId"),
                       (Integer) commandArguments.get("userStatus"),
                       (Integer) commandArguments.get("userType"),
-                      (Integer) commandArguments.get("credentialRule"));
+                      (Integer) commandArguments.get("credentialRule"),
+                      10000);
             },
             () -> new DelegatedDefaultClusterCallback(),
             doorLocksetUserCommandParams);
@@ -6669,7 +6677,8 @@ public class ClusterInfoMapping {
               ((ChipClusters.DoorLockCluster) cluster)
                   .unlockDoor(
                       (DefaultClusterCallback) callback,
-                      (Optional<byte[]>) commandArguments.get("pinCode"));
+                      (Optional<byte[]>) commandArguments.get("pinCode"),
+                      10000);
             },
             () -> new DelegatedDefaultClusterCallback(),
             doorLockunlockDoorCommandParams);
@@ -6693,7 +6702,8 @@ public class ClusterInfoMapping {
                   .unlockWithTimeout(
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("timeout"),
-                      (Optional<byte[]>) commandArguments.get("pinCode"));
+                      (Optional<byte[]>) commandArguments.get("pinCode"),
+                      10000);
             },
             () -> new DelegatedDefaultClusterCallback(),
             doorLockunlockWithTimeoutCommandParams);

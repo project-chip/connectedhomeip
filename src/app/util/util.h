@@ -223,8 +223,6 @@ uint16_t emberAfStrnlen(const uint8_t * string, uint16_t maxLength);
 uint8_t emberAfAppendCharacters(uint8_t * zclString, uint8_t zclStringMaxLen, const uint8_t * appendingChars,
                                 uint8_t appendingCharsLen);
 
-extern uint8_t emAfExtendedPanId[];
-
 EmberStatus emAfValidateChannelPages(uint8_t page, uint8_t channel);
 
 /* @brief A Silicon Labs assert function

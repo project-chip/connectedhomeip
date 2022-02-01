@@ -779,6 +779,97 @@ class ChipClusters:
             "commands": {
             },
             "attributes": {
+                0x00000001: {
+                    "attributeName": "VendorName",
+                    "attributeId": 0x00000001,
+                    "type": "str",
+                    "reportable": True,
+                },
+                0x00000002: {
+                    "attributeName": "VendorID",
+                    "attributeId": 0x00000002,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x00000003: {
+                    "attributeName": "ProductName",
+                    "attributeId": 0x00000003,
+                    "type": "str",
+                    "reportable": True,
+                },
+                0x00000005: {
+                    "attributeName": "NodeLabel",
+                    "attributeId": 0x00000005,
+                    "type": "str",
+                    "reportable": True,
+                    "writable": True,
+                },
+                0x00000007: {
+                    "attributeName": "HardwareVersion",
+                    "attributeId": 0x00000007,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x00000008: {
+                    "attributeName": "HardwareVersionString",
+                    "attributeId": 0x00000008,
+                    "type": "str",
+                    "reportable": True,
+                },
+                0x00000009: {
+                    "attributeName": "SoftwareVersion",
+                    "attributeId": 0x00000009,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x0000000A: {
+                    "attributeName": "SoftwareVersionString",
+                    "attributeId": 0x0000000A,
+                    "type": "str",
+                    "reportable": True,
+                },
+                0x0000000B: {
+                    "attributeName": "ManufacturingDate",
+                    "attributeId": 0x0000000B,
+                    "type": "str",
+                    "reportable": True,
+                },
+                0x0000000C: {
+                    "attributeName": "PartNumber",
+                    "attributeId": 0x0000000C,
+                    "type": "str",
+                    "reportable": True,
+                },
+                0x0000000D: {
+                    "attributeName": "ProductURL",
+                    "attributeId": 0x0000000D,
+                    "type": "str",
+                    "reportable": True,
+                },
+                0x0000000E: {
+                    "attributeName": "ProductLabel",
+                    "attributeId": 0x0000000E,
+                    "type": "str",
+                    "reportable": True,
+                },
+                0x0000000F: {
+                    "attributeName": "SerialNumber",
+                    "attributeId": 0x0000000F,
+                    "type": "str",
+                    "reportable": True,
+                },
+                0x00000011: {
+                    "attributeName": "Reachable",
+                    "attributeId": 0x00000011,
+                    "type": "bool",
+                    "reportable": True,
+                },
+                0x00000012: {
+                    "attributeName": "UniqueID",
+                    "attributeId": 0x00000012,
+                    "type": "str",
+                    "reportable": True,
+                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,

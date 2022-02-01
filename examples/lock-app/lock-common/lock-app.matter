@@ -37,9 +37,9 @@ server cluster AdministratorCommissioning = 60 {
     INT16U passcodeID = 5;
   }
 
-  command OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
-  command OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
-  command RevokeCommissioning(): DefaultSuccess = 2;
+  timed command OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
+  timed command OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
+  timed command RevokeCommissioning(): DefaultSuccess = 2;
 }
 
 server cluster Basic = 40 {

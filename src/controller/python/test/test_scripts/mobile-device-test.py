@@ -138,6 +138,12 @@ def main():
                                             group=GROUP_ID),
               "Failed to test Write Basic Attributes")
 
+    logger.info("Testing attribute reading basic again")
+    FailIfNot(test.TestReadBasicAttributes(nodeid=1,
+                                           endpoint=ENDPOINT_ID,
+                                           group=GROUP_ID),
+              "Failed to test Read Basic Attributes")
+
     logger.info("Testing subscription")
     FailIfNot(test.TestSubscription(nodeid=1, endpoint=LIGHTING_ENDPOINT_ID),
               "Failed to subscribe attributes.")

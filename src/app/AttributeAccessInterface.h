@@ -316,11 +316,22 @@ public:
         mReader(aReader), mSubjectDescriptor(aSubjectDescriptor)
     {}
 
-    template <typename T>
+    template <typename T, typename std::enable_if_t<!DataModel::IsFabricScoped<T>::value, bool> = true>
     CHIP_ERROR Decode(T & aArg)
     {
         mTriedDecode = true;
         return DataModel::Decode(mReader, aArg);
+    }
+
+    template <typename T, typename std::enable_if_t<DataModel::IsFabricScoped<T>::value, bool> = true>
+    CHIP_ERROR Decode(T & aArg)
+    {
+        mTriedDecode = true;
+        // TODO: We may want to reject kUndefinedFabricIndex for writing fabric scoped data. mAccessingFabricIndex will be
+        // kUndefinedFabricIndex on PASE sessions.
+        ReturnErrorOnFailure(DataModel::Decode(mReader, aArg));
+        aArg.SetFabricIndex(AccessingFabricIndex());
+        return CHIP_NO_ERROR;
     }
 
     bool TriedDecode() const { return mTriedDecode; }

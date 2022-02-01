@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from chiptest.accessories import AppsRegister
 import coloredlogs
 import click
 import logging
@@ -195,12 +196,15 @@ def cmd_run(context, iterations, all_clusters_app, tv_app):
 
     logging.info("Each test will be executed %d times" % iterations)
 
+    apps_register = AppsRegister()
+    apps_register.init()
+
     for i in range(iterations):
         logging.info("Starting iteration %d" % (i+1))
         for test in context.obj.tests:
             test_start = time.time()
             try:
-                test.Run(runner, paths)
+                test.Run(runner, apps_register, paths)
                 test_end = time.time()
                 logging.info('%-20s - Completed in %0.2f seconds' %
                              (test.name, (test_end - test_start)))
@@ -209,6 +213,8 @@ def cmd_run(context, iterations, all_clusters_app, tv_app):
                 logging.exception('%s - FAILED in %0.2f seconds' %
                                   (test.name, (test_end - test_start)))
                 sys.exit(2)
+
+    apps_register.uninit()
 
 
 # On linux, allow an execution shell to be prepared

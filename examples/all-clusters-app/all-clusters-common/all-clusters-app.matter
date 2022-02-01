@@ -102,9 +102,9 @@ server cluster AdministratorCommissioning = 60 {
     INT16U passcodeID = 5;
   }
 
-  command OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
-  command OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
-  command RevokeCommissioning(): DefaultSuccess = 2;
+  timed command OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
+  timed command OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
+  timed command RevokeCommissioning(): DefaultSuccess = 2;
 }
 
 server cluster ApplicationBasic = 1293 {
@@ -344,6 +344,21 @@ server cluster BridgedActions = 37 {
 }
 
 server cluster BridgedDeviceBasic = 57 {
+  readonly attribute char_string<32> vendorName = 1;
+  readonly attribute int16u vendorID = 2;
+  readonly attribute char_string<32> productName = 3;
+  attribute char_string<32> nodeLabel = 5;
+  readonly attribute int16u hardwareVersion = 7;
+  readonly attribute char_string<64> hardwareVersionString = 8;
+  readonly attribute int32u softwareVersion = 9;
+  readonly attribute char_string<64> softwareVersionString = 10;
+  readonly attribute char_string<16> manufacturingDate = 11;
+  readonly attribute char_string<32> partNumber = 12;
+  readonly attribute long_char_string<256> productURL = 13;
+  readonly attribute char_string<64> productLabel = 14;
+  readonly attribute char_string<32> serialNumber = 15;
+  readonly attribute boolean reachable = 17;
+  readonly attribute char_string<32> uniqueID = 18;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
@@ -1250,14 +1265,14 @@ server cluster DoorLock = 257 {
     nullable INT16U nextCredentialIndex = 2;
   }
 
-  command ClearCredential(ClearCredentialRequest): DefaultSuccess = 38;
-  command ClearUser(ClearUserRequest): DefaultSuccess = 29;
+  timed command ClearCredential(ClearCredentialRequest): DefaultSuccess = 38;
+  timed command ClearUser(ClearUserRequest): DefaultSuccess = 29;
   command GetCredentialStatus(GetCredentialStatusRequest): GetCredentialStatusResponse = 36;
   command GetUser(GetUserRequest): GetUserResponse = 27;
-  command LockDoor(LockDoorRequest): DefaultSuccess = 0;
-  command SetCredential(SetCredentialRequest): SetCredentialResponse = 34;
-  command SetUser(SetUserRequest): DefaultSuccess = 26;
-  command UnlockDoor(UnlockDoorRequest): DefaultSuccess = 1;
+  timed command LockDoor(LockDoorRequest): DefaultSuccess = 0;
+  timed command SetCredential(SetCredentialRequest): SetCredentialResponse = 34;
+  timed command SetUser(SetUserRequest): DefaultSuccess = 26;
+  timed command UnlockDoor(UnlockDoorRequest): DefaultSuccess = 1;
 }
 
 server cluster ElectricalMeasurement = 2820 {

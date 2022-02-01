@@ -25,7 +25,6 @@
 #pragma once
 
 #include <app/ConcreteCommandPath.h>
-#include <app/InteractionModelDelegate.h>
 #include <app/data-model/Encode.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>

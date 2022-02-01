@@ -23,7 +23,7 @@ server cluster AccountLogin = 1294 {
   }
 
   timed command GetSetupPINRequest(GetSetupPINRequestRequest): GetSetupPINResponse = 0;
-  command LoginRequest(LoginRequestRequest): DefaultSuccess = 2;
+  timed command LoginRequest(LoginRequestRequest): DefaultSuccess = 2;
   timed command LogoutRequest(): DefaultSuccess = 3;
 }
 
@@ -58,9 +58,9 @@ server cluster AdministratorCommissioning = 60 {
     INT16U passcodeID = 5;
   }
 
-  command OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
-  command OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
-  command RevokeCommissioning(): DefaultSuccess = 2;
+  timed command OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
+  timed command OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
+  timed command RevokeCommissioning(): DefaultSuccess = 2;
 }
 
 server cluster ApplicationBasic = 1293 {

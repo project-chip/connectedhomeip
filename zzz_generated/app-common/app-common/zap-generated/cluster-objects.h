@@ -6487,6 +6487,8 @@ public:
     static constexpr bool kIsFabricScoped = true;
 
     auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
 };
 
 struct DecodableType
@@ -6497,11 +6499,14 @@ public:
     AuthMode authMode             = static_cast<AuthMode>(0);
     DataModel::Nullable<DataModel::DecodableList<uint64_t>> subjects;
     DataModel::Nullable<DataModel::DecodableList<Structs::Target::DecodableType>> targets;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = true;
 
     auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
 };
 
 } // namespace AccessControlEntry
@@ -6524,6 +6529,8 @@ public:
     static constexpr bool kIsFabricScoped = true;
 
     auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
 };
 
 using DecodableType = Type;
@@ -7157,6 +7164,7 @@ public:
     chip::CharSpan name;
     EndpointListTypeEnum type = static_cast<EndpointListTypeEnum>(0);
     DataModel::DecodableList<chip::EndpointId> endpoints;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
@@ -8705,6 +8713,8 @@ public:
     static constexpr bool kIsFabricScoped = true;
 
     auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
 };
 
 using DecodableType = Type;
@@ -9455,6 +9465,7 @@ struct DecodableType
 public:
     DataModel::DecodableList<BatChargeFaultType> current;
     DataModel::DecodableList<BatChargeFaultType> previous;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
@@ -9484,6 +9495,7 @@ struct DecodableType
 public:
     DataModel::DecodableList<BatFaultType> current;
     DataModel::DecodableList<BatFaultType> previous;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
@@ -9513,6 +9525,7 @@ struct DecodableType
 public:
     DataModel::DecodableList<WiredFaultType> current;
     DataModel::DecodableList<WiredFaultType> previous;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
@@ -14560,7 +14573,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -14597,7 +14610,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -14626,7 +14639,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -14783,6 +14796,8 @@ public:
     static constexpr bool kIsFabricScoped = true;
 
     auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
 };
 
 using DecodableType = Type;
@@ -14809,6 +14824,8 @@ public:
     static constexpr bool kIsFabricScoped = true;
 
     auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
 };
 
 using DecodableType = Type;
@@ -15506,6 +15523,7 @@ public:
     uint16_t groupId     = static_cast<uint16_t>(0);
     DataModel::DecodableList<uint16_t> endpoints;
     chip::CharSpan groupName;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
@@ -15533,6 +15551,8 @@ public:
     static constexpr bool kIsFabricScoped = true;
 
     auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
 };
 
 using DecodableType = Type;
@@ -17349,7 +17369,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -17381,7 +17401,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -17415,7 +17435,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -17536,7 +17556,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -17644,7 +17664,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -17673,7 +17693,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -18391,7 +18411,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -18499,7 +18519,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -18528,7 +18548,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -18571,7 +18591,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -18700,7 +18720,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -18842,7 +18862,7 @@ public:
 
     using ResponseType = Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -18987,7 +19007,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -19731,7 +19751,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::LockOperation::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = true;
+    static constexpr bool kIsFabricScoped = false;
 
     DlLockOperationType lockOperationType = static_cast<DlLockOperationType>(0);
     DlOperationSource operationSource     = static_cast<DlOperationSource>(0);
@@ -19739,8 +19759,6 @@ public:
     DataModel::Nullable<chip::FabricIndex> fabricIndex;
     DataModel::Nullable<chip::NodeId> sourceNode;
     Optional<DataModel::Nullable<DataModel::List<const Structs::DlCredential::Type>>> credentials;
-
-    auto GetFabricIndex() const { return fabricIndex; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -19782,7 +19800,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::LockOperationError::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = true;
+    static constexpr bool kIsFabricScoped = false;
 
     DlLockOperationType lockOperationType = static_cast<DlLockOperationType>(0);
     DlOperationSource operationSource     = static_cast<DlOperationSource>(0);
@@ -19791,8 +19809,6 @@ public:
     DataModel::Nullable<chip::FabricIndex> fabricIndex;
     DataModel::Nullable<chip::NodeId> sourceNode;
     Optional<DataModel::Nullable<DataModel::List<const Structs::DlCredential::Type>>> credentials;
-
-    auto GetFabricIndex() const { return fabricIndex; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -19835,7 +19851,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::LockUserChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = true;
+    static constexpr bool kIsFabricScoped = false;
 
     DlLockDataType lockDataType           = static_cast<DlLockDataType>(0);
     DlDataOperationType dataOperationType = static_cast<DlDataOperationType>(0);
@@ -19844,8 +19860,6 @@ public:
     DataModel::Nullable<chip::FabricIndex> fabricIndex;
     DataModel::Nullable<chip::NodeId> sourceNode;
     DataModel::Nullable<uint16_t> dataIndex;
-
-    auto GetFabricIndex() const { return fabricIndex; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -32689,6 +32703,7 @@ public:
     ParameterEnum type = static_cast<ParameterEnum>(0);
     chip::CharSpan value;
     DataModel::DecodableList<Structs::AdditionalInfo::DecodableType> externalIDList;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
@@ -32715,6 +32730,7 @@ struct DecodableType
 {
 public:
     DataModel::DecodableList<Structs::Parameter::DecodableType> parameterList;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
@@ -33789,7 +33805,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return true; }
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -33823,7 +33839,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -34027,6 +34043,7 @@ public:
     DataModel::Nullable<DataModel::DecodableList<SimpleEnum>> nullableList;
     Optional<DataModel::DecodableList<SimpleEnum>> optionalList;
     Optional<DataModel::Nullable<DataModel::DecodableList<SimpleEnum>>> nullableOptionalList;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
@@ -34095,6 +34112,7 @@ public:
     DataModel::DecodableList<uint32_t> e;
     DataModel::DecodableList<chip::ByteSpan> f;
     DataModel::DecodableList<uint8_t> g;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
@@ -34121,6 +34139,7 @@ struct DecodableType
 {
 public:
     DataModel::DecodableList<Structs::NestedStructList::DecodableType> a;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
@@ -34144,6 +34163,8 @@ public:
     static constexpr bool kIsFabricScoped = true;
 
     auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
 };
 
 using DecodableType = Type;

@@ -453,7 +453,8 @@ void TestReadInteraction::TestReadHandlerResourceExhaustion_MultipleSubscription
 
     NL_TEST_ASSERT(apSuite, numSuccessCalls == 1);
     NL_TEST_ASSERT(apSuite, numSubscriptionEstablishedCalls == 1);
-    NL_TEST_ASSERT(apSuite, numFailureCalls == 1);
+    // Resubscription is happening for second subscribe call
+    NL_TEST_ASSERT(apSuite, numFailureCalls == 0);
 
     app::InteractionModelEngine::GetInstance()->SetHandlerCapacity(-1);
     app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
