@@ -30,8 +30,8 @@ class AutoCommissioner : public CommissioningDelegate
 public:
     AutoCommissioner() {}
     virtual ~AutoCommissioner();
-    virtual CHIP_ERROR SetCommissioningParameters(const CommissioningParameters & params) override;
-    virtual void SetOperationalCredentialsDelegate(OperationalCredentialsDelegate * operationalCredentialsDelegate) override;
+    CHIP_ERROR SetCommissioningParameters(const CommissioningParameters & params) override;
+    void SetOperationalCredentialsDelegate(OperationalCredentialsDelegate * operationalCredentialsDelegate) override;
 
     virtual CHIP_ERROR StartCommissioning(DeviceCommissioner * commissioner, CommissioneeDeviceProxy * proxy) override;
 
