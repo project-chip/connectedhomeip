@@ -180,9 +180,9 @@ function chip_endpoint_generated_functions()
   return ret.concat('\n');
 }
 
-function chip_endpoint_generated_commands_list()
+function chip_endpoint_generated_commands_list(options)
 {
-  let ret = '{ \\\n';
+  let ret = [];
   this.clusterList.forEach((c) => {
     let clientGeneratedCommands = [];
     let serverGeneratedCommands = [];
@@ -197,18 +197,18 @@ function chip_endpoint_generated_commands_list()
     });
 
     if (clientGeneratedCommands.length > 0 || serverGeneratedCommands.length > 0) {
-      ret = ret.concat(`  /* ${c.comment} */\\\n`);
+      ret.push({ text: `  /* ${c.comment} */\\` });
     }
     if (clientGeneratedCommands.length > 0) {
       clientGeneratedCommands.push('chip::kInvalidCommandId /* end of list */')
-      ret = ret.concat(`  /*   client_generated */ \\\n  ${clientGeneratedCommands.join(', \\\n  ')}, \\\n`);
+      ret.push({ text: `  /*   client_generated */ \\\n  ${clientGeneratedCommands.join(', \\\n  ')}, \\` });
     }
     if (serverGeneratedCommands.length > 0) {
       serverGeneratedCommands.push('chip::kInvalidCommandId /* end of list */')
-      ret = ret.concat(`  /*   server_generated */ \\\n  ${serverGeneratedCommands.join(', \\\n  ')}, \\\n`);
+      ret.push({ text: `  /*   server_generated */ \\\n  ${serverGeneratedCommands.join(', \\\n  ')}, \\` });
     }
   })
-  return ret.concat('}\n');
+  return templateUtil.collectBlocks(ret, options, this);
 }
 
 /**

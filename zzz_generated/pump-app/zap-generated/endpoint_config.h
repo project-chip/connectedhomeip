@@ -464,7 +464,7 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 196
+#define GENERATED_ATTRIBUTE_COUNT 193
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
                                                                                                                                    \
@@ -724,26 +724,17 @@
             { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(281) }, /* FeatureMap */                               \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },     /* ClusterRevision */                          \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Temperature Measurement (client) */                                                           \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(3) }, /* ClusterRevision */          \
-                                                                                                                                   \
             /* Endpoint: 1, Cluster: Temperature Measurement (server) */                                                           \
             { 0x00000000, ZAP_TYPE(INT16S), 2, 0, ZAP_SIMPLE_DEFAULT(0x8000) }, /* MeasuredValue */                                \
             { 0x00000001, ZAP_TYPE(INT16S), 2, 0, ZAP_SIMPLE_DEFAULT(0x8000) }, /* MinMeasuredValue */                             \
             { 0x00000002, ZAP_TYPE(INT16S), 2, 0, ZAP_SIMPLE_DEFAULT(0x8000) }, /* MaxMeasuredValue */                             \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },      /* ClusterRevision */                              \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Pressure Measurement (client) */                                                              \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(2) }, /* ClusterRevision */          \
-                                                                                                                                   \
             /* Endpoint: 1, Cluster: Pressure Measurement (server) */                                                              \
             { 0x00000000, ZAP_TYPE(INT16S), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) }, /* MeasuredValue */                                \
             { 0x00000001, ZAP_TYPE(INT16S), 2, 0, ZAP_EMPTY_DEFAULT() },        /* MinMeasuredValue */                             \
             { 0x00000002, ZAP_TYPE(INT16S), 2, 0, ZAP_EMPTY_DEFAULT() },        /* MaxMeasuredValue */                             \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(2) },      /* ClusterRevision */                              \
-                                                                                                                                   \
-            /* Endpoint: 1, Cluster: Flow Measurement (client) */                                                                  \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(2) }, /* ClusterRevision */          \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Flow Measurement (server) */                                                                  \
             { 0x00000000, ZAP_TYPE(INT16S), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) }, /* MeasuredValue */                                \
@@ -1077,8 +1068,8 @@
       /* Endpoint: 1, Cluster: Temperature Measurement (client) */ \
       .clusterId = 0x00000402,  \
       .attributes = ZAP_ATTRIBUTE_INDEX(181), \
-      .attributeCount = 1, \
-      .clusterSize = 2, \
+      .attributeCount = 0, \
+      .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
       .clientGeneratedCommandList = nullptr ,\
@@ -1087,7 +1078,7 @@
   { \
       /* Endpoint: 1, Cluster: Temperature Measurement (server) */ \
       .clusterId = 0x00000402,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(182), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(181), \
       .attributeCount = 4, \
       .clusterSize = 8, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -1098,9 +1089,9 @@
   { \
       /* Endpoint: 1, Cluster: Pressure Measurement (client) */ \
       .clusterId = 0x00000403,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(186), \
-      .attributeCount = 1, \
-      .clusterSize = 2, \
+      .attributes = ZAP_ATTRIBUTE_INDEX(185), \
+      .attributeCount = 0, \
+      .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
       .clientGeneratedCommandList = nullptr ,\
@@ -1109,7 +1100,7 @@
   { \
       /* Endpoint: 1, Cluster: Pressure Measurement (server) */ \
       .clusterId = 0x00000403,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(187), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(185), \
       .attributeCount = 4, \
       .clusterSize = 8, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -1120,9 +1111,9 @@
   { \
       /* Endpoint: 1, Cluster: Flow Measurement (client) */ \
       .clusterId = 0x00000404,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(191), \
-      .attributeCount = 1, \
-      .clusterSize = 2, \
+      .attributes = ZAP_ATTRIBUTE_INDEX(189), \
+      .attributeCount = 0, \
+      .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
       .clientGeneratedCommandList = nullptr ,\
@@ -1131,7 +1122,7 @@
   { \
       /* Endpoint: 1, Cluster: Flow Measurement (server) */ \
       .clusterId = 0x00000404,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(192), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(189), \
       .attributeCount = 4, \
       .clusterSize = 8, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -1150,7 +1141,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 15, 468 }, { ZAP_CLUSTER_INDEX(15), 10, 90 },                                                      \
+        { ZAP_CLUSTER_INDEX(0), 15, 468 }, { ZAP_CLUSTER_INDEX(15), 10, 84 },                                                      \
     }
 
 // Largest attribute size is needed for various buffers
@@ -1160,7 +1151,7 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (39)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (558)
+#define ATTRIBUTE_MAX_SIZE (552)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (2)
