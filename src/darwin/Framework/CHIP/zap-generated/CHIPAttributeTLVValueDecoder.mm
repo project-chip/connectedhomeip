@@ -3556,6 +3556,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = [NSNumber numberWithUnsignedChar:cppValue];
             return value;
         }
+        case Attributes::CredentialRulesSupport::Id: {
+            using TypeInfo = Attributes::CredentialRulesSupport::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
         case Attributes::Language::Id: {
             using TypeInfo = Attributes::Language::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -3611,8 +3622,30 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = [NSNumber numberWithUnsignedShort:cppValue];
             return value;
         }
+        case Attributes::DefaultConfigurationRegister::Id: {
+            using TypeInfo = Attributes::DefaultConfigurationRegister::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
         case Attributes::EnableOneTouchLocking::Id: {
             using TypeInfo = Attributes::EnableOneTouchLocking::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithBool:cppValue];
+            return value;
+        }
+        case Attributes::EnableInsideStatusLED::Id: {
+            using TypeInfo = Attributes::EnableInsideStatusLED::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -3642,6 +3675,28 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             NSNumber * _Nonnull value;
             value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::UserCodeTemporaryDisableTime::Id: {
+            using TypeInfo = Attributes::UserCodeTemporaryDisableTime::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::RequirePINforRemoteOperation::Id: {
+            using TypeInfo = Attributes::RequirePINforRemoteOperation::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithBool:cppValue];
             return value;
         }
         case Attributes::ServerGeneratedCommandList::Id: {

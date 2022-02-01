@@ -47151,6 +47151,31 @@ ResponseHandler test_TestSubscribe_OnOff_OnOff_Reported = nil;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterDoorLockReadAttributeCredentialRulesSupportWithCompletionHandler
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"DoorLockReadAttributeCredentialRulesSupportWithCompletionHandler"];
+
+    [cluster readAttributeCredentialRulesSupportWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"DoorLock CredentialRulesSupport Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 - (void)testSendClusterDoorLockReadAttributeLanguageWithCompletionHandler
 {
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -47372,6 +47397,31 @@ ResponseHandler test_TestSubscribe_OnOff_OnOff_Reported = nil;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterDoorLockReadAttributeDefaultConfigurationRegisterWithCompletionHandler
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"DoorLockReadAttributeDefaultConfigurationRegisterWithCompletionHandler"];
+
+    [cluster readAttributeDefaultConfigurationRegisterWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"DoorLock DefaultConfigurationRegister Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 - (void)testSendClusterDoorLockReadAttributeEnableOneTouchLockingWithCompletionHandler
 {
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -47416,6 +47466,56 @@ ResponseHandler test_TestSubscribe_OnOff_OnOff_Reported = nil;
     [cluster writeAttributeEnableOneTouchLockingWithValue:value
                                         completionHandler:^(NSError * _Nullable err) {
                                             NSLog(@"DoorLock EnableOneTouchLocking Error: %@", err);
+                                            XCTAssertEqual(err.code, 0);
+                                            [expectation fulfill];
+                                        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterDoorLockReadAttributeEnableInsideStatusLEDWithCompletionHandler
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"DoorLockReadAttributeEnableInsideStatusLEDWithCompletionHandler"];
+
+    [cluster readAttributeEnableInsideStatusLEDWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"DoorLock EnableInsideStatusLED Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterDoorLockWriteAttributeEnableInsideStatusLEDWithValue
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation = [self expectationWithDescription:@"DoorLockWriteAttributeEnableInsideStatusLEDWithValue"];
+
+    NSNumber * _Nonnull value = @(0);
+    [cluster writeAttributeEnableInsideStatusLEDWithValue:value
+                                        completionHandler:^(NSError * _Nullable err) {
+                                            NSLog(@"DoorLock EnableInsideStatusLED Error: %@", err);
                                             XCTAssertEqual(err.code, 0);
                                             [expectation fulfill];
                                         }];
@@ -47519,6 +47619,108 @@ ResponseHandler test_TestSubscribe_OnOff_OnOff_Reported = nil;
                                           XCTAssertEqual(err.code, 0);
                                           [expectation fulfill];
                                       }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterDoorLockReadAttributeUserCodeTemporaryDisableTimeWithCompletionHandler
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"DoorLockReadAttributeUserCodeTemporaryDisableTimeWithCompletionHandler"];
+
+    [cluster readAttributeUserCodeTemporaryDisableTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"DoorLock UserCodeTemporaryDisableTime Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterDoorLockWriteAttributeUserCodeTemporaryDisableTimeWithValue
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"DoorLockWriteAttributeUserCodeTemporaryDisableTimeWithValue"];
+
+    NSNumber * _Nonnull value = @(1);
+    [cluster writeAttributeUserCodeTemporaryDisableTimeWithValue:value
+                                               completionHandler:^(NSError * _Nullable err) {
+                                                   NSLog(@"DoorLock UserCodeTemporaryDisableTime Error: %@", err);
+                                                   XCTAssertEqual(err.code, 0);
+                                                   [expectation fulfill];
+                                               }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterDoorLockReadAttributeRequirePINforRemoteOperationWithCompletionHandler
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"DoorLockReadAttributeRequirePINforRemoteOperationWithCompletionHandler"];
+
+    [cluster readAttributeRequirePINforRemoteOperationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"DoorLock RequirePINforRemoteOperation Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterDoorLockWriteAttributeRequirePINforRemoteOperationWithValue
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"DoorLockWriteAttributeRequirePINforRemoteOperationWithValue"];
+
+    NSNumber * _Nonnull value = @(0);
+    [cluster writeAttributeRequirePINforRemoteOperationWithValue:value
+                                               completionHandler:^(NSError * _Nullable err) {
+                                                   NSLog(@"DoorLock RequirePINforRemoteOperation Error: %@", err);
+                                                   XCTAssertEqual(err.code, 0);
+                                                   [expectation fulfill];
+                                               }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }

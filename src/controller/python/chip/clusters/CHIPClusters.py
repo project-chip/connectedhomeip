@@ -2032,6 +2032,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000001B: {
+                    "attributeName": "CredentialRulesSupport",
+                    "attributeId": 0x0000001B,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x00000021: {
                     "attributeName": "Language",
                     "attributeId": 0x00000021,
@@ -2066,11 +2072,22 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x00000027: {
+                    "attributeName": "DefaultConfigurationRegister",
+                    "attributeId": 0x00000027,
+                    "type": "int",
+                },
                 0x00000029: {
                     "attributeName": "EnableOneTouchLocking",
                     "attributeId": 0x00000029,
                     "type": "bool",
                     "reportable": True,
+                    "writable": True,
+                },
+                0x0000002A: {
+                    "attributeName": "EnableInsideStatusLED",
+                    "attributeId": 0x0000002A,
+                    "type": "bool",
                     "writable": True,
                 },
                 0x0000002B: {
@@ -2085,6 +2102,19 @@ class ChipClusters:
                     "attributeId": 0x00000030,
                     "type": "int",
                     "reportable": True,
+                    "writable": True,
+                },
+                0x00000031: {
+                    "attributeName": "UserCodeTemporaryDisableTime",
+                    "attributeId": 0x00000031,
+                    "type": "int",
+                    "reportable": True,
+                    "writable": True,
+                },
+                0x00000033: {
+                    "attributeName": "RequirePINforRemoteOperation",
+                    "attributeId": 0x00000033,
+                    "type": "bool",
                     "writable": True,
                 },
                 0x0000FFF8: {

@@ -2872,6 +2872,20 @@ public class ClusterReadMapping {
             readDoorLockMinRFIDCodeLengthCommandParams);
     readDoorLockInteractionInfo.put(
         "readMinRFIDCodeLengthAttribute", readDoorLockMinRFIDCodeLengthAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readDoorLockCredentialRulesSupportCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readDoorLockCredentialRulesSupportAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .readCredentialRulesSupportAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readDoorLockCredentialRulesSupportCommandParams);
+    readDoorLockInteractionInfo.put(
+        "readCredentialRulesSupportAttribute",
+        readDoorLockCredentialRulesSupportAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readDoorLockLanguageCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readDoorLockLanguageAttributeInteractionInfo =
@@ -2934,6 +2948,20 @@ public class ClusterReadMapping {
     readDoorLockInteractionInfo.put(
         "readSupportedOperatingModesAttribute",
         readDoorLockSupportedOperatingModesAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readDoorLockDefaultConfigurationRegisterCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readDoorLockDefaultConfigurationRegisterAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .readDefaultConfigurationRegisterAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readDoorLockDefaultConfigurationRegisterCommandParams);
+    readDoorLockInteractionInfo.put(
+        "readDefaultConfigurationRegisterAttribute",
+        readDoorLockDefaultConfigurationRegisterAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readDoorLockEnableOneTouchLockingCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readDoorLockEnableOneTouchLockingAttributeInteractionInfo =
@@ -2948,6 +2976,20 @@ public class ClusterReadMapping {
     readDoorLockInteractionInfo.put(
         "readEnableOneTouchLockingAttribute",
         readDoorLockEnableOneTouchLockingAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readDoorLockEnableInsideStatusLEDCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readDoorLockEnableInsideStatusLEDAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .readEnableInsideStatusLEDAttribute(
+                      (ChipClusters.BooleanAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+            readDoorLockEnableInsideStatusLEDCommandParams);
+    readDoorLockInteractionInfo.put(
+        "readEnableInsideStatusLEDAttribute",
+        readDoorLockEnableInsideStatusLEDAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readDoorLockEnablePrivacyModeButtonCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readDoorLockEnablePrivacyModeButtonAttributeInteractionInfo =
@@ -2976,6 +3018,34 @@ public class ClusterReadMapping {
     readDoorLockInteractionInfo.put(
         "readWrongCodeEntryLimitAttribute",
         readDoorLockWrongCodeEntryLimitAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readDoorLockUserCodeTemporaryDisableTimeCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readDoorLockUserCodeTemporaryDisableTimeAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .readUserCodeTemporaryDisableTimeAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readDoorLockUserCodeTemporaryDisableTimeCommandParams);
+    readDoorLockInteractionInfo.put(
+        "readUserCodeTemporaryDisableTimeAttribute",
+        readDoorLockUserCodeTemporaryDisableTimeAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readDoorLockRequirePINforRemoteOperationCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readDoorLockRequirePINforRemoteOperationAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .readRequirePINforRemoteOperationAttribute(
+                      (ChipClusters.BooleanAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+            readDoorLockRequirePINforRemoteOperationCommandParams);
+    readDoorLockInteractionInfo.put(
+        "readRequirePINforRemoteOperationAttribute",
+        readDoorLockRequirePINforRemoteOperationAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readDoorLockServerGeneratedCommandListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readDoorLockServerGeneratedCommandListAttributeInteractionInfo =

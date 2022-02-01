@@ -422,8 +422,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeMinPINCodeLengthWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeMaxRFIDCodeLengthWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeMinRFIDCodeLengthWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeCredentialRulesSupportWithValue:(NSNumber * _Nonnull)value
+                                    completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeSupportedOperatingModesWithValue:(NSNumber * _Nonnull)value
                                      completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeDefaultConfigurationRegisterWithValue:(NSNumber * _Nonnull)value
+                                          completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
                                         completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value

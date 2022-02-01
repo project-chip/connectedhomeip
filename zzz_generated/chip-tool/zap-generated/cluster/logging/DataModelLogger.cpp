@@ -5011,6 +5011,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MinRFIDCodeLength", 1, value);
         }
+        case DoorLock::Attributes::CredentialRulesSupport::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CredentialRulesSupport", 1, value);
+        }
         case DoorLock::Attributes::Language::Id: {
             chip::CharSpan value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -5036,10 +5041,20 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SupportedOperatingModes", 1, value);
         }
+        case DoorLock::Attributes::DefaultConfigurationRegister::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("DefaultConfigurationRegister", 1, value);
+        }
         case DoorLock::Attributes::EnableOneTouchLocking::Id: {
             bool value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("EnableOneTouchLocking", 1, value);
+        }
+        case DoorLock::Attributes::EnableInsideStatusLED::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EnableInsideStatusLED", 1, value);
         }
         case DoorLock::Attributes::EnablePrivacyModeButton::Id: {
             bool value;
@@ -5050,6 +5065,16 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("WrongCodeEntryLimit", 1, value);
+        }
+        case DoorLock::Attributes::UserCodeTemporaryDisableTime::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("UserCodeTemporaryDisableTime", 1, value);
+        }
+        case DoorLock::Attributes::RequirePINforRemoteOperation::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RequirePINforRemoteOperation", 1, value);
         }
         case DoorLock::Attributes::ServerGeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;

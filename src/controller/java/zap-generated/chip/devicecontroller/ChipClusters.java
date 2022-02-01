@@ -6483,6 +6483,15 @@ public class ChipClusters {
       subscribeMinRFIDCodeLengthAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
+    public void readCredentialRulesSupportAttribute(IntegerAttributeCallback callback) {
+      readCredentialRulesSupportAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeCredentialRulesSupportAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeCredentialRulesSupportAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
     public void readLanguageAttribute(CharStringAttributeCallback callback) {
       readLanguageAttribute(chipClusterPtr, callback);
     }
@@ -6564,6 +6573,10 @@ public class ChipClusters {
       subscribeSupportedOperatingModesAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
+    public void readDefaultConfigurationRegisterAttribute(IntegerAttributeCallback callback) {
+      readDefaultConfigurationRegisterAttribute(chipClusterPtr, callback);
+    }
+
     public void readEnableOneTouchLockingAttribute(BooleanAttributeCallback callback) {
       readEnableOneTouchLockingAttribute(chipClusterPtr, callback);
     }
@@ -6581,6 +6594,20 @@ public class ChipClusters {
     public void subscribeEnableOneTouchLockingAttribute(
         BooleanAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeEnableOneTouchLockingAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEnableInsideStatusLEDAttribute(BooleanAttributeCallback callback) {
+      readEnableInsideStatusLEDAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeEnableInsideStatusLEDAttribute(
+        DefaultClusterCallback callback, Boolean value) {
+      writeEnableInsideStatusLEDAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writeEnableInsideStatusLEDAttribute(
+        DefaultClusterCallback callback, Boolean value, int timedWriteTimeoutMs) {
+      writeEnableInsideStatusLEDAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
     }
 
     public void readEnablePrivacyModeButtonAttribute(BooleanAttributeCallback callback) {
@@ -6618,6 +6645,42 @@ public class ChipClusters {
     public void subscribeWrongCodeEntryLimitAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeWrongCodeEntryLimitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUserCodeTemporaryDisableTimeAttribute(IntegerAttributeCallback callback) {
+      readUserCodeTemporaryDisableTimeAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeUserCodeTemporaryDisableTimeAttribute(
+        DefaultClusterCallback callback, Integer value) {
+      writeUserCodeTemporaryDisableTimeAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writeUserCodeTemporaryDisableTimeAttribute(
+        DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      writeUserCodeTemporaryDisableTimeAttribute(
+          chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    }
+
+    public void subscribeUserCodeTemporaryDisableTimeAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUserCodeTemporaryDisableTimeAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readRequirePINforRemoteOperationAttribute(BooleanAttributeCallback callback) {
+      readRequirePINforRemoteOperationAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeRequirePINforRemoteOperationAttribute(
+        DefaultClusterCallback callback, Boolean value) {
+      writeRequirePINforRemoteOperationAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writeRequirePINforRemoteOperationAttribute(
+        DefaultClusterCallback callback, Boolean value, int timedWriteTimeoutMs) {
+      writeRequirePINforRemoteOperationAttribute(
+          chipClusterPtr, callback, value, timedWriteTimeoutMs);
     }
 
     public void readServerGeneratedCommandListAttribute(
@@ -6738,6 +6801,12 @@ public class ChipClusters {
     private native void subscribeMinRFIDCodeLengthAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
+    private native void readCredentialRulesSupportAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeCredentialRulesSupportAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
     private native void readLanguageAttribute(
         long chipClusterPtr, CharStringAttributeCallback callback);
 
@@ -6795,6 +6864,9 @@ public class ChipClusters {
     private native void subscribeSupportedOperatingModesAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
+    private native void readDefaultConfigurationRegisterAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
     private native void readEnableOneTouchLockingAttribute(
         long chipClusterPtr, BooleanAttributeCallback callback);
 
@@ -6806,6 +6878,15 @@ public class ChipClusters {
 
     private native void subscribeEnableOneTouchLockingAttribute(
         long chipClusterPtr, BooleanAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readEnableInsideStatusLEDAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback);
+
+    private native void writeEnableInsideStatusLEDAttribute(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        Boolean value,
+        @Nullable Integer timedWriteTimeoutMs);
 
     private native void readEnablePrivacyModeButtonAttribute(
         long chipClusterPtr, BooleanAttributeCallback callback);
@@ -6830,6 +6911,27 @@ public class ChipClusters {
 
     private native void subscribeWrongCodeEntryLimitAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUserCodeTemporaryDisableTimeAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeUserCodeTemporaryDisableTimeAttribute(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        Integer value,
+        @Nullable Integer timedWriteTimeoutMs);
+
+    private native void subscribeUserCodeTemporaryDisableTimeAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readRequirePINforRemoteOperationAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback);
+
+    private native void writeRequirePINforRemoteOperationAttribute(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        Boolean value,
+        @Nullable Integer timedWriteTimeoutMs);
 
     private native void readServerGeneratedCommandListAttribute(
         long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);

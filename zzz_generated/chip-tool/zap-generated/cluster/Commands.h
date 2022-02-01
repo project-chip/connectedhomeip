@@ -2409,14 +2409,19 @@ private:
 | * MinPINCodeLength                                                  | 0x0018 |
 | * MaxRFIDCodeLength                                                 | 0x0019 |
 | * MinRFIDCodeLength                                                 | 0x001A |
+| * CredentialRulesSupport                                            | 0x001B |
 | * Language                                                          | 0x0021 |
 | * AutoRelockTime                                                    | 0x0023 |
 | * SoundVolume                                                       | 0x0024 |
 | * OperatingMode                                                     | 0x0025 |
 | * SupportedOperatingModes                                           | 0x0026 |
+| * DefaultConfigurationRegister                                      | 0x0027 |
 | * EnableOneTouchLocking                                             | 0x0029 |
+| * EnableInsideStatusLED                                             | 0x002A |
 | * EnablePrivacyModeButton                                           | 0x002B |
 | * WrongCodeEntryLimit                                               | 0x0030 |
+| * UserCodeTemporaryDisableTime                                      | 0x0031 |
+| * RequirePINforRemoteOperation                                      | 0x0033 |
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -2920,6 +2925,28 @@ private:
     bool mValue;
 };
 
+class WriteDoorLockEnableInsideStatusLED : public WriteAttribute
+{
+public:
+    WriteDoorLockEnableInsideStatusLED(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("EnableInsideStatusLED", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "enable-inside-status-led");
+        AddArgument("attr-value", 0, 1, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteDoorLockEnableInsideStatusLED() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000101, 0x0000002A, mValue);
+    }
+
+private:
+    bool mValue;
+};
+
 class WriteDoorLockEnablePrivacyModeButton : public WriteAttribute
 {
 public:
@@ -2962,6 +2989,50 @@ public:
 
 private:
     uint8_t mValue;
+};
+
+class WriteDoorLockUserCodeTemporaryDisableTime : public WriteAttribute
+{
+public:
+    WriteDoorLockUserCodeTemporaryDisableTime(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("UserCodeTemporaryDisableTime", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "user-code-temporary-disable-time");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteDoorLockUserCodeTemporaryDisableTime() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000101, 0x00000031, mValue);
+    }
+
+private:
+    uint8_t mValue;
+};
+
+class WriteDoorLockRequirePINforRemoteOperation : public WriteAttribute
+{
+public:
+    WriteDoorLockRequirePINforRemoteOperation(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("RequirePINforRemoteOperation", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "require-pinfor-remote-operation");
+        AddArgument("attr-value", 0, 1, &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteDoorLockRequirePINforRemoteOperation() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000101, 0x00000033, mValue);
+    }
+
+private:
+    bool mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -10346,19 +10417,27 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
         make_unique<ReadAttribute>(Id, "number-of-week-day-schedules-supported-per-user",
                                    Attributes::NumberOfWeekDaySchedulesSupportedPerUser::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "number-of-year-day-schedules-supported-per-user",
-                                   Attributes::NumberOfYearDaySchedulesSupportedPerUser::Id, credsIssuerConfig),                  //
-        make_unique<ReadAttribute>(Id, "max-pincode-length", Attributes::MaxPINCodeLength::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "min-pincode-length", Attributes::MinPINCodeLength::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "max-rfidcode-length", Attributes::MaxRFIDCodeLength::Id, credsIssuerConfig),              //
-        make_unique<ReadAttribute>(Id, "min-rfidcode-length", Attributes::MinRFIDCodeLength::Id, credsIssuerConfig),              //
-        make_unique<ReadAttribute>(Id, "language", Attributes::Language::Id, credsIssuerConfig),                                  //
-        make_unique<ReadAttribute>(Id, "auto-relock-time", Attributes::AutoRelockTime::Id, credsIssuerConfig),                    //
-        make_unique<ReadAttribute>(Id, "sound-volume", Attributes::SoundVolume::Id, credsIssuerConfig),                           //
-        make_unique<ReadAttribute>(Id, "operating-mode", Attributes::OperatingMode::Id, credsIssuerConfig),                       //
-        make_unique<ReadAttribute>(Id, "supported-operating-modes", Attributes::SupportedOperatingModes::Id, credsIssuerConfig),  //
+                                   Attributes::NumberOfYearDaySchedulesSupportedPerUser::Id, credsIssuerConfig),                 //
+        make_unique<ReadAttribute>(Id, "max-pincode-length", Attributes::MaxPINCodeLength::Id, credsIssuerConfig),               //
+        make_unique<ReadAttribute>(Id, "min-pincode-length", Attributes::MinPINCodeLength::Id, credsIssuerConfig),               //
+        make_unique<ReadAttribute>(Id, "max-rfidcode-length", Attributes::MaxRFIDCodeLength::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "min-rfidcode-length", Attributes::MinRFIDCodeLength::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "credential-rules-support", Attributes::CredentialRulesSupport::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "language", Attributes::Language::Id, credsIssuerConfig),                                 //
+        make_unique<ReadAttribute>(Id, "auto-relock-time", Attributes::AutoRelockTime::Id, credsIssuerConfig),                   //
+        make_unique<ReadAttribute>(Id, "sound-volume", Attributes::SoundVolume::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "operating-mode", Attributes::OperatingMode::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "supported-operating-modes", Attributes::SupportedOperatingModes::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "default-configuration-register", Attributes::DefaultConfigurationRegister::Id,
+                                   credsIssuerConfig),                                                                            //
         make_unique<ReadAttribute>(Id, "enable-one-touch-locking", Attributes::EnableOneTouchLocking::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "enable-inside-status-led", Attributes::EnableInsideStatusLED::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "enable-privacy-mode-button", Attributes::EnablePrivacyModeButton::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "wrong-code-entry-limit", Attributes::WrongCodeEntryLimit::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "user-code-temporary-disable-time", Attributes::UserCodeTemporaryDisableTime::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "require-pinfor-remote-operation", Attributes::RequirePINforRemoteOperation::Id,
+                                   credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
@@ -10371,8 +10450,11 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
         make_unique<WriteDoorLockSoundVolume>(credsIssuerConfig),                                                    //
         make_unique<WriteDoorLockOperatingMode>(credsIssuerConfig),                                                  //
         make_unique<WriteDoorLockEnableOneTouchLocking>(credsIssuerConfig),                                          //
+        make_unique<WriteDoorLockEnableInsideStatusLED>(credsIssuerConfig),                                          //
         make_unique<WriteDoorLockEnablePrivacyModeButton>(credsIssuerConfig),                                        //
         make_unique<WriteDoorLockWrongCodeEntryLimit>(credsIssuerConfig),                                            //
+        make_unique<WriteDoorLockUserCodeTemporaryDisableTime>(credsIssuerConfig),                                   //
+        make_unique<WriteDoorLockRequirePINforRemoteOperation>(credsIssuerConfig),                                   //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                      //
         make_unique<SubscribeAttribute>(Id, "lock-state", Attributes::LockState::Id, credsIssuerConfig),             //
         make_unique<SubscribeAttribute>(Id, "lock-type", Attributes::LockType::Id, credsIssuerConfig),               //
@@ -10392,10 +10474,12 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
         make_unique<SubscribeAttribute>(Id, "min-pincode-length", Attributes::MinPINCodeLength::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "max-rfidcode-length", Attributes::MaxRFIDCodeLength::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "min-rfidcode-length", Attributes::MinRFIDCodeLength::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "language", Attributes::Language::Id, credsIssuerConfig),                     //
-        make_unique<SubscribeAttribute>(Id, "auto-relock-time", Attributes::AutoRelockTime::Id, credsIssuerConfig),       //
-        make_unique<SubscribeAttribute>(Id, "sound-volume", Attributes::SoundVolume::Id, credsIssuerConfig),              //
-        make_unique<SubscribeAttribute>(Id, "operating-mode", Attributes::OperatingMode::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "credential-rules-support", Attributes::CredentialRulesSupport::Id,
+                                        credsIssuerConfig),                                                         //
+        make_unique<SubscribeAttribute>(Id, "language", Attributes::Language::Id, credsIssuerConfig),               //
+        make_unique<SubscribeAttribute>(Id, "auto-relock-time", Attributes::AutoRelockTime::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "sound-volume", Attributes::SoundVolume::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "operating-mode", Attributes::OperatingMode::Id, credsIssuerConfig),    //
         make_unique<SubscribeAttribute>(Id, "supported-operating-modes", Attributes::SupportedOperatingModes::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "enable-one-touch-locking", Attributes::EnableOneTouchLocking::Id,
@@ -10403,6 +10487,8 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
         make_unique<SubscribeAttribute>(Id, "enable-privacy-mode-button", Attributes::EnablePrivacyModeButton::Id,
                                         credsIssuerConfig),                                                                    //
         make_unique<SubscribeAttribute>(Id, "wrong-code-entry-limit", Attributes::WrongCodeEntryLimit::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "user-code-temporary-disable-time", Attributes::UserCodeTemporaryDisableTime::Id,
+                                        credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,

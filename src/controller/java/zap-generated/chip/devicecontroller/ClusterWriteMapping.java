@@ -495,6 +495,24 @@ public class ClusterWriteMapping {
     writeDoorLockInteractionInfo.put(
         "writeEnableOneTouchLockingAttribute",
         writeDoorLockEnableOneTouchLockingAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeDoorLockEnableInsideStatusLEDCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo doorLockenableInsideStatusLEDCommandParameterInfo =
+        new CommandParameterInfo("value", Boolean.class);
+    writeDoorLockEnableInsideStatusLEDCommandParams.put(
+        "value", doorLockenableInsideStatusLEDCommandParameterInfo);
+    InteractionInfo writeDoorLockEnableInsideStatusLEDAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .writeEnableInsideStatusLEDAttribute(
+                      (DefaultClusterCallback) callback, (Boolean) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeDoorLockEnableInsideStatusLEDCommandParams);
+    writeDoorLockInteractionInfo.put(
+        "writeEnableInsideStatusLEDAttribute",
+        writeDoorLockEnableInsideStatusLEDAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeDoorLockEnablePrivacyModeButtonCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo doorLockenablePrivacyModeButtonCommandParameterInfo =
@@ -531,6 +549,42 @@ public class ClusterWriteMapping {
     writeDoorLockInteractionInfo.put(
         "writeWrongCodeEntryLimitAttribute",
         writeDoorLockWrongCodeEntryLimitAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeDoorLockUserCodeTemporaryDisableTimeCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo doorLockuserCodeTemporaryDisableTimeCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class);
+    writeDoorLockUserCodeTemporaryDisableTimeCommandParams.put(
+        "value", doorLockuserCodeTemporaryDisableTimeCommandParameterInfo);
+    InteractionInfo writeDoorLockUserCodeTemporaryDisableTimeAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .writeUserCodeTemporaryDisableTimeAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeDoorLockUserCodeTemporaryDisableTimeCommandParams);
+    writeDoorLockInteractionInfo.put(
+        "writeUserCodeTemporaryDisableTimeAttribute",
+        writeDoorLockUserCodeTemporaryDisableTimeAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeDoorLockRequirePINforRemoteOperationCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo doorLockrequirePINforRemoteOperationCommandParameterInfo =
+        new CommandParameterInfo("value", Boolean.class);
+    writeDoorLockRequirePINforRemoteOperationCommandParams.put(
+        "value", doorLockrequirePINforRemoteOperationCommandParameterInfo);
+    InteractionInfo writeDoorLockRequirePINforRemoteOperationAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .writeRequirePINforRemoteOperationAttribute(
+                      (DefaultClusterCallback) callback, (Boolean) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeDoorLockRequirePINforRemoteOperationCommandParams);
+    writeDoorLockInteractionInfo.put(
+        "writeRequirePINforRemoteOperationAttribute",
+        writeDoorLockRequirePINforRemoteOperationAttributeInteractionInfo);
     writeAttributeMap.put("doorLock", writeDoorLockInteractionInfo);
     Map<String, InteractionInfo> writeElectricalMeasurementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("electricalMeasurement", writeElectricalMeasurementInteractionInfo);

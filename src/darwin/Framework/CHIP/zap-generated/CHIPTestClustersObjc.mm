@@ -4987,6 +4987,25 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)writeAttributeCredentialRulesSupportWithValue:(NSNumber * _Nonnull)value
+                                    completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = DoorLock::Attributes::CredentialRulesSupport::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedCharValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)writeAttributeSupportedOperatingModesWithValue:(NSNumber * _Nonnull)value
                                      completionHandler:(StatusCompletion)completionHandler
 {
@@ -4998,6 +5017,25 @@ using namespace chip::app::Clusters;
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
             using TypeInfo = DoorLock::Attributes::SupportedOperatingModes::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedShortValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeDefaultConfigurationRegisterWithValue:(NSNumber * _Nonnull)value
+                                          completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = DoorLock::Attributes::DefaultConfigurationRegister::TypeInfo;
             TypeInfo::Type cppValue;
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);

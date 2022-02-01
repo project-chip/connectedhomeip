@@ -1977,6 +1977,15 @@ NS_ASSUME_NONNULL_BEGIN
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeCredentialRulesSupportWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                     NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeCredentialRulesSupportWithMinInterval:(uint16_t)minInterval
+                                                    maxInterval:(uint16_t)maxInterval
+                                        subscriptionEstablished:
+                                            (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                  reportHandler:(void (^)(NSNumber * _Nullable value,
+                                                                    NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeLanguageWithCompletionHandler:(void (^)(
                                                        NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeLanguageWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -2020,6 +2029,9 @@ NS_ASSUME_NONNULL_BEGIN
                                                    reportHandler:(void (^)(NSNumber * _Nullable value,
                                                                      NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeDefaultConfigurationRegisterWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                           NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeEnableOneTouchLockingWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                     NSError * _Nullable error))completionHandler;
 - (void)writeAttributeEnableOneTouchLockingWithValue:(NSNumber * _Nonnull)value
@@ -2030,6 +2042,11 @@ NS_ASSUME_NONNULL_BEGIN
                                            (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                  reportHandler:
                                                      (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeEnableInsideStatusLEDWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                    NSError * _Nullable error))completionHandler;
+- (void)writeAttributeEnableInsideStatusLEDWithValue:(NSNumber * _Nonnull)value
+                                   completionHandler:(StatusCompletion)completionHandler;
 
 - (void)readAttributeEnablePrivacyModeButtonWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                       NSError * _Nullable error))completionHandler;
@@ -2051,6 +2068,22 @@ NS_ASSUME_NONNULL_BEGIN
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
                                                    (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeUserCodeTemporaryDisableTimeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                           NSError * _Nullable error))completionHandler;
+- (void)writeAttributeUserCodeTemporaryDisableTimeWithValue:(NSNumber * _Nonnull)value
+                                          completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeUserCodeTemporaryDisableTimeWithMinInterval:(uint16_t)minInterval
+                                                          maxInterval:(uint16_t)maxInterval
+                                              subscriptionEstablished:
+                                                  (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                        reportHandler:(void (^)(NSNumber * _Nullable value,
+                                                                          NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeRequirePINforRemoteOperationWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                           NSError * _Nullable error))completionHandler;
+- (void)writeAttributeRequirePINforRemoteOperationWithValue:(NSNumber * _Nonnull)value
+                                          completionHandler:(StatusCompletion)completionHandler;
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
