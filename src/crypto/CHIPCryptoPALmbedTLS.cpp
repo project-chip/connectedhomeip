@@ -1027,10 +1027,13 @@ void Spake2p_P256_SHA256_HKDF_HMAC::Clear()
     state = CHIP_SPAKE2P_STATE::PREINIT;
 }
 
-CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len, uint8_t * out)
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len, MutableByteSpan & out_span)
 {
     HMAC_sha hmac;
-    return hmac.HMAC_SHA256(key, key_len, in, in_len, out, kSHA256_Hash_Length);
+    VerifyOrReturnError(out_span.size() >= kSHA256_Hash_Length, CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorOnFailure(hmac.HMAC_SHA256(key, key_len, in, in_len, out_span.data(), kSHA256_Hash_Length));
+    out_span = out_span.SubSpan(0, kSHA256_Hash_Length);
+    return CHIP_NO_ERROR;
 }
 
 /**
@@ -1058,11 +1061,11 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::MacVerify(const uint8_t * key, size_t 
     int result       = 0;
 
     uint8_t computed_mac[kSHA256_Hash_Length];
-
+    MutableByteSpan computed_mac_span{computed_mac};
     VerifyOrExit(mac_len == kSHA256_Hash_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    error = Mac(key, key_len, in, in_len, computed_mac);
-    SuccessOrExit(error);
+    SuccessOrExit(error = Mac(key, key_len, in, in_len, computed_mac_span));
+    VerifyOrExit(computed_mac_span.size() == mac_len, error = CHIP_ERROR_INTERNAL);
 
     VerifyOrExit(constant_time_memcmp(mac, computed_mac, kSHA256_Hash_Length) == 0, error = CHIP_ERROR_INTERNAL);
 
