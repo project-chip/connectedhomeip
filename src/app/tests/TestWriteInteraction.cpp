@@ -270,7 +270,6 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
 
             app::WriteHandler writeHandler;
 
-            chip::app::InteractionModelDelegate IMdelegate;
             System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
             err                            = writeHandler.Init();
 

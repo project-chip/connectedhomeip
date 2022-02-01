@@ -19,7 +19,6 @@
 
 #include <type_traits>
 
-#include <app/InteractionModelDelegate.h>
 #include <controller/CHIPDeviceController.h>
 
 namespace chip {
