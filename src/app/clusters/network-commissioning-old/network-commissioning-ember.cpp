@@ -32,7 +32,22 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::NetworkCommissioning;
 
+// TODO: this is a TEMPORARY solution for enabling tests. The all-zero version
+// is not spec compliang and will generally not even commission on thread/wifi
+// because of a missing feature map
+//
+// Instead of this, the app::Clusters::NetworkCommissioning::Instance class
+// from the "network-commissioning" cluster (note no "-old" suffix) should
+// be used.
+#ifdef __APPLE__
+#define FAKE_NETWORK_COMMISSIONING_ATTRIBUTES
+#else
+#undef FAKE_NETWORK_COMMISSIONING_ATTRIBUTES
+#endif
+
 namespace {
+
+#ifdef FAKE_NETWORK_COMMISSIONING_ATTRIBUTES
 class NetworkCommissioningAttributeAccess : public AttributeAccessInterface
 {
 public:
@@ -65,6 +80,7 @@ public:
         }
     }
 };
+#endif // FAKE_NETWORK_COMMISSIONING_ATTRIBUTES
 } // namespace
 
 bool emberAfNetworkCommissioningClusterAddOrUpdateThreadNetworkCallback(
@@ -128,8 +144,11 @@ bool emberAfNetworkCommissioningClusterReorderNetworkCallback(app::CommandHandle
     return false;
 }
 
-NetworkCommissioningAttributeAccess gAttrAccess;
 void MatterNetworkCommissioningPluginServerInitCallback()
 {
+
+#ifdef FAKE_NETWORK_COMMISSIONING_ATTRIBUTES
+    static NetworkCommissioningAttributeAccess gAttrAccess;
     registerAttributeAccessOverride(&gAttrAccess);
+#endif // FAKE_NETWORK_COMMISSIONING_ATTRIBUTES
 }
