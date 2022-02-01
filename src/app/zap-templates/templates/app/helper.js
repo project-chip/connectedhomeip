@@ -126,7 +126,7 @@ var endpointClusterWithAttributeChanged = [
   'Pump Configuration and Control',
   'Window Covering',
 ];
-var endpointClusterWithPreAttribute     = [
+var endpointClusterWithPreAttribute = [
   'IAS Zone', 'Door Lock', 'Thermostat User Interface Configuration', 'Time Format Localization', 'Localization Configuration'
 ];
 var endpointClusterWithMessageSent = [ 'IAS Zone' ];
