@@ -972,6 +972,9 @@
     const EmberAfGenericClusterFunction chipFuncArrayIdentifyServer[] = {                                                          \
         (EmberAfGenericClusterFunction) emberAfIdentifyClusterServerInitCallback,                                                  \
         (EmberAfGenericClusterFunction) MatterIdentifyClusterServerAttributeChangedCallback,                                       \
+    };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArrayWindowCoveringServer[] = {                                                    \
+        (EmberAfGenericClusterFunction) MatterWindowCoveringClusterServerAttributeChangedCallback,                                 \
     };
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
@@ -1044,15 +1047,21 @@
             {                                                                                                                      \
                 0x0000001D, ZAP_ATTRIBUTE_INDEX(183), 5, 0, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
             }, /* Endpoint: 1, Cluster: Descriptor (server) */                                                                     \
-            {                                                                                                                      \
-                0x00000102, ZAP_ATTRIBUTE_INDEX(188), 20, 35, ZAP_CLUSTER_MASK(SERVER), NULL                                       \
-            }, /* Endpoint: 1, Cluster: Window Covering (server) */                                                                \
+            { 0x00000102,                                                                                                          \
+              ZAP_ATTRIBUTE_INDEX(188),                                                                                            \
+              20,                                                                                                                  \
+              35,                                                                                                                  \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION),                                             \
+              chipFuncArrayWindowCoveringServer }, /* Endpoint: 1, Cluster: Window Covering (server) */                            \
             {                                                                                                                      \
                 0x0000001D, ZAP_ATTRIBUTE_INDEX(208), 5, 0, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
             }, /* Endpoint: 2, Cluster: Descriptor (server) */                                                                     \
-            {                                                                                                                      \
-                0x00000102, ZAP_ATTRIBUTE_INDEX(213), 20, 35, ZAP_CLUSTER_MASK(SERVER), NULL                                       \
-            }, /* Endpoint: 2, Cluster: Window Covering (server) */                                                                \
+            { 0x00000102,                                                                                                          \
+              ZAP_ATTRIBUTE_INDEX(213),                                                                                            \
+              20,                                                                                                                  \
+              35,                                                                                                                  \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION),                                             \
+              chipFuncArrayWindowCoveringServer }, /* Endpoint: 2, Cluster: Window Covering (server) */                            \
     }
 
 #define ZAP_CLUSTER_INDEX(index) (&generatedClusters[index])

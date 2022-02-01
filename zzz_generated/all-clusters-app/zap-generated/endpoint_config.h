@@ -2471,6 +2471,9 @@
         (EmberAfGenericClusterFunction) MatterDoorLockClusterServerAttributeChangedCallback,                                       \
         (EmberAfGenericClusterFunction) MatterDoorLockClusterServerPreAttributeChangedCallback,                                    \
     };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArrayWindowCoveringServer[] = {                                                    \
+        (EmberAfGenericClusterFunction) MatterWindowCoveringClusterServerAttributeChangedCallback,                                 \
+    };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayPumpConfigurationAndControlServer[] = {                                       \
         (EmberAfGenericClusterFunction) emberAfPumpConfigurationAndControlClusterServerInitCallback,                               \
         (EmberAfGenericClusterFunction) MatterPumpConfigurationAndControlClusterServerAttributeChangedCallback,                    \
@@ -2669,9 +2672,12 @@
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION) |                                            \
                   ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION),                                                                \
               chipFuncArrayDoorLockServer }, /* Endpoint: 1, Cluster: Door Lock (server) */                                        \
-            {                                                                                                                      \
-                0x00000102, ZAP_ATTRIBUTE_INDEX(320), 20, 35, ZAP_CLUSTER_MASK(SERVER), NULL                                       \
-            }, /* Endpoint: 1, Cluster: Window Covering (server) */                                                                \
+            { 0x00000102,                                                                                                          \
+              ZAP_ATTRIBUTE_INDEX(320),                                                                                            \
+              20,                                                                                                                  \
+              35,                                                                                                                  \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION),                                             \
+              chipFuncArrayWindowCoveringServer }, /* Endpoint: 1, Cluster: Window Covering (server) */                            \
             {                                                                                                                      \
                 0x00000103, ZAP_ATTRIBUTE_INDEX(340), 5, 7, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
             }, /* Endpoint: 1, Cluster: Barrier Control (server) */                                                                \
