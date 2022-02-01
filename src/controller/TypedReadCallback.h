@@ -67,7 +67,7 @@ public:
     void AdoptReadClient(Platform::UniquePtr<app::ReadClient> aReadClient) { mReadClient = std::move(aReadClient); }
 
 private:
-    void OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
+    void OnAttributeData(const app::ConcreteDataAttributePath & aPath, DataVersion aVersion, TLV::TLVReader * apData,
                          const app::StatusIB & aStatus) override
     {
         CHIP_ERROR err = CHIP_NO_ERROR;

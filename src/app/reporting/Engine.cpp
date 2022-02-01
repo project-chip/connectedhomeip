@@ -126,6 +126,10 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                              "Error retrieving data from clusterId: " ChipLogFormatMEI ", err = %" CHIP_ERROR_FORMAT,
                              ChipLogValueMEI(pathForRetrieval.mClusterId), err.Format());
 
+                // If error is not CHIP_ERROR_BUFFER_TOO_SMALL and is not CHIP_ERROR_NO_MEMORY, rollback and encode status.
+                // Otherwise, if partial data allowed, save the encode state.
+                // Otherwise roll back. If we have already encoded some chunks, we are done; otherwise encode status.
+
                 if (encodeState.AllowPartialData() && ((err == CHIP_ERROR_BUFFER_TOO_SMALL) || (err == CHIP_ERROR_NO_MEMORY)))
                 {
                     // Encoding is aborted but partial data is allowed, then we don't rollback and save the state for next chunk.
@@ -138,12 +142,15 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                     attributeReportIBs.Rollback(attributeBackup);
                     apReadHandler->SetAttributeEncodeState(AttributeValueEncoder::AttributeEncodeState());
 
-                    // Try to encode our error as a status response.
-                    err = attributeReportIBs.EncodeAttributeStatus(pathForRetrieval, StatusIB(err));
-                    if (err != CHIP_NO_ERROR)
+                    if (err != CHIP_ERROR_NO_MEMORY && err != CHIP_ERROR_BUFFER_TOO_SMALL)
                     {
-                        // OK, just roll back again and give up.
-                        attributeReportIBs.Rollback(attributeBackup);
+                        // Try to encode our error as a status response.
+                        err = attributeReportIBs.EncodeAttributeStatus(pathForRetrieval, StatusIB(err));
+                        if (err != CHIP_NO_ERROR)
+                        {
+                            // OK, just roll back again and give up.
+                            attributeReportIBs.Rollback(attributeBackup);
+                        }
                     }
                 }
             }
