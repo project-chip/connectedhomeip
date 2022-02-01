@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -270,7 +270,7 @@ public:
      *
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
-    CHIP_ERROR OpenCommissioningWindow(NodeId deviceId, uint16_t timeout, uint16_t iteration, uint16_t discriminator,
+    CHIP_ERROR OpenCommissioningWindow(NodeId deviceId, uint16_t timeout, uint32_t iteration, uint16_t discriminator,
                                        uint8_t option, SetupPayload & payload)
     {
         mSuggestedSetUpPINCode = payload.setUpPINCode;
@@ -301,7 +301,7 @@ public:
      *
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
-    CHIP_ERROR OpenCommissioningWindowWithCallback(NodeId deviceId, uint16_t timeout, uint16_t iteration, uint16_t discriminator,
+    CHIP_ERROR OpenCommissioningWindowWithCallback(NodeId deviceId, uint16_t timeout, uint32_t iteration, uint16_t discriminator,
                                                    uint8_t option, Callback::Callback<OnOpenCommissioningWindow> * callback,
                                                    bool readVIDPIDAttributes = false);
 
@@ -426,7 +426,7 @@ private:
     uint32_t mSuggestedSetUpPINCode = 0;
 
     uint16_t mCommissioningWindowTimeout;
-    uint16_t mCommissioningWindowIteration;
+    uint32_t mCommissioningWindowIteration;
 
     CommissioningWindowOption mCommissioningWindowOption;
 

@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2020-2021 Project CHIP Authors
+ *   Copyright (c) 2020-2022 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -544,7 +544,7 @@ JNI_METHOD(jboolean, openPairingWindow)(JNIEnv * env, jobject self, jlong handle
 }
 
 JNI_METHOD(jboolean, openPairingWindowWithPIN)
-(JNIEnv * env, jobject self, jlong handle, jlong devicePtr, jint duration, jint iteration, jint discriminator, jlong setupPinCode)
+(JNIEnv * env, jobject self, jlong handle, jlong devicePtr, jint duration, jlong iteration, jint discriminator, jlong setupPinCode)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -560,7 +560,8 @@ JNI_METHOD(jboolean, openPairingWindowWithPIN)
     }
 
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
-    err = wrapper->Controller()->OpenCommissioningWindow(chipDevice->GetDeviceId(), duration, 1000, discriminator, 1, setupPayload);
+    err = wrapper->Controller()->OpenCommissioningWindow(chipDevice->GetDeviceId(), duration, iteration, discriminator, 1,
+                                                         setupPayload);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -585,7 +586,7 @@ JNI_METHOD(void, deleteDeviceController)(JNIEnv * env, jobject self, jlong handl
 }
 
 JNI_METHOD(jobject, computePaseVerifier)
-(JNIEnv * env, jobject self, jlong handle, jlong devicePtr, jlong setupPincode, jint iterations, jbyteArray salt)
+(JNIEnv * env, jobject self, jlong handle, jlong devicePtr, jlong setupPincode, jlong iterations, jbyteArray salt)
 {
     chip::DeviceLayer::StackLock lock;
 
