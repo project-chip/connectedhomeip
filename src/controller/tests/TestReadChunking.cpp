@@ -418,14 +418,9 @@ nlTestSuite sSuite =
 
 int TestReadChunkingTests()
 {
-    VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
-    {
-        TestContext gContext;
-        gSuite = &sSuite;
-        nlTestRunner(&sSuite, &gContext);
-    }
-    chip::Platform::MemoryShutdown();
-
+    TestContext gContext;
+    gSuite = &sSuite;
+    nlTestRunner(&sSuite, &gContext);
     return (nlTestRunnerStats(&sSuite));
 }
 

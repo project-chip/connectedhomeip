@@ -244,34 +244,13 @@ const nlTest sTests[] =
 };
 // clang-format on
 
-int Test_Setup(void * inContext)
-{
-    CHIP_ERROR status = chip::Platform::MemoryInit();
-    if (status != CHIP_NO_ERROR)
-    {
-        return FAILURE;
-    }
-    return TestContext::InitializeAsync(inContext);
-}
-
-int Test_Teardown(void * inContext)
-{
-    int result = TestContext::Finalize(inContext);
-
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-    ctx.~TestContext();
-
-    chip::Platform::MemoryShutdown();
-    return result;
-}
-
 // clang-format off
 nlTestSuite sSuite =
 {
     "Test-CHIP-ExchangeManager",
     &sTests[0],
-    Test_Setup,
-    Test_Teardown
+    TestContext::InitializeAsync,
+    TestContext::Finalize
 };
 // clang-format on
 

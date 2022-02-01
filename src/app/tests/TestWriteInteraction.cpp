@@ -447,6 +447,7 @@ const nlTest sTests[] =
 int Test_Setup(void * inContext)
 {
     SetGroupDataProvider(&sProvider);
+    VerifyOrReturnError(CHIP_NO_ERROR == chip::Platform::MemoryInit(), FAILURE);
     VerifyOrReturnError(CHIP_NO_ERROR == sProvider.Init(), FAILURE);
 
 
@@ -460,6 +461,7 @@ int Test_Setup(void * inContext)
  */
 int Test_Teardown(void * inContext)
 {
+    chip::Platform::MemoryShutdown();
     chip::Credentials::GroupDataProvider * provider = chip::Credentials::GetGroupDataProvider();
     if (nullptr != provider)
     {
@@ -468,6 +470,7 @@ int Test_Teardown(void * inContext)
 
 
     VerifyOrReturnError(TestContext::Finalize(inContext) == SUCCESS, FAILURE);
+
 
     return SUCCESS;
 }
@@ -485,13 +488,8 @@ nlTestSuite sSuite =
 
 int TestWriteInteraction()
 {
-    VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
-    {
-        TestContext gContext;
-        nlTestRunner(&sSuite, &gContext);
-    }
-    chip::Platform::MemoryShutdown();
-
+    TestContext gContext;
+    nlTestRunner(&sSuite, &gContext);
     return (nlTestRunnerStats(&sSuite));
 }
 
