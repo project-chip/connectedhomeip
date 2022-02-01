@@ -360,6 +360,29 @@ private:
 | Events:                                                             |        |
 \*----------------------------------------------------------------------------*/
 
+class WriteApplicationBasicApplicationApp : public WriteAttribute
+{
+public:
+    WriteApplicationBasicApplicationApp(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("ApplicationApp", credsIssuerConfig), mComplex(&mValue)
+    {
+        AddArgument("attr-name", "application-app");
+        AddArgument("attr-value", &mComplex);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteApplicationBasicApplicationApp() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050D, 0x00000004, mValue);
+    }
+
+private:
+    chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type mValue;
+    TypedComplexArgument<chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type> mComplex;
+};
+
 /*----------------------------------------------------------------------------*\
 | Cluster ApplicationLauncher                                         | 0x050C |
 |------------------------------------------------------------------------------|
@@ -7211,6 +7234,29 @@ private:
     chip::app::Clusters::TestCluster::SimpleEnum mValue;
 };
 
+class WriteTestClusterStructAttr : public WriteAttribute
+{
+public:
+    WriteTestClusterStructAttr(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("StructAttr", credsIssuerConfig), mComplex(&mValue)
+    {
+        AddArgument("attr-name", "struct-attr");
+        AddArgument("attr-value", &mComplex);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterStructAttr() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000025, mValue);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type mValue;
+    TypedComplexArgument<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type> mComplex;
+};
+
 class WriteTestClusterRangeRestrictedInt8u : public WriteAttribute
 {
 public:
@@ -7997,6 +8043,29 @@ public:
 
 private:
     chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> mValue;
+};
+
+class WriteTestClusterNullableStruct : public WriteAttribute
+{
+public:
+    WriteTestClusterNullableStruct(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("NullableStruct", credsIssuerConfig), mComplex(&mValue)
+    {
+        AddArgument("attr-name", "nullable-struct");
+        AddArgument("attr-value", &mComplex);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterNullableStruct() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008025, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type> mValue;
+    TypedComplexArgument<chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>> mComplex;
 };
 
 class WriteTestClusterNullableRangeRestrictedInt8u : public WriteAttribute
@@ -9186,6 +9255,7 @@ void registerClusterApplicationBasic(Commands & commands, CredentialIssuerComman
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                //
+        make_unique<WriteApplicationBasicApplicationApp>(credsIssuerConfig),                                               //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                            //
         make_unique<SubscribeAttribute>(Id, "vendor-name", Attributes::VendorName::Id, credsIssuerConfig),                 //
         make_unique<SubscribeAttribute>(Id, "vendor-id", Attributes::VendorId::Id, credsIssuerConfig),                     //
@@ -11713,6 +11783,7 @@ void registerClusterTestCluster(Commands & commands, CredentialIssuerCommands * 
         make_unique<WriteTestClusterVendorId>(credsIssuerConfig),                                                     //
         make_unique<WriteTestClusterListNullablesAndOptionalsStruct>(credsIssuerConfig),                              //
         make_unique<WriteTestClusterEnumAttr>(credsIssuerConfig),                                                     //
+        make_unique<WriteTestClusterStructAttr>(credsIssuerConfig),                                                   //
         make_unique<WriteTestClusterRangeRestrictedInt8u>(credsIssuerConfig),                                         //
         make_unique<WriteTestClusterRangeRestrictedInt8s>(credsIssuerConfig),                                         //
         make_unique<WriteTestClusterRangeRestrictedInt16u>(credsIssuerConfig),                                        //
@@ -11749,6 +11820,7 @@ void registerClusterTestCluster(Commands & commands, CredentialIssuerCommands * 
         make_unique<WriteTestClusterNullableOctetString>(credsIssuerConfig),                                          //
         make_unique<WriteTestClusterNullableCharString>(credsIssuerConfig),                                           //
         make_unique<WriteTestClusterNullableEnumAttr>(credsIssuerConfig),                                             //
+        make_unique<WriteTestClusterNullableStruct>(credsIssuerConfig),                                               //
         make_unique<WriteTestClusterNullableRangeRestrictedInt8u>(credsIssuerConfig),                                 //
         make_unique<WriteTestClusterNullableRangeRestrictedInt8s>(credsIssuerConfig),                                 //
         make_unique<WriteTestClusterNullableRangeRestrictedInt16u>(credsIssuerConfig),                                //
