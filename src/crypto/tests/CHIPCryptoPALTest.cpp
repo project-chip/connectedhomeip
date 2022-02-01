@@ -1414,7 +1414,7 @@ static void TestSPAKE2P_spake2p_Mac(nlTestSuite * inSuite, void * inContext)
 {
     HeapChecker heapChecker(inSuite);
     uint8_t mac[kMAX_Hash_Length];
-    MutableByteSpan mac_span{mac};
+    MutableByteSpan mac_span{ mac };
 
     int numOfTestVectors = ArraySize(hmac_tvs);
     int numOfTestsRan    = 0;
