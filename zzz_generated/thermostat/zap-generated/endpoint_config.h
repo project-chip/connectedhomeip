@@ -1033,9 +1033,6 @@
         (EmberAfGenericClusterFunction) emberAfTimeFormatLocalizationClusterServerInitCallback,                                    \
         (EmberAfGenericClusterFunction) MatterTimeFormatLocalizationClusterServerPreAttributeChangedCallback,                      \
     };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArrayUnitLocalizationServer[] = {                                                  \
-        (EmberAfGenericClusterFunction) emberAfUnitLocalizationClusterServerInitCallback,                                          \
-    };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayGroupsServer[] = {                                                            \
         (EmberAfGenericClusterFunction) emberAfGroupsClusterServerInitCallback,                                                    \
     };                                                                                                                             \
@@ -1083,12 +1080,9 @@
               4,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION),       \
               chipFuncArrayTimeFormatLocalizationServer }, /* Endpoint: 0, Cluster: Time Format Localization (server) */           \
-            { 0x0000002D,                                                                                                          \
-              ZAP_ATTRIBUTE_INDEX(36),                                                                                             \
-              3,                                                                                                                   \
-              7,                                                                                                                   \
-              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
-              chipFuncArrayUnitLocalizationServer }, /* Endpoint: 0, Cluster: Unit Localization (server) */                        \
+            {                                                                                                                      \
+                0x0000002D, ZAP_ATTRIBUTE_INDEX(36), 3, 7, ZAP_CLUSTER_MASK(SERVER), NULL                                          \
+            }, /* Endpoint: 0, Cluster: Unit Localization (server) */                                                              \
             {                                                                                                                      \
                 0x00000030, ZAP_ATTRIBUTE_INDEX(39), 6, 270, ZAP_CLUSTER_MASK(SERVER), NULL                                        \
             }, /* Endpoint: 0, Cluster: General Commissioning (server) */                                                          \

@@ -33107,6 +33107,45 @@ JNI_METHOD(void, UnitLocalizationCluster, subscribeTemperatureUnitAttribute)
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, UnitLocalizationCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPUnitLocalizationAttributeListAttributeCallback,
+                    void (*)(CHIPUnitLocalizationAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPUnitLocalizationAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPUnitLocalizationAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                       = CHIP_NO_ERROR;
+    UnitLocalizationCluster * cppCluster = reinterpret_cast<UnitLocalizationCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::UnitLocalization::Attributes::AttributeList::TypeInfo;
+    auto successFn = chip::Callback::Callback<CHIPUnitLocalizationClusterAttributeListAttributeCallbackType>::FromCancelable(
+        onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPUnitLocalizationAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, UnitLocalizationCluster, subscribeFeatureMapAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
