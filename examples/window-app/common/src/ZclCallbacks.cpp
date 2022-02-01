@@ -42,9 +42,6 @@ void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attrib
 {
     switch (attributePath.mClusterId)
     {
-    case Id:
-        MatterWindowCoveringClusterServerAttributeChangedCallback(attributePath);
-        break;
     case app::Clusters::Identify::Id:
         ChipLogProgress(Zcl, "Identify cluster ID: " ChipLogFormatMEI " Type: %" PRIu8 " Value: %" PRIu16 ", length %" PRIu16,
                         ChipLogValueMEI(attributePath.mAttributeId), type, *value, size);
