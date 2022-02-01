@@ -18,17 +18,16 @@
 package chip.devicecontroller;
 
 import androidx.annotation.Nullable;
-import chip.devicecontroller.model.ChipAttributePath;
-import java.util.Map;
 
 /** JNI wrapper callback class for {@link ReportCallback}. */
 public class ReportCallbackJni {
-  @Nullable
-  private SubscriptionEstablishedCallback wrappedSubscriptionEstablishedCallback;
+  @Nullable private SubscriptionEstablishedCallback wrappedSubscriptionEstablishedCallback;
   private ReportCallback wrappedReportCallback;
   private long callbackHandle;
 
-  public ReportCallbackJni(@Nullable SubscriptionEstablishedCallback subscriptionEstablishedCallback, ReportCallback reportCallback) {
+  public ReportCallbackJni(
+      @Nullable SubscriptionEstablishedCallback subscriptionEstablishedCallback,
+      ReportCallback reportCallback) {
     this.wrappedSubscriptionEstablishedCallback = subscriptionEstablishedCallback;
     this.wrappedReportCallback = reportCallback;
     this.callbackHandle = newCallback(subscriptionEstablishedCallback, reportCallback);
@@ -38,7 +37,9 @@ public class ReportCallbackJni {
     return callbackHandle;
   }
 
-  private native long newCallback(@Nullable SubscriptionEstablishedCallback subscriptionEstablishedCallback, ReportCallback wrappedCallback);
+  private native long newCallback(
+      @Nullable SubscriptionEstablishedCallback subscriptionEstablishedCallback,
+      ReportCallback wrappedCallback);
 
   private native void deleteCallback(long callbackHandle);
 

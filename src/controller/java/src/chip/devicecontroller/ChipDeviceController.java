@@ -305,7 +305,8 @@ public class ChipDeviceController {
       ChipAttributePath attributePath,
       int minInterval,
       int maxInterval) {
-    ReportCallbackJni jniCallback = new ReportCallbackJni(subscriptionEstablishedCallback, reportCallback);
+    ReportCallbackJni jniCallback =
+        new ReportCallbackJni(subscriptionEstablishedCallback, reportCallback);
     subscribeToPath(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
