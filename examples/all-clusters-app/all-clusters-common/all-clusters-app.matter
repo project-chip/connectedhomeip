@@ -1677,8 +1677,11 @@ server cluster IasZone = 1280 {
     BITMAP8 extendedStatus = 1;
     INT8U zoneId = 2;
     INT16U delay = 3;
+<<<<<<< HEAD
 =======
 >>>>>>> Fixing the request structs for commands in .matter generated files such that request struct  should be defined for all incoming commands from client to server and outgoing commands from client to server
+=======
+>>>>>>> Fixing the response structs for commands in .matter generated files such that response struct should be defined for all incoming commands from server to client and outgoing commands from server to client
   }
 
   command ZoneEnrollRequest(ZoneEnrollRequestRequest): ZoneEnrollResponse = 1;
