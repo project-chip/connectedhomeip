@@ -43,6 +43,11 @@ using namespace chip::Protocols;
 
 namespace {
 
+// Test Set #01 of Spake2p Parameters (PIN Code, Iteration Count, Salt, and matching Verifier):
+constexpr uint32_t sTestSpake2p01_PinCode          = 20202021;
+constexpr uint32_t sTestSpake2p01_IterationCount   = 1000;
+constexpr uint8_t sTestSpake2p01_Salt[]            = { 0x53, 0x50, 0x41, 0x4B, 0x45, 0x32, 0x50, 0x20,
+                                            0x4B, 0x65, 0x79, 0x20, 0x53, 0x61, 0x6C, 0x74 };
 constexpr PASEVerifier sTestSpake2p01_PASEVerifier = { .mW0 = { 0xab, 0xa6, 0x0c, 0x30, 0x41, 0x6b, 0x8f, 0x41, 0x77, 0xf5,
                                                                 0xe1, 0x6a, 0xd5, 0x14, 0xcf, 0xd9, 0x57, 0x75, 0x13, 0xf0,
                                                                 0x2f, 0xd6, 0x05, 0x06, 0xb1, 0x04, 0x9d, 0x0f, 0x2c, 0x73,
@@ -114,19 +119,29 @@ void SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
     gLoopback.Reset();
 
     NL_TEST_ASSERT(inSuite,
-                   pairing.WaitForPairing(1234, 500, ByteSpan(nullptr, 0), 0, Optional<ReliableMessageProtocolConfig>::Missing(),
+                   pairing.WaitForPairing(sTestSpake2p01_PASEVerifier, sTestSpake2p01_IterationCount, ByteSpan(nullptr, 0),
+                                          kDefaultCommissioningPasscodeId, 0, Optional<ReliableMessageProtocolConfig>::Missing(),
                                           &delegate) == CHIP_ERROR_INVALID_ARGUMENT);
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(inSuite,
-                   pairing.WaitForPairing(1234, 500, ByteSpan((const uint8_t *) "saltSalt", 8), 0,
-                                          Optional<ReliableMessageProtocolConfig>::Missing(),
+                   pairing.WaitForPairing(sTestSpake2p01_PASEVerifier, sTestSpake2p01_IterationCount,
+                                          ByteSpan(reinterpret_cast<const uint8_t *>("saltSalt"), 8),
+                                          kDefaultCommissioningPasscodeId, 0, Optional<ReliableMessageProtocolConfig>::Missing(),
                                           nullptr) == CHIP_ERROR_INVALID_ARGUMENT);
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(inSuite,
-                   pairing.WaitForPairing(1234, 500, ByteSpan((const uint8_t *) "saltSalt", 8), 0,
-                                          Optional<ReliableMessageProtocolConfig>::Missing(), &delegate) == CHIP_NO_ERROR);
+                   pairing.WaitForPairing(sTestSpake2p01_PASEVerifier, sTestSpake2p01_IterationCount,
+                                          ByteSpan(reinterpret_cast<const uint8_t *>("saltSalt"), 8),
+                                          kDefaultCommissioningPasscodeId, 0, Optional<ReliableMessageProtocolConfig>::Missing(),
+                                          &delegate) == CHIP_ERROR_INVALID_ARGUMENT);
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(inSuite,
+                   pairing.WaitForPairing(sTestSpake2p01_PASEVerifier, sTestSpake2p01_IterationCount, ByteSpan(sTestSpake2p01_Salt),
+                                          kDefaultCommissioningPasscodeId, 0, Optional<ReliableMessageProtocolConfig>::Missing(),
+                                          &delegate) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 }
 
@@ -144,12 +159,12 @@ void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     ExchangeContext * context = ctx.NewUnauthenticatedExchangeToBob(&pairing);
 
     NL_TEST_ASSERT(inSuite,
-                   pairing.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 0,
+                   pairing.Pair(Transport::PeerAddress(Transport::Type::kBle), sTestSpake2p01_PinCode, 0,
                                 Optional<ReliableMessageProtocolConfig>::Missing(), nullptr, nullptr) != CHIP_NO_ERROR);
 
     gLoopback.Reset();
     NL_TEST_ASSERT(inSuite,
-                   pairing.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 0,
+                   pairing.Pair(Transport::PeerAddress(Transport::Type::kBle), sTestSpake2p01_PinCode, 0,
                                 Optional<ReliableMessageProtocolConfig>::Missing(), context, &delegate) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
@@ -167,7 +182,7 @@ void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     PASESession pairing1;
     ExchangeContext * context1 = ctx.NewUnauthenticatedExchangeToBob(&pairing1);
     NL_TEST_ASSERT(inSuite,
-                   pairing1.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 0,
+                   pairing1.Pair(Transport::PeerAddress(Transport::Type::kBle), sTestSpake2p01_PinCode, 0,
                                  Optional<ReliableMessageProtocolConfig>::Missing(), context1,
                                  &delegate) == CHIP_ERROR_BAD_REQUEST);
     ctx.DrainAndServiceIO();
@@ -207,13 +222,14 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, P
                        Protocols::SecureChannel::MsgType::PBKDFParamRequest, &pairingAccessory) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite,
-                   pairingAccessory.WaitForPairing(1234, 500, ByteSpan((const uint8_t *) "saltSALTsaltSALT", 16), 0,
+                   pairingAccessory.WaitForPairing(sTestSpake2p01_PASEVerifier, sTestSpake2p01_IterationCount,
+                                                   ByteSpan(sTestSpake2p01_Salt), kDefaultCommissioningPasscodeId, 0,
                                                    mrpAccessoryConfig, &delegateAccessory) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(inSuite,
-                   pairingCommissioner.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 0, mrpCommissionerConfig,
-                                            contextCommissioner, &delegateCommissioner) == CHIP_NO_ERROR);
+                   pairingCommissioner.Pair(Transport::PeerAddress(Transport::Type::kBle), sTestSpake2p01_PinCode, 0,
+                                            mrpCommissionerConfig, contextCommissioner, &delegateCommissioner) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
     while (gLoopback.mMessageDropped)
@@ -333,7 +349,8 @@ void SecurePairingFailedHandshake(nlTestSuite * inSuite, void * inContext)
                        Protocols::SecureChannel::MsgType::PBKDFParamRequest, &pairingAccessory) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite,
-                   pairingAccessory.WaitForPairing(1234, 500, ByteSpan((const uint8_t *) "saltSALTsaltSALT", 16), 0,
+                   pairingAccessory.WaitForPairing(sTestSpake2p01_PASEVerifier, sTestSpake2p01_IterationCount,
+                                                   ByteSpan(sTestSpake2p01_Salt), kDefaultCommissioningPasscodeId, 0,
                                                    Optional<ReliableMessageProtocolConfig>::Missing(),
                                                    &delegateAccessory) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();

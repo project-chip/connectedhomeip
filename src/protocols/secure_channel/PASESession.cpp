@@ -58,8 +58,6 @@ const char * kSpake2pContext        = "CHIP PAKE V1 Commissioning";
 const char * kSpake2pI2RSessionInfo = "Commissioning I2R Key";
 const char * kSpake2pR2ISessionInfo = "Commissioning R2I Key";
 
-const char * kSpake2pKeyExchangeSalt = "SPAKE2P Key Salt";
-
 // Wait at most 30 seconds for the response from the peer.
 // This timeout value assumes the underlying transport is reliable.
 // The session establishment fails if the response is not received with in timeout window.
@@ -248,16 +246,14 @@ CHIP_ERROR PASESession::GeneratePASEVerifier(PASEVerifier & verifier, uint32_t p
 CHIP_ERROR PASESession::SetupSpake2p(uint32_t pbkdf2IterCount, const ByteSpan & salt)
 {
     TRACE_EVENT_SCOPE("SetupSpake2p", "PASESession");
-    uint8_t context[kSHA256_Hash_Length] = {
-        0,
-    };
+    uint8_t context[kSHA256_Hash_Length] = { 0 };
 
     if (mComputeVerifier)
     {
         ReturnErrorOnFailure(PASESession::ComputePASEVerifier(mSetupPINCode, pbkdf2IterCount, salt, mPASEVerifier));
     }
 
-    MutableByteSpan contextSpan{ context, sizeof(context) };
+    MutableByteSpan contextSpan{ context };
 
     ReturnErrorOnFailure(mCommissioningHash.Finish(contextSpan));
     ReturnErrorOnFailure(mSpake2p.Init(contextSpan.data(), contextSpan.size()));
@@ -265,15 +261,16 @@ CHIP_ERROR PASESession::SetupSpake2p(uint32_t pbkdf2IterCount, const ByteSpan & 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PASESession::WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const ByteSpan & salt,
-                                       uint16_t mySessionId, Optional<ReliableMessageProtocolConfig> mrpConfig,
-                                       SessionEstablishmentDelegate * delegate)
+CHIP_ERROR PASESession::WaitForPairing(const PASEVerifier & verifier, uint32_t pbkdf2IterCount, const ByteSpan & salt,
+                                       PasscodeId passcodeID, uint16_t mySessionId,
+                                       Optional<ReliableMessageProtocolConfig> mrpConfig, SessionEstablishmentDelegate * delegate)
 {
     // Return early on error here, as we have not initialized any state yet
     ReturnErrorCodeIf(salt.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorCodeIf(salt.data() == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(salt.size() < kPBKDFMinimumSaltLen || salt.size() > kPBKDFMaximumSaltLen, CHIP_ERROR_INVALID_ARGUMENT);
 
-    CHIP_ERROR err = Init(mySessionId, mySetUpPINCode, delegate);
+    CHIP_ERROR err = Init(mySessionId, kSetupPINCodeUndefinedValue, delegate);
     // From here onwards, let's go to exit on error, as some state might have already
     // been initialized
     SuccessOrExit(err);
@@ -291,13 +288,14 @@ CHIP_ERROR PASESession::WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2I
     VerifyOrExit(mSalt != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     memmove(mSalt, salt.data(), mSaltLength);
+    memmove(&mPASEVerifier, &verifier, sizeof(verifier));
 
-    mIterationCount = pbkdf2IterCount;
-
+    mIterationCount  = pbkdf2IterCount;
     mNextExpectedMsg = MsgType::PBKDFParamRequest;
     mPairingComplete = false;
     mPasscodeID      = kDefaultCommissioningPasscodeId;
     mLocalMRPConfig  = mrpConfig;
+    mComputeVerifier = false;
 
     SetPeerNodeId(NodeIdFromPAKEKeyId(mPasscodeID));
 
@@ -309,22 +307,6 @@ exit:
         Clear();
     }
     return err;
-}
-
-CHIP_ERROR PASESession::WaitForPairing(const PASEVerifier & verifier, uint32_t pbkdf2IterCount, const ByteSpan & salt,
-                                       PasscodeId passcodeID, uint16_t mySessionId,
-                                       Optional<ReliableMessageProtocolConfig> mrpConfig, SessionEstablishmentDelegate * delegate)
-{
-    ReturnErrorCodeIf(passcodeID == 0, CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorOnFailure(WaitForPairing(0, pbkdf2IterCount, salt, mySessionId, mrpConfig, delegate));
-
-    memmove(&mPASEVerifier, &verifier, sizeof(verifier));
-    mComputeVerifier = false;
-    mPasscodeID      = passcodeID;
-
-    SetPeerNodeId(NodeIdFromPAKEKeyId(mPasscodeID));
-
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PASESession::Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, uint16_t mySessionId,
