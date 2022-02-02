@@ -29,7 +29,7 @@ namespace Examples {
  * NOTE: This function should be followed by an ::Init() method call. This function does
  *       not manage lifecycle considerations.
  *
- * @param storageDelegate Storage instance to access persisted ACL data
+ * @param storageDelegate Storage instance to access persisted ACL data.
  * @return a reference to the AccessControl::Delegate singleton.
  */
 AccessControl::Delegate & GetAccessControlDelegate(PersistentStorageDelegate * storageDelegate);

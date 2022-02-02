@@ -1069,7 +1069,7 @@ public:
         CHIP_ERROR err = LoadFromFlash();
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogDetail(DataManagement, "Unable to load stored ACL entries; using empty list instead");
+            ChipLogDetail(DataManagement, "AccessControl: unable to load stored ACL entries; using empty list instead");
             for (auto & storage : EntryStorage::acl)
             {
                 storage.Clear();
