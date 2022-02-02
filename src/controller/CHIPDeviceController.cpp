@@ -1746,7 +1746,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         ChipLogProgress(Controller, "Sending request for network cluster feature map");
         app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
         app::ReadPrepareParams readParams(proxy->GetSecureSession().Value());
-        app::AttributePathParams readPath(app::Clusters::NetworkCommissioning::Id, app::Clusters::NetworkCommissioning::Attributes::FeatureMap::Id);
+        app::AttributePathParams readPath(app::Clusters::NetworkCommissioning::Id,
+                                          app::Clusters::NetworkCommissioning::Attributes::FeatureMap::Id);
         readParams.mpAttributePathParamsList    = &readPath;
         readParams.mAttributePathParamsListSize = 1;
         if (timeout.HasValue())
