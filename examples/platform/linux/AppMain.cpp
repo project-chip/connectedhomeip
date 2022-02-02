@@ -22,6 +22,7 @@
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
+#include <controller-clusters/zap-generated/CHIPClusters.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/NodeId.h>
 
@@ -63,6 +64,7 @@ using namespace chip::Credentials;
 using namespace chip::DeviceLayer;
 using namespace chip::Inet;
 using namespace chip::Transport;
+using namespace chip::app::Clusters;
 
 class GeneralStorageDelegate : public PersistentStorageDelegate
 {
@@ -248,7 +250,7 @@ MyCommissionerCallback gCommissionerCallback;
 MyServerStorageDelegate gServerStorage;
 SimpleFabricStorage gFabricStorage;
 ExampleOperationalCredentialsIssuer gOpCredsIssuer;
-NodeId gLocalId = kPlaceholderNodeId;
+NodeId gLocalId = kMaxOperationalNodeId;
 
 CHIP_ERROR InitCommissioner()
 {
@@ -321,7 +323,9 @@ CHIP_ERROR ShutdownCommissioner()
 class PairingCommand : public Controller::DevicePairingDelegate, public Controller::DeviceAddressUpdateDelegate
 {
 public:
-    PairingCommand(){};
+    PairingCommand() :
+        mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
+        mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this){};
 
     /////////// DevicePairingDelegate Interface /////////
     void OnStatusUpdate(Controller::DevicePairingDelegate::Status status) override;
@@ -334,10 +338,40 @@ public:
 
     CHIP_ERROR UpdateNetworkAddress();
 
+private:
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    /**
+     * @brief
+     *   Add a binding.
+     *
+     * @param[in] device             OperationalDeviceProxy for the target device.
+     * @param[in] deviceEndpointId   The endpoint on the device containing the binding cluster.
+     * @param[in] bindingNodeId      The NodeId for the binding that will be created.
+     * @param[in] bindingGroupId     The GroupId for the binding that will be created.
+     * @param[in] bindingEndpointId  The EndpointId for the binding that will be created.
+     * @param[in] bindingClusterId   The ClusterId for the binding that will be created.
+     * @param[in] onSuccessCallback        The function to be called on success of adding the binding.
+     * @param[in] onFailureCallback        The function to be called on failure of adding the binding.
+     *
+     * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
+     */
+    CHIP_ERROR CreateBindingWithCallback(OperationalDeviceProxy * device, chip::EndpointId deviceEndpointId,
+                                         chip::NodeId bindingNodeId, chip::GroupId bindingGroupId,
+                                         chip::EndpointId bindingEndpointId, chip::ClusterId bindingClusterId,
+                                         CommandResponseSuccessCallback<app::DataModel::NullObjectType> successCb,
+                                         CommandResponseFailureCallback failureCb);
+
     /* Callback when command results in success */
     static void OnSuccessResponse(void * context, const chip::app::DataModel::NullObjectType &);
     /* Callback when command results in failure */
     static void OnFailureResponse(void * context, CHIP_ERROR error);
+
+    static void OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device);
+    static void OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error);
+
+    chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
+    chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 };
 
 PairingCommand gPairingCommand;
@@ -396,40 +430,87 @@ void PairingCommand::OnPairingDeleted(CHIP_ERROR err)
     }
 }
 
-void PairingCommand::OnSuccessResponse(void * context, const chip::app::DataModel::NullObjectType &)
-{
-    ChipLogProgress(Controller, "OnSuccessResponse");
-}
-
-void PairingCommand::OnFailureResponse(void * context, CHIP_ERROR error)
-{
-    ChipLogProgress(Controller, "OnFailureResponse");
-}
-
 void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
 {
     if (err == CHIP_NO_ERROR)
     {
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+        ChipLogProgress(AppServer, "Device commissioning completed with success - getting OperationalDeviceProxy");
+
+        gCommissioner.GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+#else  // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
         ChipLogProgress(AppServer, "Device commissioning completed with success");
-
-        // TODO:
-        // - this code needs to be conditional based upon Content App Platform enablement
-        // - the endpointId chosen should come from the App Platform (determined based upon vid/pid of node)
-        // - the cluster(s) chosen should come from the App Platform
-        constexpr EndpointId kBindingClusterEndpoint = 0;
-
-        GroupId groupId       = kUndefinedGroupId;
-        EndpointId endpointId = 1;
-        ClusterId clusterId   = kInvalidClusterId;
-
-        gCommissioner.CreateBindingWithCallback(nodeId, kBindingClusterEndpoint, gLocalId, groupId, endpointId, clusterId,
-                                                OnSuccessResponse, OnFailureResponse);
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     }
     else
     {
         ChipLogProgress(AppServer, "Device commissioning Failure: %s", ErrorStr(err));
     }
 }
+
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+
+void PairingCommand::OnSuccessResponse(void * context, const chip::app::DataModel::NullObjectType &)
+{
+    ChipLogProgress(Controller, "OnSuccessResponse - Binding Add Successfully");
+}
+
+void PairingCommand::OnFailureResponse(void * context, CHIP_ERROR error)
+{
+    ChipLogProgress(Controller, "OnFailureResponse - Binding Add Failed");
+}
+
+void PairingCommand::OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device)
+{
+    ChipLogProgress(Controller, "OnDeviceConnectedFn");
+    if (device == nullptr)
+    {
+        ChipLogProgress(AppServer, "No OperationalDeviceProxy returned from OnDeviceConnectedFn");
+        return;
+    }
+
+    // TODO:
+    // - this code needs to be conditional based upon Content App Platform enablement
+    // - the endpointId chosen should come from the App Platform (determined based upon vid/pid of node)
+    // - the cluster(s) chosen should come from the App Platform
+    constexpr EndpointId kBindingClusterEndpoint = 0;
+
+    GroupId groupId       = kUndefinedGroupId;
+    EndpointId endpointId = 1;
+    ClusterId clusterId   = kInvalidClusterId;
+
+    ChipLogProgress(Controller, "Attempting to create Binding");
+
+    gPairingCommand.CreateBindingWithCallback(device, kBindingClusterEndpoint, gLocalId, groupId, endpointId, clusterId,
+                                              OnSuccessResponse, OnFailureResponse);
+}
+
+CHIP_ERROR PairingCommand::CreateBindingWithCallback(OperationalDeviceProxy * device, chip::EndpointId deviceEndpointId,
+                                                     chip::NodeId bindingNodeId, chip::GroupId bindingGroupId,
+                                                     chip::EndpointId bindingEndpointId, chip::ClusterId bindingClusterId,
+                                                     CommandResponseSuccessCallback<app::DataModel::NullObjectType> successCb,
+                                                     CommandResponseFailureCallback failureCb)
+{
+    chip::Controller::BindingCluster cluster;
+    cluster.Associate(device, deviceEndpointId);
+
+    Binding::Commands::Bind::Type request;
+    request.nodeId     = bindingNodeId;
+    request.groupId    = bindingGroupId;
+    request.endpointId = bindingEndpointId;
+    request.clusterId  = bindingClusterId;
+    ReturnErrorOnFailure(cluster.InvokeCommand(request, this, successCb, failureCb));
+
+    ChipLogDetail(Controller, "CreateBindingWithCallback: Sent Bind command request, waiting for response");
+    return CHIP_NO_ERROR;
+}
+
+void PairingCommand::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR err)
+{
+    ChipLogProgress(Controller, "OnDeviceConnectionFailureFn - attempt to get OperationalDeviceProxy failed");
+}
+
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
 CHIP_ERROR CommissionerPairOnNetwork(uint32_t pincode, uint16_t disc, Transport::PeerAddress address)
 {
