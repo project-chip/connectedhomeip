@@ -44,8 +44,7 @@ echo "Sending announce-ota-provider "
 
 ./out/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0 | tee /tmp/ota/chip-tool-announce-ota.txt
 
-echo "Sleeping for 20 seconds "
-sleep 20
+timeout 30 grep -q "OTA image downloaded to" <(tail -n0 -f /tmp/ota/requestor-log.txt)
 
 echo "Exiting, logs are in tmp/ota/"
 
