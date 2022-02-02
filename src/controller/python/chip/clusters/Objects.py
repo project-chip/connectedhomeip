@@ -6754,7 +6754,7 @@ class Basic(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
-                ClusterObjectFieldDescriptor(Label="interactionModelVersion", Tag=0x00000000, Type=uint),
+                ClusterObjectFieldDescriptor(Label="dataModelRevision", Tag=0x00000000, Type=uint),
                 ClusterObjectFieldDescriptor(Label="vendorName", Tag=0x00000001, Type=str),
                 ClusterObjectFieldDescriptor(Label="vendorID", Tag=0x00000002, Type=uint),
                 ClusterObjectFieldDescriptor(Label="productName", Tag=0x00000003, Type=str),
@@ -6780,7 +6780,7 @@ class Basic(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    interactionModelVersion: 'uint' = None
+    dataModelRevision: 'uint' = None
     vendorName: 'str' = None
     vendorID: 'uint' = None
     productName: 'str' = None
@@ -6824,7 +6824,7 @@ class Basic(Cluster):
 
     class Attributes:
         @dataclass
-        class InteractionModelVersion(ClusterAttributeDescriptor):
+        class DataModelRevision(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0028

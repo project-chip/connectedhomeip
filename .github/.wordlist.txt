@@ -261,6 +261,7 @@ CYW
 DAC
 DAP
 DataFrame
+DataModelRevision
 dataset
 datasets
 dbf

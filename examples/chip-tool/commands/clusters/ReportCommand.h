@@ -34,7 +34,7 @@ public:
     virtual void OnEventSubscription(){};
 
     /////////// ReadClient Callback Interface /////////
-    void OnAttributeData(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data,
+    void OnAttributeData(const chip::app::ConcreteDataAttributePath & path, chip::DataVersion aVersion, chip::TLV::TLVReader * data,
                          const chip::app::StatusIB & status) override
     {
         CHIP_ERROR error = status.ToChipError();

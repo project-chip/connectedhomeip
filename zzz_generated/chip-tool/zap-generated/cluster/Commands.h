@@ -368,6 +368,29 @@ private:
 | Events:                                                             |        |
 \*----------------------------------------------------------------------------*/
 
+class WriteApplicationBasicApplicationApp : public WriteAttribute
+{
+public:
+    WriteApplicationBasicApplicationApp(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("ApplicationApp", credsIssuerConfig), mComplex(&mValue)
+    {
+        AddArgument("attr-name", "application-app");
+        AddArgument("attr-value", &mComplex);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteApplicationBasicApplicationApp() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050D, 0x00000004, mValue);
+    }
+
+private:
+    chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type mValue;
+    TypedComplexArgument<chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type> mComplex;
+};
+
 /*----------------------------------------------------------------------------*\
 | Cluster ApplicationLauncher                                         | 0x050C |
 |------------------------------------------------------------------------------|
@@ -605,7 +628,7 @@ private:
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * InteractionModelVersion                                           | 0x0000 |
+| * DataModelRevision                                                 | 0x0000 |
 | * VendorName                                                        | 0x0001 |
 | * VendorID                                                          | 0x0002 |
 | * ProductName                                                       | 0x0003 |
@@ -1180,6 +1203,20 @@ private:
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
+| * VendorName                                                        | 0x0001 |
+| * VendorID                                                          | 0x0002 |
+| * ProductName                                                       | 0x0003 |
+| * NodeLabel                                                         | 0x0005 |
+| * HardwareVersion                                                   | 0x0007 |
+| * HardwareVersionString                                             | 0x0008 |
+| * SoftwareVersion                                                   | 0x0009 |
+| * SoftwareVersionString                                             | 0x000A |
+| * ManufacturingDate                                                 | 0x000B |
+| * PartNumber                                                        | 0x000C |
+| * ProductURL                                                        | 0x000D |
+| * ProductLabel                                                      | 0x000E |
+| * SerialNumber                                                      | 0x000F |
+| * Reachable                                                         | 0x0011 |
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -1187,6 +1224,27 @@ private:
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
 \*----------------------------------------------------------------------------*/
+
+class WriteBridgedDeviceBasicNodeLabel : public WriteAttribute
+{
+public:
+    WriteBridgedDeviceBasicNodeLabel(CredentialIssuerCommands * credsIssuerConfig) : WriteAttribute("NodeLabel", credsIssuerConfig)
+    {
+        AddArgument("attr-name", "node-label");
+        AddArgument("attr-value", &mValue);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteBridgedDeviceBasicNodeLabel() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000039, 0x00000005, mValue);
+    }
+
+private:
+    chip::CharSpan mValue;
+};
 
 /*----------------------------------------------------------------------------*\
 | Cluster Channel                                                     | 0x0504 |
@@ -7311,6 +7369,29 @@ private:
     chip::app::Clusters::TestCluster::SimpleEnum mValue;
 };
 
+class WriteTestClusterStructAttr : public WriteAttribute
+{
+public:
+    WriteTestClusterStructAttr(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("StructAttr", credsIssuerConfig), mComplex(&mValue)
+    {
+        AddArgument("attr-name", "struct-attr");
+        AddArgument("attr-value", &mComplex);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterStructAttr() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000025, mValue);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type mValue;
+    TypedComplexArgument<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type> mComplex;
+};
+
 class WriteTestClusterRangeRestrictedInt8u : public WriteAttribute
 {
 public:
@@ -8099,6 +8180,29 @@ private:
     chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> mValue;
 };
 
+class WriteTestClusterNullableStruct : public WriteAttribute
+{
+public:
+    WriteTestClusterNullableStruct(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("NullableStruct", credsIssuerConfig), mComplex(&mValue)
+    {
+        AddArgument("attr-name", "nullable-struct");
+        AddArgument("attr-value", &mComplex);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteTestClusterNullableStruct() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008025, mValue);
+    }
+
+private:
+    chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type> mValue;
+    TypedComplexArgument<chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>> mComplex;
+};
+
 class WriteTestClusterNullableRangeRestrictedInt8u : public WriteAttribute
 {
 public:
@@ -8796,6 +8900,7 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * TemperatureUnit                                                   | 0x0000 |
+| * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -9328,6 +9433,7 @@ void registerClusterApplicationBasic(Commands & commands, CredentialIssuerComman
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                //
+        make_unique<WriteApplicationBasicApplicationApp>(credsIssuerConfig),                                               //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                            //
         make_unique<SubscribeAttribute>(Id, "vendor-name", Attributes::VendorName::Id, credsIssuerConfig),                 //
         make_unique<SubscribeAttribute>(Id, "vendor-id", Attributes::VendorId::Id, credsIssuerConfig),                     //
@@ -9502,39 +9608,38 @@ void registerClusterBasic(Commands & commands, CredentialIssuerCommands * credsI
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                       //
-        make_unique<ReadAttribute>(Id, "interaction-model-version", Attributes::InteractionModelVersion::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "vendor-name", Attributes::VendorName::Id, credsIssuerConfig),                            //
-        make_unique<ReadAttribute>(Id, "vendor-id", Attributes::VendorID::Id, credsIssuerConfig),                                //
-        make_unique<ReadAttribute>(Id, "product-name", Attributes::ProductName::Id, credsIssuerConfig),                          //
-        make_unique<ReadAttribute>(Id, "product-id", Attributes::ProductID::Id, credsIssuerConfig),                              //
-        make_unique<ReadAttribute>(Id, "node-label", Attributes::NodeLabel::Id, credsIssuerConfig),                              //
-        make_unique<ReadAttribute>(Id, "location", Attributes::Location::Id, credsIssuerConfig),                                 //
-        make_unique<ReadAttribute>(Id, "hardware-version", Attributes::HardwareVersion::Id, credsIssuerConfig),                  //
-        make_unique<ReadAttribute>(Id, "hardware-version-string", Attributes::HardwareVersionString::Id, credsIssuerConfig),     //
-        make_unique<ReadAttribute>(Id, "software-version", Attributes::SoftwareVersion::Id, credsIssuerConfig),                  //
-        make_unique<ReadAttribute>(Id, "software-version-string", Attributes::SoftwareVersionString::Id, credsIssuerConfig),     //
-        make_unique<ReadAttribute>(Id, "manufacturing-date", Attributes::ManufacturingDate::Id, credsIssuerConfig),              //
-        make_unique<ReadAttribute>(Id, "part-number", Attributes::PartNumber::Id, credsIssuerConfig),                            //
-        make_unique<ReadAttribute>(Id, "product-url", Attributes::ProductURL::Id, credsIssuerConfig),                            //
-        make_unique<ReadAttribute>(Id, "product-label", Attributes::ProductLabel::Id, credsIssuerConfig),                        //
-        make_unique<ReadAttribute>(Id, "serial-number", Attributes::SerialNumber::Id, credsIssuerConfig),                        //
-        make_unique<ReadAttribute>(Id, "local-config-disabled", Attributes::LocalConfigDisabled::Id, credsIssuerConfig),         //
-        make_unique<ReadAttribute>(Id, "reachable", Attributes::Reachable::Id, credsIssuerConfig),                               //
-        make_unique<ReadAttribute>(Id, "unique-id", Attributes::UniqueID::Id, credsIssuerConfig),                                //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                   //
+        make_unique<ReadAttribute>(Id, "data-model-revision", Attributes::DataModelRevision::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "vendor-name", Attributes::VendorName::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "vendor-id", Attributes::VendorID::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "product-name", Attributes::ProductName::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "product-id", Attributes::ProductID::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "node-label", Attributes::NodeLabel::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "location", Attributes::Location::Id, credsIssuerConfig),                             //
+        make_unique<ReadAttribute>(Id, "hardware-version", Attributes::HardwareVersion::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "hardware-version-string", Attributes::HardwareVersionString::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "software-version", Attributes::SoftwareVersion::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "software-version-string", Attributes::SoftwareVersionString::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "manufacturing-date", Attributes::ManufacturingDate::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, "part-number", Attributes::PartNumber::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "product-url", Attributes::ProductURL::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "product-label", Attributes::ProductLabel::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "serial-number", Attributes::SerialNumber::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "local-config-disabled", Attributes::LocalConfigDisabled::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "reachable", Attributes::Reachable::Id, credsIssuerConfig),                           //
+        make_unique<ReadAttribute>(Id, "unique-id", Attributes::UniqueID::Id, credsIssuerConfig),                            //
         make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
-                                   credsIssuerConfig),                                                          //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                     //
-        make_unique<WriteBasicNodeLabel>(credsIssuerConfig),                                                    //
-        make_unique<WriteBasicLocation>(credsIssuerConfig),                                                     //
-        make_unique<WriteBasicLocalConfigDisabled>(credsIssuerConfig),                                          //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                 //
-        make_unique<SubscribeAttribute>(Id, "interaction-model-version", Attributes::InteractionModelVersion::Id,
-                                        credsIssuerConfig),                                                                       //
+                                   credsIssuerConfig),                                                                            //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                   //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                       //
+        make_unique<WriteBasicNodeLabel>(credsIssuerConfig),                                                                      //
+        make_unique<WriteBasicLocation>(credsIssuerConfig),                                                                       //
+        make_unique<WriteBasicLocalConfigDisabled>(credsIssuerConfig),                                                            //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                   //
+        make_unique<SubscribeAttribute>(Id, "data-model-revision", Attributes::DataModelRevision::Id, credsIssuerConfig),         //
         make_unique<SubscribeAttribute>(Id, "vendor-name", Attributes::VendorName::Id, credsIssuerConfig),                        //
         make_unique<SubscribeAttribute>(Id, "vendor-id", Attributes::VendorID::Id, credsIssuerConfig),                            //
         make_unique<SubscribeAttribute>(Id, "product-name", Attributes::ProductName::Id, credsIssuerConfig),                      //
@@ -9778,15 +9883,44 @@ void registerClusterBridgedDeviceBasic(Commands & commands, CredentialIssuerComm
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                   //
+        make_unique<ReadAttribute>(Id, "vendor-name", Attributes::VendorName::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "vendor-id", Attributes::VendorID::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "product-name", Attributes::ProductName::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "node-label", Attributes::NodeLabel::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "hardware-version", Attributes::HardwareVersion::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "hardware-version-string", Attributes::HardwareVersionString::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "software-version", Attributes::SoftwareVersion::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "software-version-string", Attributes::SoftwareVersionString::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "manufacturing-date", Attributes::ManufacturingDate::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, "part-number", Attributes::PartNumber::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "product-url", Attributes::ProductURL::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "product-label", Attributes::ProductLabel::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "serial-number", Attributes::SerialNumber::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "reachable", Attributes::Reachable::Id, credsIssuerConfig),                           //
         make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
-                                   credsIssuerConfig),                                                          //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                     //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                 //
+                                   credsIssuerConfig),                                                                            //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                   //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                       //
+        make_unique<WriteBridgedDeviceBasicNodeLabel>(credsIssuerConfig),                                                         //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                   //
+        make_unique<SubscribeAttribute>(Id, "vendor-name", Attributes::VendorName::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "vendor-id", Attributes::VendorID::Id, credsIssuerConfig),                            //
+        make_unique<SubscribeAttribute>(Id, "product-name", Attributes::ProductName::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "node-label", Attributes::NodeLabel::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, "hardware-version", Attributes::HardwareVersion::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "hardware-version-string", Attributes::HardwareVersionString::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "software-version", Attributes::SoftwareVersion::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "software-version-string", Attributes::SoftwareVersionString::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "manufacturing-date", Attributes::ManufacturingDate::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "part-number", Attributes::PartNumber::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "product-url", Attributes::ProductURL::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "product-label", Attributes::ProductLabel::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "serial-number", Attributes::SerialNumber::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "reachable", Attributes::Reachable::Id, credsIssuerConfig),                           //
         make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
@@ -12223,6 +12357,7 @@ void registerClusterTestCluster(Commands & commands, CredentialIssuerCommands * 
         make_unique<WriteTestClusterVendorId>(credsIssuerConfig),                                                     //
         make_unique<WriteTestClusterListNullablesAndOptionalsStruct>(credsIssuerConfig),                              //
         make_unique<WriteTestClusterEnumAttr>(credsIssuerConfig),                                                     //
+        make_unique<WriteTestClusterStructAttr>(credsIssuerConfig),                                                   //
         make_unique<WriteTestClusterRangeRestrictedInt8u>(credsIssuerConfig),                                         //
         make_unique<WriteTestClusterRangeRestrictedInt8s>(credsIssuerConfig),                                         //
         make_unique<WriteTestClusterRangeRestrictedInt16u>(credsIssuerConfig),                                        //
@@ -12259,6 +12394,7 @@ void registerClusterTestCluster(Commands & commands, CredentialIssuerCommands * 
         make_unique<WriteTestClusterNullableOctetString>(credsIssuerConfig),                                          //
         make_unique<WriteTestClusterNullableCharString>(credsIssuerConfig),                                           //
         make_unique<WriteTestClusterNullableEnumAttr>(credsIssuerConfig),                                             //
+        make_unique<WriteTestClusterNullableStruct>(credsIssuerConfig),                                               //
         make_unique<WriteTestClusterNullableRangeRestrictedInt8u>(credsIssuerConfig),                                 //
         make_unique<WriteTestClusterNullableRangeRestrictedInt8s>(credsIssuerConfig),                                 //
         make_unique<WriteTestClusterNullableRangeRestrictedInt16u>(credsIssuerConfig),                                //
@@ -12764,12 +12900,14 @@ void registerClusterUnitLocalization(Commands & commands, CredentialIssuerComman
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                           //
         make_unique<ReadAttribute>(Id, "temperature-unit", Attributes::TemperatureUnit::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),      //
         make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                          //
         make_unique<WriteUnitLocalizationTemperatureUnit>(credsIssuerConfig),                                        //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                      //
         make_unique<SubscribeAttribute>(Id, "temperature-unit", Attributes::TemperatureUnit::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),           //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //

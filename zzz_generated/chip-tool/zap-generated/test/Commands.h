@@ -170,6 +170,7 @@ public:
         printf("TestIdentifyCluster\n");
         printf("TestOperationalCredentialsCluster\n");
         printf("TestModeSelectCluster\n");
+        printf("TestSystemCommands\n");
         printf("Test_TC_SWDIAG_1_1\n");
         printf("Test_TC_SWDIAG_2_1\n");
         printf("Test_TC_SWDIAG_3_1\n");
@@ -16661,8 +16662,8 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Query Interaction Model Version\n");
-            err = TestQueryInteractionModelVersion_1();
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Query Data Model Revision\n");
+            err = TestQueryDataModelRevision_1();
             break;
         case 2:
             ChipLogProgress(chipTool, " ***** Test Step 2 : Query Vendor Name\n");
@@ -16767,9 +16768,9 @@ private:
         (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_1(error);
     }
 
-    static void OnSuccessCallback_1(void * context, uint16_t interactionModelVersion)
+    static void OnSuccessCallback_1(void * context, uint16_t dataModelRevision)
     {
-        (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_1(interactionModelVersion);
+        (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_1(dataModelRevision);
     }
 
     static void OnFailureCallback_2(void * context, CHIP_ERROR error)
@@ -16962,13 +16963,13 @@ private:
         return WaitForCommissionee();
     }
 
-    CHIP_ERROR TestQueryInteractionModelVersion_1()
+    CHIP_ERROR TestQueryDataModelRevision_1()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::InteractionModelVersion::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::DataModelRevision::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1));
         return CHIP_NO_ERROR;
     }
@@ -16979,9 +16980,9 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1(uint16_t interactionModelVersion)
+    void OnSuccessResponse_1(uint16_t dataModelRevision)
     {
-        VerifyOrReturn(CheckConstraintType("interactionModelVersion", "", "uint16"));
+        VerifyOrReturn(CheckConstraintType("dataModelRevision", "", "uint16"));
         NextTest();
     }
 
@@ -17459,6 +17460,14 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Query MaxNetworks\n");
+            err = TestQueryMaxNetworks_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Query Networks\n");
+            err = TestQueryNetworks_2();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -17470,10 +17479,33 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 1;
+    const uint16_t mTestCount = 3;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
+
+    static void OnFailureCallback_1(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_DM_3_1 *>(context))->OnFailureResponse_1(error);
+    }
+
+    static void OnSuccessCallback_1(void * context, uint8_t maxNetworks)
+    {
+        (static_cast<Test_TC_DM_3_1 *>(context))->OnSuccessResponse_1(maxNetworks);
+    }
+
+    static void OnFailureCallback_2(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_DM_3_1 *>(context))->OnFailureResponse_2(error);
+    }
+
+    static void OnSuccessCallback_2(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> &
+            networks)
+    {
+        (static_cast<Test_TC_DM_3_1 *>(context))->OnSuccessResponse_2(networks);
+    }
 
     //
     // Tests methods
@@ -17483,6 +17515,54 @@ private:
     {
         SetIdentity(kIdentityAlpha);
         return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestQueryMaxNetworks_1()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::NetworkCommissioningClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::NetworkCommissioning::Attributes::MaxNetworks::TypeInfo>(
+            this, OnSuccessCallback_1, OnFailureCallback_1));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_1(uint8_t maxNetworks)
+    {
+        VerifyOrReturn(CheckConstraintType("maxNetworks", "", "uint8"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestQueryNetworks_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::NetworkCommissioningClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::NetworkCommissioning::Attributes::Networks::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_2(
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> &
+            networks)
+    {
+        VerifyOrReturn(CheckConstraintType("networks", "", "list"));
+        NextTest();
     }
 };
 
@@ -20829,8 +20909,8 @@ public:
             err = TestSendsAMoveToLevelCommand_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Wait 200ms\n");
-            err = TestWait200ms_8();
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Wait a second\n");
+            err = TestWaitASecond_8();
             break;
         case 9:
             ChipLogProgress(chipTool, " ***** Test Step 9 : reads CurrentLevel attribute from DUT\n");
@@ -21120,10 +21200,10 @@ private:
 
     void OnSuccessResponse_7() { NextTest(); }
 
-    CHIP_ERROR TestWait200ms_8()
+    CHIP_ERROR TestWaitASecond_8()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForMs(200);
+        return WaitForMs(1000);
     }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_9()
@@ -21870,8 +21950,8 @@ public:
             err = TestPreconditionDutLevelIsSetTo0x80_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Wait 3000ms\n");
-            err = TestWait3000ms_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Wait 4000ms\n");
+            err = TestWait4000ms_3();
             break;
         case 4:
             ChipLogProgress(chipTool, " ***** Test Step 4 : Reads current level attribute from DUT\n");
@@ -21882,8 +21962,8 @@ public:
             err = TestSendsStepDownCommandToDut_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Wait 3000ms\n");
-            err = TestWait3000ms_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Wait 4000ms\n");
+            err = TestWait4000ms_6();
             break;
         case 7:
             ChipLogProgress(chipTool, " ***** Test Step 7 : Reads current level attribute from DUT\n");
@@ -21894,8 +21974,8 @@ public:
             err = TestSendsAStepUpCommand_8();
             break;
         case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : Wait 3000ms\n");
-            err = TestWait3000ms_9();
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Wait 4000ms\n");
+            err = TestWait4000ms_9();
             break;
         case 10:
             ChipLogProgress(chipTool, " ***** Test Step 10 : Reads current level attribute from DUT\n");
@@ -22028,10 +22108,10 @@ private:
 
     void OnSuccessResponse_2() { NextTest(); }
 
-    CHIP_ERROR TestWait3000ms_3()
+    CHIP_ERROR TestWait4000ms_3()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForMs(3000);
+        return WaitForMs(4000);
     }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_4()
@@ -22090,10 +22170,10 @@ private:
 
     void OnSuccessResponse_5() { NextTest(); }
 
-    CHIP_ERROR TestWait3000ms_6()
+    CHIP_ERROR TestWait4000ms_6()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForMs(3000);
+        return WaitForMs(4000);
     }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_7()
@@ -22152,10 +22232,10 @@ private:
 
     void OnSuccessResponse_8() { NextTest(); }
 
-    CHIP_ERROR TestWait3000ms_9()
+    CHIP_ERROR TestWait4000ms_9()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForMs(3000);
+        return WaitForMs(4000);
     }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_10()
@@ -73168,6 +73248,104 @@ private:
     void OnSuccessResponse_8() { ThrowSuccessResponse(); }
 };
 
+class TestSystemCommands : public TestCommand
+{
+public:
+    TestSystemCommands(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestSystemCommands", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~TestSystemCommands() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: TestSystemCommands\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: TestSystemCommands\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Stop the accessory\n");
+            err = TestStopTheAccessory_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Start the accessory with a given discriminator\n");
+            err = TestStartTheAccessoryWithAGivenDiscriminator_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Reboot the accessory with an other given discriminator\n");
+            err = TestRebootTheAccessoryWithAnOtherGivenDiscriminator_3();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 4;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestStopTheAccessory_1()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Stop();
+    }
+
+    CHIP_ERROR TestStartTheAccessoryWithAGivenDiscriminator_2()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Start(1111);
+    }
+
+    CHIP_ERROR TestRebootTheAccessoryWithAnOtherGivenDiscriminator_3()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Reboot(2222);
+    }
+};
+
 class Test_TC_SWDIAG_1_1 : public TestCommand
 {
 public:
@@ -85384,6 +85562,7 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<TestIdentifyCluster>(credsIssuerConfig),
         make_unique<TestOperationalCredentialsCluster>(credsIssuerConfig),
         make_unique<TestModeSelectCluster>(credsIssuerConfig),
+        make_unique<TestSystemCommands>(credsIssuerConfig),
         make_unique<Test_TC_SWDIAG_1_1>(credsIssuerConfig),
         make_unique<Test_TC_SWDIAG_2_1>(credsIssuerConfig),
         make_unique<Test_TC_SWDIAG_3_1>(credsIssuerConfig),

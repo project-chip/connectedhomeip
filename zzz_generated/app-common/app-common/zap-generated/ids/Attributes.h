@@ -1108,9 +1108,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace Basic {
 namespace Attributes {
 
-namespace InteractionModelVersion {
+namespace DataModelRevision {
 static constexpr AttributeId Id = 0x00000000;
-} // namespace InteractionModelVersion
+} // namespace DataModelRevision
 
 namespace VendorName {
 static constexpr AttributeId Id = 0x00000001;

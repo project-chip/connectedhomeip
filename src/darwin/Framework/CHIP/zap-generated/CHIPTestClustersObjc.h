@@ -152,8 +152,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPTestBasic : CHIPBasic
 
-- (void)writeAttributeInteractionModelVersionWithValue:(NSNumber * _Nonnull)value
-                                     completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeDataModelRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeVendorNameWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeVendorIDWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeProductNameWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -251,6 +250,21 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPTestBridgedDeviceBasic : CHIPBridgedDeviceBasic
 
+- (void)writeAttributeVendorNameWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeVendorIDWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeProductNameWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeHardwareVersionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeHardwareVersionStringWithValue:(NSString * _Nonnull)value
+                                   completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeSoftwareVersionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeSoftwareVersionStringWithValue:(NSString * _Nonnull)value
+                                   completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeManufacturingDateWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributePartNumberWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeProductURLWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeProductLabelWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeSerialNumberWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeReachableWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
                                         completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
@@ -1250,6 +1264,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPTestUnitLocalization : CHIPUnitLocalization
 
+- (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 

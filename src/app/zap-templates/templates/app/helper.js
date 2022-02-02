@@ -120,7 +120,6 @@ var endpointClusterWithInit = [
   'Scenes',
   'Time Format Localization',
   'Thermostat',
-  'Unit Localization',
 ];
 var endpointClusterWithAttributeChanged = [ 'Identify', 'Door Lock', 'Pump Configuration and Control' ];
 var endpointClusterWithPreAttribute     = [

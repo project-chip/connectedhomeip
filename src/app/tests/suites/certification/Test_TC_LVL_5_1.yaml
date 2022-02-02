@@ -42,13 +42,13 @@ tests:
               - name: "optionOverride"
                 value: 0
 
-    - label: "Wait 3000ms"
+    - label: "Wait 4000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 3000
+                value: 4000
 
     - label: "Reads current level attribute from DUT"
       command: "readAttribute"
@@ -71,13 +71,13 @@ tests:
               - name: "optionOverride"
                 value: 0
 
-    - label: "Wait 3000ms"
+    - label: "Wait 4000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 3000
+                value: 4000
 
     - label: "Reads current level attribute from DUT"
       command: "readAttribute"
@@ -100,13 +100,13 @@ tests:
               - name: "optionOverride"
                 value: 0
 
-    - label: "Wait 3000ms"
+    - label: "Wait 4000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 3000
+                value: 4000
 
     - label: "Reads current level attribute from DUT"
       command: "readAttribute"

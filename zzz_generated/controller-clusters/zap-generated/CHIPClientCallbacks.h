@@ -1060,6 +1060,11 @@ void TimeFormatLocalizationClusterClientGeneratedCommandListListAttributeFilter(
                                                                                 chip::Callback::Cancelable * onFailureCallback);
 typedef void (*TimeFormatLocalizationClientGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+void UnitLocalizationClusterAttributeListListAttributeFilter(chip::TLV::TLVReader * data,
+                                                             chip::Callback::Cancelable * onSuccessCallback,
+                                                             chip::Callback::Cancelable * onFailureCallback);
+typedef void (*UnitLocalizationAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 void UserLabelClusterLabelListListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
                                                   chip::Callback::Cancelable * onFailureCallback);
 typedef void (*UserLabelLabelListListAttributeCallback)(

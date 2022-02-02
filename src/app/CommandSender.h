@@ -27,7 +27,6 @@
 #include <type_traits>
 
 #include <app/CommandPathParams.h>
-#include <app/InteractionModelDelegate.h>
 #include <app/MessageDef/InvokeRequestMessage.h>
 #include <app/MessageDef/InvokeResponseMessage.h>
 #include <app/MessageDef/StatusIB.h>

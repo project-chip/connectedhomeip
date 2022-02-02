@@ -9953,15 +9953,15 @@ CHIPDevice * GetConnectedDevice(void)
 }
 - (void)testSendClusterTest_TC_DM_1_1_000001_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Query Interaction Model Version"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Query Data Model Revision"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
     CHIPTestBasic * cluster = [[CHIPTestBasic alloc] initWithDevice:device endpoint:0 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeInteractionModelVersionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Query Interaction Model Version Error: %@", err);
+    [cluster readAttributeDataModelRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Query Data Model Revision Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -10431,6 +10431,54 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForCommissionee(expectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_DM_3_1_000001_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Query MaxNetworks"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestNetworkCommissioning * cluster = [[CHIPTestNetworkCommissioning alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeMaxNetworksWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Query MaxNetworks Error: %@", err);
+
+        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+            [expectation fulfill];
+            return;
+        }
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_DM_3_1_000002_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Query Networks"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestNetworkCommissioning * cluster = [[CHIPTestNetworkCommissioning alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeNetworksWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Query Networks Error: %@", err);
+
+        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+            [expectation fulfill];
+            return;
+        }
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -12141,11 +12189,11 @@ CHIPDevice * GetConnectedDevice(void)
 }
 - (void)testSendClusterTest_TC_LVL_3_1_000008_WaitForMs
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 200ms"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait a second"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 200);
-    [self waitForExpectationsWithTimeout:(200 / 1000) + kTimeoutInSeconds handler:nil];
+    WaitForMs(expectation, queue, 1000);
+    [self waitForExpectationsWithTimeout:(1000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_3_1_000009_ReadAttribute
 {
@@ -12683,11 +12731,11 @@ CHIPDevice * GetConnectedDevice(void)
 }
 - (void)testSendClusterTest_TC_LVL_5_1_000003_WaitForMs
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 3000ms"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 4000ms"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 3000);
-    [self waitForExpectationsWithTimeout:(3000 / 1000) + kTimeoutInSeconds handler:nil];
+    WaitForMs(expectation, queue, 4000);
+    [self waitForExpectationsWithTimeout:(4000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_5_1_000004_ReadAttribute
 {
@@ -12741,11 +12789,11 @@ CHIPDevice * GetConnectedDevice(void)
 }
 - (void)testSendClusterTest_TC_LVL_5_1_000006_WaitForMs
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 3000ms"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 4000ms"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 3000);
-    [self waitForExpectationsWithTimeout:(3000 / 1000) + kTimeoutInSeconds handler:nil];
+    WaitForMs(expectation, queue, 4000);
+    [self waitForExpectationsWithTimeout:(4000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_5_1_000007_ReadAttribute
 {
@@ -12799,11 +12847,11 @@ CHIPDevice * GetConnectedDevice(void)
 }
 - (void)testSendClusterTest_TC_LVL_5_1_000009_WaitForMs
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 3000ms"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 4000ms"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 3000);
-    [self waitForExpectationsWithTimeout:(3000 / 1000) + kTimeoutInSeconds handler:nil];
+    WaitForMs(expectation, queue, 4000);
+    [self waitForExpectationsWithTimeout:(4000 / 1000) + kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_5_1_000010_ReadAttribute
 {
@@ -44069,6 +44117,381 @@ ResponseHandler test_TestSubscribe_OnOff_OnOff_Reported = nil;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterBridgedDeviceBasicReadAttributeVendorNameWithCompletionHandler
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPBridgedDeviceBasic * cluster = [[CHIPBridgedDeviceBasic alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"BridgedDeviceBasicReadAttributeVendorNameWithCompletionHandler"];
+
+    [cluster readAttributeVendorNameWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"BridgedDeviceBasic VendorName Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterBridgedDeviceBasicReadAttributeVendorIDWithCompletionHandler
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPBridgedDeviceBasic * cluster = [[CHIPBridgedDeviceBasic alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"BridgedDeviceBasicReadAttributeVendorIDWithCompletionHandler"];
+
+    [cluster readAttributeVendorIDWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"BridgedDeviceBasic VendorID Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterBridgedDeviceBasicReadAttributeProductNameWithCompletionHandler
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPBridgedDeviceBasic * cluster = [[CHIPBridgedDeviceBasic alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"BridgedDeviceBasicReadAttributeProductNameWithCompletionHandler"];
+
+    [cluster readAttributeProductNameWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"BridgedDeviceBasic ProductName Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterBridgedDeviceBasicReadAttributeNodeLabelWithCompletionHandler
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPBridgedDeviceBasic * cluster = [[CHIPBridgedDeviceBasic alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"BridgedDeviceBasicReadAttributeNodeLabelWithCompletionHandler"];
+
+    [cluster readAttributeNodeLabelWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"BridgedDeviceBasic NodeLabel Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterBridgedDeviceBasicWriteAttributeNodeLabelWithValue
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPBridgedDeviceBasic * cluster = [[CHIPBridgedDeviceBasic alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation = [self expectationWithDescription:@"BridgedDeviceBasicWriteAttributeNodeLabelWithValue"];
+
+    NSString * _Nonnull value = @"Test";
+    [cluster writeAttributeNodeLabelWithValue:value
+                            completionHandler:^(NSError * _Nullable err) {
+                                NSLog(@"BridgedDeviceBasic NodeLabel Error: %@", err);
+                                XCTAssertEqual(err.code, 0);
+                                [expectation fulfill];
+                            }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterBridgedDeviceBasicReadAttributeHardwareVersionWithCompletionHandler
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPBridgedDeviceBasic * cluster = [[CHIPBridgedDeviceBasic alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"BridgedDeviceBasicReadAttributeHardwareVersionWithCompletionHandler"];
+
+    [cluster readAttributeHardwareVersionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"BridgedDeviceBasic HardwareVersion Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterBridgedDeviceBasicReadAttributeHardwareVersionStringWithCompletionHandler
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPBridgedDeviceBasic * cluster = [[CHIPBridgedDeviceBasic alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"BridgedDeviceBasicReadAttributeHardwareVersionStringWithCompletionHandler"];
+
+    [cluster readAttributeHardwareVersionStringWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"BridgedDeviceBasic HardwareVersionString Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterBridgedDeviceBasicReadAttributeSoftwareVersionWithCompletionHandler
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPBridgedDeviceBasic * cluster = [[CHIPBridgedDeviceBasic alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"BridgedDeviceBasicReadAttributeSoftwareVersionWithCompletionHandler"];
+
+    [cluster readAttributeSoftwareVersionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"BridgedDeviceBasic SoftwareVersion Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterBridgedDeviceBasicReadAttributeSoftwareVersionStringWithCompletionHandler
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPBridgedDeviceBasic * cluster = [[CHIPBridgedDeviceBasic alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"BridgedDeviceBasicReadAttributeSoftwareVersionStringWithCompletionHandler"];
+
+    [cluster readAttributeSoftwareVersionStringWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"BridgedDeviceBasic SoftwareVersionString Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterBridgedDeviceBasicReadAttributeManufacturingDateWithCompletionHandler
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPBridgedDeviceBasic * cluster = [[CHIPBridgedDeviceBasic alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"BridgedDeviceBasicReadAttributeManufacturingDateWithCompletionHandler"];
+
+    [cluster readAttributeManufacturingDateWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"BridgedDeviceBasic ManufacturingDate Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterBridgedDeviceBasicReadAttributePartNumberWithCompletionHandler
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPBridgedDeviceBasic * cluster = [[CHIPBridgedDeviceBasic alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"BridgedDeviceBasicReadAttributePartNumberWithCompletionHandler"];
+
+    [cluster readAttributePartNumberWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"BridgedDeviceBasic PartNumber Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterBridgedDeviceBasicReadAttributeProductURLWithCompletionHandler
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPBridgedDeviceBasic * cluster = [[CHIPBridgedDeviceBasic alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"BridgedDeviceBasicReadAttributeProductURLWithCompletionHandler"];
+
+    [cluster readAttributeProductURLWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"BridgedDeviceBasic ProductURL Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterBridgedDeviceBasicReadAttributeProductLabelWithCompletionHandler
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPBridgedDeviceBasic * cluster = [[CHIPBridgedDeviceBasic alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"BridgedDeviceBasicReadAttributeProductLabelWithCompletionHandler"];
+
+    [cluster readAttributeProductLabelWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"BridgedDeviceBasic ProductLabel Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterBridgedDeviceBasicReadAttributeSerialNumberWithCompletionHandler
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPBridgedDeviceBasic * cluster = [[CHIPBridgedDeviceBasic alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"BridgedDeviceBasicReadAttributeSerialNumberWithCompletionHandler"];
+
+    [cluster readAttributeSerialNumberWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"BridgedDeviceBasic SerialNumber Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterBridgedDeviceBasicReadAttributeReachableWithCompletionHandler
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPBridgedDeviceBasic * cluster = [[CHIPBridgedDeviceBasic alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"BridgedDeviceBasicReadAttributeReachableWithCompletionHandler"];
+
+    [cluster readAttributeReachableWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"BridgedDeviceBasic Reachable Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 - (void)testSendClusterBridgedDeviceBasicReadAttributeServerGeneratedCommandListWithCompletionHandler
 {
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -57191,6 +57614,31 @@ ResponseHandler test_TestSubscribe_OnOff_OnOff_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
+- (void)testSendClusterUnitLocalizationReadAttributeAttributeListWithCompletionHandler
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPUnitLocalization * cluster = [[CHIPUnitLocalization alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"UnitLocalizationReadAttributeAttributeListWithCompletionHandler"];
+
+    [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"UnitLocalization AttributeList Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 - (void)testSendClusterUnitLocalizationReadAttributeFeatureMapWithCompletionHandler
 {
     dispatch_queue_t queue = dispatch_get_main_queue();

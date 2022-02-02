@@ -283,7 +283,7 @@ client cluster Basic = 40 {
     boolean reachableNewValue = 0;
   }
 
-  readonly attribute int16u interactionModelVersion = 0;
+  readonly attribute int16u dataModelRevision = 0;
   readonly attribute char_string<32> vendorName = 1;
   readonly attribute vendor_id vendorID = 2;
   readonly attribute char_string<32> productName = 3;
@@ -515,6 +515,20 @@ client cluster BridgedActions = 37 {
 }
 
 client cluster BridgedDeviceBasic = 57 {
+  readonly attribute char_string<32> vendorName = 1;
+  readonly attribute int16u vendorID = 2;
+  readonly attribute char_string<32> productName = 3;
+  attribute char_string<32> nodeLabel = 5;
+  readonly attribute int16u hardwareVersion = 7;
+  readonly attribute char_string<64> hardwareVersionString = 8;
+  readonly attribute int32u softwareVersion = 9;
+  readonly attribute char_string<64> softwareVersionString = 10;
+  readonly attribute char_string<16> manufacturingDate = 11;
+  readonly attribute char_string<32> partNumber = 12;
+  readonly attribute long_char_string<256> productURL = 13;
+  readonly attribute char_string<64> productLabel = 14;
+  readonly attribute char_string<32> serialNumber = 15;
+  readonly attribute boolean reachable = 17;
   readonly global attribute command_id serverGeneratedCommandList[] = 65528;
   readonly global attribute command_id clientGeneratedCommandList[] = 65529;
   readonly global attribute attrib_id attributeList[] = 65531;
@@ -3777,6 +3791,7 @@ client cluster UnitLocalization = 45 {
   }
 
   attribute TempUnit temperatureUnit = 0;
+  readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 }

@@ -464,6 +464,10 @@
   /*   client_generated */ \
   0x00000000 /* ResetCounts */, \
   chip::kInvalidCommandId /* end of list */, \
+  /* Endpoint: 1, Cluster: Bridged Device Basic (client) */\
+  /*   server_generated */ \
+  0x00000003 /* ReachableChanged */, \
+  chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 1, Cluster: AdministratorCommissioning (client) */\
   /*   client_generated */ \
   0x00000000 /* OpenCommissioningWindow */, \
@@ -985,7 +989,7 @@
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
       .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
+      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 97 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Switch (client) */ \
@@ -1006,7 +1010,7 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 97 ) ,\
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 99 ) ,\
       .serverGeneratedCommandList = nullptr ,\
     },\
   { \
@@ -1017,8 +1021,8 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 101 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 111 ) ,\
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 103 ) ,\
+      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 113 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Group Key Management (client) */ \
@@ -1028,8 +1032,8 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 116 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 121 ) ,\
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 118 ) ,\
+      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 123 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Fixed Label (client) */ \
@@ -1072,7 +1076,7 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 124 ) ,\
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 126 ) ,\
       .serverGeneratedCommandList = nullptr ,\
     },\
   { \
@@ -1083,8 +1087,8 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 126 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 129 ) ,\
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 128 ) ,\
+      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 131 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Window Covering (client) */ \
@@ -1094,7 +1098,7 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 140 ) ,\
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 142 ) ,\
       .serverGeneratedCommandList = nullptr ,\
     },\
   { \
@@ -1105,7 +1109,7 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 144 ) ,\
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 146 ) ,\
       .serverGeneratedCommandList = nullptr ,\
     },\
   { \
@@ -1127,8 +1131,8 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 147 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 149 ) ,\
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 149 ) ,\
+      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 151 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Thermostat User Interface Configuration (client) */ \
@@ -1149,8 +1153,8 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 152 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 156 ) ,\
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 154 ) ,\
+      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 158 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Illuminance Measurement (client) */ \
@@ -1237,8 +1241,8 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 168 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 172 ) ,\
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 170 ) ,\
+      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 174 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Target Navigator (client) */ \
@@ -1248,8 +1252,8 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 174 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 176 ) ,\
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 176 ) ,\
+      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 178 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Media Playback (client) */ \
@@ -1259,8 +1263,8 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 178 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 190 ) ,\
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 180 ) ,\
+      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 192 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Media Input (client) */ \
@@ -1270,7 +1274,7 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 192 ) ,\
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 194 ) ,\
       .serverGeneratedCommandList = nullptr ,\
     },\
   { \
@@ -1281,7 +1285,7 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 197 ) ,\
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 199 ) ,\
       .serverGeneratedCommandList = nullptr ,\
     },\
   { \
@@ -1292,8 +1296,8 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 199 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 201 ) ,\
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 201 ) ,\
+      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 203 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Content Launcher (client) */ \
@@ -1303,8 +1307,8 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 203 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 206 ) ,\
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 205 ) ,\
+      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 208 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Audio Output (client) */ \
@@ -1314,7 +1318,7 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 208 ) ,\
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 210 ) ,\
       .serverGeneratedCommandList = nullptr ,\
     },\
   { \
@@ -1325,8 +1329,8 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 211 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 215 ) ,\
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 213 ) ,\
+      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 217 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Application Basic (client) */ \
@@ -1347,8 +1351,8 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 217 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 221 ) ,\
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 219 ) ,\
+      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 223 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Test Cluster (client) */ \
@@ -1358,8 +1362,8 @@
       .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
       .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 223 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 241 ) ,\
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 225 ) ,\
+      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 243 ) ,\
     },\
   { \
       /* Endpoint: 1, Cluster: Electrical Measurement (client) */ \

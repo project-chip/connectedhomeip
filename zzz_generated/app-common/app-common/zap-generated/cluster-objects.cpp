@@ -62,6 +62,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -966,6 +967,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -2979,6 +2981,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -3019,6 +3022,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -3076,6 +3080,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -4377,6 +4382,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -4601,6 +4607,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -4653,6 +4660,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -4693,6 +4701,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -5120,6 +5129,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -5168,6 +5178,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -5822,8 +5833,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::InteractionModelVersion::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, interactionModelVersion));
+    case Attributes::DataModelRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, dataModelRevision));
         break;
     case Attributes::VendorName::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, vendorName));
@@ -6356,6 +6367,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -6798,6 +6810,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -6838,6 +6851,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -6878,6 +6892,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -7047,6 +7062,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -7371,6 +7387,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -7435,6 +7452,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -7491,6 +7509,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -8101,6 +8120,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -8356,6 +8376,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -8408,6 +8429,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -8611,6 +8633,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -8698,6 +8721,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -8770,6 +8794,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -8810,6 +8835,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -10164,6 +10190,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -10208,6 +10235,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -10794,6 +10822,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -10838,6 +10867,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -10902,6 +10932,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -11470,6 +11501,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -11510,6 +11542,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -11690,6 +11723,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -19024,6 +19058,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -20055,6 +20090,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -20103,6 +20139,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -20335,6 +20372,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -20496,6 +20534,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -20982,6 +21021,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -21375,6 +21415,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -21415,6 +21456,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -21459,6 +21501,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -21495,6 +21538,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -21539,6 +21583,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -21595,6 +21640,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -21807,6 +21853,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -21964,6 +22011,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -22004,6 +22052,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -22233,6 +22282,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -22535,6 +22585,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -22619,6 +22670,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -22663,6 +22715,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -22723,6 +22776,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -22759,6 +22813,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -22795,6 +22850,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -22835,6 +22891,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 

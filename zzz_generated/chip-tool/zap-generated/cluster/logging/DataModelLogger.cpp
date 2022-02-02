@@ -4132,10 +4132,10 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case Basic::Id: {
         switch (path.mAttributeId)
         {
-        case Basic::Attributes::InteractionModelVersion::Id: {
+        case Basic::Attributes::DataModelRevision::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("InteractionModelVersion", 1, value);
+            return DataModelLogger::LogValue("DataModelRevision", 1, value);
         }
         case Basic::Attributes::VendorName::Id: {
             chip::CharSpan value;
@@ -4388,6 +4388,76 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case BridgedDeviceBasic::Id: {
         switch (path.mAttributeId)
         {
+        case BridgedDeviceBasic::Attributes::VendorName::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("VendorName", 1, value);
+        }
+        case BridgedDeviceBasic::Attributes::VendorID::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("VendorID", 1, value);
+        }
+        case BridgedDeviceBasic::Attributes::ProductName::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ProductName", 1, value);
+        }
+        case BridgedDeviceBasic::Attributes::NodeLabel::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NodeLabel", 1, value);
+        }
+        case BridgedDeviceBasic::Attributes::HardwareVersion::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("HardwareVersion", 1, value);
+        }
+        case BridgedDeviceBasic::Attributes::HardwareVersionString::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("HardwareVersionString", 1, value);
+        }
+        case BridgedDeviceBasic::Attributes::SoftwareVersion::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SoftwareVersion", 1, value);
+        }
+        case BridgedDeviceBasic::Attributes::SoftwareVersionString::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SoftwareVersionString", 1, value);
+        }
+        case BridgedDeviceBasic::Attributes::ManufacturingDate::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ManufacturingDate", 1, value);
+        }
+        case BridgedDeviceBasic::Attributes::PartNumber::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PartNumber", 1, value);
+        }
+        case BridgedDeviceBasic::Attributes::ProductURL::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ProductURL", 1, value);
+        }
+        case BridgedDeviceBasic::Attributes::ProductLabel::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ProductLabel", 1, value);
+        }
+        case BridgedDeviceBasic::Attributes::SerialNumber::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SerialNumber", 1, value);
+        }
+        case BridgedDeviceBasic::Attributes::Reachable::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Reachable", 1, value);
+        }
         case BridgedDeviceBasic::Attributes::ServerGeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -7598,6 +7668,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             chip::app::Clusters::UnitLocalization::TempUnit value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TemperatureUnit", 1, value);
+        }
+        case UnitLocalization::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         case UnitLocalization::Attributes::FeatureMap::Id: {
             uint32_t value;

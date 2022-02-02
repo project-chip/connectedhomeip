@@ -318,7 +318,7 @@ class AttributeCache:
     attributeCache: Dict[int, List[Cluster]] = field(
         default_factory=lambda: {})
 
-    def UpdateTLV(self, path: AttributePath, data: Union[bytes, ValueDecodeFailure]):
+    def UpdateTLV(self, path: AttributePath, dataVersion: int, data: Union[bytes, ValueDecodeFailure]):
         ''' Store data in TLV since that makes it easiest to eventually convert to either the
             cluster or attribute view representations (see below in UpdateCachedData).
         '''
@@ -539,7 +539,7 @@ class AsyncReadTransaction:
     def GetAllEventValues(self):
         return self._events
 
-    def _handleAttributeData(self, path: AttributePathWithListIndex, status: int, data: bytes):
+    def _handleAttributeData(self, path: AttributePathWithListIndex, dataVersion: int, status: int, data: bytes):
         try:
             imStatus = status
             try:
@@ -554,14 +554,14 @@ class AsyncReadTransaction:
                 tlvData = chip.tlv.TLVReader(data).get().get("Any", {})
                 attributeValue = tlvData
 
-            self._cache.UpdateTLV(path, attributeValue)
+            self._cache.UpdateTLV(path, dataVersion, attributeValue)
             self._changedPathSet.add(path)
 
         except Exception as ex:
             logging.exception(ex)
 
-    def handleAttributeData(self, path: AttributePath, status: int, data: bytes):
-        self._handleAttributeData(path, status, data)
+    def handleAttributeData(self, path: AttributePath, dataVersion: int, status: int, data: bytes):
+        self._handleAttributeData(path, dataVersion, status, data)
 
     def _handleEventData(self, header: EventHeader, path: EventPath, data: bytes):
         try:
@@ -687,7 +687,7 @@ class AsyncWriteTransaction:
 
 
 _OnReadAttributeDataCallbackFunct = CFUNCTYPE(
-    None, py_object, c_uint16, c_uint32, c_uint32, c_uint32, c_void_p, c_size_t)
+    None, py_object, c_uint32, c_uint16, c_uint32, c_uint32, c_uint32, c_void_p, c_size_t)
 _OnSubscriptionEstablishedCallbackFunct = CFUNCTYPE(None, py_object, c_uint64)
 _OnReadEventDataCallbackFunct = CFUNCTYPE(
     None, py_object, c_uint16, c_uint32, c_uint32, c_uint32, c_uint8, c_uint64, c_uint8, c_void_p, c_size_t)
@@ -702,10 +702,10 @@ _OnReportEndCallbackFunct = CFUNCTYPE(
 
 
 @_OnReadAttributeDataCallbackFunct
-def _OnReadAttributeDataCallback(closure, endpoint: int, cluster: int, attribute: int, status, data, len):
+def _OnReadAttributeDataCallback(closure, dataVersion: int, endpoint: int, cluster: int, attribute: int, status, data, len):
     dataBytes = ctypes.string_at(data, len)
     closure.handleAttributeData(AttributePath(
-        EndpointId=endpoint, ClusterId=cluster, AttributeId=attribute), status, dataBytes[:])
+        EndpointId=endpoint, ClusterId=cluster, AttributeId=attribute), dataVersion, status, dataBytes[:])
 
 
 @_OnReadEventDataCallbackFunct
