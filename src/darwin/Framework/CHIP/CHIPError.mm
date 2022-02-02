@@ -129,10 +129,9 @@ NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
                        code:CHIPErrorCodeUnsupportedWrite
                    userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Attempt to write read-only attribute.", nil) }];
     case EMBER_ZCL_STATUS_NOT_FOUND:
-        return [NSError
-            errorWithDomain:CHIPErrorDomain
-                       code:CHIPErrorCodeNotFound
-                   userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Data not found.", nil) }];
+        return [NSError errorWithDomain:CHIPErrorDomain
+                                   code:CHIPErrorCodeNotFound
+                               userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Data not found.", nil) }];
     case EMBER_ZCL_STATUS_INVALID_DATA_TYPE:
         return [NSError
             errorWithDomain:CHIPErrorDomain
