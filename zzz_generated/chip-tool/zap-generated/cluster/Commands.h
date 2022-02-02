@@ -1223,6 +1223,10 @@ private:
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
+| * StartUp                                                           | 0x0000 |
+| * ShutDown                                                          | 0x0001 |
+| * Leave                                                             | 0x0002 |
+| * ReachableChanged                                                  | 0x0003 |
 \*----------------------------------------------------------------------------*/
 
 class WriteBridgedDeviceBasicNodeLabel : public WriteAttribute
@@ -9930,8 +9934,16 @@ void registerClusterBridgedDeviceBasic(Commands & commands, CredentialIssuerComm
         //
         // Events
         //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                         //
+        make_unique<ReadEvent>(Id, "start-up", Events::StartUp::Id, credsIssuerConfig),                        //
+        make_unique<ReadEvent>(Id, "shut-down", Events::ShutDown::Id, credsIssuerConfig),                      //
+        make_unique<ReadEvent>(Id, "leave", Events::Leave::Id, credsIssuerConfig),                             //
+        make_unique<ReadEvent>(Id, "reachable-changed", Events::ReachableChanged::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                    //
+        make_unique<SubscribeEvent>(Id, "start-up", Events::StartUp::Id, credsIssuerConfig),                   //
+        make_unique<SubscribeEvent>(Id, "shut-down", Events::ShutDown::Id, credsIssuerConfig),                 //
+        make_unique<SubscribeEvent>(Id, "leave", Events::Leave::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeEvent>(Id, "reachable-changed", Events::ReachableChanged::Id, credsIssuerConfig), //
     };
 
     commands.Register(clusterName, clusterCommands);
