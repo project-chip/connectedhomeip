@@ -480,9 +480,13 @@ CHIP_ERROR Engine::ScheduleRun()
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }
-    ReturnErrorOnFailure(systemLayer->ScheduleWork(Run, this));
     mRunScheduled = true;
-    return CHIP_NO_ERROR;
+    auto err = systemLayer->ScheduleWork(Run, this);
+    if (!::chip::ChipError::IsSuccess(err))
+    {
+        mRunScheduled = false;
+    }
+    return err;
 }
 
 void Engine::Run()
