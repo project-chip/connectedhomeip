@@ -7819,15 +7819,6 @@ public class ChipClusters {
       void onError(Exception error);
     }
 
-    public interface BasicCommissioningInfoListAttributeCallback {
-      void onSuccess(
-          List<ChipStructs.GeneralCommissioningClusterBasicCommissioningInfoType> valueList);
-
-      void onError(Exception ex);
-
-      default void onSubscriptionEstablished() {}
-    }
-
     public interface ServerGeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
@@ -7868,17 +7859,6 @@ public class ChipClusters {
     public void subscribeBreadcrumbAttribute(
         LongAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeBreadcrumbAttribute(chipClusterPtr, callback, minInterval, maxInterval);
-    }
-
-    public void readBasicCommissioningInfoListAttribute(
-        BasicCommissioningInfoListAttributeCallback callback) {
-      readBasicCommissioningInfoListAttribute(chipClusterPtr, callback);
-    }
-
-    public void subscribeBasicCommissioningInfoListAttribute(
-        BasicCommissioningInfoListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeBasicCommissioningInfoListAttribute(
-          chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readRegulatoryConfigAttribute(IntegerAttributeCallback callback) {
@@ -7950,15 +7930,6 @@ public class ChipClusters {
 
     private native void subscribeBreadcrumbAttribute(
         long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
-
-    private native void readBasicCommissioningInfoListAttribute(
-        long chipClusterPtr, BasicCommissioningInfoListAttributeCallback callback);
-
-    private native void subscribeBasicCommissioningInfoListAttribute(
-        long chipClusterPtr,
-        BasicCommissioningInfoListAttributeCallback callback,
-        int minInterval,
-        int maxInterval);
 
     private native void readRegulatoryConfigAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);

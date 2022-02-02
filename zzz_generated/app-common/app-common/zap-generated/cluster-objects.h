@@ -10698,8 +10698,8 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace PowerSource
 namespace GeneralCommissioning {
-// Enum for GeneralCommissioningError
-enum class GeneralCommissioningError : uint8_t
+// Enum for CommissioningError
+enum class CommissioningError : uint8_t
 {
     kOk                    = 0x00,
     kValueOutsideRange     = 0x01,
@@ -10715,16 +10715,16 @@ enum class RegulatoryLocationType : uint8_t
 };
 
 namespace Structs {
-namespace BasicCommissioningInfoType {
+namespace BasicCommissioningInfo {
 enum class Fields
 {
-    kFailSafeExpiryLengthMs = 0,
+    kFailSafeExpiryLengthSeconds = 0,
 };
 
 struct Type
 {
 public:
-    uint32_t failSafeExpiryLengthMs = static_cast<uint32_t>(0);
+    uint16_t failSafeExpiryLengthSeconds = static_cast<uint16_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -10734,7 +10734,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace BasicCommissioningInfoType
+} // namespace BasicCommissioningInfo
 } // namespace Structs
 
 namespace Commands {
@@ -10825,7 +10825,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ArmFailSafeResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
-    GeneralCommissioningError errorCode = static_cast<GeneralCommissioningError>(0);
+    CommissioningError errorCode = static_cast<CommissioningError>(0);
     chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -10841,7 +10841,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ArmFailSafeResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
-    GeneralCommissioningError errorCode = static_cast<GeneralCommissioningError>(0);
+    CommissioningError errorCode = static_cast<CommissioningError>(0);
     chip::CharSpan debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -10901,7 +10901,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetRegulatoryConfigResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
-    GeneralCommissioningError errorCode = static_cast<GeneralCommissioningError>(0);
+    CommissioningError errorCode = static_cast<CommissioningError>(0);
     chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -10917,7 +10917,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetRegulatoryConfigResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
-    GeneralCommissioningError errorCode = static_cast<GeneralCommissioningError>(0);
+    CommissioningError errorCode = static_cast<CommissioningError>(0);
     chip::CharSpan debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -10964,7 +10964,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::CommissioningCompleteResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
-    GeneralCommissioningError errorCode = static_cast<GeneralCommissioningError>(0);
+    CommissioningError errorCode = static_cast<CommissioningError>(0);
     chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -10980,7 +10980,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::CommissioningCompleteResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
-    GeneralCommissioningError errorCode = static_cast<GeneralCommissioningError>(0);
+    CommissioningError errorCode = static_cast<CommissioningError>(0);
     chip::CharSpan debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -11001,21 +11001,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Breadcrumb
-namespace BasicCommissioningInfoList {
+namespace BasicCommissioningInfo {
 struct TypeInfo
 {
-    using Type =
-        chip::app::DataModel::List<const chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::Type>;
-    using DecodableType = chip::app::DataModel::DecodableList<
-        chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType> &;
+    using Type             = chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfo::Type;
+    using DecodableType    = chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfo::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfo::DecodableType &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::BasicCommissioningInfoList::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BasicCommissioningInfo::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace BasicCommissioningInfoList
+} // namespace BasicCommissioningInfo
 namespace RegulatoryConfig {
 struct TypeInfo
 {
@@ -11110,7 +11107,7 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::Breadcrumb::TypeInfo::DecodableType breadcrumb = static_cast<uint64_t>(0);
-        Attributes::BasicCommissioningInfoList::TypeInfo::DecodableType basicCommissioningInfoList;
+        Attributes::BasicCommissioningInfo::TypeInfo::DecodableType basicCommissioningInfo;
         Attributes::RegulatoryConfig::TypeInfo::DecodableType regulatoryConfig     = static_cast<uint8_t>(0);
         Attributes::LocationCapability::TypeInfo::DecodableType locationCapability = static_cast<uint8_t>(0);
         Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;

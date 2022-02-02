@@ -28,15 +28,14 @@ class DeviceCommissioner;
 class AutoCommissioner : public CommissioningDelegate
 {
 public:
-    AutoCommissioner(DeviceCommissioner * commissioner) : mCommissioner(commissioner) {}
-    ~AutoCommissioner();
-    CHIP_ERROR SetCommissioningParameters(const CommissioningParameters & params);
-    void SetOperationalCredentialsDelegate(OperationalCredentialsDelegate * operationalCredentialsDelegate);
+    AutoCommissioner() {}
+    virtual ~AutoCommissioner();
+    CHIP_ERROR SetCommissioningParameters(const CommissioningParameters & params) override;
+    void SetOperationalCredentialsDelegate(OperationalCredentialsDelegate * operationalCredentialsDelegate) override;
 
-    void StartCommissioning(CommissioneeDeviceProxy * proxy);
+    virtual CHIP_ERROR StartCommissioning(DeviceCommissioner * commissioner, CommissioneeDeviceProxy * proxy) override;
 
-    // Delegate functions
-    CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report) override;
+    virtual CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report) override;
 
 private:
     CommissioningStage GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR & lastErr);
@@ -53,7 +52,7 @@ private:
     Optional<System::Clock::Timeout> GetCommandTimeout(CommissioningStage stage);
     EndpointId GetEndpoint(const CommissioningStage & stage);
 
-    DeviceCommissioner * mCommissioner;
+    DeviceCommissioner * mCommissioner                               = nullptr;
     CommissioneeDeviceProxy * mCommissioneeDeviceProxy               = nullptr;
     OperationalDeviceProxy * mOperationalDeviceProxy                 = nullptr;
     OperationalCredentialsDelegate * mOperationalCredentialsDelegate = nullptr;

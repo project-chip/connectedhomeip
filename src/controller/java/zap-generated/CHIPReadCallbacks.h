@@ -3019,39 +3019,6 @@ private:
     bool keepAlive;
 };
 
-class CHIPGeneralCommissioningBasicCommissioningInfoListAttributeCallback
-    : public chip::Callback::Callback<CHIPGeneralCommissioningClusterBasicCommissioningInfoListAttributeCallbackType>
-{
-public:
-    CHIPGeneralCommissioningBasicCommissioningInfoListAttributeCallback(jobject javaCallback, bool keepAlive = false);
-
-    ~CHIPGeneralCommissioningBasicCommissioningInfoListAttributeCallback();
-
-    static void maybeDestroy(CHIPGeneralCommissioningBasicCommissioningInfoListAttributeCallback * callback)
-    {
-        if (!callback->keepAlive)
-        {
-            callback->Cancel();
-            chip::Platform::Delete<CHIPGeneralCommissioningBasicCommissioningInfoListAttributeCallback>(callback);
-        }
-    }
-
-    static void
-    CallbackFn(void * context,
-               const chip::app::DataModel::DecodableList<
-                   chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType> & list);
-    static void OnSubscriptionEstablished(void * context)
-    {
-        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPGeneralCommissioningBasicCommissioningInfoListAttributeCallback *>(context)->javaCallbackRef);
-        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
-    };
-
-private:
-    jobject javaCallbackRef;
-    bool keepAlive;
-};
-
 class CHIPGeneralCommissioningServerGeneratedCommandListAttributeCallback
     : public chip::Callback::Callback<CHIPGeneralCommissioningClusterServerGeneratedCommandListAttributeCallbackType>
 {

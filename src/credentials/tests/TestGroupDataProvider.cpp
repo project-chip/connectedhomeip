@@ -1200,12 +1200,12 @@ int Test_Setup(void * inContext)
  */
 int Test_Teardown(void * inContext)
 {
-    chip::Platform::MemoryShutdown();
     GroupDataProvider * provider = GetGroupDataProvider();
     if (nullptr != provider)
     {
         provider->Finish();
     }
+    chip::Platform::MemoryShutdown();
     return SUCCESS;
 }
 

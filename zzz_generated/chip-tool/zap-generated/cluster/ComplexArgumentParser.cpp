@@ -205,27 +205,26 @@ void ComplexArgumentParser::Finalize(
     ComplexArgumentParser::Finalize(request.catalogVendorId);
     ComplexArgumentParser::Finalize(request.applicationId);
 }
-CHIP_ERROR
-ComplexArgumentParser::Setup(const char * label,
-                             chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::Type & request,
-                             Json::Value & value)
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfo::Type & request,
+                                        Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("BasicCommissioningInfoType.failSafeExpiryLengthMs",
-                                                                  value.isMember("failSafeExpiryLengthMs")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("BasicCommissioningInfo.failSafeExpiryLengthSeconds",
+                                                                  value.isMember("failSafeExpiryLengthSeconds")));
 
     char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "failSafeExpiryLengthMs");
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "failSafeExpiryLengthSeconds");
     ReturnErrorOnFailure(
-        ComplexArgumentParser::Setup(labelWithMember, request.failSafeExpiryLengthMs, value["failSafeExpiryLengthMs"]));
+        ComplexArgumentParser::Setup(labelWithMember, request.failSafeExpiryLengthSeconds, value["failSafeExpiryLengthSeconds"]));
 
     return CHIP_NO_ERROR;
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfo::Type & request)
 {
-    ComplexArgumentParser::Finalize(request.failSafeExpiryLengthMs);
+    ComplexArgumentParser::Finalize(request.failSafeExpiryLengthSeconds);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::PowerSource::Structs::BatChargeFaultChangeType::Type & request,

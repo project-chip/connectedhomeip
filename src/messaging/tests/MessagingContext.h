@@ -31,10 +31,41 @@ namespace chip {
 namespace Test {
 
 /**
+ * @brief
+ *  Test contexts that use Platform::Memory and might call Free() on destruction can inherit from this class and call its Init().
+ *  Platform::MemoryShutdown() will then be called after the subclasses' destructor.
+ */
+class PlatformMemoryUser
+{
+public:
+    PlatformMemoryUser() : mInitialized(false) {}
+    ~PlatformMemoryUser()
+    {
+        if (mInitialized)
+        {
+            chip::Platform::MemoryShutdown();
+        }
+    }
+    CHIP_ERROR Init()
+    {
+        CHIP_ERROR status = CHIP_NO_ERROR;
+        if (!mInitialized)
+        {
+            status       = chip::Platform::MemoryInit();
+            mInitialized = (status == CHIP_NO_ERROR);
+        }
+        return status;
+    }
+
+private:
+    bool mInitialized;
+};
+
+/**
  * @brief The context of test cases for messaging layer. It wil initialize network layer and system layer, and create
  *        two secure sessions, connected with each other. Exchanges can be created for each secure session.
  */
-class MessagingContext
+class MessagingContext : public PlatformMemoryUser
 {
 public:
     MessagingContext() :

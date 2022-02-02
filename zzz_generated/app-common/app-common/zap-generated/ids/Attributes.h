@@ -1564,9 +1564,9 @@ namespace Breadcrumb {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace Breadcrumb
 
-namespace BasicCommissioningInfoList {
+namespace BasicCommissioningInfo {
 static constexpr AttributeId Id = 0x00000001;
-} // namespace BasicCommissioningInfoList
+} // namespace BasicCommissioningInfo
 
 namespace RegulatoryConfig {
 static constexpr AttributeId Id = 0x00000002;

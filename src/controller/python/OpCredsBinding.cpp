@@ -89,6 +89,20 @@ extern chip::Controller::Python::StorageAdapter * pychip_Storage_GetStorageAdapt
 extern chip::Controller::Python::StorageAdapter * sStorageAdapter;
 extern chip::Controller::ScriptDeviceAddressUpdateDelegate sDeviceAddressUpdateDelegate;
 extern chip::Controller::ScriptDevicePairingDelegate sPairingDelegate;
+bool sTestCommissionerUsed = false;
+class TestCommissioner : public chip::Controller::AutoCommissioner
+{
+public:
+    TestCommissioner() : AutoCommissioner() {}
+    ~TestCommissioner() {}
+    CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err,
+                                         chip::Controller::CommissioningDelegate::CommissioningReport report) override
+    {
+        sTestCommissionerUsed = true;
+        return chip::Controller::AutoCommissioner::CommissioningStepFinished(err, report);
+    }
+};
+TestCommissioner sTestCommissioner;
 
 extern "C" {
 struct OpCredsContext
@@ -117,7 +131,7 @@ void * pychip_OpCreds_InitializeDelegate(void * pyContext, uint32_t fabricCreden
 
 ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * context,
                                                          chip::Controller::DeviceCommissioner ** outDevCtrl, uint8_t fabricIndex,
-                                                         FabricId fabricId, chip::NodeId nodeId)
+                                                         FabricId fabricId, chip::NodeId nodeId, bool useTestCommissioner)
 {
     ChipLogDetail(Controller, "Creating New Device Controller");
 
@@ -159,6 +173,10 @@ ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * contex
     initParams.controllerRCAC                 = rcacSpan;
     initParams.controllerICAC                 = icacSpan;
     initParams.controllerNOC                  = nocSpan;
+    if (useTestCommissioner)
+    {
+        initParams.defaultCommissioner = &sTestCommissioner;
+    }
 
     err = Controller::DeviceControllerFactory::GetInstance().SetupCommissioner(initParams, *devCtrl);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
@@ -183,4 +201,10 @@ ChipError::StorageType pychip_DeviceController_DeleteDeviceController(chip::Cont
 
     return CHIP_NO_ERROR.AsInteger();
 }
+
+bool pychip_TestCommissionerUsed()
+{
+    return sTestCommissionerUsed;
 }
+
+} // extern "C"
