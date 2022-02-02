@@ -168,6 +168,11 @@ public:
         {
             delete[] aReadPrepareParams.mpEventPathParamsList;
         }
+
+        if (aReadPrepareParams.mpDataVersionFilterParamsList != nullptr)
+        {
+            delete[] aReadPrepareParams.mpDataVersionFilterParamsList;
+        }
     }
 
     int mNumDataElementIndex               = 0;
@@ -228,6 +233,16 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
     }
 
     return AttributeValueEncoder(aAttributeReports, 0, aPath, 0).Encode(kTestFieldValue1);
+}
+
+bool IsClusterDataVersionAllowed(const EndpointId & aEndpointId, const ClusterId & aClusterId, const DataVersion & aDataVersion)
+{
+    return true;
+}
+
+bool IsClusterDataVersionEqual(const EndpointId & aEndpointId, const ClusterId & aClusterId, const DataVersion & aRequiredVersion)
+{
+    return true;
 }
 
 class TestReadInteraction

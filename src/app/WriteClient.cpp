@@ -144,21 +144,23 @@ exit:
     return err;
 }
 
-CHIP_ERROR WriteClient::PrepareAttribute(const AttributePathParams & attributePathParams)
+CHIP_ERROR WriteClient::PrepareAttribute(const AttributePathParams & aAttributePathParams, DataVersion aDataVersion)
 {
     if (mState == State::Uninitialized)
     {
         ReturnErrorOnFailure(Init());
     }
-    VerifyOrReturnError(attributePathParams.IsValidAttributePath(), CHIP_ERROR_INVALID_PATH_LIST);
+    VerifyOrReturnError(aAttributePathParams.IsValidAttributePath(), CHIP_ERROR_INVALID_PATH_LIST);
     AttributeDataIBs::Builder & writeRequests  = mWriteRequestBuilder.GetWriteRequests();
     AttributeDataIB::Builder & attributeDataIB = writeRequests.CreateAttributeDataIBBuilder();
     ReturnErrorOnFailure(writeRequests.GetError());
-    // TODO: Add attribute version support
-    attributeDataIB.DataVersion(0);
+    if (aDataVersion != kUndefinedDataVersion)
+    {
+        attributeDataIB.DataVersion(aDataVersion);
+    }
     ReturnErrorOnFailure(attributeDataIB.GetError());
     AttributePathIB::Builder & path = attributeDataIB.CreatePath();
-    ReturnErrorOnFailure(path.Encode(attributePathParams));
+    ReturnErrorOnFailure(path.Encode(aAttributePathParams));
     return CHIP_NO_ERROR;
 }
 

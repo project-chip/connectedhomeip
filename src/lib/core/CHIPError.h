@@ -1894,7 +1894,7 @@ using CHIP_ERROR = ::chip::ChipError;
  *  @def CHIP_ERROR_MISMATCH_UPDATE_REQUIRED_VERSION
  *
  *  @brief
- *    Encountered a mismatch between update required version and current version
+ *    Encountered a mismatch between update write version and current version
  */
 #define CHIP_ERROR_MISMATCH_UPDATE_REQUIRED_VERSION            CHIP_CORE_ERROR(0xa4)
 

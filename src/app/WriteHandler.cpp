@@ -121,7 +121,8 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         AttributeDataIB::Parser element;
         AttributePathIB::Parser attributePath;
         ClusterInfo clusterInfo;
-        TLV::TLVReader reader = aAttributeDataIBsReader;
+        DataVersion requiredVersion = kUndefinedDataVersion;
+        TLV::TLVReader reader       = aAttributeDataIBsReader;
 
         err = element.Init(reader);
         SuccessOrExit(err);
@@ -166,7 +167,23 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
             MatterPreAttributeWriteCallback(concretePath);
             TLV::TLVWriter backup;
             mWriteResponseBuilder.Checkpoint(backup);
-            err = WriteSingleClusterData(subjectDescriptor, clusterInfo, dataReader, this);
+            err = element.GetDataVersion(&requiredVersion);
+            if (CHIP_NO_ERROR == err)
+            {
+                if (!IsClusterDataVersionEqual(clusterInfo.mEndpointId, clusterInfo.mClusterId, requiredVersion))
+                {
+                    err = StatusIB(Protocols::InteractionModel::Status::DataVersionMismatch).ToChipError();
+                }
+            }
+            else if (CHIP_END_OF_TLV == err)
+            {
+                err = CHIP_NO_ERROR;
+            }
+
+            if (CHIP_NO_ERROR == err)
+            {
+                err = WriteSingleClusterData(subjectDescriptor, clusterInfo, dataReader, this);
+            }
             if (err != CHIP_NO_ERROR)
             {
                 mWriteResponseBuilder.Rollback(backup);

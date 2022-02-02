@@ -47,6 +47,18 @@ void Engine::Shutdown()
     mGlobalDirtySet.ReleaseAll();
 }
 
+bool Engine::IsClusterVersionAllowed(ClusterInfo * aDataVersionFilterList, const ConcreteReadAttributePath & aPath)
+{
+    for (auto filter = aDataVersionFilterList; filter != nullptr; filter = filter->mpNext)
+    {
+        if (aPath.mEndpointId == filter->mEndpointId && aPath.mClusterId == filter->mClusterId)
+        {
+            return IsClusterDataVersionAllowed(filter->mEndpointId, filter->mClusterId, filter->mDataVersion);
+        }
+    }
+    return true;
+}
+
 CHIP_ERROR
 Engine::RetrieveClusterData(const SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
                             AttributeReportIBs::Builder & aAttributeReportIBs, const ConcreteReadAttributePath & aPath,
@@ -108,6 +120,13 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                 if (!concretePathDirty)
                 {
                     // This attribute is not dirty, we just skip this one.
+                    continue;
+                }
+            }
+            else
+            {
+                if (!IsClusterVersionAllowed(apReadHandler->GetDataVersionFilterlist(), readPath))
+                {
                     continue;
                 }
             }

@@ -108,7 +108,8 @@ public:
 protected:
     CHIP_ERROR ReportAttribute(ChipDevice * device, chip::EndpointId endpointId, chip::ClusterId clusterId,
                                chip::AttributeId attributeId, chip::app::ReadClient::InteractionType interactionType,
-                               uint16_t minInterval = 0, uint16_t maxInterval = 0)
+                               chip::DataVersion dataVersion = chip::kUndefinedDataVersion, uint16_t minInterval = 0,
+                               uint16_t maxInterval = 0)
     {
         chip::app::AttributePathParams attributePathParams[1];
         attributePathParams[0].mEndpointId  = endpointId;
@@ -120,7 +121,15 @@ protected:
         params.mEventPathParamsListSize     = 0;
         params.mpAttributePathParamsList    = attributePathParams;
         params.mAttributePathParamsListSize = 1;
-
+        if (dataVersion != chip::kUndefinedDataVersion)
+        {
+            chip::app::DataVersionFilterParams dataVersionFilterParams[1];
+            dataVersionFilterParams[0].mEndpointId  = endpointId;
+            dataVersionFilterParams[0].mClusterId   = clusterId;
+            dataVersionFilterParams[0].mDataVersion = dataVersion;
+            params.mpDataVersionFilterParamsList    = dataVersionFilterParams;
+            params.mDataVersionFilterParamsListSize = 1;
+        }
         if (interactionType == chip::app::ReadClient::InteractionType::Subscribe)
         {
             params.mMinIntervalFloorSeconds   = minInterval;

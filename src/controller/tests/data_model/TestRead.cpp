@@ -140,6 +140,15 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
+bool IsClusterDataVersionAllowed(const EndpointId & aEndpointId, const ClusterId & aClusterId, const DataVersion & aDataVersion)
+{
+    return true;
+}
+
+bool IsClusterDataVersionEqual(const EndpointId & aEndpointId, const ClusterId & aClusterId, const DataVersion & aRequiredVersion)
+{
+    return true;
+}
 } // namespace app
 } // namespace chip
 
@@ -367,12 +376,13 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptions(nlTestSuite * ap
     // If heap allocation is correctly setup, this should result in it successfully servicing more than the number
     // present in that define.
     //
+    chip::DataVersion dataVersion = chip::kUndefinedDataVersion;
     for (int i = 0; i < (CHIP_IM_MAX_NUM_READ_HANDLER + 1); i++)
     {
         NL_TEST_ASSERT(apSuite,
                        chip::Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
                            &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
-                           onSubscriptionEstablishedCb, false, true) == CHIP_NO_ERROR);
+                           onSubscriptionEstablishedCb, dataVersion, false, true) == CHIP_NO_ERROR);
     }
 
     //
@@ -429,16 +439,16 @@ void TestReadInteraction::TestReadHandlerResourceExhaustion_MultipleSubscription
     // since the second subscription below should fail correctly.
     //
     app::InteractionModelEngine::GetInstance()->SetHandlerCapacity(2);
+    chip::DataVersion dataVersion = chip::kUndefinedDataVersion;
+    NL_TEST_ASSERT(apSuite,
+                   chip::Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+                       &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
+                       onSubscriptionEstablishedCb, dataVersion, false, true) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(apSuite,
                    chip::Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
                        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
-                       onSubscriptionEstablishedCb, false, true) == CHIP_NO_ERROR);
-
-    NL_TEST_ASSERT(apSuite,
-                   chip::Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
-                       &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
-                       onSubscriptionEstablishedCb, false, true) == CHIP_NO_ERROR);
+                       onSubscriptionEstablishedCb, dataVersion, false, true) == CHIP_NO_ERROR);
 
     //
     // It may take a couple of service calls since we may hit the limit of CHIP_IM_MAX_REPORTS_IN_FLIGHT
@@ -552,9 +562,10 @@ void TestReadInteraction::TestReadFabricScopedWithoutFabricFilter(nlTestSuite * 
     auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteAttributePath * attributePath, CHIP_ERROR aError) {
         onFailureCbInvoked = true;
     };
-
-    chip::Controller::ReadAttribute<TestCluster::Attributes::ListFabricScoped::TypeInfo>(
-        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, false /* fabric filtered */);
+    chip::DataVersion dataVersion = chip::kUndefinedDataVersion;
+    chip::Controller::ReadAttribute<TestCluster::Attributes::ListFabricScoped::TypeInfo>(&ctx.GetExchangeManager(), sessionHandle,
+                                                                                         kTestEndpointId, onSuccessCb, onFailureCb,
+                                                                                         dataVersion, false /* fabric filtered */);
 
     ctx.DrainAndServiceIO();
     chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
@@ -610,8 +621,10 @@ void TestReadInteraction::TestReadFabricScopedWithFabricFilter(nlTestSuite * apS
         onFailureCbInvoked = true;
     };
 
-    chip::Controller::ReadAttribute<TestCluster::Attributes::ListFabricScoped::TypeInfo>(
-        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, true /* fabric filtered */);
+    chip::DataVersion dataVersion = chip::kUndefinedDataVersion;
+    chip::Controller::ReadAttribute<TestCluster::Attributes::ListFabricScoped::TypeInfo>(&ctx.GetExchangeManager(), sessionHandle,
+                                                                                         kTestEndpointId, onSuccessCb, onFailureCb,
+                                                                                         dataVersion, true /* fabric filtered */);
 
     ctx.DrainAndServiceIO();
     chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();

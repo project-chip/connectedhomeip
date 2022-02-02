@@ -98,6 +98,7 @@ ReadHandler::~ReadHandler()
 
     InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(mpAttributeClusterInfoList);
     InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(mpEventClusterInfoList);
+    InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(mpDataVersionFilterList);
 }
 
 void ReadHandler::Close()
@@ -305,6 +306,16 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
     else if (err == CHIP_NO_ERROR)
     {
         ReturnErrorOnFailure(ProcessAttributePathList(attributePathListParser));
+        DataVersionFilterIBs::Parser dataVersionFilterListParser;
+        err = readRequestParser.GetDataVersionFilters(&dataVersionFilterListParser);
+        if (err == CHIP_END_OF_TLV)
+        {
+            err = CHIP_NO_ERROR;
+        }
+        else if (err == CHIP_NO_ERROR)
+        {
+            ReturnErrorOnFailure(ProcessDataVersionFilterList(dataVersionFilterListParser));
+        }
     }
     ReturnErrorOnFailure(err);
     err = readRequestParser.GetEventRequests(&eventPathListParser);
@@ -356,7 +367,6 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathIBs::Parser & aAtt
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
         VerifyOrExit(TLV::AnonymousTag() == reader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
-        VerifyOrExit(TLV::kTLVType_List == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
         ClusterInfo clusterInfo;
         AttributePathIB::Parser path;
         err = path.Init(reader);
@@ -408,6 +418,39 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathIBs::Parser & aAtt
         }
         SuccessOrExit(err);
         err = InteractionModelEngine::GetInstance()->PushFront(mpAttributeClusterInfoList, clusterInfo);
+        SuccessOrExit(err);
+    }
+    // if we have exhausted this container
+    if (CHIP_END_OF_TLV == err)
+    {
+        mAttributePathExpandIterator = AttributePathExpandIterator(mpAttributeClusterInfoList);
+        err                          = CHIP_NO_ERROR;
+    }
+
+exit:
+    return err;
+}
+
+CHIP_ERROR ReadHandler::ProcessDataVersionFilterList(DataVersionFilterIBs::Parser & aDataVersionFilterListParser)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVReader reader;
+    aDataVersionFilterListParser.GetReader(&reader);
+
+    while (CHIP_NO_ERROR == (err = reader.Next()))
+    {
+        VerifyOrReturnError(TLV::AnonymousTag() == reader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
+        ClusterInfo clusterInfo;
+        ClusterPathIB::Parser path;
+        DataVersionFilterIB::Parser filter;
+        ReturnErrorOnFailure(filter.Init(reader));
+        ReturnErrorOnFailure(filter.GetDataVersion(&(clusterInfo.mDataVersion)));
+        ReturnErrorOnFailure(filter.GetPath(&path));
+        ReturnErrorOnFailure(path.GetEndpoint(&(clusterInfo.mEndpointId)));
+        ReturnErrorOnFailure(path.GetCluster(&(clusterInfo.mClusterId)));
+        VerifyOrReturnError(clusterInfo.IsValidDataVersionFilter(), CHIP_ERROR_IM_MALFORMED_DATA_VERSION_FILTER_IB);
+
+        err = InteractionModelEngine::GetInstance()->PushFront(mpDataVersionFilterList, clusterInfo);
         SuccessOrExit(err);
     }
     // if we have exhausted this container
@@ -594,6 +637,16 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     else if (err == CHIP_NO_ERROR)
     {
         ReturnErrorOnFailure(ProcessAttributePathList(attributePathListParser));
+        DataVersionFilterIBs::Parser dataVersionFilterListParser;
+        err = subscribeRequestParser.GetDataVersionFilters(&dataVersionFilterListParser);
+        if (err == CHIP_END_OF_TLV)
+        {
+            err = CHIP_NO_ERROR;
+        }
+        else if (err == CHIP_NO_ERROR)
+        {
+            ReturnErrorOnFailure(ProcessDataVersionFilterList(dataVersionFilterListParser));
+        }
     }
     ReturnErrorOnFailure(err);
 

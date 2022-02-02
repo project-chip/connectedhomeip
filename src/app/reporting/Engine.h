@@ -117,7 +117,7 @@ private:
                                    AttributeReportIBs::Builder & aAttributeReportIBs,
                                    const ConcreteReadAttributePath & aClusterInfo,
                                    AttributeValueEncoder::AttributeEncodeState * apEncoderState);
-
+    bool IsClusterVersionAllowed(ClusterInfo * aDataVersionFilterList, const ConcreteReadAttributePath & aPath);
     /**
      * Check all active subscription, if the subscription has no paths that intersect with global dirty set,
      * it would clear dirty flag for that subscription

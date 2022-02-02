@@ -84,7 +84,8 @@ public:
 
     template <class T>
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId, chip::ClusterId clusterId,
-                           chip::AttributeId attributeId, const T & value)
+                           chip::AttributeId attributeId, const T & value,
+                           chip::DataVersion aDataVersion = chip::kUndefinedDataVersion)
     {
         ChipLogProgress(chipTool, "Sending WriteAttribute to cluster " ChipLogFormatMEI " on endpoint %" PRIu16,
                         ChipLogValueMEI(clusterId), endpointId);
@@ -98,7 +99,7 @@ public:
 
         mWriteClient = std::make_unique<chip::app::WriteClient>(device->GetExchangeManager(), this, mTimedInteractionTimeoutMs);
 
-        ReturnErrorOnFailure(mWriteClient->EncodeAttributeWritePayload(attributePathParams, value));
+        ReturnErrorOnFailure(mWriteClient->EncodeAttributeWritePayload(attributePathParams, aDataVersion, value));
         return mWriteClient->SendWriteRequest(device->GetSecureSession().Value());
     }
 
