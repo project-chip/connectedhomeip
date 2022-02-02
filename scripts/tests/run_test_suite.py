@@ -212,7 +212,7 @@ def cmd_run(context, iterations, all_clusters_app, tv_app):
                 test_end = time.time()
                 logging.exception('%s - FAILED in %0.2f seconds' %
                                   (test.name, (test_end - test_start)))
-                apps_register.uninit();
+                apps_register.uninit()
                 sys.exit(2)
 
     apps_register.uninit()
