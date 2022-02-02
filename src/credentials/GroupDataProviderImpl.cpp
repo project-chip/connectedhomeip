@@ -1102,9 +1102,11 @@ CHIP_ERROR GroupDataProviderImpl::AddEndpoint(chip::FabricIndex fabric_index, ch
     if (!group.Find(mStorage, fabric, group_id))
     {
         // New group
+        VerifyOrReturnError(fabric.group_count < mMaxGroupsPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
         ReturnErrorOnFailure(EndpointData(fabric_index, group_id, endpoint_id).Save(mStorage));
         // Save the new group into the fabric
         group.group_id       = group_id;
+        group.name[0]        = 0;
         group.first_endpoint = endpoint_id;
         group.endpoint_count = 1;
         group.next           = fabric.first_group;
