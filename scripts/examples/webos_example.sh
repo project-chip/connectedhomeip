@@ -19,7 +19,10 @@
 source scripts/activate.sh
 
 # Extract webOS SDK
-cat third_party/webos_sdk/v2.14.1/webos_sdk.tar* | (cd third_party/webos_sdk/v2.14.1/;tar xvzf -)
+cat third_party/webos_sdk/v2.14.1/webos_sdk.tar* | (
+    cd third_party/webos_sdk/v2.14.1/
+    tar xvzf -
+)
 
 # Grant execute permission for NDK install script
 chmod 555 third_party/webos_sdk/v2.14.1/webos-sdk-x86_64-cortexa7t2hf-neon-vfpv4-toolchain-2.14.1.g.sh
