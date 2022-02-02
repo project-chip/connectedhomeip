@@ -149,12 +149,15 @@ jobs:
                     scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
             - name: Setup Build, Run Build and Run Tests
               timeout-minutes: 90
+              env:
+                  LSAN_OPTIONS: detect_leaks=0
               run: |
-                  for BUILD_TYPE  in fake gcc_release clang mbedtls; do
+                  for BUILD_TYPE  in fake gcc_release clang asan mbedtls; do
                       case $BUILD_TYPE in
                           "fake") GN_ARGS='chip_device_platform="fake"';;
                           "gcc_release") GN_ARGS='is_debug=false';;
                           "clang") GN_ARGS='is_clang=true';;
+                          "clang") GN_ARGS='is_clang=true is_asan=true';;
                           "mbedtls") GN_ARGS='chip_crypto="mbedtls"';;
                       esac
 
