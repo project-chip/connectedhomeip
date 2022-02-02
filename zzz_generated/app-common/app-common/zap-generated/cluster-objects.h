@@ -14703,146 +14703,6 @@ struct TypeInfo
 } // namespace TimeSynchronization
 namespace BridgedDeviceBasic {
 
-namespace Commands {
-// Forward-declarations so we can reference these later.
-
-namespace StartUp {
-struct Type;
-struct DecodableType;
-} // namespace StartUp
-
-namespace ShutDown {
-struct Type;
-struct DecodableType;
-} // namespace ShutDown
-
-namespace Leave {
-struct Type;
-struct DecodableType;
-} // namespace Leave
-
-namespace ReachableChanged {
-struct Type;
-struct DecodableType;
-} // namespace ReachableChanged
-
-} // namespace Commands
-
-namespace Commands {
-namespace StartUp {
-enum class Fields
-{
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::StartUp::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::StartUp::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace StartUp
-namespace ShutDown {
-enum class Fields
-{
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ShutDown::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ShutDown::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ShutDown
-namespace Leave {
-enum class Fields
-{
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::Leave::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::Leave::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace Leave
-namespace ReachableChanged {
-enum class Fields
-{
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ReachableChanged::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ReachableChanged::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ReachableChanged
-} // namespace Commands
-
 namespace Attributes {
 
 namespace VendorName {
@@ -15128,6 +14988,130 @@ struct TypeInfo
     };
 };
 } // namespace Attributes
+namespace Events {
+namespace StartUp {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
+
+enum class Fields
+{
+    kSoftwareVersion = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::StartUp::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint32_t softwareVersion = static_cast<uint32_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::StartUp::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+
+    uint32_t softwareVersion = static_cast<uint32_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace StartUp
+namespace ShutDown {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
+
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::ShutDown::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::ShutDown::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace ShutDown
+namespace Leave {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::Leave::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::Leave::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace Leave
+namespace ReachableChanged {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields
+{
+    kReachableNewValue = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::ReachableChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    bool reachableNewValue = static_cast<bool>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::ReachableChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+
+    bool reachableNewValue = static_cast<bool>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace ReachableChanged
+} // namespace Events
 } // namespace BridgedDeviceBasic
 namespace Switch {
 

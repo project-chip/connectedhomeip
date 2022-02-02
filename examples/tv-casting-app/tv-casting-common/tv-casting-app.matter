@@ -235,6 +235,20 @@ server cluster Binding = 30 {
 }
 
 server cluster BridgedDeviceBasic = 57 {
+  critical event StartUp = 0 {
+    INT32U softwareVersion = 0;
+  }
+
+  critical event ShutDown = 1 {
+  }
+
+  info event Leave = 2 {
+  }
+
+  info event ReachableChanged = 3 {
+    boolean reachableNewValue = 0;
+  }
+
   readonly attribute char_string<32> vendorName = 1;
   readonly attribute int16u vendorID = 2;
   readonly attribute char_string<32> productName = 3;
@@ -250,11 +264,6 @@ server cluster BridgedDeviceBasic = 57 {
   readonly attribute char_string<32> serialNumber = 15;
   readonly attribute boolean reachable = 17;
   readonly global attribute int16u clusterRevision = 65533;
-
-  command Leave(): DefaultSuccess = 2;
-  command ReachableChanged(): DefaultSuccess = 3;
-  command ShutDown(): DefaultSuccess = 1;
-  command StartUp(): DefaultSuccess = 0;
 }
 
 client cluster Channel = 1284 {
