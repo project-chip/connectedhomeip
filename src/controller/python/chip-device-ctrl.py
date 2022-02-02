@@ -179,7 +179,8 @@ class DeviceMgrCmd(Cmd):
 
         self.bleMgr = None
 
-        self.chipStack = ChipStack.ChipStack(bluetoothAdapter=bluetoothAdapter, persistentStoragePath='/tmp/chip-device-ctrl-storage.json')
+        self.chipStack = ChipStack.ChipStack(
+            bluetoothAdapter=bluetoothAdapter, persistentStoragePath='/tmp/chip-device-ctrl-storage.json')
         self.fabricAdmin = FabricAdmin.FabricAdmin()
         self.devCtrl = self.fabricAdmin.NewController(controllerNodeId, True)
 

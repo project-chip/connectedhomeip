@@ -152,7 +152,7 @@ class FabricAdmin:
 
         FabricAdmin.activeAdmins.add(self)
 
-    def NewController(self, nodeId: int = None, useTestCommissioner: bool=False):
+    def NewController(self, nodeId: int = None, useTestCommissioner: bool = False):
         ''' Vend a new controller on this fabric seeded with the right fabric details.
         '''
         if (not(self._isActive)):
