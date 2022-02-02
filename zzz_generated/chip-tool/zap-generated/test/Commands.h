@@ -72897,7 +72897,8 @@ private:
     }
 
     void OnSuccessResponse_4(chip::app::Clusters::OperationalCredentials::OperationalCertStatus statusCode,
-                             const chip::Optional<uint8_t> & fabricIndex, const chip::Optional<chip::CharSpan> & debugText)
+                             const chip::Optional<chip::FabricIndex> & fabricIndex,
+                             const chip::Optional<chip::CharSpan> & debugText)
     {
         VerifyOrReturn(CheckValue("statusCode", statusCode, 11));
 

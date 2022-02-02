@@ -376,7 +376,11 @@ exit:
     fabricListChanged();
     // Not using ConvertToNOCResponseStatus here because it's pretty
     // AddNOC/UpdateNOC specific.
-    if (err != CHIP_NO_ERROR && err != CHIP_ERROR_NOT_FOUND)
+    if (err == CHIP_ERROR_NOT_FOUND)
+    {
+        SendNOCResponse(commandObj, commandPath, OperationalCertStatus::kInvalidFabricIndex, fabricBeingRemoved, CharSpan());
+    }
+    else if (err != CHIP_NO_ERROR)
     {
         // We have no idea what happened; just report failure.
         StatusIB status(err);
@@ -384,20 +388,8 @@ exit:
     }
     else
     {
-        OperationalCertStatus status;
-        if (err == CHIP_NO_ERROR)
-        {
-            status = OperationalCertStatus::kSuccess;
-        }
-        else
-        {
-            status = OperationalCertStatus::kInvalidFabricIndex;
-        }
-        SendNOCResponse(commandObj, commandPath, status, fabricBeingRemoved, CharSpan());
-    }
+        SendNOCResponse(commandObj, commandPath, OperationalCertStatus::kSuccess, fabricBeingRemoved, CharSpan());
 
-    if (err == CHIP_NO_ERROR)
-    {
         // Use a more direct getter for FabricIndex from commandObj
         chip::Messaging::ExchangeContext * ec = commandObj->GetExchangeContext();
         FabricIndex currentFabricIndex        = commandObj->GetAccessingFabricIndex();
@@ -466,7 +458,9 @@ CHIP_ERROR SendNOCResponse(app::CommandHandler * commandObj, const ConcreteComma
     }
     if (!debug_text.empty())
     {
-        payload.debugText.Emplace(debug_text);
+        // Max length of DebugText is 128 in the spec.
+        const CharSpan & to_send = debug_text.size() > 128 ? debug_text.SubSpan(0, 128) : debug_text;
+        payload.debugText.Emplace(to_send);
     }
 
     return commandObj->AddResponseData(path, payload);

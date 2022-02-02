@@ -2738,7 +2738,7 @@ client cluster OperationalCredentials = 62 {
   }
 
   request struct RemoveFabricRequest {
-    INT8U fabricIndex = 0;
+    fabric_idx fabricIndex = 0;
   }
 
   request struct RemoveTrustedRootCertificateRequest {
@@ -2765,7 +2765,7 @@ client cluster OperationalCredentials = 62 {
 
   response struct NOCResponse {
     OperationalCertStatus statusCode = 0;
-    optional INT8U fabricIndex = 1;
+    optional fabric_idx fabricIndex = 1;
     optional CHAR_STRING debugText = 2;
   }
 

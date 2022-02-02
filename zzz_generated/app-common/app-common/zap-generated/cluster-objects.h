@@ -16205,7 +16205,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     OperationalCertStatus statusCode = static_cast<OperationalCertStatus>(0);
-    Optional<uint8_t> fabricIndex;
+    Optional<chip::FabricIndex> fabricIndex;
     Optional<chip::CharSpan> debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -16222,7 +16222,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     OperationalCertStatus statusCode = static_cast<OperationalCertStatus>(0);
-    Optional<uint8_t> fabricIndex;
+    Optional<chip::FabricIndex> fabricIndex;
     Optional<chip::CharSpan> debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -16272,7 +16272,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::RemoveFabric::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
-    uint8_t fabricIndex = static_cast<uint8_t>(0);
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -16287,7 +16287,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::RemoveFabric::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
-    uint8_t fabricIndex = static_cast<uint8_t>(0);
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace RemoveFabric

@@ -1286,7 +1286,7 @@ CHIP_ERROR DeviceCommissioner::ConvertFromOperationalCertStatus(OperationalCrede
     case OperationalCertStatus::kInvalidNodeOpId:
         return CHIP_ERROR_WRONG_NODE_ID;
     case OperationalCertStatus::kInvalidNOC:
-        return CHIP_ERROR_CERT_LOAD_FAILED;
+        return CHIP_ERROR_UNSUPPORTED_CERT_FORMAT;
     case OperationalCertStatus::kMissingCsr:
         return CHIP_ERROR_INCORRECT_STATE;
     case OperationalCertStatus::kTableFull:
