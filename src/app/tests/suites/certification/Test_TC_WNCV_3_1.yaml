@@ -287,4 +287,3 @@ tests:
               type: uint16
               minValue: 0
               maxValue: 9999
-
