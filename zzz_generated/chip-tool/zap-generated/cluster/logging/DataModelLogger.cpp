@@ -3449,6 +3449,33 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("weekDayIndex", indent + 1, value.weekDayIndex));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("userIndex", indent + 1, value.userIndex));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("daysMask", indent + 1, value.daysMask));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("startHour", indent + 1, value.startHour));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("startMinute", indent + 1, value.startMinute));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("endHour", indent + 1, value.endHour));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("endMinute", indent + 1, value.endMinute));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const DoorLock::Commands::GetYearDayScheduleResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("yearDayIndex", indent + 1, value.yearDayIndex));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("userIndex", indent + 1, value.userIndex));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("localStartTime", indent + 1, value.localStartTime));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("localEndTime", indent + 1, value.localEndTime));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const DoorLock::Commands::SetCredentialResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -4035,10 +4062,10 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case Basic::Id: {
         switch (path.mAttributeId)
         {
-        case Basic::Attributes::InteractionModelVersion::Id: {
+        case Basic::Attributes::DataModelRevision::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("InteractionModelVersion", 1, value);
+            return DataModelLogger::LogValue("DataModelRevision", 1, value);
         }
         case Basic::Attributes::VendorName::Id: {
             chip::CharSpan value;
@@ -4241,6 +4268,81 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case BridgedDeviceBasic::Id: {
         switch (path.mAttributeId)
         {
+        case BridgedDeviceBasic::Attributes::VendorName::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("VendorName", 1, value);
+        }
+        case BridgedDeviceBasic::Attributes::VendorID::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("VendorID", 1, value);
+        }
+        case BridgedDeviceBasic::Attributes::ProductName::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ProductName", 1, value);
+        }
+        case BridgedDeviceBasic::Attributes::NodeLabel::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NodeLabel", 1, value);
+        }
+        case BridgedDeviceBasic::Attributes::HardwareVersion::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("HardwareVersion", 1, value);
+        }
+        case BridgedDeviceBasic::Attributes::HardwareVersionString::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("HardwareVersionString", 1, value);
+        }
+        case BridgedDeviceBasic::Attributes::SoftwareVersion::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SoftwareVersion", 1, value);
+        }
+        case BridgedDeviceBasic::Attributes::SoftwareVersionString::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SoftwareVersionString", 1, value);
+        }
+        case BridgedDeviceBasic::Attributes::ManufacturingDate::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ManufacturingDate", 1, value);
+        }
+        case BridgedDeviceBasic::Attributes::PartNumber::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PartNumber", 1, value);
+        }
+        case BridgedDeviceBasic::Attributes::ProductURL::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ProductURL", 1, value);
+        }
+        case BridgedDeviceBasic::Attributes::ProductLabel::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ProductLabel", 1, value);
+        }
+        case BridgedDeviceBasic::Attributes::SerialNumber::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SerialNumber", 1, value);
+        }
+        case BridgedDeviceBasic::Attributes::Reachable::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Reachable", 1, value);
+        }
+        case BridgedDeviceBasic::Attributes::UniqueID::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("UniqueID", 1, value);
+        }
         case BridgedDeviceBasic::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -4655,6 +4757,16 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("NumberOfRFIDUsersSupported", 1, value);
+        }
+        case DoorLock::Attributes::NumberOfWeekDaySchedulesSupportedPerUser::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NumberOfWeekDaySchedulesSupportedPerUser", 1, value);
+        }
+        case DoorLock::Attributes::NumberOfYearDaySchedulesSupportedPerUser::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NumberOfYearDaySchedulesSupportedPerUser", 1, value);
         }
         case DoorLock::Attributes::MaxPINCodeLength::Id: {
             uint8_t value;
@@ -6671,7 +6783,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("RoutingRole", 1, value);
         }
         case ThreadNetworkDiagnostics::Attributes::NetworkName::Id: {
-            chip::ByteSpan value;
+            chip::CharSpan value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("NetworkName", 1, value);
         }
@@ -7348,6 +7460,16 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             DoorLock::Commands::GetUserResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GetUserResponse", 1, value);
+        }
+        case DoorLock::Commands::GetWeekDayScheduleResponse::Id: {
+            DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GetWeekDayScheduleResponse", 1, value);
+        }
+        case DoorLock::Commands::GetYearDayScheduleResponse::Id: {
+            DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GetYearDayScheduleResponse", 1, value);
         }
         case DoorLock::Commands::SetCredentialResponse::Id: {
             DoorLock::Commands::SetCredentialResponse::DecodableType value;

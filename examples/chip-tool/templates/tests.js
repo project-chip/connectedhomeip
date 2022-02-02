@@ -234,6 +234,7 @@ function getTests()
     'TestIdentifyCluster',
     'TestOperationalCredentialsCluster',
     'TestModeSelectCluster',
+    'TestSystemCommands',
   ];
 
   const SoftwareDiagnostics = [
@@ -249,6 +250,7 @@ function getTests()
   const DoorLock = [
     'DL_UsersAndCredentials',
     'DL_LockUnlock',
+    'DL_Schedules',
   ];
 
   const Groups = [

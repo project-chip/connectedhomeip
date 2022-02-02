@@ -23,7 +23,7 @@ server cluster AccountLogin = 1294 {
   }
 
   timed command GetSetupPINRequest(GetSetupPINRequestRequest): GetSetupPINResponse = 0;
-  command LoginRequest(LoginRequestRequest): DefaultSuccess = 2;
+  timed command LoginRequest(LoginRequestRequest): DefaultSuccess = 2;
   timed command LogoutRequest(): DefaultSuccess = 3;
 }
 
@@ -58,9 +58,9 @@ server cluster AdministratorCommissioning = 60 {
     INT16U passcodeID = 5;
   }
 
-  command OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
-  command OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
-  command RevokeCommissioning(): DefaultSuccess = 2;
+  timed command OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
+  timed command OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
+  timed command RevokeCommissioning(): DefaultSuccess = 2;
 }
 
 server cluster ApplicationBasic = 1293 {
@@ -92,6 +92,15 @@ server cluster ApplicationLauncher = 1292 {
     kSuccess = 0;
     kAppNotAvailable = 1;
     kSystemBusy = 2;
+  }
+
+  bitmap ApplicationLauncherFeature : BITMAP32 {
+    kApplicationPlatform = 0x1;
+  }
+
+  bitmap ChannelFeature : BITMAP32 {
+    kChannelList = 0x1;
+    kLineupInfo = 0x2;
   }
 
   struct ApplicationEP {
@@ -141,6 +150,10 @@ server cluster AudioOutput = 1291 {
     kOther = 5;
   }
 
+  bitmap AudiouOutputFeature : BITMAP32 {
+    kNameUpdates = 0x1;
+  }
+
   struct OutputInfo {
     INT8U index = 0;
     OutputTypeEnum outputType = 1;
@@ -179,7 +192,7 @@ server cluster Basic = 40 {
     boolean reachableNewValue = 0;
   }
 
-  readonly attribute int16u interactionModelVersion = 0;
+  readonly attribute int16u dataModelRevision = 0;
   readonly attribute char_string<32> vendorName = 1;
   readonly attribute vendor_id vendorID = 2;
   readonly attribute char_string<32> productName = 3;
@@ -322,6 +335,16 @@ server cluster ContentLauncher = 1290 {
     kSuccess = 0;
     kUrlNotAvailable = 1;
     kAuthFailed = 2;
+  }
+
+  bitmap ContentLauncherFeature : BITMAP32 {
+    kContentSearch = 0x1;
+    kURLPlayback = 0x2;
+  }
+
+  bitmap SupportedStreamingProtocol : BITMAP32 {
+    kDash = 0x1;
+    kHls = 0x2;
   }
 
   struct ContentSearch {
@@ -785,6 +808,12 @@ server cluster KeypadInput = 1289 {
     kInvalidKeyInCurrentState = 2;
   }
 
+  bitmap KeypadInputFeature : BITMAP32 {
+    kNavigationKeyCodes = 0x1;
+    kLocationKeys = 0x2;
+    kNumberKeys = 0x4;
+  }
+
   readonly global attribute int16u clusterRevision = 65533;
 
   request struct SendKeyRequestRequest {
@@ -803,6 +832,12 @@ server cluster LevelControl = 8 {
   enum StepMode : ENUM8 {
     kUp = 0;
     kDown = 1;
+  }
+
+  bitmap LevelControlFeature : BITMAP32 {
+    kOnOff = 0x1;
+    kLighting = 0x2;
+    kFrequency = 0x4;
   }
 
   readonly attribute int8u currentLevel = 0;
@@ -901,6 +936,10 @@ server cluster MediaInput = 1287 {
     kScart = 9;
     kUsb = 10;
     kOther = 11;
+  }
+
+  bitmap MediaInputFeature : BITMAP32 {
+    kNameUpdates = 0x1;
   }
 
   struct InputInfo {
@@ -1012,6 +1051,12 @@ client cluster NetworkCommissioning = 49 {
     k5g = 2;
     k6g = 3;
     k60g = 4;
+  }
+
+  bitmap NetworkCommissioningFeature : BITMAP32 {
+    kWiFiNetworkInterface = 0x1;
+    kThreadNetworkInterface = 0x2;
+    kEthernetNetworkInterface = 0x4;
   }
 
   struct NetworkInfo {
@@ -1131,6 +1176,12 @@ server cluster NetworkCommissioning = 49 {
     k5g = 2;
     k6g = 3;
     k60g = 4;
+  }
+
+  bitmap NetworkCommissioningFeature : BITMAP32 {
+    kWiFiNetworkInterface = 0x1;
+    kThreadNetworkInterface = 0x2;
+    kEthernetNetworkInterface = 0x4;
   }
 
   struct NetworkInfo {
@@ -1306,6 +1357,10 @@ server cluster OnOff = 6 {
   enum OnOffEffectIdentifier : enum8 {
     kDelayedAllOff = 0;
     kDyingLight = 1;
+  }
+
+  bitmap OnOffControl : BITMAP8 {
+    kAcceptOnlyWhenOn = 0x1;
   }
 
   readonly attribute boolean onOff = 0;
@@ -1603,6 +1658,13 @@ server cluster ThreadNetworkDiagnostics = 53 {
     kNotConnected = 1;
   }
 
+  bitmap ThreadNetworkDiagnosticsFeature : BITMAP32 {
+    kPacketCounts = 0x1;
+    kErrorCounts = 0x2;
+    kMLECounts = 0x4;
+    kMACCounts = 0x8;
+  }
+
   struct NeighborTable {
     INT64U extAddress = 0;
     INT32U age = 1;
@@ -1659,7 +1721,7 @@ server cluster ThreadNetworkDiagnostics = 53 {
 
   readonly attribute int16u channel = 0;
   readonly attribute enum8 routingRole = 1;
-  readonly attribute octet_string<16> networkName = 2;
+  readonly attribute char_string<16> networkName = 2;
   readonly attribute int16u panId = 3;
   readonly attribute int64u extendedPanId = 4;
   readonly attribute octet_string<17> meshLocalPrefix = 5;
@@ -1756,6 +1818,10 @@ server cluster UnitLocalization = 45 {
     kFahrenheit = 0;
     kCelsius = 1;
     kKelvin = 2;
+  }
+
+  bitmap UnitLocalizationFeature : BITMAP32 {
+    kTemperatureUnit = 0x1;
   }
 
   attribute TempUnit temperatureUnit = 0;

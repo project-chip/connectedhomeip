@@ -131,11 +131,6 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 #endif
                                                             ));
 
-    if (params.imDelegate == nullptr)
-    {
-        params.imDelegate = chip::Platform::New<DeviceControllerInteractionModelDelegate>();
-    }
-
     stateParams.fabricTable           = chip::Platform::New<FabricTable>();
     stateParams.sessionMgr            = chip::Platform::New<SessionManager>();
     stateParams.exchangeMgr           = chip::Platform::New<Messaging::ExchangeManager>();
@@ -149,7 +144,6 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
     InitDataModelHandler(stateParams.exchangeMgr);
 
-    stateParams.imDelegate = params.imDelegate;
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(stateParams.exchangeMgr));
 
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
@@ -289,12 +283,6 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
     {
         chip::Platform::Delete(mSessionMgr);
         mSessionMgr = nullptr;
-    }
-
-    if (mIMDelegate != nullptr)
-    {
-        chip::Platform::Delete(mIMDelegate);
-        mIMDelegate = nullptr;
     }
 
     return CHIP_NO_ERROR;

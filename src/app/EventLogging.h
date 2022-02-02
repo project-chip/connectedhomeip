@@ -61,14 +61,9 @@ private:
  * @param[out] aEventNumber The event Number if the event was written to the
  *                         log, 0 otherwise. The Event number is expected to monotonically increase.
  *
- * TODO: Revisit spec foc nullable fabric index in event.
- *
  * @return CHIP_ERROR  CHIP Error Code
  */
-template <typename T,
-          std::enable_if_t<DataModel::IsFabricScoped<T>::value &&
-                               std::is_same<decltype(std::declval<T>().GetFabricIndex()), FabricIndex>::value,
-                           bool> = true>
+template <typename T, std::enable_if_t<DataModel::IsFabricScoped<T>::value, bool> = true>
 CHIP_ERROR LogEvent(const T & aEventData, EndpointId aEndpoint, EventNumber & aEventNumber,
                     EventOptions::Type aUrgent = EventOptions::Type::kNotUrgent)
 {
@@ -80,24 +75,6 @@ CHIP_ERROR LogEvent(const T & aEventData, EndpointId aEndpoint, EventNumber & aE
     eventOptions.mPath        = path;
     eventOptions.mPriority    = aEventData.GetPriorityLevel();
     eventOptions.mFabricIndex = aEventData.GetFabricIndex();
-    return logMgmt.LogEvent(&eventData, eventOptions, aEventNumber);
-}
-
-template <typename T,
-          std::enable_if_t<DataModel::IsFabricScoped<T>::value &&
-                               std::is_same<decltype(std::declval<T>().GetFabricIndex()), DataModel::Nullable<FabricIndex>>::value,
-                           bool> = true>
-CHIP_ERROR LogEvent(const T & aEventData, EndpointId aEndpoint, EventNumber & aEventNumber,
-                    EventOptions::Type aUrgent = EventOptions::Type::kNotUrgent)
-{
-    EventLogger<T> eventData(aEventData);
-    ConcreteEventPath path(aEndpoint, aEventData.GetClusterId(), aEventData.GetEventId());
-    EventManagement & logMgmt = chip::app::EventManagement::GetInstance();
-    EventOptions eventOptions;
-    eventOptions.mUrgent      = aUrgent;
-    eventOptions.mPath        = path;
-    eventOptions.mPriority    = aEventData.GetPriorityLevel();
-    eventOptions.mFabricIndex = aEventData.GetFabricIndex().IsNull() ? kUndefinedFabricIndex : aEventData.GetFabricIndex().Value();
     return logMgmt.LogEvent(&eventData, eventOptions, aEventNumber);
 }
 

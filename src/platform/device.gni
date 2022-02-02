@@ -124,6 +124,7 @@ if (chip_device_platform != "external") {
   chip_platform_config_include = ""
   chip_inet_platform_config_include = ""
   chip_system_platform_config_include = ""
+  chip_system_layer_impl_config_file = ""
 } else {
   declare_args() {
     chip_ble_platform_config_include = ""
@@ -131,6 +132,7 @@ if (chip_device_platform != "external") {
     chip_platform_config_include = ""
     chip_inet_platform_config_include = ""
     chip_system_platform_config_include = ""
+    chip_system_layer_impl_config_file = ""
   }
 }
 

@@ -29,7 +29,6 @@
 #include <app/AttributePathExpandIterator.h>
 #include <app/ClusterInfo.h>
 #include <app/EventManagement.h>
-#include <app/InteractionModelDelegate.h>
 #include <app/MessageDef/AttributePathIBs.h>
 #include <app/MessageDef/EventPathIBs.h>
 #include <lib/core/CHIPCore.h>

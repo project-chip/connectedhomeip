@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    Copyright (c) 2019-2020 Google LLC.
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
@@ -48,15 +48,18 @@ const char P6Config::kConfigNamespace_ChipConfig[]   = "chip-config";
 const char P6Config::kConfigNamespace_ChipCounters[] = "chip-counters";
 
 // Keys stored in the chip-factory namespace
-const P6Config::Key P6Config::kConfigKey_SerialNum           = { kConfigNamespace_ChipFactory, "serial-num" };
-const P6Config::Key P6Config::kConfigKey_MfrDeviceId         = { kConfigNamespace_ChipFactory, "device-id" };
-const P6Config::Key P6Config::kConfigKey_MfrDeviceCert       = { kConfigNamespace_ChipFactory, "device-cert" };
-const P6Config::Key P6Config::kConfigKey_MfrDeviceICACerts   = { kConfigNamespace_ChipFactory, "device-ca-certs" };
-const P6Config::Key P6Config::kConfigKey_MfrDevicePrivateKey = { kConfigNamespace_ChipFactory, "device-key" };
-const P6Config::Key P6Config::kConfigKey_HardwareVersion     = { kConfigNamespace_ChipFactory, "hardware-ver" };
-const P6Config::Key P6Config::kConfigKey_ManufacturingDate   = { kConfigNamespace_ChipFactory, "mfg-date" };
-const P6Config::Key P6Config::kConfigKey_SetupPinCode        = { kConfigNamespace_ChipFactory, "pin-code" };
-const P6Config::Key P6Config::kConfigKey_SetupDiscriminator  = { kConfigNamespace_ChipFactory, "discriminator" };
+const P6Config::Key P6Config::kConfigKey_SerialNum             = { kConfigNamespace_ChipFactory, "serial-num" };
+const P6Config::Key P6Config::kConfigKey_MfrDeviceId           = { kConfigNamespace_ChipFactory, "device-id" };
+const P6Config::Key P6Config::kConfigKey_MfrDeviceCert         = { kConfigNamespace_ChipFactory, "device-cert" };
+const P6Config::Key P6Config::kConfigKey_MfrDeviceICACerts     = { kConfigNamespace_ChipFactory, "device-ca-certs" };
+const P6Config::Key P6Config::kConfigKey_MfrDevicePrivateKey   = { kConfigNamespace_ChipFactory, "device-key" };
+const P6Config::Key P6Config::kConfigKey_HardwareVersion       = { kConfigNamespace_ChipFactory, "hardware-ver" };
+const P6Config::Key P6Config::kConfigKey_ManufacturingDate     = { kConfigNamespace_ChipFactory, "mfg-date" };
+const P6Config::Key P6Config::kConfigKey_SetupPinCode          = { kConfigNamespace_ChipFactory, "pin-code" };
+const P6Config::Key P6Config::kConfigKey_SetupDiscriminator    = { kConfigNamespace_ChipFactory, "discriminator" };
+const P6Config::Key P6Config::kConfigKey_Spake2pIterationCount = { kConfigNamespace_ChipFactory, "iteration-count" };
+const P6Config::Key P6Config::kConfigKey_Spake2pSalt           = { kConfigNamespace_ChipFactory, "salt" };
+const P6Config::Key P6Config::kConfigKey_Spake2pVerifier       = { kConfigNamespace_ChipFactory, "verifier" };
 
 // Keys stored in the chip-config namespace
 const P6Config::Key P6Config::kConfigKey_FabricId           = { kConfigNamespace_ChipConfig, "fabric-id" };
@@ -213,6 +216,7 @@ bool P6Config::ConfigValueExists(Key key)
 // Clear out keys in config namespace
 CHIP_ERROR P6Config::FactoryResetConfig(void)
 {
+    CHIP_ERROR err            = CHIP_NO_ERROR;
     const Key * config_keys[] = { &kConfigKey_FabricId,      &kConfigKey_ServiceConfig,      &kConfigKey_PairedAccountId,
                                   &kConfigKey_ServiceId,     &kConfigKey_GroupKeyIndex,      &kConfigKey_LastUsedEpochKeyId,
                                   &kConfigKey_FailSafeArmed, &kConfigKey_WiFiStationSecType, &kConfigKey_WiFiSSID,
@@ -220,12 +224,19 @@ CHIP_ERROR P6Config::FactoryResetConfig(void)
 
     for (uint32_t i = 0; i < (sizeof(config_keys) / sizeof(config_keys[0])); i++)
     {
-        CHIP_ERROR err = ClearConfigValue(*config_keys[i]);
+        err = ClearConfigValue(*config_keys[i]);
         // Something unexpected happened
         if (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND && err != CHIP_NO_ERROR)
         {
             return err;
         }
+    }
+
+    // Erase all key-values including fabric info.
+    err = PersistedStorage::KeyValueStoreMgrImpl().Erase();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Clear Key-Value Storage failed");
     }
 
     return CHIP_NO_ERROR;

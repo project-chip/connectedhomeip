@@ -55,8 +55,6 @@ struct DeviceProxyInitParams
     FabricTable * fabricTable                = nullptr;
     CASEClientPoolDelegate * clientPool      = nullptr;
 
-    Controller::DeviceControllerInteractionModelDelegate * imDelegate = nullptr;
-
     Optional<ReliableMessageProtocolConfig> mrpLocalConfig = Optional<ReliableMessageProtocolConfig>::Missing();
 
     CHIP_ERROR Validate() const
@@ -169,8 +167,6 @@ public:
     uint8_t GetNextSequenceNumber() override { return mSequenceNumber++; };
 
     CHIP_ERROR ShutdownSubscriptions() override;
-
-    Controller::DeviceControllerInteractionModelDelegate * GetInteractionModelDelegate() override { return mInitParams.imDelegate; }
 
     Messaging::ExchangeManager * GetExchangeManager() const override { return mInitParams.exchangeMgr; }
 

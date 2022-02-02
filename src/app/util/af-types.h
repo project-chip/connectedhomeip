@@ -96,7 +96,7 @@ typedef struct
     /**
      * Pointer to attribute metadata array for this cluster.
      */
-    EmberAfAttributeMetadata * attributes;
+    const EmberAfAttributeMetadata * attributes;
     /**
      * Total number of attributes
      */
@@ -328,7 +328,7 @@ typedef struct
      * Pointer to the cluster structs, describing clusters on this
      * endpoint type.
      */
-    EmberAfCluster * cluster;
+    const EmberAfCluster * cluster;
     /**
      * Number of clusters in this endpoint type.
      */
@@ -385,7 +385,12 @@ typedef struct
     /**
      * Endpoint type for this endpoint.
      */
-    EmberAfEndpointType * endpointType;
+    const EmberAfEndpointType * endpointType;
+    /**
+     * Pointer to the DataVersion storage for the server clusters on this
+     * endpoint
+     */
+    chip::DataVersion * dataVersions;
     /**
      * Network index for this endpoint.
      */

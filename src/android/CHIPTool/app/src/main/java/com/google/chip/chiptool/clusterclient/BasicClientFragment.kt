@@ -106,7 +106,7 @@ class BasicClientFragment : Fragment() {
 
   private suspend fun readBasicClusters(itemIndex: Int) {
     when(ATTRIBUTES[itemIndex]) {
-      getString(R.string.basic_cluster_interaction_mode_version_text) -> sendReadInteractionModelVersionAttribute()
+      getString(R.string.basic_cluster_data_model_revision_text) -> sendReadDataModelRevisionAttribute()
       getString(R.string.basic_cluster_vendor_name_text) -> sendReadVendorNameAttribute()
       getString(R.string.basic_cluster_vendor_id_text) -> sendReadVendorIDAttribute()
       getString(R.string.basic_cluster_product_name_text) -> sendReadProductNameAttribute()
@@ -129,7 +129,7 @@ class BasicClientFragment : Fragment() {
   }
 
   private fun makeAttributeList() {
-    ATTRIBUTES.add(getString(R.string.basic_cluster_interaction_mode_version_text))
+    ATTRIBUTES.add(getString(R.string.basic_cluster_data_model_revision_text))
     ATTRIBUTES.add(getString(R.string.basic_cluster_vendor_name_text))
     ATTRIBUTES.add(getString(R.string.basic_cluster_vendor_id_text))
     ATTRIBUTES.add(getString(R.string.basic_cluster_product_name_text))
@@ -150,16 +150,16 @@ class BasicClientFragment : Fragment() {
     ATTRIBUTES.add(getString(R.string.basic_cluster_cluster_revision_text))
   }
 
-  private suspend fun sendReadInteractionModelVersionAttribute() {
-    getBasicClusterForDevice().readInteractionModelVersionAttribute(object : ChipClusters.IntegerAttributeCallback {
+  private suspend fun sendReadDataModelRevisionAttribute() {
+    getBasicClusterForDevice().readDataModelRevisionAttribute(object : ChipClusters.IntegerAttributeCallback {
       override fun onSuccess(value: Int) {
-        Log.i(TAG,"[Read Success] InteractionModelVersion: $value")
-        showMessage("[Read Success] InteractionModelVersion: $value")
+        Log.i(TAG,"[Read Success] DataModelRevision: $value")
+        showMessage("[Read Success] DataModelRevision: $value")
       }
 
       override fun onError(ex: Exception) {
-        showMessage("Read InteractionModelVersion failure $ex")
-        Log.e(TAG, "Read InteractionModelVersion failure", ex)
+        showMessage("Read DataModelRevision failure $ex")
+        Log.e(TAG, "Read DataModelRevision failure", ex)
       }
     })
   }

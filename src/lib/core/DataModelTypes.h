@@ -42,12 +42,13 @@ typedef uint32_t FieldId;
 typedef uint16_t ListIndex;
 typedef uint32_t TransactionId;
 typedef uint16_t KeysetId;
+typedef uint8_t InteractionModelRevision;
 
 constexpr FabricIndex kUndefinedFabricIndex = 0;
 constexpr EndpointId kInvalidEndpointId     = 0xFFFF;
 constexpr EndpointId kRootEndpointId        = 0;
 constexpr ListIndex kInvalidListIndex       = 0xFFFF; // List index is a uint16 thus 0xFFFF is a invalid list index.
-
+constexpr DataVersion kUndefinedDataVersion = 0;
 // These are MEIs, 0xFFFF is not a valid manufacturer code,
 // thus 0xFFFF'FFFF is not a valid MEI.
 static constexpr ClusterId kInvalidClusterId     = 0xFFFF'FFFF;
