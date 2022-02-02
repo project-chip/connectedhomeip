@@ -51,7 +51,7 @@ CHIP_ERROR GenericThreadDriver::Init()
 
 CHIP_ERROR GenericThreadDriver::CommitConfiguration()
 {
-    // Note: on AttachToThreadNetwork OpenThread will persist the networks by their own, 
+    // Note: on AttachToThreadNetwork OpenThread will persist the networks by their own,
     // we don't have much to do for saving the networks (see Init() above,
     // we just loads the saved dataset from ot instance.)
     mSavedNetwork = mStagingNetwork;

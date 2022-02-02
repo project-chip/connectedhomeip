@@ -48,7 +48,7 @@ void GenericConnectivityManagerImpl_Thread<ImplClass>::_OnPlatformEvent(const Ch
     {
         ThreadStackMgrImpl().OnThreadAttachFinished();
     }
-    
+
     // If any of the above events has occurred, assess whether there's been a change in
     // service connectivity via Thread.
     if (threadConnChanged || threadAddrChanged || threadNetDataChanged || fabricMembershipChanged)
