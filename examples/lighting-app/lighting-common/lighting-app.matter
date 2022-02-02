@@ -1122,7 +1122,10 @@ client cluster OnOff = 6 {
   }
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> Cleaning up the remaining non determinism in MatterIDL template
 
   command Off(): DefaultSuccess = 0;
   command OffWithEffect(OffWithEffectRequest): DefaultSuccess = 64;
@@ -1130,11 +1133,14 @@ client cluster OnOff = 6 {
   command OnWithRecallGlobalScene(): DefaultSuccess = 65;
   command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
   command Toggle(): DefaultSuccess = 2;
+<<<<<<< HEAD
 >>>>>>> - Reverting from zcl_command_arguments to chip_cluster_command_arguments_with_structs_expanded
 =======
 >>>>>>> Cleaning up asBlock and regening
 =======
 >>>>>>> Fixing the request structs for commands in .matter generated files such that request struct  should be defined for all incoming commands from client to server and outgoing commands from client to server
+=======
+>>>>>>> Cleaning up the remaining non determinism in MatterIDL template
 }
 
 server cluster OnOff = 6 {

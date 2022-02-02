@@ -647,11 +647,14 @@ client cluster Groups = 4 {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> Restore the previous asBlocks behavior
 =======
 >>>>>>> Fixing the request structs for commands in .matter generated files such that request struct  should be defined for all incoming commands from client to server and outgoing commands from client to server
 =======
+=======
+>>>>>>> Cleaning up the remaining non determinism in MatterIDL template
 
   command AddGroup(AddGroupRequest): AddGroupResponse = 0;
   command AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
@@ -659,9 +662,12 @@ client cluster Groups = 4 {
   command RemoveAllGroups(): DefaultSuccess = 4;
   command RemoveGroup(RemoveGroupRequest): RemoveGroupResponse = 3;
   command ViewGroup(ViewGroupRequest): ViewGroupResponse = 1;
+<<<<<<< HEAD
 >>>>>>> Fixing the response structs for commands in .matter generated files such that response struct should be defined for all incoming commands from server to client and outgoing commands from server to client
 =======
 >>>>>>> Regening after rebasing master
+=======
+>>>>>>> Cleaning up the remaining non determinism in MatterIDL template
 }
 
 client cluster Identify = 3 {
@@ -1031,6 +1037,10 @@ client cluster OnOff = 6 {
   readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
+
+  command Off(): DefaultSuccess = 0;
+  command On(): DefaultSuccess = 1;
+  command Toggle(): DefaultSuccess = 2;
 }
 
 server cluster OperationalCredentials = 62 {
@@ -1247,11 +1257,14 @@ client cluster Scenes = 5 {
   }
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> Restore the previous asBlocks behavior
 =======
 >>>>>>> Fixing the request structs for commands in .matter generated files such that request struct  should be defined for all incoming commands from client to server and outgoing commands from client to server
 =======
+=======
+>>>>>>> Cleaning up the remaining non determinism in MatterIDL template
 
   command AddScene(AddSceneRequest): AddSceneResponse = 0;
   command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
@@ -1260,9 +1273,12 @@ client cluster Scenes = 5 {
   command RemoveScene(RemoveSceneRequest): RemoveSceneResponse = 2;
   command StoreScene(StoreSceneRequest): StoreSceneResponse = 4;
   command ViewScene(ViewSceneRequest): ViewSceneResponse = 1;
+<<<<<<< HEAD
 >>>>>>> Fixing the response structs for commands in .matter generated files such that response struct should be defined for all incoming commands from server to client and outgoing commands from server to client
 =======
 >>>>>>> Regening after rebasing master
+=======
+>>>>>>> Cleaning up the remaining non determinism in MatterIDL template
 }
 
 server cluster SoftwareDiagnostics = 52 {

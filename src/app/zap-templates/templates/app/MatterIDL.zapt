@@ -121,7 +121,8 @@
   {{/zcl_command_arguments}}
   {{/all_outgoing_commands_for_cluster}}
   {{/if}}
-  {{#chip_cluster_commands}}
+  {{#if (is_server side)}}
+  {{#all_incoming_commands_for_cluster name 'server'}}
   {{#first}}
 
   {{/first}}
@@ -129,12 +130,33 @@
   timed command
   {{~else}}
   command
-  {{~/if}} {{asUpperCamelCase name}}(
-    {{~#if arguments~}}
-       {{asUpperCamelCase name}}Request
-    {{~/if~}}
-  ): {{asUpperCamelCase responseName}} = {{code}};
-  {{/chip_cluster_commands}}
+  {{~/if}} {{asUpperCamelCase commandName}}(
+    {{~#zcl_command_arguments~}}
+    {{~#first~}}
+       {{asUpperCamelCase parent.commandName}}Request
+    {{~/first~}}
+    {{~/zcl_command_arguments~}}
+  ): {{#if responseName}}{{responseName}}{{else}}{{#if_command_has_response commandName ''}}{{commandName}}Response{{else}}{{#if_command_has_response commandName 'Request'}}{{replace_string commandName 'Request' ''}}Response{{else}}DefaultSuccess{{/if_command_has_response}}{{/if_command_has_response}}{{/if}} = {{code}};
+  {{/all_incoming_commands_for_cluster}}
+  {{/if}}
+  {{#if (is_client side)}}
+  {{#all_outgoing_commands_for_cluster name 'client'}}
+  {{#first}}
+
+  {{/first}}
+  {{#if mustUseTimedInvoke}}
+  timed command
+  {{~else}}
+  command
+  {{~/if}} {{asUpperCamelCase commandName}}(
+    {{~#zcl_command_arguments~}}
+    {{~#first~}}
+       {{asUpperCamelCase parent.commandName}}Request
+    {{~/first~}}
+    {{~/zcl_command_arguments~}}
+  ): {{#if responseName}}{{responseName}}{{else}}{{#if_command_has_response commandName ''}}{{commandName}}Response{{else}}{{#if_command_has_response commandName 'Request'}}{{replace_string commandName 'Request' ''}}Response{{else}}DefaultSuccess{{/if_command_has_response}}{{/if_command_has_response}}{{/if}} = {{code}};
+  {{/all_outgoing_commands_for_cluster}}
+  {{/if}}
 }
 
 {{/all_user_clusters}}

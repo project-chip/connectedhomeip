@@ -1684,8 +1684,7 @@ server cluster IasZone = 1280 {
 >>>>>>> Fixing the response structs for commands in .matter generated files such that response struct should be defined for all incoming commands from server to client and outgoing commands from server to client
   }
 
-  command ZoneEnrollRequest(ZoneEnrollRequestRequest): ZoneEnrollResponse = 1;
-  command ZoneStatusChangeNotification(ZoneStatusChangeNotificationRequest): DefaultSuccess = 0;
+  command ZoneEnrollResponse(ZoneEnrollResponseRequest): DefaultSuccess = 0;
 }
 
 server cluster Identify = 3 {
