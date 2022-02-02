@@ -83549,11 +83549,11 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Add Group 1 - endpoint 1\n");
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Add Group 1 (endpoint 1)\n");
             err = TestAddGroup1Endpoint1_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Add Group 2 - endpoint 0\n");
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Add Group 2 (endpoint 0)\n");
             err = TestAddGroup2Endpoint0_2();
             break;
         case 3:
@@ -83680,7 +83680,7 @@ private:
         using RequestType               = chip::app::Clusters::Groups::Commands::AddGroup::Type;
 
         RequestType request;
-        request.groupId   = 4660U;
+        request.groupId   = 257U;
         request.groupName = chip::Span<const char>("Group #1garbage: not in length on purpose", 8);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
@@ -83705,7 +83705,7 @@ private:
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
-        VerifyOrReturn(CheckValue("groupId", groupId, 4660U));
+        VerifyOrReturn(CheckValue("groupId", groupId, 257U));
 
         NextTest();
     }
@@ -83716,7 +83716,7 @@ private:
         using RequestType               = chip::app::Clusters::Groups::Commands::AddGroup::Type;
 
         RequestType request;
-        request.groupId   = 1U;
+        request.groupId   = 258U;
         request.groupName = chip::Span<const char>("Group #2garbage: not in length on purpose", 8);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
@@ -83741,7 +83741,7 @@ private:
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
-        VerifyOrReturn(CheckValue("groupId", groupId, 1U));
+        VerifyOrReturn(CheckValue("groupId", groupId, 258U));
 
         NextTest();
     }
@@ -83753,23 +83753,30 @@ private:
 
         RequestType request;
 
-        request.groupKeySet.groupKeySetID  = 257U;
-        request.groupKeySet.securityPolicy = static_cast<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy>(0);
-        request.groupKeySet.epochKey0 =
+        request.groupKeySet.groupKeySetID = 417U;
+        request.groupKeySet.groupKeySecurityPolicy =
+            static_cast<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy>(0);
+        request.groupKeySet.epochKey0.SetNonNull();
+        request.groupKeySet.epochKey0.Value() =
             chip::ByteSpan(chip::Uint8::from_const_char(
                                "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xafgarbage: not in length on purpose"),
                            16);
-        request.groupKeySet.epochStartTime0 = 1110000ULL;
-        request.groupKeySet.epochKey1 =
+        request.groupKeySet.epochStartTime0.SetNonNull();
+        request.groupKeySet.epochStartTime0.Value() = 1110000ULL;
+        request.groupKeySet.epochKey1.SetNonNull();
+        request.groupKeySet.epochKey1.Value() =
             chip::ByteSpan(chip::Uint8::from_const_char(
                                "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbfgarbage: not in length on purpose"),
                            16);
-        request.groupKeySet.epochStartTime1 = 1110001ULL;
-        request.groupKeySet.epochKey2 =
+        request.groupKeySet.epochStartTime1.SetNonNull();
+        request.groupKeySet.epochStartTime1.Value() = 1110001ULL;
+        request.groupKeySet.epochKey2.SetNonNull();
+        request.groupKeySet.epochKey2.Value() =
             chip::ByteSpan(chip::Uint8::from_const_char(
                                "\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcfgarbage: not in length on purpose"),
                            16);
-        request.groupKeySet.epochStartTime2 = 1110002ULL;
+        request.groupKeySet.epochStartTime2.SetNonNull();
+        request.groupKeySet.epochStartTime2.Value() = 1110002ULL;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_3();
@@ -83798,23 +83805,30 @@ private:
 
         RequestType request;
 
-        request.groupKeySet.groupKeySetID  = 258U;
-        request.groupKeySet.securityPolicy = static_cast<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy>(0);
-        request.groupKeySet.epochKey0 =
+        request.groupKeySet.groupKeySetID = 418U;
+        request.groupKeySet.groupKeySecurityPolicy =
+            static_cast<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy>(1);
+        request.groupKeySet.epochKey0.SetNonNull();
+        request.groupKeySet.epochKey0.Value() =
             chip::ByteSpan(chip::Uint8::from_const_char(
                                "\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdfgarbage: not in length on purpose"),
                            16);
-        request.groupKeySet.epochStartTime0 = 2220000ULL;
-        request.groupKeySet.epochKey1 =
+        request.groupKeySet.epochStartTime0.SetNonNull();
+        request.groupKeySet.epochStartTime0.Value() = 2220000ULL;
+        request.groupKeySet.epochKey1.SetNonNull();
+        request.groupKeySet.epochKey1.Value() =
             chip::ByteSpan(chip::Uint8::from_const_char(
                                "\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xefgarbage: not in length on purpose"),
                            16);
-        request.groupKeySet.epochStartTime1 = 2220001ULL;
-        request.groupKeySet.epochKey2 =
+        request.groupKeySet.epochStartTime1.SetNonNull();
+        request.groupKeySet.epochStartTime1.Value() = 2220001ULL;
+        request.groupKeySet.epochKey2.SetNonNull();
+        request.groupKeySet.epochKey2.Value() =
             chip::ByteSpan(chip::Uint8::from_const_char(
                                "\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xffgarbage: not in length on purpose"),
                            16);
-        request.groupKeySet.epochStartTime2 = 2220002ULL;
+        request.groupKeySet.epochStartTime2.SetNonNull();
+        request.groupKeySet.epochStartTime2.Value() = 2220002ULL;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_4();
@@ -83842,17 +83856,18 @@ private:
         chip::Controller::GroupKeyManagementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::Type> groupKeyMapArgument;
+        chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type>
+            groupKeyMapArgument;
 
-        chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::Type groupKeyMapList_0[2];
+        chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type groupKeyMapList_0[2];
 
         groupKeyMapList_0[0].fabricIndex   = 1;
-        groupKeyMapList_0[0].groupId       = 4660U;
-        groupKeyMapList_0[0].groupKeySetID = 257U;
+        groupKeyMapList_0[0].groupId       = 257U;
+        groupKeyMapList_0[0].groupKeySetID = 417U;
 
         groupKeyMapList_0[1].fabricIndex   = 1;
-        groupKeyMapList_0[1].groupId       = 1U;
-        groupKeyMapList_0[1].groupKeySetID = 258U;
+        groupKeyMapList_0[1].groupId       = 258U;
+        groupKeyMapList_0[1].groupKeySetID = 418U;
 
         groupKeyMapArgument = groupKeyMapList_0;
 
@@ -83871,7 +83886,7 @@ private:
 
     CHIP_ERROR TestGroupWriteAttribute_6()
     {
-        const chip::GroupId groupId = 1;
+        const chip::GroupId groupId = 258;
         chip::Controller::BasicClusterTest cluster;
         cluster.AssociateWithGroup(mDevices[kIdentityAlpha], groupId);
 
@@ -83919,7 +83934,7 @@ private:
 
     CHIP_ERROR TestRestoreInitialLocationValue_8()
     {
-        const chip::GroupId groupId = 1;
+        const chip::GroupId groupId = 258;
         chip::Controller::BasicClusterTest cluster;
         cluster.AssociateWithGroup(mDevices[kIdentityAlpha], groupId);
 
@@ -83967,7 +83982,7 @@ private:
 
     CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_10()
     {
-        const chip::GroupId groupId = 4660;
+        const chip::GroupId groupId = 257;
         using RequestType           = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -85696,7 +85711,7 @@ private:
         using RequestType               = chip::app::Clusters::Groups::Commands::AddGroup::Type;
 
         RequestType request;
-        request.groupId   = 17U;
+        request.groupId   = 257U;
         request.groupName = chip::Span<const char>("Group #1garbage: not in length on purpose", 8);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
@@ -85721,7 +85736,7 @@ private:
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
-        VerifyOrReturn(CheckValue("groupId", groupId, 17U));
+        VerifyOrReturn(CheckValue("groupId", groupId, 257U));
 
         NextTest();
     }
@@ -85732,7 +85747,7 @@ private:
         using RequestType               = chip::app::Clusters::Groups::Commands::AddGroup::Type;
 
         RequestType request;
-        request.groupId   = 18U;
+        request.groupId   = 258U;
         request.groupName = chip::Span<const char>("Group #2garbage: not in length on purpose", 8);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
@@ -85757,7 +85772,7 @@ private:
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
-        VerifyOrReturn(CheckValue("groupId", groupId, 18U));
+        VerifyOrReturn(CheckValue("groupId", groupId, 258U));
 
         NextTest();
     }
@@ -85769,7 +85784,7 @@ private:
 
         RequestType request;
 
-        request.groupKeySet.groupKeySetID = 257U;
+        request.groupKeySet.groupKeySetID = 417U;
         request.groupKeySet.groupKeySecurityPolicy =
             static_cast<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy>(0);
         request.groupKeySet.epochKey0.SetNonNull();
@@ -85821,7 +85836,7 @@ private:
 
         RequestType request;
 
-        request.groupKeySet.groupKeySetID = 258U;
+        request.groupKeySet.groupKeySetID = 418U;
         request.groupKeySet.groupKeySecurityPolicy =
             static_cast<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy>(1);
         request.groupKeySet.epochKey0.SetNonNull();
@@ -85872,7 +85887,7 @@ private:
         using RequestType               = chip::app::Clusters::GroupKeyManagement::Commands::KeySetRead::Type;
 
         RequestType request;
-        request.groupKeySetID = 257U;
+        request.groupKeySetID = 417U;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_7(data.groupKeySet);
@@ -85894,7 +85909,7 @@ private:
 
     void OnSuccessResponse_7(const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySetStruct::DecodableType & groupKeySet)
     {
-        VerifyOrReturn(CheckValue("groupKeySet.groupKeySetID", groupKeySet.groupKeySetID, 257U));
+        VerifyOrReturn(CheckValue("groupKeySet.groupKeySetID", groupKeySet.groupKeySetID, 417U));
         VerifyOrReturn(CheckValue("groupKeySet.groupKeySecurityPolicy", groupKeySet.groupKeySecurityPolicy, 0));
         VerifyOrReturn(CheckValueNull("groupKeySet.epochKey0", groupKeySet.epochKey0));
         VerifyOrReturn(CheckValueNonNull("groupKeySet.epochStartTime0", groupKeySet.epochStartTime0));
@@ -85921,12 +85936,12 @@ private:
         chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type groupKeyMapList_0[2];
 
         groupKeyMapList_0[0].fabricIndex   = 1;
-        groupKeyMapList_0[0].groupId       = 17U;
-        groupKeyMapList_0[0].groupKeySetID = 257U;
+        groupKeyMapList_0[0].groupId       = 257U;
+        groupKeyMapList_0[0].groupKeySetID = 417U;
 
         groupKeyMapList_0[1].fabricIndex   = 1;
-        groupKeyMapList_0[1].groupId       = 18U;
-        groupKeyMapList_0[1].groupKeySetID = 258U;
+        groupKeyMapList_0[1].groupId       = 258U;
+        groupKeyMapList_0[1].groupKeySetID = 418U;
 
         groupKeyMapArgument = groupKeyMapList_0;
 
@@ -85967,12 +85982,12 @@ private:
             auto iter_0 = groupKeyMap.begin();
             VerifyOrReturn(CheckNextListItemDecodes<decltype(groupKeyMap)>("groupKeyMap", iter_0, 0));
             VerifyOrReturn(CheckValue("groupKeyMap[0].fabricIndex", iter_0.GetValue().fabricIndex, 1));
-            VerifyOrReturn(CheckValue("groupKeyMap[0].groupId", iter_0.GetValue().groupId, 17U));
-            VerifyOrReturn(CheckValue("groupKeyMap[0].groupKeySetID", iter_0.GetValue().groupKeySetID, 257U));
+            VerifyOrReturn(CheckValue("groupKeyMap[0].groupId", iter_0.GetValue().groupId, 257U));
+            VerifyOrReturn(CheckValue("groupKeyMap[0].groupKeySetID", iter_0.GetValue().groupKeySetID, 417U));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(groupKeyMap)>("groupKeyMap", iter_0, 1));
             VerifyOrReturn(CheckValue("groupKeyMap[1].fabricIndex", iter_0.GetValue().fabricIndex, 1));
-            VerifyOrReturn(CheckValue("groupKeyMap[1].groupId", iter_0.GetValue().groupId, 18U));
-            VerifyOrReturn(CheckValue("groupKeyMap[1].groupKeySetID", iter_0.GetValue().groupKeySetID, 258U));
+            VerifyOrReturn(CheckValue("groupKeyMap[1].groupId", iter_0.GetValue().groupId, 258U));
+            VerifyOrReturn(CheckValue("groupKeyMap[1].groupKeySetID", iter_0.GetValue().groupKeySetID, 418U));
             VerifyOrReturn(CheckNoMoreListItems<decltype(groupKeyMap)>("groupKeyMap", iter_0, 2));
         }
 
@@ -86003,13 +86018,13 @@ private:
             auto iter_0 = groupTable.begin();
             VerifyOrReturn(CheckNextListItemDecodes<decltype(groupTable)>("groupTable", iter_0, 0));
             VerifyOrReturn(CheckValue("groupTable[0].fabricIndex", iter_0.GetValue().fabricIndex, 1));
-            VerifyOrReturn(CheckValue("groupTable[0].groupId", iter_0.GetValue().groupId, 17U));
+            VerifyOrReturn(CheckValue("groupTable[0].groupId", iter_0.GetValue().groupId, 257U));
             VerifyOrReturn(CheckValuePresent("groupTable[0].groupName", iter_0.GetValue().groupName));
             VerifyOrReturn(CheckValueAsString("groupTable[0].groupName.Value()", iter_0.GetValue().groupName.Value(),
                                               chip::CharSpan("Group #1", 8)));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(groupTable)>("groupTable", iter_0, 1));
             VerifyOrReturn(CheckValue("groupTable[1].fabricIndex", iter_0.GetValue().fabricIndex, 1));
-            VerifyOrReturn(CheckValue("groupTable[1].groupId", iter_0.GetValue().groupId, 18U));
+            VerifyOrReturn(CheckValue("groupTable[1].groupId", iter_0.GetValue().groupId, 258U));
             VerifyOrReturn(CheckValuePresent("groupTable[1].groupName", iter_0.GetValue().groupName));
             VerifyOrReturn(CheckValueAsString("groupTable[1].groupName.Value()", iter_0.GetValue().groupName.Value(),
                                               chip::CharSpan("Group #2", 8)));
@@ -86025,7 +86040,7 @@ private:
         using RequestType               = chip::app::Clusters::GroupKeyManagement::Commands::KeySetRemove::Type;
 
         RequestType request;
-        request.groupKeySetID = 257U;
+        request.groupKeySetID = 417U;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_11();
@@ -86053,7 +86068,7 @@ private:
         using RequestType               = chip::app::Clusters::GroupKeyManagement::Commands::KeySetRead::Type;
 
         RequestType request;
-        request.groupKeySetID = 257U;
+        request.groupKeySetID = 417U;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_12(data.groupKeySet);
@@ -86086,7 +86101,7 @@ private:
         using RequestType               = chip::app::Clusters::GroupKeyManagement::Commands::KeySetRead::Type;
 
         RequestType request;
-        request.groupKeySetID = 258U;
+        request.groupKeySetID = 418U;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_13(data.groupKeySet);
@@ -86109,7 +86124,7 @@ private:
     void
     OnSuccessResponse_13(const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySetStruct::DecodableType & groupKeySet)
     {
-        VerifyOrReturn(CheckValue("groupKeySet.groupKeySetID", groupKeySet.groupKeySetID, 258U));
+        VerifyOrReturn(CheckValue("groupKeySet.groupKeySetID", groupKeySet.groupKeySetID, 418U));
         VerifyOrReturn(CheckValue("groupKeySet.groupKeySecurityPolicy", groupKeySet.groupKeySecurityPolicy, 1));
         VerifyOrReturn(CheckValueNull("groupKeySet.epochKey0", groupKeySet.epochKey0));
         VerifyOrReturn(CheckValueNonNull("groupKeySet.epochStartTime0", groupKeySet.epochStartTime0));
@@ -86157,7 +86172,7 @@ private:
         using RequestType               = chip::app::Clusters::GroupKeyManagement::Commands::KeySetRemove::Type;
 
         RequestType request;
-        request.groupKeySetID = 258U;
+        request.groupKeySetID = 418U;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_15();
@@ -86185,7 +86200,7 @@ private:
         using RequestType               = chip::app::Clusters::GroupKeyManagement::Commands::KeySetRead::Type;
 
         RequestType request;
-        request.groupKeySetID = 258U;
+        request.groupKeySetID = 418U;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_16(data.groupKeySet);

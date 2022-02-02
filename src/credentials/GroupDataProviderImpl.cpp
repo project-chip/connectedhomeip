@@ -1643,7 +1643,7 @@ CHIP_ERROR GroupDataProviderImpl::GetKeySet(chip::FabricIndex fabric_index, uint
     out_keyset.keyset_id     = keyset.keyset_id;
     out_keyset.policy        = keyset.policy;
     out_keyset.num_keys_used = keyset.keys_count;
-    // Epoch keys are not read back, only the times
+    // Epoch keys are not read back, only start times
     memset(out_keyset.epoch_keys, 0x00, sizeof(out_keyset.epoch_keys));
     out_keyset.epoch_keys[0].start_time = keyset.operational_keys[0].start_time;
     out_keyset.epoch_keys[1].start_time = keyset.operational_keys[1].start_time;
@@ -1718,8 +1718,11 @@ bool GroupDataProviderImpl::KeySetIteratorImpl::Next(KeySet & output)
     output.keyset_id     = keyset.keyset_id;
     output.policy        = keyset.policy;
     output.num_keys_used = keyset.keys_count;
-    // Epoch keys are not read back
+    // Epoch keys are not read back, only start times
     memset(output.epoch_keys, 0x00, sizeof(output.epoch_keys));
+    output.epoch_keys[0].start_time = keyset.operational_keys[0].start_time;
+    output.epoch_keys[1].start_time = keyset.operational_keys[1].start_time;
+    output.epoch_keys[2].start_time = keyset.operational_keys[2].start_time;
     return true;
 }
 

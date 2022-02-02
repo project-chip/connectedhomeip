@@ -41742,7 +41742,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTAssertNotNil(cluster);
 
     __auto_type * params = [[CHIPGroupsClusterAddGroupParams alloc] init];
-    params.groupId = [NSNumber numberWithUnsignedShort:17U];
+    params.groupId = [NSNumber numberWithUnsignedShort:257U];
     params.groupName = @"Group #1";
     [cluster addGroupWithParams:params
               completionHandler:^(CHIPGroupsClusterAddGroupResponseParams * _Nullable values, NSError * _Nullable err) {
@@ -41756,7 +41756,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
                   }
                   {
                       id actualValue = values.groupId;
-                      XCTAssertEqual([actualValue unsignedShortValue], 17U);
+                      XCTAssertEqual([actualValue unsignedShortValue], 257U);
                   }
 
                   [expectation fulfill];
@@ -41774,7 +41774,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTAssertNotNil(cluster);
 
     __auto_type * params = [[CHIPGroupsClusterAddGroupParams alloc] init];
-    params.groupId = [NSNumber numberWithUnsignedShort:18U];
+    params.groupId = [NSNumber numberWithUnsignedShort:258U];
     params.groupName = @"Group #2";
     [cluster addGroupWithParams:params
               completionHandler:^(CHIPGroupsClusterAddGroupResponseParams * _Nullable values, NSError * _Nullable err) {
@@ -41788,7 +41788,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
                   }
                   {
                       id actualValue = values.groupId;
-                      XCTAssertEqual([actualValue unsignedShortValue], 18U);
+                      XCTAssertEqual([actualValue unsignedShortValue], 258U);
                   }
 
                   [expectation fulfill];
@@ -41807,7 +41807,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
 
     __auto_type * params = [[CHIPGroupKeyManagementClusterKeySetWriteParams alloc] init];
     params.groupKeySet = [[CHIPGroupKeyManagementClusterGroupKeySetStruct alloc] init];
-    ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).groupKeySetID = [NSNumber numberWithUnsignedShort:257U];
+    ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).groupKeySetID = [NSNumber numberWithUnsignedShort:417U];
     ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).groupKeySecurityPolicy =
         [NSNumber numberWithUnsignedChar:0];
     ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochKey0 =
@@ -41845,7 +41845,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
 
     __auto_type * params = [[CHIPGroupKeyManagementClusterKeySetWriteParams alloc] init];
     params.groupKeySet = [[CHIPGroupKeyManagementClusterGroupKeySetStruct alloc] init];
-    ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).groupKeySetID = [NSNumber numberWithUnsignedShort:258U];
+    ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).groupKeySetID = [NSNumber numberWithUnsignedShort:418U];
     ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).groupKeySecurityPolicy =
         [NSNumber numberWithUnsignedChar:1];
     ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochKey0 =
@@ -41882,7 +41882,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTAssertNotNil(cluster);
 
     __auto_type * params = [[CHIPGroupKeyManagementClusterKeySetReadParams alloc] init];
-    params.groupKeySetID = [NSNumber numberWithUnsignedShort:257U];
+    params.groupKeySetID = [NSNumber numberWithUnsignedShort:417U];
     [cluster
         keySetReadWithParams:params
            completionHandler:^(CHIPGroupKeyManagementClusterKeySetReadResponseParams * _Nullable values, NSError * _Nullable err) {
@@ -41893,7 +41893,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
                {
                    id actualValue = values.groupKeySet;
                    XCTAssertEqual(
-                       [((CHIPGroupKeyManagementClusterGroupKeySetStruct *) actualValue).groupKeySetID unsignedShortValue], 257U);
+                       [((CHIPGroupKeyManagementClusterGroupKeySetStruct *) actualValue).groupKeySetID unsignedShortValue], 417U);
                    XCTAssertEqual(
                        [((CHIPGroupKeyManagementClusterGroupKeySetStruct *) actualValue).groupKeySecurityPolicy unsignedCharValue],
                        0);
@@ -41933,13 +41933,13 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
         NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
         temp_0[0] = [[CHIPGroupKeyManagementClusterGroupKeyMapStruct alloc] init];
         ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:1];
-        ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[0]).groupId = [NSNumber numberWithUnsignedShort:17U];
-        ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[0]).groupKeySetID = [NSNumber numberWithUnsignedShort:257U];
+        ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[0]).groupId = [NSNumber numberWithUnsignedShort:257U];
+        ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[0]).groupKeySetID = [NSNumber numberWithUnsignedShort:417U];
 
         temp_0[1] = [[CHIPGroupKeyManagementClusterGroupKeyMapStruct alloc] init];
         ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:1];
-        ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[1]).groupId = [NSNumber numberWithUnsignedShort:18U];
-        ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[1]).groupKeySetID = [NSNumber numberWithUnsignedShort:258U];
+        ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[1]).groupId = [NSNumber numberWithUnsignedShort:258U];
+        ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[1]).groupKeySetID = [NSNumber numberWithUnsignedShort:418U];
 
         groupKeyMapArgument = temp_0;
     }
@@ -41972,13 +41972,13 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
             id actualValue = value;
             XCTAssertEqual([actualValue count], 2);
             XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[0]).fabricIndex unsignedCharValue], 1);
-            XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[0]).groupId unsignedShortValue], 17U);
+            XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[0]).groupId unsignedShortValue], 257U);
             XCTAssertEqual(
-                [((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[0]).groupKeySetID unsignedShortValue], 257U);
+                [((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[0]).groupKeySetID unsignedShortValue], 417U);
             XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[1]).fabricIndex unsignedCharValue], 1);
-            XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[1]).groupId unsignedShortValue], 18U);
+            XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[1]).groupId unsignedShortValue], 258U);
             XCTAssertEqual(
-                [((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[1]).groupKeySetID unsignedShortValue], 258U);
+                [((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[1]).groupKeySetID unsignedShortValue], 418U);
         }
 
         [expectation fulfill];
@@ -42004,11 +42004,11 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
             id actualValue = value;
             XCTAssertEqual([actualValue count], 2);
             XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[0]).fabricIndex unsignedCharValue], 1);
-            XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[0]).groupId unsignedShortValue], 17U);
+            XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[0]).groupId unsignedShortValue], 257U);
             XCTAssertTrue(
                 [((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[0]).groupName isEqualToString:@"Group #1"]);
             XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[1]).fabricIndex unsignedCharValue], 1);
-            XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[1]).groupId unsignedShortValue], 18U);
+            XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[1]).groupId unsignedShortValue], 258U);
             XCTAssertTrue(
                 [((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[1]).groupName isEqualToString:@"Group #2"]);
         }
@@ -42028,7 +42028,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTAssertNotNil(cluster);
 
     __auto_type * params = [[CHIPGroupKeyManagementClusterKeySetRemoveParams alloc] init];
-    params.groupKeySetID = [NSNumber numberWithUnsignedShort:257U];
+    params.groupKeySetID = [NSNumber numberWithUnsignedShort:417U];
     [cluster keySetRemoveWithParams:params
                   completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"KeySet Remove 1 Error: %@", err);
@@ -42050,7 +42050,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTAssertNotNil(cluster);
 
     __auto_type * params = [[CHIPGroupKeyManagementClusterKeySetReadParams alloc] init];
-    params.groupKeySetID = [NSNumber numberWithUnsignedShort:257U];
+    params.groupKeySetID = [NSNumber numberWithUnsignedShort:417U];
     [cluster
         keySetReadWithParams:params
            completionHandler:^(CHIPGroupKeyManagementClusterKeySetReadResponseParams * _Nullable values, NSError * _Nullable err) {
@@ -42072,7 +42072,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTAssertNotNil(cluster);
 
     __auto_type * params = [[CHIPGroupKeyManagementClusterKeySetReadParams alloc] init];
-    params.groupKeySetID = [NSNumber numberWithUnsignedShort:258U];
+    params.groupKeySetID = [NSNumber numberWithUnsignedShort:418U];
     [cluster
         keySetReadWithParams:params
            completionHandler:^(CHIPGroupKeyManagementClusterKeySetReadResponseParams * _Nullable values, NSError * _Nullable err) {
@@ -42083,7 +42083,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
                {
                    id actualValue = values.groupKeySet;
                    XCTAssertEqual(
-                       [((CHIPGroupKeyManagementClusterGroupKeySetStruct *) actualValue).groupKeySetID unsignedShortValue], 258U);
+                       [((CHIPGroupKeyManagementClusterGroupKeySetStruct *) actualValue).groupKeySetID unsignedShortValue], 418U);
                    XCTAssertEqual(
                        [((CHIPGroupKeyManagementClusterGroupKeySetStruct *) actualValue).groupKeySecurityPolicy unsignedCharValue],
                        1);
@@ -42138,7 +42138,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTAssertNotNil(cluster);
 
     __auto_type * params = [[CHIPGroupKeyManagementClusterKeySetRemoveParams alloc] init];
-    params.groupKeySetID = [NSNumber numberWithUnsignedShort:258U];
+    params.groupKeySetID = [NSNumber numberWithUnsignedShort:418U];
     [cluster keySetRemoveWithParams:params
                   completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"KeySet Remove 2 Error: %@", err);
@@ -42160,7 +42160,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTAssertNotNil(cluster);
 
     __auto_type * params = [[CHIPGroupKeyManagementClusterKeySetReadParams alloc] init];
-    params.groupKeySetID = [NSNumber numberWithUnsignedShort:258U];
+    params.groupKeySetID = [NSNumber numberWithUnsignedShort:418U];
     [cluster
         keySetReadWithParams:params
            completionHandler:^(CHIPGroupKeyManagementClusterKeySetReadResponseParams * _Nullable values, NSError * _Nullable err) {
