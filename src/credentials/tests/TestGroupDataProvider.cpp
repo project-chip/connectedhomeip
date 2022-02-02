@@ -134,11 +134,14 @@ static TestListener sListener;
 
 bool CompareKeySets(const KeySet & keyset1, const KeySet & keyset2)
 {
-    ReturnErrorOnFailure(keyset1.policy == keyset2.policy);
-    ReturnErrorOnFailure(keyset1.num_keys_used == keyset2.num_keys_used);
-    ReturnErrorOnFailure(keyset1.epoch_keys[0].start_time == keyset2.epoch_keys[0].start_time);
-    ReturnErrorOnFailure(keyset1.epoch_keys[1].start_time == keyset2.epoch_keys[1].start_time);
-    ReturnErrorOnFailure(keyset1.epoch_keys[2].start_time == keyset2.epoch_keys[2].start_time);
+    VerifyOrReturnError(keyset1.policy == keyset2.policy, false);
+    VerifyOrReturnError(keyset1.num_keys_used == keyset2.num_keys_used, false);
+    VerifyOrReturnError(keyset1.epoch_keys[0].start_time == keyset2.epoch_keys[0].start_time, false);
+    VerifyOrReturnError(keyset1.epoch_keys[1].start_time == keyset2.epoch_keys[1].start_time, false);
+    VerifyOrReturnError(keyset1.epoch_keys[2].start_time == keyset2.epoch_keys[2].start_time, false);
+    VerifyOrReturnError(0 == memcmp(kZeroKey, keyset1.epoch_keys[0].key, EpochKey::kLengthBytes), false);
+    VerifyOrReturnError(0 == memcmp(kZeroKey, keyset1.epoch_keys[1].key, EpochKey::kLengthBytes), false);
+    VerifyOrReturnError(0 == memcmp(kZeroKey, keyset1.epoch_keys[2].key, EpochKey::kLengthBytes), false);
     return true;
 }
 
