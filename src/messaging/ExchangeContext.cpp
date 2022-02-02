@@ -438,7 +438,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
     });
 
     ReturnErrorOnFailure(mDispatch.OnMessageReceived(messageCounter, payloadHeader, peerAddress, msgFlags,
-                                                        GetReliableMessageContext(), IsGroupExchangeContext()));
+                                                     GetReliableMessageContext(), IsGroupExchangeContext()));
 
     if (IsAckPending() && !mDelegate)
     {
