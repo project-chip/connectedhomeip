@@ -5,8 +5,20 @@
   {{#if (isLiteralNull expected)}}
     VerifyOrReturn(CheckValueNull("{{label}}", {{actual}}));
   {{else}}
-    VerifyOrReturn(CheckValueNonNull("{{label}}", {{actual}}));
-    {{>valueEquals label=(concat label ".Value()") actual=(concat actual ".Value()") expected=expected isNullable=false depth=(incrementDepth depth)}}
+    {{#if (chip_tests_variables_has expected)}}
+      {{! Expected value is also a nullable. }}
+      if ({{expected}}.IsNull()) {
+        VerifyOrReturn(CheckValueNull("{{label}}", {{actual}}));
+      }
+      else
+      {
+        VerifyOrReturn(CheckValueNonNull("{{label}}", {{actual}}));
+        {{>valueEquals label=(concat label ".Value()") actual=(concat actual ".Value()") expected=(concat expected ".Value()") isNullable=false depth=(incrementDepth depth)}}
+      }
+    {{else}}
+      VerifyOrReturn(CheckValueNonNull("{{label}}", {{actual}}));
+      {{>valueEquals label=(concat label ".Value()") actual=(concat actual ".Value()") expected=expected isNullable=false depth=(incrementDepth depth)}}
+    {{/if}}
   {{/if}}
 {{else if isArray}}
     {

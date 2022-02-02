@@ -275,11 +275,14 @@ function chip_cluster_command_arguments(options)
 function chip_cluster_command_arguments_with_structs_expanded(options)
 {
   const commandId = checkIsInsideCommandBlock(this, 'chip_cluster_command_arguments');
-  const commands  = getCommands.call(this.parent, 'chip_cluster_commands_argments_with_structs_expanded');
+  const commands  = getCommands.call(this.parent, 'chip_cluster_command_arguments_with_structs_expanded');
 
   const filter = command => command.id == commandId;
   return asBlocks.call(this, commands.then(items => {
     const item = items.find(filter);
+    if (item === undefined) {
+      return [];
+    }
     return item.expandedArguments || item.arguments;
   }),
       options);

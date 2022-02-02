@@ -285,6 +285,12 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
         mSessionMgr = nullptr;
     }
 
+    if (mFabrics != nullptr)
+    {
+        chip::Platform::Delete(mFabrics);
+        mFabrics = nullptr;
+    }
+
     return CHIP_NO_ERROR;
 }
 
