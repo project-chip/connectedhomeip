@@ -27,8 +27,12 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.cpp>
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.cpp>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.cpp>
-
+//   "../OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp",
+//   "../OpenThread/GenericThreadStackManagerImpl_OpenThread.h",
+//   "../OpenThread/GenericNetworkCommissioningThreadDriver.cpp",
+//   "../OpenThread/GenericNetworkCommissioningThreadDriver.h",
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 
