@@ -37,9 +37,9 @@ server cluster AdministratorCommissioning = 60 {
     INT16U passcodeID = 5;
   }
 
-  command OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
-  command OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
-  command RevokeCommissioning(): DefaultSuccess = 2;
+  timed command OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
+  timed command OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
+  timed command RevokeCommissioning(): DefaultSuccess = 2;
 }
 
 server cluster Basic = 40 {
@@ -57,7 +57,7 @@ server cluster Basic = 40 {
     boolean reachableNewValue = 0;
   }
 
-  readonly attribute int16u interactionModelVersion = 0;
+  readonly attribute int16u dataModelRevision = 0;
   readonly attribute char_string<32> vendorName = 1;
   readonly attribute vendor_id vendorID = 2;
   readonly attribute char_string<32> productName = 3;
@@ -332,6 +332,12 @@ server cluster NetworkCommissioning = 49 {
     k60g = 4;
   }
 
+  bitmap NetworkCommissioningFeature : BITMAP32 {
+    kWiFiNetworkInterface = 0x1;
+    kThreadNetworkInterface = 0x2;
+    kEthernetNetworkInterface = 0x4;
+  }
+
   struct NetworkInfo {
     OCTET_STRING networkID = 0;
     BOOLEAN connected = 1;
@@ -578,6 +584,10 @@ server cluster UnitLocalization = 45 {
     kFahrenheit = 0;
     kCelsius = 1;
     kKelvin = 2;
+  }
+
+  bitmap UnitLocalizationFeature : BITMAP32 {
+    kTemperatureUnit = 0x1;
   }
 
   attribute TempUnit temperatureUnit = 0;

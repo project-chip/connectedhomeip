@@ -2,7 +2,11 @@
 class {{filename}}: public TestCommand
 {
   public:
+    {{#if ../credsIssuerConfigArg}}
+    {{filename}}(CredentialIssuerCommands * credsIssuerConfig): TestCommand("{{filename}}", credsIssuerConfig), mTestIndex(0)
+    {{else}}
     {{filename}}(): TestCommand("{{filename}}"), mTestIndex(0)
+    {{/if}}
     {
         {{#chip_tests_config}}
           {{#if (isString type)}}
@@ -93,7 +97,7 @@ class {{filename}}: public TestCommand
     {{#chip_tests_item_response_parameters}}
     {{#if saveAs}}
     {{~#if (isString type)}}{{#if (isOctetString type)}}uint8_t{{else}}char{{/if}} * {{saveAs}}Buffer = nullptr;{{/if~}}
-    {{chipType}} {{saveAs}};
+    {{zapTypeToDecodableClusterObjectType type ns=../cluster}} {{saveAs}};
     {{/if}}
     {{/chip_tests_item_response_parameters}}
     {{/chip_tests_items}}

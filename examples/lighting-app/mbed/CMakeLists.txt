@@ -54,7 +54,6 @@ target_sources(${APP_TARGET} PRIVATE
 )
 
 chip_configure_data_model(${APP_TARGET}
-    INCLUDE_CLIENT_CALLBACKS
     INCLUDE_SERVER
     ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../lighting-common/lighting-app.zap
     GEN_DIR ${GEN_DIR}/lighting-app/zap-generated

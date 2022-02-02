@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019-2020 Google LLC.
  *    Copyright (c) 2018 Nest Labs, Inc.
  *
@@ -96,6 +96,9 @@ public:
     virtual CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVer)                                   = 0;
     virtual CHIP_ERROR GetSetupPinCode(uint32_t & setupPinCode)                                     = 0;
     virtual CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator)                         = 0;
+    virtual CHIP_ERROR GetSpake2pIterationCount(uint32_t & iterationCount)                          = 0;
+    virtual CHIP_ERROR GetSpake2pSalt(uint8_t * buf, size_t bufSize, size_t & saltLen)              = 0;
+    virtual CHIP_ERROR GetSpake2pVerifier(uint8_t * buf, size_t bufSize, size_t & verifierLen)      = 0;
     // Lifetime counter is monotonic counter that is incremented only in the case of a factory reset
     virtual CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter)                  = 0;
     virtual CHIP_ERROR IncrementLifetimeCounter()                                      = 0;

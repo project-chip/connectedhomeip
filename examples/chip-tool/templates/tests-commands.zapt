@@ -21,16 +21,16 @@ public:
     }
 };
 
-{{>test_cluster tests=(getTests)}}
+{{>test_cluster tests=(getTests) credsIssuerConfigArg=true}}
 
-void registerCommandsTests(Commands & commands)
+void registerCommandsTests(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     const char * clusterName = "Tests";
 
     commands_list clusterCommands = {
         make_unique<TestList>(),
       {{#chip_tests (getTests)}}
-        make_unique<{{filename}}>(),
+        make_unique<{{filename}}>(credsIssuerConfig),
       {{/chip_tests}}
     };
 

@@ -2248,6 +2248,27 @@ void TimeFormatLocalizationClusterSupportedCalendarTypesListAttributeFilter(TLV:
     cb->mCall(cb->mContext, list);
 }
 
+void UnitLocalizationClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                             Callback::Cancelable * onFailureCallback)
+{
+    chip::app::DataModel::DecodableList<chip::AttributeId> list;
+    CHIP_ERROR err = Decode(*tlvData, list);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    Callback::Callback<UnitLocalizationAttributeListListAttributeCallback> * cb =
+        Callback::Callback<UnitLocalizationAttributeListListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, list);
+}
+
 void UserLabelClusterLabelListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                   Callback::Cancelable * onFailureCallback)
 {
@@ -2452,6 +2473,48 @@ bool emberAfDoorLockClusterGetUserResponseCallback(EndpointId endpoint, app::Com
         Callback::Callback<DoorLockClusterGetUserResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, userIndex, userName, userUniqueId, userStatus, userType, credentialRule, credentials,
               creatorFabricIndex, lastModifiedFabricIndex, nextUserIndex);
+    return true;
+}
+
+bool emberAfDoorLockClusterGetWeekDayScheduleResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
+                                                              uint8_t weekDayIndex, uint16_t userIndex, uint8_t status,
+                                                              uint8_t daysMask, uint8_t startHour, uint8_t startMinute,
+                                                              uint8_t endHour, uint8_t endMinute)
+{
+    ChipLogProgress(Zcl, "GetWeekDayScheduleResponse:");
+    ChipLogProgress(Zcl, "  weekDayIndex: %" PRIu8 "", weekDayIndex);
+    ChipLogProgress(Zcl, "  userIndex: %" PRIu16 "", userIndex);
+    ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
+    ChipLogProgress(Zcl, "  daysMask: %" PRIu8 "", daysMask);
+    ChipLogProgress(Zcl, "  startHour: %" PRIu8 "", startHour);
+    ChipLogProgress(Zcl, "  startMinute: %" PRIu8 "", startMinute);
+    ChipLogProgress(Zcl, "  endHour: %" PRIu8 "", endHour);
+    ChipLogProgress(Zcl, "  endMinute: %" PRIu8 "", endMinute);
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetWeekDayScheduleResponseCallback");
+
+    Callback::Callback<DoorLockClusterGetWeekDayScheduleResponseCallback> * cb =
+        Callback::Callback<DoorLockClusterGetWeekDayScheduleResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, weekDayIndex, userIndex, status, daysMask, startHour, startMinute, endHour, endMinute);
+    return true;
+}
+
+bool emberAfDoorLockClusterGetYearDayScheduleResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
+                                                              uint8_t yearDayIndex, uint16_t userIndex, uint8_t status,
+                                                              uint32_t localStartTime, uint32_t localEndTime)
+{
+    ChipLogProgress(Zcl, "GetYearDayScheduleResponse:");
+    ChipLogProgress(Zcl, "  yearDayIndex: %" PRIu8 "", yearDayIndex);
+    ChipLogProgress(Zcl, "  userIndex: %" PRIu16 "", userIndex);
+    ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
+    ChipLogProgress(Zcl, "  localStartTime: %" PRIu32 "", localStartTime);
+    ChipLogProgress(Zcl, "  localEndTime: %" PRIu32 "", localEndTime);
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetYearDayScheduleResponseCallback");
+
+    Callback::Callback<DoorLockClusterGetYearDayScheduleResponseCallback> * cb =
+        Callback::Callback<DoorLockClusterGetYearDayScheduleResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, yearDayIndex, userIndex, status, localStartTime, localEndTime);
     return true;
 }
 

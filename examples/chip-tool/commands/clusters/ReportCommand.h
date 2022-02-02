@@ -26,13 +26,15 @@
 class ReportCommand : public ModelCommand, public chip::app::ReadClient::Callback
 {
 public:
-    ReportCommand(const char * commandName) : ModelCommand(commandName), mBufferedReadAdapter(*this) {}
+    ReportCommand(const char * commandName, CredentialIssuerCommands * credsIssuerConfig) :
+        ModelCommand(commandName, credsIssuerConfig), mBufferedReadAdapter(*this)
+    {}
 
     virtual void OnAttributeSubscription(){};
     virtual void OnEventSubscription(){};
 
     /////////// ReadClient Callback Interface /////////
-    void OnAttributeData(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data,
+    void OnAttributeData(const chip::app::ConcreteDataAttributePath & path, chip::DataVersion aVersion, chip::TLV::TLVReader * data,
                          const chip::app::StatusIB & status) override
     {
         CHIP_ERROR error = status.ToChipError();
@@ -163,21 +165,24 @@ protected:
 class ReadAttribute : public ReportCommand
 {
 public:
-    ReadAttribute() : ReportCommand("read-by-id")
+    ReadAttribute(CredentialIssuerCommands * credsIssuerConfig) : ReportCommand("read-by-id", credsIssuerConfig)
     {
         AddArgument("cluster-id", 0, UINT32_MAX, &mClusterId);
         AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
         ReportCommand::AddArguments();
     }
 
-    ReadAttribute(chip::ClusterId clusterId) : ReportCommand("read-by-id"), mClusterId(clusterId)
+    ReadAttribute(chip::ClusterId clusterId, CredentialIssuerCommands * credsIssuerConfig) :
+        ReportCommand("read-by-id", credsIssuerConfig), mClusterId(clusterId)
     {
         AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
         ReportCommand::AddArguments();
     }
 
-    ReadAttribute(chip::ClusterId clusterId, const char * attributeName, chip::AttributeId attributeId) :
-        ReportCommand("read"), mClusterId(clusterId), mAttributeId(attributeId)
+    ReadAttribute(chip::ClusterId clusterId, const char * attributeName, chip::AttributeId attributeId,
+                  CredentialIssuerCommands * credsIssuerConfig) :
+        ReportCommand("read", credsIssuerConfig),
+        mClusterId(clusterId), mAttributeId(attributeId)
     {
         AddArgument("attr-name", attributeName);
         ReportCommand::AddArguments();
@@ -201,7 +206,7 @@ private:
 class SubscribeAttribute : public ReportCommand
 {
 public:
-    SubscribeAttribute() : ReportCommand("subscribe-by-id")
+    SubscribeAttribute(CredentialIssuerCommands * credsIssuerConfig) : ReportCommand("subscribe-by-id", credsIssuerConfig)
     {
         AddArgument("cluster-id", 0, UINT32_MAX, &mClusterId);
         AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
@@ -211,7 +216,8 @@ public:
         ReportCommand::AddArguments();
     }
 
-    SubscribeAttribute(chip::ClusterId clusterId) : ReportCommand("subscribe-by-id"), mClusterId(clusterId)
+    SubscribeAttribute(chip::ClusterId clusterId, CredentialIssuerCommands * credsIssuerConfig) :
+        ReportCommand("subscribe-by-id", credsIssuerConfig), mClusterId(clusterId)
     {
         AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -220,8 +226,10 @@ public:
         ReportCommand::AddArguments();
     }
 
-    SubscribeAttribute(chip::ClusterId clusterId, const char * attributeName, chip::AttributeId attributeId) :
-        ReportCommand("subscribe"), mClusterId(clusterId), mAttributeId(attributeId)
+    SubscribeAttribute(chip::ClusterId clusterId, const char * attributeName, chip::AttributeId attributeId,
+                       CredentialIssuerCommands * credsIssuerConfig) :
+        ReportCommand("subscribe", credsIssuerConfig),
+        mClusterId(clusterId), mAttributeId(attributeId)
     {
         AddArgument("attr-name", attributeName);
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -265,21 +273,24 @@ private:
 class ReadEvent : public ReportCommand
 {
 public:
-    ReadEvent() : ReportCommand("read-event-by-id")
+    ReadEvent(CredentialIssuerCommands * credsIssuerConfig) : ReportCommand("read-event-by-id", credsIssuerConfig)
     {
         AddArgument("cluster-id", 0, UINT32_MAX, &mClusterId);
         AddArgument("event-id", 0, UINT32_MAX, &mEventId);
         ReportCommand::AddArguments();
     }
 
-    ReadEvent(chip::ClusterId clusterId) : ReportCommand("read-event-by-id"), mClusterId(clusterId)
+    ReadEvent(chip::ClusterId clusterId, CredentialIssuerCommands * credsIssuerConfig) :
+        ReportCommand("read-event-by-id", credsIssuerConfig), mClusterId(clusterId)
     {
         AddArgument("event-id", 0, UINT32_MAX, &mEventId);
         ReportCommand::AddArguments();
     }
 
-    ReadEvent(chip::ClusterId clusterId, const char * eventName, chip::EventId eventId) :
-        ReportCommand("read-event"), mClusterId(clusterId), mEventId(eventId)
+    ReadEvent(chip::ClusterId clusterId, const char * eventName, chip::EventId eventId,
+              CredentialIssuerCommands * credsIssuerConfig) :
+        ReportCommand("read-event", credsIssuerConfig),
+        mClusterId(clusterId), mEventId(eventId)
     {
         AddArgument("event-name", eventName);
         ReportCommand::AddArguments();
@@ -302,7 +313,7 @@ private:
 class SubscribeEvent : public ReportCommand
 {
 public:
-    SubscribeEvent() : ReportCommand("subscribe-event-by-id")
+    SubscribeEvent(CredentialIssuerCommands * credsIssuerConfig) : ReportCommand("subscribe-event-by-id", credsIssuerConfig)
     {
         AddArgument("cluster-id", 0, UINT32_MAX, &mClusterId);
         AddArgument("event-id", 0, UINT32_MAX, &mEventId);
@@ -312,7 +323,8 @@ public:
         ReportCommand::AddArguments();
     }
 
-    SubscribeEvent(chip::ClusterId clusterId) : ReportCommand("subscribe-event-by-id"), mClusterId(clusterId)
+    SubscribeEvent(chip::ClusterId clusterId, CredentialIssuerCommands * credsIssuerConfig) :
+        ReportCommand("subscribe-event-by-id", credsIssuerConfig), mClusterId(clusterId)
     {
         AddArgument("event-id", 0, UINT32_MAX, &mEventId);
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -321,8 +333,10 @@ public:
         ReportCommand::AddArguments();
     }
 
-    SubscribeEvent(chip::ClusterId clusterId, const char * eventName, chip::EventId eventId) :
-        ReportCommand("subscribe-event"), mClusterId(clusterId), mEventId(eventId)
+    SubscribeEvent(chip::ClusterId clusterId, const char * eventName, chip::EventId eventId,
+                   CredentialIssuerCommands * credsIssuerConfig) :
+        ReportCommand("subscribe-event", credsIssuerConfig),
+        mClusterId(clusterId), mEventId(eventId)
     {
         AddArgument("attr-name", eventName);
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);

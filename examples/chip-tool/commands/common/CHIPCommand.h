@@ -52,18 +52,14 @@ public:
     using PeerId                 = ::chip::PeerId;
     using PeerAddress            = ::chip::Transport::PeerAddress;
 
-    CHIPCommand(const char * commandName) : Command(commandName)
+    CHIPCommand(const char * commandName, CredentialIssuerCommands * credIssuerCmds) :
+        Command(commandName), mCredIssuerCmds(credIssuerCmds)
     {
         AddArgument("commissioner-name", &mCommissionerName);
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
         AddArgument("trace_file", &mTraceFile);
         AddArgument("trace_log", 0, 1, &mTraceLog);
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
-    }
-
-    CHIPCommand(const char * commandName, CredentialIssuerCommands * credIssuerCmds) : CHIPCommand(commandName)
-    {
-        mCredIssuerCmds = credIssuerCmds;
     }
 
     /////////// Command Interface /////////
@@ -94,8 +90,7 @@ protected:
     PersistentStorage mDefaultStorage;
     PersistentStorage mCommissionerStorage;
     chip::SimpleFabricStorage mFabricStorage;
-    ExampleCredentialIssuerCommands mExampleCredentialIssuerCmds;
-    CredentialIssuerCommands * mCredIssuerCmds = &mExampleCredentialIssuerCmds;
+    CredentialIssuerCommands * mCredIssuerCmds;
 
     std::string GetIdentity();
     void SetIdentity(const char * name);

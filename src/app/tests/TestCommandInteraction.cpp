@@ -103,15 +103,6 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
     chip::isCommandDispatched = true;
 }
 
-void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPath, chip::TLV::TLVReader & aReader,
-                                          CommandSender * apCommandObj)
-{
-    ChipLogDetail(Controller,
-                  "Received Cluster Command: Endpoint=%" PRIx16 " Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
-                  aCommandPath.mEndpointId, ChipLogValueMEI(aCommandPath.mClusterId), ChipLogValueMEI(aCommandPath.mCommandId));
-    // Nothing todo.
-}
-
 class MockCommandSenderCallback : public CommandSender::Callback
 {
 public:

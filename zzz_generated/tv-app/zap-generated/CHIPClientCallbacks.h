@@ -30,32 +30,6 @@
 #include <lib/support/FunctionTraits.h>
 #include <lib/support/Span.h>
 
-// Note: The IMDefaultResponseCallback is a bridge to the old CallbackMgr before IM is landed, so it still accepts EmberAfStatus
-// instead of IM status code.
-// #6308 should handle IM error code on the application side, either modify this function or remove this.
-
-// Cluster Specific Response Callbacks
-typedef void (*GeneralCommissioningClusterArmFailSafeResponseCallback)(void * context, uint8_t errorCode, chip::CharSpan debugText);
-typedef void (*GeneralCommissioningClusterCommissioningCompleteResponseCallback)(void * context, uint8_t errorCode,
-                                                                                 chip::CharSpan debugText);
-typedef void (*GeneralCommissioningClusterSetRegulatoryConfigResponseCallback)(void * context, uint8_t errorCode,
-                                                                               chip::CharSpan debugText);
-typedef void (*NetworkCommissioningClusterConnectNetworkResponseCallback)(void * context, uint8_t NetworkingStatus,
-                                                                          chip::CharSpan DebugText, int32_t ErrorValue);
-typedef void (*NetworkCommissioningClusterNetworkConfigResponseCallback)(void * context, uint8_t NetworkingStatus,
-                                                                         chip::CharSpan DebugText);
-typedef void (*NetworkCommissioningClusterScanNetworksResponseCallback)(
-    void * context, uint8_t NetworkingStatus, chip::CharSpan DebugText,
-    /* TYPE WARNING: array array defaults to */ uint8_t * WiFiScanResults,
-    /* TYPE WARNING: array array defaults to */ uint8_t * ThreadScanResults);
-typedef void (*OperationalCredentialsClusterAttestationResponseCallback)(void * context, chip::ByteSpan AttestationElements,
-                                                                         chip::ByteSpan Signature);
-typedef void (*OperationalCredentialsClusterCertificateChainResponseCallback)(void * context, chip::ByteSpan Certificate);
-typedef void (*OperationalCredentialsClusterNOCResponseCallback)(void * context, uint8_t StatusCode, uint8_t FabricIndex,
-                                                                 chip::CharSpan DebugText);
-typedef void (*OperationalCredentialsClusterOpCSRResponseCallback)(void * context, chip::ByteSpan NOCSRElements,
-                                                                   chip::ByteSpan AttestationSignature);
-
 // List specific responses
 void GeneralCommissioningClusterBasicCommissioningInfoListListAttributeFilter(chip::TLV::TLVReader * data,
                                                                               chip::Callback::Cancelable * onSuccessCallback,

@@ -17,7 +17,6 @@
  */
 
 #include "TimedHandler.h"
-#include <app/InteractionModelDelegate.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/TimedRequestMessage.h>
 #include <app/StatusResponse.h>

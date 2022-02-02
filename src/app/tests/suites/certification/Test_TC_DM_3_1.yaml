@@ -26,7 +26,6 @@ tests:
     - label: "Query MaxNetworks"
       command: "readAttribute"
       attribute: "MaxNetworks"
-      disabled: true
       optional: true
       response:
           constraints:
@@ -35,7 +34,6 @@ tests:
     - label: "Query Networks"
       command: "readAttribute"
       attribute: "Networks"
-      disabled: true
       optional: true
       response:
           constraints:

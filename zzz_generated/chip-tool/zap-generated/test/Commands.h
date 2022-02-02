@@ -170,12 +170,14 @@ public:
         printf("TestIdentifyCluster\n");
         printf("TestOperationalCredentialsCluster\n");
         printf("TestModeSelectCluster\n");
+        printf("TestSystemCommands\n");
         printf("Test_TC_SWDIAG_1_1\n");
         printf("Test_TC_SWDIAG_2_1\n");
         printf("Test_TC_SWDIAG_3_1\n");
         printf("TestSubscribe_OnOff\n");
         printf("DL_UsersAndCredentials\n");
         printf("DL_LockUnlock\n");
+        printf("DL_Schedules\n");
         printf("TestGroupMessaging\n");
         printf("TestGroupsCluster\n");
         printf("TestGroupDemoCommand\n");
@@ -189,7 +191,7 @@ public:
 class Test_TC_BI_1_1 : public TestCommand
 {
 public:
-    Test_TC_BI_1_1() : TestCommand("Test_TC_BI_1_1"), mTestIndex(0)
+    Test_TC_BI_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_BI_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -441,7 +443,7 @@ private:
 class Test_TC_BI_2_1 : public TestCommand
 {
 public:
-    Test_TC_BI_2_1() : TestCommand("Test_TC_BI_2_1"), mTestIndex(0)
+    Test_TC_BI_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_BI_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -914,7 +916,7 @@ private:
 class Test_TC_BI_2_2 : public TestCommand
 {
 public:
-    Test_TC_BI_2_2() : TestCommand("Test_TC_BI_2_2"), mTestIndex(0)
+    Test_TC_BI_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_BI_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -1325,7 +1327,8 @@ private:
 class Test_TC_BOOL_1_1 : public TestCommand
 {
 public:
-    Test_TC_BOOL_1_1() : TestCommand("Test_TC_BOOL_1_1"), mTestIndex(0)
+    Test_TC_BOOL_1_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_BOOL_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -1577,7 +1580,8 @@ private:
 class Test_TC_BOOL_2_1 : public TestCommand
 {
 public:
-    Test_TC_BOOL_2_1() : TestCommand("Test_TC_BOOL_2_1"), mTestIndex(0)
+    Test_TC_BOOL_2_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_BOOL_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -1792,7 +1796,8 @@ private:
 class Test_TC_BRAC_1_1 : public TestCommand
 {
 public:
-    Test_TC_BRAC_1_1() : TestCommand("Test_TC_BRAC_1_1"), mTestIndex(0)
+    Test_TC_BRAC_1_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_BRAC_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -1934,7 +1939,7 @@ private:
 class Test_TC_CC_1_1 : public TestCommand
 {
 public:
-    Test_TC_CC_1_1() : TestCommand("Test_TC_CC_1_1"), mTestIndex(0)
+    Test_TC_CC_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -2110,7 +2115,7 @@ private:
 class Test_TC_CC_2_1 : public TestCommand
 {
 public:
-    Test_TC_CC_2_1() : TestCommand("Test_TC_CC_2_1"), mTestIndex(0)
+    Test_TC_CC_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -7844,7 +7849,7 @@ private:
 class Test_TC_CC_3_1 : public TestCommand
 {
 public:
-    Test_TC_CC_3_1() : TestCommand("Test_TC_CC_3_1"), mTestIndex(0)
+    Test_TC_CC_3_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_3_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -8193,7 +8198,7 @@ private:
 class Test_TC_CC_3_2 : public TestCommand
 {
 public:
-    Test_TC_CC_3_2() : TestCommand("Test_TC_CC_3_2"), mTestIndex(0)
+    Test_TC_CC_3_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_3_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -8538,7 +8543,7 @@ private:
 class Test_TC_CC_3_3 : public TestCommand
 {
 public:
-    Test_TC_CC_3_3() : TestCommand("Test_TC_CC_3_3"), mTestIndex(0)
+    Test_TC_CC_3_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_3_3", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -8815,7 +8820,7 @@ private:
 class Test_TC_CC_4_1 : public TestCommand
 {
 public:
-    Test_TC_CC_4_1() : TestCommand("Test_TC_CC_4_1"), mTestIndex(0)
+    Test_TC_CC_4_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_4_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -9055,7 +9060,7 @@ private:
 class Test_TC_CC_4_2 : public TestCommand
 {
 public:
-    Test_TC_CC_4_2() : TestCommand("Test_TC_CC_4_2"), mTestIndex(0)
+    Test_TC_CC_4_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_4_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -9470,7 +9475,7 @@ private:
 class Test_TC_CC_4_3 : public TestCommand
 {
 public:
-    Test_TC_CC_4_3() : TestCommand("Test_TC_CC_4_3"), mTestIndex(0)
+    Test_TC_CC_4_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_4_3", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -9747,7 +9752,7 @@ private:
 class Test_TC_CC_4_4 : public TestCommand
 {
 public:
-    Test_TC_CC_4_4() : TestCommand("Test_TC_CC_4_4"), mTestIndex(0)
+    Test_TC_CC_4_4(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_4_4", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -9988,7 +9993,7 @@ private:
 class Test_TC_CC_5_1 : public TestCommand
 {
 public:
-    Test_TC_CC_5_1() : TestCommand("Test_TC_CC_5_1"), mTestIndex(0)
+    Test_TC_CC_5_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_5_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -10229,7 +10234,7 @@ private:
 class Test_TC_CC_5_2 : public TestCommand
 {
 public:
-    Test_TC_CC_5_2() : TestCommand("Test_TC_CC_5_2"), mTestIndex(0)
+    Test_TC_CC_5_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_5_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -10502,7 +10507,7 @@ private:
 class Test_TC_CC_5_3 : public TestCommand
 {
 public:
-    Test_TC_CC_5_3() : TestCommand("Test_TC_CC_5_3"), mTestIndex(0)
+    Test_TC_CC_5_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_5_3", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -10743,7 +10748,7 @@ private:
 class Test_TC_CC_6_1 : public TestCommand
 {
 public:
-    Test_TC_CC_6_1() : TestCommand("Test_TC_CC_6_1"), mTestIndex(0)
+    Test_TC_CC_6_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_6_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -10983,7 +10988,7 @@ private:
 class Test_TC_CC_6_2 : public TestCommand
 {
 public:
-    Test_TC_CC_6_2() : TestCommand("Test_TC_CC_6_2"), mTestIndex(0)
+    Test_TC_CC_6_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_6_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -11299,7 +11304,7 @@ private:
 class Test_TC_CC_6_3 : public TestCommand
 {
 public:
-    Test_TC_CC_6_3() : TestCommand("Test_TC_CC_6_3"), mTestIndex(0)
+    Test_TC_CC_6_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_6_3", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -11580,7 +11585,7 @@ private:
 class Test_TC_CC_7_1 : public TestCommand
 {
 public:
-    Test_TC_CC_7_1() : TestCommand("Test_TC_CC_7_1"), mTestIndex(0)
+    Test_TC_CC_7_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_7_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -11860,7 +11865,7 @@ private:
 class Test_TC_CC_7_2 : public TestCommand
 {
 public:
-    Test_TC_CC_7_2() : TestCommand("Test_TC_CC_7_2"), mTestIndex(0)
+    Test_TC_CC_7_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_7_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -12205,7 +12210,7 @@ private:
 class Test_TC_CC_7_3 : public TestCommand
 {
 public:
-    Test_TC_CC_7_3() : TestCommand("Test_TC_CC_7_3"), mTestIndex(0)
+    Test_TC_CC_7_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_7_3", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -12482,7 +12487,7 @@ private:
 class Test_TC_CC_7_4 : public TestCommand
 {
 public:
-    Test_TC_CC_7_4() : TestCommand("Test_TC_CC_7_4"), mTestIndex(0)
+    Test_TC_CC_7_4(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_7_4", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -12723,7 +12728,7 @@ private:
 class Test_TC_CC_8_1 : public TestCommand
 {
 public:
-    Test_TC_CC_8_1() : TestCommand("Test_TC_CC_8_1"), mTestIndex(0)
+    Test_TC_CC_8_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_8_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -13385,7 +13390,7 @@ private:
 class Test_TC_CC_9_1 : public TestCommand
 {
 public:
-    Test_TC_CC_9_1() : TestCommand("Test_TC_CC_9_1"), mTestIndex(0)
+    Test_TC_CC_9_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_9_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -14937,7 +14942,7 @@ private:
 class Test_TC_CC_9_2 : public TestCommand
 {
 public:
-    Test_TC_CC_9_2() : TestCommand("Test_TC_CC_9_2"), mTestIndex(0)
+    Test_TC_CC_9_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_9_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -15578,7 +15583,7 @@ private:
 class Test_TC_CC_9_3 : public TestCommand
 {
 public:
-    Test_TC_CC_9_3() : TestCommand("Test_TC_CC_9_3"), mTestIndex(0)
+    Test_TC_CC_9_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_9_3", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -16219,7 +16224,7 @@ private:
 class Test_TC_DD_1_5 : public TestCommand
 {
 public:
-    Test_TC_DD_1_5() : TestCommand("Test_TC_DD_1_5"), mTestIndex(0)
+    Test_TC_DD_1_5(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_5", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -16287,7 +16292,7 @@ private:
 class Test_TC_DD_1_6 : public TestCommand
 {
 public:
-    Test_TC_DD_1_6() : TestCommand("Test_TC_DD_1_6"), mTestIndex(0)
+    Test_TC_DD_1_6(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_6", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -16376,7 +16381,7 @@ private:
 class Test_TC_DD_1_7 : public TestCommand
 {
 public:
-    Test_TC_DD_1_7() : TestCommand("Test_TC_DD_1_7"), mTestIndex(0)
+    Test_TC_DD_1_7(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_7", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -16454,7 +16459,7 @@ private:
 class Test_TC_DD_1_8 : public TestCommand
 {
 public:
-    Test_TC_DD_1_8() : TestCommand("Test_TC_DD_1_8"), mTestIndex(0)
+    Test_TC_DD_1_8(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_8", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -16531,7 +16536,7 @@ private:
 class Test_TC_DD_1_9 : public TestCommand
 {
 public:
-    Test_TC_DD_1_9() : TestCommand("Test_TC_DD_1_9"), mTestIndex(0)
+    Test_TC_DD_1_9(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_9", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -16619,7 +16624,7 @@ private:
 class Test_TC_DM_1_1 : public TestCommand
 {
 public:
-    Test_TC_DM_1_1() : TestCommand("Test_TC_DM_1_1"), mTestIndex(0)
+    Test_TC_DM_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DM_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -16657,8 +16662,8 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Query Interaction Model Version\n");
-            err = TestQueryInteractionModelVersion_1();
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Query Data Model Revision\n");
+            err = TestQueryDataModelRevision_1();
             break;
         case 2:
             ChipLogProgress(chipTool, " ***** Test Step 2 : Query Vendor Name\n");
@@ -16763,9 +16768,9 @@ private:
         (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_1(error);
     }
 
-    static void OnSuccessCallback_1(void * context, uint16_t interactionModelVersion)
+    static void OnSuccessCallback_1(void * context, uint16_t dataModelRevision)
     {
-        (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_1(interactionModelVersion);
+        (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_1(dataModelRevision);
     }
 
     static void OnFailureCallback_2(void * context, CHIP_ERROR error)
@@ -16958,13 +16963,13 @@ private:
         return WaitForCommissionee();
     }
 
-    CHIP_ERROR TestQueryInteractionModelVersion_1()
+    CHIP_ERROR TestQueryDataModelRevision_1()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::InteractionModelVersion::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::DataModelRevision::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1));
         return CHIP_NO_ERROR;
     }
@@ -16975,9 +16980,9 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1(uint16_t interactionModelVersion)
+    void OnSuccessResponse_1(uint16_t dataModelRevision)
     {
-        VerifyOrReturn(CheckConstraintType("interactionModelVersion", "", "uint16"));
+        VerifyOrReturn(CheckConstraintType("dataModelRevision", "", "uint16"));
         NextTest();
     }
 
@@ -17418,7 +17423,7 @@ private:
 class Test_TC_DM_3_1 : public TestCommand
 {
 public:
-    Test_TC_DM_3_1() : TestCommand("Test_TC_DM_3_1"), mTestIndex(0)
+    Test_TC_DM_3_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DM_3_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -17455,6 +17460,14 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Query MaxNetworks\n");
+            err = TestQueryMaxNetworks_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Query Networks\n");
+            err = TestQueryNetworks_2();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -17466,10 +17479,33 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 1;
+    const uint16_t mTestCount = 3;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
+
+    static void OnFailureCallback_1(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_DM_3_1 *>(context))->OnFailureResponse_1(error);
+    }
+
+    static void OnSuccessCallback_1(void * context, uint8_t maxNetworks)
+    {
+        (static_cast<Test_TC_DM_3_1 *>(context))->OnSuccessResponse_1(maxNetworks);
+    }
+
+    static void OnFailureCallback_2(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_DM_3_1 *>(context))->OnFailureResponse_2(error);
+    }
+
+    static void OnSuccessCallback_2(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> &
+            networks)
+    {
+        (static_cast<Test_TC_DM_3_1 *>(context))->OnSuccessResponse_2(networks);
+    }
 
     //
     // Tests methods
@@ -17480,12 +17516,60 @@ private:
         SetIdentity(kIdentityAlpha);
         return WaitForCommissionee();
     }
+
+    CHIP_ERROR TestQueryMaxNetworks_1()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::NetworkCommissioningClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::NetworkCommissioning::Attributes::MaxNetworks::TypeInfo>(
+            this, OnSuccessCallback_1, OnFailureCallback_1));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_1(uint8_t maxNetworks)
+    {
+        VerifyOrReturn(CheckConstraintType("maxNetworks", "", "uint8"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestQueryNetworks_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::NetworkCommissioningClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::NetworkCommissioning::Attributes::Networks::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_2(
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> &
+            networks)
+    {
+        VerifyOrReturn(CheckConstraintType("networks", "", "list"));
+        NextTest();
+    }
 };
 
 class Test_TC_DM_2_2 : public TestCommand
 {
 public:
-    Test_TC_DM_2_2() : TestCommand("Test_TC_DM_2_2"), mTestIndex(0)
+    Test_TC_DM_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DM_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -17716,7 +17800,7 @@ private:
 class Test_TC_EMR_1_1 : public TestCommand
 {
 public:
-    Test_TC_EMR_1_1() : TestCommand("Test_TC_EMR_1_1"), mTestIndex(0)
+    Test_TC_EMR_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_EMR_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -17972,7 +18056,8 @@ private:
 class Test_TC_ETHDIAG_1_1 : public TestCommand
 {
 public:
-    Test_TC_ETHDIAG_1_1() : TestCommand("Test_TC_ETHDIAG_1_1"), mTestIndex(0)
+    Test_TC_ETHDIAG_1_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_ETHDIAG_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -18039,7 +18124,8 @@ private:
 class Test_TC_ETHDIAG_2_1 : public TestCommand
 {
 public:
-    Test_TC_ETHDIAG_2_1() : TestCommand("Test_TC_ETHDIAG_2_1"), mTestIndex(0)
+    Test_TC_ETHDIAG_2_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_ETHDIAG_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -18106,7 +18192,7 @@ private:
 class Test_TC_FLW_1_1 : public TestCommand
 {
 public:
-    Test_TC_FLW_1_1() : TestCommand("Test_TC_FLW_1_1"), mTestIndex(0)
+    Test_TC_FLW_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_FLW_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -18282,7 +18368,7 @@ private:
 class Test_TC_FLW_2_1 : public TestCommand
 {
 public:
-    Test_TC_FLW_2_1() : TestCommand("Test_TC_FLW_2_1"), mTestIndex(0)
+    Test_TC_FLW_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_FLW_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -18822,7 +18908,7 @@ private:
 class Test_TC_FLW_2_2 : public TestCommand
 {
 public:
-    Test_TC_FLW_2_2() : TestCommand("Test_TC_FLW_2_2"), mTestIndex(0)
+    Test_TC_FLW_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_FLW_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -18963,7 +19049,7 @@ private:
 class Test_TC_ILL_1_1 : public TestCommand
 {
 public:
-    Test_TC_ILL_1_1() : TestCommand("Test_TC_ILL_1_1"), mTestIndex(0)
+    Test_TC_ILL_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ILL_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -19220,7 +19306,7 @@ private:
 class Test_TC_LVL_1_1 : public TestCommand
 {
 public:
-    Test_TC_LVL_1_1() : TestCommand("Test_TC_LVL_1_1"), mTestIndex(0)
+    Test_TC_LVL_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LVL_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -19543,7 +19629,7 @@ private:
 class Test_TC_LVL_2_1 : public TestCommand
 {
 public:
-    Test_TC_LVL_2_1() : TestCommand("Test_TC_LVL_2_1"), mTestIndex(0)
+    Test_TC_LVL_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LVL_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -20144,7 +20230,7 @@ private:
 class Test_TC_LVL_2_2 : public TestCommand
 {
 public:
-    Test_TC_LVL_2_2() : TestCommand("Test_TC_LVL_2_2"), mTestIndex(0)
+    Test_TC_LVL_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LVL_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -20757,7 +20843,7 @@ private:
 class Test_TC_LVL_3_1 : public TestCommand
 {
 public:
-    Test_TC_LVL_3_1() : TestCommand("Test_TC_LVL_3_1"), mTestIndex(0)
+    Test_TC_LVL_3_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LVL_3_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -20823,8 +20909,8 @@ public:
             err = TestSendsAMoveToLevelCommand_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Wait 200ms\n");
-            err = TestWait200ms_8();
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Wait a second\n");
+            err = TestWaitASecond_8();
             break;
         case 9:
             ChipLogProgress(chipTool, " ***** Test Step 9 : reads CurrentLevel attribute from DUT\n");
@@ -21114,10 +21200,10 @@ private:
 
     void OnSuccessResponse_7() { NextTest(); }
 
-    CHIP_ERROR TestWait200ms_8()
+    CHIP_ERROR TestWaitASecond_8()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForMs(200);
+        return WaitForMs(1000);
     }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_9()
@@ -21270,7 +21356,7 @@ private:
 class Test_TC_LVL_4_1 : public TestCommand
 {
 public:
-    Test_TC_LVL_4_1() : TestCommand("Test_TC_LVL_4_1"), mTestIndex(0)
+    Test_TC_LVL_4_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LVL_4_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -21818,7 +21904,7 @@ private:
 class Test_TC_LVL_5_1 : public TestCommand
 {
 public:
-    Test_TC_LVL_5_1() : TestCommand("Test_TC_LVL_5_1"), mTestIndex(0)
+    Test_TC_LVL_5_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LVL_5_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -21864,8 +21950,8 @@ public:
             err = TestPreconditionDutLevelIsSetTo0x80_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Wait 3000ms\n");
-            err = TestWait3000ms_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Wait 4000ms\n");
+            err = TestWait4000ms_3();
             break;
         case 4:
             ChipLogProgress(chipTool, " ***** Test Step 4 : Reads current level attribute from DUT\n");
@@ -21876,8 +21962,8 @@ public:
             err = TestSendsStepDownCommandToDut_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Wait 3000ms\n");
-            err = TestWait3000ms_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Wait 4000ms\n");
+            err = TestWait4000ms_6();
             break;
         case 7:
             ChipLogProgress(chipTool, " ***** Test Step 7 : Reads current level attribute from DUT\n");
@@ -21888,8 +21974,8 @@ public:
             err = TestSendsAStepUpCommand_8();
             break;
         case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : Wait 3000ms\n");
-            err = TestWait3000ms_9();
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Wait 4000ms\n");
+            err = TestWait4000ms_9();
             break;
         case 10:
             ChipLogProgress(chipTool, " ***** Test Step 10 : Reads current level attribute from DUT\n");
@@ -22022,10 +22108,10 @@ private:
 
     void OnSuccessResponse_2() { NextTest(); }
 
-    CHIP_ERROR TestWait3000ms_3()
+    CHIP_ERROR TestWait4000ms_3()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForMs(3000);
+        return WaitForMs(4000);
     }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_4()
@@ -22084,10 +22170,10 @@ private:
 
     void OnSuccessResponse_5() { NextTest(); }
 
-    CHIP_ERROR TestWait3000ms_6()
+    CHIP_ERROR TestWait4000ms_6()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForMs(3000);
+        return WaitForMs(4000);
     }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_7()
@@ -22146,10 +22232,10 @@ private:
 
     void OnSuccessResponse_8() { NextTest(); }
 
-    CHIP_ERROR TestWait3000ms_9()
+    CHIP_ERROR TestWait4000ms_9()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForMs(3000);
+        return WaitForMs(4000);
     }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_10()
@@ -22244,7 +22330,7 @@ private:
 class Test_TC_LVL_6_1 : public TestCommand
 {
 public:
-    Test_TC_LVL_6_1() : TestCommand("Test_TC_LVL_6_1"), mTestIndex(0)
+    Test_TC_LVL_6_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LVL_6_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -22617,7 +22703,7 @@ private:
 class Test_TC_MC_1_1 : public TestCommand
 {
 public:
-    Test_TC_MC_1_1() : TestCommand("Test_TC_MC_1_1"), mTestIndex(0)
+    Test_TC_MC_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -22793,7 +22879,7 @@ private:
 class Test_TC_MC_2_1 : public TestCommand
 {
 public:
-    Test_TC_MC_2_1() : TestCommand("Test_TC_MC_2_1"), mTestIndex(0)
+    Test_TC_MC_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -22891,7 +22977,7 @@ private:
 class Test_TC_MC_3_1 : public TestCommand
 {
 public:
-    Test_TC_MC_3_1() : TestCommand("Test_TC_MC_3_1"), mTestIndex(0)
+    Test_TC_MC_3_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -22958,7 +23044,7 @@ private:
 class Test_TC_MC_3_2 : public TestCommand
 {
 public:
-    Test_TC_MC_3_2() : TestCommand("Test_TC_MC_3_2"), mTestIndex(0)
+    Test_TC_MC_3_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23025,7 +23111,7 @@ private:
 class Test_TC_MC_3_3 : public TestCommand
 {
 public:
-    Test_TC_MC_3_3() : TestCommand("Test_TC_MC_3_3"), mTestIndex(0)
+    Test_TC_MC_3_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_3", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23092,7 +23178,7 @@ private:
 class Test_TC_MC_3_4 : public TestCommand
 {
 public:
-    Test_TC_MC_3_4() : TestCommand("Test_TC_MC_3_4"), mTestIndex(0)
+    Test_TC_MC_3_4(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_4", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23159,7 +23245,7 @@ private:
 class Test_TC_MC_3_5 : public TestCommand
 {
 public:
-    Test_TC_MC_3_5() : TestCommand("Test_TC_MC_3_5"), mTestIndex(0)
+    Test_TC_MC_3_5(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_5", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23226,7 +23312,7 @@ private:
 class Test_TC_MC_3_6 : public TestCommand
 {
 public:
-    Test_TC_MC_3_6() : TestCommand("Test_TC_MC_3_6"), mTestIndex(0)
+    Test_TC_MC_3_6(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_6", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23293,7 +23379,7 @@ private:
 class Test_TC_MC_3_7 : public TestCommand
 {
 public:
-    Test_TC_MC_3_7() : TestCommand("Test_TC_MC_3_7"), mTestIndex(0)
+    Test_TC_MC_3_7(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_7", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23360,7 +23446,7 @@ private:
 class Test_TC_MC_3_8 : public TestCommand
 {
 public:
-    Test_TC_MC_3_8() : TestCommand("Test_TC_MC_3_8"), mTestIndex(0)
+    Test_TC_MC_3_8(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_8", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23427,7 +23513,7 @@ private:
 class Test_TC_MC_3_9 : public TestCommand
 {
 public:
-    Test_TC_MC_3_9() : TestCommand("Test_TC_MC_3_9"), mTestIndex(0)
+    Test_TC_MC_3_9(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_9", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23494,7 +23580,7 @@ private:
 class Test_TC_MC_3_10 : public TestCommand
 {
 public:
-    Test_TC_MC_3_10() : TestCommand("Test_TC_MC_3_10"), mTestIndex(0)
+    Test_TC_MC_3_10(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_10", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23561,7 +23647,7 @@ private:
 class Test_TC_MC_3_11 : public TestCommand
 {
 public:
-    Test_TC_MC_3_11() : TestCommand("Test_TC_MC_3_11"), mTestIndex(0)
+    Test_TC_MC_3_11(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_11", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23628,7 +23714,7 @@ private:
 class Test_TC_MC_5_1 : public TestCommand
 {
 public:
-    Test_TC_MC_5_1() : TestCommand("Test_TC_MC_5_1"), mTestIndex(0)
+    Test_TC_MC_5_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_5_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23735,7 +23821,7 @@ private:
 class Test_TC_MC_5_2 : public TestCommand
 {
 public:
-    Test_TC_MC_5_2() : TestCommand("Test_TC_MC_5_2"), mTestIndex(0)
+    Test_TC_MC_5_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_5_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23812,7 +23898,7 @@ private:
 class Test_TC_MC_5_3 : public TestCommand
 {
 public:
-    Test_TC_MC_5_3() : TestCommand("Test_TC_MC_5_3"), mTestIndex(0)
+    Test_TC_MC_5_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_5_3", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -23889,7 +23975,7 @@ private:
 class Test_TC_MC_6_1 : public TestCommand
 {
 public:
-    Test_TC_MC_6_1() : TestCommand("Test_TC_MC_6_1"), mTestIndex(0)
+    Test_TC_MC_6_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_6_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -24034,7 +24120,7 @@ private:
 class Test_TC_MC_6_2 : public TestCommand
 {
 public:
-    Test_TC_MC_6_2() : TestCommand("Test_TC_MC_6_2"), mTestIndex(0)
+    Test_TC_MC_6_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_6_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -24209,7 +24295,7 @@ private:
 class Test_TC_MC_6_3 : public TestCommand
 {
 public:
-    Test_TC_MC_6_3() : TestCommand("Test_TC_MC_6_3"), mTestIndex(0)
+    Test_TC_MC_6_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_6_3", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -24306,7 +24392,7 @@ private:
 class Test_TC_MC_6_4 : public TestCommand
 {
 public:
-    Test_TC_MC_6_4() : TestCommand("Test_TC_MC_6_4"), mTestIndex(0)
+    Test_TC_MC_6_4(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_6_4", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -24547,7 +24633,7 @@ private:
 class Test_TC_MC_7_1 : public TestCommand
 {
 public:
-    Test_TC_MC_7_1() : TestCommand("Test_TC_MC_7_1"), mTestIndex(0)
+    Test_TC_MC_7_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_7_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -24614,7 +24700,7 @@ private:
 class Test_TC_MC_7_2 : public TestCommand
 {
 public:
-    Test_TC_MC_7_2() : TestCommand("Test_TC_MC_7_2"), mTestIndex(0)
+    Test_TC_MC_7_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_7_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -24681,7 +24767,7 @@ private:
 class Test_TC_MC_8_1 : public TestCommand
 {
 public:
-    Test_TC_MC_8_1() : TestCommand("Test_TC_MC_8_1"), mTestIndex(0)
+    Test_TC_MC_8_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_8_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -24831,7 +24917,7 @@ private:
 class Test_TC_MC_9_1 : public TestCommand
 {
 public:
-    Test_TC_MC_9_1() : TestCommand("Test_TC_MC_9_1"), mTestIndex(0)
+    Test_TC_MC_9_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_9_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -25134,7 +25220,7 @@ private:
 class Test_TC_OCC_1_1 : public TestCommand
 {
 public:
-    Test_TC_OCC_1_1() : TestCommand("Test_TC_OCC_1_1"), mTestIndex(0)
+    Test_TC_OCC_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OCC_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -25348,7 +25434,7 @@ private:
 class Test_TC_OCC_2_1 : public TestCommand
 {
 public:
-    Test_TC_OCC_2_1() : TestCommand("Test_TC_OCC_2_1"), mTestIndex(0)
+    Test_TC_OCC_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OCC_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -25758,7 +25844,7 @@ private:
 class Test_TC_OCC_2_2 : public TestCommand
 {
 public:
-    Test_TC_OCC_2_2() : TestCommand("Test_TC_OCC_2_2"), mTestIndex(0)
+    Test_TC_OCC_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OCC_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -25909,7 +25995,7 @@ private:
 class Test_TC_OO_1_1 : public TestCommand
 {
 public:
-    Test_TC_OO_1_1() : TestCommand("Test_TC_OO_1_1"), mTestIndex(0)
+    Test_TC_OO_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OO_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -26318,7 +26404,7 @@ private:
 class Test_TC_OO_2_1 : public TestCommand
 {
 public:
-    Test_TC_OO_2_1() : TestCommand("Test_TC_OO_2_1"), mTestIndex(0)
+    Test_TC_OO_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OO_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -26932,7 +27018,7 @@ private:
 class Test_TC_OO_2_2 : public TestCommand
 {
 public:
-    Test_TC_OO_2_2() : TestCommand("Test_TC_OO_2_2"), mTestIndex(0)
+    Test_TC_OO_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OO_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -27482,7 +27568,7 @@ private:
 class Test_TC_OO_2_3 : public TestCommand
 {
 public:
-    Test_TC_OO_2_3() : TestCommand("Test_TC_OO_2_3"), mTestIndex(0)
+    Test_TC_OO_2_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OO_2_3", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -29358,7 +29444,7 @@ private:
 class Test_TC_PS_1_1 : public TestCommand
 {
 public:
-    Test_TC_PS_1_1() : TestCommand("Test_TC_PS_1_1"), mTestIndex(0)
+    Test_TC_PS_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_PS_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -29610,7 +29696,7 @@ private:
 class Test_TC_PRS_1_1 : public TestCommand
 {
 public:
-    Test_TC_PRS_1_1() : TestCommand("Test_TC_PRS_1_1"), mTestIndex(0)
+    Test_TC_PRS_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_PRS_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -29787,7 +29873,7 @@ private:
 class Test_TC_PRS_2_1 : public TestCommand
 {
 public:
-    Test_TC_PRS_2_1() : TestCommand("Test_TC_PRS_2_1"), mTestIndex(0)
+    Test_TC_PRS_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_PRS_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -30187,7 +30273,7 @@ private:
 class Test_TC_PCC_1_1 : public TestCommand
 {
 public:
-    Test_TC_PCC_1_1() : TestCommand("Test_TC_PCC_1_1"), mTestIndex(0)
+    Test_TC_PCC_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_PCC_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -30404,7 +30490,7 @@ private:
 class Test_TC_PCC_2_1 : public TestCommand
 {
 public:
-    Test_TC_PCC_2_1() : TestCommand("Test_TC_PCC_2_1"), mTestIndex(0)
+    Test_TC_PCC_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_PCC_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -32338,7 +32424,7 @@ private:
 class Test_TC_PCC_2_2 : public TestCommand
 {
 public:
-    Test_TC_PCC_2_2() : TestCommand("Test_TC_PCC_2_2"), mTestIndex(0)
+    Test_TC_PCC_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_PCC_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -32522,7 +32608,7 @@ private:
 class Test_TC_PCC_2_3 : public TestCommand
 {
 public:
-    Test_TC_PCC_2_3() : TestCommand("Test_TC_PCC_2_3"), mTestIndex(0)
+    Test_TC_PCC_2_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_PCC_2_3", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -32950,7 +33036,7 @@ private:
 class Test_TC_RH_1_1 : public TestCommand
 {
 public:
-    Test_TC_RH_1_1() : TestCommand("Test_TC_RH_1_1"), mTestIndex(0)
+    Test_TC_RH_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_RH_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -33129,7 +33215,7 @@ private:
 class Test_TC_RH_2_1 : public TestCommand
 {
 public:
-    Test_TC_RH_2_1() : TestCommand("Test_TC_RH_2_1"), mTestIndex(0)
+    Test_TC_RH_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_RH_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -33353,7 +33439,7 @@ private:
 class Test_TC_RH_2_2 : public TestCommand
 {
 public:
-    Test_TC_RH_2_2() : TestCommand("Test_TC_RH_2_2"), mTestIndex(0)
+    Test_TC_RH_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_RH_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -33506,7 +33592,8 @@ private:
 class Test_TC_SWTCH_2_1 : public TestCommand
 {
 public:
-    Test_TC_SWTCH_2_1() : TestCommand("Test_TC_SWTCH_2_1"), mTestIndex(0)
+    Test_TC_SWTCH_2_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_SWTCH_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -33801,7 +33888,8 @@ private:
 class Test_TC_SWTCH_2_2 : public TestCommand
 {
 public:
-    Test_TC_SWTCH_2_2() : TestCommand("Test_TC_SWTCH_2_2"), mTestIndex(0)
+    Test_TC_SWTCH_2_2(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_SWTCH_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -34294,7 +34382,7 @@ private:
 class Test_TC_TM_1_1 : public TestCommand
 {
 public:
-    Test_TC_TM_1_1() : TestCommand("Test_TC_TM_1_1"), mTestIndex(0)
+    Test_TC_TM_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TM_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -34551,7 +34639,7 @@ private:
 class Test_TC_TM_2_1 : public TestCommand
 {
 public:
-    Test_TC_TM_2_1() : TestCommand("Test_TC_TM_2_1"), mTestIndex(0)
+    Test_TC_TM_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TM_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -34695,7 +34783,7 @@ private:
 class Test_TC_TM_2_2 : public TestCommand
 {
 public:
-    Test_TC_TM_2_2() : TestCommand("Test_TC_TM_2_2"), mTestIndex(0)
+    Test_TC_TM_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TM_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -34848,7 +34936,8 @@ private:
 class Test_TC_TSTAT_1_1 : public TestCommand
 {
 public:
-    Test_TC_TSTAT_1_1() : TestCommand("Test_TC_TSTAT_1_1"), mTestIndex(0)
+    Test_TC_TSTAT_1_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_TSTAT_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -35061,7 +35150,8 @@ private:
 class Test_TC_TSTAT_2_1 : public TestCommand
 {
 public:
-    Test_TC_TSTAT_2_1() : TestCommand("Test_TC_TSTAT_2_1"), mTestIndex(0)
+    Test_TC_TSTAT_2_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_TSTAT_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -37399,7 +37489,8 @@ private:
 class Test_TC_TSTAT_2_2 : public TestCommand
 {
 public:
-    Test_TC_TSTAT_2_2() : TestCommand("Test_TC_TSTAT_2_2"), mTestIndex(0)
+    Test_TC_TSTAT_2_2(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_TSTAT_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -39482,7 +39573,8 @@ private:
 class Test_TC_TSUIC_1_1 : public TestCommand
 {
 public:
-    Test_TC_TSUIC_1_1() : TestCommand("Test_TC_TSUIC_1_1"), mTestIndex(0)
+    Test_TC_TSUIC_1_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_TSUIC_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -39662,7 +39754,8 @@ private:
 class Test_TC_TSUIC_2_1 : public TestCommand
 {
 public:
-    Test_TC_TSUIC_2_1() : TestCommand("Test_TC_TSUIC_2_1"), mTestIndex(0)
+    Test_TC_TSUIC_2_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_TSUIC_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -40303,7 +40396,8 @@ private:
 class Test_TC_TSUIC_2_2 : public TestCommand
 {
 public:
-    Test_TC_TSUIC_2_2() : TestCommand("Test_TC_TSUIC_2_2"), mTestIndex(0)
+    Test_TC_TSUIC_2_2(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_TSUIC_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -40766,7 +40860,8 @@ private:
 class Test_TC_DIAGTH_1_1 : public TestCommand
 {
 public:
-    Test_TC_DIAGTH_1_1() : TestCommand("Test_TC_DIAGTH_1_1"), mTestIndex(0)
+    Test_TC_DIAGTH_1_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_DIAGTH_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -41023,7 +41118,8 @@ private:
 class Test_TC_WIFIDIAG_1_1 : public TestCommand
 {
 public:
-    Test_TC_WIFIDIAG_1_1() : TestCommand("Test_TC_WIFIDIAG_1_1"), mTestIndex(0)
+    Test_TC_WIFIDIAG_1_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WIFIDIAG_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -41167,7 +41263,8 @@ private:
 class Test_TC_WIFIDIAG_3_1 : public TestCommand
 {
 public:
-    Test_TC_WIFIDIAG_3_1() : TestCommand("Test_TC_WIFIDIAG_3_1"), mTestIndex(0)
+    Test_TC_WIFIDIAG_3_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WIFIDIAG_3_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -41234,7 +41331,8 @@ private:
 class Test_TC_WNCV_1_1 : public TestCommand
 {
 public:
-    Test_TC_WNCV_1_1() : TestCommand("Test_TC_WNCV_1_1"), mTestIndex(0)
+    Test_TC_WNCV_1_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WNCV_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -41564,7 +41662,8 @@ private:
 class Test_TC_WNCV_2_1 : public TestCommand
 {
 public:
-    Test_TC_WNCV_2_1() : TestCommand("Test_TC_WNCV_2_1"), mTestIndex(0)
+    Test_TC_WNCV_2_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WNCV_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -43736,7 +43835,8 @@ private:
 class Test_TC_WNCV_2_2 : public TestCommand
 {
 public:
-    Test_TC_WNCV_2_2() : TestCommand("Test_TC_WNCV_2_2"), mTestIndex(0)
+    Test_TC_WNCV_2_2(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WNCV_2_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -43803,7 +43903,8 @@ private:
 class Test_TC_WNCV_2_4 : public TestCommand
 {
 public:
-    Test_TC_WNCV_2_4() : TestCommand("Test_TC_WNCV_2_4"), mTestIndex(0)
+    Test_TC_WNCV_2_4(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WNCV_2_4", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -43957,7 +44058,8 @@ private:
 class Test_TC_WNCV_2_5 : public TestCommand
 {
 public:
-    Test_TC_WNCV_2_5() : TestCommand("Test_TC_WNCV_2_5"), mTestIndex(0)
+    Test_TC_WNCV_2_5(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WNCV_2_5", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -44111,7 +44213,8 @@ private:
 class Test_TC_WNCV_3_1 : public TestCommand
 {
 public:
-    Test_TC_WNCV_3_1() : TestCommand("Test_TC_WNCV_3_1"), mTestIndex(0)
+    Test_TC_WNCV_3_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WNCV_3_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -44278,7 +44381,8 @@ private:
 class Test_TC_WNCV_3_2 : public TestCommand
 {
 public:
-    Test_TC_WNCV_3_2() : TestCommand("Test_TC_WNCV_3_2"), mTestIndex(0)
+    Test_TC_WNCV_3_2(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WNCV_3_2", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -44445,7 +44549,8 @@ private:
 class Test_TC_WNCV_3_3 : public TestCommand
 {
 public:
-    Test_TC_WNCV_3_3() : TestCommand("Test_TC_WNCV_3_3"), mTestIndex(0)
+    Test_TC_WNCV_3_3(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WNCV_3_3", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -44612,7 +44717,8 @@ private:
 class TV_TargetNavigatorCluster : public TestCommand
 {
 public:
-    TV_TargetNavigatorCluster() : TestCommand("TV_TargetNavigatorCluster"), mTestIndex(0)
+    TV_TargetNavigatorCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TV_TargetNavigatorCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -44812,7 +44918,8 @@ private:
 class TV_AudioOutputCluster : public TestCommand
 {
 public:
-    TV_AudioOutputCluster() : TestCommand("TV_AudioOutputCluster"), mTestIndex(0)
+    TV_AudioOutputCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TV_AudioOutputCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -45043,7 +45150,8 @@ private:
 class TV_ApplicationLauncherCluster : public TestCommand
 {
 public:
-    TV_ApplicationLauncherCluster() : TestCommand("TV_ApplicationLauncherCluster"), mTestIndex(0)
+    TV_ApplicationLauncherCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TV_ApplicationLauncherCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -45280,7 +45388,8 @@ private:
 class TV_KeypadInputCluster : public TestCommand
 {
 public:
-    TV_KeypadInputCluster() : TestCommand("TV_KeypadInputCluster"), mTestIndex(0)
+    TV_KeypadInputCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TV_KeypadInputCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -45384,7 +45493,8 @@ private:
 class TV_AccountLoginCluster : public TestCommand
 {
 public:
-    TV_AccountLoginCluster() : TestCommand("TV_AccountLoginCluster"), mTestIndex(0)
+    TV_AccountLoginCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TV_AccountLoginCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -45555,7 +45665,8 @@ private:
 class TV_WakeOnLanCluster : public TestCommand
 {
 public:
-    TV_WakeOnLanCluster() : TestCommand("TV_WakeOnLanCluster"), mTestIndex(0)
+    TV_WakeOnLanCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TV_WakeOnLanCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -45660,7 +45771,8 @@ private:
 class TV_ApplicationBasicCluster : public TestCommand
 {
 public:
-    TV_ApplicationBasicCluster() : TestCommand("TV_ApplicationBasicCluster"), mTestIndex(0)
+    TV_ApplicationBasicCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TV_ApplicationBasicCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -45955,7 +46067,8 @@ private:
 class TV_MediaPlaybackCluster : public TestCommand
 {
 public:
-    TV_MediaPlaybackCluster() : TestCommand("TV_MediaPlaybackCluster"), mTestIndex(0)
+    TV_MediaPlaybackCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TV_MediaPlaybackCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -46649,7 +46762,8 @@ private:
 class TV_ChannelCluster : public TestCommand
 {
 public:
-    TV_ChannelCluster() : TestCommand("TV_ChannelCluster"), mTestIndex(0)
+    TV_ChannelCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TV_ChannelCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -46886,7 +47000,8 @@ private:
 class TV_LowPowerCluster : public TestCommand
 {
 public:
-    TV_LowPowerCluster() : TestCommand("TV_LowPowerCluster"), mTestIndex(0)
+    TV_LowPowerCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TV_LowPowerCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -46984,7 +47099,8 @@ private:
 class TV_ContentLauncherCluster : public TestCommand
 {
 public:
-    TV_ContentLauncherCluster() : TestCommand("TV_ContentLauncherCluster"), mTestIndex(0)
+    TV_ContentLauncherCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TV_ContentLauncherCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -47255,7 +47371,8 @@ private:
 class TV_MediaInputCluster : public TestCommand
 {
 public:
-    TV_MediaInputCluster() : TestCommand("TV_MediaInputCluster"), mTestIndex(0)
+    TV_MediaInputCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TV_MediaInputCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -47545,7 +47662,7 @@ private:
 class TestCluster : public TestCommand
 {
 public:
-    TestCluster() : TestCommand("TestCluster"), mTestIndex(0)
+    TestCluster(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -49598,6 +49715,14 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 475 : read attribute that returns cluster-specific status on read\n");
             err = TestReadAttributeThatReturnsClusterSpecificStatusOnRead_475();
             break;
+        case 476:
+            ChipLogProgress(chipTool, " ***** Test Step 476 : read ClientGeneratedCommandList attribute\n");
+            err = TestReadClientGeneratedCommandListAttribute_476();
+            break;
+        case 477:
+            ChipLogProgress(chipTool, " ***** Test Step 477 : read ServerGeneratedCommandList attribute\n");
+            err = TestReadServerGeneratedCommandListAttribute_477();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -49609,7 +49734,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 476;
+    const uint16_t mTestCount = 478;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
@@ -53511,6 +53636,28 @@ private:
     static void OnSuccessCallback_475(void * context, bool clusterErrorBoolean)
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_475(clusterErrorBoolean);
+    }
+
+    static void OnFailureCallback_476(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_476(error);
+    }
+
+    static void OnSuccessCallback_476(void * context,
+                                      const chip::app::DataModel::DecodableList<chip::CommandId> & clientGeneratedCommandList)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_476(clientGeneratedCommandList);
+    }
+
+    static void OnFailureCallback_477(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_477(error);
+    }
+
+    static void OnSuccessCallback_477(void * context,
+                                      const chip::app::DataModel::DecodableList<chip::CommandId> & serverGeneratedCommandList)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_477(serverGeneratedCommandList);
     }
 
     //
@@ -65595,12 +65742,129 @@ private:
     }
 
     void OnSuccessResponse_475(bool clusterErrorBoolean) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadClientGeneratedCommandListAttribute_476()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ClientGeneratedCommandList::TypeInfo>(
+                this, OnSuccessCallback_476, OnFailureCallback_476));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_476(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_476(const chip::app::DataModel::DecodableList<chip::CommandId> & clientGeneratedCommandList)
+    {
+        {
+            auto iter_0 = clientGeneratedCommandList.begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(clientGeneratedCommandList)>("clientGeneratedCommandList", iter_0, 0));
+            VerifyOrReturn(CheckValue("clientGeneratedCommandList[0]", iter_0.GetValue(), 0UL));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(clientGeneratedCommandList)>("clientGeneratedCommandList", iter_0, 1));
+            VerifyOrReturn(CheckValue("clientGeneratedCommandList[1]", iter_0.GetValue(), 1UL));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(clientGeneratedCommandList)>("clientGeneratedCommandList", iter_0, 2));
+            VerifyOrReturn(CheckValue("clientGeneratedCommandList[2]", iter_0.GetValue(), 2UL));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(clientGeneratedCommandList)>("clientGeneratedCommandList", iter_0, 3));
+            VerifyOrReturn(CheckValue("clientGeneratedCommandList[3]", iter_0.GetValue(), 4UL));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(clientGeneratedCommandList)>("clientGeneratedCommandList", iter_0, 4));
+            VerifyOrReturn(CheckValue("clientGeneratedCommandList[4]", iter_0.GetValue(), 7UL));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(clientGeneratedCommandList)>("clientGeneratedCommandList", iter_0, 5));
+            VerifyOrReturn(CheckValue("clientGeneratedCommandList[5]", iter_0.GetValue(), 8UL));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(clientGeneratedCommandList)>("clientGeneratedCommandList", iter_0, 6));
+            VerifyOrReturn(CheckValue("clientGeneratedCommandList[6]", iter_0.GetValue(), 9UL));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(clientGeneratedCommandList)>("clientGeneratedCommandList", iter_0, 7));
+            VerifyOrReturn(CheckValue("clientGeneratedCommandList[7]", iter_0.GetValue(), 10UL));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(clientGeneratedCommandList)>("clientGeneratedCommandList", iter_0, 8));
+            VerifyOrReturn(CheckValue("clientGeneratedCommandList[8]", iter_0.GetValue(), 11UL));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(clientGeneratedCommandList)>("clientGeneratedCommandList", iter_0, 9));
+            VerifyOrReturn(CheckValue("clientGeneratedCommandList[9]", iter_0.GetValue(), 12UL));
+            VerifyOrReturn(
+                CheckNextListItemDecodes<decltype(clientGeneratedCommandList)>("clientGeneratedCommandList", iter_0, 10));
+            VerifyOrReturn(CheckValue("clientGeneratedCommandList[10]", iter_0.GetValue(), 13UL));
+            VerifyOrReturn(
+                CheckNextListItemDecodes<decltype(clientGeneratedCommandList)>("clientGeneratedCommandList", iter_0, 11));
+            VerifyOrReturn(CheckValue("clientGeneratedCommandList[11]", iter_0.GetValue(), 14UL));
+            VerifyOrReturn(
+                CheckNextListItemDecodes<decltype(clientGeneratedCommandList)>("clientGeneratedCommandList", iter_0, 12));
+            VerifyOrReturn(CheckValue("clientGeneratedCommandList[12]", iter_0.GetValue(), 15UL));
+            VerifyOrReturn(
+                CheckNextListItemDecodes<decltype(clientGeneratedCommandList)>("clientGeneratedCommandList", iter_0, 13));
+            VerifyOrReturn(CheckValue("clientGeneratedCommandList[13]", iter_0.GetValue(), 17UL));
+            VerifyOrReturn(
+                CheckNextListItemDecodes<decltype(clientGeneratedCommandList)>("clientGeneratedCommandList", iter_0, 14));
+            VerifyOrReturn(CheckValue("clientGeneratedCommandList[14]", iter_0.GetValue(), 18UL));
+            VerifyOrReturn(
+                CheckNextListItemDecodes<decltype(clientGeneratedCommandList)>("clientGeneratedCommandList", iter_0, 15));
+            VerifyOrReturn(CheckValue("clientGeneratedCommandList[15]", iter_0.GetValue(), 19UL));
+            VerifyOrReturn(
+                CheckNextListItemDecodes<decltype(clientGeneratedCommandList)>("clientGeneratedCommandList", iter_0, 16));
+            VerifyOrReturn(CheckValue("clientGeneratedCommandList[16]", iter_0.GetValue(), 20UL));
+            VerifyOrReturn(
+                CheckNextListItemDecodes<decltype(clientGeneratedCommandList)>("clientGeneratedCommandList", iter_0, 17));
+            VerifyOrReturn(CheckValue("clientGeneratedCommandList[17]", iter_0.GetValue(), 21UL));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(clientGeneratedCommandList)>("clientGeneratedCommandList", iter_0, 18));
+        }
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadServerGeneratedCommandListAttribute_477()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ServerGeneratedCommandList::TypeInfo>(
+                this, OnSuccessCallback_477, OnFailureCallback_477));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_477(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_477(const chip::app::DataModel::DecodableList<chip::CommandId> & serverGeneratedCommandList)
+    {
+        {
+            auto iter_0 = serverGeneratedCommandList.begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(serverGeneratedCommandList)>("serverGeneratedCommandList", iter_0, 0));
+            VerifyOrReturn(CheckValue("serverGeneratedCommandList[0]", iter_0.GetValue(), 0UL));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(serverGeneratedCommandList)>("serverGeneratedCommandList", iter_0, 1));
+            VerifyOrReturn(CheckValue("serverGeneratedCommandList[1]", iter_0.GetValue(), 1UL));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(serverGeneratedCommandList)>("serverGeneratedCommandList", iter_0, 2));
+            VerifyOrReturn(CheckValue("serverGeneratedCommandList[2]", iter_0.GetValue(), 4UL));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(serverGeneratedCommandList)>("serverGeneratedCommandList", iter_0, 3));
+            VerifyOrReturn(CheckValue("serverGeneratedCommandList[3]", iter_0.GetValue(), 5UL));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(serverGeneratedCommandList)>("serverGeneratedCommandList", iter_0, 4));
+            VerifyOrReturn(CheckValue("serverGeneratedCommandList[4]", iter_0.GetValue(), 6UL));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(serverGeneratedCommandList)>("serverGeneratedCommandList", iter_0, 5));
+            VerifyOrReturn(CheckValue("serverGeneratedCommandList[5]", iter_0.GetValue(), 9UL));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(serverGeneratedCommandList)>("serverGeneratedCommandList", iter_0, 6));
+            VerifyOrReturn(CheckValue("serverGeneratedCommandList[6]", iter_0.GetValue(), 10UL));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(serverGeneratedCommandList)>("serverGeneratedCommandList", iter_0, 7));
+            VerifyOrReturn(CheckValue("serverGeneratedCommandList[7]", iter_0.GetValue(), 11UL));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(serverGeneratedCommandList)>("serverGeneratedCommandList", iter_0, 8));
+        }
+
+        NextTest();
+    }
 };
 
 class TestClusterComplexTypes : public TestCommand
 {
 public:
-    TestClusterComplexTypes() : TestCommand("TestClusterComplexTypes"), mTestIndex(0)
+    TestClusterComplexTypes(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestClusterComplexTypes", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -66500,7 +66764,7 @@ private:
 class TestConstraints : public TestCommand
 {
 public:
-    TestConstraints() : TestCommand("TestConstraints"), mTestIndex(0)
+    TestConstraints(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestConstraints", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -67315,7 +67579,8 @@ private:
 class TestDelayCommands : public TestCommand
 {
 public:
-    TestDelayCommands() : TestCommand("TestDelayCommands"), mTestIndex(0)
+    TestDelayCommands(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestDelayCommands", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -67392,7 +67657,7 @@ private:
 class TestLogCommands : public TestCommand
 {
 public:
-    TestLogCommands() : TestCommand("TestLogCommands"), mTestIndex(0)
+    TestLogCommands(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestLogCommands", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -67479,7 +67744,7 @@ private:
 class TestSaveAs : public TestCommand
 {
 public:
-    TestSaveAs() : TestCommand("TestSaveAs"), mTestIndex(0)
+    TestSaveAs(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestSaveAs", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -71581,7 +71846,8 @@ private:
 class TestConfigVariables : public TestCommand
 {
 public:
-    TestConfigVariables() : TestCommand("TestConfigVariables"), mTestIndex(0)
+    TestConfigVariables(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestConfigVariables", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -71731,7 +71997,8 @@ private:
 class TestDescriptorCluster : public TestCommand
 {
 public:
-    TestDescriptorCluster() : TestCommand("TestDescriptorCluster"), mTestIndex(0)
+    TestDescriptorCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestDescriptorCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -72024,7 +72291,8 @@ private:
 class TestBasicInformation : public TestCommand
 {
 public:
-    TestBasicInformation() : TestCommand("TestBasicInformation"), mTestIndex(0)
+    TestBasicInformation(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestBasicInformation", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -72316,7 +72584,8 @@ private:
 class TestIdentifyCluster : public TestCommand
 {
 public:
-    TestIdentifyCluster() : TestCommand("TestIdentifyCluster"), mTestIndex(0)
+    TestIdentifyCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestIdentifyCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -72415,7 +72684,8 @@ private:
 class TestOperationalCredentialsCluster : public TestCommand
 {
 public:
-    TestOperationalCredentialsCluster() : TestCommand("TestOperationalCredentialsCluster"), mTestIndex(0)
+    TestOperationalCredentialsCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestOperationalCredentialsCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -72599,7 +72869,8 @@ private:
 class TestModeSelectCluster : public TestCommand
 {
 public:
-    TestModeSelectCluster() : TestCommand("TestModeSelectCluster"), mTestIndex(0)
+    TestModeSelectCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestModeSelectCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -72977,10 +73248,109 @@ private:
     void OnSuccessResponse_8() { ThrowSuccessResponse(); }
 };
 
+class TestSystemCommands : public TestCommand
+{
+public:
+    TestSystemCommands(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestSystemCommands", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~TestSystemCommands() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: TestSystemCommands\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: TestSystemCommands\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Stop the accessory\n");
+            err = TestStopTheAccessory_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Start the accessory with a given discriminator\n");
+            err = TestStartTheAccessoryWithAGivenDiscriminator_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Reboot the accessory with an other given discriminator\n");
+            err = TestRebootTheAccessoryWithAnOtherGivenDiscriminator_3();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 4;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestStopTheAccessory_1()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Stop();
+    }
+
+    CHIP_ERROR TestStartTheAccessoryWithAGivenDiscriminator_2()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Start(1111);
+    }
+
+    CHIP_ERROR TestRebootTheAccessoryWithAnOtherGivenDiscriminator_3()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Reboot(2222);
+    }
+};
+
 class Test_TC_SWDIAG_1_1 : public TestCommand
 {
 public:
-    Test_TC_SWDIAG_1_1() : TestCommand("Test_TC_SWDIAG_1_1"), mTestIndex(0)
+    Test_TC_SWDIAG_1_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_SWDIAG_1_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -73169,7 +73539,8 @@ private:
 class Test_TC_SWDIAG_2_1 : public TestCommand
 {
 public:
-    Test_TC_SWDIAG_2_1() : TestCommand("Test_TC_SWDIAG_2_1"), mTestIndex(0)
+    Test_TC_SWDIAG_2_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_SWDIAG_2_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -73226,7 +73597,8 @@ private:
 class Test_TC_SWDIAG_3_1 : public TestCommand
 {
 public:
-    Test_TC_SWDIAG_3_1() : TestCommand("Test_TC_SWDIAG_3_1"), mTestIndex(0)
+    Test_TC_SWDIAG_3_1(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_SWDIAG_3_1", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -73380,7 +73752,8 @@ private:
 class TestSubscribe_OnOff : public TestCommand
 {
 public:
-    TestSubscribe_OnOff() : TestCommand("TestSubscribe_OnOff"), mTestIndex(0)
+    TestSubscribe_OnOff(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestSubscribe_OnOff", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -73721,7 +74094,8 @@ private:
 class DL_UsersAndCredentials : public TestCommand
 {
 public:
-    DL_UsersAndCredentials() : TestCommand("DL_UsersAndCredentials"), mTestIndex(0)
+    DL_UsersAndCredentials(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("DL_UsersAndCredentials", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -74433,7 +74807,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_5(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -74538,7 +74913,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_7(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -74574,7 +74950,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_8(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -74680,7 +75057,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_10(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -74787,7 +75165,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_12(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -74894,7 +75273,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_14(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -75001,7 +75381,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_16(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -75112,7 +75493,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_18(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -75223,7 +75605,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_20(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -75330,7 +75713,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_22(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -75434,7 +75818,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_24(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -75469,7 +75854,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_25(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -75498,7 +75884,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_26(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -75597,7 +75984,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_28(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -75696,7 +76084,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_30(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -75725,7 +76114,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_31(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -75754,7 +76144,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_32(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -76059,7 +76450,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_39(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -76230,7 +76622,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_42(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -76279,7 +76672,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_43(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -76468,7 +76862,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_48(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -76642,7 +77037,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_51(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -76692,7 +77088,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_52(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -76741,7 +77138,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_53(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -76791,7 +77189,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_54(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -76841,7 +77240,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_55(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -76891,7 +77291,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_56(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -76941,7 +77342,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_57(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -76991,7 +77393,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_58(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -77042,7 +77445,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_59(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -77093,7 +77497,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_60(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -77142,7 +77547,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_61(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -77192,7 +77598,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_62(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -77242,7 +77649,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_63(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -77291,7 +77699,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_64(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -77341,7 +77750,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_65(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -77384,7 +77794,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_66(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -77535,7 +77946,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_69(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -77680,7 +78092,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_72(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -77724,7 +78137,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_73(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -77975,7 +78389,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_78(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -78026,7 +78441,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_79(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -78077,7 +78493,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_80(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -78118,7 +78535,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_81(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -78476,7 +78894,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_88(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -78524,7 +78943,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_89(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -78693,7 +79113,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_92(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -78735,7 +79156,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_93(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -78767,7 +79189,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_94(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -78799,7 +79222,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_95(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -78831,7 +79255,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_96(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -78863,7 +79288,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_97(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -78895,7 +79321,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_98(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -78924,7 +79351,8 @@ private:
             (static_cast<DL_UsersAndCredentials *>(context))->OnFailureResponse_99(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -79046,7 +79474,7 @@ private:
 class DL_LockUnlock : public TestCommand
 {
 public:
-    DL_LockUnlock() : TestCommand("DL_LockUnlock"), mTestIndex(0)
+    DL_LockUnlock(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("DL_LockUnlock", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -79217,7 +79645,8 @@ private:
             (static_cast<DL_LockUnlock *>(context))->OnFailureResponse_1(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -79259,7 +79688,8 @@ private:
             (static_cast<DL_LockUnlock *>(context))->OnFailureResponse_2(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -79314,7 +79744,8 @@ private:
             (static_cast<DL_LockUnlock *>(context))->OnFailureResponse_4(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -79368,7 +79799,8 @@ private:
             (static_cast<DL_LockUnlock *>(context))->OnFailureResponse_6(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -79423,7 +79855,8 @@ private:
             (static_cast<DL_LockUnlock *>(context))->OnFailureResponse_8(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -79479,7 +79912,8 @@ private:
             (static_cast<DL_LockUnlock *>(context))->OnFailureResponse_10(error);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
         return CHIP_NO_ERROR;
     }
 
@@ -79492,10 +79926,3552 @@ private:
     void OnSuccessResponse_10() { NextTest(); }
 };
 
+class DL_Schedules : public TestCommand
+{
+public:
+    DL_Schedules(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("DL_Schedules", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~DL_Schedules() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: DL_Schedules\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: DL_Schedules\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Create new PIN credential and schedule user\n");
+            err = TestCreateNewPinCredentialAndScheduleUser_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Get number of supported users\n");
+            err = TestGetNumberOfSupportedUsers_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 3 : Get Max number of Week Day schedules for user and verify default value\n");
+            err = TestGetMaxNumberOfWeekDaySchedulesForUserAndVerifyDefaultValue_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 4 : Get Max number of Year Day schedules for user and verify default value\n");
+            err = TestGetMaxNumberOfYearDaySchedulesForUserAndVerifyDefaultValue_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Create Week Day schedule with 0 index\n");
+            err = TestCreateWeekDayScheduleWith0Index_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Create Week Day schedule with out-of-bounds index\n");
+            err = TestCreateWeekDayScheduleWithOutOfBoundsIndex_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Create Week Day schedule with 0 user index\n");
+            err = TestCreateWeekDayScheduleWith0UserIndex_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Create Week Day schedule with out-of-bounds user index\n");
+            err = TestCreateWeekDayScheduleWithOutOfBoundsUserIndex_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Create Week Day schedule for non-existing user\n");
+            err = TestCreateWeekDayScheduleForNonExistingUser_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Create Week Day schedule with 0 days mask\n");
+            err = TestCreateWeekDayScheduleWith0DaysMask_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Create Week Day schedule for Sunday and Monday\n");
+            err = TestCreateWeekDayScheduleForSundayAndMonday_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Create Week Day schedule for Sunday Wednesday and Saturday\n");
+            err = TestCreateWeekDayScheduleForSundayWednesdayAndSaturday_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : Create Week Day schedule with invalid start hour\n");
+            err = TestCreateWeekDayScheduleWithInvalidStartHour_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : Create Week Day schedule with invalid start minute\n");
+            err = TestCreateWeekDayScheduleWithInvalidStartMinute_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool, " ***** Test Step 15 : Create Week Day schedule with invalid end hour\n");
+            err = TestCreateWeekDayScheduleWithInvalidEndHour_15();
+            break;
+        case 16:
+            ChipLogProgress(chipTool, " ***** Test Step 16 : Create Week Day schedule with invalid end minute\n");
+            err = TestCreateWeekDayScheduleWithInvalidEndMinute_16();
+            break;
+        case 17:
+            ChipLogProgress(chipTool, " ***** Test Step 17 : Create Week Day schedule with start hour later that end hour\n");
+            err = TestCreateWeekDayScheduleWithStartHourLaterThatEndHour_17();
+            break;
+        case 18:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 18 : Create Week Day schedule with start minute later that end minute when hours are equal\n");
+            err = TestCreateWeekDayScheduleWithStartMinuteLaterThatEndMinuteWhenHoursAreEqual_18();
+            break;
+        case 19:
+            ChipLogProgress(chipTool, " ***** Test Step 19 : Make sure that previous operations did not create a schedule\n");
+            err = TestMakeSureThatPreviousOperationsDidNotCreateASchedule_19();
+            break;
+        case 20:
+            ChipLogProgress(chipTool, " ***** Test Step 20 : Get Week Day schedule with 0 index\n");
+            err = TestGetWeekDayScheduleWith0Index_20();
+            break;
+        case 21:
+            ChipLogProgress(chipTool, " ***** Test Step 21 : Get Week Day schedule with out-of-bounds index\n");
+            err = TestGetWeekDayScheduleWithOutOfBoundsIndex_21();
+            break;
+        case 22:
+            ChipLogProgress(chipTool, " ***** Test Step 22 : Get Week Day schedule with 0 user index\n");
+            err = TestGetWeekDayScheduleWith0UserIndex_22();
+            break;
+        case 23:
+            ChipLogProgress(chipTool, " ***** Test Step 23 : Get Week Day schedule with out-of-bounds user index\n");
+            err = TestGetWeekDayScheduleWithOutOfBoundsUserIndex_23();
+            break;
+        case 24:
+            ChipLogProgress(chipTool, " ***** Test Step 24 : Get Week Day schedule with non-existing user index\n");
+            err = TestGetWeekDayScheduleWithNonExistingUserIndex_24();
+            break;
+        case 25:
+            ChipLogProgress(chipTool, " ***** Test Step 25 : Create Year Day schedule with 0 index\n");
+            err = TestCreateYearDayScheduleWith0Index_25();
+            break;
+        case 26:
+            ChipLogProgress(chipTool, " ***** Test Step 26 : Create Year Day schedule with out-of-bounds index\n");
+            err = TestCreateYearDayScheduleWithOutOfBoundsIndex_26();
+            break;
+        case 27:
+            ChipLogProgress(chipTool, " ***** Test Step 27 : Create Year Day schedule with 0 user index\n");
+            err = TestCreateYearDayScheduleWith0UserIndex_27();
+            break;
+        case 28:
+            ChipLogProgress(chipTool, " ***** Test Step 28 : Create Year Day schedule with out-of-bounds user index\n");
+            err = TestCreateYearDayScheduleWithOutOfBoundsUserIndex_28();
+            break;
+        case 29:
+            ChipLogProgress(chipTool, " ***** Test Step 29 : Create Year Day schedule for non-existing user\n");
+            err = TestCreateYearDayScheduleForNonExistingUser_29();
+            break;
+        case 30:
+            ChipLogProgress(chipTool, " ***** Test Step 30 : Create Year Day schedule with start hour later that end hour\n");
+            err = TestCreateYearDayScheduleWithStartHourLaterThatEndHour_30();
+            break;
+        case 31:
+            ChipLogProgress(chipTool, " ***** Test Step 31 : Make sure that previous operations did not create a schedule\n");
+            err = TestMakeSureThatPreviousOperationsDidNotCreateASchedule_31();
+            break;
+        case 32:
+            ChipLogProgress(chipTool, " ***** Test Step 32 : Get Year Day schedule with 0 index\n");
+            err = TestGetYearDayScheduleWith0Index_32();
+            break;
+        case 33:
+            ChipLogProgress(chipTool, " ***** Test Step 33 : Get Year Day schedule with out-of-bounds index\n");
+            err = TestGetYearDayScheduleWithOutOfBoundsIndex_33();
+            break;
+        case 34:
+            ChipLogProgress(chipTool, " ***** Test Step 34 : Get Year Day schedule with 0 user index\n");
+            err = TestGetYearDayScheduleWith0UserIndex_34();
+            break;
+        case 35:
+            ChipLogProgress(chipTool, " ***** Test Step 35 : Get Year Day schedule with out-of-bounds user index\n");
+            err = TestGetYearDayScheduleWithOutOfBoundsUserIndex_35();
+            break;
+        case 36:
+            ChipLogProgress(chipTool, " ***** Test Step 36 : Get Year Day schedule with non-existing user index\n");
+            err = TestGetYearDayScheduleWithNonExistingUserIndex_36();
+            break;
+        case 37:
+            ChipLogProgress(chipTool, " ***** Test Step 37 : Create Week Day schedule with valid parameters\n");
+            err = TestCreateWeekDayScheduleWithValidParameters_37();
+            break;
+        case 38:
+            ChipLogProgress(chipTool, " ***** Test Step 38 : Verify created schedule\n");
+            err = TestVerifyCreatedSchedule_38();
+            break;
+        case 39:
+            ChipLogProgress(chipTool, " ***** Test Step 39 : Create Year Day schedule with valid parameters\n");
+            err = TestCreateYearDayScheduleWithValidParameters_39();
+            break;
+        case 40:
+            ChipLogProgress(chipTool, " ***** Test Step 40 : Verify created schedule\n");
+            err = TestVerifyCreatedSchedule_40();
+            break;
+        case 41:
+            ChipLogProgress(chipTool, " ***** Test Step 41 : Clear Week Day schedule with 0 index\n");
+            err = TestClearWeekDayScheduleWith0Index_41();
+            break;
+        case 42:
+            ChipLogProgress(chipTool, " ***** Test Step 42 : Clear Week Day schedule with out-of-bounds index\n");
+            err = TestClearWeekDayScheduleWithOutOfBoundsIndex_42();
+            break;
+        case 43:
+            ChipLogProgress(chipTool, " ***** Test Step 43 : Clear Week Day schedule with 0 user index\n");
+            err = TestClearWeekDayScheduleWith0UserIndex_43();
+            break;
+        case 44:
+            ChipLogProgress(chipTool, " ***** Test Step 44 : Clear Week Day schedule with out-of-bounds user index\n");
+            err = TestClearWeekDayScheduleWithOutOfBoundsUserIndex_44();
+            break;
+        case 45:
+            ChipLogProgress(chipTool, " ***** Test Step 45 : Clear Week Day schedule with non-existing user\n");
+            err = TestClearWeekDayScheduleWithNonExistingUser_45();
+            break;
+        case 46:
+            ChipLogProgress(chipTool, " ***** Test Step 46 : Clear Year Day schedule with 0 index\n");
+            err = TestClearYearDayScheduleWith0Index_46();
+            break;
+        case 47:
+            ChipLogProgress(chipTool, " ***** Test Step 47 : Clear Year Day schedule with out-of-bounds index\n");
+            err = TestClearYearDayScheduleWithOutOfBoundsIndex_47();
+            break;
+        case 48:
+            ChipLogProgress(chipTool, " ***** Test Step 48 : Clear Year Day schedule with 0 user index\n");
+            err = TestClearYearDayScheduleWith0UserIndex_48();
+            break;
+        case 49:
+            ChipLogProgress(chipTool, " ***** Test Step 49 : Clear Year Day schedule with out-of-bounds user index\n");
+            err = TestClearYearDayScheduleWithOutOfBoundsUserIndex_49();
+            break;
+        case 50:
+            ChipLogProgress(chipTool, " ***** Test Step 50 : Clear Year Day schedule with non-existing user\n");
+            err = TestClearYearDayScheduleWithNonExistingUser_50();
+            break;
+        case 51:
+            ChipLogProgress(chipTool, " ***** Test Step 51 : Make sure that week day schedule was not deleted\n");
+            err = TestMakeSureThatWeekDayScheduleWasNotDeleted_51();
+            break;
+        case 52:
+            ChipLogProgress(chipTool, " ***** Test Step 52 : Make sure that year day schedule was not deleted\n");
+            err = TestMakeSureThatYearDayScheduleWasNotDeleted_52();
+            break;
+        case 53:
+            ChipLogProgress(chipTool, " ***** Test Step 53 : Create another Week Day schedule with valid parameters\n");
+            err = TestCreateAnotherWeekDayScheduleWithValidParameters_53();
+            break;
+        case 54:
+            ChipLogProgress(chipTool, " ***** Test Step 54 : Verify created week day schedule\n");
+            err = TestVerifyCreatedWeekDaySchedule_54();
+            break;
+        case 55:
+            ChipLogProgress(chipTool, " ***** Test Step 55 : Create another Year Day schedule with valid parameters\n");
+            err = TestCreateAnotherYearDayScheduleWithValidParameters_55();
+            break;
+        case 56:
+            ChipLogProgress(chipTool, " ***** Test Step 56 : Verify created year day schedule\n");
+            err = TestVerifyCreatedYearDaySchedule_56();
+            break;
+        case 57:
+            ChipLogProgress(chipTool, " ***** Test Step 57 : Clear a single week day schedule for the first user\n");
+            err = TestClearASingleWeekDayScheduleForTheFirstUser_57();
+            break;
+        case 58:
+            ChipLogProgress(chipTool, " ***** Test Step 58 : Verify cleared week day schedule\n");
+            err = TestVerifyClearedWeekDaySchedule_58();
+            break;
+        case 59:
+            ChipLogProgress(chipTool, " ***** Test Step 59 : Clear all remaining week day schedules for the first user\n");
+            err = TestClearAllRemainingWeekDaySchedulesForTheFirstUser_59();
+            break;
+        case 60:
+            ChipLogProgress(chipTool, " ***** Test Step 60 : Verify cleared week schedule\n");
+            err = TestVerifyClearedWeekSchedule_60();
+            break;
+        case 61:
+            ChipLogProgress(chipTool, " ***** Test Step 61 : Make sure that first year day schedule was not deleted\n");
+            err = TestMakeSureThatFirstYearDayScheduleWasNotDeleted_61();
+            break;
+        case 62:
+            ChipLogProgress(chipTool, " ***** Test Step 62 : Make sure that second year day schedule was not deleted\n");
+            err = TestMakeSureThatSecondYearDayScheduleWasNotDeleted_62();
+            break;
+        case 63:
+            ChipLogProgress(chipTool, " ***** Test Step 63 : Create another Week Day schedule with valid parameters\n");
+            err = TestCreateAnotherWeekDayScheduleWithValidParameters_63();
+            break;
+        case 64:
+            ChipLogProgress(chipTool, " ***** Test Step 64 : Clear a single year day schedule for the first user\n");
+            err = TestClearASingleYearDayScheduleForTheFirstUser_64();
+            break;
+        case 65:
+            ChipLogProgress(chipTool, " ***** Test Step 65 : Verify cleared year day schedule\n");
+            err = TestVerifyClearedYearDaySchedule_65();
+            break;
+        case 66:
+            ChipLogProgress(chipTool, " ***** Test Step 66 : Clear all remaining year schedules for the first user\n");
+            err = TestClearAllRemainingYearSchedulesForTheFirstUser_66();
+            break;
+        case 67:
+            ChipLogProgress(chipTool, " ***** Test Step 67 : Verify that second year day schedule was cleared\n");
+            err = TestVerifyThatSecondYearDayScheduleWasCleared_67();
+            break;
+        case 68:
+            ChipLogProgress(chipTool, " ***** Test Step 68 : Verify created week day schedule\n");
+            err = TestVerifyCreatedWeekDaySchedule_68();
+            break;
+        case 69:
+            ChipLogProgress(chipTool, " ***** Test Step 69 : Clear all remaining week day schedules for the first user\n");
+            err = TestClearAllRemainingWeekDaySchedulesForTheFirstUser_69();
+            break;
+        case 70:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 70 : Create new user without credential so we can add more schedules to it\n");
+            err = TestCreateNewUserWithoutCredentialSoWeCanAddMoreSchedulesToIt_70();
+            break;
+        case 71:
+            ChipLogProgress(chipTool, " ***** Test Step 71 : Create Week Day schedule with valid parameters for first user\n");
+            err = TestCreateWeekDayScheduleWithValidParametersForFirstUser_71();
+            break;
+        case 72:
+            ChipLogProgress(chipTool, " ***** Test Step 72 : Verify created week day schedule for first user\n");
+            err = TestVerifyCreatedWeekDayScheduleForFirstUser_72();
+            break;
+        case 73:
+            ChipLogProgress(chipTool, " ***** Test Step 73 : Create Year Day schedule for first user\n");
+            err = TestCreateYearDayScheduleForFirstUser_73();
+            break;
+        case 74:
+            ChipLogProgress(chipTool, " ***** Test Step 74 : Verify created year day schedule for first\n");
+            err = TestVerifyCreatedYearDayScheduleForFirst_74();
+            break;
+        case 75:
+            ChipLogProgress(chipTool, " ***** Test Step 75 : Create Week Day schedule with valid parameters for second user\n");
+            err = TestCreateWeekDayScheduleWithValidParametersForSecondUser_75();
+            break;
+        case 76:
+            ChipLogProgress(chipTool, " ***** Test Step 76 : Verify created week day schedule for first user\n");
+            err = TestVerifyCreatedWeekDayScheduleForFirstUser_76();
+            break;
+        case 77:
+            ChipLogProgress(chipTool, " ***** Test Step 77 : Create Year Day schedule for second user\n");
+            err = TestCreateYearDayScheduleForSecondUser_77();
+            break;
+        case 78:
+            ChipLogProgress(chipTool, " ***** Test Step 78 : Verify created year day schedule for first\n");
+            err = TestVerifyCreatedYearDayScheduleForFirst_78();
+            break;
+        case 79:
+            ChipLogProgress(chipTool, " ***** Test Step 79 : Cleanup\n");
+            err = TestCleanup_79();
+            break;
+        case 80:
+            ChipLogProgress(chipTool, " ***** Test Step 80 : Make sure clearing first user also cleared week day schedules\n");
+            err = TestMakeSureClearingFirstUserAlsoClearedWeekDaySchedules_80();
+            break;
+        case 81:
+            ChipLogProgress(chipTool, " ***** Test Step 81 : Make sure clearing first user also cleared year day schedules\n");
+            err = TestMakeSureClearingFirstUserAlsoClearedYearDaySchedules_81();
+            break;
+        case 82:
+            ChipLogProgress(chipTool, " ***** Test Step 82 : Make sure clearing second user also cleared week day schedules\n");
+            err = TestMakeSureClearingSecondUserAlsoClearedWeekDaySchedules_82();
+            break;
+        case 83:
+            ChipLogProgress(chipTool, " ***** Test Step 83 : Make sure clearing second user also cleared year day schedules\n");
+            err = TestMakeSureClearingSecondUserAlsoClearedYearDaySchedules_83();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 84;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    uint16_t NumberOfTotalUsersSupported;
+    uint8_t NumberOfWeekDaySchedulesSupportedPerUser;
+    uint8_t NumberOfYearDaySchedulesSupportedPerUser;
+
+    static void OnFailureCallback_2(void * context, CHIP_ERROR error)
+    {
+        (static_cast<DL_Schedules *>(context))->OnFailureResponse_2(error);
+    }
+
+    static void OnSuccessCallback_2(void * context, uint16_t numberOfTotalUsersSupported)
+    {
+        (static_cast<DL_Schedules *>(context))->OnSuccessResponse_2(numberOfTotalUsersSupported);
+    }
+
+    static void OnFailureCallback_3(void * context, CHIP_ERROR error)
+    {
+        (static_cast<DL_Schedules *>(context))->OnFailureResponse_3(error);
+    }
+
+    static void OnSuccessCallback_3(void * context, uint8_t numberOfWeekDaySchedulesSupportedPerUser)
+    {
+        (static_cast<DL_Schedules *>(context))->OnSuccessResponse_3(numberOfWeekDaySchedulesSupportedPerUser);
+    }
+
+    static void OnFailureCallback_4(void * context, CHIP_ERROR error)
+    {
+        (static_cast<DL_Schedules *>(context))->OnFailureResponse_4(error);
+    }
+
+    static void OnSuccessCallback_4(void * context, uint8_t numberOfYearDaySchedulesSupportedPerUser)
+    {
+        (static_cast<DL_Schedules *>(context))->OnSuccessResponse_4(numberOfYearDaySchedulesSupportedPerUser);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestCreateNewPinCredentialAndScheduleUser_1()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetCredential::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+
+        request.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+        request.credential.credentialIndex = 1U;
+
+        request.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
+        request.userIndex.SetNull();
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_1(data.status, data.userIndex, data.nextCredentialIndex);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) { (static_cast<DL_Schedules *>(context))->OnFailureResponse_1(error); };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_1(chip::app::Clusters::DoorLock::DlStatus status,
+                             const chip::app::DataModel::Nullable<uint16_t> & userIndex,
+                             const chip::app::DataModel::Nullable<uint16_t> & nextCredentialIndex)
+    {
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValueNonNull("userIndex", userIndex));
+        VerifyOrReturn(CheckValue("userIndex.Value()", userIndex.Value(), 1U));
+
+        VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", nextCredentialIndex));
+        VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", nextCredentialIndex.Value(), 2U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestGetNumberOfSupportedUsers_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::DoorLockClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::NumberOfTotalUsersSupported::TypeInfo>(
+                this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_2(uint16_t numberOfTotalUsersSupported)
+    {
+        VerifyOrReturn(CheckValue("numberOfTotalUsersSupported", numberOfTotalUsersSupported, 10U));
+
+        NumberOfTotalUsersSupported = numberOfTotalUsersSupported;
+        NextTest();
+    }
+
+    CHIP_ERROR TestGetMaxNumberOfWeekDaySchedulesForUserAndVerifyDefaultValue_3()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::DoorLockClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::NumberOfWeekDaySchedulesSupportedPerUser::TypeInfo>(
+                this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_3(uint8_t numberOfWeekDaySchedulesSupportedPerUser)
+    {
+        VerifyOrReturn(CheckValue("numberOfWeekDaySchedulesSupportedPerUser", numberOfWeekDaySchedulesSupportedPerUser, 10));
+
+        NumberOfWeekDaySchedulesSupportedPerUser = numberOfWeekDaySchedulesSupportedPerUser;
+        NextTest();
+    }
+
+    CHIP_ERROR TestGetMaxNumberOfYearDaySchedulesForUserAndVerifyDefaultValue_4()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::DoorLockClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::NumberOfYearDaySchedulesSupportedPerUser::TypeInfo>(
+                this, OnSuccessCallback_4, OnFailureCallback_4));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_4(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_4(uint8_t numberOfYearDaySchedulesSupportedPerUser)
+    {
+        VerifyOrReturn(CheckValue("numberOfYearDaySchedulesSupportedPerUser", numberOfYearDaySchedulesSupportedPerUser, 10));
+
+        NumberOfYearDaySchedulesSupportedPerUser = numberOfYearDaySchedulesSupportedPerUser;
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateWeekDayScheduleWith0Index_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 0;
+        request.userIndex    = 1U;
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+        request.startHour    = 15;
+        request.startMinute  = 16;
+        request.endHour      = 18;
+        request.endMinute    = 0;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_5();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) { (static_cast<DL_Schedules *>(context))->OnFailureResponse_5(error); };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_5() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestCreateWeekDayScheduleWithOutOfBoundsIndex_6()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = static_cast<uint8_t>(NumberOfWeekDaySchedulesSupportedPerUser + 1);
+        request.userIndex    = 1U;
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+        request.startHour    = 15;
+        request.startMinute  = 16;
+        request.endHour      = 18;
+        request.endMinute    = 0;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_6();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) { (static_cast<DL_Schedules *>(context))->OnFailureResponse_6(error); };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_6() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestCreateWeekDayScheduleWith0UserIndex_7()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 0U;
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+        request.startHour    = 15;
+        request.startMinute  = 16;
+        request.endHour      = 18;
+        request.endMinute    = 0;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_7();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) { (static_cast<DL_Schedules *>(context))->OnFailureResponse_7(error); };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_7(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_7() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestCreateWeekDayScheduleWithOutOfBoundsUserIndex_8()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = static_cast<uint8_t>(NumberOfTotalUsersSupported + 1);
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+        request.startHour    = 15;
+        request.startMinute  = 16;
+        request.endHour      = 18;
+        request.endMinute    = 0;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_8();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) { (static_cast<DL_Schedules *>(context))->OnFailureResponse_8(error); };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_8(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_8() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestCreateWeekDayScheduleForNonExistingUser_9()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 2U;
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+        request.startHour    = 15;
+        request.startMinute  = 16;
+        request.endHour      = 18;
+        request.endMinute    = 0;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_9();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) { (static_cast<DL_Schedules *>(context))->OnFailureResponse_9(error); };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_9(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_NOT_FOUND));
+        NextTest();
+    }
+
+    void OnSuccessResponse_9() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestCreateWeekDayScheduleWith0DaysMask_10()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(0);
+        request.startHour    = 15;
+        request.startMinute  = 16;
+        request.endHour      = 18;
+        request.endMinute    = 0;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_10();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_10(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_10(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_10() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestCreateWeekDayScheduleForSundayAndMonday_11()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(3);
+        request.startHour    = 15;
+        request.startMinute  = 16;
+        request.endHour      = 18;
+        request.endMinute    = 0;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_11();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_11(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_11(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_11() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestCreateWeekDayScheduleForSundayWednesdayAndSaturday_12()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(73);
+        request.startHour    = 15;
+        request.startMinute  = 16;
+        request.endHour      = 18;
+        request.endMinute    = 0;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_12();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_12(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_12(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_12() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestCreateWeekDayScheduleWithInvalidStartHour_13()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+        request.startHour    = 24;
+        request.startMinute  = 16;
+        request.endHour      = 18;
+        request.endMinute    = 0;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_13();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_13(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_13(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_13() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestCreateWeekDayScheduleWithInvalidStartMinute_14()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+        request.startHour    = 15;
+        request.startMinute  = 60;
+        request.endHour      = 18;
+        request.endMinute    = 0;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_14();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_14(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_14(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_14() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestCreateWeekDayScheduleWithInvalidEndHour_15()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+        request.startHour    = 15;
+        request.startMinute  = 16;
+        request.endHour      = 24;
+        request.endMinute    = 0;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_15();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_15(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_15(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_15() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestCreateWeekDayScheduleWithInvalidEndMinute_16()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+        request.startHour    = 15;
+        request.startMinute  = 16;
+        request.endHour      = 18;
+        request.endMinute    = 60;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_16();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_16(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_16(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_16() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestCreateWeekDayScheduleWithStartHourLaterThatEndHour_17()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+        request.startHour    = 19;
+        request.startMinute  = 16;
+        request.endHour      = 18;
+        request.endMinute    = 0;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_17();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_17(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_17(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_17() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestCreateWeekDayScheduleWithStartMinuteLaterThatEndMinuteWhenHoursAreEqual_18()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+        request.startHour    = 15;
+        request.startMinute  = 50;
+        request.endHour      = 15;
+        request.endMinute    = 49;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_18();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_18(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_18(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_18() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestMakeSureThatPreviousOperationsDidNotCreateASchedule_19()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_19(data.weekDayIndex, data.userIndex, data.status, data.daysMask, data.startHour,
+                                       data.startMinute, data.endHour, data.endMinute);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_19(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_19(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_19(uint8_t weekDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>> & daysMask,
+                              const chip::Optional<uint8_t> & startHour, const chip::Optional<uint8_t> & startMinute,
+                              const chip::Optional<uint8_t> & endHour, const chip::Optional<uint8_t> & endMinute)
+    {
+        VerifyOrReturn(CheckValue("weekDayIndex", weekDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 139));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestGetWeekDayScheduleWith0Index_20()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 0;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_20(data.weekDayIndex, data.userIndex, data.status, data.daysMask, data.startHour,
+                                       data.startMinute, data.endHour, data.endMinute);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_20(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_20(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_20(uint8_t weekDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>> & daysMask,
+                              const chip::Optional<uint8_t> & startHour, const chip::Optional<uint8_t> & startMinute,
+                              const chip::Optional<uint8_t> & endHour, const chip::Optional<uint8_t> & endMinute)
+    {
+        VerifyOrReturn(CheckValue("weekDayIndex", weekDayIndex, 0));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 133));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestGetWeekDayScheduleWithOutOfBoundsIndex_21()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = static_cast<uint8_t>(NumberOfWeekDaySchedulesSupportedPerUser + 1);
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_21(data.weekDayIndex, data.userIndex, data.status, data.daysMask, data.startHour,
+                                       data.startMinute, data.endHour, data.endMinute);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_21(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_21(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_21(uint8_t weekDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>> & daysMask,
+                              const chip::Optional<uint8_t> & startHour, const chip::Optional<uint8_t> & startMinute,
+                              const chip::Optional<uint8_t> & endHour, const chip::Optional<uint8_t> & endMinute)
+    {
+        VerifyOrReturn(
+            CheckValue("weekDayIndex", weekDayIndex, static_cast<uint8_t>(NumberOfWeekDaySchedulesSupportedPerUser + 1)));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 133));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestGetWeekDayScheduleWith0UserIndex_22()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 0U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_22(data.weekDayIndex, data.userIndex, data.status, data.daysMask, data.startHour,
+                                       data.startMinute, data.endHour, data.endMinute);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_22(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_22(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_22(uint8_t weekDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>> & daysMask,
+                              const chip::Optional<uint8_t> & startHour, const chip::Optional<uint8_t> & startMinute,
+                              const chip::Optional<uint8_t> & endHour, const chip::Optional<uint8_t> & endMinute)
+    {
+        VerifyOrReturn(CheckValue("weekDayIndex", weekDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 0U));
+
+        VerifyOrReturn(CheckValue("status", status, 133));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestGetWeekDayScheduleWithOutOfBoundsUserIndex_23()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = static_cast<uint8_t>(NumberOfTotalUsersSupported + 1);
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_23(data.weekDayIndex, data.userIndex, data.status, data.daysMask, data.startHour,
+                                       data.startMinute, data.endHour, data.endMinute);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_23(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_23(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_23(uint8_t weekDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>> & daysMask,
+                              const chip::Optional<uint8_t> & startHour, const chip::Optional<uint8_t> & startMinute,
+                              const chip::Optional<uint8_t> & endHour, const chip::Optional<uint8_t> & endMinute)
+    {
+        VerifyOrReturn(CheckValue("weekDayIndex", weekDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, static_cast<uint8_t>(NumberOfTotalUsersSupported + 1)));
+
+        VerifyOrReturn(CheckValue("status", status, 133));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestGetWeekDayScheduleWithNonExistingUserIndex_24()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 2U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_24(data.weekDayIndex, data.userIndex, data.status, data.daysMask, data.startHour,
+                                       data.startMinute, data.endHour, data.endMinute);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_24(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_24(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_24(uint8_t weekDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>> & daysMask,
+                              const chip::Optional<uint8_t> & startHour, const chip::Optional<uint8_t> & startMinute,
+                              const chip::Optional<uint8_t> & endHour, const chip::Optional<uint8_t> & endMinute)
+    {
+        VerifyOrReturn(CheckValue("weekDayIndex", weekDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 2U));
+
+        VerifyOrReturn(CheckValue("status", status, 139));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateYearDayScheduleWith0Index_25()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex   = 0;
+        request.userIndex      = 1U;
+        request.localStartTime = 12345UL;
+        request.localEndTime   = 12345689UL;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_25();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_25(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_25(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_25() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestCreateYearDayScheduleWithOutOfBoundsIndex_26()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex   = static_cast<uint8_t>(NumberOfYearDaySchedulesSupportedPerUser + 1);
+        request.userIndex      = 1U;
+        request.localStartTime = 12345UL;
+        request.localEndTime   = 12345689UL;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_26();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_26(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_26(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_26() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestCreateYearDayScheduleWith0UserIndex_27()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex   = 1;
+        request.userIndex      = 0U;
+        request.localStartTime = 12345UL;
+        request.localEndTime   = 12345689UL;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_27();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_27(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_27(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_27() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestCreateYearDayScheduleWithOutOfBoundsUserIndex_28()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex   = 1;
+        request.userIndex      = static_cast<uint8_t>(NumberOfTotalUsersSupported + 1);
+        request.localStartTime = 12345UL;
+        request.localEndTime   = 12345689UL;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_28();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_28(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_28(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_28() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestCreateYearDayScheduleForNonExistingUser_29()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex   = 1;
+        request.userIndex      = 2U;
+        request.localStartTime = 12345UL;
+        request.localEndTime   = 12345689UL;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_29();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_29(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_29(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_NOT_FOUND));
+        NextTest();
+    }
+
+    void OnSuccessResponse_29() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestCreateYearDayScheduleWithStartHourLaterThatEndHour_30()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex   = 1;
+        request.userIndex      = 1U;
+        request.localStartTime = 12345689UL;
+        request.localEndTime   = 12345688UL;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_30();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_30(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_30(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_30() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestMakeSureThatPreviousOperationsDidNotCreateASchedule_31()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 1;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_31(data.yearDayIndex, data.userIndex, data.status, data.localStartTime, data.localEndTime);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_31(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_31(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_31(uint8_t yearDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<uint32_t> & localStartTime, const chip::Optional<uint32_t> & localEndTime)
+    {
+        VerifyOrReturn(CheckValue("yearDayIndex", yearDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 139));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestGetYearDayScheduleWith0Index_32()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 0;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_32(data.yearDayIndex, data.userIndex, data.status, data.localStartTime, data.localEndTime);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_32(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_32(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_32(uint8_t yearDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<uint32_t> & localStartTime, const chip::Optional<uint32_t> & localEndTime)
+    {
+        VerifyOrReturn(CheckValue("yearDayIndex", yearDayIndex, 0));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 133));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestGetYearDayScheduleWithOutOfBoundsIndex_33()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = static_cast<uint8_t>(NumberOfYearDaySchedulesSupportedPerUser + 1);
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_33(data.yearDayIndex, data.userIndex, data.status, data.localStartTime, data.localEndTime);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_33(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_33(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_33(uint8_t yearDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<uint32_t> & localStartTime, const chip::Optional<uint32_t> & localEndTime)
+    {
+        VerifyOrReturn(
+            CheckValue("yearDayIndex", yearDayIndex, static_cast<uint8_t>(NumberOfYearDaySchedulesSupportedPerUser + 1)));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 133));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestGetYearDayScheduleWith0UserIndex_34()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 1;
+        request.userIndex    = 0U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_34(data.yearDayIndex, data.userIndex, data.status, data.localStartTime, data.localEndTime);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_34(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_34(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_34(uint8_t yearDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<uint32_t> & localStartTime, const chip::Optional<uint32_t> & localEndTime)
+    {
+        VerifyOrReturn(CheckValue("yearDayIndex", yearDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 0U));
+
+        VerifyOrReturn(CheckValue("status", status, 133));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestGetYearDayScheduleWithOutOfBoundsUserIndex_35()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 1;
+        request.userIndex    = static_cast<uint8_t>(NumberOfTotalUsersSupported + 1);
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_35(data.yearDayIndex, data.userIndex, data.status, data.localStartTime, data.localEndTime);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_35(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_35(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_35(uint8_t yearDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<uint32_t> & localStartTime, const chip::Optional<uint32_t> & localEndTime)
+    {
+        VerifyOrReturn(CheckValue("yearDayIndex", yearDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, static_cast<uint8_t>(NumberOfTotalUsersSupported + 1)));
+
+        VerifyOrReturn(CheckValue("status", status, 133));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestGetYearDayScheduleWithNonExistingUserIndex_36()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 1;
+        request.userIndex    = 2U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_36(data.yearDayIndex, data.userIndex, data.status, data.localStartTime, data.localEndTime);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_36(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_36(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_36(uint8_t yearDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<uint32_t> & localStartTime, const chip::Optional<uint32_t> & localEndTime)
+    {
+        VerifyOrReturn(CheckValue("yearDayIndex", yearDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 2U));
+
+        VerifyOrReturn(CheckValue("status", status, 139));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateWeekDayScheduleWithValidParameters_37()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+        request.startHour    = 15;
+        request.startMinute  = 16;
+        request.endHour      = 18;
+        request.endMinute    = 0;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_37();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_37(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_37(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_37() { NextTest(); }
+
+    CHIP_ERROR TestVerifyCreatedSchedule_38()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_38(data.weekDayIndex, data.userIndex, data.status, data.daysMask, data.startHour,
+                                       data.startMinute, data.endHour, data.endMinute);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_38(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_38(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_38(uint8_t weekDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>> & daysMask,
+                              const chip::Optional<uint8_t> & startHour, const chip::Optional<uint8_t> & startMinute,
+                              const chip::Optional<uint8_t> & endHour, const chip::Optional<uint8_t> & endMinute)
+    {
+        VerifyOrReturn(CheckValue("weekDayIndex", weekDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("daysMask", daysMask));
+        VerifyOrReturn(CheckValue("daysMask.Value()", daysMask.Value(), 1));
+
+        VerifyOrReturn(CheckValuePresent("startHour", startHour));
+        VerifyOrReturn(CheckValue("startHour.Value()", startHour.Value(), 15));
+
+        VerifyOrReturn(CheckValuePresent("startMinute", startMinute));
+        VerifyOrReturn(CheckValue("startMinute.Value()", startMinute.Value(), 16));
+
+        VerifyOrReturn(CheckValuePresent("endHour", endHour));
+        VerifyOrReturn(CheckValue("endHour.Value()", endHour.Value(), 18));
+
+        VerifyOrReturn(CheckValuePresent("endMinute", endMinute));
+        VerifyOrReturn(CheckValue("endMinute.Value()", endMinute.Value(), 0));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateYearDayScheduleWithValidParameters_39()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex   = 1;
+        request.userIndex      = 1U;
+        request.localStartTime = 12345UL;
+        request.localEndTime   = 12345689UL;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_39();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_39(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_39(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_39() { NextTest(); }
+
+    CHIP_ERROR TestVerifyCreatedSchedule_40()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 1;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_40(data.yearDayIndex, data.userIndex, data.status, data.localStartTime, data.localEndTime);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_40(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_40(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_40(uint8_t yearDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<uint32_t> & localStartTime, const chip::Optional<uint32_t> & localEndTime)
+    {
+        VerifyOrReturn(CheckValue("yearDayIndex", yearDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("localStartTime", localStartTime));
+        VerifyOrReturn(CheckValue("localStartTime.Value()", localStartTime.Value(), 12345UL));
+
+        VerifyOrReturn(CheckValuePresent("localEndTime", localEndTime));
+        VerifyOrReturn(CheckValue("localEndTime.Value()", localEndTime.Value(), 12345689UL));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestClearWeekDayScheduleWith0Index_41()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 0;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_41();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_41(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_41(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_41() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestClearWeekDayScheduleWithOutOfBoundsIndex_42()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = static_cast<uint8_t>(NumberOfWeekDaySchedulesSupportedPerUser + 1);
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_42();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_42(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_42(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_42() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestClearWeekDayScheduleWith0UserIndex_43()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 0U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_43();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_43(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_43(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_43() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestClearWeekDayScheduleWithOutOfBoundsUserIndex_44()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = static_cast<uint8_t>(NumberOfTotalUsersSupported + 1);
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_44();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_44(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_44(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_44() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestClearWeekDayScheduleWithNonExistingUser_45()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 2U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_45();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_45(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_45(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_NOT_FOUND));
+        NextTest();
+    }
+
+    void OnSuccessResponse_45() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestClearYearDayScheduleWith0Index_46()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 0;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_46();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_46(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_46(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_46() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestClearYearDayScheduleWithOutOfBoundsIndex_47()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = static_cast<uint8_t>(NumberOfYearDaySchedulesSupportedPerUser + 1);
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_47();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_47(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_47(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_47() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestClearYearDayScheduleWith0UserIndex_48()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 1;
+        request.userIndex    = 0U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_48();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_48(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_48(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_48() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestClearYearDayScheduleWithOutOfBoundsUserIndex_49()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 1;
+        request.userIndex    = static_cast<uint8_t>(NumberOfTotalUsersSupported + 1);
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_49();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_49(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_49(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+        NextTest();
+    }
+
+    void OnSuccessResponse_49() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestClearYearDayScheduleWithNonExistingUser_50()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 1;
+        request.userIndex    = 2U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_50();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_50(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_50(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_NOT_FOUND));
+        NextTest();
+    }
+
+    void OnSuccessResponse_50() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestMakeSureThatWeekDayScheduleWasNotDeleted_51()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_51(data.weekDayIndex, data.userIndex, data.status, data.daysMask, data.startHour,
+                                       data.startMinute, data.endHour, data.endMinute);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_51(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_51(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_51(uint8_t weekDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>> & daysMask,
+                              const chip::Optional<uint8_t> & startHour, const chip::Optional<uint8_t> & startMinute,
+                              const chip::Optional<uint8_t> & endHour, const chip::Optional<uint8_t> & endMinute)
+    {
+        VerifyOrReturn(CheckValue("weekDayIndex", weekDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("daysMask", daysMask));
+        VerifyOrReturn(CheckValue("daysMask.Value()", daysMask.Value(), 1));
+
+        VerifyOrReturn(CheckValuePresent("startHour", startHour));
+        VerifyOrReturn(CheckValue("startHour.Value()", startHour.Value(), 15));
+
+        VerifyOrReturn(CheckValuePresent("startMinute", startMinute));
+        VerifyOrReturn(CheckValue("startMinute.Value()", startMinute.Value(), 16));
+
+        VerifyOrReturn(CheckValuePresent("endHour", endHour));
+        VerifyOrReturn(CheckValue("endHour.Value()", endHour.Value(), 18));
+
+        VerifyOrReturn(CheckValuePresent("endMinute", endMinute));
+        VerifyOrReturn(CheckValue("endMinute.Value()", endMinute.Value(), 0));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestMakeSureThatYearDayScheduleWasNotDeleted_52()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 1;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_52(data.yearDayIndex, data.userIndex, data.status, data.localStartTime, data.localEndTime);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_52(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_52(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_52(uint8_t yearDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<uint32_t> & localStartTime, const chip::Optional<uint32_t> & localEndTime)
+    {
+        VerifyOrReturn(CheckValue("yearDayIndex", yearDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("localStartTime", localStartTime));
+        VerifyOrReturn(CheckValue("localStartTime.Value()", localStartTime.Value(), 12345UL));
+
+        VerifyOrReturn(CheckValuePresent("localEndTime", localEndTime));
+        VerifyOrReturn(CheckValue("localEndTime.Value()", localEndTime.Value(), 12345689UL));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateAnotherWeekDayScheduleWithValidParameters_53()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 2;
+        request.userIndex    = 1U;
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(2);
+        request.startHour    = 0;
+        request.startMinute  = 0;
+        request.endHour      = 23;
+        request.endMinute    = 59;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_53();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_53(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_53(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_53() { NextTest(); }
+
+    CHIP_ERROR TestVerifyCreatedWeekDaySchedule_54()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 2;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_54(data.weekDayIndex, data.userIndex, data.status, data.daysMask, data.startHour,
+                                       data.startMinute, data.endHour, data.endMinute);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_54(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_54(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_54(uint8_t weekDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>> & daysMask,
+                              const chip::Optional<uint8_t> & startHour, const chip::Optional<uint8_t> & startMinute,
+                              const chip::Optional<uint8_t> & endHour, const chip::Optional<uint8_t> & endMinute)
+    {
+        VerifyOrReturn(CheckValue("weekDayIndex", weekDayIndex, 2));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("daysMask", daysMask));
+        VerifyOrReturn(CheckValue("daysMask.Value()", daysMask.Value(), 2));
+
+        VerifyOrReturn(CheckValuePresent("startHour", startHour));
+        VerifyOrReturn(CheckValue("startHour.Value()", startHour.Value(), 0));
+
+        VerifyOrReturn(CheckValuePresent("startMinute", startMinute));
+        VerifyOrReturn(CheckValue("startMinute.Value()", startMinute.Value(), 0));
+
+        VerifyOrReturn(CheckValuePresent("endHour", endHour));
+        VerifyOrReturn(CheckValue("endHour.Value()", endHour.Value(), 23));
+
+        VerifyOrReturn(CheckValuePresent("endMinute", endMinute));
+        VerifyOrReturn(CheckValue("endMinute.Value()", endMinute.Value(), 59));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateAnotherYearDayScheduleWithValidParameters_55()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex   = 2;
+        request.userIndex      = 1U;
+        request.localStartTime = 9000UL;
+        request.localEndTime   = 888888888UL;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_55();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_55(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_55(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_55() { NextTest(); }
+
+    CHIP_ERROR TestVerifyCreatedYearDaySchedule_56()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 2;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_56(data.yearDayIndex, data.userIndex, data.status, data.localStartTime, data.localEndTime);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_56(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_56(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_56(uint8_t yearDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<uint32_t> & localStartTime, const chip::Optional<uint32_t> & localEndTime)
+    {
+        VerifyOrReturn(CheckValue("yearDayIndex", yearDayIndex, 2));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("localStartTime", localStartTime));
+        VerifyOrReturn(CheckValue("localStartTime.Value()", localStartTime.Value(), 9000UL));
+
+        VerifyOrReturn(CheckValuePresent("localEndTime", localEndTime));
+        VerifyOrReturn(CheckValue("localEndTime.Value()", localEndTime.Value(), 888888888UL));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestClearASingleWeekDayScheduleForTheFirstUser_57()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_57();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_57(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_57(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_57() { NextTest(); }
+
+    CHIP_ERROR TestVerifyClearedWeekDaySchedule_58()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_58(data.weekDayIndex, data.userIndex, data.status, data.daysMask, data.startHour,
+                                       data.startMinute, data.endHour, data.endMinute);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_58(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_58(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_58(uint8_t weekDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>> & daysMask,
+                              const chip::Optional<uint8_t> & startHour, const chip::Optional<uint8_t> & startMinute,
+                              const chip::Optional<uint8_t> & endHour, const chip::Optional<uint8_t> & endMinute)
+    {
+        VerifyOrReturn(CheckValue("weekDayIndex", weekDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 139));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestClearAllRemainingWeekDaySchedulesForTheFirstUser_59()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 254;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_59();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_59(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_59(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_59() { NextTest(); }
+
+    CHIP_ERROR TestVerifyClearedWeekSchedule_60()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 2;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_60(data.weekDayIndex, data.userIndex, data.status, data.daysMask, data.startHour,
+                                       data.startMinute, data.endHour, data.endMinute);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_60(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_60(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_60(uint8_t weekDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>> & daysMask,
+                              const chip::Optional<uint8_t> & startHour, const chip::Optional<uint8_t> & startMinute,
+                              const chip::Optional<uint8_t> & endHour, const chip::Optional<uint8_t> & endMinute)
+    {
+        VerifyOrReturn(CheckValue("weekDayIndex", weekDayIndex, 2));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 139));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestMakeSureThatFirstYearDayScheduleWasNotDeleted_61()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 1;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_61(data.yearDayIndex, data.userIndex, data.status, data.localStartTime, data.localEndTime);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_61(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_61(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_61(uint8_t yearDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<uint32_t> & localStartTime, const chip::Optional<uint32_t> & localEndTime)
+    {
+        VerifyOrReturn(CheckValue("yearDayIndex", yearDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("localStartTime", localStartTime));
+        VerifyOrReturn(CheckValue("localStartTime.Value()", localStartTime.Value(), 12345UL));
+
+        VerifyOrReturn(CheckValuePresent("localEndTime", localEndTime));
+        VerifyOrReturn(CheckValue("localEndTime.Value()", localEndTime.Value(), 12345689UL));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestMakeSureThatSecondYearDayScheduleWasNotDeleted_62()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 2;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_62(data.yearDayIndex, data.userIndex, data.status, data.localStartTime, data.localEndTime);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_62(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_62(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_62(uint8_t yearDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<uint32_t> & localStartTime, const chip::Optional<uint32_t> & localEndTime)
+    {
+        VerifyOrReturn(CheckValue("yearDayIndex", yearDayIndex, 2));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("localStartTime", localStartTime));
+        VerifyOrReturn(CheckValue("localStartTime.Value()", localStartTime.Value(), 9000UL));
+
+        VerifyOrReturn(CheckValuePresent("localEndTime", localEndTime));
+        VerifyOrReturn(CheckValue("localEndTime.Value()", localEndTime.Value(), 888888888UL));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateAnotherWeekDayScheduleWithValidParameters_63()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(2);
+        request.startHour    = 0;
+        request.startMinute  = 0;
+        request.endHour      = 23;
+        request.endMinute    = 59;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_63();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_63(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_63(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_63() { NextTest(); }
+
+    CHIP_ERROR TestClearASingleYearDayScheduleForTheFirstUser_64()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 1;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_64();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_64(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_64(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_64() { NextTest(); }
+
+    CHIP_ERROR TestVerifyClearedYearDaySchedule_65()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 1;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_65(data.yearDayIndex, data.userIndex, data.status, data.localStartTime, data.localEndTime);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_65(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_65(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_65(uint8_t yearDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<uint32_t> & localStartTime, const chip::Optional<uint32_t> & localEndTime)
+    {
+        VerifyOrReturn(CheckValue("yearDayIndex", yearDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 139));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestClearAllRemainingYearSchedulesForTheFirstUser_66()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 254;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_66();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_66(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_66(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_66() { NextTest(); }
+
+    CHIP_ERROR TestVerifyThatSecondYearDayScheduleWasCleared_67()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 2;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_67(data.yearDayIndex, data.userIndex, data.status, data.localStartTime, data.localEndTime);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_67(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_67(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_67(uint8_t yearDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<uint32_t> & localStartTime, const chip::Optional<uint32_t> & localEndTime)
+    {
+        VerifyOrReturn(CheckValue("yearDayIndex", yearDayIndex, 2));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 139));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestVerifyCreatedWeekDaySchedule_68()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_68(data.weekDayIndex, data.userIndex, data.status, data.daysMask, data.startHour,
+                                       data.startMinute, data.endHour, data.endMinute);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_68(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_68(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_68(uint8_t weekDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>> & daysMask,
+                              const chip::Optional<uint8_t> & startHour, const chip::Optional<uint8_t> & startMinute,
+                              const chip::Optional<uint8_t> & endHour, const chip::Optional<uint8_t> & endMinute)
+    {
+        VerifyOrReturn(CheckValue("weekDayIndex", weekDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("daysMask", daysMask));
+        VerifyOrReturn(CheckValue("daysMask.Value()", daysMask.Value(), 2));
+
+        VerifyOrReturn(CheckValuePresent("startHour", startHour));
+        VerifyOrReturn(CheckValue("startHour.Value()", startHour.Value(), 0));
+
+        VerifyOrReturn(CheckValuePresent("startMinute", startMinute));
+        VerifyOrReturn(CheckValue("startMinute.Value()", startMinute.Value(), 0));
+
+        VerifyOrReturn(CheckValuePresent("endHour", endHour));
+        VerifyOrReturn(CheckValue("endHour.Value()", endHour.Value(), 23));
+
+        VerifyOrReturn(CheckValuePresent("endMinute", endMinute));
+        VerifyOrReturn(CheckValue("endMinute.Value()", endMinute.Value(), 59));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestClearAllRemainingWeekDaySchedulesForTheFirstUser_69()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 254;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_69();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_69(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_69(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_69() { NextTest(); }
+
+    CHIP_ERROR TestCreateNewUserWithoutCredentialSoWeCanAddMoreSchedulesToIt_70()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetUser::Type;
+
+        RequestType request;
+        request.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+        request.userIndex     = 2U;
+        request.userName.SetNull();
+        request.userUniqueId.SetNull();
+        request.userStatus.SetNull();
+        request.userType.SetNull();
+        request.credentialRule.SetNull();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_70();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_70(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_70(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_70() { NextTest(); }
+
+    CHIP_ERROR TestCreateWeekDayScheduleWithValidParametersForFirstUser_71()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
+        request.startHour    = 0;
+        request.startMinute  = 0;
+        request.endHour      = 23;
+        request.endMinute    = 59;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_71();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_71(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_71(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_71() { NextTest(); }
+
+    CHIP_ERROR TestVerifyCreatedWeekDayScheduleForFirstUser_72()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_72(data.weekDayIndex, data.userIndex, data.status, data.daysMask, data.startHour,
+                                       data.startMinute, data.endHour, data.endMinute);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_72(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_72(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_72(uint8_t weekDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>> & daysMask,
+                              const chip::Optional<uint8_t> & startHour, const chip::Optional<uint8_t> & startMinute,
+                              const chip::Optional<uint8_t> & endHour, const chip::Optional<uint8_t> & endMinute)
+    {
+        VerifyOrReturn(CheckValue("weekDayIndex", weekDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("daysMask", daysMask));
+        VerifyOrReturn(CheckValue("daysMask.Value()", daysMask.Value(), 1));
+
+        VerifyOrReturn(CheckValuePresent("startHour", startHour));
+        VerifyOrReturn(CheckValue("startHour.Value()", startHour.Value(), 0));
+
+        VerifyOrReturn(CheckValuePresent("startMinute", startMinute));
+        VerifyOrReturn(CheckValue("startMinute.Value()", startMinute.Value(), 0));
+
+        VerifyOrReturn(CheckValuePresent("endHour", endHour));
+        VerifyOrReturn(CheckValue("endHour.Value()", endHour.Value(), 23));
+
+        VerifyOrReturn(CheckValuePresent("endMinute", endMinute));
+        VerifyOrReturn(CheckValue("endMinute.Value()", endMinute.Value(), 59));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateYearDayScheduleForFirstUser_73()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex   = 4;
+        request.userIndex      = 1U;
+        request.localStartTime = 9000UL;
+        request.localEndTime   = 888888888UL;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_73();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_73(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_73(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_73() { NextTest(); }
+
+    CHIP_ERROR TestVerifyCreatedYearDayScheduleForFirst_74()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 4;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_74(data.yearDayIndex, data.userIndex, data.status, data.localStartTime, data.localEndTime);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_74(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_74(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_74(uint8_t yearDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<uint32_t> & localStartTime, const chip::Optional<uint32_t> & localEndTime)
+    {
+        VerifyOrReturn(CheckValue("yearDayIndex", yearDayIndex, 4));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("localStartTime", localStartTime));
+        VerifyOrReturn(CheckValue("localStartTime.Value()", localStartTime.Value(), 9000UL));
+
+        VerifyOrReturn(CheckValuePresent("localEndTime", localEndTime));
+        VerifyOrReturn(CheckValue("localEndTime.Value()", localEndTime.Value(), 888888888UL));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateWeekDayScheduleWithValidParametersForSecondUser_75()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 4;
+        request.userIndex    = 2U;
+        request.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(64);
+        request.startHour    = 23;
+        request.startMinute  = 0;
+        request.endHour      = 23;
+        request.endMinute    = 59;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_75();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_75(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_75(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_75() { NextTest(); }
+
+    CHIP_ERROR TestVerifyCreatedWeekDayScheduleForFirstUser_76()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 4;
+        request.userIndex    = 2U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_76(data.weekDayIndex, data.userIndex, data.status, data.daysMask, data.startHour,
+                                       data.startMinute, data.endHour, data.endMinute);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_76(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_76(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_76(uint8_t weekDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>> & daysMask,
+                              const chip::Optional<uint8_t> & startHour, const chip::Optional<uint8_t> & startMinute,
+                              const chip::Optional<uint8_t> & endHour, const chip::Optional<uint8_t> & endMinute)
+    {
+        VerifyOrReturn(CheckValue("weekDayIndex", weekDayIndex, 4));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 2U));
+
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("daysMask", daysMask));
+        VerifyOrReturn(CheckValue("daysMask.Value()", daysMask.Value(), 64));
+
+        VerifyOrReturn(CheckValuePresent("startHour", startHour));
+        VerifyOrReturn(CheckValue("startHour.Value()", startHour.Value(), 23));
+
+        VerifyOrReturn(CheckValuePresent("startMinute", startMinute));
+        VerifyOrReturn(CheckValue("startMinute.Value()", startMinute.Value(), 0));
+
+        VerifyOrReturn(CheckValuePresent("endHour", endHour));
+        VerifyOrReturn(CheckValue("endHour.Value()", endHour.Value(), 23));
+
+        VerifyOrReturn(CheckValuePresent("endMinute", endMinute));
+        VerifyOrReturn(CheckValue("endMinute.Value()", endMinute.Value(), 59));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCreateYearDayScheduleForSecondUser_77()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex   = 1;
+        request.userIndex      = 1U;
+        request.localStartTime = 55555UL;
+        request.localEndTime   = 7777777UL;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_77();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_77(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_77(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_77() { NextTest(); }
+
+    CHIP_ERROR TestVerifyCreatedYearDayScheduleForFirst_78()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 1;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_78(data.yearDayIndex, data.userIndex, data.status, data.localStartTime, data.localEndTime);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_78(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_78(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_78(uint8_t yearDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<uint32_t> & localStartTime, const chip::Optional<uint32_t> & localEndTime)
+    {
+        VerifyOrReturn(CheckValue("yearDayIndex", yearDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValuePresent("localStartTime", localStartTime));
+        VerifyOrReturn(CheckValue("localStartTime.Value()", localStartTime.Value(), 55555UL));
+
+        VerifyOrReturn(CheckValuePresent("localEndTime", localEndTime));
+        VerifyOrReturn(CheckValue("localEndTime.Value()", localEndTime.Value(), 7777777UL));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestCleanup_79()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::ClearUser::Type;
+
+        RequestType request;
+        request.userIndex = 65534U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))->OnSuccessResponse_79();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_79(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_79(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_79() { NextTest(); }
+
+    CHIP_ERROR TestMakeSureClearingFirstUserAlsoClearedWeekDaySchedules_80()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 1;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_80(data.weekDayIndex, data.userIndex, data.status, data.daysMask, data.startHour,
+                                       data.startMinute, data.endHour, data.endMinute);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_80(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_80(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_80(uint8_t weekDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>> & daysMask,
+                              const chip::Optional<uint8_t> & startHour, const chip::Optional<uint8_t> & startMinute,
+                              const chip::Optional<uint8_t> & endHour, const chip::Optional<uint8_t> & endMinute)
+    {
+        VerifyOrReturn(CheckValue("weekDayIndex", weekDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 139));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestMakeSureClearingFirstUserAlsoClearedYearDaySchedules_81()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 4;
+        request.userIndex    = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_81(data.yearDayIndex, data.userIndex, data.status, data.localStartTime, data.localEndTime);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_81(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_81(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_81(uint8_t yearDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<uint32_t> & localStartTime, const chip::Optional<uint32_t> & localEndTime)
+    {
+        VerifyOrReturn(CheckValue("yearDayIndex", yearDayIndex, 4));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 1U));
+
+        VerifyOrReturn(CheckValue("status", status, 139));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestMakeSureClearingSecondUserAlsoClearedWeekDaySchedules_82()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type;
+
+        RequestType request;
+        request.weekDayIndex = 4;
+        request.userIndex    = 2U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_82(data.weekDayIndex, data.userIndex, data.status, data.daysMask, data.startHour,
+                                       data.startMinute, data.endHour, data.endMinute);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_82(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_82(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_82(uint8_t weekDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>> & daysMask,
+                              const chip::Optional<uint8_t> & startHour, const chip::Optional<uint8_t> & startMinute,
+                              const chip::Optional<uint8_t> & endHour, const chip::Optional<uint8_t> & endMinute)
+    {
+        VerifyOrReturn(CheckValue("weekDayIndex", weekDayIndex, 4));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 2U));
+
+        VerifyOrReturn(CheckValue("status", status, 139));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestMakeSureClearingSecondUserAlsoClearedYearDaySchedules_83()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type;
+
+        RequestType request;
+        request.yearDayIndex = 1;
+        request.userIndex    = 2U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<DL_Schedules *>(context))
+                ->OnSuccessResponse_83(data.yearDayIndex, data.userIndex, data.status, data.localStartTime, data.localEndTime);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<DL_Schedules *>(context))->OnFailureResponse_83(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_83(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_83(uint8_t yearDayIndex, uint16_t userIndex, chip::app::Clusters::DoorLock::DlStatus status,
+                              const chip::Optional<uint32_t> & localStartTime, const chip::Optional<uint32_t> & localEndTime)
+    {
+        VerifyOrReturn(CheckValue("yearDayIndex", yearDayIndex, 1));
+
+        VerifyOrReturn(CheckValue("userIndex", userIndex, 2U));
+
+        VerifyOrReturn(CheckValue("status", status, 139));
+
+        NextTest();
+    }
+};
+
 class TestGroupMessaging : public TestCommand
 {
 public:
-    TestGroupMessaging() : TestCommand("TestGroupMessaging"), mTestIndex(0)
+    TestGroupMessaging(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestGroupMessaging", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -79867,7 +83843,8 @@ private:
 class TestGroupsCluster : public TestCommand
 {
 public:
-    TestGroupsCluster() : TestCommand("TestGroupsCluster"), mTestIndex(0)
+    TestGroupsCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestGroupsCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -80662,7 +84639,8 @@ private:
 class TestGroupDemoCommand : public TestCommand
 {
 public:
-    TestGroupDemoCommand() : TestCommand("TestGroupDemoCommand"), mTestIndex(0)
+    TestGroupDemoCommand(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestGroupDemoCommand", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -81189,7 +85167,8 @@ private:
 class TestGroupDemoConfig : public TestCommand
 {
 public:
-    TestGroupDemoConfig() : TestCommand("TestGroupDemoConfig"), mTestIndex(0)
+    TestGroupDemoConfig(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestGroupDemoConfig", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -81296,7 +85275,8 @@ private:
 class TestGroupKeyManagementCluster : public TestCommand
 {
 public:
-    TestGroupKeyManagementCluster() : TestCommand("TestGroupKeyManagementCluster"), mTestIndex(0)
+    TestGroupKeyManagementCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestGroupKeyManagementCluster", credsIssuerConfig), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -81438,161 +85418,163 @@ private:
     }
 };
 
-void registerCommandsTests(Commands & commands)
+void registerCommandsTests(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     const char * clusterName = "Tests";
 
     commands_list clusterCommands = {
         make_unique<TestList>(),
-        make_unique<Test_TC_BI_1_1>(),
-        make_unique<Test_TC_BI_2_1>(),
-        make_unique<Test_TC_BI_2_2>(),
-        make_unique<Test_TC_BOOL_1_1>(),
-        make_unique<Test_TC_BOOL_2_1>(),
-        make_unique<Test_TC_BRAC_1_1>(),
-        make_unique<Test_TC_CC_1_1>(),
-        make_unique<Test_TC_CC_2_1>(),
-        make_unique<Test_TC_CC_3_1>(),
-        make_unique<Test_TC_CC_3_2>(),
-        make_unique<Test_TC_CC_3_3>(),
-        make_unique<Test_TC_CC_4_1>(),
-        make_unique<Test_TC_CC_4_2>(),
-        make_unique<Test_TC_CC_4_3>(),
-        make_unique<Test_TC_CC_4_4>(),
-        make_unique<Test_TC_CC_5_1>(),
-        make_unique<Test_TC_CC_5_2>(),
-        make_unique<Test_TC_CC_5_3>(),
-        make_unique<Test_TC_CC_6_1>(),
-        make_unique<Test_TC_CC_6_2>(),
-        make_unique<Test_TC_CC_6_3>(),
-        make_unique<Test_TC_CC_7_1>(),
-        make_unique<Test_TC_CC_7_2>(),
-        make_unique<Test_TC_CC_7_3>(),
-        make_unique<Test_TC_CC_7_4>(),
-        make_unique<Test_TC_CC_8_1>(),
-        make_unique<Test_TC_CC_9_1>(),
-        make_unique<Test_TC_CC_9_2>(),
-        make_unique<Test_TC_CC_9_3>(),
-        make_unique<Test_TC_DD_1_5>(),
-        make_unique<Test_TC_DD_1_6>(),
-        make_unique<Test_TC_DD_1_7>(),
-        make_unique<Test_TC_DD_1_8>(),
-        make_unique<Test_TC_DD_1_9>(),
-        make_unique<Test_TC_DM_1_1>(),
-        make_unique<Test_TC_DM_3_1>(),
-        make_unique<Test_TC_DM_2_2>(),
-        make_unique<Test_TC_EMR_1_1>(),
-        make_unique<Test_TC_ETHDIAG_1_1>(),
-        make_unique<Test_TC_ETHDIAG_2_1>(),
-        make_unique<Test_TC_FLW_1_1>(),
-        make_unique<Test_TC_FLW_2_1>(),
-        make_unique<Test_TC_FLW_2_2>(),
-        make_unique<Test_TC_ILL_1_1>(),
-        make_unique<Test_TC_LVL_1_1>(),
-        make_unique<Test_TC_LVL_2_1>(),
-        make_unique<Test_TC_LVL_2_2>(),
-        make_unique<Test_TC_LVL_3_1>(),
-        make_unique<Test_TC_LVL_4_1>(),
-        make_unique<Test_TC_LVL_5_1>(),
-        make_unique<Test_TC_LVL_6_1>(),
-        make_unique<Test_TC_MC_1_1>(),
-        make_unique<Test_TC_MC_2_1>(),
-        make_unique<Test_TC_MC_3_1>(),
-        make_unique<Test_TC_MC_3_2>(),
-        make_unique<Test_TC_MC_3_3>(),
-        make_unique<Test_TC_MC_3_4>(),
-        make_unique<Test_TC_MC_3_5>(),
-        make_unique<Test_TC_MC_3_6>(),
-        make_unique<Test_TC_MC_3_7>(),
-        make_unique<Test_TC_MC_3_8>(),
-        make_unique<Test_TC_MC_3_9>(),
-        make_unique<Test_TC_MC_3_10>(),
-        make_unique<Test_TC_MC_3_11>(),
-        make_unique<Test_TC_MC_5_1>(),
-        make_unique<Test_TC_MC_5_2>(),
-        make_unique<Test_TC_MC_5_3>(),
-        make_unique<Test_TC_MC_6_1>(),
-        make_unique<Test_TC_MC_6_2>(),
-        make_unique<Test_TC_MC_6_3>(),
-        make_unique<Test_TC_MC_6_4>(),
-        make_unique<Test_TC_MC_7_1>(),
-        make_unique<Test_TC_MC_7_2>(),
-        make_unique<Test_TC_MC_8_1>(),
-        make_unique<Test_TC_MC_9_1>(),
-        make_unique<Test_TC_OCC_1_1>(),
-        make_unique<Test_TC_OCC_2_1>(),
-        make_unique<Test_TC_OCC_2_2>(),
-        make_unique<Test_TC_OO_1_1>(),
-        make_unique<Test_TC_OO_2_1>(),
-        make_unique<Test_TC_OO_2_2>(),
-        make_unique<Test_TC_OO_2_3>(),
-        make_unique<Test_TC_PS_1_1>(),
-        make_unique<Test_TC_PRS_1_1>(),
-        make_unique<Test_TC_PRS_2_1>(),
-        make_unique<Test_TC_PCC_1_1>(),
-        make_unique<Test_TC_PCC_2_1>(),
-        make_unique<Test_TC_PCC_2_2>(),
-        make_unique<Test_TC_PCC_2_3>(),
-        make_unique<Test_TC_RH_1_1>(),
-        make_unique<Test_TC_RH_2_1>(),
-        make_unique<Test_TC_RH_2_2>(),
-        make_unique<Test_TC_SWTCH_2_1>(),
-        make_unique<Test_TC_SWTCH_2_2>(),
-        make_unique<Test_TC_TM_1_1>(),
-        make_unique<Test_TC_TM_2_1>(),
-        make_unique<Test_TC_TM_2_2>(),
-        make_unique<Test_TC_TSTAT_1_1>(),
-        make_unique<Test_TC_TSTAT_2_1>(),
-        make_unique<Test_TC_TSTAT_2_2>(),
-        make_unique<Test_TC_TSUIC_1_1>(),
-        make_unique<Test_TC_TSUIC_2_1>(),
-        make_unique<Test_TC_TSUIC_2_2>(),
-        make_unique<Test_TC_DIAGTH_1_1>(),
-        make_unique<Test_TC_WIFIDIAG_1_1>(),
-        make_unique<Test_TC_WIFIDIAG_3_1>(),
-        make_unique<Test_TC_WNCV_1_1>(),
-        make_unique<Test_TC_WNCV_2_1>(),
-        make_unique<Test_TC_WNCV_2_2>(),
-        make_unique<Test_TC_WNCV_2_4>(),
-        make_unique<Test_TC_WNCV_2_5>(),
-        make_unique<Test_TC_WNCV_3_1>(),
-        make_unique<Test_TC_WNCV_3_2>(),
-        make_unique<Test_TC_WNCV_3_3>(),
-        make_unique<TV_TargetNavigatorCluster>(),
-        make_unique<TV_AudioOutputCluster>(),
-        make_unique<TV_ApplicationLauncherCluster>(),
-        make_unique<TV_KeypadInputCluster>(),
-        make_unique<TV_AccountLoginCluster>(),
-        make_unique<TV_WakeOnLanCluster>(),
-        make_unique<TV_ApplicationBasicCluster>(),
-        make_unique<TV_MediaPlaybackCluster>(),
-        make_unique<TV_ChannelCluster>(),
-        make_unique<TV_LowPowerCluster>(),
-        make_unique<TV_ContentLauncherCluster>(),
-        make_unique<TV_MediaInputCluster>(),
-        make_unique<TestCluster>(),
-        make_unique<TestClusterComplexTypes>(),
-        make_unique<TestConstraints>(),
-        make_unique<TestDelayCommands>(),
-        make_unique<TestLogCommands>(),
-        make_unique<TestSaveAs>(),
-        make_unique<TestConfigVariables>(),
-        make_unique<TestDescriptorCluster>(),
-        make_unique<TestBasicInformation>(),
-        make_unique<TestIdentifyCluster>(),
-        make_unique<TestOperationalCredentialsCluster>(),
-        make_unique<TestModeSelectCluster>(),
-        make_unique<Test_TC_SWDIAG_1_1>(),
-        make_unique<Test_TC_SWDIAG_2_1>(),
-        make_unique<Test_TC_SWDIAG_3_1>(),
-        make_unique<TestSubscribe_OnOff>(),
-        make_unique<DL_UsersAndCredentials>(),
-        make_unique<DL_LockUnlock>(),
-        make_unique<TestGroupMessaging>(),
-        make_unique<TestGroupsCluster>(),
-        make_unique<TestGroupDemoCommand>(),
-        make_unique<TestGroupDemoConfig>(),
-        make_unique<TestGroupKeyManagementCluster>(),
+        make_unique<Test_TC_BI_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_BI_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_BI_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_BOOL_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_BOOL_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_BRAC_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_CC_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_CC_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_CC_3_1>(credsIssuerConfig),
+        make_unique<Test_TC_CC_3_2>(credsIssuerConfig),
+        make_unique<Test_TC_CC_3_3>(credsIssuerConfig),
+        make_unique<Test_TC_CC_4_1>(credsIssuerConfig),
+        make_unique<Test_TC_CC_4_2>(credsIssuerConfig),
+        make_unique<Test_TC_CC_4_3>(credsIssuerConfig),
+        make_unique<Test_TC_CC_4_4>(credsIssuerConfig),
+        make_unique<Test_TC_CC_5_1>(credsIssuerConfig),
+        make_unique<Test_TC_CC_5_2>(credsIssuerConfig),
+        make_unique<Test_TC_CC_5_3>(credsIssuerConfig),
+        make_unique<Test_TC_CC_6_1>(credsIssuerConfig),
+        make_unique<Test_TC_CC_6_2>(credsIssuerConfig),
+        make_unique<Test_TC_CC_6_3>(credsIssuerConfig),
+        make_unique<Test_TC_CC_7_1>(credsIssuerConfig),
+        make_unique<Test_TC_CC_7_2>(credsIssuerConfig),
+        make_unique<Test_TC_CC_7_3>(credsIssuerConfig),
+        make_unique<Test_TC_CC_7_4>(credsIssuerConfig),
+        make_unique<Test_TC_CC_8_1>(credsIssuerConfig),
+        make_unique<Test_TC_CC_9_1>(credsIssuerConfig),
+        make_unique<Test_TC_CC_9_2>(credsIssuerConfig),
+        make_unique<Test_TC_CC_9_3>(credsIssuerConfig),
+        make_unique<Test_TC_DD_1_5>(credsIssuerConfig),
+        make_unique<Test_TC_DD_1_6>(credsIssuerConfig),
+        make_unique<Test_TC_DD_1_7>(credsIssuerConfig),
+        make_unique<Test_TC_DD_1_8>(credsIssuerConfig),
+        make_unique<Test_TC_DD_1_9>(credsIssuerConfig),
+        make_unique<Test_TC_DM_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_DM_3_1>(credsIssuerConfig),
+        make_unique<Test_TC_DM_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_EMR_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_ETHDIAG_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_ETHDIAG_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_FLW_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_FLW_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_FLW_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_ILL_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_LVL_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_LVL_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_LVL_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_LVL_3_1>(credsIssuerConfig),
+        make_unique<Test_TC_LVL_4_1>(credsIssuerConfig),
+        make_unique<Test_TC_LVL_5_1>(credsIssuerConfig),
+        make_unique<Test_TC_LVL_6_1>(credsIssuerConfig),
+        make_unique<Test_TC_MC_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_MC_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_MC_3_1>(credsIssuerConfig),
+        make_unique<Test_TC_MC_3_2>(credsIssuerConfig),
+        make_unique<Test_TC_MC_3_3>(credsIssuerConfig),
+        make_unique<Test_TC_MC_3_4>(credsIssuerConfig),
+        make_unique<Test_TC_MC_3_5>(credsIssuerConfig),
+        make_unique<Test_TC_MC_3_6>(credsIssuerConfig),
+        make_unique<Test_TC_MC_3_7>(credsIssuerConfig),
+        make_unique<Test_TC_MC_3_8>(credsIssuerConfig),
+        make_unique<Test_TC_MC_3_9>(credsIssuerConfig),
+        make_unique<Test_TC_MC_3_10>(credsIssuerConfig),
+        make_unique<Test_TC_MC_3_11>(credsIssuerConfig),
+        make_unique<Test_TC_MC_5_1>(credsIssuerConfig),
+        make_unique<Test_TC_MC_5_2>(credsIssuerConfig),
+        make_unique<Test_TC_MC_5_3>(credsIssuerConfig),
+        make_unique<Test_TC_MC_6_1>(credsIssuerConfig),
+        make_unique<Test_TC_MC_6_2>(credsIssuerConfig),
+        make_unique<Test_TC_MC_6_3>(credsIssuerConfig),
+        make_unique<Test_TC_MC_6_4>(credsIssuerConfig),
+        make_unique<Test_TC_MC_7_1>(credsIssuerConfig),
+        make_unique<Test_TC_MC_7_2>(credsIssuerConfig),
+        make_unique<Test_TC_MC_8_1>(credsIssuerConfig),
+        make_unique<Test_TC_MC_9_1>(credsIssuerConfig),
+        make_unique<Test_TC_OCC_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_OCC_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_OCC_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_OO_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_OO_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_OO_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_OO_2_3>(credsIssuerConfig),
+        make_unique<Test_TC_PS_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_PRS_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_PRS_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_PCC_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_PCC_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_PCC_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_PCC_2_3>(credsIssuerConfig),
+        make_unique<Test_TC_RH_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_RH_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_RH_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_SWTCH_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_SWTCH_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_TM_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_TM_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_TM_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_TSTAT_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_TSTAT_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_TSTAT_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_TSUIC_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_TSUIC_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_TSUIC_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_DIAGTH_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_WIFIDIAG_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_WIFIDIAG_3_1>(credsIssuerConfig),
+        make_unique<Test_TC_WNCV_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_WNCV_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_WNCV_2_2>(credsIssuerConfig),
+        make_unique<Test_TC_WNCV_2_4>(credsIssuerConfig),
+        make_unique<Test_TC_WNCV_2_5>(credsIssuerConfig),
+        make_unique<Test_TC_WNCV_3_1>(credsIssuerConfig),
+        make_unique<Test_TC_WNCV_3_2>(credsIssuerConfig),
+        make_unique<Test_TC_WNCV_3_3>(credsIssuerConfig),
+        make_unique<TV_TargetNavigatorCluster>(credsIssuerConfig),
+        make_unique<TV_AudioOutputCluster>(credsIssuerConfig),
+        make_unique<TV_ApplicationLauncherCluster>(credsIssuerConfig),
+        make_unique<TV_KeypadInputCluster>(credsIssuerConfig),
+        make_unique<TV_AccountLoginCluster>(credsIssuerConfig),
+        make_unique<TV_WakeOnLanCluster>(credsIssuerConfig),
+        make_unique<TV_ApplicationBasicCluster>(credsIssuerConfig),
+        make_unique<TV_MediaPlaybackCluster>(credsIssuerConfig),
+        make_unique<TV_ChannelCluster>(credsIssuerConfig),
+        make_unique<TV_LowPowerCluster>(credsIssuerConfig),
+        make_unique<TV_ContentLauncherCluster>(credsIssuerConfig),
+        make_unique<TV_MediaInputCluster>(credsIssuerConfig),
+        make_unique<TestCluster>(credsIssuerConfig),
+        make_unique<TestClusterComplexTypes>(credsIssuerConfig),
+        make_unique<TestConstraints>(credsIssuerConfig),
+        make_unique<TestDelayCommands>(credsIssuerConfig),
+        make_unique<TestLogCommands>(credsIssuerConfig),
+        make_unique<TestSaveAs>(credsIssuerConfig),
+        make_unique<TestConfigVariables>(credsIssuerConfig),
+        make_unique<TestDescriptorCluster>(credsIssuerConfig),
+        make_unique<TestBasicInformation>(credsIssuerConfig),
+        make_unique<TestIdentifyCluster>(credsIssuerConfig),
+        make_unique<TestOperationalCredentialsCluster>(credsIssuerConfig),
+        make_unique<TestModeSelectCluster>(credsIssuerConfig),
+        make_unique<TestSystemCommands>(credsIssuerConfig),
+        make_unique<Test_TC_SWDIAG_1_1>(credsIssuerConfig),
+        make_unique<Test_TC_SWDIAG_2_1>(credsIssuerConfig),
+        make_unique<Test_TC_SWDIAG_3_1>(credsIssuerConfig),
+        make_unique<TestSubscribe_OnOff>(credsIssuerConfig),
+        make_unique<DL_UsersAndCredentials>(credsIssuerConfig),
+        make_unique<DL_LockUnlock>(credsIssuerConfig),
+        make_unique<DL_Schedules>(credsIssuerConfig),
+        make_unique<TestGroupMessaging>(credsIssuerConfig),
+        make_unique<TestGroupsCluster>(credsIssuerConfig),
+        make_unique<TestGroupDemoCommand>(credsIssuerConfig),
+        make_unique<TestGroupDemoConfig>(credsIssuerConfig),
+        make_unique<TestGroupKeyManagementCluster>(credsIssuerConfig),
     };
 
     commands.Register(clusterName, clusterCommands);

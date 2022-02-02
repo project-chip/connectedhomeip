@@ -29,7 +29,6 @@
 
 #pragma once
 
-#include <app/DeviceControllerInteractionModelDelegate.h>
 #include <credentials/FabricTable.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <transport/TransportMgr.h>
@@ -73,7 +72,6 @@ struct DeviceControllerSystemStateParams
     Messaging::ExchangeManager * exchangeMgr                      = nullptr;
     secure_channel::MessageCounterManager * messageCounterManager = nullptr;
     FabricTable * fabricTable                                     = nullptr;
-    DeviceControllerInteractionModelDelegate * imDelegate         = nullptr;
 };
 
 // A representation of the internal state maintained by the DeviceControllerFactory
@@ -86,8 +84,7 @@ public:
     DeviceControllerSystemState(DeviceControllerSystemStateParams params) :
         mSystemLayer(params.systemLayer), mTCPEndPointManager(params.tcpEndPointManager),
         mUDPEndPointManager(params.udpEndPointManager), mTransportMgr(params.transportMgr), mSessionMgr(params.sessionMgr),
-        mExchangeMgr(params.exchangeMgr), mMessageCounterManager(params.messageCounterManager), mFabrics(params.fabricTable),
-        mIMDelegate(params.imDelegate)
+        mExchangeMgr(params.exchangeMgr), mMessageCounterManager(params.messageCounterManager), mFabrics(params.fabricTable)
     {
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
@@ -130,7 +127,6 @@ public:
     Messaging::ExchangeManager * ExchangeMgr() { return mExchangeMgr; }
     secure_channel::MessageCounterManager * MessageCounterManager() { return mMessageCounterManager; };
     FabricTable * Fabrics() { return mFabrics; };
-    DeviceControllerInteractionModelDelegate * IMDelegate() { return mIMDelegate; }
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * BleLayer() { return mBleLayer; };
 #endif
@@ -149,7 +145,6 @@ private:
     Messaging::ExchangeManager * mExchangeMgr                      = nullptr;
     secure_channel::MessageCounterManager * mMessageCounterManager = nullptr;
     FabricTable * mFabrics                                         = nullptr;
-    DeviceControllerInteractionModelDelegate * mIMDelegate         = nullptr;
 
     std::atomic<uint32_t> mRefCount{ 1 };
 

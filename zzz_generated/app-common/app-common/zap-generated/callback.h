@@ -14015,22 +14015,6 @@ bool emberAfEthernetNetworkDiagnosticsClusterResetCountsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::EthernetNetworkDiagnostics::Commands::ResetCounts::DecodableType & commandData);
 /**
- * @brief Bridged Device Basic Cluster StartUp Command callback (from server)
- */
-bool emberAfBridgedDeviceBasicClusterStartUpCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj);
-/**
- * @brief Bridged Device Basic Cluster ShutDown Command callback (from server)
- */
-bool emberAfBridgedDeviceBasicClusterShutDownCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj);
-/**
- * @brief Bridged Device Basic Cluster Leave Command callback (from server)
- */
-bool emberAfBridgedDeviceBasicClusterLeaveCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj);
-/**
- * @brief Bridged Device Basic Cluster ReachableChanged Command callback (from server)
- */
-bool emberAfBridgedDeviceBasicClusterReachableChangedCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj);
-/**
  * @brief AdministratorCommissioning Cluster OpenCommissioningWindow Command callback (from client)
  */
 bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
@@ -15504,7 +15488,7 @@ bool emberAfMessageSentCallback(const chip::MessageSendDestination & destination
  * application was not able to read the attribute.
  */
 EmberAfStatus emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                   EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
+                                                   const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
                                                    uint16_t maxReadLength);
 
 /** @brief External Attribute Write
@@ -15548,7 +15532,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, ch
  * attribute.
  */
 EmberAfStatus emberAfExternalAttributeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                    EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer);
+                                                    const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer);
 
 /** @brief Get Current Time
  *
