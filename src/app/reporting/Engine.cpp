@@ -481,7 +481,7 @@ CHIP_ERROR Engine::ScheduleRun()
         return CHIP_ERROR_INCORRECT_STATE;
     }
     mRunScheduled = true;
-    auto err = systemLayer->ScheduleWork(Run, this);
+    auto err      = systemLayer->ScheduleWork(Run, this);
     if (!::chip::ChipError::IsSuccess(err))
     {
         mRunScheduled = false;
