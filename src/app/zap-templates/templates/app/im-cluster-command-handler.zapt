@@ -30,7 +30,7 @@ namespace {{asUpperCamelCase clusterName}} {
 
 void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
 {
-    {{#all_incoming_commands_for_cluster clusterName clusterSide isMfgSpecific="false"}}
+    {{#all_incoming_commands_for_cluster clusterName clusterSide}}
     {{#first}}
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled = false;
