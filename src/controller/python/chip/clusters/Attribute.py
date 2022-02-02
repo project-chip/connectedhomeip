@@ -336,7 +336,8 @@ class AttributeCache:
         if (path.AttributeId not in clusterCache):
             clusterCache[path.AttributeId] = {}
 
-        clusterCache[path.AttributeId] = {'Data': data, 'DataVersion': path.DataVersion}
+        clusterCache[path.AttributeId] = {
+            'Data': data, 'DataVersion': path.DataVersion}
 
     def UpdateCachedData(self):
         ''' This converts the raw TLV data into a cluster object format.
