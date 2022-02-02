@@ -360,7 +360,7 @@ ThreadStackManager::AttachToThreadNetwork(ByteSpan netInfo,
 
 inline void ThreadStackManager::OnThreadAttachFinished(void)
 {
-    return static_cast<ImplClass *>(this)->_OnThreadAttachFinished();
+    static_cast<ImplClass *>(this)->_OnThreadAttachFinished();
 }
 
 inline CHIP_ERROR ThreadStackManager::StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback)
