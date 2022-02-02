@@ -95,7 +95,7 @@ GENERATED_FUNCTION_ARRAYS
 #endif
 
 #ifdef GENERATED_COMMANDS
-constexpr const chip::CommandId generatedCommands[]                 = GENERATED_COMMANDS;
+constexpr const chip::CommandId generatedCommands[] = GENERATED_COMMANDS;
 #endif // GENERATED_COMMANDS
 
 constexpr const EmberAfAttributeMetadata generatedAttributes[]      = GENERATED_ATTRIBUTES;

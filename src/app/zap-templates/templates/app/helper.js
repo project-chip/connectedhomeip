@@ -197,15 +197,15 @@ function chip_endpoint_generated_commands_list(options)
     });
 
     if (clientGeneratedCommands.length > 0 || serverGeneratedCommands.length > 0) {
-      ret.push({ text: `  /* ${c.comment} */\\` });
+      ret.push({ text : `  /* ${c.comment} */\\` });
     }
     if (clientGeneratedCommands.length > 0) {
       clientGeneratedCommands.push('chip::kInvalidCommandId /* end of list */')
-      ret.push({ text: `  /*   client_generated */ \\\n  ${clientGeneratedCommands.join(', \\\n  ')}, \\` });
+      ret.push({ text : `  /*   client_generated */ \\\n  ${clientGeneratedCommands.join(', \\\n  ')}, \\` });
     }
     if (serverGeneratedCommands.length > 0) {
       serverGeneratedCommands.push('chip::kInvalidCommandId /* end of list */')
-      ret.push({ text: `  /*   server_generated */ \\\n  ${serverGeneratedCommands.join(', \\\n  ')}, \\` });
+      ret.push({ text : `  /*   server_generated */ \\\n  ${serverGeneratedCommands.join(', \\\n  ')}, \\` });
     }
   })
   return templateUtil.collectBlocks(ret, options, this);
