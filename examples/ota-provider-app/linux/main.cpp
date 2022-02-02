@@ -53,10 +53,14 @@ constexpr chip::EndpointId kOtaProviderEndpoint = 0;
 constexpr uint16_t kOptionFilepath             = 'f';
 constexpr uint16_t kOptionOtaImageList         = 'o';
 constexpr uint16_t kOptionQueryImageBehavior   = 'q';
-constexpr uint16_t kOptionDelayedActionTimeSec = 'd';
-constexpr uint16_t kOptionDiscriminator        = 'D';
+constexpr uint16_t kOptionDelayedActionTimeSec = 't';
+constexpr uint16_t kOptionDiscriminator        = 'd';
 constexpr uint16_t kOptionPasscode             = 'p';
 constexpr uint16_t kOptionSoftwareVersion      = 's';
+
+static constexpr uint16_t kMaximumDiscriminatorValue = 0xFFF;
+static constexpr uint32_t kMinimumPasscodeValue      = 0x0000001;
+static constexpr uint32_t kMaximumPasscodeValue      = 0x5F5E0FE;
 
 // Global variables used for passing the CLI arguments to the OTAProviderExample object
 static OTAProviderExample::QueryImageBehaviorType gQueryImageBehavior = OTAProviderExample::kRespondWithUpdateAvailable;
@@ -191,7 +195,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         break;
     case kOptionDiscriminator: {
         uint16_t discriminator = static_cast<uint16_t>(strtol(aValue, NULL, 0));
-        if (discriminator > 0xFFF)
+        if (discriminator > kMaximumDiscriminatorValue)
         {
             PrintArgError("%s: Input ERROR: setupDiscriminator value %s is out of range \n", aProgram, aValue);
             retval = false;
@@ -201,7 +205,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
     }
     case kOptionPasscode: {
         uint32_t passcode = static_cast<uint32_t>(strtol(aValue, NULL, 0));
-        if (passcode < 1 || passcode > 99999998)
+        if (passcode < kMinimumPasscodeValue || passcode > kMaximumPasscodeValue)
         {
             PrintArgError("%s: Input ERROR: setupPasscode value %s is out of range \n", aProgram, aValue);
             retval = false;
@@ -239,10 +243,10 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "        Path to a file containing a list of OTA images.\n"
                              "  -q/--QueryImageBehavior <UpdateAvailable | Busy | UpdateNotAvailable>\n"
                              "        Status value in the Query Image Response\n"
-                             "  -d/--DelayedActionTimeSec <time>\n"
+                             "  -t/--DelayedActionTimeSec <time>\n"
                              "        Value in seconds for the DelayedActionTime in the Query Image Response\n"
                              "        and Apply Update Response\n"
-                             "  -D/--discriminator <discriminator>\n"
+                             "  -d/--discriminator <discriminator>\n"
                              "        A 12-bit value used to discern between multiple commissionable CHIP device\n"
                              "        advertisements. If none is specified, default value is 3840.\n"
                              "  -p/--passcode <passcode>\n"
@@ -251,7 +255,9 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "        If none is specified, default value is 20202021.\n"
                              "  -s/--softwareVersion <version>\n"
                              "        Value of SoftwareVersion in the Query Image Response\n"
-                             "        If provided this will override the value in the OTA image.\n" };
+                             "        If ota image list is present along with this option\n"
+                             "        then value from ota image list is used.\n"
+                             "        Otherwise, this value will be used is then value from that will be used\n" };
 
 HelpOptions helpOptions("ota-provider-app", "Usage: ota-provider-app [options]", "1.0");
 

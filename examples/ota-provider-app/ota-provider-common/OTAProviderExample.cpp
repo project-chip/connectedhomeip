@@ -148,8 +148,15 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
     if (strlen(mOTAFilePath)) // If OTA file is directly provided
     {
         otaAvailable       = true;
-        newSoftwareVersion = commandData.softwareVersion + 1; // This implementation will always indicate that an update is
-                                                              // available (if the user provides a file).
+
+        // If software version is provided using command line then use it.
+        // Otherwise, bump the software version received in QueryImage by 1.
+        newSoftwareVersion = commandData.softwareVersion + 1;
+        if (mSoftwareVersion.HasValue())
+        {
+            newSoftwareVersion = mSoftwareVersion.Value();
+        }
+
         newSoftwareVersionString = "Example-Image-V0.1";
         otaFilePath              = mOTAFilePath;
     }
@@ -162,10 +169,6 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
             newSoftwareVersionString = candidate.softwareVersionString;
             otaFilePath              = candidate.otaURL;
         }
-    }
-    if (mSoftwareVersion.HasValue())
-    {
-        newSoftwareVersion = mSoftwareVersion.Value();
     }
 
     GenerateUpdateToken(updateToken, kUpdateTokenLen);
