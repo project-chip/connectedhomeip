@@ -18,12 +18,11 @@
 #pragma once
 
 /**
- * CHIP_DEVICE_INTERACTION_MODEL_REVISION
+ * CHIP_DEVICE_DATA__MODEL_REVISION
  *
- * A monothonic number identifying the interaction model revision.
+ * A monothonic number identifying the revision number of the Data Model against
+ * which the Node is certified.
  */
-#ifndef CHIP_DEVICE_INTERACTION_MODEL_REVISION
-#define CHIP_DEVICE_INTERACTION_MODEL_REVISION 1
+#ifndef CHIP_DEVICE_DATA__MODEL_REVISION
+#define CHIP_DEVICE_DATA__MODEL_REVISION 1
 #endif
-
-constexpr uint8_t kInteractionModelRevisionTag = 0xFF;

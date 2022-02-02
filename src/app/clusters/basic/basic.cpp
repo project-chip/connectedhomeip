@@ -20,6 +20,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/DataModelRevision.h>
 #include <app/EventLogging.h>
 #include <app/util/attribute-storage.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -52,6 +53,7 @@ public:
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
 private:
+    CHIP_ERROR ReadDataModelRevision(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadLocation(AttributeValueEncoder & aEncoder);
     CHIP_ERROR WriteLocation(AttributeValueDecoder & aDecoder);
 };
@@ -76,6 +78,10 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
 
     switch (aPath.mAttributeId)
     {
+    case DataModelRevision::Id:
+        status = ReadDataModelRevision(aEncoder);
+        break;
+
     case Location::Id:
         status = ReadLocation(aEncoder);
         break;
@@ -265,6 +271,12 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
     }
 
     return status;
+}
+
+CHIP_ERROR BasicAttrAccess::ReadDataModelRevision(AttributeValueEncoder & aEncoder)
+{
+    uint16_t revision = CHIP_DEVICE_DATA__MODEL_REVISION;
+    return aEncoder.Encode(revision);
 }
 
 CHIP_ERROR BasicAttrAccess::ReadLocation(AttributeValueEncoder & aEncoder)
