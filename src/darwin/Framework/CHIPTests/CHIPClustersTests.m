@@ -13764,7 +13764,7 @@ CHIPDevice * GetConnectedDevice(void)
     WaitForCommissionee(expectation, queue);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-uint8_t currentTarget;
+NSNumber * _Nonnull currentTarget;
 - (void)testSendClusterTest_TC_MC_8_1_000001_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Reads the CurrentTarget attribute"];
@@ -13781,7 +13781,7 @@ uint8_t currentTarget;
 
         {
             id actualValue = value;
-            currentTarget = [actualValue unsignedCharValue];
+            currentTarget = actualValue;
         }
 
         [expectation fulfill];
@@ -37580,7 +37580,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
     WaitForCommissionee(expectation, queue);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-uint8_t TestAddArgumentDefaultValue;
+NSNumber * _Nonnull TestAddArgumentDefaultValue;
 - (void)testSendClusterTestSaveAs_000001_TestAddArguments
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Send Test Add Arguments Command"];
@@ -37606,7 +37606,7 @@ uint8_t TestAddArgumentDefaultValue;
                           }
                           {
                               id actualValue = values.returnValue;
-                              TestAddArgumentDefaultValue = [actualValue unsignedCharValue];
+                              TestAddArgumentDefaultValue = actualValue;
                           }
 
                           [expectation fulfill];
@@ -37635,7 +37635,7 @@ uint8_t TestAddArgumentDefaultValue;
 
                           {
                               id actualValue = values.returnValue;
-                              XCTAssertEqual([actualValue unsignedCharValue], TestAddArgumentDefaultValue);
+                              XCTAssertEqualObjects(actualValue, TestAddArgumentDefaultValue);
                           }
 
                           [expectation fulfill];
@@ -37654,7 +37654,7 @@ uint8_t TestAddArgumentDefaultValue;
 
     __auto_type * params = [[CHIPTestClusterClusterTestAddArgumentsParams alloc] init];
     params.arg1 = [NSNumber numberWithUnsignedChar:3];
-    params.arg2 = [NSNumber numberWithUnsignedChar:TestAddArgumentDefaultValue];
+    params.arg2 = [TestAddArgumentDefaultValue copy];
     [cluster testAddArgumentsWithParams:params
                       completionHandler:^(
                           CHIPTestClusterClusterTestAddArgumentsResponseParams * _Nullable values, NSError * _Nullable err) {
@@ -37664,9 +37664,7 @@ uint8_t TestAddArgumentDefaultValue;
 
                           {
                               id actualValue = values.returnValue;
-                              if (actualValue != nil) {
-                                  XCTAssertNotEqual([actualValue unsignedCharValue], TestAddArgumentDefaultValue);
-                              }
+                              XCTAssertNotEqualObjects(actualValue, TestAddArgumentDefaultValue);
                           }
 
                           [expectation fulfill];
@@ -37674,7 +37672,7 @@ uint8_t TestAddArgumentDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-bool readAttributeBooleanDefaultValue;
+NSNumber * _Nonnull readAttributeBooleanDefaultValue;
 - (void)testSendClusterTestSaveAs_000004_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute BOOLEAN Default Value"];
@@ -37695,7 +37693,7 @@ bool readAttributeBooleanDefaultValue;
         }
         {
             id actualValue = value;
-            readAttributeBooleanDefaultValue = [actualValue boolValue];
+            readAttributeBooleanDefaultValue = actualValue;
         }
 
         [expectation fulfill];
@@ -37741,9 +37739,7 @@ bool readAttributeBooleanDefaultValue;
 
         {
             id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertNotEqual([actualValue boolValue], readAttributeBooleanDefaultValue);
-            }
+            XCTAssertNotEqualObjects(actualValue, readAttributeBooleanDefaultValue);
         }
 
         [expectation fulfill];
@@ -37761,7 +37757,7 @@ bool readAttributeBooleanDefaultValue;
     XCTAssertNotNil(cluster);
 
     id booleanArgument;
-    booleanArgument = [NSNumber numberWithBool:readAttributeBooleanDefaultValue];
+    booleanArgument = [readAttributeBooleanDefaultValue copy];
     [cluster writeAttributeBooleanWithValue:booleanArgument
                           completionHandler:^(NSError * _Nullable err) {
                               NSLog(@"Write attribute BOOLEAN DefaultValue Error: %@", err);
@@ -37789,7 +37785,7 @@ bool readAttributeBooleanDefaultValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue boolValue], readAttributeBooleanDefaultValue);
+            XCTAssertEqualObjects(actualValue, readAttributeBooleanDefaultValue);
         }
 
         [expectation fulfill];
@@ -37797,7 +37793,7 @@ bool readAttributeBooleanDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-uint8_t readAttributeBitmap8DefaultValue;
+NSNumber * _Nonnull readAttributeBitmap8DefaultValue;
 - (void)testSendClusterTestSaveAs_000009_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute BITMAP8 Default Value"];
@@ -37818,7 +37814,7 @@ uint8_t readAttributeBitmap8DefaultValue;
         }
         {
             id actualValue = value;
-            readAttributeBitmap8DefaultValue = [actualValue unsignedCharValue];
+            readAttributeBitmap8DefaultValue = actualValue;
         }
 
         [expectation fulfill];
@@ -37864,9 +37860,7 @@ uint8_t readAttributeBitmap8DefaultValue;
 
         {
             id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertNotEqual([actualValue unsignedCharValue], readAttributeBitmap8DefaultValue);
-            }
+            XCTAssertNotEqualObjects(actualValue, readAttributeBitmap8DefaultValue);
         }
 
         [expectation fulfill];
@@ -37884,7 +37878,7 @@ uint8_t readAttributeBitmap8DefaultValue;
     XCTAssertNotNil(cluster);
 
     id bitmap8Argument;
-    bitmap8Argument = [NSNumber numberWithUnsignedChar:readAttributeBitmap8DefaultValue];
+    bitmap8Argument = [readAttributeBitmap8DefaultValue copy];
     [cluster writeAttributeBitmap8WithValue:bitmap8Argument
                           completionHandler:^(NSError * _Nullable err) {
                               NSLog(@"Write attribute BITMAP8 Default Value Error: %@", err);
@@ -37912,7 +37906,7 @@ uint8_t readAttributeBitmap8DefaultValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], readAttributeBitmap8DefaultValue);
+            XCTAssertEqualObjects(actualValue, readAttributeBitmap8DefaultValue);
         }
 
         [expectation fulfill];
@@ -37920,7 +37914,7 @@ uint8_t readAttributeBitmap8DefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-uint16_t readAttributeBitmap16DefaultValue;
+NSNumber * _Nonnull readAttributeBitmap16DefaultValue;
 - (void)testSendClusterTestSaveAs_000014_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute BITMAP16 Default Value"];
@@ -37941,7 +37935,7 @@ uint16_t readAttributeBitmap16DefaultValue;
         }
         {
             id actualValue = value;
-            readAttributeBitmap16DefaultValue = [actualValue unsignedShortValue];
+            readAttributeBitmap16DefaultValue = actualValue;
         }
 
         [expectation fulfill];
@@ -37987,9 +37981,7 @@ uint16_t readAttributeBitmap16DefaultValue;
 
         {
             id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertNotEqual([actualValue unsignedShortValue], readAttributeBitmap16DefaultValue);
-            }
+            XCTAssertNotEqualObjects(actualValue, readAttributeBitmap16DefaultValue);
         }
 
         [expectation fulfill];
@@ -38007,7 +37999,7 @@ uint16_t readAttributeBitmap16DefaultValue;
     XCTAssertNotNil(cluster);
 
     id bitmap16Argument;
-    bitmap16Argument = [NSNumber numberWithUnsignedShort:readAttributeBitmap16DefaultValue];
+    bitmap16Argument = [readAttributeBitmap16DefaultValue copy];
     [cluster writeAttributeBitmap16WithValue:bitmap16Argument
                            completionHandler:^(NSError * _Nullable err) {
                                NSLog(@"Write attribute BITMAP16 Default Value Error: %@", err);
@@ -38035,7 +38027,7 @@ uint16_t readAttributeBitmap16DefaultValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedShortValue], readAttributeBitmap16DefaultValue);
+            XCTAssertEqualObjects(actualValue, readAttributeBitmap16DefaultValue);
         }
 
         [expectation fulfill];
@@ -38043,7 +38035,7 @@ uint16_t readAttributeBitmap16DefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-uint32_t readAttributeBitmap32DefaultValue;
+NSNumber * _Nonnull readAttributeBitmap32DefaultValue;
 - (void)testSendClusterTestSaveAs_000019_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute BITMAP32 Default Value"];
@@ -38064,7 +38056,7 @@ uint32_t readAttributeBitmap32DefaultValue;
         }
         {
             id actualValue = value;
-            readAttributeBitmap32DefaultValue = [actualValue unsignedIntValue];
+            readAttributeBitmap32DefaultValue = actualValue;
         }
 
         [expectation fulfill];
@@ -38110,9 +38102,7 @@ uint32_t readAttributeBitmap32DefaultValue;
 
         {
             id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertNotEqual([actualValue unsignedIntValue], readAttributeBitmap32DefaultValue);
-            }
+            XCTAssertNotEqualObjects(actualValue, readAttributeBitmap32DefaultValue);
         }
 
         [expectation fulfill];
@@ -38130,7 +38120,7 @@ uint32_t readAttributeBitmap32DefaultValue;
     XCTAssertNotNil(cluster);
 
     id bitmap32Argument;
-    bitmap32Argument = [NSNumber numberWithUnsignedInt:readAttributeBitmap32DefaultValue];
+    bitmap32Argument = [readAttributeBitmap32DefaultValue copy];
     [cluster writeAttributeBitmap32WithValue:bitmap32Argument
                            completionHandler:^(NSError * _Nullable err) {
                                NSLog(@"Write attribute BITMAP32 Default Value Error: %@", err);
@@ -38158,7 +38148,7 @@ uint32_t readAttributeBitmap32DefaultValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedIntValue], readAttributeBitmap32DefaultValue);
+            XCTAssertEqualObjects(actualValue, readAttributeBitmap32DefaultValue);
         }
 
         [expectation fulfill];
@@ -38166,7 +38156,7 @@ uint32_t readAttributeBitmap32DefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-uint64_t readAttributeBitmap64DefaultValue;
+NSNumber * _Nonnull readAttributeBitmap64DefaultValue;
 - (void)testSendClusterTestSaveAs_000024_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute BITMAP64 Default Value"];
@@ -38187,7 +38177,7 @@ uint64_t readAttributeBitmap64DefaultValue;
         }
         {
             id actualValue = value;
-            readAttributeBitmap64DefaultValue = [actualValue unsignedLongLongValue];
+            readAttributeBitmap64DefaultValue = actualValue;
         }
 
         [expectation fulfill];
@@ -38233,9 +38223,7 @@ uint64_t readAttributeBitmap64DefaultValue;
 
         {
             id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertNotEqual([actualValue unsignedLongLongValue], readAttributeBitmap64DefaultValue);
-            }
+            XCTAssertNotEqualObjects(actualValue, readAttributeBitmap64DefaultValue);
         }
 
         [expectation fulfill];
@@ -38253,7 +38241,7 @@ uint64_t readAttributeBitmap64DefaultValue;
     XCTAssertNotNil(cluster);
 
     id bitmap64Argument;
-    bitmap64Argument = [NSNumber numberWithUnsignedLongLong:readAttributeBitmap64DefaultValue];
+    bitmap64Argument = [readAttributeBitmap64DefaultValue copy];
     [cluster writeAttributeBitmap64WithValue:bitmap64Argument
                            completionHandler:^(NSError * _Nullable err) {
                                NSLog(@"Write attribute BITMAP64 Default Value Error: %@", err);
@@ -38281,7 +38269,7 @@ uint64_t readAttributeBitmap64DefaultValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedLongLongValue], readAttributeBitmap64DefaultValue);
+            XCTAssertEqualObjects(actualValue, readAttributeBitmap64DefaultValue);
         }
 
         [expectation fulfill];
@@ -38289,7 +38277,7 @@ uint64_t readAttributeBitmap64DefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-uint8_t readAttributeInt8uDefaultValue;
+NSNumber * _Nonnull readAttributeInt8uDefaultValue;
 - (void)testSendClusterTestSaveAs_000029_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT8U Default Value"];
@@ -38310,7 +38298,7 @@ uint8_t readAttributeInt8uDefaultValue;
         }
         {
             id actualValue = value;
-            readAttributeInt8uDefaultValue = [actualValue unsignedCharValue];
+            readAttributeInt8uDefaultValue = actualValue;
         }
 
         [expectation fulfill];
@@ -38356,9 +38344,7 @@ uint8_t readAttributeInt8uDefaultValue;
 
         {
             id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertNotEqual([actualValue unsignedCharValue], readAttributeInt8uDefaultValue);
-            }
+            XCTAssertNotEqualObjects(actualValue, readAttributeInt8uDefaultValue);
         }
 
         [expectation fulfill];
@@ -38376,7 +38362,7 @@ uint8_t readAttributeInt8uDefaultValue;
     XCTAssertNotNil(cluster);
 
     id int8uArgument;
-    int8uArgument = [NSNumber numberWithUnsignedChar:readAttributeInt8uDefaultValue];
+    int8uArgument = [readAttributeInt8uDefaultValue copy];
     [cluster writeAttributeInt8uWithValue:int8uArgument
                         completionHandler:^(NSError * _Nullable err) {
                             NSLog(@"Write attribute INT8U Default Value Error: %@", err);
@@ -38404,7 +38390,7 @@ uint8_t readAttributeInt8uDefaultValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], readAttributeInt8uDefaultValue);
+            XCTAssertEqualObjects(actualValue, readAttributeInt8uDefaultValue);
         }
 
         [expectation fulfill];
@@ -38412,7 +38398,7 @@ uint8_t readAttributeInt8uDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-uint16_t readAttributeInt16uDefaultValue;
+NSNumber * _Nonnull readAttributeInt16uDefaultValue;
 - (void)testSendClusterTestSaveAs_000034_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT16U Default Value"];
@@ -38433,7 +38419,7 @@ uint16_t readAttributeInt16uDefaultValue;
         }
         {
             id actualValue = value;
-            readAttributeInt16uDefaultValue = [actualValue unsignedShortValue];
+            readAttributeInt16uDefaultValue = actualValue;
         }
 
         [expectation fulfill];
@@ -38479,9 +38465,7 @@ uint16_t readAttributeInt16uDefaultValue;
 
         {
             id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertNotEqual([actualValue unsignedShortValue], readAttributeInt16uDefaultValue);
-            }
+            XCTAssertNotEqualObjects(actualValue, readAttributeInt16uDefaultValue);
         }
 
         [expectation fulfill];
@@ -38499,7 +38483,7 @@ uint16_t readAttributeInt16uDefaultValue;
     XCTAssertNotNil(cluster);
 
     id int16uArgument;
-    int16uArgument = [NSNumber numberWithUnsignedShort:readAttributeInt16uDefaultValue];
+    int16uArgument = [readAttributeInt16uDefaultValue copy];
     [cluster writeAttributeInt16uWithValue:int16uArgument
                          completionHandler:^(NSError * _Nullable err) {
                              NSLog(@"Write attribute INT16U Default Value Error: %@", err);
@@ -38527,7 +38511,7 @@ uint16_t readAttributeInt16uDefaultValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedShortValue], readAttributeInt16uDefaultValue);
+            XCTAssertEqualObjects(actualValue, readAttributeInt16uDefaultValue);
         }
 
         [expectation fulfill];
@@ -38535,7 +38519,7 @@ uint16_t readAttributeInt16uDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-uint32_t readAttributeInt32uDefaultValue;
+NSNumber * _Nonnull readAttributeInt32uDefaultValue;
 - (void)testSendClusterTestSaveAs_000039_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT32U Default Value"];
@@ -38556,7 +38540,7 @@ uint32_t readAttributeInt32uDefaultValue;
         }
         {
             id actualValue = value;
-            readAttributeInt32uDefaultValue = [actualValue unsignedIntValue];
+            readAttributeInt32uDefaultValue = actualValue;
         }
 
         [expectation fulfill];
@@ -38602,9 +38586,7 @@ uint32_t readAttributeInt32uDefaultValue;
 
         {
             id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertNotEqual([actualValue unsignedIntValue], readAttributeInt32uDefaultValue);
-            }
+            XCTAssertNotEqualObjects(actualValue, readAttributeInt32uDefaultValue);
         }
 
         [expectation fulfill];
@@ -38622,7 +38604,7 @@ uint32_t readAttributeInt32uDefaultValue;
     XCTAssertNotNil(cluster);
 
     id int32uArgument;
-    int32uArgument = [NSNumber numberWithUnsignedInt:readAttributeInt32uDefaultValue];
+    int32uArgument = [readAttributeInt32uDefaultValue copy];
     [cluster writeAttributeInt32uWithValue:int32uArgument
                          completionHandler:^(NSError * _Nullable err) {
                              NSLog(@"Write attribute INT32U Default Value Error: %@", err);
@@ -38650,7 +38632,7 @@ uint32_t readAttributeInt32uDefaultValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedIntValue], readAttributeInt32uDefaultValue);
+            XCTAssertEqualObjects(actualValue, readAttributeInt32uDefaultValue);
         }
 
         [expectation fulfill];
@@ -38658,7 +38640,7 @@ uint32_t readAttributeInt32uDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-uint64_t readAttributeInt64uDefaultValue;
+NSNumber * _Nonnull readAttributeInt64uDefaultValue;
 - (void)testSendClusterTestSaveAs_000044_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT64U Default Value"];
@@ -38679,7 +38661,7 @@ uint64_t readAttributeInt64uDefaultValue;
         }
         {
             id actualValue = value;
-            readAttributeInt64uDefaultValue = [actualValue unsignedLongLongValue];
+            readAttributeInt64uDefaultValue = actualValue;
         }
 
         [expectation fulfill];
@@ -38725,9 +38707,7 @@ uint64_t readAttributeInt64uDefaultValue;
 
         {
             id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertNotEqual([actualValue unsignedLongLongValue], readAttributeInt64uDefaultValue);
-            }
+            XCTAssertNotEqualObjects(actualValue, readAttributeInt64uDefaultValue);
         }
 
         [expectation fulfill];
@@ -38745,7 +38725,7 @@ uint64_t readAttributeInt64uDefaultValue;
     XCTAssertNotNil(cluster);
 
     id int64uArgument;
-    int64uArgument = [NSNumber numberWithUnsignedLongLong:readAttributeInt64uDefaultValue];
+    int64uArgument = [readAttributeInt64uDefaultValue copy];
     [cluster writeAttributeInt64uWithValue:int64uArgument
                          completionHandler:^(NSError * _Nullable err) {
                              NSLog(@"Write attribute INT64U Default Value Error: %@", err);
@@ -38773,7 +38753,7 @@ uint64_t readAttributeInt64uDefaultValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedLongLongValue], readAttributeInt64uDefaultValue);
+            XCTAssertEqualObjects(actualValue, readAttributeInt64uDefaultValue);
         }
 
         [expectation fulfill];
@@ -38781,7 +38761,7 @@ uint64_t readAttributeInt64uDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-int8_t readAttributeInt8sDefaultValue;
+NSNumber * _Nonnull readAttributeInt8sDefaultValue;
 - (void)testSendClusterTestSaveAs_000049_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT8S Default Value"];
@@ -38802,7 +38782,7 @@ int8_t readAttributeInt8sDefaultValue;
         }
         {
             id actualValue = value;
-            readAttributeInt8sDefaultValue = [actualValue charValue];
+            readAttributeInt8sDefaultValue = actualValue;
         }
 
         [expectation fulfill];
@@ -38848,9 +38828,7 @@ int8_t readAttributeInt8sDefaultValue;
 
         {
             id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertNotEqual([actualValue charValue], readAttributeInt8sDefaultValue);
-            }
+            XCTAssertNotEqualObjects(actualValue, readAttributeInt8sDefaultValue);
         }
 
         [expectation fulfill];
@@ -38868,7 +38846,7 @@ int8_t readAttributeInt8sDefaultValue;
     XCTAssertNotNil(cluster);
 
     id int8sArgument;
-    int8sArgument = [NSNumber numberWithChar:readAttributeInt8sDefaultValue];
+    int8sArgument = [readAttributeInt8sDefaultValue copy];
     [cluster writeAttributeInt8sWithValue:int8sArgument
                         completionHandler:^(NSError * _Nullable err) {
                             NSLog(@"Write attribute INT8S Default Value Error: %@", err);
@@ -38896,7 +38874,7 @@ int8_t readAttributeInt8sDefaultValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue charValue], readAttributeInt8sDefaultValue);
+            XCTAssertEqualObjects(actualValue, readAttributeInt8sDefaultValue);
         }
 
         [expectation fulfill];
@@ -38904,7 +38882,7 @@ int8_t readAttributeInt8sDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-int16_t readAttributeInt16sDefaultValue;
+NSNumber * _Nonnull readAttributeInt16sDefaultValue;
 - (void)testSendClusterTestSaveAs_000054_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT16S Default Value"];
@@ -38925,7 +38903,7 @@ int16_t readAttributeInt16sDefaultValue;
         }
         {
             id actualValue = value;
-            readAttributeInt16sDefaultValue = [actualValue shortValue];
+            readAttributeInt16sDefaultValue = actualValue;
         }
 
         [expectation fulfill];
@@ -38971,9 +38949,7 @@ int16_t readAttributeInt16sDefaultValue;
 
         {
             id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertNotEqual([actualValue shortValue], readAttributeInt16sDefaultValue);
-            }
+            XCTAssertNotEqualObjects(actualValue, readAttributeInt16sDefaultValue);
         }
 
         [expectation fulfill];
@@ -38991,7 +38967,7 @@ int16_t readAttributeInt16sDefaultValue;
     XCTAssertNotNil(cluster);
 
     id int16sArgument;
-    int16sArgument = [NSNumber numberWithShort:readAttributeInt16sDefaultValue];
+    int16sArgument = [readAttributeInt16sDefaultValue copy];
     [cluster writeAttributeInt16sWithValue:int16sArgument
                          completionHandler:^(NSError * _Nullable err) {
                              NSLog(@"Write attribute INT16S Default Value Error: %@", err);
@@ -39019,7 +38995,7 @@ int16_t readAttributeInt16sDefaultValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue shortValue], readAttributeInt16sDefaultValue);
+            XCTAssertEqualObjects(actualValue, readAttributeInt16sDefaultValue);
         }
 
         [expectation fulfill];
@@ -39027,7 +39003,7 @@ int16_t readAttributeInt16sDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-int32_t readAttributeInt32sDefaultValue;
+NSNumber * _Nonnull readAttributeInt32sDefaultValue;
 - (void)testSendClusterTestSaveAs_000059_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT32S Default Value"];
@@ -39048,7 +39024,7 @@ int32_t readAttributeInt32sDefaultValue;
         }
         {
             id actualValue = value;
-            readAttributeInt32sDefaultValue = [actualValue intValue];
+            readAttributeInt32sDefaultValue = actualValue;
         }
 
         [expectation fulfill];
@@ -39094,9 +39070,7 @@ int32_t readAttributeInt32sDefaultValue;
 
         {
             id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertNotEqual([actualValue intValue], readAttributeInt32sDefaultValue);
-            }
+            XCTAssertNotEqualObjects(actualValue, readAttributeInt32sDefaultValue);
         }
 
         [expectation fulfill];
@@ -39114,7 +39088,7 @@ int32_t readAttributeInt32sDefaultValue;
     XCTAssertNotNil(cluster);
 
     id int32sArgument;
-    int32sArgument = [NSNumber numberWithInt:readAttributeInt32sDefaultValue];
+    int32sArgument = [readAttributeInt32sDefaultValue copy];
     [cluster writeAttributeInt32sWithValue:int32sArgument
                          completionHandler:^(NSError * _Nullable err) {
                              NSLog(@"Write attribute INT32S Default Value Error: %@", err);
@@ -39142,7 +39116,7 @@ int32_t readAttributeInt32sDefaultValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue intValue], readAttributeInt32sDefaultValue);
+            XCTAssertEqualObjects(actualValue, readAttributeInt32sDefaultValue);
         }
 
         [expectation fulfill];
@@ -39150,7 +39124,7 @@ int32_t readAttributeInt32sDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-int64_t readAttributeInt64sDefaultValue;
+NSNumber * _Nonnull readAttributeInt64sDefaultValue;
 - (void)testSendClusterTestSaveAs_000064_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT64S Default Value"];
@@ -39171,7 +39145,7 @@ int64_t readAttributeInt64sDefaultValue;
         }
         {
             id actualValue = value;
-            readAttributeInt64sDefaultValue = [actualValue longLongValue];
+            readAttributeInt64sDefaultValue = actualValue;
         }
 
         [expectation fulfill];
@@ -39217,9 +39191,7 @@ int64_t readAttributeInt64sDefaultValue;
 
         {
             id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertNotEqual([actualValue longLongValue], readAttributeInt64sDefaultValue);
-            }
+            XCTAssertNotEqualObjects(actualValue, readAttributeInt64sDefaultValue);
         }
 
         [expectation fulfill];
@@ -39237,7 +39209,7 @@ int64_t readAttributeInt64sDefaultValue;
     XCTAssertNotNil(cluster);
 
     id int64sArgument;
-    int64sArgument = [NSNumber numberWithLongLong:readAttributeInt64sDefaultValue];
+    int64sArgument = [readAttributeInt64sDefaultValue copy];
     [cluster writeAttributeInt64sWithValue:int64sArgument
                          completionHandler:^(NSError * _Nullable err) {
                              NSLog(@"Write attribute INT64S Default Value Error: %@", err);
@@ -39265,7 +39237,7 @@ int64_t readAttributeInt64sDefaultValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue longLongValue], readAttributeInt64sDefaultValue);
+            XCTAssertEqualObjects(actualValue, readAttributeInt64sDefaultValue);
         }
 
         [expectation fulfill];
@@ -39273,7 +39245,7 @@ int64_t readAttributeInt64sDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-uint8_t readAttributeEnum8DefaultValue;
+NSNumber * _Nonnull readAttributeEnum8DefaultValue;
 - (void)testSendClusterTestSaveAs_000069_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute ENUM8 Default Value"];
@@ -39294,7 +39266,7 @@ uint8_t readAttributeEnum8DefaultValue;
         }
         {
             id actualValue = value;
-            readAttributeEnum8DefaultValue = [actualValue unsignedCharValue];
+            readAttributeEnum8DefaultValue = actualValue;
         }
 
         [expectation fulfill];
@@ -39340,9 +39312,7 @@ uint8_t readAttributeEnum8DefaultValue;
 
         {
             id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertNotEqual([actualValue unsignedCharValue], readAttributeEnum8DefaultValue);
-            }
+            XCTAssertNotEqualObjects(actualValue, readAttributeEnum8DefaultValue);
         }
 
         [expectation fulfill];
@@ -39360,7 +39330,7 @@ uint8_t readAttributeEnum8DefaultValue;
     XCTAssertNotNil(cluster);
 
     id enum8Argument;
-    enum8Argument = [NSNumber numberWithUnsignedChar:readAttributeEnum8DefaultValue];
+    enum8Argument = [readAttributeEnum8DefaultValue copy];
     [cluster writeAttributeEnum8WithValue:enum8Argument
                         completionHandler:^(NSError * _Nullable err) {
                             NSLog(@"Write attribute ENUM8 Default Value Error: %@", err);
@@ -39388,7 +39358,7 @@ uint8_t readAttributeEnum8DefaultValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], readAttributeEnum8DefaultValue);
+            XCTAssertEqualObjects(actualValue, readAttributeEnum8DefaultValue);
         }
 
         [expectation fulfill];
@@ -39396,7 +39366,7 @@ uint8_t readAttributeEnum8DefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-uint16_t readAttributeEnum16DefaultValue;
+NSNumber * _Nonnull readAttributeEnum16DefaultValue;
 - (void)testSendClusterTestSaveAs_000074_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute ENUM16 Default Value"];
@@ -39417,7 +39387,7 @@ uint16_t readAttributeEnum16DefaultValue;
         }
         {
             id actualValue = value;
-            readAttributeEnum16DefaultValue = [actualValue unsignedShortValue];
+            readAttributeEnum16DefaultValue = actualValue;
         }
 
         [expectation fulfill];
@@ -39463,9 +39433,7 @@ uint16_t readAttributeEnum16DefaultValue;
 
         {
             id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertNotEqual([actualValue unsignedShortValue], readAttributeEnum16DefaultValue);
-            }
+            XCTAssertNotEqualObjects(actualValue, readAttributeEnum16DefaultValue);
         }
 
         [expectation fulfill];
@@ -39483,7 +39451,7 @@ uint16_t readAttributeEnum16DefaultValue;
     XCTAssertNotNil(cluster);
 
     id enum16Argument;
-    enum16Argument = [NSNumber numberWithUnsignedShort:readAttributeEnum16DefaultValue];
+    enum16Argument = [readAttributeEnum16DefaultValue copy];
     [cluster writeAttributeEnum16WithValue:enum16Argument
                          completionHandler:^(NSError * _Nullable err) {
                              NSLog(@"Write attribute ENUM16 Default Value Error: %@", err);
@@ -39511,7 +39479,7 @@ uint16_t readAttributeEnum16DefaultValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedShortValue], readAttributeEnum16DefaultValue);
+            XCTAssertEqualObjects(actualValue, readAttributeEnum16DefaultValue);
         }
 
         [expectation fulfill];
@@ -39519,7 +39487,7 @@ uint16_t readAttributeEnum16DefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-uint64_t readAttributeEpochUSDefaultValue;
+NSNumber * _Nonnull readAttributeEpochUSDefaultValue;
 - (void)testSendClusterTestSaveAs_000079_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute EPOCH_US Default Value"];
@@ -39540,7 +39508,7 @@ uint64_t readAttributeEpochUSDefaultValue;
         }
         {
             id actualValue = value;
-            readAttributeEpochUSDefaultValue = [actualValue unsignedLongLongValue];
+            readAttributeEpochUSDefaultValue = actualValue;
         }
 
         [expectation fulfill];
@@ -39586,9 +39554,7 @@ uint64_t readAttributeEpochUSDefaultValue;
 
         {
             id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertNotEqual([actualValue unsignedLongLongValue], readAttributeEpochUSDefaultValue);
-            }
+            XCTAssertNotEqualObjects(actualValue, readAttributeEpochUSDefaultValue);
         }
 
         [expectation fulfill];
@@ -39606,7 +39572,7 @@ uint64_t readAttributeEpochUSDefaultValue;
     XCTAssertNotNil(cluster);
 
     id epochUsArgument;
-    epochUsArgument = [NSNumber numberWithUnsignedLongLong:readAttributeEpochUSDefaultValue];
+    epochUsArgument = [readAttributeEpochUSDefaultValue copy];
     [cluster writeAttributeEpochUsWithValue:epochUsArgument
                           completionHandler:^(NSError * _Nullable err) {
                               NSLog(@"Write attribute EPOCH_US Default Value Error: %@", err);
@@ -39634,7 +39600,7 @@ uint64_t readAttributeEpochUSDefaultValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedLongLongValue], readAttributeEpochUSDefaultValue);
+            XCTAssertEqualObjects(actualValue, readAttributeEpochUSDefaultValue);
         }
 
         [expectation fulfill];
@@ -39642,7 +39608,7 @@ uint64_t readAttributeEpochUSDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-uint32_t readAttributeEpochSDefaultValue;
+NSNumber * _Nonnull readAttributeEpochSDefaultValue;
 - (void)testSendClusterTestSaveAs_000084_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute EPOCH_S Default Value"];
@@ -39663,7 +39629,7 @@ uint32_t readAttributeEpochSDefaultValue;
         }
         {
             id actualValue = value;
-            readAttributeEpochSDefaultValue = [actualValue unsignedIntValue];
+            readAttributeEpochSDefaultValue = actualValue;
         }
 
         [expectation fulfill];
@@ -39709,9 +39675,7 @@ uint32_t readAttributeEpochSDefaultValue;
 
         {
             id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertNotEqual([actualValue unsignedIntValue], readAttributeEpochSDefaultValue);
-            }
+            XCTAssertNotEqualObjects(actualValue, readAttributeEpochSDefaultValue);
         }
 
         [expectation fulfill];
@@ -39729,7 +39693,7 @@ uint32_t readAttributeEpochSDefaultValue;
     XCTAssertNotNil(cluster);
 
     id epochSArgument;
-    epochSArgument = [NSNumber numberWithUnsignedInt:readAttributeEpochSDefaultValue];
+    epochSArgument = [readAttributeEpochSDefaultValue copy];
     [cluster writeAttributeEpochSWithValue:epochSArgument
                          completionHandler:^(NSError * _Nullable err) {
                              NSLog(@"Write attribute EPOCH_S Default Value Error: %@", err);
@@ -39757,7 +39721,7 @@ uint32_t readAttributeEpochSDefaultValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedIntValue], readAttributeEpochSDefaultValue);
+            XCTAssertEqualObjects(actualValue, readAttributeEpochSDefaultValue);
         }
 
         [expectation fulfill];
@@ -39765,7 +39729,7 @@ uint32_t readAttributeEpochSDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-uint16_t readAttributeVendorIdDefaultValue;
+NSNumber * _Nonnull readAttributeVendorIdDefaultValue;
 - (void)testSendClusterTestSaveAs_000089_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute vendor_id Default Value"];
@@ -39786,7 +39750,7 @@ uint16_t readAttributeVendorIdDefaultValue;
         }
         {
             id actualValue = value;
-            readAttributeVendorIdDefaultValue = [actualValue unsignedShortValue];
+            readAttributeVendorIdDefaultValue = actualValue;
         }
 
         [expectation fulfill];
@@ -39832,9 +39796,7 @@ uint16_t readAttributeVendorIdDefaultValue;
 
         {
             id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertNotEqual([actualValue unsignedShortValue], readAttributeVendorIdDefaultValue);
-            }
+            XCTAssertNotEqualObjects(actualValue, readAttributeVendorIdDefaultValue);
         }
 
         [expectation fulfill];
@@ -39852,7 +39814,7 @@ uint16_t readAttributeVendorIdDefaultValue;
     XCTAssertNotNil(cluster);
 
     id vendorIdArgument;
-    vendorIdArgument = [NSNumber numberWithUnsignedShort:readAttributeVendorIdDefaultValue];
+    vendorIdArgument = [readAttributeVendorIdDefaultValue copy];
     [cluster writeAttributeVendorIdWithValue:vendorIdArgument
                            completionHandler:^(NSError * _Nullable err) {
                                NSLog(@"Write attribute vendor_id Default Value Error: %@", err);
@@ -39880,7 +39842,7 @@ uint16_t readAttributeVendorIdDefaultValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedShortValue], readAttributeVendorIdDefaultValue);
+            XCTAssertEqualObjects(actualValue, readAttributeVendorIdDefaultValue);
         }
 
         [expectation fulfill];
@@ -39888,7 +39850,7 @@ uint16_t readAttributeVendorIdDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-NSMutableString * readAttributeCharStringDefaultValue;
+NSString * _Nonnull readAttributeCharStringDefaultValue;
 - (void)testSendClusterTestSaveAs_000094_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute char_string Default Value"];
@@ -39909,7 +39871,7 @@ NSMutableString * readAttributeCharStringDefaultValue;
         }
         {
             id actualValue = value;
-            readAttributeCharStringDefaultValue = [NSMutableString stringWithString:actualValue];
+            readAttributeCharStringDefaultValue = actualValue;
         }
 
         [expectation fulfill];
@@ -39964,7 +39926,7 @@ NSMutableString * readAttributeCharStringDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-NSMutableString * readAttributeCharStringNotDefaultValue;
+NSString * _Nonnull readAttributeCharStringNotDefaultValue;
 - (void)testSendClusterTestSaveAs_000097_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute char_string Not Default Value"];
@@ -39985,13 +39947,11 @@ NSMutableString * readAttributeCharStringNotDefaultValue;
         }
         {
             id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertNotEqualObjects(actualValue, readAttributeCharStringDefaultValue);
-            }
+            XCTAssertNotEqualObjects(actualValue, readAttributeCharStringDefaultValue);
         }
         {
             id actualValue = value;
-            readAttributeCharStringNotDefaultValue = [NSMutableString stringWithString:actualValue];
+            readAttributeCharStringNotDefaultValue = actualValue;
         }
 
         [expectation fulfill];
@@ -40020,9 +39980,7 @@ NSMutableString * readAttributeCharStringNotDefaultValue;
         }
         {
             id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertNotEqualObjects(actualValue, readAttributeCharStringDefaultValue);
-            }
+            XCTAssertNotEqualObjects(actualValue, readAttributeCharStringDefaultValue);
         }
 
         [expectation fulfill];
@@ -40100,7 +40058,7 @@ NSMutableString * readAttributeCharStringNotDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-NSMutableData * readAttributeOctetStringDefaultValue;
+NSData * _Nonnull readAttributeOctetStringDefaultValue;
 - (void)testSendClusterTestSaveAs_000102_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute octet_string Default Value"];
@@ -40121,7 +40079,7 @@ NSMutableData * readAttributeOctetStringDefaultValue;
         }
         {
             id actualValue = value;
-            readAttributeOctetStringDefaultValue = [NSMutableData dataWithData:actualValue];
+            readAttributeOctetStringDefaultValue = actualValue;
         }
 
         [expectation fulfill];
@@ -40176,7 +40134,7 @@ NSMutableData * readAttributeOctetStringDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-NSMutableData * readAttributeOctetStringNotDefaultValue;
+NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
 - (void)testSendClusterTestSaveAs_000105_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute octet_string Not Default Value"];
@@ -40197,13 +40155,11 @@ NSMutableData * readAttributeOctetStringNotDefaultValue;
         }
         {
             id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertNotEqualObjects(actualValue, readAttributeOctetStringDefaultValue);
-            }
+            XCTAssertNotEqualObjects(actualValue, readAttributeOctetStringDefaultValue);
         }
         {
             id actualValue = value;
-            readAttributeOctetStringNotDefaultValue = [NSMutableData dataWithData:actualValue];
+            readAttributeOctetStringNotDefaultValue = actualValue;
         }
 
         [expectation fulfill];
@@ -40232,9 +40188,7 @@ NSMutableData * readAttributeOctetStringNotDefaultValue;
         }
         {
             id actualValue = value;
-            if (actualValue != nil) {
-                XCTAssertNotEqualObjects(actualValue, readAttributeOctetStringDefaultValue);
-            }
+            XCTAssertNotEqualObjects(actualValue, readAttributeOctetStringDefaultValue);
         }
 
         [expectation fulfill];
