@@ -320,7 +320,7 @@ public:
     /**
      * Gets called when a fabric is deleted from KVS store.
      **/
-    virtual void OnFabricDeletedFromStorage(CompressedFabricId compreessedId, FabricIndex fabricIndex) = 0;
+    virtual void OnFabricDeletedFromStorage(CompressedFabricId compressedId, FabricIndex fabricIndex) = 0;
 
     /**
      * Gets called when a fabric is loaded into Fabric Table from KVS store.
