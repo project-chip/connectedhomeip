@@ -72734,6 +72734,10 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 3 : Read current fabric index\n");
             err = TestReadCurrentFabricIndex_3();
             break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Remove nonexistent fabric\n");
+            err = TestRemoveNonexistentFabric_4();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -72745,7 +72749,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 4;
+    const uint16_t mTestCount = 5;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
@@ -72862,6 +72866,41 @@ private:
     {
         VerifyOrReturn(CheckConstraintType("currentFabricIndex", "", "uint8"));
         VerifyOrReturn(CheckConstraintMinValue<chip::FabricIndex>("currentFabricIndex", currentFabricIndex, 1));
+        NextTest();
+    }
+
+    CHIP_ERROR TestRemoveNonexistentFabric_4()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        using RequestType               = chip::app::Clusters::OperationalCredentials::Commands::RemoveFabric::Type;
+
+        RequestType request;
+        request.fabricIndex = 243;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestOperationalCredentialsCluster *>(context))
+                ->OnSuccessResponse_4(data.statusCode, data.fabricIndex, data.debugText);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestOperationalCredentialsCluster *>(context))->OnFailureResponse_4(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_4(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_4(chip::app::Clusters::OperationalCredentials::OperationalCertStatus statusCode,
+                             const chip::Optional<uint8_t> & fabricIndex, const chip::Optional<chip::CharSpan> & debugText)
+    {
+        VerifyOrReturn(CheckValue("statusCode", statusCode, 11));
+
         NextTest();
     }
 };

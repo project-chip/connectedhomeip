@@ -848,7 +848,7 @@ private:
         return cluster.InvokeCommand(request, this, successCb, failureCb);
     }
 
-    static CHIP_ERROR ConvertFromNodeOperationalCertStatus(uint8_t err);
+    static CHIP_ERROR ConvertFromOperationalCertStatus(chip::app::Clusters::OperationalCredentials::OperationalCertStatus err);
 
     Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;
     Callback::Callback<OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;

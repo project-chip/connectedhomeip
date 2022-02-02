@@ -41933,6 +41933,36 @@ NSMutableData * readAttributeOctetStringNotDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
+- (void)testSendClusterTestOperationalCredentialsCluster_000004_RemoveFabric
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Remove nonexistent fabric"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestOperationalCredentials * cluster = [[CHIPTestOperationalCredentials alloc] initWithDevice:device
+                                                                                             endpoint:0
+                                                                                                queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPOperationalCredentialsClusterRemoveFabricParams alloc] init];
+    params.fabricIndex = [NSNumber numberWithUnsignedChar:243];
+    [cluster
+        removeFabricWithParams:params
+             completionHandler:^(CHIPOperationalCredentialsClusterNOCResponseParams * _Nullable values, NSError * _Nullable err) {
+                 NSLog(@"Remove nonexistent fabric Error: %@", err);
+
+                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                 {
+                     id actualValue = values.statusCode;
+                     XCTAssertEqual([actualValue unsignedCharValue], 11);
+                 }
+
+                 [expectation fulfill];
+             }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
 
 - (void)testSendClusterTestModeSelectCluster_000000_WaitForCommissionee
 {

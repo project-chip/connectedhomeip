@@ -801,8 +801,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPOperationalCredentialsClusterNOCResponseParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull statusCode;
-@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
-@property (strong, nonatomic) NSString * _Nonnull debugText;
+@property (strong, nonatomic) NSNumber * _Nullable fabricIndex;
+@property (strong, nonatomic) NSString * _Nullable debugText;
 - (instancetype)init;
 @end
 

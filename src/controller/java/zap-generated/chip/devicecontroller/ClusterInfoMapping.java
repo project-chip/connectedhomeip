@@ -4682,15 +4682,17 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer StatusCode, Integer FabricIndex, String DebugText) {
+    public void onSuccess(
+        Integer StatusCode, Optional<Integer> FabricIndex, Optional<String> DebugText) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo StatusCodeResponseValue =
           new CommandResponseInfo("StatusCode", "Integer");
       responseValues.put(StatusCodeResponseValue, StatusCode);
       CommandResponseInfo FabricIndexResponseValue =
-          new CommandResponseInfo("FabricIndex", "Integer");
+          new CommandResponseInfo("FabricIndex", "Optional<Integer>");
       responseValues.put(FabricIndexResponseValue, FabricIndex);
-      CommandResponseInfo DebugTextResponseValue = new CommandResponseInfo("DebugText", "String");
+      CommandResponseInfo DebugTextResponseValue =
+          new CommandResponseInfo("DebugText", "Optional<String>");
       responseValues.put(DebugTextResponseValue, DebugText);
       callback.onSuccess(responseValues);
     }

@@ -14048,7 +14048,7 @@ class OperationalCredentials(Cluster):
     clusterRevision: 'uint' = None
 
     class Enums:
-        class NodeOperationalCertStatus(IntEnum):
+        class OperationalCertStatus(IntEnum):
             kSuccess = 0x00
             kInvalidPublicKey = 0x01
             kInvalidNodeOpId = 0x02
@@ -14245,14 +14245,14 @@ class OperationalCredentials(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="statusCode", Tag=0, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=1, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="debugText", Tag=2, Type=str),
+                            ClusterObjectFieldDescriptor(Label="statusCode", Tag=0, Type=OperationalCredentials.Enums.OperationalCertStatus),
+                            ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=1, Type=typing.Optional[uint]),
+                            ClusterObjectFieldDescriptor(Label="debugText", Tag=2, Type=typing.Optional[str]),
                     ])
 
-            statusCode: 'uint' = 0
-            fabricIndex: 'uint' = 0
-            debugText: 'str' = ""
+            statusCode: 'OperationalCredentials.Enums.OperationalCertStatus' = 0
+            fabricIndex: 'typing.Optional[uint]' = None
+            debugText: 'typing.Optional[str]' = None
 
         @dataclass
         class UpdateFabricLabel(ClusterCommand):

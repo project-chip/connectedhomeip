@@ -10453,15 +10453,23 @@ void CHIPOperationalCredentialsClusterNOCResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPOperationalCredentialsClusterNOCResponseParams new];
     {
-        response.statusCode = [NSNumber numberWithUnsignedChar:data.statusCode];
+        response.statusCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.statusCode)];
     }
     {
-        response.fabricIndex = [NSNumber numberWithUnsignedChar:data.fabricIndex];
+        if (data.fabricIndex.HasValue()) {
+            response.fabricIndex = [NSNumber numberWithUnsignedChar:data.fabricIndex.Value()];
+        } else {
+            response.fabricIndex = nil;
+        }
     }
     {
-        response.debugText = [[NSString alloc] initWithBytes:data.debugText.data()
-                                                      length:data.debugText.size()
-                                                    encoding:NSUTF8StringEncoding];
+        if (data.debugText.HasValue()) {
+            response.debugText = [[NSString alloc] initWithBytes:data.debugText.Value().data()
+                                                          length:data.debugText.Value().size()
+                                                        encoding:NSUTF8StringEncoding];
+        } else {
+            response.debugText = nil;
+        }
     }
     DispatchSuccess(context, response);
 };
@@ -13875,19 +13883,18 @@ void CHIPNullableAdministratorCommissioningClusterStatusCodeAttributeCallbackSub
     }
 }
 
-void CHIPOperationalCredentialsClusterNodeOperationalCertStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OperationalCredentials::NodeOperationalCertStatus value)
+void CHIPOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::OperationalCredentials::OperationalCertStatus value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPOperationalCredentialsClusterNodeOperationalCertStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+void CHIPOperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
-    auto * self
-        = static_cast<CHIPOperationalCredentialsClusterNodeOperationalCertStatusAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPOperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -13901,8 +13908,8 @@ void CHIPOperationalCredentialsClusterNodeOperationalCertStatusAttributeCallback
     }
 }
 
-void CHIPNullableOperationalCredentialsClusterNodeOperationalCertStatusAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalCredentials::NodeOperationalCertStatus> & value)
+void CHIPNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalCredentials::OperationalCertStatus> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -13913,12 +13920,11 @@ void CHIPNullableOperationalCredentialsClusterNodeOperationalCertStatusAttribute
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPNullableOperationalCredentialsClusterNodeOperationalCertStatusAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished(void * context)
+void CHIPNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
 {
     auto * self
-        = static_cast<CHIPNullableOperationalCredentialsClusterNodeOperationalCertStatusAttributeCallbackSubscriptionBridge *>(
-            context);
+        = static_cast<CHIPNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }

@@ -2584,21 +2584,36 @@ void CHIPOperationalCredentialsClusterNOCResponseCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr);
 
     err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess",
-                                                  "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;)V", &javaMethod);
+                                                  "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject StatusCode;
     std::string StatusCodeClassName     = "java/lang/Integer";
     std::string StatusCodeCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(StatusCodeClassName.c_str(), StatusCodeCtorSignature.c_str(),
-                                                                  dataResponse.statusCode, StatusCode);
+                                                                  static_cast<uint8_t>(dataResponse.statusCode), StatusCode);
     jobject FabricIndex;
-    std::string FabricIndexClassName     = "java/lang/Integer";
-    std::string FabricIndexCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(FabricIndexClassName.c_str(), FabricIndexCtorSignature.c_str(),
-                                                                  dataResponse.fabricIndex, FabricIndex);
+    if (!dataResponse.fabricIndex.HasValue())
+    {
+        chip::JniReferences::GetInstance().CreateOptional(nullptr, FabricIndex);
+    }
+    else
+    {
+        std::string FabricIndexClassName     = "java/lang/Integer";
+        std::string FabricIndexCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+            FabricIndexClassName.c_str(), FabricIndexCtorSignature.c_str(), dataResponse.fabricIndex.Value(), FabricIndex);
+    }
     jobject DebugText;
-    DebugText = env->NewStringUTF(std::string(dataResponse.debugText.data(), dataResponse.debugText.size()).c_str());
+    if (!dataResponse.debugText.HasValue())
+    {
+        chip::JniReferences::GetInstance().CreateOptional(nullptr, DebugText);
+    }
+    else
+    {
+        DebugText =
+            env->NewStringUTF(std::string(dataResponse.debugText.Value().data(), dataResponse.debugText.Value().size()).c_str());
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, StatusCode, FabricIndex, DebugText);
 }

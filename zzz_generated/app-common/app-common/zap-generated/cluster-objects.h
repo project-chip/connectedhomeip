@@ -15761,11 +15761,8 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace AdministratorCommissioning
 namespace OperationalCredentials {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for NodeOperationalCertStatus
-enum class NodeOperationalCertStatus : uint8_t
+// Enum for OperationalCertStatus
+enum class OperationalCertStatus : uint8_t
 {
     kSuccess               = 0x00,
     kInvalidPublicKey      = 0x01,
@@ -15778,9 +15775,6 @@ enum class NodeOperationalCertStatus : uint8_t
     kLabelConflict         = 0x0A,
     kInvalidFabricIndex    = 0x0B,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using NodeOperationalCertStatus       = EmberAfNodeOperationalCertStatus;
-#endif
 
 namespace Structs {
 namespace FabricDescriptor {
@@ -16210,9 +16204,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::NOCResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
-    uint8_t statusCode  = static_cast<uint8_t>(0);
-    uint8_t fabricIndex = static_cast<uint8_t>(0);
-    chip::CharSpan debugText;
+    OperationalCertStatus statusCode = static_cast<OperationalCertStatus>(0);
+    Optional<uint8_t> fabricIndex;
+    Optional<chip::CharSpan> debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -16227,9 +16221,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::NOCResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
-    uint8_t statusCode  = static_cast<uint8_t>(0);
-    uint8_t fabricIndex = static_cast<uint8_t>(0);
-    chip::CharSpan debugText;
+    OperationalCertStatus statusCode = static_cast<OperationalCertStatus>(0);
+    Optional<uint8_t> fabricIndex;
+    Optional<chip::CharSpan> debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace NOCResponse
