@@ -46,6 +46,7 @@
 #endif
 
 #include <app/AttributeAccessInterface.h>
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
@@ -53,6 +54,7 @@
 #include <lib/support/ThreadOperationalDataset.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -73,12 +75,19 @@ extern "C" void otAppCliInit(otInstance * aInstance);
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
+using namespace chip::DeviceLayer::NetworkCommissioning;
 
 using chip::Inet::IPPrefix;
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
+
+// Network commissioning
+namespace {
+NetworkCommissioning::GenericThreadDriver sGenericThreadDriver;
+Clusters::NetworkCommissioning::Instance sThreadNetworkCommissioningInstance(0 /* Endpoint Id */, &sGenericThreadDriver);
+} // namespace
 
 // Fully instantiate the generic implementation class in whatever compilation unit includes this file.
 template class GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>;
@@ -282,6 +291,27 @@ bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_IsThreadProvisioned(v
 }
 
 template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetThreadProvision(ByteSpan & netInfo)
+{
+    VerifyOrReturnError(Impl()->IsThreadProvisioned(), CHIP_ERROR_INCORRECT_STATE);
+    otOperationalDatasetTlvs datasetTlv;
+
+    Impl()->LockThreadStack();
+    otError otErr = otDatasetGetActiveTlvs(mOTInst, &datasetTlv);
+    Impl()->UnlockThreadStack();
+    if (otErr != OT_ERROR_NONE)
+    {
+        return MapOpenThreadError(otErr);
+    }
+
+    assert(Thread::kSizeOperationalDataset <= netInfo.size());
+    //memcpy(tlvs.mTlvs, netInfo.data(), netInfo.size());
+    netInfo = ByteSpan(datasetTlv.mTlvs, datasetTlv.mLength);
+
+    return CHIP_NO_ERROR;
+}
+
+template <class ImplClass>
 bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_IsThreadAttached(void)
 {
     otDeviceRole curRole;
@@ -291,6 +321,30 @@ bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_IsThreadAttached(void
     Impl()->UnlockThreadStack();
 
     return (curRole != OT_DEVICE_ROLE_DISABLED && curRole != OT_DEVICE_ROLE_DETACHED);
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AttachToThreadNetwork(ByteSpan netInfo,
+                                              NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback)
+{
+    // There is another ongoing connect request, reject the new one.
+    VerifyOrReturnError(mpConnectCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(Impl()->SetThreadEnabled(false));
+    ReturnErrorOnFailure(Impl()->SetThreadProvision(netInfo));
+    ReturnErrorOnFailure(Impl()->SetThreadEnabled(true));
+    mpConnectCallback = callback;
+    return CHIP_NO_ERROR;
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_StartThreadScan(ThreadDriver::ScanCallback * callback)
+{
+    // TODO
+    // There is another ongoing scan request, reject the new one.
+    VerifyOrReturnError(mpScanCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    mpScanCallback = callback;
+    //openthread_io_openthread_border_router_call_scan(mProxy.get(), nullptr, _OnNetworkScanFinished, this);
+    return CHIP_NO_ERROR;
 }
 
 template <class ImplClass>
@@ -1508,6 +1562,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
 
         ChipLogProgress(DeviceLayer, "OpenThread ifconfig up and thread start");
     }
+
+    sThreadNetworkCommissioningInstance.Init();
 
 exit:
     ChipLogProgress(DeviceLayer, "OpenThread started: %s", otThreadErrorToString(otErr));
