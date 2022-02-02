@@ -41,7 +41,7 @@ class App:
             self.process = None
             process, outpipe, errpipe = self.__startServer(
                 self.runner, self.command, discriminator)
-            self.__waitForServerReady(outpipe)
+            self.__waitForServerReady(process, outpipe)
             self.__updateSetUpCode(outpipe)
             self.process = process
             self.stopped = False
@@ -85,11 +85,15 @@ class App:
         app_cmd = command + ['--discriminator', str(discriminator)]
         return runner.RunSubprocess(app_cmd, name='APP ', wait=False)
 
-    def __waitForServerReady(self, outpipe):
+    def __waitForServerReady(self, server_process, outpipe):
         logging.debug('Waiting for server to listen.')
         start_time = time.time()
         server_is_listening = outpipe.CapturedLogContains("Server Listening")
         while not server_is_listening:
+            if server_process.poll() is not None:
+                died_str = 'Server died during startup, returncode %d' % server_process.returncode
+                logging.error(died_str)
+                raise Exception(died_str)
             if time.time() - start_time > 10:
                 raise Exception('Timeout for server listening')
             time.sleep(0.1)
