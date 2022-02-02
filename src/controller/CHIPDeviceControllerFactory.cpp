@@ -210,6 +210,11 @@ CHIP_ERROR DeviceControllerFactory::ServiceEvents()
 
 DeviceControllerFactory::~DeviceControllerFactory()
 {
+    Shutdown();
+}
+
+CHIP_ERROR DeviceControllerFactory::Shutdown()
+{
     if (mSystemState != nullptr)
     {
         mSystemState->Release();
@@ -217,7 +222,9 @@ DeviceControllerFactory::~DeviceControllerFactory()
         mSystemState = nullptr;
     }
     mFabricStorage = nullptr;
+    return CHIP_NO_ERROR;
 }
+
 
 CHIP_ERROR DeviceControllerSystemState::Shutdown()
 {
