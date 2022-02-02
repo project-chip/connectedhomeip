@@ -1610,6 +1610,7 @@ void AttributeReadFailure(void * context, CHIP_ERROR status)
     commissioner->CommissioningStageComplete(status);
 }
 
+// AttributeCache::Callback impl
 void DeviceCommissioner::OnDone()
 {
     NetworkClusters clusters;
@@ -1623,11 +1624,9 @@ void DeviceCommissioner::OnDone()
             TLV::TLVReader reader;
             if (this->mAttributeCache->Get(path, reader) == CHIP_NO_ERROR)
             {
-                uint32_t flags = 0;
                 BitFlags<app::Clusters::NetworkCommissioning::NetworkCommissioningFeature> features;
-                if (app::DataModel::Decode(reader, flags) == CHIP_NO_ERROR)
+                if (app::DataModel::Decode(reader, features) == CHIP_NO_ERROR)
                 {
-                    features.SetRaw(flags);
                     if (features.Has(app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kWiFiNetworkInterface))
                     {
                         clusters.wifi = path.mEndpointId;
@@ -1645,7 +1644,14 @@ void DeviceCommissioner::OnDone()
                     else
                     {
                         // TODO: Gross workaround for the empty feature map on all clusters. Remove.
-                        clusters.thread = path.mEndpointId;
+                        if (clusters.thread == kInvalidEndpointId)
+                        {
+                            clusters.thread = path.mEndpointId;
+                        }
+                        if (clusters.wifi == kInvalidEndpointId)
+                        {
+                            clusters.wifi = path.mEndpointId;
+                        }
                     }
                 }
             }
@@ -1656,6 +1662,8 @@ void DeviceCommissioner::OnDone()
     {
         ChipLogError(Controller, "Error parsing Network commissioning features");
     }
+    mAttributeCache = nullptr;
+    mReadClient     = nullptr;
     CommissioningDelegate::CommissioningReport report;
     report.Set<NetworkClusters>(clusters);
     CommissioningStageComplete(err, report);
@@ -1769,16 +1777,18 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         {
             readParams.mTimeout = timeout.Value();
         }
-        mAttributeCache = Platform::MakeUnique<app::AttributeCache>(*this);
-        mReadClient     = chip::Platform::MakeUnique<app::ReadClient>(
-            engine, proxy->GetExchangeManager(), mAttributeCache->GetBufferedCallback(), app::ReadClient::InteractionType::Read);
-        CHIP_ERROR err = mReadClient->SendRequest(readParams);
+        auto attributeCache = Platform::MakeUnique<app::AttributeCache>(*this);
+        auto readClient     = chip::Platform::MakeUnique<app::ReadClient>(
+            engine, proxy->GetExchangeManager(), attributeCache->GetBufferedCallback(), app::ReadClient::InteractionType::Read);
+        CHIP_ERROR err = readClient->SendRequest(readParams);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "Failed to send read request for networking clusters");
             CommissioningStageComplete(err);
             return;
         }
+        mAttributeCache = std::move(attributeCache);
+        mReadClient     = std::move(readClient);
         return;
     }
     break;

@@ -679,7 +679,7 @@ public:
 
     void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
 
-    // ReadClient::Callback impl
+    // AttributeCache::Callback impl
     void OnDone() override;
 
 private:
