@@ -231,7 +231,6 @@ tests:
       response:
           error: NOT_FOUND
 
-
     - label: "Add Group 1 (new)"
       cluster: "Groups"
       command: "AddGroup"
