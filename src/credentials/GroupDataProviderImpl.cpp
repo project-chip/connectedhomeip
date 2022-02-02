@@ -77,10 +77,13 @@ struct PersistentData
         // Load the serialized data
         uint16_t size  = static_cast<uint16_t>(sizeof(buffer));
         CHIP_ERROR err = storage.SyncGetKeyValue(key.KeyName(), buffer, size);
-        if(CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND == err) { err = CHIP_ERROR_NOT_FOUND; };
+        if (CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND == err)
+        {
+            err = CHIP_ERROR_NOT_FOUND;
+        };
         // VerifyOrReturnError(CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND != err, CHIP_ERROR_NOT_FOUND);
         // ReturnErrorOnFailure(err);
-        if(CHIP_NO_ERROR == err)
+        if (CHIP_NO_ERROR == err)
         {
             // Decode serialized data
             TLV::TLVReader reader;
@@ -102,19 +105,15 @@ struct PersistentData
         return err;
     }
 
-// DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG
+    // DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG
     char mDebug[514];
-    const char *ToString()
+    const char * ToString()
     {
         Format();
         return mDebug;
     }
-    virtual void Format()
-    {
-        strncpy(mDebug, "?", sizeof(mDebug));
-    }
-// DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG
-
+    virtual void Format() { strncpy(mDebug, "?", sizeof(mDebug)); }
+    // DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG
 };
 
 struct LinkedData : public PersistentData<kPersistentBufferMax>
@@ -142,10 +141,7 @@ struct FabricList : public PersistentData<kPersistentBufferMax>
     FabricList() = default;
     FabricList(chip::FabricIndex first) : first_fabric(first), fabric_count(1) {}
 
-    void Format() override
-    {
-        snprintf(mDebug, sizeof(mDebug), "[fabric_list] *fabric:%u/%u", first_fabric, fabric_count);
-    }
+    void Format() override { snprintf(mDebug, sizeof(mDebug), "[fabric_list] *fabric:%u/%u", first_fabric, fabric_count); }
 
     CHIP_ERROR UpdateKey(DefaultStorageKeyAllocator & key) override
     {
@@ -213,7 +209,8 @@ struct FabricData : public PersistentData<kPersistentBufferMax>
 
     void Format() override
     {
-        snprintf(mDebug, sizeof(mDebug), "[fabric:%u] *group:#%x/%u, *map:%u/%u, *keys:#%x/%u next:%u", fabric_index, first_group, group_count, first_map, map_count, first_keyset, keyset_count, next);
+        snprintf(mDebug, sizeof(mDebug), "[fabric:%u] *group:#%x/%u, *map:%u/%u, *keys:#%x/%u next:%u", fabric_index, first_group,
+                 group_count, first_map, map_count, first_keyset, keyset_count, next);
     }
 
     CHIP_ERROR UpdateKey(DefaultStorageKeyAllocator & key) override
@@ -416,7 +413,8 @@ struct GroupData : public GroupDataProvider::GroupInfo, PersistentData<kPersiste
 
     void Format() override
     {
-        snprintf(mDebug, sizeof(mDebug), "[group:%u.%u #%x '%s'] *end:#%x/%u (#%x..#%x)", fabric_index, index, group_id, name, first_endpoint, endpoint_count, prev, next);
+        snprintf(mDebug, sizeof(mDebug), "[group:%u.%u #%x '%s'] *end:#%x/%u (#%x..#%x)", fabric_index, index, group_id, name,
+                 first_endpoint, endpoint_count, prev, next);
     }
 
     CHIP_ERROR UpdateKey(DefaultStorageKeyAllocator & key) override
@@ -544,7 +542,8 @@ struct KeyMapData : public GroupDataProvider::GroupKey, LinkedData
 
     void Format() override
     {
-        snprintf(mDebug, sizeof(mDebug), "[group-keyset] fabric:%u, group:#%x, keyset:#%x (#%x..#%x)", fabric_index, group_id, keyset_id, prev, next);
+        snprintf(mDebug, sizeof(mDebug), "[group-keyset] fabric:%u, group:#%x, keyset:#%x (#%x..#%x)", fabric_index, group_id,
+                 keyset_id, prev, next);
     }
 
     CHIP_ERROR UpdateKey(DefaultStorageKeyAllocator & key) override
@@ -669,7 +668,8 @@ struct EndpointData : GroupDataProvider::GroupEndpoint, PersistentData<kPersiste
 
     void Format() override
     {
-        snprintf(mDebug, sizeof(mDebug), "[group-end] fabric:%u, group:#%x, end:#%x (#%x..#%x)", fabric_index, group_id, endpoint_id, prev, next);
+        snprintf(mDebug, sizeof(mDebug), "[group-end] fabric:%u, group:#%x, end:#%x (#%x..#%x)", fabric_index, group_id,
+                 endpoint_id, prev, next);
     }
 
     CHIP_ERROR UpdateKey(DefaultStorageKeyAllocator & key) override
@@ -780,7 +780,6 @@ struct KeySetData : PersistentData<kPersistentBufferMax>
     {
         snprintf(mDebug, sizeof(mDebug), "[keyset:%u.#%x] num_keys:%u (#%x..#%x)", fabric_index, keyset_id, keys_count, prev, next);
     }
-
 
     CHIP_ERROR UpdateKey(DefaultStorageKeyAllocator & key) override
     {
@@ -1175,7 +1174,7 @@ CHIP_ERROR GroupDataProviderImpl::AddEndpoint(chip::FabricIndex fabric_index, ch
         ReturnErrorOnFailure(EndpointData(fabric_index, group_id, endpoint_id).Save(mStorage));
         // Save the new group into the fabric
         group.group_id       = group_id;
-        group.name[0] = 0;
+        group.name[0]        = 0;
         group.first_endpoint = endpoint_id;
         group.endpoint_count = 1;
         group.next           = fabric.first_group;
