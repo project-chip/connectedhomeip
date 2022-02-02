@@ -3359,30 +3359,6 @@ private:
         mComplex;
 };
 
-class WriteGroupKeyManagementGroupKeyMap : public WriteAttribute
-{
-public:
-    WriteGroupKeyManagementGroupKeyMap(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("GroupKeyMap", credsIssuerConfig), mComplex(&mValue)
-    {
-        AddArgument("attr-name", "group-key-map");
-        AddArgument("attr-value", &mComplex);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteGroupKeyManagementGroupKeyMap() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
-    {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000003F, 0x00000000, mValue);
-    }
-
-private:
-    chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::Type> mValue;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::Type>>
-        mComplex;
-};
-
 /*----------------------------------------------------------------------------*\
 | Cluster Groups                                                      | 0x0004 |
 |------------------------------------------------------------------------------|

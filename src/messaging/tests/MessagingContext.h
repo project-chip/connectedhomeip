@@ -151,7 +151,7 @@ private:
     NodeId mAliceNodeId     = 111222333;
     uint16_t mBobKeyId      = 1;
     uint16_t mAliceKeyId    = 2;
-    GroupId mFriendsGroupId = 0x1234;
+    GroupId mFriendsGroupId = 0x0101;
     Transport::PeerAddress mAliceAddress;
     Transport::PeerAddress mBobAddress;
     SecurePairingUsingTestSecret mPairingAliceToBob;
