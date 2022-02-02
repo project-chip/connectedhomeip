@@ -124,6 +124,9 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, CHIP_ERRO
 #endif
     proxy->OnNodeIdResolved(nodeData);
     proxy->Release();
+
+    // Allocated in OnDnsResolveResult(), must be freed here
+    free(result);
 }
 
 static void HandleNodeBrowse(void * context, DnssdService * services, size_t servicesSize, CHIP_ERROR error)
