@@ -265,6 +265,8 @@
 // This is an array of EmberAfCluster structures.
 #define ZAP_ATTRIBUTE_INDEX(index) (&generatedAttributes[index])
 
+#define ZAP_GENERATED_COMMANDS_INDEX(index) ((chip::CommandId *) (&generatedCommands[index]))
+
 // Cluster function static arrays
 #define GENERATED_FUNCTION_ARRAYS                                                                                                  \
     const EmberAfGenericClusterFunction chipFuncArrayBasicServer[] = {                                                             \
@@ -279,50 +281,185 @@
         (EmberAfGenericClusterFunction) MatterTimeFormatLocalizationClusterServerPreAttributeChangedCallback,                      \
     };
 
+// clang-format off
+#define GENERATED_COMMANDS { \
+  /* Endpoint: 0, Cluster: OTA Software Update Provider (client) */\
+  /*   client_generated */ \
+  0x00000000 /* QueryImage */, \
+  0x00000002 /* ApplyUpdateRequest */, \
+  0x00000004 /* NotifyUpdateApplied */, \
+  chip::kInvalidCommandId /* end of list */, \
+  /*   server_generated */ \
+  0x00000001 /* QueryImageResponse */, \
+  0x00000003 /* ApplyUpdateResponse */, \
+  chip::kInvalidCommandId /* end of list */, \
+  /* Endpoint: 0, Cluster: OTA Software Update Requestor (server) */\
+  /*   client_generated */ \
+  0x00000000 /* AnnounceOtaProvider */, \
+  chip::kInvalidCommandId /* end of list */, \
+  /* Endpoint: 0, Cluster: General Commissioning (server) */\
+  /*   client_generated */ \
+  0x00000000 /* ArmFailSafe */, \
+  0x00000002 /* SetRegulatoryConfig */, \
+  0x00000004 /* CommissioningComplete */, \
+  chip::kInvalidCommandId /* end of list */, \
+  /*   server_generated */ \
+  0x00000001 /* ArmFailSafeResponse */, \
+  0x00000005 /* CommissioningCompleteResponse */, \
+  chip::kInvalidCommandId /* end of list */, \
+  /* Endpoint: 0, Cluster: Network Commissioning (server) */\
+  /*   client_generated */ \
+  0x00000000 /* ScanNetworks */, \
+  0x00000002 /* AddOrUpdateWiFiNetwork */, \
+  0x00000003 /* AddOrUpdateThreadNetwork */, \
+  0x00000004 /* RemoveNetwork */, \
+  0x00000006 /* ConnectNetwork */, \
+  0x00000008 /* ReorderNetwork */, \
+  chip::kInvalidCommandId /* end of list */, \
+  /*   server_generated */ \
+  0x00000001 /* ScanNetworksResponse */, \
+  0x00000007 /* ConnectNetworkResponse */, \
+  chip::kInvalidCommandId /* end of list */, \
+  /* Endpoint: 0, Cluster: Operational Credentials (server) */\
+  /*   client_generated */ \
+  0x00000000 /* AttestationRequest */, \
+  0x00000002 /* CertificateChainRequest */, \
+  0x00000004 /* OpCSRRequest */, \
+  0x00000006 /* AddNOC */, \
+  0x00000007 /* UpdateNOC */, \
+  0x00000009 /* UpdateFabricLabel */, \
+  0x0000000A /* RemoveFabric */, \
+  0x0000000B /* AddTrustedRootCertificate */, \
+  0x0000000C /* RemoveTrustedRootCertificate */, \
+  chip::kInvalidCommandId /* end of list */, \
+  /*   server_generated */ \
+  0x00000001 /* AttestationResponse */, \
+  0x00000003 /* CertificateChainResponse */, \
+  0x00000005 /* OpCSRResponse */, \
+  0x00000008 /* NOCResponse */, \
+  chip::kInvalidCommandId /* end of list */, \
+}
+
+// clang-format on
+
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
 #define GENERATED_CLUSTER_COUNT 10
-#define GENERATED_CLUSTERS                                                                                                         \
-    {                                                                                                                              \
-        { 0x00000028,                                                                                                              \
-          ZAP_ATTRIBUTE_INDEX(0),                                                                                                  \
-          20,                                                                                                                      \
-          39,                                                                                                                      \
-          ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                              \
-          chipFuncArrayBasicServer }, /* Endpoint: 0, Cluster: Basic (server) */                                                   \
-            {                                                                                                                      \
-                0x00000029, ZAP_ATTRIBUTE_INDEX(20), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                          \
-            }, /* Endpoint: 0, Cluster: OTA Software Update Provider (client) */                                                   \
-            {                                                                                                                      \
-                0x0000002A, ZAP_ATTRIBUTE_INDEX(21), 5, 5, ZAP_CLUSTER_MASK(SERVER), NULL                                          \
-            }, /* Endpoint: 0, Cluster: OTA Software Update Requestor (server) */                                                  \
-            { 0x0000002B,                                                                                                          \
-              ZAP_ATTRIBUTE_INDEX(26),                                                                                             \
-              3,                                                                                                                   \
-              38,                                                                                                                  \
-              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION),       \
-              chipFuncArrayLocalizationConfigurationServer }, /* Endpoint: 0, Cluster: Localization Configuration (server) */      \
-            { 0x0000002C,                                                                                                          \
-              ZAP_ATTRIBUTE_INDEX(29),                                                                                             \
-              4,                                                                                                                   \
-              4,                                                                                                                   \
-              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION),       \
-              chipFuncArrayTimeFormatLocalizationServer }, /* Endpoint: 0, Cluster: Time Format Localization (server) */           \
-            {                                                                                                                      \
-                0x00000030, ZAP_ATTRIBUTE_INDEX(33), 6, 270, ZAP_CLUSTER_MASK(SERVER), NULL                                        \
-            }, /* Endpoint: 0, Cluster: General Commissioning (server) */                                                          \
-            {                                                                                                                      \
-                0x00000031, ZAP_ATTRIBUTE_INDEX(39), 10, 60, ZAP_CLUSTER_MASK(SERVER), NULL                                        \
-            }, /* Endpoint: 0, Cluster: Network Commissioning (server) */                                                          \
-            {                                                                                                                      \
-                0x0000003E, ZAP_ATTRIBUTE_INDEX(49), 7, 4, ZAP_CLUSTER_MASK(SERVER), NULL                                          \
-            }, /* Endpoint: 0, Cluster: Operational Credentials (server) */                                                        \
-            {                                                                                                                      \
-                0x00000040, ZAP_ATTRIBUTE_INDEX(56), 2, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                          \
-            }, /* Endpoint: 0, Cluster: Fixed Label (server) */                                                                    \
-            {                                                                                                                      \
-                0x00000041, ZAP_ATTRIBUTE_INDEX(58), 2, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                          \
-            }, /* Endpoint: 0, Cluster: User Label (server) */                                                                     \
-    }
+
+// clang-format off
+#define GENERATED_CLUSTERS { \
+  { \
+      /* Endpoint: 0, Cluster: Basic (server) */ \
+      .clusterId = 0x00000028,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
+      .attributeCount = 20, \
+      .clusterSize = 39, \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
+      .functions = chipFuncArrayBasicServer, \
+      .clientGeneratedCommandList = nullptr ,\
+      .serverGeneratedCommandList = nullptr ,\
+    },\
+  { \
+      /* Endpoint: 0, Cluster: OTA Software Update Provider (client) */ \
+      .clusterId = 0x00000029,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(20), \
+      .attributeCount = 1, \
+      .clusterSize = 2, \
+      .mask = ZAP_CLUSTER_MASK(CLIENT), \
+      .functions = NULL, \
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 0 ) ,\
+      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 4 ) ,\
+    },\
+  { \
+      /* Endpoint: 0, Cluster: OTA Software Update Requestor (server) */ \
+      .clusterId = 0x0000002A,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(21), \
+      .attributeCount = 5, \
+      .clusterSize = 5, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 7 ) ,\
+      .serverGeneratedCommandList = nullptr ,\
+    },\
+  { \
+      /* Endpoint: 0, Cluster: Localization Configuration (server) */ \
+      .clusterId = 0x0000002B,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(26), \
+      .attributeCount = 3, \
+      .clusterSize = 38, \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION), \
+      .functions = chipFuncArrayLocalizationConfigurationServer, \
+      .clientGeneratedCommandList = nullptr ,\
+      .serverGeneratedCommandList = nullptr ,\
+    },\
+  { \
+      /* Endpoint: 0, Cluster: Time Format Localization (server) */ \
+      .clusterId = 0x0000002C,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(29), \
+      .attributeCount = 4, \
+      .clusterSize = 4, \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION), \
+      .functions = chipFuncArrayTimeFormatLocalizationServer, \
+      .clientGeneratedCommandList = nullptr ,\
+      .serverGeneratedCommandList = nullptr ,\
+    },\
+  { \
+      /* Endpoint: 0, Cluster: General Commissioning (server) */ \
+      .clusterId = 0x00000030,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(33), \
+      .attributeCount = 6, \
+      .clusterSize = 270, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 9 ) ,\
+      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 13 ) ,\
+    },\
+  { \
+      /* Endpoint: 0, Cluster: Network Commissioning (server) */ \
+      .clusterId = 0x00000031,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(39), \
+      .attributeCount = 10, \
+      .clusterSize = 60, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 16 ) ,\
+      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 23 ) ,\
+    },\
+  { \
+      /* Endpoint: 0, Cluster: Operational Credentials (server) */ \
+      .clusterId = 0x0000003E,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(49), \
+      .attributeCount = 7, \
+      .clusterSize = 4, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
+      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 26 ) ,\
+      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 36 ) ,\
+    },\
+  { \
+      /* Endpoint: 0, Cluster: Fixed Label (server) */ \
+      .clusterId = 0x00000040,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(56), \
+      .attributeCount = 2, \
+      .clusterSize = 2, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
+      .clientGeneratedCommandList = nullptr ,\
+      .serverGeneratedCommandList = nullptr ,\
+    },\
+  { \
+      /* Endpoint: 0, Cluster: User Label (server) */ \
+      .clusterId = 0x00000041,  \
+      .attributes = ZAP_ATTRIBUTE_INDEX(58), \
+      .attributeCount = 2, \
+      .clusterSize = 2, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
+      .clientGeneratedCommandList = nullptr ,\
+      .serverGeneratedCommandList = nullptr ,\
+    },\
+}
+
+// clang-format on
 
 #define ZAP_CLUSTER_INDEX(index) (&generatedClusters[index])
 

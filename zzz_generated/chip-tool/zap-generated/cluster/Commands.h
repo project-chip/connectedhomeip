@@ -105,6 +105,8 @@
 | Attributes:                                                         |        |
 | * Acl                                                               | 0x0000 |
 | * Extension                                                         | 0x0001 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -170,6 +172,8 @@ private:
 | * LogoutRequest                                                     |   0x03 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -258,6 +262,8 @@ private:
 | * WindowStatus                                                      | 0x0000 |
 | * AdminFabricIndex                                                  | 0x0001 |
 | * AdminVendorId                                                     | 0x0002 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -354,6 +360,8 @@ private:
 | * ApplicationStatus                                                 | 0x0005 |
 | * ApplicationVersion                                                | 0x0006 |
 | * AllowedVendorList                                                 | 0x0007 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -393,6 +401,8 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * ApplicationLauncherList                                           | 0x0000 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -488,6 +498,8 @@ private:
 | Attributes:                                                         |        |
 | * AudioOutputList                                                   | 0x0000 |
 | * CurrentAudioOutput                                                | 0x0001 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -555,6 +567,8 @@ private:
 | * BarrierSafetyStatus                                               | 0x0002 |
 | * BarrierCapabilities                                               | 0x0003 |
 | * BarrierPosition                                                   | 0x000A |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -633,6 +647,8 @@ private:
 | * LocalConfigDisabled                                               | 0x0010 |
 | * Reachable                                                         | 0x0011 |
 | * UniqueID                                                          | 0x0012 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -716,6 +732,8 @@ private:
 | * OutOfService                                                      | 0x0051 |
 | * PresentValue                                                      | 0x0055 |
 | * StatusFlags                                                       | 0x006F |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -774,6 +792,8 @@ private:
 | * Unbind                                                            |   0x01 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -839,6 +859,8 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * StateValue                                                        | 0x0000 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -867,6 +889,8 @@ private:
 | * ActionList                                                        | 0x0000 |
 | * EndpointList                                                      | 0x0001 |
 | * SetupUrl                                                          | 0x0002 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -1193,7 +1217,8 @@ private:
 | * ProductLabel                                                      | 0x000E |
 | * SerialNumber                                                      | 0x000F |
 | * Reachable                                                         | 0x0011 |
-| * UniqueID                                                          | 0x0012 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -1231,6 +1256,8 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * ChannelList                                                       | 0x0000 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -1387,6 +1414,8 @@ private:
 | * ColorTempPhysicalMax                                              | 0x400C |
 | * CoupleColorTempToLevelMinMireds                                   | 0x400D |
 | * StartUpColorTemperatureMireds                                     | 0x4010 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -2199,6 +2228,8 @@ private:
 | Attributes:                                                         |        |
 | * AcceptHeaderList                                                  | 0x0000 |
 | * SupportedStreamingProtocols                                       | 0x0001 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -2292,6 +2323,8 @@ private:
 | * ServerList                                                        | 0x0001 |
 | * ClientList                                                        | 0x0002 |
 | * PartsList                                                         | 0x0003 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -2305,6 +2338,8 @@ private:
 | * RetrieveLogsRequest                                               |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -2378,6 +2413,8 @@ private:
 | * EnableOneTouchLocking                                             | 0x0029 |
 | * EnablePrivacyModeButton                                           | 0x002B |
 | * WrongCodeEntryLimit                                               | 0x0030 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -2940,6 +2977,8 @@ private:
 | * ActivePower                                                       | 0x050B |
 | * ActivePowerMin                                                    | 0x050C |
 | * ActivePowerMax                                                    | 0x050D |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -2962,6 +3001,8 @@ private:
 | * OverrunCount                                                      | 0x0006 |
 | * CarrierDetect                                                     | 0x0007 |
 | * TimeSinceReset                                                    | 0x0008 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -2999,6 +3040,8 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * LabelList                                                         | 0x0000 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -3015,6 +3058,8 @@ private:
 | * MinMeasuredValue                                                  | 0x0001 |
 | * MaxMeasuredValue                                                  | 0x0002 |
 | * Tolerance                                                         | 0x0003 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -3034,6 +3079,8 @@ private:
 | * BasicCommissioningInfoList                                        | 0x0001 |
 | * RegulatoryConfig                                                  | 0x0002 |
 | * LocationCapability                                                | 0x0003 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -3152,6 +3199,8 @@ private:
 | * ActiveHardwareFaults                                              | 0x0005 |
 | * ActiveRadioFaults                                                 | 0x0006 |
 | * ActiveNetworkFaults                                               | 0x0007 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -3176,6 +3225,8 @@ private:
 | * GroupTable                                                        | 0x0001 |
 | * MaxGroupsPerFabric                                                | 0x0002 |
 | * MaxGroupKeysPerFabric                                             | 0x0003 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -3292,6 +3343,8 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * NameSupport                                                       | 0x0000 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -3451,6 +3504,8 @@ private:
 | Attributes:                                                         |        |
 | * IdentifyTime                                                      | 0x0000 |
 | * IdentifyType                                                      | 0x0001 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -3558,6 +3613,8 @@ private:
 | * MaxMeasuredValue                                                  | 0x0002 |
 | * Tolerance                                                         | 0x0003 |
 | * LightSensorType                                                   | 0x0004 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -3571,6 +3628,8 @@ private:
 | * SendKeyRequest                                                    |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -3628,6 +3687,8 @@ private:
 | * OffTransitionTime                                                 | 0x0013 |
 | * DefaultMoveRate                                                   | 0x0014 |
 | * StartUpCurrentLevel                                               | 0x4000 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -3994,6 +4055,8 @@ private:
 | Attributes:                                                         |        |
 | * ActiveLocale                                                      | 0x0001 |
 | * SupportedLocales                                                  | 0x0002 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -4028,6 +4091,8 @@ private:
 | * Sleep                                                             |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -4068,6 +4133,8 @@ private:
 | Attributes:                                                         |        |
 | * MediaInputList                                                    | 0x0000 |
 | * CurrentMediaInput                                                 | 0x0001 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -4192,6 +4259,8 @@ private:
 | * PlaybackSpeed                                                     | 0x0004 |
 | * SeekRangeEnd                                                      | 0x0005 |
 | * SeekRangeStart                                                    | 0x0006 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -4460,6 +4529,8 @@ private:
 | * OnMode                                                            | 0x0002 |
 | * StartUpMode                                                       | 0x0003 |
 | * Description                                                       | 0x0004 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -4530,6 +4601,8 @@ private:
 | * LastNetworkingStatus                                              | 0x0005 |
 | * LastNetworkID                                                     | 0x0006 |
 | * LastConnectErrorValue                                             | 0x0007 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -4890,6 +4963,8 @@ private:
 | * Occupancy                                                         | 0x0000 |
 | * OccupancySensorType                                               | 0x0001 |
 | * OccupancySensorTypeBitmap                                         | 0x0002 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -4913,6 +4988,8 @@ private:
 | * OnTime                                                            | 0x4001 |
 | * OffWaitTime                                                       | 0x4002 |
 | * StartUpOnOff                                                      | 0x4003 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -5129,6 +5206,8 @@ private:
 | Attributes:                                                         |        |
 | * SwitchType                                                        | 0x0000 |
 | * SwitchActions                                                     | 0x0010 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -5178,6 +5257,8 @@ private:
 | * CommissionedFabrics                                               | 0x0003 |
 | * TrustedRootCertificates                                           | 0x0004 |
 | * CurrentFabricIndex                                                | 0x0005 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -5418,6 +5499,8 @@ private:
 | * BatteryChargeLevel                                                | 0x000E |
 | * ActiveBatteryFaults                                               | 0x0012 |
 | * BatteryChargeState                                                | 0x001A |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -5432,6 +5515,8 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Sources                                                           | 0x0000 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -5483,6 +5568,8 @@ private:
 | * OperationMode                                                     | 0x0020 |
 | * ControlMode                                                       | 0x0021 |
 | * AlarmMask                                                         | 0x0022 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -5605,6 +5692,8 @@ private:
 | * MinMeasuredValue                                                  | 0x0001 |
 | * MaxMeasuredValue                                                  | 0x0002 |
 | * Tolerance                                                         | 0x0003 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -5629,6 +5718,8 @@ private:
 | * CurrentGroup                                                      | 0x0002 |
 | * SceneValid                                                        | 0x0003 |
 | * NameSupport                                                       | 0x0004 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -5820,6 +5911,8 @@ private:
 | * CurrentHeapFree                                                   | 0x0001 |
 | * CurrentHeapUsed                                                   | 0x0002 |
 | * CurrentHeapHighWatermark                                          | 0x0003 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -5860,6 +5953,8 @@ private:
 | * NumberOfPositions                                                 | 0x0000 |
 | * CurrentPosition                                                   | 0x0001 |
 | * MultiPressMax                                                     | 0x0002 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -5883,6 +5978,8 @@ private:
 | Attributes:                                                         |        |
 | * TargetNavigatorList                                               | 0x0000 |
 | * CurrentNavigatorTarget                                            | 0x0001 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -6034,6 +6131,8 @@ private:
 | * NullableRangeRestrictedInt8s                                      | 0x8027 |
 | * NullableRangeRestrictedInt16u                                     | 0x8028 |
 | * NullableRangeRestrictedInt16s                                     | 0x8029 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -8557,6 +8656,8 @@ private:
 | * TemperatureDisplayMode                                            | 0x0000 |
 | * KeypadLockout                                                     | 0x0001 |
 | * ScheduleProgrammingVisibility                                     | 0x0002 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -8699,6 +8800,8 @@ private:
 | * ChannelMask                                                       | 0x003C |
 | * OperationalDatasetComponents                                      | 0x003D |
 | * ActiveNetworkFaultsList                                           | 0x003E |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -8739,6 +8842,8 @@ private:
 | * HourFormat                                                        | 0x0000 |
 | * ActiveCalendarType                                                | 0x0001 |
 | * SupportedCalendarTypes                                            | 0x0002 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -8831,6 +8936,8 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * LabelList                                                         | 0x0000 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -8866,6 +8973,8 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * WakeOnLanMacAddress                                               | 0x0000 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -8892,6 +9001,8 @@ private:
 | * PacketUnicastTxCount                                              | 0x000A |
 | * CurrentMaxRate                                                    | 0x000B |
 | * OverrunCount                                                      | 0x000C |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -8956,6 +9067,8 @@ private:
 | * InstalledClosedLimitTilt                                          | 0x0013 |
 | * Mode                                                              | 0x0017 |
 | * SafetyStatus                                                      | 0x001A |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -9165,17 +9278,25 @@ void registerClusterAccessControl(Commands & commands, CredentialIssuerCommands 
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                           //
-        make_unique<ReadAttribute>(Id, "acl", Attributes::Acl::Id, credsIssuerConfig),                               //
-        make_unique<ReadAttribute>(Id, "extension", Attributes::Extension::Id, credsIssuerConfig),                   //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),      //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                          //
-        make_unique<WriteAccessControlAcl>(credsIssuerConfig),                                                       //
-        make_unique<WriteAccessControlExtension>(credsIssuerConfig),                                                 //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                      //
-        make_unique<SubscribeAttribute>(Id, "acl", Attributes::Acl::Id, credsIssuerConfig),                          //
-        make_unique<SubscribeAttribute>(Id, "extension", Attributes::Extension::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                         //
+        make_unique<ReadAttribute>(Id, "acl", Attributes::Acl::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "extension", Attributes::Extension::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                          //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                     //
+        make_unique<WriteAccessControlAcl>(credsIssuerConfig),                                                  //
+        make_unique<WriteAccessControlExtension>(credsIssuerConfig),                                            //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                 //
+        make_unique<SubscribeAttribute>(Id, "acl", Attributes::Acl::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "extension", Attributes::Extension::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
@@ -9211,11 +9332,19 @@ void registerClusterAccountLogin(Commands & commands, CredentialIssuerCommands *
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                           //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),      //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                          //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                      //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                          //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                     //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                 //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
@@ -9244,10 +9373,14 @@ void registerClusterAdministratorCommissioning(Commands & commands, CredentialIs
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                              //
-        make_unique<ReadAttribute>(Id, "window-status", Attributes::WindowStatus::Id, credsIssuerConfig),               //
-        make_unique<ReadAttribute>(Id, "admin-fabric-index", Attributes::AdminFabricIndex::Id, credsIssuerConfig),      //
-        make_unique<ReadAttribute>(Id, "admin-vendor-id", Attributes::AdminVendorId::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                         //
+        make_unique<ReadAttribute>(Id, "window-status", Attributes::WindowStatus::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, "admin-fabric-index", Attributes::AdminFabricIndex::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "admin-vendor-id", Attributes::AdminVendorId::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                                  //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),             //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),         //
         make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                             //
@@ -9255,8 +9388,12 @@ void registerClusterAdministratorCommissioning(Commands & commands, CredentialIs
         make_unique<SubscribeAttribute>(Id, "window-status", Attributes::WindowStatus::Id, credsIssuerConfig),          //
         make_unique<SubscribeAttribute>(Id, "admin-fabric-index", Attributes::AdminFabricIndex::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "admin-vendor-id", Attributes::AdminVendorId::Id, credsIssuerConfig),       //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),        //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),    //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
         // Events
         //
@@ -9280,15 +9417,19 @@ void registerClusterApplicationBasic(Commands & commands, CredentialIssuerComman
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<ReadAttribute>(Id, "vendor-name", Attributes::VendorName::Id, credsIssuerConfig),                      //
-        make_unique<ReadAttribute>(Id, "vendor-id", Attributes::VendorId::Id, credsIssuerConfig),                          //
-        make_unique<ReadAttribute>(Id, "application-name", Attributes::ApplicationName::Id, credsIssuerConfig),            //
-        make_unique<ReadAttribute>(Id, "product-id", Attributes::ProductId::Id, credsIssuerConfig),                        //
-        make_unique<ReadAttribute>(Id, "application-app", Attributes::ApplicationApp::Id, credsIssuerConfig),              //
-        make_unique<ReadAttribute>(Id, "application-status", Attributes::ApplicationStatus::Id, credsIssuerConfig),        //
-        make_unique<ReadAttribute>(Id, "application-version", Attributes::ApplicationVersion::Id, credsIssuerConfig),      //
-        make_unique<ReadAttribute>(Id, "allowed-vendor-list", Attributes::AllowedVendorList::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                            //
+        make_unique<ReadAttribute>(Id, "vendor-name", Attributes::VendorName::Id, credsIssuerConfig),                 //
+        make_unique<ReadAttribute>(Id, "vendor-id", Attributes::VendorId::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "application-name", Attributes::ApplicationName::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "product-id", Attributes::ProductId::Id, credsIssuerConfig),                   //
+        make_unique<ReadAttribute>(Id, "application-app", Attributes::ApplicationApp::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "application-status", Attributes::ApplicationStatus::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "application-version", Attributes::ApplicationVersion::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "allowed-vendor-list", Attributes::AllowedVendorList::Id, credsIssuerConfig),  //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                                     //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                //
@@ -9302,8 +9443,12 @@ void registerClusterApplicationBasic(Commands & commands, CredentialIssuerComman
         make_unique<SubscribeAttribute>(Id, "application-status", Attributes::ApplicationStatus::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "application-version", Attributes::ApplicationVersion::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "allowed-vendor-list", Attributes::AllowedVendorList::Id, credsIssuerConfig),  //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),           //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
         // Events
         //
@@ -9332,11 +9477,19 @@ void registerClusterApplicationLauncher(Commands & commands, CredentialIssuerCom
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                       //
         make_unique<ReadAttribute>(Id, "application-launcher-list", Attributes::ApplicationLauncherList::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                      //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                  //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                      //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                  //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                          //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                     //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                 //
         make_unique<SubscribeAttribute>(Id, "application-launcher-list", Attributes::ApplicationLauncherList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
                                         credsIssuerConfig),                                                          //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
@@ -9365,17 +9518,25 @@ void registerClusterAudioOutput(Commands & commands, CredentialIssuerCommands * 
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                  //
-        make_unique<ReadAttribute>(Id, "audio-output-list", Attributes::AudioOutputList::Id, credsIssuerConfig),            //
-        make_unique<ReadAttribute>(Id, "current-audio-output", Attributes::CurrentAudioOutput::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                             //
+        make_unique<ReadAttribute>(Id, "audio-output-list", Attributes::AudioOutputList::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "current-audio-output", Attributes::CurrentAudioOutput::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                                      //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                 //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),             //
         make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                             //
         make_unique<SubscribeAttribute>(Id, "audio-output-list", Attributes::AudioOutputList::Id, credsIssuerConfig),       //
         make_unique<SubscribeAttribute>(Id, "current-audio-output", Attributes::CurrentAudioOutput::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),            //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
         // Events
         //
@@ -9401,11 +9562,15 @@ void registerClusterBarrierControl(Commands & commands, CredentialIssuerCommands
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                    //
-        make_unique<ReadAttribute>(Id, "barrier-moving-state", Attributes::BarrierMovingState::Id, credsIssuerConfig),        //
-        make_unique<ReadAttribute>(Id, "barrier-safety-status", Attributes::BarrierSafetyStatus::Id, credsIssuerConfig),      //
-        make_unique<ReadAttribute>(Id, "barrier-capabilities", Attributes::BarrierCapabilities::Id, credsIssuerConfig),       //
-        make_unique<ReadAttribute>(Id, "barrier-position", Attributes::BarrierPosition::Id, credsIssuerConfig),               //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                               //
+        make_unique<ReadAttribute>(Id, "barrier-moving-state", Attributes::BarrierMovingState::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "barrier-safety-status", Attributes::BarrierSafetyStatus::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "barrier-capabilities", Attributes::BarrierCapabilities::Id, credsIssuerConfig),  //
+        make_unique<ReadAttribute>(Id, "barrier-position", Attributes::BarrierPosition::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                                        //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                   //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),               //
         make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                   //
@@ -9414,8 +9579,12 @@ void registerClusterBarrierControl(Commands & commands, CredentialIssuerCommands
         make_unique<SubscribeAttribute>(Id, "barrier-safety-status", Attributes::BarrierSafetyStatus::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "barrier-capabilities", Attributes::BarrierCapabilities::Id, credsIssuerConfig),  //
         make_unique<SubscribeAttribute>(Id, "barrier-position", Attributes::BarrierPosition::Id, credsIssuerConfig),          //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),              //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
         // Events
         //
@@ -9439,26 +9608,30 @@ void registerClusterBasic(Commands & commands, CredentialIssuerCommands * credsI
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
-        make_unique<ReadAttribute>(Id, "data-model-revision", Attributes::DataModelRevision::Id, credsIssuerConfig),              //
-        make_unique<ReadAttribute>(Id, "vendor-name", Attributes::VendorName::Id, credsIssuerConfig),                             //
-        make_unique<ReadAttribute>(Id, "vendor-id", Attributes::VendorID::Id, credsIssuerConfig),                                 //
-        make_unique<ReadAttribute>(Id, "product-name", Attributes::ProductName::Id, credsIssuerConfig),                           //
-        make_unique<ReadAttribute>(Id, "product-id", Attributes::ProductID::Id, credsIssuerConfig),                               //
-        make_unique<ReadAttribute>(Id, "node-label", Attributes::NodeLabel::Id, credsIssuerConfig),                               //
-        make_unique<ReadAttribute>(Id, "location", Attributes::Location::Id, credsIssuerConfig),                                  //
-        make_unique<ReadAttribute>(Id, "hardware-version", Attributes::HardwareVersion::Id, credsIssuerConfig),                   //
-        make_unique<ReadAttribute>(Id, "hardware-version-string", Attributes::HardwareVersionString::Id, credsIssuerConfig),      //
-        make_unique<ReadAttribute>(Id, "software-version", Attributes::SoftwareVersion::Id, credsIssuerConfig),                   //
-        make_unique<ReadAttribute>(Id, "software-version-string", Attributes::SoftwareVersionString::Id, credsIssuerConfig),      //
-        make_unique<ReadAttribute>(Id, "manufacturing-date", Attributes::ManufacturingDate::Id, credsIssuerConfig),               //
-        make_unique<ReadAttribute>(Id, "part-number", Attributes::PartNumber::Id, credsIssuerConfig),                             //
-        make_unique<ReadAttribute>(Id, "product-url", Attributes::ProductURL::Id, credsIssuerConfig),                             //
-        make_unique<ReadAttribute>(Id, "product-label", Attributes::ProductLabel::Id, credsIssuerConfig),                         //
-        make_unique<ReadAttribute>(Id, "serial-number", Attributes::SerialNumber::Id, credsIssuerConfig),                         //
-        make_unique<ReadAttribute>(Id, "local-config-disabled", Attributes::LocalConfigDisabled::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "reachable", Attributes::Reachable::Id, credsIssuerConfig),                                //
-        make_unique<ReadAttribute>(Id, "unique-id", Attributes::UniqueID::Id, credsIssuerConfig),                                 //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                   //
+        make_unique<ReadAttribute>(Id, "data-model-revision", Attributes::DataModelRevision::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "vendor-name", Attributes::VendorName::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "vendor-id", Attributes::VendorID::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "product-name", Attributes::ProductName::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "product-id", Attributes::ProductID::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "node-label", Attributes::NodeLabel::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "location", Attributes::Location::Id, credsIssuerConfig),                             //
+        make_unique<ReadAttribute>(Id, "hardware-version", Attributes::HardwareVersion::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "hardware-version-string", Attributes::HardwareVersionString::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "software-version", Attributes::SoftwareVersion::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "software-version-string", Attributes::SoftwareVersionString::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "manufacturing-date", Attributes::ManufacturingDate::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, "part-number", Attributes::PartNumber::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "product-url", Attributes::ProductURL::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "product-label", Attributes::ProductLabel::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "serial-number", Attributes::SerialNumber::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "local-config-disabled", Attributes::LocalConfigDisabled::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "reachable", Attributes::Reachable::Id, credsIssuerConfig),                           //
+        make_unique<ReadAttribute>(Id, "unique-id", Attributes::UniqueID::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                                            //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                       //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                   //
         make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                       //
@@ -9485,8 +9658,12 @@ void registerClusterBasic(Commands & commands, CredentialIssuerCommands * credsI
         make_unique<SubscribeAttribute>(Id, "local-config-disabled", Attributes::LocalConfigDisabled::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "reachable", Attributes::Reachable::Id, credsIssuerConfig),                           //
         make_unique<SubscribeAttribute>(Id, "unique-id", Attributes::UniqueID::Id, credsIssuerConfig),                            //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
         // Events
         //
@@ -9518,19 +9695,27 @@ void registerClusterBinaryInputBasic(Commands & commands, CredentialIssuerComman
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                           //
-        make_unique<ReadAttribute>(Id, "out-of-service", Attributes::OutOfService::Id, credsIssuerConfig),           //
-        make_unique<ReadAttribute>(Id, "present-value", Attributes::PresentValue::Id, credsIssuerConfig),            //
-        make_unique<ReadAttribute>(Id, "status-flags", Attributes::StatusFlags::Id, credsIssuerConfig),              //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),      //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                          //
-        make_unique<WriteBinaryInputBasicOutOfService>(credsIssuerConfig),                                           //
-        make_unique<WriteBinaryInputBasicPresentValue>(credsIssuerConfig),                                           //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                      //
-        make_unique<SubscribeAttribute>(Id, "out-of-service", Attributes::OutOfService::Id, credsIssuerConfig),      //
-        make_unique<SubscribeAttribute>(Id, "present-value", Attributes::PresentValue::Id, credsIssuerConfig),       //
-        make_unique<SubscribeAttribute>(Id, "status-flags", Attributes::StatusFlags::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                 //
+        make_unique<ReadAttribute>(Id, "out-of-service", Attributes::OutOfService::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "present-value", Attributes::PresentValue::Id, credsIssuerConfig),  //
+        make_unique<ReadAttribute>(Id, "status-flags", Attributes::StatusFlags::Id, credsIssuerConfig),    //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                          //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                     //
+        make_unique<WriteBinaryInputBasicOutOfService>(credsIssuerConfig),                                      //
+        make_unique<WriteBinaryInputBasicPresentValue>(credsIssuerConfig),                                      //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                 //
+        make_unique<SubscribeAttribute>(Id, "out-of-service", Attributes::OutOfService::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "present-value", Attributes::PresentValue::Id, credsIssuerConfig),  //
+        make_unique<SubscribeAttribute>(Id, "status-flags", Attributes::StatusFlags::Id, credsIssuerConfig),    //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
@@ -9558,11 +9743,19 @@ void registerClusterBinding(Commands & commands, CredentialIssuerCommands * cred
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                           //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),      //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                          //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                      //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                          //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                     //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                 //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
@@ -9588,13 +9781,21 @@ void registerClusterBooleanState(Commands & commands, CredentialIssuerCommands *
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                           //
-        make_unique<ReadAttribute>(Id, "state-value", Attributes::StateValue::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),      //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                          //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                      //
-        make_unique<SubscribeAttribute>(Id, "state-value", Attributes::StateValue::Id, credsIssuerConfig),           //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                            //
+        make_unique<ReadAttribute>(Id, "state-value", Attributes::StateValue::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                          //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                     //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                 //
+        make_unique<SubscribeAttribute>(Id, "state-value", Attributes::StateValue::Id, credsIssuerConfig),      //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
@@ -9634,17 +9835,25 @@ void registerClusterBridgedActions(Commands & commands, CredentialIssuerCommands
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                           //
-        make_unique<ReadAttribute>(Id, "action-list", Attributes::ActionList::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "endpoint-list", Attributes::EndpointList::Id, credsIssuerConfig),            //
-        make_unique<ReadAttribute>(Id, "setup-url", Attributes::SetupUrl::Id, credsIssuerConfig),                    //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),      //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                          //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                      //
-        make_unique<SubscribeAttribute>(Id, "action-list", Attributes::ActionList::Id, credsIssuerConfig),           //
-        make_unique<SubscribeAttribute>(Id, "endpoint-list", Attributes::EndpointList::Id, credsIssuerConfig),       //
-        make_unique<SubscribeAttribute>(Id, "setup-url", Attributes::SetupUrl::Id, credsIssuerConfig),               //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                //
+        make_unique<ReadAttribute>(Id, "action-list", Attributes::ActionList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "endpoint-list", Attributes::EndpointList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "setup-url", Attributes::SetupUrl::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                          //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                     //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                 //
+        make_unique<SubscribeAttribute>(Id, "action-list", Attributes::ActionList::Id, credsIssuerConfig),      //
+        make_unique<SubscribeAttribute>(Id, "endpoint-list", Attributes::EndpointList::Id, credsIssuerConfig),  //
+        make_unique<SubscribeAttribute>(Id, "setup-url", Attributes::SetupUrl::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
@@ -9674,22 +9883,25 @@ void registerClusterBridgedDeviceBasic(Commands & commands, CredentialIssuerComm
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
-        make_unique<ReadAttribute>(Id, "vendor-name", Attributes::VendorName::Id, credsIssuerConfig),                             //
-        make_unique<ReadAttribute>(Id, "vendor-id", Attributes::VendorID::Id, credsIssuerConfig),                                 //
-        make_unique<ReadAttribute>(Id, "product-name", Attributes::ProductName::Id, credsIssuerConfig),                           //
-        make_unique<ReadAttribute>(Id, "node-label", Attributes::NodeLabel::Id, credsIssuerConfig),                               //
-        make_unique<ReadAttribute>(Id, "hardware-version", Attributes::HardwareVersion::Id, credsIssuerConfig),                   //
-        make_unique<ReadAttribute>(Id, "hardware-version-string", Attributes::HardwareVersionString::Id, credsIssuerConfig),      //
-        make_unique<ReadAttribute>(Id, "software-version", Attributes::SoftwareVersion::Id, credsIssuerConfig),                   //
-        make_unique<ReadAttribute>(Id, "software-version-string", Attributes::SoftwareVersionString::Id, credsIssuerConfig),      //
-        make_unique<ReadAttribute>(Id, "manufacturing-date", Attributes::ManufacturingDate::Id, credsIssuerConfig),               //
-        make_unique<ReadAttribute>(Id, "part-number", Attributes::PartNumber::Id, credsIssuerConfig),                             //
-        make_unique<ReadAttribute>(Id, "product-url", Attributes::ProductURL::Id, credsIssuerConfig),                             //
-        make_unique<ReadAttribute>(Id, "product-label", Attributes::ProductLabel::Id, credsIssuerConfig),                         //
-        make_unique<ReadAttribute>(Id, "serial-number", Attributes::SerialNumber::Id, credsIssuerConfig),                         //
-        make_unique<ReadAttribute>(Id, "reachable", Attributes::Reachable::Id, credsIssuerConfig),                                //
-        make_unique<ReadAttribute>(Id, "unique-id", Attributes::UniqueID::Id, credsIssuerConfig),                                 //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                   //
+        make_unique<ReadAttribute>(Id, "vendor-name", Attributes::VendorName::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "vendor-id", Attributes::VendorID::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "product-name", Attributes::ProductName::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "node-label", Attributes::NodeLabel::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "hardware-version", Attributes::HardwareVersion::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "hardware-version-string", Attributes::HardwareVersionString::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "software-version", Attributes::SoftwareVersion::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "software-version-string", Attributes::SoftwareVersionString::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "manufacturing-date", Attributes::ManufacturingDate::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, "part-number", Attributes::PartNumber::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "product-url", Attributes::ProductURL::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "product-label", Attributes::ProductLabel::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "serial-number", Attributes::SerialNumber::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "reachable", Attributes::Reachable::Id, credsIssuerConfig),                           //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                                            //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                       //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                   //
         make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                       //
@@ -9709,9 +9921,12 @@ void registerClusterBridgedDeviceBasic(Commands & commands, CredentialIssuerComm
         make_unique<SubscribeAttribute>(Id, "product-label", Attributes::ProductLabel::Id, credsIssuerConfig),                    //
         make_unique<SubscribeAttribute>(Id, "serial-number", Attributes::SerialNumber::Id, credsIssuerConfig),                    //
         make_unique<SubscribeAttribute>(Id, "reachable", Attributes::Reachable::Id, credsIssuerConfig),                           //
-        make_unique<SubscribeAttribute>(Id, "unique-id", Attributes::UniqueID::Id, credsIssuerConfig),                            //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
         // Events
         //
@@ -9738,13 +9953,21 @@ void registerClusterChannel(Commands & commands, CredentialIssuerCommands * cred
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                           //
-        make_unique<ReadAttribute>(Id, "channel-list", Attributes::ChannelList::Id, credsIssuerConfig),              //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),      //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                          //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                      //
-        make_unique<SubscribeAttribute>(Id, "channel-list", Attributes::ChannelList::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                              //
+        make_unique<ReadAttribute>(Id, "channel-list", Attributes::ChannelList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                          //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                     //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                 //
+        make_unique<SubscribeAttribute>(Id, "channel-list", Attributes::ChannelList::Id, credsIssuerConfig),    //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
@@ -9845,6 +10068,10 @@ void registerClusterColorControl(Commands & commands, CredentialIssuerCommands *
         make_unique<ReadAttribute>(Id, "couple-color-temp-to-level-min-mireds", Attributes::CoupleColorTempToLevelMinMireds::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "start-up-color-temperature-mireds", Attributes::StartUpColorTemperatureMireds::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
                                    credsIssuerConfig),                                                                          //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                     //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                 //
@@ -9918,6 +10145,10 @@ void registerClusterColorControl(Commands & commands, CredentialIssuerCommands *
         make_unique<SubscribeAttribute>(Id, "couple-color-temp-to-level-min-mireds",
                                         Attributes::CoupleColorTempToLevelMinMireds::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "start-up-color-temperature-mireds", Attributes::StartUpColorTemperatureMireds::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
                                         credsIssuerConfig),                                                          //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
@@ -9949,6 +10180,10 @@ void registerClusterContentLauncher(Commands & commands, CredentialIssuerCommand
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                         //
         make_unique<ReadAttribute>(Id, "accept-header-list", Attributes::AcceptHeaderList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "supported-streaming-protocols", Attributes::SupportedStreamingProtocols::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
                                    credsIssuerConfig),                                                                  //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),             //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),         //
@@ -9957,6 +10192,10 @@ void registerClusterContentLauncher(Commands & commands, CredentialIssuerCommand
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                         //
         make_unique<SubscribeAttribute>(Id, "accept-header-list", Attributes::AcceptHeaderList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "supported-streaming-protocols", Attributes::SupportedStreamingProtocols::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
                                         credsIssuerConfig),                                                          //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
@@ -9983,19 +10222,27 @@ void registerClusterDescriptor(Commands & commands, CredentialIssuerCommands * c
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                           //
-        make_unique<ReadAttribute>(Id, "device-list", Attributes::DeviceList::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "server-list", Attributes::ServerList::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "client-list", Attributes::ClientList::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "parts-list", Attributes::PartsList::Id, credsIssuerConfig),                  //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),      //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                          //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                      //
-        make_unique<SubscribeAttribute>(Id, "device-list", Attributes::DeviceList::Id, credsIssuerConfig),           //
-        make_unique<SubscribeAttribute>(Id, "server-list", Attributes::ServerList::Id, credsIssuerConfig),           //
-        make_unique<SubscribeAttribute>(Id, "client-list", Attributes::ClientList::Id, credsIssuerConfig),           //
-        make_unique<SubscribeAttribute>(Id, "parts-list", Attributes::PartsList::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                            //
+        make_unique<ReadAttribute>(Id, "device-list", Attributes::DeviceList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "server-list", Attributes::ServerList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-list", Attributes::ClientList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "parts-list", Attributes::PartsList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                          //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                     //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                 //
+        make_unique<SubscribeAttribute>(Id, "device-list", Attributes::DeviceList::Id, credsIssuerConfig),      //
+        make_unique<SubscribeAttribute>(Id, "server-list", Attributes::ServerList::Id, credsIssuerConfig),      //
+        make_unique<SubscribeAttribute>(Id, "client-list", Attributes::ClientList::Id, credsIssuerConfig),      //
+        make_unique<SubscribeAttribute>(Id, "parts-list", Attributes::PartsList::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
@@ -10022,10 +10269,18 @@ void registerClusterDiagnosticLogs(Commands & commands, CredentialIssuerCommands
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                       //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),      //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                      //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                  //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                      //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                 //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                             //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                      //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig), //
         //
         // Events
@@ -10092,21 +10347,25 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
         make_unique<ReadAttribute>(Id, "enable-one-touch-locking", Attributes::EnableOneTouchLocking::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "enable-privacy-mode-button", Attributes::EnablePrivacyModeButton::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "wrong-code-entry-limit", Attributes::WrongCodeEntryLimit::Id, credsIssuerConfig),         //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                       //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                   //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                       //
-        make_unique<WriteDoorLockLanguage>(credsIssuerConfig),                                                                    //
-        make_unique<WriteDoorLockAutoRelockTime>(credsIssuerConfig),                                                              //
-        make_unique<WriteDoorLockSoundVolume>(credsIssuerConfig),                                                                 //
-        make_unique<WriteDoorLockOperatingMode>(credsIssuerConfig),                                                               //
-        make_unique<WriteDoorLockEnableOneTouchLocking>(credsIssuerConfig),                                                       //
-        make_unique<WriteDoorLockEnablePrivacyModeButton>(credsIssuerConfig),                                                     //
-        make_unique<WriteDoorLockWrongCodeEntryLimit>(credsIssuerConfig),                                                         //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                   //
-        make_unique<SubscribeAttribute>(Id, "lock-state", Attributes::LockState::Id, credsIssuerConfig),                          //
-        make_unique<SubscribeAttribute>(Id, "lock-type", Attributes::LockType::Id, credsIssuerConfig),                            //
-        make_unique<SubscribeAttribute>(Id, "actuator-enabled", Attributes::ActuatorEnabled::Id, credsIssuerConfig),              //
-        make_unique<SubscribeAttribute>(Id, "door-state", Attributes::DoorState::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                               //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),      //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                          //
+        make_unique<WriteDoorLockLanguage>(credsIssuerConfig),                                                       //
+        make_unique<WriteDoorLockAutoRelockTime>(credsIssuerConfig),                                                 //
+        make_unique<WriteDoorLockSoundVolume>(credsIssuerConfig),                                                    //
+        make_unique<WriteDoorLockOperatingMode>(credsIssuerConfig),                                                  //
+        make_unique<WriteDoorLockEnableOneTouchLocking>(credsIssuerConfig),                                          //
+        make_unique<WriteDoorLockEnablePrivacyModeButton>(credsIssuerConfig),                                        //
+        make_unique<WriteDoorLockWrongCodeEntryLimit>(credsIssuerConfig),                                            //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                      //
+        make_unique<SubscribeAttribute>(Id, "lock-state", Attributes::LockState::Id, credsIssuerConfig),             //
+        make_unique<SubscribeAttribute>(Id, "lock-type", Attributes::LockType::Id, credsIssuerConfig),               //
+        make_unique<SubscribeAttribute>(Id, "actuator-enabled", Attributes::ActuatorEnabled::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "door-state", Attributes::DoorState::Id, credsIssuerConfig),             //
         make_unique<SubscribeAttribute>(Id, "number-of-total-users-supported", Attributes::NumberOfTotalUsersSupported::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "number-of-pinusers-supported", Attributes::NumberOfPINUsersSupported::Id,
@@ -10132,8 +10391,12 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
         make_unique<SubscribeAttribute>(Id, "enable-privacy-mode-button", Attributes::EnablePrivacyModeButton::Id,
                                         credsIssuerConfig),                                                                    //
         make_unique<SubscribeAttribute>(Id, "wrong-code-entry-limit", Attributes::WrongCodeEntryLimit::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),               //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),           //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
         // Events
         //
@@ -10167,18 +10430,22 @@ void registerClusterElectricalMeasurement(Commands & commands, CredentialIssuerC
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                              //
-        make_unique<ReadAttribute>(Id, "measurement-type", Attributes::MeasurementType::Id, credsIssuerConfig),         //
-        make_unique<ReadAttribute>(Id, "total-active-power", Attributes::TotalActivePower::Id, credsIssuerConfig),      //
-        make_unique<ReadAttribute>(Id, "rms-voltage", Attributes::RmsVoltage::Id, credsIssuerConfig),                   //
-        make_unique<ReadAttribute>(Id, "rms-voltage-min", Attributes::RmsVoltageMin::Id, credsIssuerConfig),            //
-        make_unique<ReadAttribute>(Id, "rms-voltage-max", Attributes::RmsVoltageMax::Id, credsIssuerConfig),            //
-        make_unique<ReadAttribute>(Id, "rms-current", Attributes::RmsCurrent::Id, credsIssuerConfig),                   //
-        make_unique<ReadAttribute>(Id, "rms-current-min", Attributes::RmsCurrentMin::Id, credsIssuerConfig),            //
-        make_unique<ReadAttribute>(Id, "rms-current-max", Attributes::RmsCurrentMax::Id, credsIssuerConfig),            //
-        make_unique<ReadAttribute>(Id, "active-power", Attributes::ActivePower::Id, credsIssuerConfig),                 //
-        make_unique<ReadAttribute>(Id, "active-power-min", Attributes::ActivePowerMin::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "active-power-max", Attributes::ActivePowerMax::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                         //
+        make_unique<ReadAttribute>(Id, "measurement-type", Attributes::MeasurementType::Id, credsIssuerConfig),    //
+        make_unique<ReadAttribute>(Id, "total-active-power", Attributes::TotalActivePower::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "rms-voltage", Attributes::RmsVoltage::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "rms-voltage-min", Attributes::RmsVoltageMin::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "rms-voltage-max", Attributes::RmsVoltageMax::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "rms-current", Attributes::RmsCurrent::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "rms-current-min", Attributes::RmsCurrentMin::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "rms-current-max", Attributes::RmsCurrentMax::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "active-power", Attributes::ActivePower::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "active-power-min", Attributes::ActivePowerMin::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "active-power-max", Attributes::ActivePowerMax::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                                  //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),             //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),         //
         make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                             //
@@ -10194,8 +10461,12 @@ void registerClusterElectricalMeasurement(Commands & commands, CredentialIssuerC
         make_unique<SubscribeAttribute>(Id, "active-power", Attributes::ActivePower::Id, credsIssuerConfig),            //
         make_unique<SubscribeAttribute>(Id, "active-power-min", Attributes::ActivePowerMin::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "active-power-max", Attributes::ActivePowerMax::Id, credsIssuerConfig),     //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),        //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),    //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
         // Events
         //
@@ -10220,30 +10491,38 @@ void registerClusterEthernetNetworkDiagnostics(Commands & commands, CredentialIs
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                           //
-        make_unique<ReadAttribute>(Id, "phyrate", Attributes::PHYRate::Id, credsIssuerConfig),                       //
-        make_unique<ReadAttribute>(Id, "full-duplex", Attributes::FullDuplex::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "packet-rx-count", Attributes::PacketRxCount::Id, credsIssuerConfig),         //
-        make_unique<ReadAttribute>(Id, "packet-tx-count", Attributes::PacketTxCount::Id, credsIssuerConfig),         //
-        make_unique<ReadAttribute>(Id, "tx-err-count", Attributes::TxErrCount::Id, credsIssuerConfig),               //
-        make_unique<ReadAttribute>(Id, "collision-count", Attributes::CollisionCount::Id, credsIssuerConfig),        //
-        make_unique<ReadAttribute>(Id, "overrun-count", Attributes::OverrunCount::Id, credsIssuerConfig),            //
-        make_unique<ReadAttribute>(Id, "carrier-detect", Attributes::CarrierDetect::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "time-since-reset", Attributes::TimeSinceReset::Id, credsIssuerConfig),       //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),      //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                          //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                      //
-        make_unique<SubscribeAttribute>(Id, "phyrate", Attributes::PHYRate::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "full-duplex", Attributes::FullDuplex::Id, credsIssuerConfig),           //
-        make_unique<SubscribeAttribute>(Id, "packet-rx-count", Attributes::PacketRxCount::Id, credsIssuerConfig),    //
-        make_unique<SubscribeAttribute>(Id, "packet-tx-count", Attributes::PacketTxCount::Id, credsIssuerConfig),    //
-        make_unique<SubscribeAttribute>(Id, "tx-err-count", Attributes::TxErrCount::Id, credsIssuerConfig),          //
-        make_unique<SubscribeAttribute>(Id, "collision-count", Attributes::CollisionCount::Id, credsIssuerConfig),   //
-        make_unique<SubscribeAttribute>(Id, "overrun-count", Attributes::OverrunCount::Id, credsIssuerConfig),       //
-        make_unique<SubscribeAttribute>(Id, "carrier-detect", Attributes::CarrierDetect::Id, credsIssuerConfig),     //
-        make_unique<SubscribeAttribute>(Id, "time-since-reset", Attributes::TimeSinceReset::Id, credsIssuerConfig),  //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                     //
+        make_unique<ReadAttribute>(Id, "phyrate", Attributes::PHYRate::Id, credsIssuerConfig),                 //
+        make_unique<ReadAttribute>(Id, "full-duplex", Attributes::FullDuplex::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, "packet-rx-count", Attributes::PacketRxCount::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "packet-tx-count", Attributes::PacketTxCount::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "tx-err-count", Attributes::TxErrCount::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "collision-count", Attributes::CollisionCount::Id, credsIssuerConfig),  //
+        make_unique<ReadAttribute>(Id, "overrun-count", Attributes::OverrunCount::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "carrier-detect", Attributes::CarrierDetect::Id, credsIssuerConfig),    //
+        make_unique<ReadAttribute>(Id, "time-since-reset", Attributes::TimeSinceReset::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                              //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),               //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),     //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                         //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                     //
+        make_unique<SubscribeAttribute>(Id, "phyrate", Attributes::PHYRate::Id, credsIssuerConfig),                 //
+        make_unique<SubscribeAttribute>(Id, "full-duplex", Attributes::FullDuplex::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "packet-rx-count", Attributes::PacketRxCount::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "packet-tx-count", Attributes::PacketTxCount::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "tx-err-count", Attributes::TxErrCount::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "collision-count", Attributes::CollisionCount::Id, credsIssuerConfig),  //
+        make_unique<SubscribeAttribute>(Id, "overrun-count", Attributes::OverrunCount::Id, credsIssuerConfig),      //
+        make_unique<SubscribeAttribute>(Id, "carrier-detect", Attributes::CarrierDetect::Id, credsIssuerConfig),    //
+        make_unique<SubscribeAttribute>(Id, "time-since-reset", Attributes::TimeSinceReset::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),           //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
@@ -10270,13 +10549,21 @@ void registerClusterFixedLabel(Commands & commands, CredentialIssuerCommands * c
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                           //
-        make_unique<ReadAttribute>(Id, "label-list", Attributes::LabelList::Id, credsIssuerConfig),                  //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),      //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                          //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                      //
-        make_unique<SubscribeAttribute>(Id, "label-list", Attributes::LabelList::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                          //
+        make_unique<ReadAttribute>(Id, "label-list", Attributes::LabelList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                          //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                     //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                 //
+        make_unique<SubscribeAttribute>(Id, "label-list", Attributes::LabelList::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
@@ -10302,11 +10589,15 @@ void registerClusterFlowMeasurement(Commands & commands, CredentialIssuerCommand
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                              //
-        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),             //
-        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),      //
-        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),      //
-        make_unique<ReadAttribute>(Id, "tolerance", Attributes::Tolerance::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                         //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "tolerance", Attributes::Tolerance::Id, credsIssuerConfig),                 //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                                  //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),             //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),         //
         make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                             //
@@ -10315,8 +10606,12 @@ void registerClusterFlowMeasurement(Commands & commands, CredentialIssuerCommand
         make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "tolerance", Attributes::Tolerance::Id, credsIssuerConfig),                 //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),        //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),    //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
         // Events
         //
@@ -10349,18 +10644,26 @@ void registerClusterGeneralCommissioning(Commands & commands, CredentialIssuerCo
                                    credsIssuerConfig),                                                                //
         make_unique<ReadAttribute>(Id, "regulatory-config", Attributes::RegulatoryConfig::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "location-capability", Attributes::LocationCapability::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),           //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),       //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                           //
-        make_unique<WriteGeneralCommissioningBreadcrumb>(credsIssuerConfig),                                          //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                       //
-        make_unique<SubscribeAttribute>(Id, "breadcrumb", Attributes::Breadcrumb::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                          //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                     //
+        make_unique<WriteGeneralCommissioningBreadcrumb>(credsIssuerConfig),                                    //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                 //
+        make_unique<SubscribeAttribute>(Id, "breadcrumb", Attributes::Breadcrumb::Id, credsIssuerConfig),       //
         make_unique<SubscribeAttribute>(Id, "basic-commissioning-info-list", Attributes::BasicCommissioningInfoList::Id,
                                         credsIssuerConfig),                                                                //
         make_unique<SubscribeAttribute>(Id, "regulatory-config", Attributes::RegulatoryConfig::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "location-capability", Attributes::LocationCapability::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),           //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
         // Events
         //
@@ -10384,15 +10687,19 @@ void registerClusterGeneralDiagnostics(Commands & commands, CredentialIssuerComm
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
-        make_unique<ReadAttribute>(Id, "network-interfaces", Attributes::NetworkInterfaces::Id, credsIssuerConfig),               //
-        make_unique<ReadAttribute>(Id, "reboot-count", Attributes::RebootCount::Id, credsIssuerConfig),                           //
-        make_unique<ReadAttribute>(Id, "up-time", Attributes::UpTime::Id, credsIssuerConfig),                                     //
-        make_unique<ReadAttribute>(Id, "total-operational-hours", Attributes::TotalOperationalHours::Id, credsIssuerConfig),      //
-        make_unique<ReadAttribute>(Id, "boot-reasons", Attributes::BootReasons::Id, credsIssuerConfig),                           //
-        make_unique<ReadAttribute>(Id, "active-hardware-faults", Attributes::ActiveHardwareFaults::Id, credsIssuerConfig),        //
-        make_unique<ReadAttribute>(Id, "active-radio-faults", Attributes::ActiveRadioFaults::Id, credsIssuerConfig),              //
-        make_unique<ReadAttribute>(Id, "active-network-faults", Attributes::ActiveNetworkFaults::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                   //
+        make_unique<ReadAttribute>(Id, "network-interfaces", Attributes::NetworkInterfaces::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, "reboot-count", Attributes::RebootCount::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "up-time", Attributes::UpTime::Id, credsIssuerConfig),                                //
+        make_unique<ReadAttribute>(Id, "total-operational-hours", Attributes::TotalOperationalHours::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "boot-reasons", Attributes::BootReasons::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "active-hardware-faults", Attributes::ActiveHardwareFaults::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "active-radio-faults", Attributes::ActiveRadioFaults::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "active-network-faults", Attributes::ActiveNetworkFaults::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                                            //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                       //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                   //
         make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                       //
@@ -10405,8 +10712,12 @@ void registerClusterGeneralDiagnostics(Commands & commands, CredentialIssuerComm
         make_unique<SubscribeAttribute>(Id, "active-hardware-faults", Attributes::ActiveHardwareFaults::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "active-radio-faults", Attributes::ActiveRadioFaults::Id, credsIssuerConfig),         //
         make_unique<SubscribeAttribute>(Id, "active-network-faults", Attributes::ActiveNetworkFaults::Id, credsIssuerConfig),     //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
         // Events
         //
@@ -10447,14 +10758,22 @@ void registerClusterGroupKeyManagement(Commands & commands, CredentialIssuerComm
         make_unique<ReadAttribute>(Id, "group-table", Attributes::GroupTable::Id, credsIssuerConfig),                          //
         make_unique<ReadAttribute>(Id, "max-groups-per-fabric", Attributes::MaxGroupsPerFabric::Id, credsIssuerConfig),        //
         make_unique<ReadAttribute>(Id, "max-group-keys-per-fabric", Attributes::MaxGroupKeysPerFabric::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                    //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                    //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                //
-        make_unique<SubscribeAttribute>(Id, "group-key-map", Attributes::GroupKeyMap::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "group-table", Attributes::GroupTable::Id, credsIssuerConfig),                     //
-        make_unique<SubscribeAttribute>(Id, "max-groups-per-fabric", Attributes::MaxGroupsPerFabric::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                                       //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                  //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),              //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                  //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                              //
+        make_unique<SubscribeAttribute>(Id, "group-key-map", Attributes::GroupKeyMap::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "group-table", Attributes::GroupTable::Id, credsIssuerConfig),                   //
+        make_unique<SubscribeAttribute>(Id, "max-groups-per-fabric", Attributes::MaxGroupsPerFabric::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "max-group-keys-per-fabric", Attributes::MaxGroupKeysPerFabric::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
                                         credsIssuerConfig),                                                          //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
@@ -10487,13 +10806,21 @@ void registerClusterGroups(Commands & commands, CredentialIssuerCommands * creds
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                           //
-        make_unique<ReadAttribute>(Id, "name-support", Attributes::NameSupport::Id, credsIssuerConfig),              //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),      //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                          //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                      //
-        make_unique<SubscribeAttribute>(Id, "name-support", Attributes::NameSupport::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                              //
+        make_unique<ReadAttribute>(Id, "name-support", Attributes::NameSupport::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                          //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                     //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                 //
+        make_unique<SubscribeAttribute>(Id, "name-support", Attributes::NameSupport::Id, credsIssuerConfig),    //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
@@ -10522,16 +10849,24 @@ void registerClusterIdentify(Commands & commands, CredentialIssuerCommands * cre
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                           //
-        make_unique<ReadAttribute>(Id, "identify-time", Attributes::IdentifyTime::Id, credsIssuerConfig),            //
-        make_unique<ReadAttribute>(Id, "identify-type", Attributes::IdentifyType::Id, credsIssuerConfig),            //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),      //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                          //
-        make_unique<WriteIdentifyIdentifyTime>(credsIssuerConfig),                                                   //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                      //
-        make_unique<SubscribeAttribute>(Id, "identify-time", Attributes::IdentifyTime::Id, credsIssuerConfig),       //
-        make_unique<SubscribeAttribute>(Id, "identify-type", Attributes::IdentifyType::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                //
+        make_unique<ReadAttribute>(Id, "identify-time", Attributes::IdentifyTime::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "identify-type", Attributes::IdentifyType::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                          //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                     //
+        make_unique<WriteIdentifyIdentifyTime>(credsIssuerConfig),                                              //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                 //
+        make_unique<SubscribeAttribute>(Id, "identify-time", Attributes::IdentifyTime::Id, credsIssuerConfig),  //
+        make_unique<SubscribeAttribute>(Id, "identify-type", Attributes::IdentifyType::Id, credsIssuerConfig),  //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
@@ -10557,12 +10892,16 @@ void registerClusterIlluminanceMeasurement(Commands & commands, CredentialIssuer
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                              //
-        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),             //
-        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),      //
-        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),      //
-        make_unique<ReadAttribute>(Id, "tolerance", Attributes::Tolerance::Id, credsIssuerConfig),                      //
-        make_unique<ReadAttribute>(Id, "light-sensor-type", Attributes::LightSensorType::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                         //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "tolerance", Attributes::Tolerance::Id, credsIssuerConfig),                 //
+        make_unique<ReadAttribute>(Id, "light-sensor-type", Attributes::LightSensorType::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                                  //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),             //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),         //
         make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                             //
@@ -10572,8 +10911,12 @@ void registerClusterIlluminanceMeasurement(Commands & commands, CredentialIssuer
         make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "tolerance", Attributes::Tolerance::Id, credsIssuerConfig),                 //
         make_unique<SubscribeAttribute>(Id, "light-sensor-type", Attributes::LightSensorType::Id, credsIssuerConfig),   //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),        //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),    //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
         // Events
         //
@@ -10598,11 +10941,19 @@ void registerClusterKeypadInput(Commands & commands, CredentialIssuerCommands * 
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                           //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),      //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                          //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                      //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                          //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                     //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                 //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
@@ -10636,21 +10987,25 @@ void registerClusterLevelControl(Commands & commands, CredentialIssuerCommands *
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                     //
-        make_unique<ReadAttribute>(Id, "current-level", Attributes::CurrentLevel::Id, credsIssuerConfig),                      //
-        make_unique<ReadAttribute>(Id, "remaining-time", Attributes::RemainingTime::Id, credsIssuerConfig),                    //
-        make_unique<ReadAttribute>(Id, "min-level", Attributes::MinLevel::Id, credsIssuerConfig),                              //
-        make_unique<ReadAttribute>(Id, "max-level", Attributes::MaxLevel::Id, credsIssuerConfig),                              //
-        make_unique<ReadAttribute>(Id, "current-frequency", Attributes::CurrentFrequency::Id, credsIssuerConfig),              //
-        make_unique<ReadAttribute>(Id, "min-frequency", Attributes::MinFrequency::Id, credsIssuerConfig),                      //
-        make_unique<ReadAttribute>(Id, "max-frequency", Attributes::MaxFrequency::Id, credsIssuerConfig),                      //
-        make_unique<ReadAttribute>(Id, "options", Attributes::Options::Id, credsIssuerConfig),                                 //
-        make_unique<ReadAttribute>(Id, "on-off-transition-time", Attributes::OnOffTransitionTime::Id, credsIssuerConfig),      //
-        make_unique<ReadAttribute>(Id, "on-level", Attributes::OnLevel::Id, credsIssuerConfig),                                //
-        make_unique<ReadAttribute>(Id, "on-transition-time", Attributes::OnTransitionTime::Id, credsIssuerConfig),             //
-        make_unique<ReadAttribute>(Id, "off-transition-time", Attributes::OffTransitionTime::Id, credsIssuerConfig),           //
-        make_unique<ReadAttribute>(Id, "default-move-rate", Attributes::DefaultMoveRate::Id, credsIssuerConfig),               //
-        make_unique<ReadAttribute>(Id, "start-up-current-level", Attributes::StartUpCurrentLevel::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                //
+        make_unique<ReadAttribute>(Id, "current-level", Attributes::CurrentLevel::Id, credsIssuerConfig),                 //
+        make_unique<ReadAttribute>(Id, "remaining-time", Attributes::RemainingTime::Id, credsIssuerConfig),               //
+        make_unique<ReadAttribute>(Id, "min-level", Attributes::MinLevel::Id, credsIssuerConfig),                         //
+        make_unique<ReadAttribute>(Id, "max-level", Attributes::MaxLevel::Id, credsIssuerConfig),                         //
+        make_unique<ReadAttribute>(Id, "current-frequency", Attributes::CurrentFrequency::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "min-frequency", Attributes::MinFrequency::Id, credsIssuerConfig),                 //
+        make_unique<ReadAttribute>(Id, "max-frequency", Attributes::MaxFrequency::Id, credsIssuerConfig),                 //
+        make_unique<ReadAttribute>(Id, "options", Attributes::Options::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "on-off-transition-time", Attributes::OnOffTransitionTime::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "on-level", Attributes::OnLevel::Id, credsIssuerConfig),                           //
+        make_unique<ReadAttribute>(Id, "on-transition-time", Attributes::OnTransitionTime::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "off-transition-time", Attributes::OffTransitionTime::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "default-move-rate", Attributes::DefaultMoveRate::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, "start-up-current-level", Attributes::StartUpCurrentLevel::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                                         //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                          //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                //
@@ -10677,9 +11032,13 @@ void registerClusterLevelControl(Commands & commands, CredentialIssuerCommands *
         make_unique<SubscribeAttribute>(Id, "off-transition-time", Attributes::OffTransitionTime::Id, credsIssuerConfig),      //
         make_unique<SubscribeAttribute>(Id, "default-move-rate", Attributes::DefaultMoveRate::Id, credsIssuerConfig),          //
         make_unique<SubscribeAttribute>(Id, "start-up-current-level", Attributes::StartUpCurrentLevel::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),               //
-        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                     //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),           //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),           //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
         // Events
         //
@@ -10703,16 +11062,24 @@ void registerClusterLocalizationConfiguration(Commands & commands, CredentialIss
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                             //
-        make_unique<ReadAttribute>(Id, "active-locale", Attributes::ActiveLocale::Id, credsIssuerConfig),              //
-        make_unique<ReadAttribute>(Id, "supported-locales", Attributes::SupportedLocales::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                        //
+        make_unique<ReadAttribute>(Id, "active-locale", Attributes::ActiveLocale::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "supported-locales", Attributes::SupportedLocales::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                                 //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),        //
         make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                            //
         make_unique<WriteLocalizationConfigurationActiveLocale>(credsIssuerConfig),                                    //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                        //
         make_unique<SubscribeAttribute>(Id, "active-locale", Attributes::ActiveLocale::Id, credsIssuerConfig),         //
         make_unique<SubscribeAttribute>(Id, "supported-locales", Attributes::SupportedLocales::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
         // Events
         //
@@ -10737,11 +11104,19 @@ void registerClusterLowPower(Commands & commands, CredentialIssuerCommands * cre
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                           //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),      //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                          //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                      //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                          //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                     //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                 //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
@@ -10771,17 +11146,25 @@ void registerClusterMediaInput(Commands & commands, CredentialIssuerCommands * c
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                //
-        make_unique<ReadAttribute>(Id, "media-input-list", Attributes::MediaInputList::Id, credsIssuerConfig),            //
-        make_unique<ReadAttribute>(Id, "current-media-input", Attributes::CurrentMediaInput::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<ReadAttribute>(Id, "media-input-list", Attributes::MediaInputList::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "current-media-input", Attributes::CurrentMediaInput::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                                    //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),               //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),           //
         make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                               //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
         make_unique<SubscribeAttribute>(Id, "media-input-list", Attributes::MediaInputList::Id, credsIssuerConfig),       //
         make_unique<SubscribeAttribute>(Id, "current-media-input", Attributes::CurrentMediaInput::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),          //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),      //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
         // Events
         //
@@ -10816,23 +11199,31 @@ void registerClusterMediaPlayback(Commands & commands, CredentialIssuerCommands 
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                           //
-        make_unique<ReadAttribute>(Id, "playback-state", Attributes::PlaybackState::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "start-time", Attributes::StartTime::Id, credsIssuerConfig),                  //
-        make_unique<ReadAttribute>(Id, "duration", Attributes::Duration::Id, credsIssuerConfig),                     //
-        make_unique<ReadAttribute>(Id, "playback-speed", Attributes::PlaybackSpeed::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "seek-range-end", Attributes::SeekRangeEnd::Id, credsIssuerConfig),           //
-        make_unique<ReadAttribute>(Id, "seek-range-start", Attributes::SeekRangeStart::Id, credsIssuerConfig),       //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),      //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                          //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                      //
-        make_unique<SubscribeAttribute>(Id, "playback-state", Attributes::PlaybackState::Id, credsIssuerConfig),     //
-        make_unique<SubscribeAttribute>(Id, "start-time", Attributes::StartTime::Id, credsIssuerConfig),             //
-        make_unique<SubscribeAttribute>(Id, "duration", Attributes::Duration::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "playback-speed", Attributes::PlaybackSpeed::Id, credsIssuerConfig),     //
-        make_unique<SubscribeAttribute>(Id, "seek-range-end", Attributes::SeekRangeEnd::Id, credsIssuerConfig),      //
-        make_unique<SubscribeAttribute>(Id, "seek-range-start", Attributes::SeekRangeStart::Id, credsIssuerConfig),  //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                     //
+        make_unique<ReadAttribute>(Id, "playback-state", Attributes::PlaybackState::Id, credsIssuerConfig),    //
+        make_unique<ReadAttribute>(Id, "start-time", Attributes::StartTime::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "duration", Attributes::Duration::Id, credsIssuerConfig),               //
+        make_unique<ReadAttribute>(Id, "playback-speed", Attributes::PlaybackSpeed::Id, credsIssuerConfig),    //
+        make_unique<ReadAttribute>(Id, "seek-range-end", Attributes::SeekRangeEnd::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "seek-range-start", Attributes::SeekRangeStart::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                              //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),     //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                         //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                     //
+        make_unique<SubscribeAttribute>(Id, "playback-state", Attributes::PlaybackState::Id, credsIssuerConfig),    //
+        make_unique<SubscribeAttribute>(Id, "start-time", Attributes::StartTime::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "duration", Attributes::Duration::Id, credsIssuerConfig),               //
+        make_unique<SubscribeAttribute>(Id, "playback-speed", Attributes::PlaybackSpeed::Id, credsIssuerConfig),    //
+        make_unique<SubscribeAttribute>(Id, "seek-range-end", Attributes::SeekRangeEnd::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "seek-range-start", Attributes::SeekRangeStart::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
@@ -10859,22 +11250,30 @@ void registerClusterModeSelect(Commands & commands, CredentialIssuerCommands * c
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                           //
-        make_unique<ReadAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),              //
-        make_unique<ReadAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),        //
-        make_unique<ReadAttribute>(Id, "on-mode", Attributes::OnMode::Id, credsIssuerConfig),                        //
-        make_unique<ReadAttribute>(Id, "start-up-mode", Attributes::StartUpMode::Id, credsIssuerConfig),             //
-        make_unique<ReadAttribute>(Id, "description", Attributes::Description::Id, credsIssuerConfig),               //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),      //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                          //
-        make_unique<WriteModeSelectOnMode>(credsIssuerConfig),                                                       //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                      //
-        make_unique<SubscribeAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),         //
-        make_unique<SubscribeAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),   //
-        make_unique<SubscribeAttribute>(Id, "on-mode", Attributes::OnMode::Id, credsIssuerConfig),                   //
-        make_unique<SubscribeAttribute>(Id, "start-up-mode", Attributes::StartUpMode::Id, credsIssuerConfig),        //
-        make_unique<SubscribeAttribute>(Id, "description", Attributes::Description::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                    //
+        make_unique<ReadAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "on-mode", Attributes::OnMode::Id, credsIssuerConfig),                 //
+        make_unique<ReadAttribute>(Id, "start-up-mode", Attributes::StartUpMode::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "description", Attributes::Description::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                             //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),    //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                        //
+        make_unique<WriteModeSelectOnMode>(credsIssuerConfig),                                                     //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                    //
+        make_unique<SubscribeAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "on-mode", Attributes::OnMode::Id, credsIssuerConfig),                 //
+        make_unique<SubscribeAttribute>(Id, "start-up-mode", Attributes::StartUpMode::Id, credsIssuerConfig),      //
+        make_unique<SubscribeAttribute>(Id, "description", Attributes::Description::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
@@ -10915,20 +11314,28 @@ void registerClusterNetworkCommissioning(Commands & commands, CredentialIssuerCo
         make_unique<ReadAttribute>(Id, "last-networking-status", Attributes::LastNetworkingStatus::Id, credsIssuerConfig),    //
         make_unique<ReadAttribute>(Id, "last-network-id", Attributes::LastNetworkID::Id, credsIssuerConfig),                  //
         make_unique<ReadAttribute>(Id, "last-connect-error-value", Attributes::LastConnectErrorValue::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                         //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),               //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                   //
-        make_unique<WriteNetworkCommissioningInterfaceEnabled>(credsIssuerConfig),                                            //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                               //
-        make_unique<SubscribeAttribute>(Id, "max-networks", Attributes::MaxNetworks::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "networks", Attributes::Networks::Id, credsIssuerConfig),                         //
-        make_unique<SubscribeAttribute>(Id, "scan-max-time-seconds", Attributes::ScanMaxTimeSeconds::Id, credsIssuerConfig),  //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                                       //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),              //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                  //
+        make_unique<WriteNetworkCommissioningInterfaceEnabled>(credsIssuerConfig),                                           //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                              //
+        make_unique<SubscribeAttribute>(Id, "max-networks", Attributes::MaxNetworks::Id, credsIssuerConfig),                 //
+        make_unique<SubscribeAttribute>(Id, "networks", Attributes::Networks::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "scan-max-time-seconds", Attributes::ScanMaxTimeSeconds::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "connect-max-time-seconds", Attributes::ConnectMaxTimeSeconds::Id,
                                         credsIssuerConfig),                                                                     //
         make_unique<SubscribeAttribute>(Id, "interface-enabled", Attributes::InterfaceEnabled::Id, credsIssuerConfig),          //
         make_unique<SubscribeAttribute>(Id, "last-networking-status", Attributes::LastNetworkingStatus::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "last-network-id", Attributes::LastNetworkID::Id, credsIssuerConfig),               //
         make_unique<SubscribeAttribute>(Id, "last-connect-error-value", Attributes::LastConnectErrorValue::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
                                         credsIssuerConfig),                                                          //
         make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),           //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
@@ -11038,6 +11445,10 @@ void registerClusterOccupancySensing(Commands & commands, CredentialIssuerComman
         make_unique<ReadAttribute>(Id, "occupancy", Attributes::Occupancy::Id, credsIssuerConfig),                       //
         make_unique<ReadAttribute>(Id, "occupancy-sensor-type", Attributes::OccupancySensorType::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "occupancy-sensor-type-bitmap", Attributes::OccupancySensorTypeBitmap::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
                                    credsIssuerConfig),                                                                        //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                   //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),               //
@@ -11046,6 +11457,10 @@ void registerClusterOccupancySensing(Commands & commands, CredentialIssuerComman
         make_unique<SubscribeAttribute>(Id, "occupancy", Attributes::Occupancy::Id, credsIssuerConfig),                       //
         make_unique<SubscribeAttribute>(Id, "occupancy-sensor-type", Attributes::OccupancySensorType::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "occupancy-sensor-type-bitmap", Attributes::OccupancySensorTypeBitmap::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
                                         credsIssuerConfig),                                                          //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
@@ -11078,12 +11493,16 @@ void registerClusterOnOff(Commands & commands, CredentialIssuerCommands * credsI
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                  //
-        make_unique<ReadAttribute>(Id, "on-off", Attributes::OnOff::Id, credsIssuerConfig),                                 //
-        make_unique<ReadAttribute>(Id, "global-scene-control", Attributes::GlobalSceneControl::Id, credsIssuerConfig),      //
-        make_unique<ReadAttribute>(Id, "on-time", Attributes::OnTime::Id, credsIssuerConfig),                               //
-        make_unique<ReadAttribute>(Id, "off-wait-time", Attributes::OffWaitTime::Id, credsIssuerConfig),                    //
-        make_unique<ReadAttribute>(Id, "start-up-on-off", Attributes::StartUpOnOff::Id, credsIssuerConfig),                 //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                             //
+        make_unique<ReadAttribute>(Id, "on-off", Attributes::OnOff::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "global-scene-control", Attributes::GlobalSceneControl::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "on-time", Attributes::OnTime::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "off-wait-time", Attributes::OffWaitTime::Id, credsIssuerConfig),               //
+        make_unique<ReadAttribute>(Id, "start-up-on-off", Attributes::StartUpOnOff::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                                      //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                 //
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                       //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),             //
@@ -11097,9 +11516,13 @@ void registerClusterOnOff(Commands & commands, CredentialIssuerCommands * credsI
         make_unique<SubscribeAttribute>(Id, "on-time", Attributes::OnTime::Id, credsIssuerConfig),                          //
         make_unique<SubscribeAttribute>(Id, "off-wait-time", Attributes::OffWaitTime::Id, credsIssuerConfig),               //
         make_unique<SubscribeAttribute>(Id, "start-up-on-off", Attributes::StartUpOnOff::Id, credsIssuerConfig),            //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),            //
-        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),           //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
         // Events
         //
@@ -11123,16 +11546,24 @@ void registerClusterOnOffSwitchConfiguration(Commands & commands, CredentialIssu
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                           //
-        make_unique<ReadAttribute>(Id, "switch-type", Attributes::SwitchType::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "switch-actions", Attributes::SwitchActions::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),      //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                          //
-        make_unique<WriteOnOffSwitchConfigurationSwitchActions>(credsIssuerConfig),                                  //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                      //
-        make_unique<SubscribeAttribute>(Id, "switch-type", Attributes::SwitchType::Id, credsIssuerConfig),           //
-        make_unique<SubscribeAttribute>(Id, "switch-actions", Attributes::SwitchActions::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                  //
+        make_unique<ReadAttribute>(Id, "switch-type", Attributes::SwitchType::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "switch-actions", Attributes::SwitchActions::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                           //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),  //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                      //
+        make_unique<WriteOnOffSwitchConfigurationSwitchActions>(credsIssuerConfig),                              //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                  //
+        make_unique<SubscribeAttribute>(Id, "switch-type", Attributes::SwitchType::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "switch-actions", Attributes::SwitchActions::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
@@ -11174,19 +11605,27 @@ void registerClusterOperationalCredentials(Commands & commands, CredentialIssuer
         make_unique<ReadAttribute>(Id, "commissioned-fabrics", Attributes::CommissionedFabrics::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "trusted-root-certificates", Attributes::TrustedRootCertificates::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "current-fabric-index", Attributes::CurrentFabricIndex::Id, credsIssuerConfig),           //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                      //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                  //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                      //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                  //
-        make_unique<SubscribeAttribute>(Id, "nocs", Attributes::NOCs::Id, credsIssuerConfig),                                    //
-        make_unique<SubscribeAttribute>(Id, "fabrics-list", Attributes::FabricsList::Id, credsIssuerConfig),                     //
-        make_unique<SubscribeAttribute>(Id, "supported-fabrics", Attributes::SupportedFabrics::Id, credsIssuerConfig),           //
-        make_unique<SubscribeAttribute>(Id, "commissioned-fabrics", Attributes::CommissionedFabrics::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                                       //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                  //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),              //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                  //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                              //
+        make_unique<SubscribeAttribute>(Id, "nocs", Attributes::NOCs::Id, credsIssuerConfig),                                //
+        make_unique<SubscribeAttribute>(Id, "fabrics-list", Attributes::FabricsList::Id, credsIssuerConfig),                 //
+        make_unique<SubscribeAttribute>(Id, "supported-fabrics", Attributes::SupportedFabrics::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "commissioned-fabrics", Attributes::CommissionedFabrics::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "trusted-root-certificates", Attributes::TrustedRootCertificates::Id,
                                         credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "current-fabric-index", Attributes::CurrentFabricIndex::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),            //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
         // Events
         //
@@ -11220,24 +11659,32 @@ void registerClusterPowerSource(Commands & commands, CredentialIssuerCommands * 
         make_unique<ReadAttribute>(Id, "battery-charge-level", Attributes::BatteryChargeLevel::Id, credsIssuerConfig),           //
         make_unique<ReadAttribute>(Id, "active-battery-faults", Attributes::ActiveBatteryFaults::Id, credsIssuerConfig),         //
         make_unique<ReadAttribute>(Id, "battery-charge-state", Attributes::BatteryChargeState::Id, credsIssuerConfig),           //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                      //
-        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                            //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                  //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                      //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                  //
-        make_unique<SubscribeAttribute>(Id, "status", Attributes::Status::Id, credsIssuerConfig),                                //
-        make_unique<SubscribeAttribute>(Id, "order", Attributes::Order::Id, credsIssuerConfig),                                  //
-        make_unique<SubscribeAttribute>(Id, "description", Attributes::Description::Id, credsIssuerConfig),                      //
-        make_unique<SubscribeAttribute>(Id, "battery-voltage", Attributes::BatteryVoltage::Id, credsIssuerConfig),               //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                             //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),    //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                        //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                    //
+        make_unique<SubscribeAttribute>(Id, "status", Attributes::Status::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeAttribute>(Id, "order", Attributes::Order::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "description", Attributes::Description::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "battery-voltage", Attributes::BatteryVoltage::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "battery-percent-remaining", Attributes::BatteryPercentRemaining::Id,
                                         credsIssuerConfig),                                                                     //
         make_unique<SubscribeAttribute>(Id, "battery-time-remaining", Attributes::BatteryTimeRemaining::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "battery-charge-level", Attributes::BatteryChargeLevel::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "active-battery-faults", Attributes::ActiveBatteryFaults::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "battery-charge-state", Attributes::BatteryChargeState::Id, credsIssuerConfig),     //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),           //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
         // Events
         //
@@ -11261,13 +11708,21 @@ void registerClusterPowerSourceConfiguration(Commands & commands, CredentialIssu
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                           //
-        make_unique<ReadAttribute>(Id, "sources", Attributes::Sources::Id, credsIssuerConfig),                       //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),      //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                          //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                      //
-        make_unique<SubscribeAttribute>(Id, "sources", Attributes::Sources::Id, credsIssuerConfig),                  //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                     //
+        make_unique<ReadAttribute>(Id, "sources", Attributes::Sources::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                          //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                     //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                 //
+        make_unique<SubscribeAttribute>(Id, "sources", Attributes::Sources::Id, credsIssuerConfig),             //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
@@ -11354,29 +11809,33 @@ void registerClusterPumpConfigurationAndControl(Commands & commands, CredentialI
         make_unique<ReadAttribute>(Id, "operation-mode", Attributes::OperationMode::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "control-mode", Attributes::ControlMode::Id, credsIssuerConfig),                        //
         make_unique<ReadAttribute>(Id, "alarm-mask", Attributes::AlarmMask::Id, credsIssuerConfig),                            //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                    //
-        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                          //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                    //
-        make_unique<WritePumpConfigurationAndControlLifetimeRunningHours>(credsIssuerConfig),                                  //
-        make_unique<WritePumpConfigurationAndControlLifetimeEnergyConsumed>(credsIssuerConfig),                                //
-        make_unique<WritePumpConfigurationAndControlOperationMode>(credsIssuerConfig),                                         //
-        make_unique<WritePumpConfigurationAndControlControlMode>(credsIssuerConfig),                                           //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                //
-        make_unique<SubscribeAttribute>(Id, "max-pressure", Attributes::MaxPressure::Id, credsIssuerConfig),                   //
-        make_unique<SubscribeAttribute>(Id, "max-speed", Attributes::MaxSpeed::Id, credsIssuerConfig),                         //
-        make_unique<SubscribeAttribute>(Id, "max-flow", Attributes::MaxFlow::Id, credsIssuerConfig),                           //
-        make_unique<SubscribeAttribute>(Id, "min-const-pressure", Attributes::MinConstPressure::Id, credsIssuerConfig),        //
-        make_unique<SubscribeAttribute>(Id, "max-const-pressure", Attributes::MaxConstPressure::Id, credsIssuerConfig),        //
-        make_unique<SubscribeAttribute>(Id, "min-comp-pressure", Attributes::MinCompPressure::Id, credsIssuerConfig),          //
-        make_unique<SubscribeAttribute>(Id, "max-comp-pressure", Attributes::MaxCompPressure::Id, credsIssuerConfig),          //
-        make_unique<SubscribeAttribute>(Id, "min-const-speed", Attributes::MinConstSpeed::Id, credsIssuerConfig),              //
-        make_unique<SubscribeAttribute>(Id, "max-const-speed", Attributes::MaxConstSpeed::Id, credsIssuerConfig),              //
-        make_unique<SubscribeAttribute>(Id, "min-const-flow", Attributes::MinConstFlow::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "max-const-flow", Attributes::MaxConstFlow::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "min-const-temp", Attributes::MinConstTemp::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "max-const-temp", Attributes::MaxConstTemp::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "pump-status", Attributes::PumpStatus::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                                  //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                   //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),         //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                             //
+        make_unique<WritePumpConfigurationAndControlLifetimeRunningHours>(credsIssuerConfig),                           //
+        make_unique<WritePumpConfigurationAndControlLifetimeEnergyConsumed>(credsIssuerConfig),                         //
+        make_unique<WritePumpConfigurationAndControlOperationMode>(credsIssuerConfig),                                  //
+        make_unique<WritePumpConfigurationAndControlControlMode>(credsIssuerConfig),                                    //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                         //
+        make_unique<SubscribeAttribute>(Id, "max-pressure", Attributes::MaxPressure::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "max-speed", Attributes::MaxSpeed::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeAttribute>(Id, "max-flow", Attributes::MaxFlow::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "min-const-pressure", Attributes::MinConstPressure::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "max-const-pressure", Attributes::MaxConstPressure::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "min-comp-pressure", Attributes::MinCompPressure::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-comp-pressure", Attributes::MaxCompPressure::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "min-const-speed", Attributes::MinConstSpeed::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "max-const-speed", Attributes::MaxConstSpeed::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "min-const-flow", Attributes::MinConstFlow::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "max-const-flow", Attributes::MaxConstFlow::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "min-const-temp", Attributes::MinConstTemp::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "max-const-temp", Attributes::MaxConstTemp::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "pump-status", Attributes::PumpStatus::Id, credsIssuerConfig),              //
         make_unique<SubscribeAttribute>(Id, "effective-operation-mode", Attributes::EffectiveOperationMode::Id,
                                         credsIssuerConfig),                                                                     //
         make_unique<SubscribeAttribute>(Id, "effective-control-mode", Attributes::EffectiveControlMode::Id, credsIssuerConfig), //
@@ -11385,10 +11844,14 @@ void registerClusterPumpConfigurationAndControl(Commands & commands, CredentialI
         make_unique<SubscribeAttribute>(Id, "lifetime-running-hours", Attributes::LifetimeRunningHours::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "power", Attributes::Power::Id, credsIssuerConfig),                                 //
         make_unique<SubscribeAttribute>(Id, "lifetime-energy-consumed", Attributes::LifetimeEnergyConsumed::Id,
+                                        credsIssuerConfig),                                                      //
+        make_unique<SubscribeAttribute>(Id, "operation-mode", Attributes::OperationMode::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "control-mode", Attributes::ControlMode::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "alarm-mask", Attributes::AlarmMask::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
                                         credsIssuerConfig),                                                          //
-        make_unique<SubscribeAttribute>(Id, "operation-mode", Attributes::OperationMode::Id, credsIssuerConfig),     //
-        make_unique<SubscribeAttribute>(Id, "control-mode", Attributes::ControlMode::Id, credsIssuerConfig),         //
-        make_unique<SubscribeAttribute>(Id, "alarm-mask", Attributes::AlarmMask::Id, credsIssuerConfig),             //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),           //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
@@ -11450,11 +11913,15 @@ void registerClusterRelativeHumidityMeasurement(Commands & commands, CredentialI
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                              //
-        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),             //
-        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),      //
-        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),      //
-        make_unique<ReadAttribute>(Id, "tolerance", Attributes::Tolerance::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                         //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "tolerance", Attributes::Tolerance::Id, credsIssuerConfig),                 //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                                  //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),             //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),         //
         make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                             //
@@ -11463,8 +11930,12 @@ void registerClusterRelativeHumidityMeasurement(Commands & commands, CredentialI
         make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "tolerance", Attributes::Tolerance::Id, credsIssuerConfig),                 //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),        //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),    //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
         // Events
         //
@@ -11495,21 +11966,29 @@ void registerClusterScenes(Commands & commands, CredentialIssuerCommands * creds
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                           //
-        make_unique<ReadAttribute>(Id, "scene-count", Attributes::SceneCount::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "current-scene", Attributes::CurrentScene::Id, credsIssuerConfig),            //
-        make_unique<ReadAttribute>(Id, "current-group", Attributes::CurrentGroup::Id, credsIssuerConfig),            //
-        make_unique<ReadAttribute>(Id, "scene-valid", Attributes::SceneValid::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "name-support", Attributes::NameSupport::Id, credsIssuerConfig),              //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),      //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                          //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                      //
-        make_unique<SubscribeAttribute>(Id, "scene-count", Attributes::SceneCount::Id, credsIssuerConfig),           //
-        make_unique<SubscribeAttribute>(Id, "current-scene", Attributes::CurrentScene::Id, credsIssuerConfig),       //
-        make_unique<SubscribeAttribute>(Id, "current-group", Attributes::CurrentGroup::Id, credsIssuerConfig),       //
-        make_unique<SubscribeAttribute>(Id, "scene-valid", Attributes::SceneValid::Id, credsIssuerConfig),           //
-        make_unique<SubscribeAttribute>(Id, "name-support", Attributes::NameSupport::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                //
+        make_unique<ReadAttribute>(Id, "scene-count", Attributes::SceneCount::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "current-scene", Attributes::CurrentScene::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "current-group", Attributes::CurrentGroup::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "scene-valid", Attributes::SceneValid::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "name-support", Attributes::NameSupport::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                          //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                     //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                 //
+        make_unique<SubscribeAttribute>(Id, "scene-count", Attributes::SceneCount::Id, credsIssuerConfig),      //
+        make_unique<SubscribeAttribute>(Id, "current-scene", Attributes::CurrentScene::Id, credsIssuerConfig),  //
+        make_unique<SubscribeAttribute>(Id, "current-group", Attributes::CurrentGroup::Id, credsIssuerConfig),  //
+        make_unique<SubscribeAttribute>(Id, "scene-valid", Attributes::SceneValid::Id, credsIssuerConfig),      //
+        make_unique<SubscribeAttribute>(Id, "name-support", Attributes::NameSupport::Id, credsIssuerConfig),    //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
@@ -11541,6 +12020,10 @@ void registerClusterSoftwareDiagnostics(Commands & commands, CredentialIssuerCom
         make_unique<ReadAttribute>(Id, "current-heap-free", Attributes::CurrentHeapFree::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "current-heap-used", Attributes::CurrentHeapUsed::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "current-heap-high-watermark", Attributes::CurrentHeapHighWatermark::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
                                    credsIssuerConfig),                                                                //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),           //
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                 //
@@ -11551,6 +12034,10 @@ void registerClusterSoftwareDiagnostics(Commands & commands, CredentialIssuerCom
         make_unique<SubscribeAttribute>(Id, "current-heap-free", Attributes::CurrentHeapFree::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "current-heap-used", Attributes::CurrentHeapUsed::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "current-heap-high-watermark", Attributes::CurrentHeapHighWatermark::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
                                         credsIssuerConfig),                                                          //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),           //
@@ -11580,10 +12067,14 @@ void registerClusterSwitch(Commands & commands, CredentialIssuerCommands * creds
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                //
-        make_unique<ReadAttribute>(Id, "number-of-positions", Attributes::NumberOfPositions::Id, credsIssuerConfig),      //
-        make_unique<ReadAttribute>(Id, "current-position", Attributes::CurrentPosition::Id, credsIssuerConfig),           //
-        make_unique<ReadAttribute>(Id, "multi-press-max", Attributes::MultiPressMax::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<ReadAttribute>(Id, "number-of-positions", Attributes::NumberOfPositions::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "current-position", Attributes::CurrentPosition::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "multi-press-max", Attributes::MultiPressMax::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                                    //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),               //
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                     //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),           //
@@ -11592,9 +12083,13 @@ void registerClusterSwitch(Commands & commands, CredentialIssuerCommands * creds
         make_unique<SubscribeAttribute>(Id, "number-of-positions", Attributes::NumberOfPositions::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "current-position", Attributes::CurrentPosition::Id, credsIssuerConfig),      //
         make_unique<SubscribeAttribute>(Id, "multi-press-max", Attributes::MultiPressMax::Id, credsIssuerConfig),         //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),          //
-        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),      //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),           //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
         // Events
         //
@@ -11636,12 +12131,20 @@ void registerClusterTargetNavigator(Commands & commands, CredentialIssuerCommand
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                     //
         make_unique<ReadAttribute>(Id, "target-navigator-list", Attributes::TargetNavigatorList::Id, credsIssuerConfig),       //
         make_unique<ReadAttribute>(Id, "current-navigator-target", Attributes::CurrentNavigatorTarget::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                    //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                    //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                //
-        make_unique<SubscribeAttribute>(Id, "target-navigator-list", Attributes::TargetNavigatorList::Id, credsIssuerConfig),  //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                   //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),               //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                   //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                               //
+        make_unique<SubscribeAttribute>(Id, "target-navigator-list", Attributes::TargetNavigatorList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "current-navigator-target", Attributes::CurrentNavigatorTarget::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
                                         credsIssuerConfig),                                                          //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
@@ -11809,6 +12312,10 @@ void registerClusterTestCluster(Commands & commands, CredentialIssuerCommands * 
         make_unique<ReadAttribute>(Id, "nullable-range-restricted-int16u", Attributes::NullableRangeRestrictedInt16u::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "nullable-range-restricted-int16s", Attributes::NullableRangeRestrictedInt16s::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
                                    credsIssuerConfig),                                                                //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),           //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),       //
@@ -11978,6 +12485,10 @@ void registerClusterTestCluster(Commands & commands, CredentialIssuerCommands * 
         make_unique<SubscribeAttribute>(Id, "nullable-range-restricted-int16u", Attributes::NullableRangeRestrictedInt16u::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "nullable-range-restricted-int16s", Attributes::NullableRangeRestrictedInt16s::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
                                         credsIssuerConfig),                                                          //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
@@ -12108,6 +12619,10 @@ void registerClusterThermostatUserInterfaceConfiguration(Commands & commands, Cr
         make_unique<ReadAttribute>(Id, "temperature-display-mode", Attributes::TemperatureDisplayMode::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "keypad-lockout", Attributes::KeypadLockout::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "schedule-programming-visibility", Attributes::ScheduleProgrammingVisibility::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
                                    credsIssuerConfig),                                                          //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
@@ -12120,6 +12635,10 @@ void registerClusterThermostatUserInterfaceConfiguration(Commands & commands, Cr
                                         credsIssuerConfig),                                                      //
         make_unique<SubscribeAttribute>(Id, "keypad-lockout", Attributes::KeypadLockout::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "schedule-programming-visibility", Attributes::ScheduleProgrammingVisibility::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
                                         credsIssuerConfig),                                                          //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
@@ -12218,30 +12737,34 @@ void registerClusterThreadNetworkDiagnostics(Commands & commands, CredentialIssu
         make_unique<ReadAttribute>(Id, "operational-dataset-components", Attributes::OperationalDatasetComponents::Id,
                                    credsIssuerConfig),                                                                            //
         make_unique<ReadAttribute>(Id, "active-network-faults-list", Attributes::ActiveNetworkFaultsList::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                       //
-        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                             //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                   //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                       //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                   //
-        make_unique<SubscribeAttribute>(Id, "channel", Attributes::Channel::Id, credsIssuerConfig),                               //
-        make_unique<SubscribeAttribute>(Id, "routing-role", Attributes::RoutingRole::Id, credsIssuerConfig),                      //
-        make_unique<SubscribeAttribute>(Id, "network-name", Attributes::NetworkName::Id, credsIssuerConfig),                      //
-        make_unique<SubscribeAttribute>(Id, "pan-id", Attributes::PanId::Id, credsIssuerConfig),                                  //
-        make_unique<SubscribeAttribute>(Id, "extended-pan-id", Attributes::ExtendedPanId::Id, credsIssuerConfig),                 //
-        make_unique<SubscribeAttribute>(Id, "mesh-local-prefix", Attributes::MeshLocalPrefix::Id, credsIssuerConfig),             //
-        make_unique<SubscribeAttribute>(Id, "overrun-count", Attributes::OverrunCount::Id, credsIssuerConfig),                    //
-        make_unique<SubscribeAttribute>(Id, "neighbor-table-list", Attributes::NeighborTableList::Id, credsIssuerConfig),         //
-        make_unique<SubscribeAttribute>(Id, "route-table-list", Attributes::RouteTableList::Id, credsIssuerConfig),               //
-        make_unique<SubscribeAttribute>(Id, "partition-id", Attributes::PartitionId::Id, credsIssuerConfig),                      //
-        make_unique<SubscribeAttribute>(Id, "weighting", Attributes::Weighting::Id, credsIssuerConfig),                           //
-        make_unique<SubscribeAttribute>(Id, "data-version", Attributes::DataVersion::Id, credsIssuerConfig),                      //
-        make_unique<SubscribeAttribute>(Id, "stable-data-version", Attributes::StableDataVersion::Id, credsIssuerConfig),         //
-        make_unique<SubscribeAttribute>(Id, "leader-router-id", Attributes::LeaderRouterId::Id, credsIssuerConfig),               //
-        make_unique<SubscribeAttribute>(Id, "detached-role-count", Attributes::DetachedRoleCount::Id, credsIssuerConfig),         //
-        make_unique<SubscribeAttribute>(Id, "child-role-count", Attributes::ChildRoleCount::Id, credsIssuerConfig),               //
-        make_unique<SubscribeAttribute>(Id, "router-role-count", Attributes::RouterRoleCount::Id, credsIssuerConfig),             //
-        make_unique<SubscribeAttribute>(Id, "leader-role-count", Attributes::LeaderRoleCount::Id, credsIssuerConfig),             //
-        make_unique<SubscribeAttribute>(Id, "attach-attempt-count", Attributes::AttachAttemptCount::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                                      //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                 //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),             //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                             //
+        make_unique<SubscribeAttribute>(Id, "channel", Attributes::Channel::Id, credsIssuerConfig),                         //
+        make_unique<SubscribeAttribute>(Id, "routing-role", Attributes::RoutingRole::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "network-name", Attributes::NetworkName::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "pan-id", Attributes::PanId::Id, credsIssuerConfig),                            //
+        make_unique<SubscribeAttribute>(Id, "extended-pan-id", Attributes::ExtendedPanId::Id, credsIssuerConfig),           //
+        make_unique<SubscribeAttribute>(Id, "mesh-local-prefix", Attributes::MeshLocalPrefix::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "overrun-count", Attributes::OverrunCount::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "neighbor-table-list", Attributes::NeighborTableList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "route-table-list", Attributes::RouteTableList::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "partition-id", Attributes::PartitionId::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "weighting", Attributes::Weighting::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "data-version", Attributes::DataVersion::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "stable-data-version", Attributes::StableDataVersion::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "leader-router-id", Attributes::LeaderRouterId::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "detached-role-count", Attributes::DetachedRoleCount::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "child-role-count", Attributes::ChildRoleCount::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "router-role-count", Attributes::RouterRoleCount::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "leader-role-count", Attributes::LeaderRoleCount::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "attach-attempt-count", Attributes::AttachAttemptCount::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "partition-id-change-count", Attributes::PartitionIdChangeCount::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "better-partition-attach-attempt-count",
@@ -12297,6 +12820,10 @@ void registerClusterThreadNetworkDiagnostics(Commands & commands, CredentialIssu
         make_unique<SubscribeAttribute>(Id, "operational-dataset-components", Attributes::OperationalDatasetComponents::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "active-network-faults-list", Attributes::ActiveNetworkFaultsList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
                                         credsIssuerConfig),                                                          //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),           //
@@ -12330,14 +12857,22 @@ void registerClusterTimeFormatLocalization(Commands & commands, CredentialIssuer
         make_unique<ReadAttribute>(Id, "hour-format", Attributes::HourFormat::Id, credsIssuerConfig),                          //
         make_unique<ReadAttribute>(Id, "active-calendar-type", Attributes::ActiveCalendarType::Id, credsIssuerConfig),         //
         make_unique<ReadAttribute>(Id, "supported-calendar-types", Attributes::SupportedCalendarTypes::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                    //
-        make_unique<WriteTimeFormatLocalizationHourFormat>(credsIssuerConfig),                                                 //
-        make_unique<WriteTimeFormatLocalizationActiveCalendarType>(credsIssuerConfig),                                         //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                //
-        make_unique<SubscribeAttribute>(Id, "hour-format", Attributes::HourFormat::Id, credsIssuerConfig),                     //
-        make_unique<SubscribeAttribute>(Id, "active-calendar-type", Attributes::ActiveCalendarType::Id, credsIssuerConfig),    //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),             //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<WriteTimeFormatLocalizationHourFormat>(credsIssuerConfig),                                              //
+        make_unique<WriteTimeFormatLocalizationActiveCalendarType>(credsIssuerConfig),                                      //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                             //
+        make_unique<SubscribeAttribute>(Id, "hour-format", Attributes::HourFormat::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeAttribute>(Id, "active-calendar-type", Attributes::ActiveCalendarType::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "supported-calendar-types", Attributes::SupportedCalendarTypes::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
                                         credsIssuerConfig),                                                          //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
@@ -12398,13 +12933,21 @@ void registerClusterUserLabel(Commands & commands, CredentialIssuerCommands * cr
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                           //
-        make_unique<ReadAttribute>(Id, "label-list", Attributes::LabelList::Id, credsIssuerConfig),                  //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),      //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                          //
-        make_unique<WriteUserLabelLabelList>(credsIssuerConfig),                                                     //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                      //
-        make_unique<SubscribeAttribute>(Id, "label-list", Attributes::LabelList::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                          //
+        make_unique<ReadAttribute>(Id, "label-list", Attributes::LabelList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                          //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                     //
+        make_unique<WriteUserLabelLabelList>(credsIssuerConfig),                                                //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                 //
+        make_unique<SubscribeAttribute>(Id, "label-list", Attributes::LabelList::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
         // Events
@@ -12429,15 +12972,23 @@ void registerClusterWakeOnLan(Commands & commands, CredentialIssuerCommands * cr
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                      //
-        make_unique<ReadAttribute>(Id, "wake-on-lan-mac-address", Attributes::WakeOnLanMacAddress::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<ReadAttribute>(Id, "wake-on-lan-mac-address", Attributes::WakeOnLanMacAddress::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                                          //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                     //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                 //
         make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                     //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "wake-on-lan-mac-address", Attributes::WakeOnLanMacAddress::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
         // Events
         //
@@ -12476,18 +13027,22 @@ void registerClusterWiFiNetworkDiagnostics(Commands & commands, CredentialIssuer
         make_unique<ReadAttribute>(Id, "packet-unicast-tx-count", Attributes::PacketUnicastTxCount::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "current-max-rate", Attributes::CurrentMaxRate::Id, credsIssuerConfig),                  //
         make_unique<ReadAttribute>(Id, "overrun-count", Attributes::OverrunCount::Id, credsIssuerConfig),                       //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                     //
-        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                           //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                 //
-        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                     //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "bssid", Attributes::Bssid::Id, credsIssuerConfig),                                 //
-        make_unique<SubscribeAttribute>(Id, "security-type", Attributes::SecurityType::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "wi-fi-version", Attributes::WiFiVersion::Id, credsIssuerConfig),                   //
-        make_unique<SubscribeAttribute>(Id, "channel-number", Attributes::ChannelNumber::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "rssi", Attributes::Rssi::Id, credsIssuerConfig),                                   //
-        make_unique<SubscribeAttribute>(Id, "beacon-lost-count", Attributes::BeaconLostCount::Id, credsIssuerConfig),           //
-        make_unique<SubscribeAttribute>(Id, "beacon-rx-count", Attributes::BeaconRxCount::Id, credsIssuerConfig),               //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                                //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),           //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                 //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),       //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                       //
+        make_unique<SubscribeAttribute>(Id, "bssid", Attributes::Bssid::Id, credsIssuerConfig),                       //
+        make_unique<SubscribeAttribute>(Id, "security-type", Attributes::SecurityType::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "wi-fi-version", Attributes::WiFiVersion::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "channel-number", Attributes::ChannelNumber::Id, credsIssuerConfig),      //
+        make_unique<SubscribeAttribute>(Id, "rssi", Attributes::Rssi::Id, credsIssuerConfig),                         //
+        make_unique<SubscribeAttribute>(Id, "beacon-lost-count", Attributes::BeaconLostCount::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "beacon-rx-count", Attributes::BeaconRxCount::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "packet-multicast-rx-count", Attributes::PacketMulticastRxCount::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "packet-multicast-tx-count", Attributes::PacketMulticastTxCount::Id,
@@ -12496,9 +13051,13 @@ void registerClusterWiFiNetworkDiagnostics(Commands & commands, CredentialIssuer
         make_unique<SubscribeAttribute>(Id, "packet-unicast-tx-count", Attributes::PacketUnicastTxCount::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "current-max-rate", Attributes::CurrentMaxRate::Id, credsIssuerConfig),              //
         make_unique<SubscribeAttribute>(Id, "overrun-count", Attributes::OverrunCount::Id, credsIssuerConfig),                   //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                 //
-        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                       //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),             //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),           //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         //
         // Events
         //
@@ -12559,9 +13118,13 @@ void registerClusterWindowCovering(Commands & commands, CredentialIssuerCommands
                                    credsIssuerConfig),                                                                          //
         make_unique<ReadAttribute>(Id, "installed-open-limit-tilt", Attributes::InstalledOpenLimitTilt::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "installed-closed-limit-tilt", Attributes::InstalledClosedLimitTilt::Id,
+                                   credsIssuerConfig),                                                    //
+        make_unique<ReadAttribute>(Id, "mode", Attributes::Mode::Id, credsIssuerConfig),                  //
+        make_unique<ReadAttribute>(Id, "safety-status", Attributes::SafetyStatus::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
                                    credsIssuerConfig),                                                                        //
-        make_unique<ReadAttribute>(Id, "mode", Attributes::Mode::Id, credsIssuerConfig),                                      //
-        make_unique<ReadAttribute>(Id, "safety-status", Attributes::SafetyStatus::Id, credsIssuerConfig),                     //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                   //
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                         //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),               //
@@ -12593,9 +13156,13 @@ void registerClusterWindowCovering(Commands & commands, CredentialIssuerCommands
         make_unique<SubscribeAttribute>(Id, "installed-open-limit-tilt", Attributes::InstalledOpenLimitTilt::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "installed-closed-limit-tilt", Attributes::InstalledClosedLimitTilt::Id,
+                                        credsIssuerConfig),                                                    //
+        make_unique<SubscribeAttribute>(Id, "mode", Attributes::Mode::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeAttribute>(Id, "safety-status", Attributes::SafetyStatus::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
                                         credsIssuerConfig),                                                          //
-        make_unique<SubscribeAttribute>(Id, "mode", Attributes::Mode::Id, credsIssuerConfig),                        //
-        make_unique<SubscribeAttribute>(Id, "safety-status", Attributes::SafetyStatus::Id, credsIssuerConfig),       //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),           //
         make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
