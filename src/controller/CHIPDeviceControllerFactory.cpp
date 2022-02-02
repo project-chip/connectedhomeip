@@ -225,7 +225,6 @@ CHIP_ERROR DeviceControllerFactory::Shutdown()
     return CHIP_NO_ERROR;
 }
 
-
 CHIP_ERROR DeviceControllerSystemState::Shutdown()
 {
     VerifyOrReturnError(mRefCount == 1, CHIP_ERROR_INCORRECT_STATE);
