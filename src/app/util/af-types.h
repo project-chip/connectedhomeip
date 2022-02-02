@@ -395,6 +395,10 @@ typedef struct
      */
     uint8_t deviceVersion;
     /**
+     * Meta-data about the endpoint
+     */
+    EmberAfEndpointBitmask bitmask;
+    /**
      * Endpoint type for this endpoint.
      */
     const EmberAfEndpointType * endpointType;
@@ -403,14 +407,6 @@ typedef struct
      * endpoint
      */
     chip::DataVersion * dataVersions;
-    /**
-     * Network index for this endpoint.
-     */
-    uint8_t networkIndex;
-    /**
-     * Meta-data about the endpoint
-     */
-    EmberAfEndpointBitmask bitmask;
 } EmberAfDefinedEndpoint;
 
 // Cluster specific types

@@ -107,7 +107,6 @@ DataVersion fixedEndpointDataVersions[ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT];
 #define endpointDeviceVersion(x) fixedDeviceVersions[x]
 // Added 'Macro' to silence MISRA warning about conflict with synonymous vars.
 #define endpointTypeMacro(x) (&(generatedEmberAfEndpointTypes[fixedEmberAfEndpointTypes[x]]))
-#define endpointNetworkIndex(x) fixedNetworks[x]
 #endif
 
 app::AttributeAccessInterface * gAttributeAccessOverrides = nullptr;
@@ -131,7 +130,6 @@ void emberAfEndpointConfigure(void)
     uint16_t fixedDeviceIds[]           = FIXED_DEVICE_IDS;
     uint8_t fixedDeviceVersions[]       = FIXED_DEVICE_VERSIONS;
     uint8_t fixedEmberAfEndpointTypes[] = FIXED_ENDPOINT_TYPES;
-    uint8_t fixedNetworks[]             = FIXED_NETWORKS;
 #endif
 
 #if ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT > 0
@@ -156,7 +154,6 @@ void emberAfEndpointConfigure(void)
         emAfEndpoints[ep].deviceVersion = endpointDeviceVersion(ep);
         emAfEndpoints[ep].endpointType  = endpointTypeMacro(ep);
         emAfEndpoints[ep].dataVersions  = currentDataVersions;
-        emAfEndpoints[ep].networkIndex  = endpointNetworkIndex(ep);
         emAfEndpoints[ep].bitmask       = EMBER_AF_ENDPOINT_ENABLED;
 
         // Increment currentDataVersions by 1 (slot) for every server cluster
@@ -231,7 +228,6 @@ EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, EmberAfEn
     emAfEndpoints[index].deviceVersion = deviceVersion;
     emAfEndpoints[index].endpointType  = ep;
     emAfEndpoints[index].dataVersions  = dataVersionStorage.data();
-    emAfEndpoints[index].networkIndex  = 0;
     // Start the endpoint off as disabled.
     emAfEndpoints[index].bitmask = EMBER_AF_ENDPOINT_DISABLED;
 
@@ -321,9 +317,7 @@ void emberAfClusterDefaultResponseCallback(EndpointId endpoint, ClusterId cluste
         EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_DEFAULT_RESPONSE_FUNCTION);
         if (f != NULL)
         {
-            // emberAfPushEndpointNetworkIndex(endpoint);
             ((EmberAfDefaultResponseFunction) f)(endpoint, commandId, status);
-            // emberAfPopNetworkIndex();
         }
     }
 }
@@ -343,9 +337,7 @@ void emberAfClusterMessageSentCallback(const MessageSendDestination & destinatio
             EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_MESSAGE_SENT_FUNCTION);
             if (f != NULL)
             {
-                // emberAfPushEndpointNetworkIndex(apsFrame->sourceEndpoint);
                 ((EmberAfMessageSentFunction) f)(destination, apsFrame, msgLen, message, status);
-                // emberAfPopNetworkIndex();
             }
         }
     }
@@ -390,7 +382,6 @@ static void initializeEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
 {
     uint8_t clusterIndex;
     const EmberAfEndpointType * epType = definedEndpoint->endpointType;
-    // emberAfPushEndpointNetworkIndex(definedEndpoint->endpoint);
     for (clusterIndex = 0; clusterIndex < epType->clusterCount; clusterIndex++)
     {
         const EmberAfCluster * cluster = &(epType->cluster[clusterIndex]);
@@ -402,7 +393,6 @@ static void initializeEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
             ((EmberAfInitFunction) f)(definedEndpoint->endpoint);
         }
     }
-    // emberAfPopNetworkIndex();
 }
 
 // Calls the init functions.
@@ -1171,7 +1161,7 @@ void emberAfResetAttributes(EndpointId endpoint)
 void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional<ClusterId> clusterId)
 {
     uint16_t ep;
-    uint8_t clusterI, curNetwork = 0 /* emberGetCurrentNetwork() */;
+    uint8_t clusterI;
     uint16_t attr;
     uint8_t * ptr;
     uint16_t epCount = emberAfEndpointCount();
@@ -1191,11 +1181,6 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
         }
         de = &(emAfEndpoints[ep]);
 
-        // Ensure that the endpoint is on the current network
-        if (endpoint == EMBER_BROADCAST_ENDPOINT && de->networkIndex != curNetwork)
-        {
-            continue;
-        }
         for (clusterI = 0; clusterI < de->endpointType->clusterCount; clusterI++)
         {
             const EmberAfCluster * cluster = &(de->endpointType->cluster[clusterI]);
