@@ -84,6 +84,7 @@ protected:
     CHIP_ERROR _GetThreadProvision(ByteSpan & netInfo);
     CHIP_ERROR _SetThreadProvision(ByteSpan netInfo);
     CHIP_ERROR _AttachToThreadNetwork(ByteSpan netInfo, NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback);
+    void _OnThreadAttachFinished(void);
     void _ErasePersistentInfo(void);
     ConnectivityManager::ThreadDeviceType _GetThreadDeviceType(void);
     CHIP_ERROR _SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType);

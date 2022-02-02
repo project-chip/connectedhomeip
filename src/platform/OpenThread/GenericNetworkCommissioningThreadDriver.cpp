@@ -144,8 +144,6 @@ exit:
 
 void GenericThreadDriver::ScanNetworks(ThreadDriver::ScanCallback * callback)
 {
-
-    // TO VALIDATE NOT IMPLEMENTED NOT SUPPORED ON ED?
     CHIP_ERROR err = DeviceLayer::ThreadStackMgrImpl().StartThreadScan(callback);
     if (err != CHIP_NO_ERROR)
     {

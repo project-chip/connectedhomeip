@@ -337,13 +337,24 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AttachToThreadN
 }
 
 template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnThreadAttachFinished()
+{
+    if (mpConnectCallback != nullptr)
+    {
+        DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+            mpConnectCallback->OnResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
+            mpConnectCallback = nullptr;
+        });
+    }
+}
+
+template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_StartThreadScan(ThreadDriver::ScanCallback * callback)
 {
-    // TODO
+    // TODO END scan feature + _OnNetworkScanFinished callback for response
     // There is another ongoing scan request, reject the new one.
     VerifyOrReturnError(mpScanCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
     mpScanCallback = callback;
-    //openthread_io_openthread_border_router_call_scan(mProxy.get(), nullptr, _OnNetworkScanFinished, this);
     return CHIP_NO_ERROR;
 }
 

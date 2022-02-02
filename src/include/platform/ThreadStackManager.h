@@ -105,6 +105,7 @@ public:
     CHIP_ERROR SetThreadEnabled(bool val);
     CHIP_ERROR AttachToThreadNetwork(ByteSpan netInfo, NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback);
     CHIP_ERROR StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback);
+    void OnThreadAttachFinished(void);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
     CHIP_ERROR AddSrpService(const char * aInstanceName, const char * aName, uint16_t aPort,
@@ -353,6 +354,11 @@ inline CHIP_ERROR ThreadStackManager::SetThreadProvision(ByteSpan netInfo)
 inline CHIP_ERROR ThreadStackManager::AttachToThreadNetwork(ByteSpan netInfo, NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback)
 {
     return static_cast<ImplClass *>(this)->_AttachToThreadNetwork(netInfo, callback);
+}
+
+inline void ThreadStackManager::OnThreadAttachFinished(void)
+{
+    return static_cast<ImplClass *>(this)->_OnThreadAttachFinished();
 }
 
 inline CHIP_ERROR ThreadStackManager::StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback)

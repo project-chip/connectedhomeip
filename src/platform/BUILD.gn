@@ -301,6 +301,14 @@ if (chip_device_platform != "none") {
       "PlatformEventSupport.cpp",
     ]
 
+    if (chip_enable_openthread)
+    {
+      sources += [
+        "OpenThread/GenericNetworkCommissioningThreadDriver.cpp",
+        "OpenThread/GenericNetworkCommissioningThreadDriver.h",
+      ]
+    }
+
     if (chip_enable_ota_requestor) {
       sources += [
         "GenericOTARequestorDriver.cpp",
