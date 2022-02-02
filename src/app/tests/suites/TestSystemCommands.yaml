@@ -39,3 +39,6 @@ tests:
           values:
               - name: "discriminator"
                 value: 2222
+
+    - label: "Factory Reset the accessory"
+      command: "FactoryReset"
