@@ -53,8 +53,8 @@
 #include <lib/support/FixedBufferAllocator.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -305,7 +305,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetThreadProvis
     }
 
     assert(Thread::kSizeOperationalDataset <= netInfo.size());
-    //memcpy(tlvs.mTlvs, netInfo.data(), netInfo.size());
+    // memcpy(tlvs.mTlvs, netInfo.data(), netInfo.size());
     netInfo = ByteSpan(datasetTlv.mTlvs, datasetTlv.mLength);
 
     return CHIP_NO_ERROR;
@@ -324,8 +324,8 @@ bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_IsThreadAttached(void
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AttachToThreadNetwork(ByteSpan netInfo,
-                                              NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback)
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AttachToThreadNetwork(
+    ByteSpan netInfo, NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback)
 {
     // There is another ongoing connect request, reject the new one.
     VerifyOrReturnError(mpConnectCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);

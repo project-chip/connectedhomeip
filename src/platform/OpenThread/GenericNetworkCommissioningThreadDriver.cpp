@@ -34,8 +34,8 @@ namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
 // NOTE: For ThreadDriver, we uses two network configs, one is mSavedNetwork, and another is mStagingNetwork, during init, it will
-// load the network config from thread persistent info, and loads it into both mSavedNetwork and mStagingNetwork. When updating the networks,
-// all changed are made on the staging network. When validated we can commit it and save it to the persisten info
+// load the network config from thread persistent info, and loads it into both mSavedNetwork and mStagingNetwork. When updating the
+// networks, all changed are made on the staging network. When validated we can commit it and save it to the persisten info
 
 CHIP_ERROR GenericThreadDriver::Init()
 {

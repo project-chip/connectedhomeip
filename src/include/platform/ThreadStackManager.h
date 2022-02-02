@@ -351,7 +351,9 @@ inline CHIP_ERROR ThreadStackManager::SetThreadProvision(ByteSpan netInfo)
     return static_cast<ImplClass *>(this)->_SetThreadProvision(netInfo);
 }
 
-inline CHIP_ERROR ThreadStackManager::AttachToThreadNetwork(ByteSpan netInfo, NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback)
+inline CHIP_ERROR
+ThreadStackManager::AttachToThreadNetwork(ByteSpan netInfo,
+                                          NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback)
 {
     return static_cast<ImplClass *>(this)->_AttachToThreadNetwork(netInfo, callback);
 }
