@@ -26033,45 +26033,41 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Wait for the commissioned device to be retrieved\n");
-            err = TestWaitForTheCommissionedDeviceToBeRetrieved_1();
+            ChipLogProgress(chipTool, " ***** Test Step 1 : read the global attribute: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeClusterRevision_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : read the global attribute: ClusterRevision\n");
-            err = TestReadTheGlobalAttributeClusterRevision_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute constraints: ClusterRevision\n");
-            err = TestReadTheGlobalAttributeConstraintsClusterRevision_3();
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 3 : write the default values to mandatory global attribute: ClusterRevision\n");
+            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3();
             break;
         case 4:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 4 : write the default values to mandatory global attribute: ClusterRevision\n");
-            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : reads back global attribute: ClusterRevision\n");
+            err = TestReadsBackGlobalAttributeClusterRevision_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : reads back global attribute: ClusterRevision\n");
-            err = TestReadsBackGlobalAttributeClusterRevision_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Read the global attribute: AttributeList\n");
+            err = TestReadTheGlobalAttributeAttributeList_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Read the global attribute: AttributeList\n");
-            err = TestReadTheGlobalAttributeAttributeList_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : read the optional global attribute: FeatureMap\n");
+            err = TestReadTheOptionalGlobalAttributeFeatureMap_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : read the optional global attribute: FeatureMap\n");
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Read the optional global attribute : FeatureMap\n");
             err = TestReadTheOptionalGlobalAttributeFeatureMap_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Read the optional global attribute : FeatureMap\n");
-            err = TestReadTheOptionalGlobalAttributeFeatureMap_8();
+            ChipLogProgress(chipTool, " ***** Test Step 8 : write the default values to optional global attribute: FeatureMap\n");
+            err = TestWriteTheDefaultValuesToOptionalGlobalAttributeFeatureMap_8();
             break;
         case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : write the default values to optional global attribute: FeatureMap\n");
-            err = TestWriteTheDefaultValuesToOptionalGlobalAttributeFeatureMap_9();
-            break;
-        case 10:
-            ChipLogProgress(chipTool, " ***** Test Step 10 : reads back optional global attribute: FeatureMap\n");
-            err = TestReadsBackOptionalGlobalAttributeFeatureMap_10();
+            ChipLogProgress(chipTool, " ***** Test Step 9 : reads back optional global attribute: FeatureMap\n");
+            err = TestReadsBackOptionalGlobalAttributeFeatureMap_9();
             break;
         }
 
@@ -26084,10 +26080,20 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 11;
+    const uint16_t mTestCount = 10;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
+
+    static void OnFailureCallback_1(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_OO_1_1 *>(context))->OnFailureResponse_1(error);
+    }
+
+    static void OnSuccessCallback_1(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_OO_1_1 *>(context))->OnSuccessResponse_1(clusterRevision);
+    }
 
     static void OnFailureCallback_2(void * context, CHIP_ERROR error)
     {
@@ -26104,26 +26110,26 @@ private:
         (static_cast<Test_TC_OO_1_1 *>(context))->OnFailureResponse_3(error);
     }
 
-    static void OnSuccessCallback_3(void * context, uint16_t clusterRevision)
-    {
-        (static_cast<Test_TC_OO_1_1 *>(context))->OnSuccessResponse_3(clusterRevision);
-    }
+    static void OnSuccessCallback_3(void * context) { (static_cast<Test_TC_OO_1_1 *>(context))->OnSuccessResponse_3(); }
 
     static void OnFailureCallback_4(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_OO_1_1 *>(context))->OnFailureResponse_4(error);
     }
 
-    static void OnSuccessCallback_4(void * context) { (static_cast<Test_TC_OO_1_1 *>(context))->OnSuccessResponse_4(); }
+    static void OnSuccessCallback_4(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_OO_1_1 *>(context))->OnSuccessResponse_4(clusterRevision);
+    }
 
     static void OnFailureCallback_5(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_OO_1_1 *>(context))->OnFailureResponse_5(error);
     }
 
-    static void OnSuccessCallback_5(void * context, uint16_t clusterRevision)
+    static void OnSuccessCallback_5(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & attributeList)
     {
-        (static_cast<Test_TC_OO_1_1 *>(context))->OnSuccessResponse_5(clusterRevision);
+        (static_cast<Test_TC_OO_1_1 *>(context))->OnSuccessResponse_5(attributeList);
     }
 
     static void OnFailureCallback_6(void * context, CHIP_ERROR error)
@@ -26131,9 +26137,9 @@ private:
         (static_cast<Test_TC_OO_1_1 *>(context))->OnFailureResponse_6(error);
     }
 
-    static void OnSuccessCallback_6(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & attributeList)
+    static void OnSuccessCallback_6(void * context, uint32_t featureMap)
     {
-        (static_cast<Test_TC_OO_1_1 *>(context))->OnSuccessResponse_6(attributeList);
+        (static_cast<Test_TC_OO_1_1 *>(context))->OnSuccessResponse_6(featureMap);
     }
 
     static void OnFailureCallback_7(void * context, CHIP_ERROR error)
@@ -26151,26 +26157,16 @@ private:
         (static_cast<Test_TC_OO_1_1 *>(context))->OnFailureResponse_8(error);
     }
 
-    static void OnSuccessCallback_8(void * context, uint32_t featureMap)
-    {
-        (static_cast<Test_TC_OO_1_1 *>(context))->OnSuccessResponse_8(featureMap);
-    }
+    static void OnSuccessCallback_8(void * context) { (static_cast<Test_TC_OO_1_1 *>(context))->OnSuccessResponse_8(); }
 
     static void OnFailureCallback_9(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_OO_1_1 *>(context))->OnFailureResponse_9(error);
     }
 
-    static void OnSuccessCallback_9(void * context) { (static_cast<Test_TC_OO_1_1 *>(context))->OnSuccessResponse_9(); }
-
-    static void OnFailureCallback_10(void * context, CHIP_ERROR error)
+    static void OnSuccessCallback_9(void * context, uint32_t featureMap)
     {
-        (static_cast<Test_TC_OO_1_1 *>(context))->OnFailureResponse_10(error);
-    }
-
-    static void OnSuccessCallback_10(void * context, uint32_t featureMap)
-    {
-        (static_cast<Test_TC_OO_1_1 *>(context))->OnSuccessResponse_10(featureMap);
+        (static_cast<Test_TC_OO_1_1 *>(context))->OnSuccessResponse_9(featureMap);
     }
 
     //
@@ -26183,13 +26179,31 @@ private:
         return WaitForCommissionee();
     }
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_1()
+    CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
     {
-        SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::OnOffClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::ClusterRevision::TypeInfo>(
+            this, OnSuccessCallback_1, OnFailureCallback_1));
+        return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_2()
+    void OnFailureResponse_1(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_1(uint16_t clusterRevision)
+    {
+        VerifyOrReturn(CheckValue("clusterRevision", clusterRevision, 4U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
@@ -26208,35 +26222,11 @@ private:
 
     void OnSuccessResponse_2(uint16_t clusterRevision)
     {
-        VerifyOrReturn(CheckValue("clusterRevision", clusterRevision, 4U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_3()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::ClusterRevision::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_3(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_3(uint16_t clusterRevision)
-    {
         VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
         NextTest();
     }
 
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_4()
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
@@ -26246,26 +26236,50 @@ private:
         clusterRevisionArgument = 3U;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::ClusterRevision::TypeInfo>(
-            clusterRevisionArgument, this, OnSuccessCallback_4, OnFailureCallback_4));
+            clusterRevisionArgument, this, OnSuccessCallback_3, OnFailureCallback_3));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_4(CHIP_ERROR error)
+    void OnFailureResponse_3(CHIP_ERROR error)
     {
         chip::app::StatusIB status(error);
         VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
-    void OnSuccessResponse_4() { ThrowSuccessResponse(); }
+    void OnSuccessResponse_3() { ThrowSuccessResponse(); }
 
-    CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_5()
+    CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_4()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::ClusterRevision::TypeInfo>(
+            this, OnSuccessCallback_4, OnFailureCallback_4));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_4(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_4(uint16_t clusterRevision)
+    {
+        VerifyOrReturn(CheckValue("clusterRevision", clusterRevision, 4U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::OnOffClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::AttributeList::TypeInfo>(
             this, OnSuccessCallback_5, OnFailureCallback_5));
         return CHIP_NO_ERROR;
     }
@@ -26276,20 +26290,19 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_5(uint16_t clusterRevision)
+    void OnSuccessResponse_5(const chip::app::DataModel::DecodableList<chip::AttributeId> & attributeList)
     {
-        VerifyOrReturn(CheckValue("clusterRevision", clusterRevision, 4U));
-
+        VerifyOrReturn(CheckConstraintType("attributeList", "", "list"));
         NextTest();
     }
 
-    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_6()
+    CHIP_ERROR TestReadTheOptionalGlobalAttributeFeatureMap_6()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::AttributeList::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::FeatureMap::TypeInfo>(
             this, OnSuccessCallback_6, OnFailureCallback_6));
         return CHIP_NO_ERROR;
     }
@@ -26300,9 +26313,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_6(const chip::app::DataModel::DecodableList<chip::AttributeId> & attributeList)
+    void OnSuccessResponse_6(uint32_t featureMap)
     {
-        VerifyOrReturn(CheckConstraintType("attributeList", "", "list"));
+        VerifyOrReturn(CheckValue("featureMap", featureMap, 0UL));
+
         NextTest();
     }
 
@@ -26325,35 +26339,11 @@ private:
 
     void OnSuccessResponse_7(uint32_t featureMap)
     {
-        VerifyOrReturn(CheckValue("featureMap", featureMap, 0UL));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadTheOptionalGlobalAttributeFeatureMap_8()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::FeatureMap::TypeInfo>(
-            this, OnSuccessCallback_8, OnFailureCallback_8));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_8(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_8(uint32_t featureMap)
-    {
         VerifyOrReturn(CheckConstraintType("featureMap", "", "map32"));
         NextTest();
     }
 
-    CHIP_ERROR TestWriteTheDefaultValuesToOptionalGlobalAttributeFeatureMap_9()
+    CHIP_ERROR TestWriteTheDefaultValuesToOptionalGlobalAttributeFeatureMap_8()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
@@ -26363,37 +26353,37 @@ private:
         featureMapArgument = 0UL;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::FeatureMap::TypeInfo>(
-            featureMapArgument, this, OnSuccessCallback_9, OnFailureCallback_9));
+            featureMapArgument, this, OnSuccessCallback_8, OnFailureCallback_8));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_9(CHIP_ERROR error)
+    void OnFailureResponse_8(CHIP_ERROR error)
     {
         chip::app::StatusIB status(error);
         VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
-    void OnSuccessResponse_9() { ThrowSuccessResponse(); }
+    void OnSuccessResponse_8() { ThrowSuccessResponse(); }
 
-    CHIP_ERROR TestReadsBackOptionalGlobalAttributeFeatureMap_10()
+    CHIP_ERROR TestReadsBackOptionalGlobalAttributeFeatureMap_9()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::FeatureMap::TypeInfo>(
-            this, OnSuccessCallback_10, OnFailureCallback_10));
+            this, OnSuccessCallback_9, OnFailureCallback_9));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_10(CHIP_ERROR error)
+    void OnFailureResponse_9(CHIP_ERROR error)
     {
         chip::app::StatusIB status(error);
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_10(uint32_t featureMap)
+    void OnSuccessResponse_9(uint32_t featureMap)
     {
         VerifyOrReturn(CheckValue("featureMap", featureMap, 0UL));
 
