@@ -263,4 +263,3 @@ tests:
                 value: 0x0001
               - name: "groupName"
                 value: "Group #1"
-                
