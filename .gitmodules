@@ -184,3 +184,6 @@
 [submodule "third_party/mbed-mcu-boot/repo"]
 	path = third_party/mbed-mcu-boot/repo
 	url = https://github.com/ATmobica/mcuboot.git
+[submodule "third_party/webos_sdk"]
+	path = third_party/webos_sdk
+	url = https://github.com/cabin15/webos-ose-ndk
