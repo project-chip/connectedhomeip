@@ -330,7 +330,6 @@ void CheckFailedMessageRetainOnSend(nlTestSuite * inSuite, void * inContext)
     });
 
     mockSender.mMessageDispatch.mRetainMessageOnSend = false;
-
     // Let's drop the initial message
     gLoopback.mSentMessageCount    = 0;
     gLoopback.mNumMessagesToDrop   = 1;
