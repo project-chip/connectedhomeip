@@ -9178,7 +9178,7 @@ class GeneralCommissioning(Cluster):
         return ClusterObjectDescriptor(
             Fields = [
                 ClusterObjectFieldDescriptor(Label="breadcrumb", Tag=0x00000000, Type=uint),
-                ClusterObjectFieldDescriptor(Label="basicCommissioningInfoList", Tag=0x00000001, Type=typing.List[GeneralCommissioning.Structs.BasicCommissioningInfoType]),
+                ClusterObjectFieldDescriptor(Label="basicCommissioningInfo", Tag=0x00000001, Type=GeneralCommissioning.Structs.BasicCommissioningInfo),
                 ClusterObjectFieldDescriptor(Label="regulatoryConfig", Tag=0x00000002, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="locationCapability", Tag=0x00000003, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="serverGeneratedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
@@ -9189,7 +9189,7 @@ class GeneralCommissioning(Cluster):
             ])
 
     breadcrumb: 'uint' = None
-    basicCommissioningInfoList: 'typing.List[GeneralCommissioning.Structs.BasicCommissioningInfoType]' = None
+    basicCommissioningInfo: 'GeneralCommissioning.Structs.BasicCommissioningInfo' = None
     regulatoryConfig: 'typing.Optional[uint]' = None
     locationCapability: 'typing.Optional[uint]' = None
     serverGeneratedCommandList: 'typing.List[uint]' = None
@@ -9199,7 +9199,7 @@ class GeneralCommissioning(Cluster):
     clusterRevision: 'uint' = None
 
     class Enums:
-        class GeneralCommissioningError(IntEnum):
+        class CommissioningError(IntEnum):
             kOk = 0x00
             kValueOutsideRange = 0x01
             kInvalidAuthentication = 0x02
@@ -9213,15 +9213,15 @@ class GeneralCommissioning(Cluster):
 
     class Structs:
         @dataclass
-        class BasicCommissioningInfoType(ClusterObject):
+        class BasicCommissioningInfo(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="failSafeExpiryLengthMs", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="failSafeExpiryLengthSeconds", Tag=0, Type=uint),
                     ])
 
-            failSafeExpiryLengthMs: 'uint' = 0
+            failSafeExpiryLengthSeconds: 'uint' = 0
 
 
 
@@ -9255,11 +9255,11 @@ class GeneralCommissioning(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="errorCode", Tag=0, Type=GeneralCommissioning.Enums.GeneralCommissioningError),
+                            ClusterObjectFieldDescriptor(Label="errorCode", Tag=0, Type=GeneralCommissioning.Enums.CommissioningError),
                             ClusterObjectFieldDescriptor(Label="debugText", Tag=1, Type=str),
                     ])
 
-            errorCode: 'GeneralCommissioning.Enums.GeneralCommissioningError' = 0
+            errorCode: 'GeneralCommissioning.Enums.CommissioningError' = 0
             debugText: 'str' = ""
 
         @dataclass
@@ -9293,11 +9293,11 @@ class GeneralCommissioning(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="errorCode", Tag=0, Type=GeneralCommissioning.Enums.GeneralCommissioningError),
+                            ClusterObjectFieldDescriptor(Label="errorCode", Tag=0, Type=GeneralCommissioning.Enums.CommissioningError),
                             ClusterObjectFieldDescriptor(Label="debugText", Tag=1, Type=str),
                     ])
 
-            errorCode: 'GeneralCommissioning.Enums.GeneralCommissioningError' = 0
+            errorCode: 'GeneralCommissioning.Enums.CommissioningError' = 0
             debugText: 'str' = ""
 
         @dataclass
@@ -9323,11 +9323,11 @@ class GeneralCommissioning(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="errorCode", Tag=0, Type=GeneralCommissioning.Enums.GeneralCommissioningError),
+                            ClusterObjectFieldDescriptor(Label="errorCode", Tag=0, Type=GeneralCommissioning.Enums.CommissioningError),
                             ClusterObjectFieldDescriptor(Label="debugText", Tag=1, Type=str),
                     ])
 
-            errorCode: 'GeneralCommissioning.Enums.GeneralCommissioningError' = 0
+            errorCode: 'GeneralCommissioning.Enums.CommissioningError' = 0
             debugText: 'str' = ""
 
 
@@ -9349,7 +9349,7 @@ class GeneralCommissioning(Cluster):
             value: 'uint' = 0
 
         @dataclass
-        class BasicCommissioningInfoList(ClusterAttributeDescriptor):
+        class BasicCommissioningInfo(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0030
@@ -9360,9 +9360,9 @@ class GeneralCommissioning(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[GeneralCommissioning.Structs.BasicCommissioningInfoType])
+                return ClusterObjectFieldDescriptor(Type=GeneralCommissioning.Structs.BasicCommissioningInfo)
 
-            value: 'typing.List[GeneralCommissioning.Structs.BasicCommissioningInfoType]' = field(default_factory=lambda: [])
+            value: 'GeneralCommissioning.Structs.BasicCommissioningInfo' = field(default_factory=lambda: GeneralCommissioning.Structs.BasicCommissioningInfo())
 
         @dataclass
         class RegulatoryConfig(ClusterAttributeDescriptor):

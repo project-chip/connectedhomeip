@@ -247,6 +247,16 @@
 #endif
 
 /**
+ * CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC
+ *
+ * The default conservative initial duration (in seconds) to set in the FailSafe for the commissioning
+ * flow to complete successfully. This may vary depending on the speed or sleepiness of the Commissionee.
+ */
+#ifndef CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC
+#define CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC 60
+#endif // CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC
+
+/**
  * CHIP_DEVICE_CONFIG_USER_SELECTED_MODE_TIMEOUT_SEC
  *
  * The default amount of time (in whole seconds) that the device will remain in "user selected"
