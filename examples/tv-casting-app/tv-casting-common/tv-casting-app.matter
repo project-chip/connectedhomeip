@@ -1471,21 +1471,21 @@ server cluster IasZone = 1280 {
   readonly attribute int8u zoneId = 17;
   readonly global attribute int16u clusterRevision = 65533;
 
-  request struct ZoneEnrollRequestRequest {
+  request struct ZoneEnrollResponseRequest {
+    IasEnrollResponseCode enrollResponseCode = 0;
+    INT8U zoneId = 1;
+  }
+
+  response struct ZoneEnrollRequest {
     IasZoneType zoneType = 0;
     INT16U manufacturerCode = 1;
   }
 
-  request struct ZoneStatusChangeNotificationRequest {
+  response struct ZoneStatusChangeNotification {
     IasZoneStatus zoneStatus = 0;
     BITMAP8 extendedStatus = 1;
     INT8U zoneId = 2;
     INT16U delay = 3;
-  }
-
-  response struct ZoneEnrollResponse {
-    IasEnrollResponseCode enrollResponseCode = 0;
-    INT8U zoneId = 1;
   }
 
   command ZoneEnrollRequest(ZoneEnrollRequestRequest): ZoneEnrollResponse = 1;
