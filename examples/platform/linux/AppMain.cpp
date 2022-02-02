@@ -25,10 +25,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/NodeId.h>
 
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/DeviceAttestationVerifier.h>
-#include <credentials/examples/DefaultDeviceAttestationVerifier.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <DattConfig.h>
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/ScopedBuffer.h>
@@ -257,7 +254,7 @@ CHIP_ERROR InitCommissioner()
 
     // Initialize device attestation verifier
     // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
-    const Credentials::AttestationTrustStore * testingRootStore = Credentials::GetTestAttestationTrustStore();
+    const Credentials::AttestationTrustStore * testingRootStore = GetAttestationTrustStore();
     SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
 
     Platform::ScopedMemoryBuffer<uint8_t> noc;
@@ -519,7 +516,7 @@ void ChipLinuxAppMainLoop()
     PrintOnboardingCodes(LinuxDeviceOptions::GetInstance().payload);
 
     // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    SetDeviceAttestationCredentialsProvider(GetAttestationCredentialsProvider());
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     InitCommissioner();

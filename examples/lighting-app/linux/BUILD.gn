@@ -33,7 +33,7 @@ config("includes") {
   ]
 }
 
-executable("chip-lighting-app") {
+static_library("chip-lighting-app-utils") {
   sources = [
     "LightingManager.cpp",
     "include/CHIPProjectAppConfig.h",
@@ -81,6 +81,12 @@ executable("chip-lighting-app") {
     # -Wconversion, remove check for RPC build only.
     cflags = [ "-Wconversion" ]
   }
+
+  output_dir = root_out_dir
+}
+
+executable("chip-lighting-app") {
+  deps = [ ":chip-lighting-app-utils" ]
 
   output_dir = root_out_dir
 }
