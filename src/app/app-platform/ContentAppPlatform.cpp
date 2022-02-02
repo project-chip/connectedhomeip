@@ -194,9 +194,9 @@ void ContentAppPlatform::SetupAppPlatform()
     // emberAfEndpointEnableDisable(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1)), false);
 }
 
-ContentApp * ContentAppPlatform::GetContentAppInternal(const CatalogVendorApp * vendorApp)
+ContentApp * ContentAppPlatform::GetContentAppInternal(const CatalogVendorApp & vendorApp)
 {
-    if (vendorApp->catalogVendorId != mContentAppFactory->GetPlatformCatalogVendorId())
+    if (vendorApp.catalogVendorId != mContentAppFactory->GetPlatformCatalogVendorId())
     {
         return nullptr;
     }
@@ -213,7 +213,7 @@ ContentApp * ContentAppPlatform::GetContentAppInternal(const CatalogVendorApp * 
     return nullptr;
 }
 
-ContentApp * ContentAppPlatform::LoadContentAppInternal(const CatalogVendorApp * vendorApp)
+ContentApp * ContentAppPlatform::LoadContentAppInternal(const CatalogVendorApp & vendorApp)
 {
     ContentApp * app = GetContentAppInternal(vendorApp);
     if (app != nullptr)
@@ -242,9 +242,9 @@ ContentApp * ContentAppPlatform::LoadContentAppByClient(uint16_t vendorId, uint1
     return LoadContentAppInternal(&vendorApp);
 }
 
-ContentApp * ContentAppPlatform::LoadContentApp(const CatalogVendorApp * vendorApp)
+ContentApp * ContentAppPlatform::LoadContentApp(const CatalogVendorApp & vendorApp)
 {
-    if (vendorApp->catalogVendorId == mContentAppFactory->GetPlatformCatalogVendorId())
+    if (vendorApp.catalogVendorId == mContentAppFactory->GetPlatformCatalogVendorId())
     {
         return LoadContentAppInternal(vendorApp);
     }
@@ -253,15 +253,15 @@ ContentApp * ContentAppPlatform::LoadContentApp(const CatalogVendorApp * vendorA
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(DeviceLayer, "GetLoadContentApp() - failed to find an app for catalog vendorId %d, appId %s",
-                        vendorApp->catalogVendorId, vendorApp->applicationId);
+                        vendorApp.catalogVendorId, vendorApp.applicationId);
         return nullptr;
     }
     return LoadContentAppInternal(&destinationApp);
 }
 
-ContentApp * ContentAppPlatform::GetContentApp(const CatalogVendorApp * vendorApp)
+ContentApp * ContentAppPlatform::GetContentApp(const CatalogVendorApp & vendorApp)
 {
-    if (vendorApp->catalogVendorId == mContentAppFactory->GetPlatformCatalogVendorId())
+    if (vendorApp.catalogVendorId == mContentAppFactory->GetPlatformCatalogVendorId())
     {
         return GetContentAppInternal(vendorApp);
     }
@@ -270,7 +270,7 @@ ContentApp * ContentAppPlatform::GetContentApp(const CatalogVendorApp * vendorAp
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(DeviceLayer, "GetContentApp() - failed to find an app for catalog vendorId %d, appId %s",
-                        vendorApp->catalogVendorId, vendorApp->applicationId);
+                        vendorApp.catalogVendorId, vendorApp.applicationId);
         return nullptr;
     }
     return GetContentAppInternal(&destinationApp);

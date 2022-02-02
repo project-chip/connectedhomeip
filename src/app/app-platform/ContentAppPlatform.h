@@ -43,14 +43,14 @@ public:
     virtual CHIP_ERROR LookupCatalogVendorApp(uint16_t vendorId, uint16_t productId, CatalogVendorApp * destinationApp) = 0;
 
     // Lookup ContentApp for this catalog id / app id and load it
-    virtual ContentApp * LoadContentApp(const CatalogVendorApp * vendorApp) = 0;
+    virtual ContentApp * LoadContentApp(const CatalogVendorApp & vendorApp) = 0;
 
     // Gets the catalog vendor ID used by this platform
     virtual uint16_t GetPlatformCatalogVendorId() = 0;
 
     // Converts application (any catalog) into the platform's catalog Vendor
     // and then writes it to destinationApp
-    virtual CHIP_ERROR ConvertToPlatformCatalogVendorApp(const CatalogVendorApp * sourceApp, CatalogVendorApp * destinationApp) = 0;
+    virtual CHIP_ERROR ConvertToPlatformCatalogVendorApp(const CatalogVendorApp & sourceApp, CatalogVendorApp * destinationApp) = 0;
 };
 
 class DLL_EXPORT ContentAppPlatform
@@ -86,13 +86,13 @@ public:
     ContentApp * LoadContentAppByClient(uint16_t vendorId, uint16_t productId);
 
     // Lookup ContentApp described by this application and load it
-    ContentApp * LoadContentApp(const CatalogVendorApp * application);
+    ContentApp * LoadContentApp(const CatalogVendorApp & application);
 
     // helpful method to get a Content App by endpoint in order to perform attribute or command ops
     ContentApp * GetContentApp(EndpointId id);
 
     // helpful method to get a Content App by application, does not load if not found
-    ContentApp * GetContentApp(const CatalogVendorApp * application);
+    ContentApp * GetContentApp(const CatalogVendorApp & application);
 
     // sets the current app for this platform
     void SetCurrentApp(ContentApp * app);
@@ -115,8 +115,8 @@ public:
 
 protected:
     // requires vendorApp to be in the catalog of the platform
-    ContentApp * LoadContentAppInternal(const CatalogVendorApp * vendorApp);
-    ContentApp * GetContentAppInternal(const CatalogVendorApp * vendorApp);
+    ContentApp * LoadContentAppInternal(const CatalogVendorApp & vendorApp);
+    ContentApp * GetContentAppInternal(const CatalogVendorApp & vendorApp);
 
     static const int kNoCurrentEndpointId = 0;
     EndpointId mCurrentAppEndpointId      = kNoCurrentEndpointId;
