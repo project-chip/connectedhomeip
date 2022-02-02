@@ -58,7 +58,9 @@ struct PersistentData
         ReturnErrorOnFailure(Serialize(writer));
 
         // Save serialized data
-        return storage.SyncSetKeyValue(key.KeyName(), buffer, static_cast<uint16_t>(writer.GetLengthWritten()));
+        CHIP_ERROR err = storage.SyncSetKeyValue(key.KeyName(), buffer, static_cast<uint16_t>(writer.GetLengthWritten()));
+        printf("\nSAVE %s %s\n", ToString(), CHIP_NO_ERROR == err ? "ok" : err.AsString());
+        return err;
     }
 
     CHIP_ERROR Load(chip::PersistentStorageDelegate & storage)
@@ -75,13 +77,18 @@ struct PersistentData
         // Load the serialized data
         uint16_t size  = static_cast<uint16_t>(sizeof(buffer));
         CHIP_ERROR err = storage.SyncGetKeyValue(key.KeyName(), buffer, size);
-        VerifyOrReturnError(CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND != err, CHIP_ERROR_NOT_FOUND);
-        ReturnErrorOnFailure(err);
-
-        // Decode serialized data
-        TLV::TLVReader reader;
-        reader.Init(buffer, size);
-        return Deserialize(reader);
+        if(CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND == err) { err = CHIP_ERROR_NOT_FOUND; };
+        // VerifyOrReturnError(CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND != err, CHIP_ERROR_NOT_FOUND);
+        // ReturnErrorOnFailure(err);
+        if(CHIP_NO_ERROR == err)
+        {
+            // Decode serialized data
+            TLV::TLVReader reader;
+            reader.Init(buffer, size);
+            err = Deserialize(reader);
+        }
+        printf("\nLOAD %s %s\n", ToString(), CHIP_NO_ERROR == err ? "ok" : CHIP_ERROR_NOT_FOUND == err ? "MISS" : err.AsString());
+        return err;
     }
 
     virtual CHIP_ERROR Delete(chip::PersistentStorageDelegate & storage)
@@ -90,8 +97,24 @@ struct PersistentData
         // Update storage key
         ReturnErrorOnFailure(UpdateKey(key));
         // Delete stored data
-        return storage.SyncDeleteKeyValue(key.KeyName());
+        CHIP_ERROR err = storage.SyncDeleteKeyValue(key.KeyName());
+        printf("\nDELETE %s %s\n", ToString(), CHIP_NO_ERROR == err ? "ok" : err.AsString());
+        return err;
     }
+
+// DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG
+    char mDebug[514];
+    const char *ToString()
+    {
+        Format();
+        return mDebug;
+    }
+    virtual void Format()
+    {
+        strncpy(mDebug, "?", sizeof(mDebug));
+    }
+// DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG
+
 };
 
 struct LinkedData : public PersistentData<kPersistentBufferMax>
@@ -118,6 +141,11 @@ struct FabricList : public PersistentData<kPersistentBufferMax>
 
     FabricList() = default;
     FabricList(chip::FabricIndex first) : first_fabric(first), fabric_count(1) {}
+
+    void Format() override
+    {
+        snprintf(mDebug, sizeof(mDebug), "[fabric_list] *fabric:%u/%u", first_fabric, fabric_count);
+    }
 
     CHIP_ERROR UpdateKey(DefaultStorageKeyAllocator & key) override
     {
@@ -182,6 +210,11 @@ struct FabricData : public PersistentData<kPersistentBufferMax>
 
     FabricData() = default;
     FabricData(chip::FabricIndex fabric) : fabric_index(fabric) {}
+
+    void Format() override
+    {
+        snprintf(mDebug, sizeof(mDebug), "[fabric:%u] *group:#%x/%u, *map:%u/%u, *keys:#%x/%u next:%u", fabric_index, first_group, group_count, first_map, map_count, first_keyset, keyset_count, next);
+    }
 
     CHIP_ERROR UpdateKey(DefaultStorageKeyAllocator & key) override
     {
@@ -381,6 +414,11 @@ struct GroupData : public GroupDataProvider::GroupInfo, PersistentData<kPersiste
     GroupData(chip::FabricIndex fabric) : GroupInfo(), fabric_index(fabric) {}
     GroupData(chip::FabricIndex fabric, chip::GroupId group) : GroupInfo(group, nullptr), fabric_index(fabric) {}
 
+    void Format() override
+    {
+        snprintf(mDebug, sizeof(mDebug), "[group:%u.%u #%x '%s'] *end:#%x/%u (#%x..#%x)", fabric_index, index, group_id, name, first_endpoint, endpoint_count, prev, next);
+    }
+
     CHIP_ERROR UpdateKey(DefaultStorageKeyAllocator & key) override
     {
         VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_FABRIC_ID);
@@ -504,6 +542,11 @@ struct KeyMapData : public GroupDataProvider::GroupKey, LinkedData
         GroupKey(group, keyset), LinkedData(link_id), fabric_index(fabric)
     {}
 
+    void Format() override
+    {
+        snprintf(mDebug, sizeof(mDebug), "[group-keyset] fabric:%u, group:#%x, keyset:#%x (#%x..#%x)", fabric_index, group_id, keyset_id, prev, next);
+    }
+
     CHIP_ERROR UpdateKey(DefaultStorageKeyAllocator & key) override
     {
         VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_FABRIC_ID);
@@ -624,6 +667,11 @@ struct EndpointData : GroupDataProvider::GroupEndpoint, PersistentData<kPersiste
         fabric_index(fabric)
     {}
 
+    void Format() override
+    {
+        snprintf(mDebug, sizeof(mDebug), "[group-end] fabric:%u, group:#%x, end:#%x (#%x..#%x)", fabric_index, group_id, endpoint_id, prev, next);
+    }
+
     CHIP_ERROR UpdateKey(DefaultStorageKeyAllocator & key) override
     {
         VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_FABRIC_ID);
@@ -727,6 +775,12 @@ struct KeySetData : PersistentData<kPersistentBufferMax>
     KeySetData(chip::FabricIndex fabric, chip::KeysetId id, KeySet::SecurityPolicy policy_id, uint8_t num_keys) :
         fabric_index(fabric), keyset_id(id), policy(policy_id), keys_count(num_keys)
     {}
+
+    void Format() override
+    {
+        snprintf(mDebug, sizeof(mDebug), "[keyset:%u.#%x] num_keys:%u (#%x..#%x)", fabric_index, keyset_id, keys_count, prev, next);
+    }
+
 
     CHIP_ERROR UpdateKey(DefaultStorageKeyAllocator & key) override
     {
@@ -899,6 +953,8 @@ void GroupDataProviderImpl::Finish()
 
 CHIP_ERROR GroupDataProviderImpl::SetGroupInfo(chip::FabricIndex fabric_index, const GroupInfo & info)
 {
+    printf("\n======== SetGroupInfo, fabric:%u, group:#%x '%s'\n", fabric_index, info.group_id, info.name);
+
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
 
     FabricData fabric(fabric_index);
@@ -910,6 +966,7 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfo(chip::FabricIndex fabric_index, c
 
     if (group.Find(mStorage, fabric, info.group_id))
     {
+        printf("FOUND!\n");
         // Existing group_id
         group.SetName(info.name);
         return group.Save(mStorage);
@@ -917,20 +974,22 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfo(chip::FabricIndex fabric_index, c
     else
     {
         // New group_id
-        group.group_id = info.group_id;
-        group.SetName(info.name);
-        return SetGroupInfoAt(fabric_index, fabric.group_count, group);
+        printf("NOT FOUND!\n");
+        return SetGroupInfoAt(fabric_index, fabric.group_count, info);
     }
 }
 
 CHIP_ERROR GroupDataProviderImpl::GetGroupInfo(chip::FabricIndex fabric_index, chip::GroupId group_id, GroupInfo & info)
 {
+    printf("\n======== GetGroupInfo, fabric:%u, group:#%x\n", fabric_index, group_id);
+
     FabricData fabric(fabric_index);
     GroupData group;
 
     ReturnErrorOnFailure(fabric.Load(mStorage));
     VerifyOrReturnError(group.Find(mStorage, fabric, group_id), CHIP_ERROR_NOT_FOUND);
 
+    printf("FOUND!!\n");
     info.group_id = group_id;
     info.SetName(group.name);
     return CHIP_NO_ERROR;
@@ -949,6 +1008,8 @@ CHIP_ERROR GroupDataProviderImpl::RemoveGroupInfo(chip::FabricIndex fabric_index
 
 CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index, size_t index, const GroupInfo & info)
 {
+    printf("\n======== SetGroupInfoAt, fabric:%u.%zu, group:#%x '%s'\n", fabric_index, index, info.group_id, info.name);
+
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
 
     FabricData fabric(fabric_index);
@@ -964,15 +1025,17 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index,
 
     group.group_id = info.group_id;
     group.SetName(info.name);
-
     if (found)
     {
         // Update existing entry
+        printf("\n*FOUND\n");
         return group.Save(mStorage);
     }
     else if (index < fabric.group_count)
     {
         // Replace existing entry with a new group
+        printf("\n*REPLACE\n");
+
         GroupData old_group;
         old_group.Get(mStorage, fabric, index);
         group.first = old_group.first;
@@ -986,11 +1049,15 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index,
     else
     {
         // Insert last
+        printf("\n*INSERT.1\n");
         VerifyOrReturnError(fabric.group_count == index, CHIP_ERROR_INVALID_ARGUMENT);
+        printf("\n*INSERT.2 %u, %u\n", fabric.group_count, mMaxGroupsPerFabric);
         VerifyOrReturnError(fabric.group_count < mMaxGroupsPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
+        printf("\n*INSERT.3\n");
         fabric.group_count++;
     }
 
+    printf("SAVING... #%x '%s'\n", group.group_id, group.name);
     ReturnErrorOnFailure(group.Save(mStorage));
 
     if (group.first)
@@ -1014,6 +1081,8 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index,
 
 CHIP_ERROR GroupDataProviderImpl::GetGroupInfoAt(chip::FabricIndex fabric_index, size_t index, GroupInfo & info)
 {
+    printf("\n======== GetGroupInfoAt, fabric:%u.%zu\n", fabric_index, index);
+
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
 
     FabricData fabric(fabric_index);
@@ -1102,9 +1171,11 @@ CHIP_ERROR GroupDataProviderImpl::AddEndpoint(chip::FabricIndex fabric_index, ch
     if (!group.Find(mStorage, fabric, group_id))
     {
         // New group
+        VerifyOrReturnError(fabric.group_count < mMaxGroupsPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
         ReturnErrorOnFailure(EndpointData(fabric_index, group_id, endpoint_id).Save(mStorage));
         // Save the new group into the fabric
         group.group_id       = group_id;
+        group.name[0] = 0;
         group.first_endpoint = endpoint_id;
         group.endpoint_count = 1;
         group.next           = fabric.first_group;

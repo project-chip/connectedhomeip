@@ -230,3 +230,37 @@ tests:
                 value: 0x0102
       response:
           error: NOT_FOUND
+
+
+    - label: "Add Group 1 (new)"
+      cluster: "Groups"
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "groupId"
+                value: 0x0001
+              - name: "groupName"
+                value: "Group #1"
+      response:
+          values:
+              - name: "status"
+                value: 0
+              - name: "groupId"
+                value: 0x0001
+
+    - label: "View Group 1 (new)"
+      cluster: "Groups"
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: "groupId"
+                value: 0x0001
+      response:
+          values:
+              - name: "status"
+                value: 0
+              - name: "groupId"
+                value: 0x0001
+              - name: "groupName"
+                value: "Group #1"
+                

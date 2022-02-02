@@ -42226,6 +42226,73 @@ NSMutableData * readAttributeOctetStringNotDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
+- (void)testSendClusterTestGroupKeyManagementCluster_000017_AddGroup
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Add Group 1 (new)"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestGroups * cluster = [[CHIPTestGroups alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPGroupsClusterAddGroupParams alloc] init];
+    params.groupId = [NSNumber numberWithUnsignedShort:1U];
+    params.groupName = @"Group #1";
+    [cluster addGroupWithParams:params
+              completionHandler:^(CHIPGroupsClusterAddGroupResponseParams * _Nullable values, NSError * _Nullable err) {
+                  NSLog(@"Add Group 1 (new) Error: %@", err);
+
+                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                  {
+                      id actualValue = values.status;
+                      XCTAssertEqual([actualValue unsignedCharValue], 0);
+                  }
+                  {
+                      id actualValue = values.groupId;
+                      XCTAssertEqual([actualValue unsignedShortValue], 1U);
+                  }
+
+                  [expectation fulfill];
+              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestGroupKeyManagementCluster_000018_ViewGroup
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"View Group 1 (new)"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestGroups * cluster = [[CHIPTestGroups alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPGroupsClusterViewGroupParams alloc] init];
+    params.groupId = [NSNumber numberWithUnsignedShort:1U];
+    [cluster viewGroupWithParams:params
+               completionHandler:^(CHIPGroupsClusterViewGroupResponseParams * _Nullable values, NSError * _Nullable err) {
+                   NSLog(@"View Group 1 (new) Error: %@", err);
+
+                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                   {
+                       id actualValue = values.status;
+                       XCTAssertEqual([actualValue unsignedCharValue], 0);
+                   }
+                   {
+                       id actualValue = values.groupId;
+                       XCTAssertEqual([actualValue unsignedShortValue], 1U);
+                   }
+                   {
+                       id actualValue = values.groupName;
+                       XCTAssertTrue([actualValue isEqualToString:@"Group #1"]);
+                   }
+
+                   [expectation fulfill];
+               }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
 
 - (void)testSendClusterTestIdentifyCluster_000000_WaitForCommissionee
 {
