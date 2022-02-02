@@ -239,12 +239,12 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPGeneralCommissioningClusterBasicCommissioningInfoType
+@implementation CHIPGeneralCommissioningClusterBasicCommissioningInfo
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _failSafeExpiryLengthMs = @(0);
+        _failSafeExpiryLengthSeconds = @(0);
     }
     return self;
 }

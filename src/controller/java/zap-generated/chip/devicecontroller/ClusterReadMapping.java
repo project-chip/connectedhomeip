@@ -3653,25 +3653,6 @@ public class ClusterReadMapping {
             readGeneralCommissioningBreadcrumbCommandParams);
     readGeneralCommissioningInteractionInfo.put(
         "readBreadcrumbAttribute", readGeneralCommissioningBreadcrumbAttributeInteractionInfo);
-    Map<String, CommandParameterInfo>
-        readGeneralCommissioningBasicCommissioningInfoListCommandParams =
-            new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readGeneralCommissioningBasicCommissioningInfoListAttributeInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.GeneralCommissioningCluster) cluster)
-                  .readBasicCommissioningInfoListAttribute(
-                      (ChipClusters.GeneralCommissioningCluster
-                              .BasicCommissioningInfoListAttributeCallback)
-                          callback);
-            },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedGeneralCommissioningClusterBasicCommissioningInfoListAttributeCallback(),
-            readGeneralCommissioningBasicCommissioningInfoListCommandParams);
-    readGeneralCommissioningInteractionInfo.put(
-        "readBasicCommissioningInfoListAttribute",
-        readGeneralCommissioningBasicCommissioningInfoListAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readGeneralCommissioningRegulatoryConfigCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readGeneralCommissioningRegulatoryConfigAttributeInteractionInfo =

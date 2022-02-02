@@ -182,11 +182,11 @@ typedef struct _ApplicationBasicApplication
     chip::CharSpan applicationId;
 } ApplicationBasicApplication;
 
-// Struct for BasicCommissioningInfoType
-typedef struct _BasicCommissioningInfoType
+// Struct for BasicCommissioningInfo
+typedef struct _BasicCommissioningInfo
 {
-    uint32_t FailSafeExpiryLengthMs;
-} BasicCommissioningInfoType;
+    uint16_t FailSafeExpiryLengthSeconds;
+} BasicCommissioningInfo;
 
 // Struct for BatChargeFaultChangeType
 typedef struct _BatChargeFaultChangeType

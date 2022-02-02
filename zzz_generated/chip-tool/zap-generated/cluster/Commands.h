@@ -3080,7 +3080,7 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Breadcrumb                                                        | 0x0000 |
-| * BasicCommissioningInfoList                                        | 0x0001 |
+| * BasicCommissioningInfo                                            | 0x0001 |
 | * RegulatoryConfig                                                  | 0x0002 |
 | * LocationCapability                                                | 0x0003 |
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
@@ -10650,12 +10650,11 @@ void registerClusterGeneralCommissioning(Commands & commands, CredentialIssuerCo
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                           //
-        make_unique<ReadAttribute>(Id, "breadcrumb", Attributes::Breadcrumb::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "basic-commissioning-info-list", Attributes::BasicCommissioningInfoList::Id,
-                                   credsIssuerConfig),                                                                //
-        make_unique<ReadAttribute>(Id, "regulatory-config", Attributes::RegulatoryConfig::Id, credsIssuerConfig),     //
-        make_unique<ReadAttribute>(Id, "location-capability", Attributes::LocationCapability::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "breadcrumb", Attributes::Breadcrumb::Id, credsIssuerConfig),                           //
+        make_unique<ReadAttribute>(Id, "basic-commissioning-info", Attributes::BasicCommissioningInfo::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "regulatory-config", Attributes::RegulatoryConfig::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "location-capability", Attributes::LocationCapability::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
@@ -10666,7 +10665,7 @@ void registerClusterGeneralCommissioning(Commands & commands, CredentialIssuerCo
         make_unique<WriteGeneralCommissioningBreadcrumb>(credsIssuerConfig),                                    //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                 //
         make_unique<SubscribeAttribute>(Id, "breadcrumb", Attributes::Breadcrumb::Id, credsIssuerConfig),       //
-        make_unique<SubscribeAttribute>(Id, "basic-commissioning-info-list", Attributes::BasicCommissioningInfoList::Id,
+        make_unique<SubscribeAttribute>(Id, "basic-commissioning-info", Attributes::BasicCommissioningInfo::Id,
                                         credsIssuerConfig),                                                                //
         make_unique<SubscribeAttribute>(Id, "regulatory-config", Attributes::RegulatoryConfig::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "location-capability", Attributes::LocationCapability::Id, credsIssuerConfig), //

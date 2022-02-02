@@ -525,8 +525,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPTestGeneralCommissioning : CHIPGeneralCommissioning
 
-- (void)writeAttributeBasicCommissioningInfoListWithValue:(NSArray * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeBasicCommissioningInfoWithValue:(CHIPGeneralCommissioningClusterBasicCommissioningInfo * _Nonnull)value
+                                    completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeRegulatoryConfigWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeLocationCapabilityWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
