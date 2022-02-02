@@ -42,15 +42,16 @@ def VerifyDecodeSuccess(values):
     for endpoint in values:
         for cluster in values[endpoint]:
             for attribute in values[endpoint][cluster]:
-                v = values[endpoint][cluster][attribute]
-                print(f"EP{endpoint}/{attribute} = {v}")
-                if (isinstance(v, ValueDecodeFailure)):
+                data = values[endpoint][cluster][attribute]['Data']
+                data_version = values[endpoint][cluster][attribute]['DataVersion']
+                print(f"EP{endpoint}/{attribute} = {data}/{data_version}")
+                if (isinstance(data, ValueDecodeFailure)):
                     if _IgnoreAttributeDecodeFailure((endpoint, cluster, attribute)):
                         print(
                             f"Ignoring attribute decode failure for path {endpoint}/{attribute}")
                     else:
                         raise AssertionError(
-                            f"Cannot decode value for path {k}, got error: '{str(v.Data.Reason)}', raw TLV data: '{v.Data.TLVValue}'")
+                            f"Cannot decode value for path {endpoint}/{attribute}, got error: '{str(data.Data.Reason)}', raw TLV data: '{data.Data.TLVValue}'")
 
 
 def _AssumeEventsDecodeSuccess(values):
@@ -211,21 +212,21 @@ class ClusterObjectTests:
 
         logger.info("7: Reading Chunked List")
         res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.TestCluster.Attributes.ListLongOctetString)])
-        if res[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListLongOctetString] != [b'0123456789abcdef' * 32] * 4:
+        if res[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListLongOctetString]['Data'] != [b'0123456789abcdef' * 32] * 4:
             raise AssertionError("Unexpected read result")
 
         logger.info("*: Getting current fabric index")
         res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(0, Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)])
-        fabricIndex = res[0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.CurrentFabricIndex]
+        fabricIndex = res[0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.CurrentFabricIndex]['Data']
 
         logger.info("8: Read without fabric filter")
         res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.TestCluster.Attributes.ListFabricScoped)], fabricFiltered=False)
-        if len(res[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]) <= 1:
+        if len(res[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]['Data']) <= 1:
             raise AssertionError("Expect more elements in the response")
 
         logger.info("9: Read with fabric filter")
         res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.TestCluster.Attributes.ListFabricScoped)], fabricFiltered=True)
-        if len(res[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]) != 1:
+        if len(res[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]['Data']) != 1:
             raise AssertionError("Expect exact one element in the response")
         if res[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped][0].fabricIndex != fabricIndex:
             raise AssertionError(
@@ -339,6 +340,78 @@ class ClusterObjectTests:
             pass
 
     @classmethod
+    async def TestReadWriteAttributeRequestsWithVersion(cls, devCtrl):
+        logger.info("TestReadWriteAttributeRequestsWithVersion")
+        req = [
+            (0, Clusters.Basic.Attributes.VendorName)
+        ]
+        res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req)
+        VerifyDecodeSuccess(res)
+        data_version = res[0][Clusters.Basic][Clusters.Basic.Attributes.VendorName]['DataVersion']
+
+        res = await devCtrl.WriteAttribute(nodeid=NODE_ID,
+                                           attributes=[
+                                               (0, Clusters.Basic.Attributes.NodeLabel(
+                                                   "Test"))
+                                           ])
+        expectedRes = [
+            AttributeStatus(Path=AttributePath(EndpointId=0, ClusterId=40,
+                                               AttributeId=5), Status=chip.interaction_model.Status.Success),
+        ]
+
+        if res != expectedRes:
+            for i in range(len(res)):
+                if res[i] != expectedRes[i]:
+                    logger.error(
+                        f"Item {i} is not expected, expect {expectedRes[i]} got {res[i]}")
+            raise AssertionError("Write returned unexpected result.")
+
+        req = [
+            (0, Clusters.Basic.Attributes.VendorName),
+        ]
+        res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req, dataVersionFilters=[(0, Clusters.Basic, data_version)])
+        VerifyDecodeSuccess(res)
+        new_data_version = res[0][Clusters.Basic][Clusters.Basic.Attributes.VendorName]['DataVersion']
+        if (data_version + 1) != new_data_version:
+            raise AssertionError("Version mistmatch happens.")
+
+        res = await devCtrl.WriteAttribute(nodeid=NODE_ID,
+                                           attributes=[
+                                               (0, Clusters.Basic.Attributes.NodeLabel(
+                                                   "Test"), new_data_version)
+                                           ])
+
+        expectedRes = [
+            AttributeStatus(Path=AttributePath(EndpointId=0, ClusterId=40,
+                                               AttributeId=5), Status=chip.interaction_model.Status.Success),
+        ]
+
+        if res != expectedRes:
+            for i in range(len(res)):
+                if res[i] != expectedRes[i]:
+                    logger.error(
+                        f"Item {i} is not expected, expect {expectedRes[i]} got {res[i]}")
+            raise AssertionError("Write returned unexpected result.")
+
+        res = await devCtrl.WriteAttribute(nodeid=NODE_ID,
+                                           attributes=[
+                                               (0, Clusters.Basic.Attributes.NodeLabel(
+                                                   "Test"), new_data_version)
+                                           ])
+
+        expectedRes = [
+            AttributeStatus(Path=AttributePath(EndpointId=0, ClusterId=40,
+                                               AttributeId=5), Status=chip.interaction_model.Status.DataVersionMismatch),
+        ]
+
+        if res != expectedRes:
+            for i in range(len(res)):
+                if res[i] != expectedRes[i]:
+                    logger.error(
+                        f"Item {i} is not expected, expect {expectedRes[i]} got {res[i]}")
+            raise AssertionError("Write returned unexpected result.")
+
+    @classmethod
     async def RunTest(cls, devCtrl):
         try:
             cls.TestAPI()
@@ -348,6 +421,7 @@ class ClusterObjectTests:
             await cls.TestReadEventRequests(devCtrl, 1)
             await cls.SendWriteRequest(devCtrl)
             await cls.TestReadAttributeRequests(devCtrl)
+            await cls.TestReadWriteAttributeRequestsWithVersion(devCtrl)
             await cls.TestSubscribeAttribute(devCtrl)
             await cls.TestTimedRequest(devCtrl)
         except Exception as ex:

@@ -554,8 +554,12 @@ class ChipDeviceController():
 
         attrs = []
         for v in attributes:
-            attrs.append(ClusterAttribute.AttributeWriteRequest(
-                v[0], v[1], v[1].value))
+            if len(v) == 3:
+                attrs.append(ClusterAttribute.AttributeWriteRequest(
+                    v[0], v[1], v[2]))
+            else:
+                attrs.append(ClusterAttribute.AttributeWriteRequest(
+                    v[0], v[1]))
 
         res = self._ChipStack.Call(
             lambda: ClusterAttribute.WriteAttributes(
@@ -576,7 +580,7 @@ class ChipDeviceController():
         typing.Tuple[int, typing.Type[ClusterObjects.Cluster]],
         # Concrete path
         typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]]
-    ]], returnClusterObject: bool = False, reportInterval: typing.Tuple[int, int] = None, fabricFiltered: bool = True):
+    ]], dataVersionFilters: typing.List[typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int]] = None, returnClusterObject: bool = False, reportInterval: typing.Tuple[int, int] = None, fabricFiltered: bool = True):
         '''
         Read a list of attributes from a target node
 

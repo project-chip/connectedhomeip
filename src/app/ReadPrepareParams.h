@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app/AttributePathParams.h>
+#include <app/DataVersionFilterParams.h>
 #include <app/EventPathParams.h>
 #include <app/InteractionModelTimeout.h>
 #include <app/util/basic-types.h>
@@ -41,17 +42,19 @@ typedef void (*OnResubscribePolicyCB)(uint32_t aNumCumulativeRetries, uint32_t &
 struct ReadPrepareParams
 {
     SessionHolder mSessionHolder;
-    EventPathParams * mpEventPathParamsList         = nullptr;
-    size_t mEventPathParamsListSize                 = 0;
-    AttributePathParams * mpAttributePathParamsList = nullptr;
-    size_t mAttributePathParamsListSize             = 0;
-    EventNumber mEventNumber                        = 0;
-    System::Clock::Timeout mTimeout                 = kImMessageTimeout;
-    uint16_t mMinIntervalFloorSeconds               = 0;
-    uint16_t mMaxIntervalCeilingSeconds             = 0;
-    bool mKeepSubscriptions                         = true;
-    bool mIsFabricFiltered                          = false;
-    OnResubscribePolicyCB mResubscribePolicy        = nullptr;
+    EventPathParams * mpEventPathParamsList                 = nullptr;
+    size_t mEventPathParamsListSize                         = 0;
+    AttributePathParams * mpAttributePathParamsList         = nullptr;
+    size_t mAttributePathParamsListSize                     = 0;
+    DataVersionFilterParams * mpDataVersionFilterParamsList = nullptr;
+    size_t mDataVersionFilterParamsListSize                 = 0;
+    EventNumber mEventNumber                                = 0;
+    System::Clock::Timeout mTimeout                         = kImMessageTimeout;
+    uint16_t mMinIntervalFloorSeconds                       = 0;
+    uint16_t mMaxIntervalCeilingSeconds                     = 0;
+    bool mKeepSubscriptions                                 = true;
+    bool mIsFabricFiltered                                  = false;
+    OnResubscribePolicyCB mResubscribePolicy                = nullptr;
 
     ReadPrepareParams() {}
     ReadPrepareParams(const SessionHandle & sessionHandle) { mSessionHolder.Grab(sessionHandle); }
@@ -62,6 +65,8 @@ struct ReadPrepareParams
         mEventPathParamsListSize           = other.mEventPathParamsListSize;
         mpAttributePathParamsList          = other.mpAttributePathParamsList;
         mAttributePathParamsListSize       = other.mAttributePathParamsListSize;
+        mpDataVersionFilterParamsList      = other.mpDataVersionFilterParamsList;
+        mDataVersionFilterParamsListSize   = other.mDataVersionFilterParamsListSize;
         mEventNumber                       = other.mEventNumber;
         mMinIntervalFloorSeconds           = other.mMinIntervalFloorSeconds;
         mMaxIntervalCeilingSeconds         = other.mMaxIntervalCeilingSeconds;
@@ -85,6 +90,8 @@ struct ReadPrepareParams
         mEventPathParamsListSize           = other.mEventPathParamsListSize;
         mpAttributePathParamsList          = other.mpAttributePathParamsList;
         mAttributePathParamsListSize       = other.mAttributePathParamsListSize;
+        mpDataVersionFilterParamsList      = other.mpDataVersionFilterParamsList;
+        mDataVersionFilterParamsListSize   = other.mDataVersionFilterParamsListSize;
         mEventNumber                       = other.mEventNumber;
         mMinIntervalFloorSeconds           = other.mMinIntervalFloorSeconds;
         mMaxIntervalCeilingSeconds         = other.mMaxIntervalCeilingSeconds;

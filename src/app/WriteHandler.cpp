@@ -121,7 +121,8 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         AttributeDataIB::Parser element;
         AttributePathIB::Parser attributePath;
         ClusterInfo clusterInfo;
-        TLV::TLVReader reader = aAttributeDataIBsReader;
+        DataVersion requiredVersion = kUndefinedDataVersion;
+        TLV::TLVReader reader       = aAttributeDataIBsReader;
 
         err = element.Init(reader);
         SuccessOrExit(err);
@@ -156,6 +157,20 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         // We do not support Wildcard writes for now, reject all wildcard write requests.
         VerifyOrExit(clusterInfo.IsValidAttributePath() && !clusterInfo.HasAttributeWildcard(),
                      err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+
+        err = element.GetDataVersion(&requiredVersion);
+        if (CHIP_NO_ERROR == err)
+        {
+            if (!IsClusterDataVersionEqual(clusterInfo.mEndpointId, clusterInfo.mClusterId, requiredVersion))
+            {
+                err = CHIP_ERROR_MISMATCH_WRITE_REQUIRED_VERSION;
+            }
+        }
+        else if (CHIP_END_OF_TLV == err)
+        {
+            err = CHIP_NO_ERROR;
+        }
+        SuccessOrExit(err);
 
         err = element.GetData(&dataReader);
         SuccessOrExit(err);
@@ -365,6 +380,10 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     else
     {
         err = ProcessAttributeDataIBs(AttributeDataIBsReader);
+        if (err == CHIP_ERROR_MISMATCH_WRITE_REQUIRED_VERSION)
+        {
+            status = Status::DataVersionMismatch;
+        }
     }
 
     if (err == CHIP_NO_ERROR)

@@ -115,6 +115,14 @@ private:
                 chip::Platform::Delete<app::AttributePathParams>(&aReadPrepareParams.mpAttributePathParamsList[i]);
             }
         }
+
+        if (aReadPrepareParams.mpDataVersionFilterParamsList != nullptr)
+        {
+            for (size_t i = 0; i < aReadPrepareParams.mDataVersionFilterParamsListSize; i++)
+            {
+                chip::Platform::Delete<app::DataVersionFilterParams>(&aReadPrepareParams.mpDataVersionFilterParamsList[i]);
+            }
+        }
     }
 
     ClusterId mClusterId;

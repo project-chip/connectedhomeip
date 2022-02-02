@@ -123,11 +123,12 @@ public:
      *  Encode an attribute value that can be directly encoded using TLVWriter::Put
      */
     template <class T>
-    CHIP_ERROR EncodeAttributeWritePayload(const chip::app::AttributePathParams & attributePath, const T & value)
+    CHIP_ERROR EncodeAttributeWritePayload(const chip::app::AttributePathParams & attributePath,
+                                           const chip::DataVersion aDataVersion, const T & value)
     {
         chip::TLV::TLVWriter * writer = nullptr;
 
-        ReturnErrorOnFailure(PrepareAttribute(attributePath));
+        ReturnErrorOnFailure(PrepareAttribute(attributePath, aDataVersion));
         VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorOnFailure(
             DataModel::Encode(*writer, chip::TLV::ContextTag(to_underlying(chip::app::AttributeDataIB::Tag::kData)), value));
@@ -153,7 +154,7 @@ public:
      */
     void Shutdown();
 
-    CHIP_ERROR PrepareAttribute(const AttributePathParams & attributePathParams);
+    CHIP_ERROR PrepareAttribute(const AttributePathParams & aAttributePathParams, DataVersion aDataVersion = kUndefinedDataVersion);
     CHIP_ERROR FinishAttribute();
     TLV::TLVWriter * GetAttributeDataIBTLVWriter();
 

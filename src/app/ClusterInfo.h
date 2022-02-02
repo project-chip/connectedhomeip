@@ -79,6 +79,11 @@ public:
     // For event, an event id can only be interpreted if the cluster id is known.
     bool IsValidEventPath() const { return !(HasWildcardClusterId() && !HasWildcardEventId()); }
 
+    bool IsValidDataVersionFilter() const
+    {
+        return !HasWildcardEndpointId() && !HasWildcardClusterId() && mDataVersion != kUndefinedDataVersion;
+    }
+
     inline bool HasWildcardNodeId() const { return mNodeId == kUndefinedNodeId; }
     inline bool HasWildcardEndpointId() const { return mEndpointId == kInvalidEndpointId; }
     inline bool HasWildcardClusterId() const { return mClusterId == kInvalidClusterId; }
@@ -93,13 +98,14 @@ public:
      * Changing order to something more natural (e.g. endpoint id before cluster id) will result
      * in extra memory alignment padding.
      */
-    NodeId mNodeId           = kUndefinedNodeId;    // uint64
-    ClusterInfo * mpNext     = nullptr;             // pointer width (32/64 bits)
-    ClusterId mClusterId     = kInvalidClusterId;   // uint32
-    AttributeId mAttributeId = kInvalidAttributeId; // uint32
-    EventId mEventId         = kInvalidEventId;     // uint32
-    ListIndex mListIndex     = kInvalidListIndex;   // uint16
-    EndpointId mEndpointId   = kInvalidEndpointId;  // uint16
+    NodeId mNodeId           = kUndefinedNodeId;      // uint64
+    ClusterInfo * mpNext     = nullptr;               // pointer width (32/64 bits)
+    ClusterId mClusterId     = kInvalidClusterId;     // uint32
+    AttributeId mAttributeId = kInvalidAttributeId;   // uint32
+    EventId mEventId         = kInvalidEventId;       // uint32
+    ListIndex mListIndex     = kInvalidListIndex;     // uint16
+    EndpointId mEndpointId   = kInvalidEndpointId;    // uint16
+    DataVersion mDataVersion = kUndefinedDataVersion; // uint32
 };
 } // namespace app
 } // namespace chip

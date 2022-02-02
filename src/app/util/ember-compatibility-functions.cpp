@@ -936,6 +936,36 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
     return apWriteHandler->AddStatus(aPath, status);
 }
 
+bool IsClusterDataVersionAllowed(const EndpointId & aEndpointId, const ClusterId & aClusterId, const DataVersion & aDataVersion)
+{
+    DataVersion * version = emberAfDataVersionStorage(aEndpointId, aClusterId);
+    if (version == nullptr)
+    {
+        ChipLogError(DataManagement, "Endpoint %" PRIx16 ", Cluster " ChipLogFormatMEI " not found in IsClusterDataVersionAllowed!",
+                     aEndpointId, ChipLogValueMEI(aClusterId));
+        return false;
+    }
+    else
+    {
+        return (*(version)) > aDataVersion ? true : false;
+    }
+}
+
+bool IsClusterDataVersionEqual(const EndpointId & aEndpointId, const ClusterId & aClusterId, const DataVersion & aRequiredVersion)
+{
+    DataVersion * version = emberAfDataVersionStorage(aEndpointId, aClusterId);
+    if (version == nullptr)
+    {
+        ChipLogError(DataManagement, "Endpoint %" PRIx16 ", Cluster " ChipLogFormatMEI " not found in IsClusterDataVersionEqual!",
+                     aEndpointId, ChipLogValueMEI(aClusterId));
+        return false;
+    }
+    else
+    {
+        return (*(version)) == aRequiredVersion ? true : false;
+    }
+}
+
 } // namespace app
 } // namespace chip
 

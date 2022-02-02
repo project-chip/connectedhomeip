@@ -293,6 +293,9 @@ private:
                                   size_t aEventPathParamsListSize);
     CHIP_ERROR GenerateAttributePathList(AttributePathIBs::Builder & aAttributePathIBsBuilder,
                                          AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize);
+    CHIP_ERROR GenerateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
+                                             DataVersionFilterParams * apDataVersionFilterParamsList,
+                                             size_t aDataVersionFilterParamsListSize);
     CHIP_ERROR ProcessAttributeReportIBs(TLV::TLVReader & aAttributeDataIBsReader);
     CHIP_ERROR ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsReader);
 
@@ -310,7 +313,7 @@ private:
     // Specialized request-sending functions.
     CHIP_ERROR SendReadRequest(ReadPrepareParams & aReadPrepareParams);
     CHIP_ERROR SendSubscribeRequest(ReadPrepareParams & aSubscribePrepareParams);
-
+    void UpdateDataVersionFilters(const EndpointId aEndpointId, const ClusterId & aClusterId, const DataVersion & aDataVersion);
     static void OnResubscribeTimerCallback(System::Layer * apSystemLayer, void * apAppState);
 
     /*

@@ -105,6 +105,15 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
+bool IsClusterDataVersionAllowed(const EndpointId & aEndpointId, const ClusterId & aClusterId, const DataVersion & aDataVersion)
+{
+    return true;
+}
+
+bool IsClusterDataVersionEqual(const EndpointId & aEndpointId, const ClusterId & aClusterId, const DataVersion & aRequiredVersion)
+{
+    return true;
+}
 } // namespace app
 } // namespace chip
 
