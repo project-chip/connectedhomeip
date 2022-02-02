@@ -1683,7 +1683,7 @@ void DeviceCommissioner::OnDone()
                     }
                     else
                     {
-                        // TODO: Gross workaroud for the empty feature map on all clusters. Remove.
+                        // TODO: Gross workaround for the empty feature map on all clusters. Remove.
                         clusters.thread = path.mEndpointId;
                     }
                 }
