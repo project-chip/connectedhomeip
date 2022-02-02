@@ -234,7 +234,7 @@ EndpointId AutoCommissioner::GetEndpoint(const CommissioningStage & stage)
     case CommissioningStage::kGetNetworkTechnology:
         return kInvalidEndpointId;
     default:
-        return 0;
+        return kRootEndpointId;
     }
 }
 
