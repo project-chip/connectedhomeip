@@ -225,8 +225,10 @@ CHIP_ERROR PASESession::ComputePASEVerifier(uint32_t setUpPINCode, uint32_t pbkd
     uint8_t littleEndianSetupPINCode[sizeof(uint32_t)];
     Encoding::LittleEndian::Put32(littleEndianSetupPINCode, setUpPINCode);
 
-    return mPBKDF.pbkdf2_sha256(littleEndianSetupPINCode, sizeof(littleEndianSetupPINCode), salt.data(), salt.size(),
-                                pbkdf2IterCount, sizeof(PASEVerifier), reinterpret_cast<uint8_t *>(&verifier));
+    PASEVerifierSerialized serializedVerifier;
+    ReturnErrorOnFailure(mPBKDF.pbkdf2_sha256(littleEndianSetupPINCode, sizeof(littleEndianSetupPINCode), salt.data(), salt.size(),
+                                              pbkdf2IterCount, sizeof(PASEVerifierSerialized), serializedVerifier));
+    return verifier.Deserialize(ByteSpan(serializedVerifier));
 }
 
 CHIP_ERROR PASESession::GeneratePASEVerifier(PASEVerifier & verifier, uint32_t pbkdf2IterCount, const ByteSpan & salt,
@@ -977,6 +979,28 @@ exit:
         mDelegate->OnSessionEstablishmentError(err);
     }
     return err;
+}
+
+CHIP_ERROR PASEVerifier::Serialize(MutableByteSpan & outSerialized)
+{
+    VerifyOrReturnError(outSerialized.size() >= kSpake2pSerializedVerifierSize, CHIP_ERROR_INVALID_ARGUMENT);
+
+    memcpy(&outSerialized.data()[0], mW0, kSpake2p_WS_Length);
+    memcpy(&outSerialized.data()[kSpake2p_WS_Length], mL, kSpake2p_WS_Length);
+
+    outSerialized.reduce_size(kSpake2pSerializedVerifierSize);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PASEVerifier::Deserialize(ByteSpan inSerialized)
+{
+    VerifyOrReturnError(inSerialized.size() >= kSpake2pSerializedVerifierSize, CHIP_ERROR_INVALID_ARGUMENT);
+
+    memcpy(mW0, &inSerialized.data()[0], kSpake2p_WS_Length);
+    memcpy(mL, &inSerialized.data()[kSpake2p_WS_Length], kSpake2p_WS_Length);
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace chip
