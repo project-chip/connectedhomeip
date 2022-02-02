@@ -90,7 +90,7 @@ public:
     }
 
 private:
-    BitMapObjectPool<OperationalDeviceProxy, N> mDevicePool;
+    ObjectPool<OperationalDeviceProxy, N> mDevicePool;
 };
 
 }; // namespace chip

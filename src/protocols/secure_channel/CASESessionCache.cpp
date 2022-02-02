@@ -50,7 +50,7 @@ CHIP_ERROR CASESessionCache::Add(CASESessionCachable & cachableSession)
     VerifyOrReturnError(mCachePool.Capacity() > 0, CHIP_NO_ERROR);
 
     // If the cache is full, get the least recently used session index and release that.
-    if (mCachePool.Exhausted())
+    if (mCachePool.Allocated() >= kCacheSize)
     {
         mCachePool.ReleaseObject(GetLRUSession());
     }
