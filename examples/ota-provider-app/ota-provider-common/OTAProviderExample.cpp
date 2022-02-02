@@ -147,7 +147,7 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
     // start using the ota-candidates-file method.
     if (strlen(mOTAFilePath)) // If OTA file is directly provided
     {
-        otaAvailable       = true;
+        otaAvailable = true;
 
         // If software version is provided using command line then use it.
         // Otherwise, bump the software version received in QueryImage by 1.
