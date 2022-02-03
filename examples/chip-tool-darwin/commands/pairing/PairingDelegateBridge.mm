@@ -18,7 +18,6 @@
 
 #include "PairingDelegateBridge.h"
 
-
 @interface CHIPToolPairingDelegate ()
 @property (nonatomic, strong) CHIPBasic * cluster;
 @property (nonatomic, strong) ResponseHandler responseHandler;

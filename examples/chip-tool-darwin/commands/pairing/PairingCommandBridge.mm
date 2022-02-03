@@ -18,8 +18,8 @@
 
 #import <CHIP/CHIPError_Internal.h>
 
-#include "PairingCommandBridge.h"
 #include "../common/CHIPCommandBridge.h"
+#include "PairingCommandBridge.h"
 #include "PairingDelegateBridge.h"
 #include "platform/PlatformManager.h"
 #include <lib/support/logging/CHIPLogging.h>
@@ -45,7 +45,7 @@ CHIP_ERROR PairingCommandBridge::RunCommand()
     switch (mPairingMode) {
     case PairingMode::None:
         Unpair(error);
-        err = [CHIPError errorToCHIPErrorCode: error];
+        err = [CHIPError errorToCHIPErrorCode:error];
         SetCommandExitStatus(err);
         return err;
     case PairingMode::QRCode:
@@ -56,14 +56,14 @@ CHIP_ERROR PairingCommandBridge::RunCommand()
         PairWithIPAddress(error);
         break;
     }
-    err = [CHIPError errorToCHIPErrorCode: error];
-    if (err != CHIP_NO_ERROR){
+    err = [CHIPError errorToCHIPErrorCode:error];
+    if (err != CHIP_NO_ERROR) {
         ChipLogProgress(chipTool, "Error: %s", chip::ErrorStr(err));
     }
     return err;
 }
 
-void  PairingCommandBridge::PairWithCode(NSError * error)
+void PairingCommandBridge::PairWithCode(NSError * error)
 {
     NSString * payload = [NSString stringWithUTF8String:mOnboardingPayload];
 
@@ -71,7 +71,7 @@ void  PairingCommandBridge::PairWithCode(NSError * error)
     [CurrentCommissioner() pairDevice:mNodeId onboardingPayload:payload error:&error];
 }
 
-void  PairingCommandBridge::PairWithIPAddress(NSError * error)
+void PairingCommandBridge::PairWithIPAddress(NSError * error)
 {
     SetUpPairingDelegate();
     [CurrentCommissioner() pairDevice:mNodeId
@@ -80,10 +80,9 @@ void  PairingCommandBridge::PairWithIPAddress(NSError * error)
                         discriminator:mDiscriminator
                          setupPINCode:mSetupPINCode
                                 error:&error];
-
 }
 
-void  PairingCommandBridge::Unpair(NSError * error)
+void PairingCommandBridge::Unpair(NSError * error)
 {
     [CurrentCommissioner() unpairDevice:mNodeId error:&error];
     NSLog(@"Upairing error: %@", error);
