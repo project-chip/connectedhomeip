@@ -1,0 +1,27 @@
+{{#first}}
+
+{{/first}}
+{{#if mustUseTimedInvoke}}
+    {{~indent 1~}}timed command
+{{~else}}
+    {{~indent 1~}}command
+{{~/if}} {{asUpperCamelCase commandName}}(
+{{~#zcl_command_arguments~}}
+    {{~#first~}}
+        {{asUpperCamelCase parent.commandName}}Request
+    {{~/first~}}
+{{~/zcl_command_arguments~}}
+): {{#if responseName~}}
+    {{~responseName~}}
+{{~else~}}
+    {{~#if_command_has_response commandName ''~}}
+        {{~commandName~}}Response
+    {{~else~}}
+        {{~#if_command_has_response commandName 'Request'~}}
+            {{~replace_string commandName 'Request' ''}}Response
+        {{~else~}}
+            DefaultSuccess
+        {{~/if_command_has_response~}}
+    {{~/if_command_has_response~}}
+{{~/if~}}
+{{~indent 0}} = {{code}};
