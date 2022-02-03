@@ -36,7 +36,7 @@ public:
      * @brief
      * Initalize the KVS, must be called before using.
      */
-    void Init(const char * file) { mStorage.Init(file); }
+    CHIP_ERROR Init(const char * file) { return mStorage.Init(file); }
 
     CHIP_ERROR _Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size = nullptr, size_t offset = 0);
     CHIP_ERROR _Delete(const char * key);

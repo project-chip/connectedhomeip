@@ -40,6 +40,7 @@ struct LinuxDeviceOptions
     uint32_t unsecuredCommissionerPort = CHIP_UDC_PORT;
     const char * command               = nullptr;
     const char * PICS                  = nullptr;
+    const char * KVS                   = nullptr;
 
     static LinuxDeviceOptions & GetInstance();
 };

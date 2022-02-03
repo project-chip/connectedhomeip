@@ -123,6 +123,18 @@ int ChipLinuxAppInit(int argc, char ** argv)
     err = Platform::MemoryInit();
     SuccessOrExit(err);
 
+#ifdef CHIP_CONFIG_KVS_PATH
+    if (LinuxDeviceOptions::GetInstance().KVS == nullptr)
+    {
+        err = DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
+    }
+    else
+    {
+        err = DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(LinuxDeviceOptions::GetInstance().KVS);
+    }
+    SuccessOrExit(err);
+#endif
+
     err = DeviceLayer::PlatformMgr().InitChipStack();
     SuccessOrExit(err);
 
