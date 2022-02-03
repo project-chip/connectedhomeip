@@ -69,8 +69,6 @@ private:
     static void _OnCommissioningComplete(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     void OnCommissioningComplete(CHIP_ERROR err);
 
-    using NetworkCommissioningFeature = chip::app::Clusters::NetworkCommissioning::NetworkCommissioningFeature;
-
     const BitFlags<NetworkCommissioningFeature> mFeatureFlags;
 
     DeviceLayer::NetworkCommissioning::Internal::WirelessDriver * const mpWirelessDriver;
