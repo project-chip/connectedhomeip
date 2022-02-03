@@ -35,7 +35,7 @@ void PairingCommandBridge::SetUpPairingDelegate()
     pairing.deviceID = mNodeId;
     pairing.commandBridge = this;
 
-    [CurrentCommissioner() setPairingDelegate:pairing queue:callbackQueue]; 
+    [CurrentCommissioner() setPairingDelegate:pairing queue:callbackQueue];
 }
 
 CHIP_ERROR PairingCommandBridge::RunCommand()
