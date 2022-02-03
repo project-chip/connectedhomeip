@@ -50,6 +50,9 @@ efr32_sdk("sdk") {
     "BOARD_ID=${efr32_board}",
     "OPENTHREAD_CONFIG_CLI_TRANSPORT=OT_CLI_TRANSPORT_CONSOLE",
     "ENABLE_CHIP_SHELL",
+
+    # shell app use openthread but do not have the NETWORK_COMMISSIONING cluster or zap config.
+    "_NO_NETWORK_COMMISSIONING_DRIVER_",
   ]
 }
 

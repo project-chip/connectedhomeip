@@ -33,9 +33,6 @@ config("shell_common_config") {
     "ENABLE_CHIP_SHELL",
     "OPENTHREAD_CONFIG_CLI_TRANSPORT=OT_CLI_TRANSPORT_CONSOLE",
     "CHIP_SHELL_ENABLE_CMD_SERVER=${chip_shell_cmd_server}",
-
-    # shell app use openthread but do not have the NETWORK_COMMISSIONING cluster or zap config.
-    "_NO_NETWORK_COMMISSIONING_DRIVER_",
   ]
 }
 
