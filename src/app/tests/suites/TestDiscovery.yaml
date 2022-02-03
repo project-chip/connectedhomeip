@@ -18,7 +18,7 @@ config:
     endpoint: 0
     discriminator:
         type: INT16U
-        defaultValue: 3840
+        defaultValue: GetUniqueDiscriminator()
     vendorId:
         type: INT16U
         defaultValue: 65521

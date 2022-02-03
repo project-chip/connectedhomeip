@@ -71,7 +71,12 @@ public:
     void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override{};
     void OnNodeDiscoveryComplete(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
 
+protected:
+    // This function initialize a random discriminator once and returns it all the time afterwards
+    uint16_t GetUniqueDiscriminator();
+
 private:
     bool mReady = false;
     chip::Dnssd::ResolverProxy mDNSResolver;
+    uint16_t mDiscriminatorUseForFiltering = 0;
 };
