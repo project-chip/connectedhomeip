@@ -67,16 +67,15 @@ struct NOCChainGenerationParameters
     ByteSpan nocsrElements;
     ByteSpan signature;
 };
-struct NOCerts
-{
-};
+
+constexpr uint16_t kDefaultFailsafeTimeout = 60;
 class CommissioningParameters
 {
 public:
-    static constexpr size_t kMaxThreadDatasetLen      = 254;
-    static constexpr size_t kMaxSsidLen               = 32;
-    static constexpr size_t kMaxCredentialsLen        = 64;
-    static constexpr uint16_t kDefaultFailsafeTimeout = 60;
+    static constexpr size_t kMaxThreadDatasetLen = 254;
+    static constexpr size_t kMaxSsidLen          = 32;
+    static constexpr size_t kMaxCredentialsLen   = 64;
+
     const Optional<uint16_t> GetFailsafeTimerSeconds() const { return mFailsafeTimerSeconds; }
     const Optional<ByteSpan> GetCSRNonce() const { return mCSRNonce; }
     const Optional<ByteSpan> GetAttestationNonce() const { return mAttestationNonce; }

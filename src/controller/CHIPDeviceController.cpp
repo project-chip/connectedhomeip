@@ -1726,7 +1726,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     {
     case CommissioningStage::kArmFailsafe: {
         GeneralCommissioning::Commands::ArmFailSafe::Type request;
-        request.expiryLengthSeconds = params.GetFailsafeTimerSeconds().ValueOr(params.kDefaultFailsafeTimeout);
+        request.expiryLengthSeconds = params.GetFailsafeTimerSeconds().ValueOr(kDefaultFailsafeTimeout);
         request.breadcrumb          = breadcrumb;
         request.timeoutMs           = kCommandTimeoutMs;
         ChipLogProgress(Controller, "Arming failsafe (%u seconds)", request.expiryLengthSeconds);
