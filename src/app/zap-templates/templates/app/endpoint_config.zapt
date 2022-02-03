@@ -41,9 +41,18 @@
 // Cluster function static arrays
 #define GENERATED_FUNCTION_ARRAYS   {{chip_endpoint_generated_functions}}
 
+{{#chip_endpoint_generated_commands_list}}
+{{#first}}
 // clang-format off
-#define GENERATED_COMMANDS {{chip_endpoint_generated_commands_list}}
+#define GENERATED_COMMANDS { \
+{{/first}}
+{{text}}
+{{#last}}
+}
+
 // clang-format on
+{{/last}}
+{{/chip_endpoint_generated_commands_list}}
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_ ## mask
 #define GENERATED_CLUSTER_COUNT {{endpoint_cluster_count}}
