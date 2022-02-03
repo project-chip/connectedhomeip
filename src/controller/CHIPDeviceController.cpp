@@ -1798,7 +1798,6 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
         mAttributeCache = std::move(attributeCache);
         mReadClient     = std::move(readClient);
-        return;
     }
     break;
     case CommissioningStage::kConfigRegulatory: {

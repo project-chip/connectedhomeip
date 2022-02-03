@@ -394,7 +394,6 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
     }
 
     mParams.SetCompletionStatus(err);
-    // TODO: Get real endpoint
     mCommissioner->PerformCommissioningStep(proxy, nextStage, mParams, this, GetEndpoint(nextStage), GetCommandTimeout(nextStage));
     return CHIP_NO_ERROR;
 }
