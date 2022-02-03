@@ -20,7 +20,7 @@
 /**
  * CHIP_DEVICE_DATA__MODEL_REVISION
  *
- * A monothonic number identifying the revision number of the Data Model against
+ * A monotonic number identifying the revision number of the Data Model against
  * which the Node is certified.
  */
 #ifndef CHIP_DEVICE_DATA__MODEL_REVISION
