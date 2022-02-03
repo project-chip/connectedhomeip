@@ -4616,6 +4616,34 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedCSRResponseCallback
+      implements ChipClusters.OperationalCredentialsCluster.CSRResponseCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(byte[] NOCSRElements, byte[] AttestationSignature) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo NOCSRElementsResponseValue =
+          new CommandResponseInfo("NOCSRElements", "byte[]");
+      responseValues.put(NOCSRElementsResponseValue, NOCSRElements);
+      CommandResponseInfo AttestationSignatureResponseValue =
+          new CommandResponseInfo("AttestationSignature", "byte[]");
+      responseValues.put(AttestationSignatureResponseValue, AttestationSignature);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
   public static class DelegatedCertificateChainResponseCallback
       implements ChipClusters.OperationalCredentialsCluster.CertificateChainResponseCallback,
           DelegatedClusterCallback {
@@ -4664,34 +4692,6 @@ public class ClusterInfoMapping {
       CommandResponseInfo DebugTextResponseValue =
           new CommandResponseInfo("DebugText", "Optional<String>");
       responseValues.put(DebugTextResponseValue, DebugText);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception error) {
-      callback.onFailure(error);
-    }
-  }
-
-  public static class DelegatedOpCSRResponseCallback
-      implements ChipClusters.OperationalCredentialsCluster.OpCSRResponseCallback,
-          DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(byte[] NOCSRElements, byte[] AttestationSignature) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo NOCSRElementsResponseValue =
-          new CommandResponseInfo("NOCSRElements", "byte[]");
-      responseValues.put(NOCSRElementsResponseValue, NOCSRElements);
-      CommandResponseInfo AttestationSignatureResponseValue =
-          new CommandResponseInfo("AttestationSignature", "byte[]");
-      responseValues.put(AttestationSignatureResponseValue, AttestationSignature);
       callback.onSuccess(responseValues);
     }
 
@@ -10933,6 +10933,25 @@ public class ClusterInfoMapping {
             operationalCredentialsattestationRequestCommandParams);
     operationalCredentialsClusterInteractionInfoMap.put(
         "attestationRequest", operationalCredentialsattestationRequestInteractionInfo);
+    Map<String, CommandParameterInfo> operationalCredentialsCSRRequestCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo operationalCredentialsCSRRequestCSRNonceCommandParameterInfo =
+        new CommandParameterInfo("CSRNonce", byte[].class);
+    operationalCredentialsCSRRequestCommandParams.put(
+        "CSRNonce", operationalCredentialsCSRRequestCSRNonceCommandParameterInfo);
+
+    InteractionInfo operationalCredentialsCSRRequestInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.OperationalCredentialsCluster) cluster)
+                  .CSRRequest(
+                      (ChipClusters.OperationalCredentialsCluster.CSRResponseCallback) callback,
+                      (byte[]) commandArguments.get("CSRNonce"));
+            },
+            () -> new DelegatedCSRResponseCallback(),
+            operationalCredentialsCSRRequestCommandParams);
+    operationalCredentialsClusterInteractionInfoMap.put(
+        "CSRRequest", operationalCredentialsCSRRequestInteractionInfo);
     Map<String, CommandParameterInfo> operationalCredentialscertificateChainRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo
@@ -10955,25 +10974,6 @@ public class ClusterInfoMapping {
             operationalCredentialscertificateChainRequestCommandParams);
     operationalCredentialsClusterInteractionInfoMap.put(
         "certificateChainRequest", operationalCredentialscertificateChainRequestInteractionInfo);
-    Map<String, CommandParameterInfo> operationalCredentialsopCSRRequestCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo operationalCredentialsopCSRRequestCSRNonceCommandParameterInfo =
-        new CommandParameterInfo("CSRNonce", byte[].class);
-    operationalCredentialsopCSRRequestCommandParams.put(
-        "CSRNonce", operationalCredentialsopCSRRequestCSRNonceCommandParameterInfo);
-
-    InteractionInfo operationalCredentialsopCSRRequestInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.OperationalCredentialsCluster) cluster)
-                  .opCSRRequest(
-                      (ChipClusters.OperationalCredentialsCluster.OpCSRResponseCallback) callback,
-                      (byte[]) commandArguments.get("CSRNonce"));
-            },
-            () -> new DelegatedOpCSRResponseCallback(),
-            operationalCredentialsopCSRRequestCommandParams);
-    operationalCredentialsClusterInteractionInfoMap.put(
-        "opCSRRequest", operationalCredentialsopCSRRequestInteractionInfo);
     Map<String, CommandParameterInfo> operationalCredentialsremoveFabricCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo operationalCredentialsremoveFabricfabricIndexCommandParameterInfo =

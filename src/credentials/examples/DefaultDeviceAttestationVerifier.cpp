@@ -404,7 +404,7 @@ CHIP_ERROR DefaultDACVerifier::VerifyNodeOperationalCSRInformation(const ByteSpa
                             !attestationSignatureBuffer.empty() && !csrNonce.empty(),
                         CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrReturnError(csrNonce.size() == Controller::kOpCSRNonceLength, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(csrNonce.size() == Controller::kCSRNonceLength, CHIP_ERROR_INVALID_ARGUMENT);
 
     ByteSpan csrSpan;
     ByteSpan csrNonceSpan;

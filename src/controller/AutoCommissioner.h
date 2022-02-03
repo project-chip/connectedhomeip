@@ -71,7 +71,7 @@ private:
     uint8_t * mPAI   = nullptr;
     uint16_t mPAILen = 0;
     uint8_t mAttestationNonce[kAttestationNonceLength];
-    uint8_t mCSRNonce[kOpCSRNonceLength];
+    uint8_t mCSRNonce[kCSRNonceLength];
     uint8_t mNOCertBuffer[Credentials::kMaxCHIPCertLength];
     uint8_t mICACertBuffer[Credentials::kMaxCHIPCertLength];
 };

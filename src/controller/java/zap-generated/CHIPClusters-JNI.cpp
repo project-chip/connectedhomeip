@@ -23282,6 +23282,59 @@ JNI_METHOD(void, OperationalCredentialsCluster, attestationRequest)
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, OperationalCredentialsCluster, CSRRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray CSRNonce, jobject timedInvokeTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    OperationalCredentialsCluster * cppCluster;
+
+    ListFreer listFreer;
+    chip::app::Clusters::OperationalCredentials::Commands::CSRRequest::Type request;
+
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+    cleanupByteArrays.push_back(chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(CSRNonce)));
+    request.CSRNonce = cleanupByteArrays.back()->byteSpan();
+
+    std::unique_ptr<CHIPOperationalCredentialsClusterCSRResponseCallback,
+                    void (*)(CHIPOperationalCredentialsClusterCSRResponseCallback *)>
+        onSuccess(Platform::New<CHIPOperationalCredentialsClusterCSRResponseCallback>(callback),
+                  Platform::Delete<CHIPOperationalCredentialsClusterCSRResponseCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+
+    cppCluster = reinterpret_cast<OperationalCredentialsCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn =
+        chip::Callback::Callback<CHIPOperationalCredentialsClusterCSRResponseCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
+                                                                                       CHIP_ERROR_INCORRECT_STATE));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, OperationalCredentialsCluster, certificateChainRequest)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject certificateType, jobject timedInvokeTimeoutMs)
 {
@@ -23318,59 +23371,6 @@ JNI_METHOD(void, OperationalCredentialsCluster, certificateChainRequest)
     auto successFn =
         chip::Callback::Callback<CHIPOperationalCredentialsClusterCertificateChainResponseCallbackType>::FromCancelable(
             onSuccess->Cancel());
-    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-
-    if (timedInvokeTimeoutMs == nullptr)
-    {
-        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
-    }
-    else
-    {
-        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
-                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
-    }
-    VerifyOrReturn(err == CHIP_NO_ERROR,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
-                                                                                       CHIP_ERROR_INCORRECT_STATE));
-
-    onSuccess.release();
-    onFailure.release();
-}
-JNI_METHOD(void, OperationalCredentialsCluster, opCSRRequest)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray CSRNonce, jobject timedInvokeTimeoutMs)
-{
-    chip::DeviceLayer::StackLock lock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    OperationalCredentialsCluster * cppCluster;
-
-    ListFreer listFreer;
-    chip::app::Clusters::OperationalCredentials::Commands::OpCSRRequest::Type request;
-
-    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
-    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
-    cleanupByteArrays.push_back(chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(CSRNonce)));
-    request.CSRNonce = cleanupByteArrays.back()->byteSpan();
-
-    std::unique_ptr<CHIPOperationalCredentialsClusterOpCSRResponseCallback,
-                    void (*)(CHIPOperationalCredentialsClusterOpCSRResponseCallback *)>
-        onSuccess(Platform::New<CHIPOperationalCredentialsClusterOpCSRResponseCallback>(callback),
-                  Platform::Delete<CHIPOperationalCredentialsClusterOpCSRResponseCallback>);
-    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
-        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
-    VerifyOrReturn(onSuccess.get() != nullptr,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
-    VerifyOrReturn(onFailure.get() != nullptr,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
-
-    cppCluster = reinterpret_cast<OperationalCredentialsCluster *>(clusterPtr);
-    VerifyOrReturn(cppCluster != nullptr,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
-
-    auto successFn =
-        chip::Callback::Callback<CHIPOperationalCredentialsClusterOpCSRResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
     if (timedInvokeTimeoutMs == nullptr)

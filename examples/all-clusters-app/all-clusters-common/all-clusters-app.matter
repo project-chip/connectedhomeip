@@ -2384,12 +2384,12 @@ server cluster OperationalCredentials = 62 {
     OCTET_STRING attestationNonce = 0;
   }
 
-  request struct CertificateChainRequestRequest {
-    INT8U certificateType = 0;
+  request struct CSRRequestRequest {
+    OCTET_STRING CSRNonce = 0;
   }
 
-  request struct OpCSRRequestRequest {
-    OCTET_STRING CSRNonce = 0;
+  request struct CertificateChainRequestRequest {
+    INT8U certificateType = 0;
   }
 
   request struct RemoveFabricRequest {
@@ -2414,6 +2414,11 @@ server cluster OperationalCredentials = 62 {
     OCTET_STRING signature = 1;
   }
 
+  response struct CSRResponse {
+    OCTET_STRING NOCSRElements = 0;
+    OCTET_STRING attestationSignature = 1;
+  }
+
   response struct CertificateChainResponse {
     OCTET_STRING certificate = 0;
   }
@@ -2424,16 +2429,11 @@ server cluster OperationalCredentials = 62 {
     optional CHAR_STRING debugText = 2;
   }
 
-  response struct OpCSRResponse {
-    OCTET_STRING NOCSRElements = 0;
-    OCTET_STRING attestationSignature = 1;
-  }
-
   command AddNOC(AddNOCRequest): NOCResponse = 6;
   command AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
   command AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
+  command CSRRequest(CSRRequestRequest): CSRResponse = 4;
   command CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
-  command OpCSRRequest(OpCSRRequestRequest): OpCSRResponse = 4;
   command RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
   command RemoveTrustedRootCertificate(RemoveTrustedRootCertificateRequest): DefaultSuccess = 12;
   command UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;

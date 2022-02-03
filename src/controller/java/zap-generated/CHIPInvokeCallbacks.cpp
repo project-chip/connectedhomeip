@@ -2471,6 +2471,71 @@ void CHIPOperationalCredentialsClusterAttestationResponseCallback::CallbackFn(
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, AttestationElements, Signature);
 }
+CHIPOperationalCredentialsClusterCSRResponseCallback::CHIPOperationalCredentialsClusterCSRResponseCallback(jobject javaCallback) :
+    Callback::Callback<CHIPOperationalCredentialsClusterCSRResponseCallbackType>(CallbackFn, this)
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPOperationalCredentialsClusterCSRResponseCallback::~CHIPOperationalCredentialsClusterCSRResponseCallback()
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+};
+
+void CHIPOperationalCredentialsClusterCSRResponseCallback::CallbackFn(
+    void * context, const chip::app::Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType & dataResponse)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+    jmethodID javaMethod;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
+
+    std::unique_ptr<CHIPOperationalCredentialsClusterCSRResponseCallback,
+                    void (*)(CHIPOperationalCredentialsClusterCSRResponseCallback *)>
+        cppCallback(reinterpret_cast<CHIPOperationalCredentialsClusterCSRResponseCallback *>(context),
+                    chip::Platform::Delete<CHIPOperationalCredentialsClusterCSRResponseCallback>);
+    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
+
+    javaCallbackRef = cppCallback->javaCallbackRef;
+    // Java callback is allowed to be null, exit early if this is the case.
+    VerifyOrReturn(javaCallbackRef != nullptr);
+
+    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "([B[B)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
+
+    jobject NOCSRElements;
+    jbyteArray NOCSRElementsByteArray = env->NewByteArray(static_cast<jsize>(dataResponse.NOCSRElements.size()));
+    env->SetByteArrayRegion(NOCSRElementsByteArray, 0, static_cast<jsize>(dataResponse.NOCSRElements.size()),
+                            reinterpret_cast<const jbyte *>(dataResponse.NOCSRElements.data()));
+    NOCSRElements = NOCSRElementsByteArray;
+    jobject AttestationSignature;
+    jbyteArray AttestationSignatureByteArray = env->NewByteArray(static_cast<jsize>(dataResponse.attestationSignature.size()));
+    env->SetByteArrayRegion(AttestationSignatureByteArray, 0, static_cast<jsize>(dataResponse.attestationSignature.size()),
+                            reinterpret_cast<const jbyte *>(dataResponse.attestationSignature.data()));
+    AttestationSignature = AttestationSignatureByteArray;
+
+    env->CallVoidMethod(javaCallbackRef, javaMethod, NOCSRElements, AttestationSignature);
+}
 CHIPOperationalCredentialsClusterCertificateChainResponseCallback::
     CHIPOperationalCredentialsClusterCertificateChainResponseCallback(jobject javaCallback) :
     Callback::Callback<CHIPOperationalCredentialsClusterCertificateChainResponseCallbackType>(CallbackFn, this)
@@ -2616,72 +2681,6 @@ void CHIPOperationalCredentialsClusterNOCResponseCallback::CallbackFn(
     }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, StatusCode, FabricIndex, DebugText);
-}
-CHIPOperationalCredentialsClusterOpCSRResponseCallback::CHIPOperationalCredentialsClusterOpCSRResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPOperationalCredentialsClusterOpCSRResponseCallbackType>(CallbackFn, this)
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-CHIPOperationalCredentialsClusterOpCSRResponseCallback::~CHIPOperationalCredentialsClusterOpCSRResponseCallback()
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not delete global reference for Java callback");
-        return;
-    }
-    env->DeleteGlobalRef(javaCallbackRef);
-};
-
-void CHIPOperationalCredentialsClusterOpCSRResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::OperationalCredentials::Commands::OpCSRResponse::DecodableType & dataResponse)
-{
-    chip::DeviceLayer::StackUnlock unlock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    jobject javaCallbackRef;
-    jmethodID javaMethod;
-
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
-
-    std::unique_ptr<CHIPOperationalCredentialsClusterOpCSRResponseCallback,
-                    void (*)(CHIPOperationalCredentialsClusterOpCSRResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPOperationalCredentialsClusterOpCSRResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPOperationalCredentialsClusterOpCSRResponseCallback>);
-    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
-
-    javaCallbackRef = cppCallback->javaCallbackRef;
-    // Java callback is allowed to be null, exit early if this is the case.
-    VerifyOrReturn(javaCallbackRef != nullptr);
-
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "([B[B)V", &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
-
-    jobject NOCSRElements;
-    jbyteArray NOCSRElementsByteArray = env->NewByteArray(static_cast<jsize>(dataResponse.NOCSRElements.size()));
-    env->SetByteArrayRegion(NOCSRElementsByteArray, 0, static_cast<jsize>(dataResponse.NOCSRElements.size()),
-                            reinterpret_cast<const jbyte *>(dataResponse.NOCSRElements.data()));
-    NOCSRElements = NOCSRElementsByteArray;
-    jobject AttestationSignature;
-    jbyteArray AttestationSignatureByteArray = env->NewByteArray(static_cast<jsize>(dataResponse.attestationSignature.size()));
-    env->SetByteArrayRegion(AttestationSignatureByteArray, 0, static_cast<jsize>(dataResponse.attestationSignature.size()),
-                            reinterpret_cast<const jbyte *>(dataResponse.attestationSignature.data()));
-    AttestationSignature = AttestationSignatureByteArray;
-
-    env->CallVoidMethod(javaCallbackRef, javaMethod, NOCSRElements, AttestationSignature);
 }
 CHIPScenesClusterAddSceneResponseCallback::CHIPScenesClusterAddSceneResponseCallback(jobject javaCallback) :
     Callback::Callback<CHIPScenesClusterAddSceneResponseCallbackType>(CallbackFn, this)

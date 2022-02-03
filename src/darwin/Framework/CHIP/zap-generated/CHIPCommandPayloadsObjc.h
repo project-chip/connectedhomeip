@@ -773,12 +773,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPOperationalCredentialsClusterOpCSRRequestParams : NSObject
+@interface CHIPOperationalCredentialsClusterCSRRequestParams : NSObject
 @property (strong, nonatomic) NSData * _Nonnull csrNonce;
 - (instancetype)init;
 @end
 
-@interface CHIPOperationalCredentialsClusterOpCSRResponseParams : NSObject
+@interface CHIPOperationalCredentialsClusterCSRResponseParams : NSObject
 @property (strong, nonatomic) NSData * _Nonnull nocsrElements;
 @property (strong, nonatomic) NSData * _Nonnull attestationSignature;
 - (instancetype)init;

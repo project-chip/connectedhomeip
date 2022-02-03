@@ -12601,6 +12601,15 @@ public class ChipClusters {
       attestationRequest(chipClusterPtr, callback, attestationNonce, timedInvokeTimeoutMs);
     }
 
+    public void CSRRequest(CSRResponseCallback callback, byte[] CSRNonce) {
+      CSRRequest(chipClusterPtr, callback, CSRNonce, null);
+    }
+
+    public void CSRRequest(
+        CSRResponseCallback callback, byte[] CSRNonce, int timedInvokeTimeoutMs) {
+      CSRRequest(chipClusterPtr, callback, CSRNonce, timedInvokeTimeoutMs);
+    }
+
     public void certificateChainRequest(
         CertificateChainResponseCallback callback, Integer certificateType) {
       certificateChainRequest(chipClusterPtr, callback, certificateType, null);
@@ -12611,15 +12620,6 @@ public class ChipClusters {
         Integer certificateType,
         int timedInvokeTimeoutMs) {
       certificateChainRequest(chipClusterPtr, callback, certificateType, timedInvokeTimeoutMs);
-    }
-
-    public void opCSRRequest(OpCSRResponseCallback callback, byte[] CSRNonce) {
-      opCSRRequest(chipClusterPtr, callback, CSRNonce, null);
-    }
-
-    public void opCSRRequest(
-        OpCSRResponseCallback callback, byte[] CSRNonce, int timedInvokeTimeoutMs) {
-      opCSRRequest(chipClusterPtr, callback, CSRNonce, timedInvokeTimeoutMs);
     }
 
     public void removeFabric(NOCResponseCallback callback, Integer fabricIndex) {
@@ -12686,16 +12686,16 @@ public class ChipClusters {
         byte[] attestationNonce,
         @Nullable Integer timedInvokeTimeoutMs);
 
+    private native void CSRRequest(
+        long chipClusterPtr,
+        CSRResponseCallback Callback,
+        byte[] CSRNonce,
+        @Nullable Integer timedInvokeTimeoutMs);
+
     private native void certificateChainRequest(
         long chipClusterPtr,
         CertificateChainResponseCallback Callback,
         Integer certificateType,
-        @Nullable Integer timedInvokeTimeoutMs);
-
-    private native void opCSRRequest(
-        long chipClusterPtr,
-        OpCSRResponseCallback Callback,
-        byte[] CSRNonce,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void removeFabric(
@@ -12729,6 +12729,12 @@ public class ChipClusters {
       void onError(Exception error);
     }
 
+    public interface CSRResponseCallback {
+      void onSuccess(byte[] NOCSRElements, byte[] attestationSignature);
+
+      void onError(Exception error);
+    }
+
     public interface CertificateChainResponseCallback {
       void onSuccess(byte[] certificate);
 
@@ -12737,12 +12743,6 @@ public class ChipClusters {
 
     public interface NOCResponseCallback {
       void onSuccess(Integer statusCode, Optional<Integer> fabricIndex, Optional<String> debugText);
-
-      void onError(Exception error);
-    }
-
-    public interface OpCSRResponseCallback {
-      void onSuccess(byte[] NOCSRElements, byte[] attestationSignature);
 
       void onError(Exception error);
     }
