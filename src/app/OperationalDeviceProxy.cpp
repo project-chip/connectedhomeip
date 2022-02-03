@@ -42,6 +42,18 @@ using namespace chip::Callback;
 
 namespace chip {
 
+void OperationalDeviceProxy::MoveToState(State aTargetState)
+{
+    if (mState != aTargetState)
+    {
+        ChipLogDetail(Controller,
+                      "OperationalDeviceProxy[CF" ChipLogFormatX64 ":" ChipLogFormatX64 "]: Moving from state %d --> %d",
+                      ChipLogValueX64(mPeerId.GetCompressedFabricId()), ChipLogValueX64(mPeerId.GetNodeId()), (uint32_t) mState,
+                      (uint32_t) aTargetState);
+        mState = aTargetState;
+    }
+}
+
 CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnDeviceConnected> * onConnection,
                                            Callback::Callback<OnDeviceConnectionFailure> * onFailure,
                                            Dnssd::ResolverProxy * resolver)
@@ -109,8 +121,8 @@ CHIP_ERROR OperationalDeviceProxy::UpdateDeviceData(const Transport::PeerAddress
 
     if (mState == State::NeedsAddress)
     {
-        mState = State::Initialized;
-        err    = EstablishConnection();
+        MoveToState(State::Initialized);
+        err = EstablishConnection();
         if (err != CHIP_NO_ERROR)
         {
             OnSessionEstablishmentError(err);
@@ -154,7 +166,7 @@ CHIP_ERROR OperationalDeviceProxy::EstablishConnection()
         mCASEClient->EstablishSession(mPeerId, mDeviceAddress, mMRPConfig, HandleCASEConnected, HandleCASEConnectionFailure, this);
     ReturnErrorOnFailure(err);
 
-    mState = State::Connecting;
+    MoveToState(State::Connecting);
 
     return CHIP_NO_ERROR;
 }
@@ -213,7 +225,7 @@ void OperationalDeviceProxy::HandleCASEConnectionFailure(void * context, CASECli
                    ChipLogError(Controller, "HandleCASEConnectionFailure was called while the device was not initialized"));
     VerifyOrReturn(client == device->mCASEClient, ChipLogError(Controller, "HandleCASEConnectionFailure for unknown CASEClient"));
 
-    device->mState = State::Initialized;
+    device->MoveToState(State::Initialized);
 
     device->DequeueConnectionSuccessCallbacks(/* executeCallback */ false);
     device->DequeueConnectionFailureCallbacks(error, /* executeCallback */ true);
@@ -234,7 +246,7 @@ void OperationalDeviceProxy::HandleCASEConnected(void * context, CASEClient * cl
     }
     else
     {
-        device->mState = State::SecureConnected;
+        device->MoveToState(State::SecureConnected);
 
         device->DequeueConnectionFailureCallbacks(CHIP_NO_ERROR, /* executeCallback */ false);
         device->DequeueConnectionSuccessCallbacks(/* executeCallback */ true);
@@ -249,7 +261,7 @@ CHIP_ERROR OperationalDeviceProxy::Disconnect()
     {
         mInitParams.sessionManager->ExpirePairing(mSecureSession.Get());
     }
-    mState = State::Initialized;
+    MoveToState(State::Initialized);
     if (mCASEClient)
     {
         mInitParams.clientPool->Release(mCASEClient);
@@ -261,7 +273,7 @@ CHIP_ERROR OperationalDeviceProxy::Disconnect()
 void OperationalDeviceProxy::SetConnectedSession(const SessionHandle & handle)
 {
     mSecureSession.Grab(handle);
-    mState = State::SecureConnected;
+    MoveToState(State::SecureConnected);
 }
 
 void OperationalDeviceProxy::Clear()
@@ -272,7 +284,7 @@ void OperationalDeviceProxy::Clear()
         mCASEClient = nullptr;
     }
 
-    mState      = State::Uninitialized;
+    MoveToState(State::Uninitialized);
     mInitParams = DeviceProxyInitParams();
 }
 
@@ -287,7 +299,7 @@ void OperationalDeviceProxy::CloseCASESession()
 
 void OperationalDeviceProxy::OnSessionReleased()
 {
-    mState = State::Initialized;
+    MoveToState(State::Initialized);
 }
 
 CHIP_ERROR OperationalDeviceProxy::ShutdownSubscriptions()

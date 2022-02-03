@@ -98,6 +98,14 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
 
 CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR & lastErr)
 {
+    auto nextStage = _GetNextCommissioningStage(currentStage, lastErr);
+    ChipLogProgress(Controller, "Going from commissioning step '%s' with lastErr = '%s' --> '%s'", StageToString(currentStage),
+                    lastErr.AsString(), StageToString(nextStage));
+    return nextStage;
+}
+
+CommissioningStage AutoCommissioner::_GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR & lastErr)
+{
     if (lastErr != CHIP_NO_ERROR)
     {
         return CommissioningStage::kCleanup;
@@ -287,6 +295,100 @@ CHIP_ERROR AutoCommissioner::NOCChainGenerated(ByteSpan noc, ByteSpan icac, Byte
     return CHIP_NO_ERROR;
 }
 
+const char * AutoCommissioner::StageToString(CommissioningStage stage)
+{
+    switch (stage)
+    {
+    case kError:
+        return "Error";
+        break;
+
+    case kSecurePairing:
+        return "SecurePairing";
+        break;
+
+    case kArmFailsafe:
+        return "ArmFailSafe";
+        break;
+
+    case kGetNetworkTechnology:
+        return "GetNetworkTechnology";
+        break;
+
+    case kConfigRegulatory:
+        return "ConfigRegulatory";
+        break;
+
+    case kSendPAICertificateRequest:
+        return "SendPAICertificateRequest";
+        break;
+
+    case kSendDACCertificateRequest:
+        return "SendDACCertificateRequest";
+        break;
+
+    case kSendAttestationRequest:
+        return "SendAttestationRequest";
+        break;
+
+    case kAttestationVerification:
+        return "AttestationVerification";
+        break;
+
+    case kSendOpCertSigningRequest:
+        return "SendOpCertSigningRequest";
+        break;
+
+    case kGenerateNOCChain:
+        return "GenerateNOCChain";
+        break;
+
+    case kSendTrustedRootCert:
+        return "SendTrustedRootCert";
+        break;
+
+    case kSendNOC:
+        return "SendNOC";
+        break;
+
+    case kWiFiNetworkSetup:
+        return "WiFiNetworkSetup";
+        break;
+
+    case kThreadNetworkSetup:
+        return "ThreadNetworkSetup";
+        break;
+
+    case kWiFiNetworkEnable:
+        return "WiFiNetworkEnable";
+        break;
+
+    case kThreadNetworkEnable:
+        return "ThreadNetworkEnable";
+        break;
+
+    case kFindOperational:
+        return "FindOperational";
+        break;
+
+    case kSendComplete:
+        return "SendComplete";
+        break;
+
+    case kCleanup:
+        return "Cleanup";
+        break;
+
+    case kConfigACL:
+        return "ConfigACL";
+        break;
+
+    default:
+        return "???";
+        break;
+    }
+}
+
 CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report)
 {
     if (err != CHIP_NO_ERROR)
@@ -295,6 +397,9 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
     }
     else
     {
+        ChipLogProgress(Controller, "Finished commissioning step '%s' with error '%s'", StageToString(report.stageCompleted),
+                        err.AsString());
+
         switch (report.stageCompleted)
         {
         case CommissioningStage::kGetNetworkTechnology:

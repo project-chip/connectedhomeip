@@ -213,6 +213,8 @@ private:
 
     Transport::PeerAddress mDeviceAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
 
+    void MoveToState(State aTargetState);
+
     State mState = State::Uninitialized;
 
     SessionHolderWithDelegate mSecureSession;

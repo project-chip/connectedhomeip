@@ -1501,12 +1501,13 @@ void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, Commissionin
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 void DeviceCommissioner::OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & nodeData)
 {
-    ChipLogProgress(Controller, "OperationalDiscoveryComplete for device ID 0x" ChipLogFormatX64,
-                    ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
+    ChipLogProgress(Controller, "F" ChipLogFormatX64 ": OperationalDiscoveryComplete for device ID N" ChipLogFormatX64,
+                    ChipLogValueX64(mFabricId), ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
     VerifyOrReturn(mState == State::Initialized);
 
     mDNSCache.Insert(nodeData);
 
+    mCASESessionManager->FindOrEstablishSession(nodeData.mPeerId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
     mCASESessionManager->FindOrEstablishSession(nodeData.mPeerId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
     DeviceController::OnNodeIdResolved(nodeData);
 }
@@ -1649,6 +1650,9 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
                                                   CommissioningDelegate * delegate, EndpointId endpoint,
                                                   Optional<System::Clock::Timeout> timeout)
 {
+    ChipLogProgress(Controller, "Performing next commissioning step '%s' with completion status = '%s'",
+                    AutoCommissioner::StageToString(step), params.GetCompletionStatus().AsString());
+
     // For now, we ignore errors coming in from the device since not all commissioning clusters are implemented on the device
     // side.
     mCommissioningStage    = step;
