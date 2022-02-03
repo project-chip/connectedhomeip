@@ -864,11 +864,11 @@
           "mfgCode": null,
           "define": "BASIC_CLUSTER",
           "side": "server",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [],
           "attributes": [
             {
-              "name": "DataModelRevision",
+              "name": "InteractionModelVersion",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -1629,7 +1629,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BasicCommissioningInfo",
+              "name": "BasicCommissioningInfoList",
               "code": 1,
               "mfgCode": null,
               "side": "server",
