@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set -e
-
 PASSCODE=${1:-20202021}
 ID=${2:-42}
 DISCRIMINATOR=${3:-5560}
