@@ -25,50 +25,6 @@ const ChipTypesHelper = require('../../../../../src/app/zap-templates/common/Chi
 const StringHelper    = require('../../../../../src/app/zap-templates/common/StringHelper.js');
 const appHelper       = require('../../../../../src/app/zap-templates/templates/app/helper.js');
 
-// Ideally those clusters clusters endpoints should be retrieved from the
-// descriptor cluster.
-function asExpectedEndpointForCluster(clusterName)
-{
-  switch (clusterName) {
-  case 'AccessControl':
-  case 'AdministratorCommissioning':
-  case 'Basic':
-  case 'Descriptor':
-  case 'DiagnosticLogs':
-  case 'GeneralCommissioning':
-  case 'GeneralDiagnostics':
-  case 'LocalizationConfiguration':
-  case 'SoftwareDiagnostics':
-  case 'ThreadNetworkDiagnostics':
-  case 'EthernetNetworkDiagnostics':
-  case 'WiFiNetworkDiagnostics':
-  case 'GroupKeyManagement':
-  case 'NetworkCommissioning':
-  case 'OperationalCredentials':
-  case 'TimeFormatLocalization':
-  case 'TrustedRootCertificates':
-  case 'OtaSoftwareUpdateProvider':
-  case 'OtaSoftwareUpdateRequestor':
-  case 'PowerSourceConfiguration':
-  case 'UnitLocalization':
-    return 0;
-  }
-  return 1;
-}
-
-function asTestValue()
-{
-  if (StringHelper.isOctetString(this.type)) {
-    return `[@"${"Test".substring(0, this.maxLength)}" dataUsingEncoding:NSUTF8StringEncoding]`;
-  } else if (StringHelper.isCharString(this.type)) {
-    return `@"${"Test".substring(0, this.maxLength)}"`;
-  } else if (this.isArray) {
-    return '[NSArray array]';
-  } else {
-    return `@(${this.min || this.max || 0})`;
-  }
-}
-
 function asObjectiveCBasicType(type, options)
 {
   if (StringHelper.isOctetString(type)) {
@@ -199,9 +155,7 @@ function commandHasRequiredField(command)
 //
 exports.asObjectiveCBasicType        = asObjectiveCBasicType;
 exports.asObjectiveCNumberType       = asObjectiveCNumberType;
-exports.asExpectedEndpointForCluster = asExpectedEndpointForCluster;
 exports.asTestIndex                  = asTestIndex;
-exports.asTestValue                  = asTestValue;
 exports.asObjectiveCClass            = asObjectiveCClass;
 exports.asObjectiveCType             = asObjectiveCType;
 exports.asStructPropertyName         = asStructPropertyName;
