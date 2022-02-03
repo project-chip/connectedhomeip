@@ -31,9 +31,6 @@ endif()
 
 project(chip-nrfconnect-shell-example)
 
-# shell app use openthread but do not have the NETWORK_COMMISSIONING cluster or zap config
-add_definitions(-D_NO_NETWORK_COMMISSIONING_DRIVER_)
-
 include(${CHIP_ROOT}/config/nrfconnect/app/enable-gnu-std.cmake)
 
 target_compile_options(app PRIVATE -Werror)

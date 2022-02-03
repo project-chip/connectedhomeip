@@ -24,8 +24,6 @@
 #include <platform/ThreadStackManager.h>
 
 #include <limits>
-#include <string>
-#include <vector>
 
 using namespace chip;
 using namespace chip::Thread;

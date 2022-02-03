@@ -21,8 +21,6 @@ include(${MBED_PATH}/tools/cmake/app.cmake)
 
 project(${APP_TARGET})
 
-# shell app use openthread but do not have the NETWORK_COMMISSIONING cluster or zap config
-add_definitions(-D_NO_NETWORK_COMMISSIONING_DRIVER_)
 
 add_subdirectory(${MBED_PATH} ./mbed_build)
 add_subdirectory(${MBED_OS_POSIX_SOCKET_PATH} ./mbed_os_posix_socket_build)
