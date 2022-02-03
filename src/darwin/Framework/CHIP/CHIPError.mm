@@ -128,6 +128,10 @@ NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
             errorWithDomain:CHIPErrorDomain
                        code:CHIPErrorCodeUnsupportedWrite
                    userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Attempt to write read-only attribute.", nil) }];
+    case EMBER_ZCL_STATUS_NOT_FOUND:
+        return [NSError errorWithDomain:CHIPErrorDomain
+                                   code:CHIPErrorCodeNotFound
+                               userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Data not found.", nil) }];
     case EMBER_ZCL_STATUS_INVALID_DATA_TYPE:
         return [NSError
             errorWithDomain:CHIPErrorDomain
@@ -207,6 +211,10 @@ NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
     case CHIPErrorCodeUnsupportedWrite:
         return EMBER_ZCL_STATUS_UNSUPPORTED_WRITE;
+    case CHIPErrorCodeNotFound:
+        return EMBER_ZCL_STATUS_NOT_FOUND;
+    case CHIPErrorCodeInvalidDataType:
+        return EMBER_ZCL_STATUS_INVALID_DATA_TYPE;
     case CHIPErrorCodeUnsupportedCluster:
         return EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER;
     default:

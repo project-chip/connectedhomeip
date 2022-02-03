@@ -44,10 +44,10 @@ static CHIP_ERROR Setup(const char * label,
 
 static void Finalize(chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & request);
 static CHIP_ERROR Setup(const char * label,
-                        chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::Type & request,
+                        chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfo::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::Type & request);
+static void Finalize(chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfo::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::PowerSource::Structs::BatChargeFaultChangeType::Type & request,
                         Json::Value & value);
 

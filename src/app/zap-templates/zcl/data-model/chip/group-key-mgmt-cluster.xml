@@ -56,7 +56,7 @@ limitations under the License.
     <code>0x003F</code>
     <define>GROUP_KEY_MANAGEMENT_CLUSTER</define>
     <description>The Group Key Management Cluster is the mechanism by which group keys are managed.</description>
-    <attribute side="server" code="0x0000" define="GROUP_KEY_MAP" type="ARRAY" length="254" entryType="GroupKey" writable="false" optional="false">groupKeyMap</attribute>
+    <attribute side="server" code="0x0000" define="GROUP_KEY_MAP" type="ARRAY" length="254" entryType="GroupKey" writable="true" optional="false">groupKeyMap</attribute>
     <attribute side="server" code="0x0001" define="GROUP_TABLE" type="ARRAY" length="254" entryType="GroupInfo" writable="false" optional="false">groupTable</attribute>
     <attribute side="server" code="0x0002" define="MAX_GROUPS_PER_FABRIC" type="INT16U" writable="false" optional="false">maxGroupsPerFabric</attribute>
     <attribute side="server" code="0x0003" define="MAX_GROUP_KEYS_PER_FABRIC" type="INT16U" writable="false" optional="false">maxGroupKeysPerFabric</attribute>

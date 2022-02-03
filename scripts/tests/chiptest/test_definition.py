@@ -64,6 +64,16 @@ class App:
             return True
         return False
 
+    def factoryReset(self):
+        storage = '/tmp/chip_kvs'
+        if platform.system() == 'Darwin':
+            storage = str(Path.home()) + '/Documents/chip.store'
+
+        if os.path.exists(storage):
+            os.unlink(storage)
+
+        return True
+
     def poll(self):
         # When the server is manually stopped, process polling is overriden so the other
         # processes that depends on the accessory beeing alive does not stop.
@@ -192,16 +202,8 @@ class TestDefinition:
                 if os.path.exists(f):
                     os.unlink(f)
 
-            # Remove server all_clusters_app or tv_app storage, so it will be commissionable again
-            if platform.system() == 'Linux':
-                if os.path.exists('/tmp/chip_kvs'):
-                    os.unlink('/tmp/chip_kvs')
-
-            if platform.system() == "Darwin":
-                if os.path.exists(str(Path.home()) + '/Documents/chip.store'):
-                    os.unlink(str(Path.home()) + '/Documents/chip.store')
-
             app = App(runner, app_cmd)
+            app.factoryReset()  # Remove server application storage, so it will be commissionable again
             app.start(str(randrange(1, 4096)))
             apps_register.add("default", app)
 
@@ -216,4 +218,5 @@ class TestDefinition:
             raise
         finally:
             apps_register.killAll()
+            apps_register.factoryResetAll()
             apps_register.removeAll()

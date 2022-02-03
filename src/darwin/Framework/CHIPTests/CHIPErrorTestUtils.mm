@@ -52,6 +52,8 @@ NS_ASSUME_NONNULL_BEGIN
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
     case CHIPErrorCodeUnsupportedWrite:
         return EMBER_ZCL_STATUS_UNSUPPORTED_WRITE;
+    case CHIPErrorCodeNotFound:
+        return EMBER_ZCL_STATUS_NOT_FOUND;
     case CHIPErrorCodeInvalidDataType:
         return EMBER_ZCL_STATUS_INVALID_DATA_TYPE;
     case CHIPErrorCodeUnsupportedCluster:

@@ -221,15 +221,21 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
     return CommissioningStage::kError;
 }
 
-void AutoCommissioner::StartCommissioning(CommissioneeDeviceProxy * proxy)
+CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissioner, CommissioneeDeviceProxy * proxy)
 {
     // TODO: check that there is no commissioning in progress currently.
+    if (commissioner == nullptr)
+    {
+        ChipLogError(Controller, "Invalid DeviceCommissioner");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 
     if (proxy == nullptr || !proxy->GetSecureSession().HasValue())
     {
         ChipLogError(Controller, "Device proxy secure session error");
-        return;
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
+    mCommissioner            = commissioner;
     mCommissioneeDeviceProxy = proxy;
     mNeedsNetworkSetup =
         mCommissioneeDeviceProxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType() ==
@@ -237,6 +243,7 @@ void AutoCommissioner::StartCommissioning(CommissioneeDeviceProxy * proxy)
     CHIP_ERROR err               = CHIP_NO_ERROR;
     CommissioningStage nextStage = GetNextCommissioningStage(CommissioningStage::kSecurePairing, err);
     mCommissioner->PerformCommissioningStep(mCommissioneeDeviceProxy, nextStage, mParams, this, 0, GetCommandTimeout(nextStage));
+    return CHIP_NO_ERROR;
 }
 
 Optional<System::Clock::Timeout> AutoCommissioner::GetCommandTimeout(CommissioningStage stage)

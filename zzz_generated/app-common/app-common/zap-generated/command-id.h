@@ -203,12 +203,6 @@
 // Commands for cluster: Ethernet Network Diagnostics
 #define ZCL_RESET_COUNTS_COMMAND_ID (0x00)
 
-// Commands for cluster: Bridged Device Basic
-#define ZCL_START_UP_COMMAND_ID (0x00)
-#define ZCL_SHUT_DOWN_COMMAND_ID (0x01)
-#define ZCL_LEAVE_COMMAND_ID (0x02)
-#define ZCL_REACHABLE_CHANGED_COMMAND_ID (0x03)
-
 // Commands for cluster: AdministratorCommissioning
 #define ZCL_OPEN_COMMISSIONING_WINDOW_COMMAND_ID (0x00)
 #define ZCL_OPEN_BASIC_COMMISSIONING_WINDOW_COMMAND_ID (0x01)

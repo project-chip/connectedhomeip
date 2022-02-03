@@ -5547,7 +5547,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 namespace Basic {
 namespace Attributes {
 
-namespace InteractionModelVersion {
+namespace DataModelRevision {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
 {
@@ -5576,7 +5576,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::Basic::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
-} // namespace InteractionModelVersion
+} // namespace DataModelRevision
 
 namespace VendorName {
 

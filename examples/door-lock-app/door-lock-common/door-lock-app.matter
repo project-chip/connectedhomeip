@@ -57,7 +57,7 @@ server cluster Basic = 40 {
     boolean reachableNewValue = 0;
   }
 
-  readonly attribute int16u interactionModelVersion = 0;
+  readonly attribute int16u dataModelRevision = 0;
   readonly attribute char_string<32> vendorName = 1;
   readonly attribute vendor_id vendorID = 2;
   readonly attribute char_string<32> productName = 3;
@@ -694,7 +694,7 @@ server cluster FixedLabel = 64 {
 }
 
 server cluster GeneralCommissioning = 48 {
-  enum GeneralCommissioningError : ENUM8 {
+  enum CommissioningError : ENUM8 {
     kOk = 0;
     kValueOutsideRange = 1;
     kInvalidAuthentication = 2;
@@ -707,12 +707,12 @@ server cluster GeneralCommissioning = 48 {
     kIndoorOutdoor = 2;
   }
 
-  struct BasicCommissioningInfoType {
-    INT32U failSafeExpiryLengthMs = 0;
+  struct BasicCommissioningInfo {
+    INT16U failSafeExpiryLengthSeconds = 0;
   }
 
   attribute int64u breadcrumb = 0;
-  readonly attribute BasicCommissioningInfoType basicCommissioningInfoList[] = 1;
+  readonly attribute BasicCommissioningInfo basicCommissioningInfo = 1;
   readonly attribute enum8 regulatoryConfig = 2;
   readonly attribute enum8 locationCapability = 3;
   readonly global attribute bitmap32 featureMap = 65532;
@@ -732,17 +732,17 @@ server cluster GeneralCommissioning = 48 {
   }
 
   response struct ArmFailSafeResponse {
-    GeneralCommissioningError errorCode = 0;
+    CommissioningError errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
   response struct CommissioningCompleteResponse {
-    GeneralCommissioningError errorCode = 0;
+    CommissioningError errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
   response struct SetRegulatoryConfigResponse {
-    GeneralCommissioningError errorCode = 0;
+    CommissioningError errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 

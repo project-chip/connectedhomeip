@@ -21,7 +21,7 @@ public:
     }
 };
 
-{{>test_cluster tests=(getTests)}}
+{{>test_cluster tests=(getTests) credsIssuerConfigArg=true}}
 
 void registerCommandsTests(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {

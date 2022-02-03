@@ -63,6 +63,53 @@ tests:
               - name: "groupId"
                 value: 0x0001
 
+    - label: "KeySet Write 1"
+      cluster: "Group Key Management"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        groupKeySetID: 0x0101,
+                        securityPolicy: 0,
+                        epochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        epochStartTime0: 1110000,
+                        epochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+                        epochStartTime1: 1110001,
+                        epochKey2: "\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf",
+                        epochStartTime2: 1110002,
+                    }
+
+    - label: "KeySet Write 2"
+      cluster: "Group Key Management"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        groupKeySetID: 0x0102,
+                        securityPolicy: 0,
+                        epochKey0: "\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf",
+                        epochStartTime0: 2220000,
+                        epochKey1: "\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef",
+                        epochStartTime1: 2220001,
+                        epochKey2: "\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff",
+                        epochStartTime2: 2220002,
+                    }
+
+    - label: "Write Group Keys"
+      cluster: "Group Key Management"
+      command: "writeAttribute"
+      attribute: "groupKeyMap"
+      arguments:
+          value:
+              [
+                  { fabricIndex: 1, groupId: 0x1234, groupKeySetID: 0x0101 },
+                  { fabricIndex: 1, groupId: 0x0001, groupKeySetID: 0x0102 },
+              ]
+
     # Test Pair 1 : Sends a Group Write Attribute
     - label: "Group Write Attribute"
       command: "writeAttribute"

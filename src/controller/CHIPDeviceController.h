@@ -153,7 +153,8 @@ public:
 
 struct CommissionerInitParams : public ControllerInitParams
 {
-    DevicePairingDelegate * pairingDelegate = nullptr;
+    DevicePairingDelegate * pairingDelegate     = nullptr;
+    CommissioningDelegate * defaultCommissioner = nullptr;
 };
 
 typedef void (*OnOpenCommissioningWindow)(void * context, NodeId deviceId, CHIP_ERROR status, SetupPayload payload);
@@ -699,7 +700,7 @@ private:
     CommissioningStage mCommissioningStage = CommissioningStage::kSecurePairing;
     bool mRunCommissioningAfterConnection  = false;
 
-    BitMapObjectPool<CommissioneeDeviceProxy, kNumMaxActiveDevices> mCommissioneeDevicePool;
+    ObjectPool<CommissioneeDeviceProxy, kNumMaxActiveDevices> mCommissioneeDevicePool;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     UserDirectedCommissioningServer * mUdcServer = nullptr;
@@ -861,7 +862,10 @@ private:
     Callback::Callback<OnNOCChainGeneration> mDeviceNOCChainCallback;
     SetUpCodePairer mSetUpCodePairer;
     AutoCommissioner mAutoCommissioner;
-    CommissioningDelegate * mCommissioningDelegate = nullptr;
+    CommissioningDelegate * mDefaultCommissioner =
+        nullptr; // Commissioning delegate to call when PairDevice / Commission functions are used
+    CommissioningDelegate * mCommissioningDelegate =
+        nullptr; // Commissioning delegate that issued the PerformCommissioningStep command
 };
 
 } // namespace Controller

@@ -505,7 +505,7 @@ List available commands in cluster. For example, for _Basic_ cluster:
 
 ```
 chip-device-ctrl > zcl ? Basic
-InteractionModelVersion
+DataModelRevision
 VendorName
 VendorID
 ProductName

@@ -651,7 +651,7 @@ ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
 DeviceCommissioner::DeviceCommissioner() :
     mOnDeviceConnectedCallback(OnDeviceConnectedFn, this), mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this),
     mDeviceAttestationInformationVerificationCallback(OnDeviceAttestationInformationVerification, this),
-    mDeviceNOCChainCallback(OnDeviceNOCChainGeneration, this), mSetUpCodePairer(this), mAutoCommissioner(this)
+    mDeviceNOCChainCallback(OnDeviceNOCChainGeneration, this), mSetUpCodePairer(this)
 {
     mPairingDelegate         = nullptr;
     mPairedDevicesUpdated    = false;
@@ -681,6 +681,14 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
 #endif
 
     mPairingDelegate = params.pairingDelegate;
+    if (params.defaultCommissioner != nullptr)
+    {
+        mDefaultCommissioner = params.defaultCommissioner;
+    }
+    else
+    {
+        mDefaultCommissioner = &mAutoCommissioner;
+    }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     mUdcTransportMgr = chip::Platform::New<DeviceIPTransportMgr>();
@@ -949,11 +957,11 @@ CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId, CommissioningPa
     mSystemState->SystemLayer()->StartTimer(chip::System::Clock::Milliseconds32(kSessionEstablishmentTimeout),
                                             OnSessionEstablishmentTimeoutCallback, this);
 
-    mAutoCommissioner.SetOperationalCredentialsDelegate(mOperationalCredentialsDelegate);
-    ReturnErrorOnFailure(mAutoCommissioner.SetCommissioningParameters(params));
+    mDefaultCommissioner->SetOperationalCredentialsDelegate(mOperationalCredentialsDelegate);
+    ReturnErrorOnFailure(mDefaultCommissioner->SetCommissioningParameters(params));
     if (device->IsSecureConnected())
     {
-        mAutoCommissioner.StartCommissioning(device);
+        mDefaultCommissioner->StartCommissioning(this, device);
     }
     else
     {
@@ -1043,7 +1051,7 @@ void DeviceCommissioner::OnSessionEstablished()
     if (mRunCommissioningAfterConnection)
     {
         mRunCommissioningAfterConnection = false;
-        mAutoCommissioner.StartCommissioning(mDeviceBeingCommissioned);
+        mDefaultCommissioner->StartCommissioning(this, mDeviceBeingCommissioned);
     }
     else
     {

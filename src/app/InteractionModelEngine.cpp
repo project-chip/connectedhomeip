@@ -405,6 +405,15 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
     CHIP_ERROR err                             = CHIP_NO_ERROR;
     Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::Failure;
 
+    // Group Message can only be an InvokeCommandRequest or WriteRequest
+    if (apExchangeContext->IsGroupExchangeContext() &&
+        !aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandRequest) &&
+        !aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteRequest))
+    {
+        ChipLogProgress(InteractionModel, "Msg type %d not supported for group message", aPayloadHeader.GetMessageType());
+        return err;
+    }
+
     if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandRequest))
     {
         SuccessOrExit(
