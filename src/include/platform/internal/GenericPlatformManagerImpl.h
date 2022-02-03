@@ -78,6 +78,7 @@ protected:
 private:
     bool mMsgLayerWasActive;
 
+    static void HandleDeviceRebooted(intptr_t arg);
     ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 };
 

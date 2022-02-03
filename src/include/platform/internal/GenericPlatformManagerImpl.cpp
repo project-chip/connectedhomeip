@@ -27,6 +27,7 @@
 
 #include <inttypes.h>
 #include <new>
+#include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/BLEManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -122,6 +123,11 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
 
     // TODO Initialize the Software Update Manager object.
 
+    // TODO: Attempt to diagnose Darwin CI, REMOVE ONCE FIXED
+#if !CHIP_DEVICE_LAYER_TARGET_DARWIN
+    _ScheduleWork(HandleDeviceRebooted, 0);
+#endif
+
 exit:
     return err;
 }
@@ -130,6 +136,14 @@ template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_Shutdown()
 {
     CHIP_ERROR err;
+    PlatformManagerDelegate * platformManagerDelegate = PlatformMgr().GetDelegate();
+
+    // The ShutDown event SHOULD be emitted by a Node prior to any orderly shutdown sequence.
+    if (platformManagerDelegate != nullptr)
+    {
+        platformManagerDelegate->OnShutDown();
+    }
+
     ChipLogError(DeviceLayer, "Inet Layer shutdown");
     err = UDPEndPointManager()->Shutdown();
 
@@ -285,6 +299,27 @@ void GenericPlatformManagerImpl<ImplClass>::HandleMessageLayerActivityChanged(bo
     if (messageLayerIsActive != self.mMsgLayerWasActive)
     {
         self.mMsgLayerWasActive = messageLayerIsActive;
+    }
+}
+
+template <class ImplClass>
+void GenericPlatformManagerImpl<ImplClass>::HandleDeviceRebooted(intptr_t arg)
+{
+    PlatformManagerDelegate * platformManagerDelegate       = PlatformMgr().GetDelegate();
+    GeneralDiagnosticsDelegate * generalDiagnosticsDelegate = GetDiagnosticDataProvider().GetGeneralDiagnosticsDelegate();
+
+    if (generalDiagnosticsDelegate != nullptr)
+    {
+        generalDiagnosticsDelegate->OnDeviceRebooted();
+    }
+
+    // The StartUp event SHALL be emitted by a Node after completing a boot or reboot process
+    if (platformManagerDelegate != nullptr)
+    {
+        uint32_t softwareVersion;
+
+        ReturnOnFailure(ConfigurationMgr().GetSoftwareVersion(softwareVersion));
+        platformManagerDelegate->OnStartUp(softwareVersion);
     }
 }
 
