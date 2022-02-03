@@ -8795,7 +8795,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-uint16_t EnhancedCurrentHueValue1;
+NSNumber * _Nonnull EnhancedCurrentHueValue1;
 - (void)testSendClusterTest_TC_CC_9_1_000013_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read EnhancedCurrentHue attribute from DUT"];
@@ -8812,7 +8812,7 @@ uint16_t EnhancedCurrentHueValue1;
 
         {
             id actualValue = value;
-            EnhancedCurrentHueValue1 = [actualValue unsignedShortValue];
+            EnhancedCurrentHueValue1 = actualValue;
         }
 
         [expectation fulfill];
@@ -8836,7 +8836,7 @@ uint16_t EnhancedCurrentHueValue1;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedShortValue], EnhancedCurrentHueValue1);
+            XCTAssertEqualObjects(actualValue, EnhancedCurrentHueValue1);
         }
 
         [expectation fulfill];
@@ -8896,7 +8896,7 @@ uint16_t EnhancedCurrentHueValue1;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-uint16_t ColorLoopStoredEnhancedHueValue1;
+NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue1;
 - (void)testSendClusterTest_TC_CC_9_1_000017_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopStoredEnhancedHue attribute from DUT."];
@@ -8913,7 +8913,7 @@ uint16_t ColorLoopStoredEnhancedHueValue1;
 
         {
             id actualValue = value;
-            ColorLoopStoredEnhancedHueValue1 = [actualValue unsignedShortValue];
+            ColorLoopStoredEnhancedHueValue1 = actualValue;
         }
 
         [expectation fulfill];
@@ -8937,7 +8937,7 @@ uint16_t ColorLoopStoredEnhancedHueValue1;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedShortValue], ColorLoopStoredEnhancedHueValue1);
+            XCTAssertEqualObjects(actualValue, ColorLoopStoredEnhancedHueValue1);
         }
 
         [expectation fulfill];
@@ -9049,7 +9049,7 @@ uint16_t ColorLoopStoredEnhancedHueValue1;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-uint16_t EnhancedCurrentHueValue2;
+NSNumber * _Nonnull EnhancedCurrentHueValue2;
 - (void)testSendClusterTest_TC_CC_9_1_000023_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read EnhancedCurrentHue attribute from DUT"];
@@ -9066,7 +9066,7 @@ uint16_t EnhancedCurrentHueValue2;
 
         {
             id actualValue = value;
-            EnhancedCurrentHueValue2 = [actualValue unsignedShortValue];
+            EnhancedCurrentHueValue2 = actualValue;
         }
 
         [expectation fulfill];
@@ -9090,7 +9090,7 @@ uint16_t EnhancedCurrentHueValue2;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedShortValue], EnhancedCurrentHueValue2);
+            XCTAssertEqualObjects(actualValue, EnhancedCurrentHueValue2);
         }
 
         [expectation fulfill];
@@ -9150,7 +9150,7 @@ uint16_t EnhancedCurrentHueValue2;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-uint16_t ColorLoopStoredEnhancedHueValue2;
+NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue2;
 - (void)testSendClusterTest_TC_CC_9_1_000027_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopStoredEnhancedHue attribute from DUT."];
@@ -9167,7 +9167,7 @@ uint16_t ColorLoopStoredEnhancedHueValue2;
 
         {
             id actualValue = value;
-            ColorLoopStoredEnhancedHueValue2 = [actualValue unsignedShortValue];
+            ColorLoopStoredEnhancedHueValue2 = actualValue;
         }
 
         [expectation fulfill];
@@ -9191,7 +9191,7 @@ uint16_t ColorLoopStoredEnhancedHueValue2;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedShortValue], ColorLoopStoredEnhancedHueValue2);
+            XCTAssertEqualObjects(actualValue, ColorLoopStoredEnhancedHueValue2);
         }
 
         [expectation fulfill];
@@ -9361,7 +9361,7 @@ uint16_t ColorLoopStoredEnhancedHueValue2;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-uint16_t EnhancedCurrentHueValue3;
+NSNumber * _Nonnull EnhancedCurrentHueValue3;
 - (void)testSendClusterTest_TC_CC_9_1_000036_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read EnhancedCurrentHue attribute from DUT"];
@@ -9378,7 +9378,7 @@ uint16_t EnhancedCurrentHueValue3;
 
         {
             id actualValue = value;
-            EnhancedCurrentHueValue3 = [actualValue unsignedShortValue];
+            EnhancedCurrentHueValue3 = actualValue;
         }
 
         [expectation fulfill];
@@ -9402,7 +9402,7 @@ uint16_t EnhancedCurrentHueValue3;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedShortValue], EnhancedCurrentHueValue3);
+            XCTAssertEqualObjects(actualValue, EnhancedCurrentHueValue3);
         }
 
         [expectation fulfill];
@@ -9462,7 +9462,7 @@ uint16_t EnhancedCurrentHueValue3;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-uint16_t ColorLoopStoredEnhancedHueValue3;
+NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue3;
 - (void)testSendClusterTest_TC_CC_9_1_000040_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopStoredEnhancedHue attribute from DUT."];
@@ -9479,7 +9479,7 @@ uint16_t ColorLoopStoredEnhancedHueValue3;
 
         {
             id actualValue = value;
-            ColorLoopStoredEnhancedHueValue3 = [actualValue unsignedShortValue];
+            ColorLoopStoredEnhancedHueValue3 = actualValue;
         }
 
         [expectation fulfill];
@@ -9503,7 +9503,7 @@ uint16_t ColorLoopStoredEnhancedHueValue3;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedShortValue], ColorLoopStoredEnhancedHueValue3);
+            XCTAssertEqualObjects(actualValue, ColorLoopStoredEnhancedHueValue3);
         }
 
         [expectation fulfill];
@@ -9615,7 +9615,7 @@ uint16_t ColorLoopStoredEnhancedHueValue3;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-uint16_t EnhancedCurrentHueValue4;
+NSNumber * _Nonnull EnhancedCurrentHueValue4;
 - (void)testSendClusterTest_TC_CC_9_1_000046_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read EnhancedCurrentHue attribute from DUT"];
@@ -9632,7 +9632,7 @@ uint16_t EnhancedCurrentHueValue4;
 
         {
             id actualValue = value;
-            EnhancedCurrentHueValue4 = [actualValue unsignedShortValue];
+            EnhancedCurrentHueValue4 = actualValue;
         }
 
         [expectation fulfill];
@@ -9656,7 +9656,7 @@ uint16_t EnhancedCurrentHueValue4;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedShortValue], EnhancedCurrentHueValue4);
+            XCTAssertEqualObjects(actualValue, EnhancedCurrentHueValue4);
         }
 
         [expectation fulfill];
@@ -9716,7 +9716,7 @@ uint16_t EnhancedCurrentHueValue4;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-uint16_t ColorLoopStoredEnhancedHue4;
+NSNumber * _Nonnull ColorLoopStoredEnhancedHue4;
 - (void)testSendClusterTest_TC_CC_9_1_000050_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopStoredEnhancedHue attribute from DUT."];
@@ -9733,7 +9733,7 @@ uint16_t ColorLoopStoredEnhancedHue4;
 
         {
             id actualValue = value;
-            ColorLoopStoredEnhancedHue4 = [actualValue unsignedShortValue];
+            ColorLoopStoredEnhancedHue4 = actualValue;
         }
 
         [expectation fulfill];
@@ -9757,7 +9757,7 @@ uint16_t ColorLoopStoredEnhancedHue4;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedShortValue], ColorLoopStoredEnhancedHue4);
+            XCTAssertEqualObjects(actualValue, ColorLoopStoredEnhancedHue4);
         }
 
         [expectation fulfill];
@@ -10037,7 +10037,7 @@ uint16_t ColorLoopStoredEnhancedHue4;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-uint16_t EnhancedCurrentHueValue;
+NSNumber * _Nonnull EnhancedCurrentHueValue;
 - (void)testSendClusterTest_TC_CC_9_2_000010_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read EnhancedCurrentHue attribute from DUT."];
@@ -10054,7 +10054,7 @@ uint16_t EnhancedCurrentHueValue;
 
         {
             id actualValue = value;
-            EnhancedCurrentHueValue = [actualValue unsignedShortValue];
+            EnhancedCurrentHueValue = actualValue;
         }
 
         [expectation fulfill];
@@ -10078,7 +10078,7 @@ uint16_t EnhancedCurrentHueValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedShortValue], EnhancedCurrentHueValue);
+            XCTAssertEqualObjects(actualValue, EnhancedCurrentHueValue);
         }
 
         [expectation fulfill];
@@ -10190,7 +10190,7 @@ uint16_t EnhancedCurrentHueValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-uint16_t ColorLoopStoredEnhancedHueValue;
+NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 - (void)testSendClusterTest_TC_CC_9_2_000016_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopStoredEnhancedHue attribute from DUT."];
@@ -10207,7 +10207,7 @@ uint16_t ColorLoopStoredEnhancedHueValue;
 
         {
             id actualValue = value;
-            ColorLoopStoredEnhancedHueValue = [actualValue unsignedShortValue];
+            ColorLoopStoredEnhancedHueValue = actualValue;
         }
 
         [expectation fulfill];
@@ -10231,7 +10231,7 @@ uint16_t ColorLoopStoredEnhancedHueValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedShortValue], ColorLoopStoredEnhancedHueValue);
+            XCTAssertEqualObjects(actualValue, ColorLoopStoredEnhancedHueValue);
         }
 
         [expectation fulfill];
@@ -10511,7 +10511,7 @@ uint16_t ColorLoopStoredEnhancedHueValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-uint16_t EnhancedCurrentHueValue;
+NSNumber * _Nonnull EnhancedCurrentHueValue;
 - (void)testSendClusterTest_TC_CC_9_3_000010_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read EnhancedCurrentHue attribute from DUT."];
@@ -10528,7 +10528,7 @@ uint16_t EnhancedCurrentHueValue;
 
         {
             id actualValue = value;
-            EnhancedCurrentHueValue = [actualValue unsignedShortValue];
+            EnhancedCurrentHueValue = actualValue;
         }
 
         [expectation fulfill];
@@ -10552,7 +10552,7 @@ uint16_t EnhancedCurrentHueValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedShortValue], EnhancedCurrentHueValue);
+            XCTAssertEqualObjects(actualValue, EnhancedCurrentHueValue);
         }
 
         [expectation fulfill];
@@ -10664,7 +10664,7 @@ uint16_t EnhancedCurrentHueValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-uint16_t ColorLoopStoredEnhancedHueValue;
+NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
 - (void)testSendClusterTest_TC_CC_9_3_000016_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopStoredEnhancedHue attribute from DUT."];
@@ -10681,7 +10681,7 @@ uint16_t ColorLoopStoredEnhancedHueValue;
 
         {
             id actualValue = value;
-            ColorLoopStoredEnhancedHueValue = [actualValue unsignedShortValue];
+            ColorLoopStoredEnhancedHueValue = actualValue;
         }
 
         [expectation fulfill];
@@ -10705,7 +10705,7 @@ uint16_t ColorLoopStoredEnhancedHueValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedShortValue], ColorLoopStoredEnhancedHueValue);
+            XCTAssertEqualObjects(actualValue, ColorLoopStoredEnhancedHueValue);
         }
 
         [expectation fulfill];
