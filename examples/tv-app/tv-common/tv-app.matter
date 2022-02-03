@@ -707,7 +707,7 @@ server cluster GroupKeyManagement = 63 {
     CHAR_STRING<16> groupName = 3;
   }
 
-  readonly attribute GroupKey groupKeyMap[] = 0;
+  attribute GroupKey groupKeyMap[] = 0;
   readonly attribute GroupInfo groupTable[] = 1;
   readonly global attribute int16u clusterRevision = 65533;
 }

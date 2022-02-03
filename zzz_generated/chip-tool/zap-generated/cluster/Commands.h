@@ -3334,6 +3334,30 @@ private:
     TypedComplexArgument<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySet::Type> mComplex_GroupKeySet;
 };
 
+class WriteGroupKeyManagementGroupKeyMap : public WriteAttribute
+{
+public:
+    WriteGroupKeyManagementGroupKeyMap(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("GroupKeyMap", credsIssuerConfig), mComplex(&mValue)
+    {
+        AddArgument("attr-name", "group-key-map");
+        AddArgument("attr-value", &mComplex);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteGroupKeyManagementGroupKeyMap() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000003F, 0x00000000, mValue);
+    }
+
+private:
+    chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::Type> mValue;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::Type>>
+        mComplex;
+};
+
 /*----------------------------------------------------------------------------*\
 | Cluster Groups                                                      | 0x0004 |
 |------------------------------------------------------------------------------|
@@ -10776,6 +10800,7 @@ void registerClusterGroupKeyManagement(Commands & commands, CredentialIssuerComm
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                  //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),              //
         make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                  //
+        make_unique<WriteGroupKeyManagementGroupKeyMap>(credsIssuerConfig),                                                  //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                              //
         make_unique<SubscribeAttribute>(Id, "group-key-map", Attributes::GroupKeyMap::Id, credsIssuerConfig),                //
         make_unique<SubscribeAttribute>(Id, "group-table", Attributes::GroupTable::Id, credsIssuerConfig),                   //

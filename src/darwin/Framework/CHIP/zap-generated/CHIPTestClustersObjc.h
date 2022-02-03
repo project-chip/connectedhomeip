@@ -568,7 +568,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPTestGroupKeyManagement : CHIPGroupKeyManagement
 
-- (void)writeAttributeGroupKeyMapWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeGroupTableWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeMaxGroupsPerFabricWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeMaxGroupKeysPerFabricWithValue:(NSNumber * _Nonnull)value
