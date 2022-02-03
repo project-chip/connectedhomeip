@@ -14,11 +14,25 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
 
 import("${build_root}/toolchain/flashable_executable.gni")
+import("${dir_pw_build}/python.gni")
+import("${chip_root}/src/platform/device.gni")
 
 template("qpg_executable") {
   output_base_name = get_path_info(invoker.output_name, "name")
+
+  qpg_target_name = target_name
+  executable_target_name = "${target_name}.out"
+  ota_target_name = "${target_name}_ota"
+  if (chip_enable_ota_requestor) {
+    # Generate OTA image after executable
+    final_target = ota_target_name
+  } else {
+    # The executable is the final target.
+    final_target = executable_target_name
+  }
 
   objcopy_image_name = invoker.output_name + ".hex"
   objcopy_image_format = "ihex"
@@ -45,8 +59,35 @@ template("qpg_executable") {
   flashing_script_name = output_base_name + ".flash.py"
   flashing_options = [ "qpg" ]
 
-  flashable_executable(target_name) {
+  flashable_executable(executable_target_name) {
     forward_variables_from(invoker, "*")
     data_deps = [ ":${flashing_runtime_target}" ]
+  }
+
+  # If OTA requestor is enabled, generate OTA image from HEX
+  if (chip_enable_ota_requestor) {
+    pw_python_action(ota_target_name) {
+      public_deps = [ ":${qpg_target_name}.out.image" ]
+      sources = [ "${root_out_dir}/${objcopy_image_name}" ]
+      outputs = [
+        "${root_out_dir}/${objcopy_image_name}.ota",
+      ]
+      script = "${chip_root}/third_party/qpg_sdk/Tools/ota/generate_ota_img.py"
+      out_dir = rebase_path(root_out_dir, root_build_dir)
+
+      args = [
+        rebase_path(chip_root, root_build_dir),
+        "${out_dir}/${invoker.output_name}.hex",
+        "${out_dir}/${invoker.output_name}.ota",
+      ]
+    }
+  }
+
+  group(qpg_target_name) {
+    data_deps = [ ":$final_target" ]
+
+    if (defined(invoker.data_deps)) {
+      data_deps += invoker.data_deps
+    }
   }
 }
