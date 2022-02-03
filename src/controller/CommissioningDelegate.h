@@ -30,10 +30,7 @@ enum CommissioningStage : uint8_t
 {
     kError,
     kSecurePairing,
-    kReadVendorId,
-    kReadProductId,
-    kReadSoftwareVersion,
-    kGetNetworkTechnology,
+    kReadCommissioningInfo,
     kArmFailsafe,
     // kConfigTime,  // NOT YET IMPLEMENTED
     // kConfigTimeZone,  // NOT YET IMPLEMENTED
@@ -239,37 +236,36 @@ struct OperationalNodeFoundData
     OperationalDeviceProxy * operationalProxy;
 };
 
-struct BasicVendor
-{
-    BasicVendor(VendorId id) : vendorId(id) {}
-    VendorId vendorId;
-};
-
-struct BasicProduct
-{
-    BasicProduct(uint16_t id) : productId(id) {}
-    uint16_t productId;
-};
-
-struct BasicSoftware
-{
-    BasicSoftware(uint32_t version) : softwareVersion(version) {}
-    uint32_t softwareVersion;
-};
-
 struct NetworkClusters
 {
     EndpointId wifi   = kInvalidEndpointId;
     EndpointId thread = kInvalidEndpointId;
     EndpointId eth    = kInvalidEndpointId;
 };
+struct BasicClusterInfo
+{
+    VendorId vendorId        = VendorId::Common;
+    uint16_t productId       = 0;
+    uint32_t softwareVersion = 0;
+};
+struct GeneralCommissioningInfo
+{
+    uint16_t recommendedFailsafe = 0;
+};
+
+struct ReadCommissioningInfo
+{
+    NetworkClusters network;
+    BasicClusterInfo basic;
+    GeneralCommissioningInfo general;
+};
 
 class CommissioningDelegate
 {
 public:
     virtual ~CommissioningDelegate(){};
-    struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, NocChain, OperationalNodeFoundData, BasicVendor,
-                                         BasicProduct, BasicSoftware, NetworkClusters>
+    struct CommissioningReport
+        : Variant<RequestedCertificate, AttestationResponse, NocChain, OperationalNodeFoundData, ReadCommissioningInfo>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;

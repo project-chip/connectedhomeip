@@ -57,16 +57,13 @@ private:
     OperationalDeviceProxy * mOperationalDeviceProxy                 = nullptr;
     OperationalCredentialsDelegate * mOperationalCredentialsDelegate = nullptr;
     CommissioningParameters mParams                                  = CommissioningParameters();
-    VendorId mVendorId;
-    uint16_t mProductId;
-    uint32_t mSoftwareVersion;
     // Memory space for the commisisoning parameters that come in as ByteSpans - the caller is not guaranteed to retain this memory
     uint8_t mSsid[CommissioningParameters::kMaxSsidLen];
     uint8_t mCredentials[CommissioningParameters::kMaxCredentialsLen];
     uint8_t mThreadOperationalDataset[CommissioningParameters::kMaxThreadDatasetLen];
 
     bool mNeedsNetworkSetup = false;
-    NetworkClusters mNetworkEndpoints;
+    ReadCommissioningInfo mDeviceCommissioingInfo;
 
     // TODO: Why were the nonces statically allocated, but the certs dynamically allocated?
     uint8_t * mDAC   = nullptr;

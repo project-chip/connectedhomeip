@@ -106,21 +106,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
     switch (currentStage)
     {
     case CommissioningStage::kSecurePairing:
-        return CommissioningStage::kReadVendorId;
-    case CommissioningStage::kReadVendorId:
-        return CommissioningStage::kReadProductId;
-    case CommissioningStage::kReadProductId:
-        return CommissioningStage::kReadSoftwareVersion;
-    case CommissioningStage::kReadSoftwareVersion:
-        if (mNeedsNetworkSetup)
-        {
-            return CommissioningStage::kGetNetworkTechnology;
-        }
-        else
-        {
-            return CommissioningStage::kArmFailsafe;
-        }
-    case CommissioningStage::kGetNetworkTechnology:
+        return CommissioningStage::kReadCommissioningInfo;
+    case CommissioningStage::kReadCommissioningInfo:
         return CommissioningStage::kArmFailsafe;
     case CommissioningStage::kArmFailsafe:
         return CommissioningStage::kConfigRegulatory;
@@ -146,17 +133,24 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
         // operational network because the provisioning of certificates will trigger the device to start operational advertising.
         if (mNeedsNetworkSetup)
         {
-            if (mParams.GetWiFiCredentials().HasValue() && mNetworkEndpoints.wifi != kInvalidEndpointId)
+            if (mParams.GetWiFiCredentials().HasValue() && mDeviceCommissioingInfo.network.wifi != kInvalidEndpointId)
             {
                 return CommissioningStage::kWiFiNetworkSetup;
             }
-            else if (mParams.GetThreadOperationalDataset().HasValue() && mNetworkEndpoints.thread != kInvalidEndpointId)
+            else if (mParams.GetThreadOperationalDataset().HasValue() &&
+                     mDeviceCommissioingInfo.network.thread != kInvalidEndpointId)
             {
                 return CommissioningStage::kThreadNetworkSetup;
             }
             else
             {
                 ChipLogError(Controller, "Required network information not provided in commissioning parameters");
+                ChipLogError(Controller, "Parameters supplied: wifi (%s) thread (%s)",
+                             mParams.GetWiFiCredentials().HasValue() ? "yes" : "no",
+                             mParams.GetThreadOperationalDataset().HasValue() ? "yes" : "no");
+                ChipLogError(Controller, "Device supports: wifi (%s) thread(%s)",
+                             mDeviceCommissioingInfo.network.wifi == kInvalidEndpointId ? "no" : "yes",
+                             mDeviceCommissioingInfo.network.thread == kInvalidEndpointId ? "no" : "yes");
                 lastErr = CHIP_ERROR_INVALID_ARGUMENT;
                 return CommissioningStage::kCleanup;
             }
@@ -171,7 +165,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
 #endif
         }
     case CommissioningStage::kWiFiNetworkSetup:
-        if (mParams.GetThreadOperationalDataset().HasValue() && mNetworkEndpoints.thread != kInvalidEndpointId)
+        if (mParams.GetThreadOperationalDataset().HasValue() && mDeviceCommissioingInfo.network.thread != kInvalidEndpointId)
         {
             return CommissioningStage::kThreadNetworkSetup;
         }
@@ -180,7 +174,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
             return CommissioningStage::kWiFiNetworkEnable;
         }
     case CommissioningStage::kThreadNetworkSetup:
-        if (mParams.GetWiFiCredentials().HasValue() && mNetworkEndpoints.wifi != kInvalidEndpointId)
+        if (mParams.GetWiFiCredentials().HasValue() && mDeviceCommissioingInfo.network.wifi != kInvalidEndpointId)
         {
             return CommissioningStage::kWiFiNetworkEnable;
         }
@@ -190,7 +184,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
         }
 
     case CommissioningStage::kWiFiNetworkEnable:
-        if (mParams.GetThreadOperationalDataset().HasValue() && mNetworkEndpoints.thread != kInvalidEndpointId)
+        if (mParams.GetThreadOperationalDataset().HasValue() && mDeviceCommissioingInfo.network.thread != kInvalidEndpointId)
         {
             return CommissioningStage::kThreadNetworkEnable;
         }
@@ -227,12 +221,10 @@ EndpointId AutoCommissioner::GetEndpoint(const CommissioningStage & stage)
     {
     case CommissioningStage::kWiFiNetworkSetup:
     case CommissioningStage::kWiFiNetworkEnable:
-        return mNetworkEndpoints.wifi;
+        return mDeviceCommissioingInfo.network.wifi;
     case CommissioningStage::kThreadNetworkSetup:
     case CommissioningStage::kThreadNetworkEnable:
-        return mNetworkEndpoints.thread;
-    case CommissioningStage::kGetNetworkTechnology:
-        return kInvalidEndpointId;
+        return mDeviceCommissioingInfo.network.thread;
     default:
         return kRootEndpointId;
     }
@@ -315,17 +307,8 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
     {
         switch (report.stageCompleted)
         {
-        case CommissioningStage::kReadVendorId:
-            mVendorId = report.Get<BasicVendor>().vendorId;
-            break;
-        case CommissioningStage::kReadProductId:
-            mProductId = report.Get<BasicProduct>().productId;
-            break;
-        case CommissioningStage::kReadSoftwareVersion:
-            mSoftwareVersion = report.Get<BasicSoftware>().softwareVersion;
-            break;
-        case CommissioningStage::kGetNetworkTechnology:
-            mNetworkEndpoints = report.Get<NetworkClusters>();
+        case CommissioningStage::kReadCommissioningInfo:
+            mDeviceCommissioingInfo = report.Get<ReadCommissioningInfo>();
             break;
         case CommissioningStage::kSendPAICertificateRequest:
             SetPAI(report.Get<RequestedCertificate>().certificate);
@@ -367,7 +350,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             mCommissioneeDeviceProxy = nullptr;
             mOperationalDeviceProxy  = nullptr;
             mParams                  = CommissioningParameters();
-            mNetworkEndpoints        = NetworkClusters();
+            mDeviceCommissioingInfo  = ReadCommissioningInfo();
             return CHIP_NO_ERROR;
         default:
             break;

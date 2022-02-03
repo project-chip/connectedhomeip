@@ -1556,43 +1556,59 @@ void DeviceCommissioner::SetupCluster(ClusterBase & base, DeviceProxy * proxy, E
     base.SetCommandTimeout(timeout);
 }
 
-void BasicVendorCallback(void * context, VendorId vendorId)
-{
-    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-    CommissioningDelegate::CommissioningReport report;
-    report.Set<BasicVendor>(vendorId);
-    commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
-}
-
-void BasicProductCallback(void * context, uint16_t productId)
-{
-    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-    CommissioningDelegate::CommissioningReport report;
-    report.Set<BasicProduct>(productId);
-    commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
-}
-
-void BasicSoftwareCallback(void * context, uint32_t softwareVersion)
-{
-    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-    CommissioningDelegate::CommissioningReport report;
-    report.Set<BasicSoftware>(softwareVersion);
-    commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
-}
-
-void AttributeReadFailure(void * context, CHIP_ERROR status)
-{
-    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-    commissioner->CommissioningStageComplete(status);
-}
-
 // AttributeCache::Callback impl
 void DeviceCommissioner::OnDone()
 {
-    NetworkClusters clusters;
+    CHIP_ERROR err;
+    CHIP_ERROR return_err = CHIP_NO_ERROR;
+    ReadCommissioningInfo info;
 
-    CHIP_ERROR err = mAttributeCache->ForEachAttribute(
-        app::Clusters::NetworkCommissioning::Id, [this, &clusters](const app::ConcreteAttributePath & path) {
+    // Using ForEachAttribute because this attribute can be queried on any endpoint.
+    err = mAttributeCache->ForEachAttribute(
+        app::Clusters::GeneralCommissioning::Id, [this, &info](const app::ConcreteAttributePath & path) {
+            if (path.mAttributeId != app::Clusters::GeneralCommissioning::Attributes::BasicCommissioningInfo::Id)
+            {
+                return CHIP_NO_ERROR;
+            }
+            TLV::TLVReader reader;
+            ReturnErrorOnFailure(this->mAttributeCache->Get(path, reader));
+            app::Clusters::GeneralCommissioning::Attributes::BasicCommissioningInfo::TypeInfo::DecodableType basicInfo;
+            ReturnErrorOnFailure(app::DataModel::Decode(reader, basicInfo));
+            info.general.recommendedFailsafe = basicInfo.failSafeExpiryLengthSeconds;
+            return CHIP_NO_ERROR;
+        });
+
+    // Try to parse as much as we can here before returning, even if this is an error.
+    return_err = err == CHIP_NO_ERROR ? return_err : err;
+
+    err = mAttributeCache->ForEachAttribute(app::Clusters::Basic::Id, [this, &info](const app::ConcreteAttributePath & path) {
+        TLV::TLVReader reader;
+        if (path.mAttributeId != app::Clusters::Basic::Attributes::VendorID::Id &&
+            path.mAttributeId != app::Clusters::Basic::Attributes::ProductID::Id &&
+            path.mAttributeId != app::Clusters::Basic::Attributes::SoftwareVersion::Id)
+        {
+            // Continue on
+            return CHIP_NO_ERROR;
+        }
+
+        ReturnErrorOnFailure(this->mAttributeCache->Get(path, reader));
+        switch (path.mAttributeId)
+        {
+        case app::Clusters::Basic::Attributes::VendorID::Id:
+            return app::DataModel::Decode(reader, info.basic.vendorId);
+        case app::Clusters::Basic::Attributes::ProductID::Id:
+            return app::DataModel::Decode(reader, info.basic.productId);
+        case app::Clusters::Basic::Attributes::SoftwareVersion::Id:
+            return app::DataModel::Decode(reader, info.basic.softwareVersion);
+        default:
+            return CHIP_NO_ERROR;
+        }
+    });
+    // Try to parse as much as we can here before returning, even if this is an error.
+    return_err = err == CHIP_NO_ERROR ? return_err : err;
+
+    err = mAttributeCache->ForEachAttribute(
+        app::Clusters::NetworkCommissioning::Id, [this, &info](const app::ConcreteAttributePath & path) {
             if (path.mAttributeId != app::Clusters::NetworkCommissioning::Attributes::FeatureMap::Id)
             {
                 return CHIP_NO_ERROR;
@@ -1605,43 +1621,44 @@ void DeviceCommissioner::OnDone()
                 {
                     if (features.Has(app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kWiFiNetworkInterface))
                     {
-                        clusters.wifi = path.mEndpointId;
+                        info.network.wifi = path.mEndpointId;
                     }
                     else if (features.Has(
                                  app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kThreadNetworkInterface))
                     {
-                        clusters.thread = path.mEndpointId;
+                        info.network.thread = path.mEndpointId;
                     }
                     else if (features.Has(
                                  app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kEthernetNetworkInterface))
                     {
-                        clusters.eth = path.mEndpointId;
+                        info.network.eth = path.mEndpointId;
                     }
                     else
                     {
                         // TODO: Gross workaround for the empty feature map on all clusters. Remove.
-                        if (clusters.thread == kInvalidEndpointId)
+                        if (info.network.thread == kInvalidEndpointId)
                         {
-                            clusters.thread = path.mEndpointId;
+                            info.network.thread = path.mEndpointId;
                         }
-                        if (clusters.wifi == kInvalidEndpointId)
+                        if (info.network.wifi == kInvalidEndpointId)
                         {
-                            clusters.wifi = path.mEndpointId;
+                            info.network.wifi = path.mEndpointId;
                         }
                     }
                 }
             }
             return CHIP_NO_ERROR;
         });
+    return_err = err == CHIP_NO_ERROR ? return_err : err;
 
-    if (err != CHIP_NO_ERROR)
+    if (return_err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Error parsing Network commissioning features");
+        ChipLogError(Controller, "Error parsing commissioning information");
     }
     mAttributeCache = nullptr;
     mReadClient     = nullptr;
     CommissioningDelegate::CommissioningReport report;
-    report.Set<NetworkClusters>(clusters);
+    report.Set<ReadCommissioningInfo>(info);
     CommissioningStageComplete(err, report);
 }
 void DeviceCommissioner::OnArmFailSafe(void * context,
@@ -1707,30 +1724,6 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
 
     switch (step)
     {
-    case CommissioningStage::kReadVendorId: {
-        ChipLogProgress(Controller, "Reading vendor ID");
-        BasicCluster basic;
-        SetupCluster(basic, proxy, endpoint, timeout);
-        basic.ReadAttribute<chip::app::Clusters::Basic::Attributes::VendorID::TypeInfo>(this, BasicVendorCallback,
-                                                                                        AttributeReadFailure);
-    }
-    break;
-    case CommissioningStage::kReadProductId: {
-        ChipLogProgress(Controller, "Reading product ID");
-        BasicCluster basic;
-        SetupCluster(basic, proxy, endpoint, timeout);
-        basic.ReadAttribute<chip::app::Clusters::Basic::Attributes::ProductID::TypeInfo>(this, BasicProductCallback,
-                                                                                         AttributeReadFailure);
-    }
-    break;
-    case CommissioningStage::kReadSoftwareVersion: {
-        ChipLogProgress(Controller, "Reading software version");
-        BasicCluster basic;
-        SetupCluster(basic, proxy, endpoint, timeout);
-        basic.ReadAttribute<chip::app::Clusters::Basic::Attributes::SoftwareVersion::TypeInfo>(this, BasicSoftwareCallback,
-                                                                                               AttributeReadFailure);
-    }
-    break;
     case CommissioningStage::kArmFailsafe: {
         ChipLogProgress(Controller, "Arming failsafe");
         // TODO: should get the endpoint information from the descriptor cluster.
@@ -1741,14 +1734,23 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         SendCommand<GeneralCommissioningCluster>(proxy, request, OnArmFailSafe, OnBasicFailure, endpoint, timeout);
     }
     break;
-    case CommissioningStage::kGetNetworkTechnology: {
-        ChipLogProgress(Controller, "Sending request for network cluster feature map");
+    case CommissioningStage::kReadCommissioningInfo: {
+        ChipLogProgress(Controller, "Sending request for commissioning information");
         app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
         app::ReadPrepareParams readParams(proxy->GetSecureSession().Value());
-        app::AttributePathParams readPath(app::Clusters::NetworkCommissioning::Id,
-                                          app::Clusters::NetworkCommissioning::Attributes::FeatureMap::Id);
-        readParams.mpAttributePathParamsList    = &readPath;
-        readParams.mAttributePathParamsListSize = 1;
+
+        app::AttributePathParams readPaths[3];
+        // Read all the feature maps for all the networking clusters on any endpoint to determine what is supported
+        readPaths[0] = app::AttributePathParams(app::Clusters::NetworkCommissioning::Id,
+                                                app::Clusters::NetworkCommissioning::Attributes::FeatureMap::Id);
+        // Get the basic commissioning info from the general commissioning cluster on this endpoint (recommended failsafe time)
+        readPaths[1] = app::AttributePathParams(endpoint, app::Clusters::GeneralCommissioning::Id,
+                                                app::Clusters::GeneralCommissioning::Attributes::BasicCommissioningInfo::Id);
+        // Read all the attributes from the basic info cluster (includes vendor id / product id / software version)
+        readPaths[2] = app::AttributePathParams(endpoint, app::Clusters::Basic::Id);
+
+        readParams.mpAttributePathParamsList    = readPaths;
+        readParams.mAttributePathParamsListSize = 3;
         if (timeout.HasValue())
         {
             readParams.mTimeout = timeout.Value();
