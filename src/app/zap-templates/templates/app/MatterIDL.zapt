@@ -132,7 +132,20 @@
           {{asUpperCamelCase parent.commandName}}Request
         {{~/first~}}
       {{~/zcl_command_arguments~}}
-      ): {{#if responseName}}{{responseName}}{{else}}{{#if_command_has_response commandName ''}}{{commandName}}Response{{else}}{{#if_command_has_response commandName 'Request'}}{{replace_string commandName 'Request' ''}}Response{{else}}DefaultSuccess{{/if_command_has_response}}{{/if_command_has_response}}{{/if}} = {{code}};
+      ): {{#if responseName~}}
+        {{~responseName~}}
+      {{~else~}}
+        {{~#if_command_has_response commandName ''~}}
+          {{~commandName~}}Response
+        {{~else~}}
+          {{~#if_command_has_response commandName 'Request'~}}
+            {{~replace_string commandName 'Request' ''}}Response
+          {{~else~}}
+            DefaultSuccess
+          {{~/if_command_has_response~}}
+        {{~/if_command_has_response~}}
+      {{~/if~}}
+      {{~indent 0}} = {{code}};
     {{/all_incoming_commands_for_cluster}}
   {{/if}}
   {{#if (is_client side)}}
@@ -150,7 +163,20 @@
           {{asUpperCamelCase parent.commandName}}Request
         {{~/first~}}
       {{~/zcl_command_arguments~}}
-      ): {{#if responseName}}{{responseName}}{{else}}{{#if_command_has_response commandName ''}}{{commandName}}Response{{else}}{{#if_command_has_response commandName 'Request'}}{{replace_string commandName 'Request' ''}}Response{{else}}DefaultSuccess{{/if_command_has_response}}{{/if_command_has_response}}{{/if}} = {{code}};
+      ): {{#if responseName~}}
+        {{~responseName~}}
+      {{~else~}}
+        {{~#if_command_has_response commandName ''~}}
+          {{~commandName~}}Response
+        {{~else~}}
+          {{~#if_command_has_response commandName 'Request'~}}
+            {{~replace_string commandName 'Request' ''}}Response
+          {{~else~}}
+            DefaultSuccess
+          {{~/if_command_has_response~}}
+        {{~/if_command_has_response~}}
+      {{~/if~}}
+      {{~indent 0}} = {{code}};
     {{/all_outgoing_commands_for_cluster}}
   {{/if}}
 }
