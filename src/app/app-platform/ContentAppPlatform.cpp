@@ -31,6 +31,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ZclString.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <zap-generated/CHIPClusters.h>
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
@@ -384,6 +385,26 @@ uint32_t ContentAppPlatform::GetPincodeFromContentApp(uint16_t vendorId, uint16_
 
     char * eptr;
     return (uint32_t) strtol(pinString.c_str(), &eptr, 10);
+}
+
+CHIP_ERROR ContentAppPlatform::CreateBindingWithCallback(OperationalDeviceProxy * device, chip::EndpointId deviceEndpointId,
+                                                         chip::NodeId bindingNodeId, chip::GroupId bindingGroupId,
+                                                         chip::EndpointId bindingEndpointId, chip::ClusterId bindingClusterId,
+                                                         CommandResponseSuccessCallback<app::DataModel::NullObjectType> successCb,
+                                                         CommandResponseFailureCallback failureCb)
+{
+    chip::Controller::BindingCluster cluster;
+    cluster.Associate(device, deviceEndpointId);
+
+    Binding::Commands::Bind::Type request;
+    request.nodeId     = bindingNodeId;
+    request.groupId    = bindingGroupId;
+    request.endpointId = bindingEndpointId;
+    request.clusterId  = bindingClusterId;
+    ReturnErrorOnFailure(cluster.InvokeCommand(request, this, successCb, failureCb));
+
+    ChipLogDetail(Controller, "CreateBindingWithCallback: Sent Bind command request, waiting for response");
+    return CHIP_NO_ERROR;
 }
 
 } // namespace AppPlatform

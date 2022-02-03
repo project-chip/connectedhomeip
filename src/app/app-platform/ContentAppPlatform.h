@@ -23,11 +23,15 @@
 #pragma once
 
 #include <app-common/zap-generated/enums.h>
+#include <app/OperationalDeviceProxy.h>
 #include <app/app-platform/ContentApp.h>
 #include <app/util/attribute-storage.h>
+#include <controller/CHIPCluster.h>
 #include <platform/CHIPDeviceLayer.h>
 
 using chip::app::Clusters::ApplicationBasic::CatalogVendorApp;
+using chip::Controller::CommandResponseFailureCallback;
+using chip::Controller::CommandResponseSuccessCallback;
 
 namespace chip {
 namespace AppPlatform {
@@ -112,6 +116,27 @@ public:
     // loads content app identified by vid/pid of client and calls HandleGetSetupPin.
     // Returns 0 if pin cannot be obtained.
     uint32_t GetPincodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId);
+
+    /**
+     * @brief
+     *   Add a binding.
+     *
+     * @param[in] device             OperationalDeviceProxy for the target device.
+     * @param[in] deviceEndpointId   The endpoint on the device containing the binding cluster.
+     * @param[in] bindingNodeId      The NodeId for the binding that will be created.
+     * @param[in] bindingGroupId     The GroupId for the binding that will be created.
+     * @param[in] bindingEndpointId  The EndpointId for the binding that will be created.
+     * @param[in] bindingClusterId   The ClusterId for the binding that will be created.
+     * @param[in] onSuccessCallback        The function to be called on success of adding the binding.
+     * @param[in] onFailureCallback        The function to be called on failure of adding the binding.
+     *
+     * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
+     */
+    CHIP_ERROR CreateBindingWithCallback(OperationalDeviceProxy * device, chip::EndpointId deviceEndpointId,
+                                         chip::NodeId bindingNodeId, chip::GroupId bindingGroupId,
+                                         chip::EndpointId bindingEndpointId, chip::ClusterId bindingClusterId,
+                                         CommandResponseSuccessCallback<app::DataModel::NullObjectType> successCb,
+                                         CommandResponseFailureCallback failureCb);
 
 protected:
     // requires vendorApp to be in the catalog of the platform
