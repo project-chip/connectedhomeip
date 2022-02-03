@@ -101,8 +101,8 @@ class Runner:
             for dependency in dependencies:
                 if dependency.poll() is not None:
                     s.kill()
-                    raise Exception("Unexpected return %d for %r",
-                                    dependency.poll(), dependency)
+                    raise Exception("Unexpected return %d for %r" %
+                                    (dependency.poll(), dependency))
 
         code = s.wait()
         if code != 0:

@@ -246,10 +246,10 @@ typedef void (*NullablePowerSourceClusterWiredCurrentTypeAttributeCallback)(
 typedef void (*PowerSourceClusterWiredFaultTypeAttributeCallback)(void *, chip::app::Clusters::PowerSource::WiredFaultType);
 typedef void (*NullablePowerSourceClusterWiredFaultTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::WiredFaultType> &);
-typedef void (*GeneralCommissioningClusterGeneralCommissioningErrorAttributeCallback)(
-    void *, chip::app::Clusters::GeneralCommissioning::GeneralCommissioningError);
-typedef void (*NullableGeneralCommissioningClusterGeneralCommissioningErrorAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::GeneralCommissioningError> &);
+typedef void (*GeneralCommissioningClusterCommissioningErrorAttributeCallback)(
+    void *, chip::app::Clusters::GeneralCommissioning::CommissioningError);
+typedef void (*NullableGeneralCommissioningClusterCommissioningErrorAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::CommissioningError> &);
 typedef void (*GeneralCommissioningClusterRegulatoryLocationTypeAttributeCallback)(
     void *, chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType);
 typedef void (*NullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallback)(
@@ -3634,38 +3634,6 @@ public:
                                                                             CHIPActionBlock action,
                                                                             SubscriptionEstablishedHandler establishedHandler) :
         CHIPFlowMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPGeneralCommissioningBasicCommissioningInfoListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<GeneralCommissioningBasicCommissioningInfoListListAttributeCallback>
-{
-public:
-    CHIPGeneralCommissioningBasicCommissioningInfoListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                  CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<GeneralCommissioningBasicCommissioningInfoListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                                keepAlive){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::DecodableList<
-                    chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType> & value);
-};
-
-class CHIPGeneralCommissioningBasicCommissioningInfoListListAttributeCallbackSubscriptionBridge
-    : public CHIPGeneralCommissioningBasicCommissioningInfoListListAttributeCallbackBridge
-{
-public:
-    CHIPGeneralCommissioningBasicCommissioningInfoListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPGeneralCommissioningBasicCommissioningInfoListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -10256,27 +10224,26 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPGeneralCommissioningClusterGeneralCommissioningErrorAttributeCallbackBridge
-    : public CHIPCallbackBridge<GeneralCommissioningClusterGeneralCommissioningErrorAttributeCallback>
+class CHIPGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge
+    : public CHIPCallbackBridge<GeneralCommissioningClusterCommissioningErrorAttributeCallback>
 {
 public:
-    CHIPGeneralCommissioningClusterGeneralCommissioningErrorAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                    CHIPActionBlock action,
-                                                                                    bool keepAlive = false) :
-        CHIPCallbackBridge<GeneralCommissioningClusterGeneralCommissioningErrorAttributeCallback>(queue, handler, action,
-                                                                                                  OnSuccessFn, keepAlive){};
+    CHIPGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<GeneralCommissioningClusterCommissioningErrorAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                           keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::GeneralCommissioning::GeneralCommissioningError value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::GeneralCommissioning::CommissioningError value);
 };
 
-class CHIPGeneralCommissioningClusterGeneralCommissioningErrorAttributeCallbackSubscriptionBridge
-    : public CHIPGeneralCommissioningClusterGeneralCommissioningErrorAttributeCallbackBridge
+class CHIPGeneralCommissioningClusterCommissioningErrorAttributeCallbackSubscriptionBridge
+    : public CHIPGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge
 {
 public:
-    CHIPGeneralCommissioningClusterGeneralCommissioningErrorAttributeCallbackSubscriptionBridge(
+    CHIPGeneralCommissioningClusterCommissioningErrorAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
-        CHIPGeneralCommissioningClusterGeneralCommissioningErrorAttributeCallbackBridge(queue, handler, action, true),
+        CHIPGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -10286,30 +10253,30 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPNullableGeneralCommissioningClusterGeneralCommissioningErrorAttributeCallbackBridge
-    : public CHIPCallbackBridge<NullableGeneralCommissioningClusterGeneralCommissioningErrorAttributeCallback>
+class CHIPNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge
+    : public CHIPCallbackBridge<NullableGeneralCommissioningClusterCommissioningErrorAttributeCallback>
 {
 public:
-    CHIPNullableGeneralCommissioningClusterGeneralCommissioningErrorAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                            ResponseHandler handler,
-                                                                                            CHIPActionBlock action,
-                                                                                            bool keepAlive = false) :
-        CHIPCallbackBridge<NullableGeneralCommissioningClusterGeneralCommissioningErrorAttributeCallback>(queue, handler, action,
-                                                                                                          OnSuccessFn, keepAlive){};
+    CHIPNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                     ResponseHandler handler,
+                                                                                     CHIPActionBlock action,
+                                                                                     bool keepAlive = false) :
+        CHIPCallbackBridge<NullableGeneralCommissioningClusterCommissioningErrorAttributeCallback>(queue, handler, action,
+                                                                                                   OnSuccessFn, keepAlive){};
 
     static void
     OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::GeneralCommissioningError> & value);
+                const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::CommissioningError> & value);
 };
 
-class CHIPNullableGeneralCommissioningClusterGeneralCommissioningErrorAttributeCallbackSubscriptionBridge
-    : public CHIPNullableGeneralCommissioningClusterGeneralCommissioningErrorAttributeCallbackBridge
+class CHIPNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackSubscriptionBridge
+    : public CHIPNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge
 {
 public:
-    CHIPNullableGeneralCommissioningClusterGeneralCommissioningErrorAttributeCallbackSubscriptionBridge(
+    CHIPNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
-        CHIPNullableGeneralCommissioningClusterGeneralCommissioningErrorAttributeCallbackBridge(queue, handler, action, true),
+        CHIPNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 

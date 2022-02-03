@@ -286,10 +286,16 @@ menu "CHIP Device Layer"
                 persistent storage (e.g. by a factory provisioning process).
 
         config DEVICE_SOFTWARE_VERSION
-            string "Device Software Version"
+            string "Device Software Version String"
             default ""
             help
                 A string identifying the software version running on the device.
+
+        config DEVICE_SOFTWARE_VERSION_NUMBER
+            int "Device Software Version Number"
+            default 1
+            help
+                Software version number running on the device.
 
         config DEVICE_TYPE
             int "Default Device type"

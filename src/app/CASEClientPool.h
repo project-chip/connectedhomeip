@@ -43,7 +43,7 @@ public:
     void Release(CASEClient * client) override { mClientPool.ReleaseObject(client); }
 
 private:
-    BitMapObjectPool<CASEClient, N> mClientPool;
+    ObjectPool<CASEClient, N> mClientPool;
 };
 
 }; // namespace chip

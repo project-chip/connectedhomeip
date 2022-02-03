@@ -2442,7 +2442,7 @@ class ChipClusters:
                     "writable": True,
                 },
                 0x00000001: {
-                    "attributeName": "BasicCommissioningInfoList",
+                    "attributeName": "BasicCommissioningInfo",
                     "attributeId": 0x00000001,
                     "type": "",
                     "reportable": True,
@@ -2611,6 +2611,7 @@ class ChipClusters:
                     "attributeId": 0x00000000,
                     "type": "",
                     "reportable": True,
+                    "writable": True,
                 },
                 0x00000001: {
                     "attributeName": "GroupTable",

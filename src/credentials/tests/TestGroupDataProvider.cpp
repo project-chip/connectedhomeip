@@ -99,7 +99,7 @@ static KeySet kKeySet1(kKeysetId1, KeySet::SecurityPolicy::kLowLatency, 1);
 static KeySet kKeySet2(kKeysetId2, KeySet::SecurityPolicy::kLowLatency, 2);
 static KeySet kKeySet3(kKeysetId3, KeySet::SecurityPolicy::kStandard, 3);
 
-uint8_t kZeroKeys[KeySet::kEpochKeysMax][EpochKey::kLengthBytes] = { { 0 }, { 0 }, { 0 } };
+uint8_t kZeroKey[EpochKey::kLengthBytes] = { 0 };
 
 class TestListener : public GroupDataProvider::GroupListener
 {
@@ -131,6 +131,19 @@ public:
     }
 };
 static TestListener sListener;
+
+bool CompareKeySets(const KeySet & keyset1, const KeySet & keyset2)
+{
+    VerifyOrReturnError(keyset1.policy == keyset2.policy, false);
+    VerifyOrReturnError(keyset1.num_keys_used == keyset2.num_keys_used, false);
+    VerifyOrReturnError(keyset1.epoch_keys[0].start_time == keyset2.epoch_keys[0].start_time, false);
+    VerifyOrReturnError(keyset1.epoch_keys[1].start_time == keyset2.epoch_keys[1].start_time, false);
+    VerifyOrReturnError(keyset1.epoch_keys[2].start_time == keyset2.epoch_keys[2].start_time, false);
+    VerifyOrReturnError(0 == memcmp(kZeroKey, keyset1.epoch_keys[0].key, EpochKey::kLengthBytes), false);
+    VerifyOrReturnError(0 == memcmp(kZeroKey, keyset1.epoch_keys[1].key, EpochKey::kLengthBytes), false);
+    VerifyOrReturnError(0 == memcmp(kZeroKey, keyset1.epoch_keys[2].key, EpochKey::kLengthBytes), false);
+    return true;
+}
 
 void TestStorageDelegate(nlTestSuite * apSuite, void * apContext)
 {
@@ -709,44 +722,28 @@ void TestKeySets(nlTestSuite * apSuite, void * apContext)
     // Get KeySets
 
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric1, kKeysetId3, keyset));
-    NL_TEST_ASSERT(apSuite, kKeySet3.policy == keyset.policy);
-    NL_TEST_ASSERT(apSuite, kKeySet3.num_keys_used == keyset.num_keys_used);
-    NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKeys, keyset.epoch_keys, sizeof(kZeroKeys)));
+    NL_TEST_ASSERT(apSuite, CompareKeySets(keyset, kKeySet3));
 
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric1, kKeysetId1, keyset));
-    NL_TEST_ASSERT(apSuite, kKeySet1.policy == keyset.policy);
-    NL_TEST_ASSERT(apSuite, kKeySet1.num_keys_used == keyset.num_keys_used);
-    NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKeys, keyset.epoch_keys, sizeof(kZeroKeys)));
+    NL_TEST_ASSERT(apSuite, CompareKeySets(keyset, kKeySet1));
 
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric1, kKeysetId0, keyset));
-    NL_TEST_ASSERT(apSuite, kKeySet0.policy == keyset.policy);
-    NL_TEST_ASSERT(apSuite, kKeySet0.num_keys_used == keyset.num_keys_used);
-    NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKeys, keyset.epoch_keys, sizeof(kZeroKeys)));
+    NL_TEST_ASSERT(apSuite, CompareKeySets(keyset, kKeySet0));
 
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric1, kKeysetId2, keyset));
-    NL_TEST_ASSERT(apSuite, kKeySet2.policy == keyset.policy);
-    NL_TEST_ASSERT(apSuite, kKeySet2.num_keys_used == keyset.num_keys_used);
-    NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKeys, keyset.epoch_keys, sizeof(kZeroKeys)));
+    NL_TEST_ASSERT(apSuite, CompareKeySets(keyset, kKeySet2));
 
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric2, kKeysetId3, keyset));
-    NL_TEST_ASSERT(apSuite, kKeySet3.policy == keyset.policy);
-    NL_TEST_ASSERT(apSuite, kKeySet3.num_keys_used == keyset.num_keys_used);
-    NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKeys, keyset.epoch_keys, sizeof(kZeroKeys)));
+    NL_TEST_ASSERT(apSuite, CompareKeySets(keyset, kKeySet3));
 
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric2, kKeysetId2, keyset));
-    NL_TEST_ASSERT(apSuite, kKeySet2.policy == keyset.policy);
-    NL_TEST_ASSERT(apSuite, kKeySet2.num_keys_used == keyset.num_keys_used);
-    NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKeys, keyset.epoch_keys, sizeof(kZeroKeys)));
+    NL_TEST_ASSERT(apSuite, CompareKeySets(keyset, kKeySet2));
 
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric2, kKeysetId1, keyset));
-    NL_TEST_ASSERT(apSuite, kKeySet1.policy == keyset.policy);
-    NL_TEST_ASSERT(apSuite, kKeySet1.num_keys_used == keyset.num_keys_used);
-    NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKeys, keyset.epoch_keys, sizeof(kZeroKeys)));
+    NL_TEST_ASSERT(apSuite, CompareKeySets(keyset, kKeySet1));
 
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric2, kKeysetId0, keyset));
-    NL_TEST_ASSERT(apSuite, kKeySet0.policy == keyset.policy);
-    NL_TEST_ASSERT(apSuite, kKeySet0.num_keys_used == keyset.num_keys_used);
-    NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKeys, keyset.epoch_keys, sizeof(kZeroKeys)));
+    NL_TEST_ASSERT(apSuite, CompareKeySets(keyset, kKeySet0));
 
     // Remove Keysets
 
@@ -759,30 +756,20 @@ void TestKeySets(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetKeySet(kFabric1, kKeysetId3, keyset));
     NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetKeySet(kFabric1, kKeysetId1, keyset));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric1, kKeysetId0, keyset));
-    NL_TEST_ASSERT(apSuite, kKeySet0.policy == keyset.policy);
-    NL_TEST_ASSERT(apSuite, kKeySet0.num_keys_used == keyset.num_keys_used);
-    NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKeys, keyset.epoch_keys, sizeof(kZeroKeys)));
+    NL_TEST_ASSERT(apSuite, CompareKeySets(keyset, kKeySet0));
 
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric1, kKeysetId2, keyset));
-    NL_TEST_ASSERT(apSuite, kKeySet2.policy == keyset.policy);
-    NL_TEST_ASSERT(apSuite, kKeySet2.num_keys_used == keyset.num_keys_used);
-    NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKeys, keyset.epoch_keys, sizeof(kZeroKeys)));
+    NL_TEST_ASSERT(apSuite, CompareKeySets(keyset, kKeySet2));
 
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric2, kKeysetId3, keyset));
-    NL_TEST_ASSERT(apSuite, kKeySet3.policy == keyset.policy);
-    NL_TEST_ASSERT(apSuite, kKeySet3.num_keys_used == keyset.num_keys_used);
-    NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKeys, keyset.epoch_keys, sizeof(kZeroKeys)));
+    NL_TEST_ASSERT(apSuite, CompareKeySets(keyset, kKeySet3));
 
     NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetKeySet(kFabric2, kKeysetId2, keyset));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric2, kKeysetId1, keyset));
-    NL_TEST_ASSERT(apSuite, kKeySet1.policy == keyset.policy);
-    NL_TEST_ASSERT(apSuite, kKeySet1.num_keys_used == keyset.num_keys_used);
-    NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKeys, keyset.epoch_keys, sizeof(kZeroKeys)));
+    NL_TEST_ASSERT(apSuite, CompareKeySets(keyset, kKeySet1));
 
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric2, kKeysetId0, keyset));
-    NL_TEST_ASSERT(apSuite, kKeySet0.policy == keyset.policy);
-    NL_TEST_ASSERT(apSuite, kKeySet0.num_keys_used == keyset.num_keys_used);
-    NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKeys, keyset.epoch_keys, sizeof(kZeroKeys)));
+    NL_TEST_ASSERT(apSuite, CompareKeySets(keyset, kKeySet0));
 
     // Remove all
 
@@ -844,7 +831,9 @@ void TestKeySetIterator(nlTestSuite * apSuite, void * apContext)
             NL_TEST_ASSERT(apSuite, expected_f1.count(keyset.keyset_id) > 0);
             NL_TEST_ASSERT(apSuite, keyset.keyset_id == expected_f1[keyset.keyset_id].keyset_id);
             NL_TEST_ASSERT(apSuite, keyset.policy == expected_f1[keyset.keyset_id].policy);
-            NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKeys, keyset.epoch_keys, sizeof(kZeroKeys)));
+            NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKey, keyset.epoch_keys[0].key, sizeof(kZeroKey)));
+            NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKey, keyset.epoch_keys[1].key, sizeof(kZeroKey)));
+            NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKey, keyset.epoch_keys[2].key, sizeof(kZeroKey)));
             count++;
         }
         NL_TEST_ASSERT(apSuite, count == expected_f1.size());
@@ -867,7 +856,9 @@ void TestKeySetIterator(nlTestSuite * apSuite, void * apContext)
             NL_TEST_ASSERT(apSuite, expected_f2.count(keyset.keyset_id) > 0);
             NL_TEST_ASSERT(apSuite, keyset.keyset_id == expected_f2[keyset.keyset_id].keyset_id);
             NL_TEST_ASSERT(apSuite, keyset.policy == expected_f2[keyset.keyset_id].policy);
-            NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKeys, keyset.epoch_keys, sizeof(kZeroKeys)));
+            NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKey, keyset.epoch_keys[0].key, sizeof(kZeroKey)));
+            NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKey, keyset.epoch_keys[1].key, sizeof(kZeroKey)));
+            NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKey, keyset.epoch_keys[2].key, sizeof(kZeroKey)));
             count++;
         }
         NL_TEST_ASSERT(apSuite, count == expected_f2.size());
@@ -935,7 +926,7 @@ void TestPerFabricData(nlTestSuite * apSuite, void * apContext)
 
     // Keys
 
-    KeySet keys;
+    KeySet keyset;
 
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetKeySet(kFabric2, kKeySet0));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetKeySet(kFabric1, kKeySet2));
@@ -944,35 +935,23 @@ void TestPerFabricData(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetKeySet(kFabric2, kKeySet2));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetKeySet(kFabric1, kKeySet0));
 
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric2, kKeysetId0, keys));
-    NL_TEST_ASSERT(apSuite, kKeySet0.policy == keys.policy);
-    NL_TEST_ASSERT(apSuite, kKeySet0.num_keys_used == keys.num_keys_used);
-    NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKeys, keys.epoch_keys, sizeof(kZeroKeys)));
+    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric2, kKeysetId0, keyset));
+    NL_TEST_ASSERT(apSuite, CompareKeySets(keyset, kKeySet0));
 
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric2, kKeysetId1, keys));
-    NL_TEST_ASSERT(apSuite, kKeySet1.policy == keys.policy);
-    NL_TEST_ASSERT(apSuite, kKeySet1.num_keys_used == keys.num_keys_used);
-    NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKeys, keys.epoch_keys, sizeof(kZeroKeys)));
+    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric2, kKeysetId1, keyset));
+    NL_TEST_ASSERT(apSuite, CompareKeySets(keyset, kKeySet1));
 
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric2, kKeysetId2, keys));
-    NL_TEST_ASSERT(apSuite, kKeySet2.policy == keys.policy);
-    NL_TEST_ASSERT(apSuite, kKeySet2.num_keys_used == keys.num_keys_used);
-    NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKeys, keys.epoch_keys, sizeof(kZeroKeys)));
+    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric2, kKeysetId2, keyset));
+    NL_TEST_ASSERT(apSuite, CompareKeySets(keyset, kKeySet2));
 
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric1, kKeysetId2, keys));
-    NL_TEST_ASSERT(apSuite, kKeySet2.policy == keys.policy);
-    NL_TEST_ASSERT(apSuite, kKeySet2.num_keys_used == keys.num_keys_used);
-    NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKeys, keys.epoch_keys, sizeof(kZeroKeys)));
+    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric1, kKeysetId2, keyset));
+    NL_TEST_ASSERT(apSuite, CompareKeySets(keyset, kKeySet2));
 
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric1, kKeysetId1, keys));
-    NL_TEST_ASSERT(apSuite, kKeySet1.policy == keys.policy);
-    NL_TEST_ASSERT(apSuite, kKeySet1.num_keys_used == keys.num_keys_used);
-    NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKeys, keys.epoch_keys, sizeof(kZeroKeys)));
+    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric1, kKeysetId1, keyset));
+    NL_TEST_ASSERT(apSuite, CompareKeySets(keyset, kKeySet1));
 
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric1, kKeysetId0, keys));
-    NL_TEST_ASSERT(apSuite, kKeySet0.policy == keys.policy);
-    NL_TEST_ASSERT(apSuite, kKeySet0.num_keys_used == keys.num_keys_used);
-    NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKeys, keys.epoch_keys, sizeof(kZeroKeys)));
+    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric1, kKeysetId0, keyset));
+    NL_TEST_ASSERT(apSuite, CompareKeySets(keyset, kKeySet0));
 
     //
     // Remove Fabric
@@ -1005,24 +984,15 @@ void TestPerFabricData(nlTestSuite * apSuite, void * apContext)
 
     // Keys
 
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric2, kKeysetId0, keys));
-    NL_TEST_ASSERT(apSuite, kKeySet0.policy == keys.policy);
-    NL_TEST_ASSERT(apSuite, kKeySet0.num_keys_used == keys.num_keys_used);
-    NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKeys, keys.epoch_keys, sizeof(kZeroKeys)));
+    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric2, kKeysetId1, keyset));
+    NL_TEST_ASSERT(apSuite, CompareKeySets(keyset, kKeySet1));
 
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric2, kKeysetId1, keys));
-    NL_TEST_ASSERT(apSuite, kKeySet1.policy == keys.policy);
-    NL_TEST_ASSERT(apSuite, kKeySet1.num_keys_used == keys.num_keys_used);
-    NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKeys, keys.epoch_keys, sizeof(kZeroKeys)));
+    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric2, kKeysetId0, keyset));
+    NL_TEST_ASSERT(apSuite, CompareKeySets(keyset, kKeySet0));
 
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric2, kKeysetId0, keys));
-    NL_TEST_ASSERT(apSuite, kKeySet0.policy == keys.policy);
-    NL_TEST_ASSERT(apSuite, kKeySet0.num_keys_used == keys.num_keys_used);
-    NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKeys, keys.epoch_keys, sizeof(kZeroKeys)));
-
-    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetKeySet(kFabric1, 202, keys));
-    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetKeySet(kFabric1, 404, keys));
-    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetKeySet(kFabric1, 606, keys));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetKeySet(kFabric1, 202, keyset));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetKeySet(kFabric1, 404, keyset));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetKeySet(kFabric1, 606, keyset));
 }
 
 void TestGroupDecryption(nlTestSuite * apSuite, void * apContext)
@@ -1200,12 +1170,12 @@ int Test_Setup(void * inContext)
  */
 int Test_Teardown(void * inContext)
 {
-    chip::Platform::MemoryShutdown();
     GroupDataProvider * provider = GetGroupDataProvider();
     if (nullptr != provider)
     {
         provider->Finish();
     }
+    chip::Platform::MemoryShutdown();
     return SUCCESS;
 }
 

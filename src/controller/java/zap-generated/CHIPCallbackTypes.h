@@ -592,8 +592,8 @@ typedef void (*CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbac
 
 typedef void (*CHIPGeneralCommissioningClusterBreadcrumbAttributeCallbackType)(
     void *, chip::app::Clusters::GeneralCommissioning::Attributes::Breadcrumb::TypeInfo::DecodableArgType);
-typedef void (*CHIPGeneralCommissioningClusterBasicCommissioningInfoListAttributeCallbackType)(
-    void *, const chip::app::Clusters::GeneralCommissioning::Attributes::BasicCommissioningInfoList::TypeInfo::DecodableType &);
+typedef void (*CHIPGeneralCommissioningClusterBasicCommissioningInfoAttributeCallbackType)(
+    void *, chip::app::Clusters::GeneralCommissioning::Attributes::BasicCommissioningInfo::TypeInfo::DecodableArgType);
 typedef void (*CHIPGeneralCommissioningClusterRegulatoryConfigAttributeCallbackType)(
     void *, chip::app::Clusters::GeneralCommissioning::Attributes::RegulatoryConfig::TypeInfo::DecodableArgType);
 typedef void (*CHIPGeneralCommissioningClusterLocationCapabilityAttributeCallbackType)(

@@ -1347,8 +1347,8 @@ void CheckLostStandaloneAck(nlTestSuite * inSuite, void * inContext)
 int InitializeTestCase(void * inContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(inContext);
-    ctx.GetSessionAliceToBob()->AsSecureSession()->SetMRPConfig(gDefaultMRPConfig);
-    ctx.GetSessionBobToAlice()->AsSecureSession()->SetMRPConfig(gDefaultMRPConfig);
+    ctx.GetSessionAliceToBob()->AsSecureSession()->SetMRPConfig(GetLocalMRPConfig());
+    ctx.GetSessionBobToAlice()->AsSecureSession()->SetMRPConfig(GetLocalMRPConfig());
     return SUCCESS;
 }
 

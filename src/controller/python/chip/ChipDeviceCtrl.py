@@ -86,7 +86,7 @@ class DCState(enum.IntEnum):
 class ChipDeviceController():
     activeList = set()
 
-    def __init__(self, opCredsContext: ctypes.c_void_p, fabricId: int, fabricIndex: int, nodeId: int):
+    def __init__(self, opCredsContext: ctypes.c_void_p, fabricId: int, fabricIndex: int, nodeId: int, useTestCommissioner: bool = False):
         self.state = DCState.NOT_INITIALIZED
         self.devCtrl = None
         self._ChipStack = builtins.chipStack
@@ -98,7 +98,7 @@ class ChipDeviceController():
 
         res = self._ChipStack.Call(
             lambda: self._dmLib.pychip_OpCreds_AllocateController(ctypes.c_void_p(
-                opCredsContext), pointer(devCtrl), fabricIndex, fabricId, nodeId)
+                opCredsContext), pointer(devCtrl), fabricIndex, fabricId, nodeId, useTestCommissioner)
         )
 
         if res != 0:
@@ -279,6 +279,11 @@ class ChipDeviceController():
             # Error 50 is a timeout
             return False
         return self._ChipStack.commissioningEventRes == 0
+
+    def GetTestCommissionerUsed(self):
+        return self._ChipStack.Call(
+            lambda: self._dmLib.pychip_TestCommissionerUsed()
+        )
 
     def CommissionIP(self, ipaddr, setupPinCode, nodeid):
         self.CheckIsActive()
@@ -918,3 +923,5 @@ class ChipDeviceController():
             self._dmLib.pychip_DeviceController_OpenCommissioningWindow.argtypes = [
                 c_void_p, c_uint64, c_uint16, c_uint16, c_uint16, c_uint8]
             self._dmLib.pychip_DeviceController_OpenCommissioningWindow.restype = c_uint32
+            self._dmLib.pychip_TestCommissionerUsed.argtypes = []
+            self._dmLib.pychip_TestCommissionerUsed.restype = c_bool

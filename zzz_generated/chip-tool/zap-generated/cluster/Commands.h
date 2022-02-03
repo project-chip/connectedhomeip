@@ -3080,7 +3080,7 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Breadcrumb                                                        | 0x0000 |
-| * BasicCommissioningInfoList                                        | 0x0001 |
+| * BasicCommissioningInfo                                            | 0x0001 |
 | * RegulatoryConfig                                                  | 0x0002 |
 | * LocationCapability                                                | 0x0003 |
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
@@ -3332,6 +3332,30 @@ public:
 private:
     chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::Type mRequest;
     TypedComplexArgument<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySet::Type> mComplex_GroupKeySet;
+};
+
+class WriteGroupKeyManagementGroupKeyMap : public WriteAttribute
+{
+public:
+    WriteGroupKeyManagementGroupKeyMap(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("GroupKeyMap", credsIssuerConfig), mComplex(&mValue)
+    {
+        AddArgument("attr-name", "group-key-map");
+        AddArgument("attr-value", &mComplex);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteGroupKeyManagementGroupKeyMap() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000003F, 0x00000000, mValue);
+    }
+
+private:
+    chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::Type> mValue;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::Type>>
+        mComplex;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -10650,12 +10674,11 @@ void registerClusterGeneralCommissioning(Commands & commands, CredentialIssuerCo
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                           //
-        make_unique<ReadAttribute>(Id, "breadcrumb", Attributes::Breadcrumb::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "basic-commissioning-info-list", Attributes::BasicCommissioningInfoList::Id,
-                                   credsIssuerConfig),                                                                //
-        make_unique<ReadAttribute>(Id, "regulatory-config", Attributes::RegulatoryConfig::Id, credsIssuerConfig),     //
-        make_unique<ReadAttribute>(Id, "location-capability", Attributes::LocationCapability::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "breadcrumb", Attributes::Breadcrumb::Id, credsIssuerConfig),                           //
+        make_unique<ReadAttribute>(Id, "basic-commissioning-info", Attributes::BasicCommissioningInfo::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "regulatory-config", Attributes::RegulatoryConfig::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "location-capability", Attributes::LocationCapability::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
@@ -10666,7 +10689,7 @@ void registerClusterGeneralCommissioning(Commands & commands, CredentialIssuerCo
         make_unique<WriteGeneralCommissioningBreadcrumb>(credsIssuerConfig),                                    //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                 //
         make_unique<SubscribeAttribute>(Id, "breadcrumb", Attributes::Breadcrumb::Id, credsIssuerConfig),       //
-        make_unique<SubscribeAttribute>(Id, "basic-commissioning-info-list", Attributes::BasicCommissioningInfoList::Id,
+        make_unique<SubscribeAttribute>(Id, "basic-commissioning-info", Attributes::BasicCommissioningInfo::Id,
                                         credsIssuerConfig),                                                                //
         make_unique<SubscribeAttribute>(Id, "regulatory-config", Attributes::RegulatoryConfig::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "location-capability", Attributes::LocationCapability::Id, credsIssuerConfig), //
@@ -10777,6 +10800,7 @@ void registerClusterGroupKeyManagement(Commands & commands, CredentialIssuerComm
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                  //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),              //
         make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                  //
+        make_unique<WriteGroupKeyManagementGroupKeyMap>(credsIssuerConfig),                                                  //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                              //
         make_unique<SubscribeAttribute>(Id, "group-key-map", Attributes::GroupKeyMap::Id, credsIssuerConfig),                //
         make_unique<SubscribeAttribute>(Id, "group-table", Attributes::GroupTable::Id, credsIssuerConfig),                   //

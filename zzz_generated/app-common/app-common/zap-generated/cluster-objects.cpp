@@ -7029,13 +7029,13 @@ namespace Events {
 } // namespace PowerSource
 namespace GeneralCommissioning {
 namespace Structs {
-namespace BasicCommissioningInfoType {
+namespace BasicCommissioningInfo {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(
-        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFailSafeExpiryLengthMs)), failSafeExpiryLengthMs));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFailSafeExpiryLengthSeconds)),
+                                           failSafeExpiryLengthSeconds));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -7052,8 +7052,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kFailSafeExpiryLengthMs):
-            ReturnErrorOnFailure(DataModel::Decode(reader, failSafeExpiryLengthMs));
+        case to_underlying(Fields::kFailSafeExpiryLengthSeconds):
+            ReturnErrorOnFailure(DataModel::Decode(reader, failSafeExpiryLengthSeconds));
             break;
         default:
             break;
@@ -7066,7 +7066,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace BasicCommissioningInfoType
+} // namespace BasicCommissioningInfo
 } // namespace Structs
 
 namespace Commands {
@@ -7313,8 +7313,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Breadcrumb::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, breadcrumb));
         break;
-    case Attributes::BasicCommissioningInfoList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, basicCommissioningInfoList));
+    case Attributes::BasicCommissioningInfo::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, basicCommissioningInfo));
         break;
     case Attributes::RegulatoryConfig::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, regulatoryConfig));

@@ -4452,31 +4452,16 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = [NSNumber numberWithUnsignedLongLong:cppValue];
             return value;
         }
-        case Attributes::BasicCommissioningInfoList::Id: {
-            using TypeInfo = Attributes::BasicCommissioningInfoList::TypeInfo;
+        case Attributes::BasicCommissioningInfo::Id: {
+            using TypeInfo = Attributes::BasicCommissioningInfo::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                CHIPGeneralCommissioningClusterBasicCommissioningInfoType * newElement_0;
-                newElement_0 = [CHIPGeneralCommissioningClusterBasicCommissioningInfoType new];
-                newElement_0.failSafeExpiryLengthMs = [NSNumber numberWithUnsignedInt:entry_0.failSafeExpiryLengthMs];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
-                CHIP_ERROR err = iter_0.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    *aError = err;
-                    return nil;
-                }
-            }
-            value = array_0;
+            CHIPGeneralCommissioningClusterBasicCommissioningInfo * _Nonnull value;
+            value = [CHIPGeneralCommissioningClusterBasicCommissioningInfo new];
+            value.failSafeExpiryLengthSeconds = [NSNumber numberWithUnsignedShort:cppValue.failSafeExpiryLengthSeconds];
             return value;
         }
         case Attributes::RegulatoryConfig::Id: {
