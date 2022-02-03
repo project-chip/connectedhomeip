@@ -1041,7 +1041,7 @@ void DeviceCommissioner::OnSessionEstablished()
 
     ChipLogDetail(Controller, "Remote device completed SPAKE2+ handshake");
 
-    // TODO: Add code to receive OpCSR from the device, and process the signing request
+    // TODO: Add code to receive CSR from the device, and process the signing request
     // For IP rendezvous, this is sent as part of the state machine.
     if (mRunCommissioningAfterConnection)
     {
@@ -1174,15 +1174,15 @@ CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const ByteSpan & attestat
 
 CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(DeviceProxy * device, const ByteSpan & csrNonce)
 {
-    ChipLogDetail(Controller, "Sending OpCSR request to %p device", device);
+    ChipLogDetail(Controller, "Sending CSR request to %p device", device);
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    OperationalCredentials::Commands::OpCSRRequest::Type request;
+    OperationalCredentials::Commands::CSRRequest::Type request;
     request.CSRNonce = csrNonce;
 
     ReturnErrorOnFailure(
         SendCommand<OperationalCredentialsCluster>(device, request, OnOperationalCertificateSigningRequest, OnCSRFailureResponse));
-    ChipLogDetail(Controller, "Sent OpCSR request, waiting for the CSR");
+    ChipLogDetail(Controller, "Sent CSR request, waiting for the CSR");
     return CHIP_NO_ERROR;
 }
 
@@ -1194,7 +1194,7 @@ void DeviceCommissioner::OnCSRFailureResponse(void * context, CHIP_ERROR error)
 }
 
 void DeviceCommissioner::OnOperationalCertificateSigningRequest(
-    void * context, const OperationalCredentials::Commands::OpCSRResponse::DecodableType & data)
+    void * context, const OperationalCredentials::Commands::CSRResponse::DecodableType & data)
 {
     ChipLogProgress(Controller, "Received certificate signing request from the device");
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
@@ -1232,8 +1232,8 @@ void DeviceCommissioner::OnDeviceNOCChainGeneration(void * context, CHIP_ERROR s
     commissioner->CommissioningStageComplete(status, report);
 }
 
-CHIP_ERROR DeviceCommissioner::ProcessOpCSR(DeviceProxy * proxy, const ByteSpan & NOCSRElements,
-                                            const ByteSpan & AttestationSignature, ByteSpan dac, ByteSpan csrNonce)
+CHIP_ERROR DeviceCommissioner::ProcessCSR(DeviceProxy * proxy, const ByteSpan & NOCSRElements,
+                                          const ByteSpan & AttestationSignature, ByteSpan dac, ByteSpan csrNonce)
 {
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
 
@@ -1896,9 +1896,9 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             ChipLogError(Controller, "Unable to generate NOC chain parameters");
             return CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
         }
-        CHIP_ERROR err = ProcessOpCSR(proxy, params.GetNOCChainGenerationParameters().Value().nocsrElements,
-                                      params.GetNOCChainGenerationParameters().Value().signature, params.GetDAC().Value(),
-                                      params.GetCSRNonce().Value());
+        CHIP_ERROR err = ProcessCSR(proxy, params.GetNOCChainGenerationParameters().Value().nocsrElements,
+                                    params.GetNOCChainGenerationParameters().Value().signature, params.GetDAC().Value(),
+                                    params.GetCSRNonce().Value());
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "Unable to process Op CSR");
