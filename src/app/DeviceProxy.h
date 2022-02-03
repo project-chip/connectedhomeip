@@ -68,7 +68,7 @@ protected:
 
     virtual uint8_t GetNextSequenceNumber() = 0;
 
-    ReliableMessageProtocolConfig mMRPConfig = gDefaultMRPConfig;
+    ReliableMessageProtocolConfig mMRPConfig = GetLocalMRPConfig();
 };
 
 } // namespace chip

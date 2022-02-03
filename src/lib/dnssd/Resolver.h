@@ -56,8 +56,9 @@ struct ResolvedNodeData
 
     ReliableMessageProtocolConfig GetMRPConfig() const
     {
-        return ReliableMessageProtocolConfig(GetMrpRetryIntervalIdle().ValueOr(gDefaultMRPConfig.mIdleRetransTimeout),
-                                             GetMrpRetryIntervalActive().ValueOr(gDefaultMRPConfig.mActiveRetransTimeout));
+        const ReliableMessageProtocolConfig defaultConfig = GetLocalMRPConfig();
+        return ReliableMessageProtocolConfig(GetMrpRetryIntervalIdle().ValueOr(defaultConfig.mIdleRetransTimeout),
+                                             GetMrpRetryIntervalActive().ValueOr(defaultConfig.mActiveRetransTimeout));
     }
     Optional<System::Clock::Milliseconds32> GetMrpRetryIntervalIdle() const { return mMrpRetryIntervalIdle; }
     Optional<System::Clock::Milliseconds32> GetMrpRetryIntervalActive() const { return mMrpRetryIntervalActive; }
