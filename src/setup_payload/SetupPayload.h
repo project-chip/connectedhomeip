@@ -89,10 +89,10 @@ const char * const kQRCodePrefix = "MT:";
 /// The rendezvous type this device supports.
 enum class RendezvousInformationFlag : uint8_t
 {
-    kSoftAP    = 0, ///< Device supports Wi-Fi softAP
-    kBLE       = 1 << 0, ///< Device supports BLE
-    kOnNetwork = 1 << 1, ///< Device supports Setup on network
-    kNone      = (1 << 2) + (1 << 1) + (1 << 0),      ///< Device does not support any method for rendezvous
+    kSoftAP    = 0,                              ///< Device supports Wi-Fi softAP
+    kBLE       = 1 << 0,                         ///< Device supports BLE
+    kOnNetwork = 1 << 1,                         ///< Device supports Setup on network
+    kNone      = (1 << 2) + (1 << 1) + (1 << 0), ///< Device does not support any method for rendezvous
 };
 using RendezvousInformationFlags = chip::BitFlags<RendezvousInformationFlag, uint8_t>;
 
