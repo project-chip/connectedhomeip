@@ -115,12 +115,12 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SessionManager * sessionManager,
 
 CHIP_ERROR ExchangeMessageDispatch::OnMessageReceived(uint32_t messageCounter, const PayloadHeader & payloadHeader,
                                                       const Transport::PeerAddress & peerAddress, MessageFlags msgFlags,
-                                                      ReliableMessageContext * reliableMessageContext, bool isGroupMessage)
+                                                      ReliableMessageContext * reliableMessageContext)
 {
     ReturnErrorCodeIf(!MessagePermitted(payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetMessageType()),
                       CHIP_ERROR_INVALID_ARGUMENT);
 
-    if (IsReliableTransmissionAllowed() && !isGroupMessage)
+    if (IsReliableTransmissionAllowed() && !reliableMessageContext->GetExchangeContext()->IsGroupExchangeContext())
     {
         if (!msgFlags.Has(MessageFlagValues::kDuplicateMessage) && payloadHeader.IsAckMsg() &&
             payloadHeader.GetAckMessageCounter().HasValue())

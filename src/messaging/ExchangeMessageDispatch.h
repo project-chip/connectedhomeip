@@ -44,7 +44,7 @@ public:
                            uint8_t type, System::PacketBufferHandle && message);
     CHIP_ERROR OnMessageReceived(uint32_t messageCounter, const PayloadHeader & payloadHeader,
                                  const Transport::PeerAddress & peerAddress, MessageFlags msgFlags,
-                                 ReliableMessageContext * reliableMessageContext, bool isGroupMessage);
+                                 ReliableMessageContext * reliableMessageContext);
 
 protected:
     virtual bool MessagePermitted(uint16_t protocol, uint8_t type) = 0;
