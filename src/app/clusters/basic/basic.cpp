@@ -275,7 +275,7 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
 
 CHIP_ERROR BasicAttrAccess::ReadDataModelRevision(AttributeValueEncoder & aEncoder)
 {
-    uint16_t revision = CHIP_DEVICE_DATA__MODEL_REVISION;
+    uint16_t revision = CHIP_DEVICE_DATA_MODEL_REVISION;
     return aEncoder.Encode(revision);
 }
 

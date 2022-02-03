@@ -18,11 +18,11 @@
 #pragma once
 
 /**
- * CHIP_DEVICE_DATA__MODEL_REVISION
+ * CHIP_DEVICE_DATA_MODEL_REVISION
  *
  * A monotonic number identifying the revision number of the Data Model against
  * which the Node is certified.
  */
-#ifndef CHIP_DEVICE_DATA__MODEL_REVISION
-#define CHIP_DEVICE_DATA__MODEL_REVISION 1
+#ifndef CHIP_DEVICE_DATA_MODEL_REVISION
+#define CHIP_DEVICE_DATA_MODEL_REVISION 1
 #endif
