@@ -1105,10 +1105,6 @@ client cluster OnOff = 6 {
   attribute enum8 startUpOnOff = 16387;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> Fixing the request structs for commands in .matter generated files such that request struct  should be defined for all incoming commands from client to server and outgoing commands from client to server
 
   request struct OffWithEffectRequest {
     OnOffEffectIdentifier effectId = 0;
@@ -1120,12 +1116,6 @@ client cluster OnOff = 6 {
     int16u onTime = 1;
     int16u offWaitTime = 2;
   }
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> Cleaning up the remaining non determinism in MatterIDL template
 
   command Off(): DefaultSuccess = 0;
   command OffWithEffect(OffWithEffectRequest): DefaultSuccess = 64;
@@ -1133,14 +1123,6 @@ client cluster OnOff = 6 {
   command OnWithRecallGlobalScene(): DefaultSuccess = 65;
   command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
   command Toggle(): DefaultSuccess = 2;
-<<<<<<< HEAD
->>>>>>> - Reverting from zcl_command_arguments to chip_cluster_command_arguments_with_structs_expanded
-=======
->>>>>>> Cleaning up asBlock and regening
-=======
->>>>>>> Fixing the request structs for commands in .matter generated files such that request struct  should be defined for all incoming commands from client to server and outgoing commands from client to server
-=======
->>>>>>> Cleaning up the remaining non determinism in MatterIDL template
 }
 
 server cluster OnOff = 6 {
