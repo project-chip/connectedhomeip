@@ -157,7 +157,7 @@ jobs:
                           "fake") GN_ARGS='chip_device_platform="fake"';;
                           "gcc_release") GN_ARGS='is_debug=false';;
                           "clang") GN_ARGS='is_clang=true';;
-                          "clang") GN_ARGS='is_clang=true is_asan=true';;
+                          "asan") GN_ARGS='is_clang=true is_asan=true';;
                           "mbedtls") GN_ARGS='chip_crypto="mbedtls"';;
                       esac
 
