@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include <app/AttributeCache.h>
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
 #include <app/OperationalDeviceProxy.h>
@@ -211,7 +212,7 @@ public:
      *   callback. If it fails to establish the connection, it calls `onError` callback.
      */
     virtual CHIP_ERROR GetConnectedDevice(NodeId deviceId, Callback::Callback<OnDeviceConnected> * onConnection,
-                                          Callback::Callback<OnDeviceConnectionFailure> * onFailure)
+                                          chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure)
     {
         VerifyOrReturnError(mState == State::Initialized && mFabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
         return mCASESessionManager->FindOrEstablishSession(mFabricInfo->GetPeerIdForNode(deviceId), onConnection, onFailure);
@@ -397,8 +398,6 @@ protected:
 
     uint16_t mVendorId;
 
-    ReliableMessageProtocolConfig mMRPConfig = gDefaultMRPConfig;
-
     //////////// SessionRecoveryDelegate Implementation ///////////////
     void OnFirstMessageDeliveryFailed(const SessionHandle & session) override;
 
@@ -451,7 +450,8 @@ class DLL_EXPORT DeviceCommissioner : public DeviceController,
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
                                       public Protocols::UserDirectedCommissioning::InstanceNameResolver,
 #endif
-                                      public SessionEstablishmentDelegate
+                                      public SessionEstablishmentDelegate,
+                                      public app::AttributeCache::Callback
 {
 public:
     DeviceCommissioner();
@@ -552,8 +552,8 @@ public:
 
     CHIP_ERROR GetDeviceBeingCommissioned(NodeId deviceId, CommissioneeDeviceProxy ** device);
 
-    CHIP_ERROR GetConnectedDevice(NodeId deviceId, Callback::Callback<OnDeviceConnected> * onConnection,
-                                  Callback::Callback<OnDeviceConnectionFailure> * onFailure) override;
+    CHIP_ERROR GetConnectedDevice(NodeId deviceId, chip::Callback::Callback<OnDeviceConnected> * onConnection,
+                                  chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure) override;
 
     /**
      * @brief
@@ -680,6 +680,9 @@ public:
 #endif
 
     void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
+
+    // AttributeCache::Callback impl
+    void OnDone() override;
 
 private:
     DevicePairingDelegate * mPairingDelegate;
@@ -854,18 +857,21 @@ private:
 
     static CHIP_ERROR ConvertFromNodeOperationalCertStatus(uint8_t err);
 
-    Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;
-    Callback::Callback<OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
+    chip::Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;
+    chip::Callback::Callback<OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 
-    Callback::Callback<Credentials::OnAttestationInformationVerification> mDeviceAttestationInformationVerificationCallback;
+    chip::Callback::Callback<Credentials::OnAttestationInformationVerification> mDeviceAttestationInformationVerificationCallback;
 
-    Callback::Callback<OnNOCChainGeneration> mDeviceNOCChainCallback;
+    chip::Callback::Callback<OnNOCChainGeneration> mDeviceNOCChainCallback;
     SetUpCodePairer mSetUpCodePairer;
     AutoCommissioner mAutoCommissioner;
     CommissioningDelegate * mDefaultCommissioner =
         nullptr; // Commissioning delegate to call when PairDevice / Commission functions are used
     CommissioningDelegate * mCommissioningDelegate =
         nullptr; // Commissioning delegate that issued the PerformCommissioningStep command
+
+    Platform::UniquePtr<app::AttributeCache> mAttributeCache;
+    Platform::UniquePtr<app::ReadClient> mReadClient;
 };
 
 } // namespace Controller

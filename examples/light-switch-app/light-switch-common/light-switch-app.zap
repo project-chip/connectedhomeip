@@ -1036,8 +1036,8 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "included": 0,
-              "storageOption": "RAM",
+              "included": 1,
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -1051,8 +1051,8 @@
               "code": 1,
               "mfgCode": null,
               "side": "server",
-              "included": 0,
-              "storageOption": "RAM",
+              "included": 1,
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -1066,8 +1066,8 @@
               "code": 65531,
               "mfgCode": null,
               "side": "server",
-              "included": 0,
-              "storageOption": "RAM",
+              "included": 1,
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -1096,7 +1096,7 @@
               "code": 65533,
               "mfgCode": null,
               "side": "server",
-              "included": 0,
+              "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -7092,5 +7092,6 @@
       "endpointVersion": 1,
       "deviceIdentifier": 259
     }
-  ]
+  ],
+  "log": []
 }

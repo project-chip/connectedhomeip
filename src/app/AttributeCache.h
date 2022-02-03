@@ -279,6 +279,7 @@ public:
                 }
             }
         }
+        return CHIP_NO_ERROR;
     }
 
     /*
