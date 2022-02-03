@@ -72,7 +72,7 @@ template("qpg_executable") {
       outputs = [
         "${root_out_dir}/${objcopy_image_name}.ota",
       ]
-      script = "${chip_root}/third_party/qpg_sdk/Tools/ota/generate_ota_img.py"
+      script = "${chip_root}/third_party/qpg_sdk/repo/Tools/ota/generate_ota_img.py"
       out_dir = rebase_path(root_out_dir, root_build_dir)
 
       args = [
