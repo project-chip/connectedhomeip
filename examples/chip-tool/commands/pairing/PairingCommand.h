@@ -19,8 +19,8 @@
 #pragma once
 
 #include "../common/CHIPCommand.h"
-#include <controller/CommissioningDelegate.h>
 #include <commissioner/ExampleCommissioningStateMachine.h>
+#include <controller/CommissioningDelegate.h>
 #include <zap-generated/CHIPClusters.h>
 
 #include <commands/common/CredentialIssuerCommands.h>
