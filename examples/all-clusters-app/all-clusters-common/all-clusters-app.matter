@@ -344,6 +344,20 @@ server cluster BridgedActions = 37 {
 }
 
 server cluster BridgedDeviceBasic = 57 {
+  critical event StartUp = 0 {
+    INT32U softwareVersion = 0;
+  }
+
+  critical event ShutDown = 1 {
+  }
+
+  info event Leave = 2 {
+  }
+
+  info event ReachableChanged = 3 {
+    boolean reachableNewValue = 0;
+  }
+
   readonly attribute char_string<32> vendorName = 1;
   readonly attribute int16u vendorID = 2;
   readonly attribute char_string<32> productName = 3;
@@ -1333,7 +1347,7 @@ server cluster FlowMeasurement = 1028 {
 }
 
 server cluster GeneralCommissioning = 48 {
-  enum GeneralCommissioningError : ENUM8 {
+  enum CommissioningError : ENUM8 {
     kOk = 0;
     kValueOutsideRange = 1;
     kInvalidAuthentication = 2;
@@ -1346,12 +1360,12 @@ server cluster GeneralCommissioning = 48 {
     kIndoorOutdoor = 2;
   }
 
-  struct BasicCommissioningInfoType {
-    INT32U failSafeExpiryLengthMs = 0;
+  struct BasicCommissioningInfo {
+    INT16U failSafeExpiryLengthSeconds = 0;
   }
 
   attribute int64u breadcrumb = 0;
-  readonly attribute BasicCommissioningInfoType basicCommissioningInfoList[] = 1;
+  readonly attribute BasicCommissioningInfo basicCommissioningInfo = 1;
   readonly attribute enum8 regulatoryConfig = 2;
   readonly attribute enum8 locationCapability = 3;
   readonly global attribute bitmap32 featureMap = 65532;
@@ -1371,17 +1385,17 @@ server cluster GeneralCommissioning = 48 {
   }
 
   response struct ArmFailSafeResponse {
-    GeneralCommissioningError errorCode = 0;
+    CommissioningError errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
   response struct CommissioningCompleteResponse {
-    GeneralCommissioningError errorCode = 0;
+    CommissioningError errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
   response struct SetRegulatoryConfigResponse {
-    GeneralCommissioningError errorCode = 0;
+    CommissioningError errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
@@ -1509,7 +1523,7 @@ server cluster GroupKeyManagement = 63 {
     INT64U epochStartTime2 = 7;
   }
 
-  readonly attribute GroupKey groupKeyMap[] = 0;
+  attribute GroupKey groupKeyMap[] = 0;
   readonly attribute GroupInfo groupTable[] = 1;
   readonly attribute int16u maxGroupsPerFabric = 2;
   readonly attribute int16u maxGroupKeysPerFabric = 3;
@@ -1647,21 +1661,21 @@ server cluster IasZone = 1280 {
   readonly attribute int8u zoneId = 17;
   readonly global attribute int16u clusterRevision = 65533;
 
-  request struct ZoneEnrollRequestRequest {
+  request struct ZoneEnrollResponseRequest {
+    IasEnrollResponseCode enrollResponseCode = 0;
+    INT8U zoneId = 1;
+  }
+
+  response struct ZoneEnrollRequest {
     IasZoneType zoneType = 0;
     INT16U manufacturerCode = 1;
   }
 
-  request struct ZoneStatusChangeNotificationRequest {
+  response struct ZoneStatusChangeNotification {
     IasZoneStatus zoneStatus = 0;
     BITMAP8 extendedStatus = 1;
     INT8U zoneId = 2;
     INT16U delay = 3;
-  }
-
-  response struct ZoneEnrollResponse {
-    IasEnrollResponseCode enrollResponseCode = 0;
-    INT8U zoneId = 1;
   }
 
   command ZoneEnrollRequest(ZoneEnrollRequestRequest): ZoneEnrollResponse = 1;

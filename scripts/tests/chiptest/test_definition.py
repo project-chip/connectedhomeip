@@ -41,7 +41,7 @@ class App:
             self.process = None
             process, outpipe, errpipe = self.__startServer(
                 self.runner, self.command, discriminator)
-            self.__waitForServerReady(outpipe)
+            self.__waitForServerReady(process, outpipe)
             self.__updateSetUpCode(outpipe)
             self.process = process
             self.stopped = False
@@ -64,6 +64,16 @@ class App:
             return True
         return False
 
+    def factoryReset(self):
+        storage = '/tmp/chip_kvs'
+        if platform.system() == 'Darwin':
+            storage = str(Path.home()) + '/Documents/chip.store'
+
+        if os.path.exists(storage):
+            os.unlink(storage)
+
+        return True
+
     def poll(self):
         # When the server is manually stopped, process polling is overriden so the other
         # processes that depends on the accessory beeing alive does not stop.
@@ -85,11 +95,15 @@ class App:
         app_cmd = command + ['--discriminator', str(discriminator)]
         return runner.RunSubprocess(app_cmd, name='APP ', wait=False)
 
-    def __waitForServerReady(self, outpipe):
+    def __waitForServerReady(self, server_process, outpipe):
         logging.debug('Waiting for server to listen.')
         start_time = time.time()
         server_is_listening = outpipe.CapturedLogContains("Server Listening")
         while not server_is_listening:
+            if server_process.poll() is not None:
+                died_str = 'Server died during startup, returncode %d' % server_process.returncode
+                logging.error(died_str)
+                raise Exception(died_str)
             if time.time() - start_time > 10:
                 raise Exception('Timeout for server listening')
             time.sleep(0.1)
@@ -192,16 +206,8 @@ class TestDefinition:
                 if os.path.exists(f):
                     os.unlink(f)
 
-            # Remove server all_clusters_app or tv_app storage, so it will be commissionable again
-            if platform.system() == 'Linux':
-                if os.path.exists('/tmp/chip_kvs'):
-                    os.unlink('/tmp/chip_kvs')
-
-            if platform.system() == "Darwin":
-                if os.path.exists(str(Path.home()) + '/Documents/chip.store'):
-                    os.unlink(str(Path.home()) + '/Documents/chip.store')
-
             app = App(runner, app_cmd)
+            app.factoryReset()  # Remove server application storage, so it will be commissionable again
             app.start(str(randrange(1, 4096)))
             apps_register.add("default", app)
 
@@ -216,4 +222,5 @@ class TestDefinition:
             raise
         finally:
             apps_register.killAll()
+            apps_register.factoryResetAll()
             apps_register.removeAll()

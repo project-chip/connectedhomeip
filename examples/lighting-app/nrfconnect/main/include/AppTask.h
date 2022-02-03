@@ -35,6 +35,7 @@
 #include <cstdint>
 
 struct k_timer;
+struct Identify;
 
 class AppTask
 {
@@ -44,6 +45,9 @@ public:
     void PostLightingActionRequest(LightingManager::Action_t aAction);
     void PostEvent(AppEvent * event);
     void UpdateClusterState();
+
+    static void IdentifyStartHandler(Identify *);
+    static void IdentifyStopHandler(Identify *);
 
 private:
 #ifdef CONFIG_CHIP_PW_RPC

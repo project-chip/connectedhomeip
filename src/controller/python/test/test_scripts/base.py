@@ -103,11 +103,11 @@ class TestResult:
 
 
 class BaseTestHelper:
-    def __init__(self, nodeid: int):
+    def __init__(self, nodeid: int, testCommissioner: bool = False):
         self.chipStack = ChipStack('/tmp/repl_storage.json')
         self.fabricAdmin = chip.FabricAdmin.FabricAdmin(
             fabricId=1, fabricIndex=1)
-        self.devCtrl = self.fabricAdmin.NewController(nodeid)
+        self.devCtrl = self.fabricAdmin.NewController(nodeid, testCommissioner)
         self.controllerNodeId = nodeid
         self.logger = logger
 
@@ -143,6 +143,9 @@ class BaseTestHelper:
             return False
         self.logger.info("Device finished key exchange.")
         return True
+
+    def TestUsedTestCommissioner(self):
+        return self.devCtrl.GetTestCommissionerUsed()
 
     async def TestMultiFabric(self, ip: str, setuppin: int, nodeid: int):
         self.logger.info("Opening Commissioning Window")

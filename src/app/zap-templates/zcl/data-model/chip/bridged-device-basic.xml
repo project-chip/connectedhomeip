@@ -42,7 +42,7 @@ limitations under the License.
         <attribute side="server" code="13" define="PRODUCT_URL"               type="long_char_string"          length="256"                             optional="true">ProductURL</attribute>
         <attribute side="server" code="14" define="PRODUCT_LABEL"             type="char_string"               length="64"                              optional="true">ProductLabel</attribute>
         <attribute side="server" code="15" define="SERIAL_NUMBER"             type="char_string"               length="32"                              optional="true">SerialNumber</attribute>
-        <attribute side="server" code="17" define="REACHABLE"                 type="boolean"                                default="1"                                >Reachable</attribute>
+        <attribute side="server" code="17" define="REACHABLE"                 type="boolean"                                default="1"                 optional="false">Reachable</attribute>
         <attribute side="server" code="18" define="UNIQUE_ID"                 type="char_string"               length="32"                              optional="true">UniqueID</attribute>
 
         <event side="server" code="0x00" name="StartUp" priority="critical" optional="true">

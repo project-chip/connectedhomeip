@@ -648,19 +648,19 @@ public class ChipStructs {
     }
   }
 
-  public static class GeneralCommissioningClusterBasicCommissioningInfoType {
-    public Long failSafeExpiryLengthMs;
+  public static class GeneralCommissioningClusterBasicCommissioningInfo {
+    public Integer failSafeExpiryLengthSeconds;
 
-    public GeneralCommissioningClusterBasicCommissioningInfoType(Long failSafeExpiryLengthMs) {
-      this.failSafeExpiryLengthMs = failSafeExpiryLengthMs;
+    public GeneralCommissioningClusterBasicCommissioningInfo(Integer failSafeExpiryLengthSeconds) {
+      this.failSafeExpiryLengthSeconds = failSafeExpiryLengthSeconds;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("GeneralCommissioningClusterBasicCommissioningInfoType {\n");
-      output.append("\tfailSafeExpiryLengthMs: ");
-      output.append(failSafeExpiryLengthMs);
+      output.append("GeneralCommissioningClusterBasicCommissioningInfo {\n");
+      output.append("\tfailSafeExpiryLengthSeconds: ");
+      output.append(failSafeExpiryLengthSeconds);
       output.append("\n");
       output.append("}\n");
       return output.toString();

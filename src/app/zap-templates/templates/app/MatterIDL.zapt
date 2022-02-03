@@ -61,26 +61,66 @@
     {{/unless}} {{asLowerCamelCase name~}}
     {{~#if isArray~}} [] {{~/if}} = {{code}};
   {{/chip_server_cluster_attributes}}
-  {{#chip_cluster_commands}}
-  {{#if arguments}}
+  {{#if (is_server side)}}
+  {{#all_incoming_commands_for_cluster name 'server'}}
+  {{#zcl_command_arguments}}
 
-  request struct {{asUpperCamelCase name}}Request {
-    {{#chip_cluster_command_arguments}}
+{{#first}}
+  request struct {{asUpperCamelCase parent.commandName}}Request {
+{{/first}}    
     {{> idl_structure_member}}
+{{#last}}
 
-    {{/chip_cluster_command_arguments}}
   }
+{{/last}}
+  {{/zcl_command_arguments}}
+  {{/all_incoming_commands_for_cluster}}
   {{/if}}
-  {{/chip_cluster_commands}}
-  {{#chip_cluster_responses}}
+  {{#if (is_client side)}}
+  {{#all_outgoing_commands_for_cluster name 'client'}}
+  {{#zcl_command_arguments}}
 
-  response struct {{asUpperCamelCase name}} {
-    {{#chip_cluster_response_arguments}}
+{{#first}}
+  request struct {{asUpperCamelCase parent.commandName}}Request {
+{{/first}}    
     {{> idl_structure_member}}
+{{#last}}
 
-    {{/chip_cluster_response_arguments}}
   }
-  {{/chip_cluster_responses}}
+{{/last}}
+  {{/zcl_command_arguments}}
+  {{/all_outgoing_commands_for_cluster}}
+  {{/if}}
+{{#if (is_client side)}}
+  {{#all_incoming_commands_for_cluster name 'client'}}
+  {{#zcl_command_arguments}}
+
+{{#first}}
+  response struct {{asUpperCamelCase parent.commandName}} {
+{{/first}}    
+    {{> idl_structure_member}}
+{{#last}}
+
+  }
+{{/last}}
+  {{/zcl_command_arguments}}
+  {{/all_incoming_commands_for_cluster}}
+  {{/if}}
+  {{#if (is_server side)}}
+  {{#all_outgoing_commands_for_cluster name 'server'}}
+  {{#zcl_command_arguments}}
+
+{{#first}}
+  response struct {{asUpperCamelCase parent.commandName}} {
+{{/first}}    
+    {{> idl_structure_member}}
+{{#last}}
+
+  }
+{{/last}}
+  {{/zcl_command_arguments}}
+  {{/all_outgoing_commands_for_cluster}}
+  {{/if}}
   {{#chip_cluster_commands}}
   {{#first}}
 

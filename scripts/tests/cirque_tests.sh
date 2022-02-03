@@ -38,6 +38,7 @@ CIRQUE_TESTS=(
     "EchoTest"
     "EchoOverTcpTest"
     "MobileDeviceTest"
+    "CommissioningTest"
     "InteractionModelTest"
 )
 

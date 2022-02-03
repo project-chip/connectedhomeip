@@ -81,7 +81,7 @@ public:
     TransportMgrBase & GetTransportManager() { return mTransports; }
 
 #if CONFIG_NETWORK_LAYER_BLE
-    Ble::BleLayer * getBleLayerObject() { return mBleLayer; }
+    Ble::BleLayer * GetBleLayerObject() { return mBleLayer; }
 #endif
 
     CommissioningWindowManager & GetCommissioningWindowManager() { return mCommissioningWindowManager; }
