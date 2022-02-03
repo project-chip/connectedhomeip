@@ -38,7 +38,7 @@ struct ResolvedNodeData
 {
     // TODO: use pool to allow dynamic
     static constexpr int kMaxIPAddresses = 5;
-    void LogNodeIdResolved()
+    void LogNodeIdResolved() const
     {
 #if CHIP_PROGRESS_LOGGING
         char addrBuffer[Inet::IPAddress::kMaxStringLength];
