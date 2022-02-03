@@ -87,12 +87,12 @@ menu "Demo"
     config RENDEZVOUS_MODE
        int
        range 0 8
-       default 0 if RENDEZVOUS_MODE_BYPASS
-       default 1 if RENDEZVOUS_MODE_SOFTAP
-       default 2 if RENDEZVOUS_MODE_BLE
-       default 4 if RENDEZVOUS_MODE_ON_NETWORK
+       default 0 if RENDEZVOUS_MODE_SOFTAP
+       default 1 if RENDEZVOUS_MODE_BLE
+       default 2 if RENDEZVOUS_MODE_ON_NETWORK
        default 5 if RENDEZVOUS_MODE_SOFTAP_ON_NETWORK
        default 6 if RENDEZVOUS_MODE_BLE_ON_NETWORK
+       default 7 if RENDEZVOUS_MODE_BYPASS
 
     config DISPLAY_AUTO_OFF
         bool "Automatically turn off the M5Stack's Display after a few seconds"

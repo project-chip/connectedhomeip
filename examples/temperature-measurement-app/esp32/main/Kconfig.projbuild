@@ -55,10 +55,10 @@ menu "Demo"
     config RENDEZVOUS_MODE
        int
        range 0 8
-       default 0 if RENDEZVOUS_MODE_BYPASS
-       default 1 if RENDEZVOUS_MODE_WIFI
-       default 2 if RENDEZVOUS_MODE_BLE
+       default 0 if RENDEZVOUS_MODE_WIFI
+       default 1 if RENDEZVOUS_MODE_BLE
        default 4 if RENDEZVOUS_MODE_THREAD
+       default 7 if RENDEZVOUS_MODE_BYPASS
        default 8 if RENDEZVOUS_MODE_ETHERNET
 
 endmenu

@@ -105,7 +105,7 @@ const char * sDeviceOptionHelp =
     "  --custom-flow <Standard = 0 | UserActionRequired = 1 | Custom = 2>\n"
     "       A 2-bit unsigned enumeration specifying manufacturer-specific custom flow options.\n"
     "\n"
-    "  --capabilities <None = 0, SoftAP = 1 << 0, BLE = 1 << 1, OnNetwork = 1 << 2>\n"
+    "  --capabilities <SoftAp = 0, BLE = 1 << 0,  OnNetwork = 1 << 1, None =(1 << 2) + (1 << 1) + (1 << 0) \n"
     "       Discovery Capabilities Bitmask which contains information about Device’s available technologies for device discovery.\n"
     "\n"
     "  --discriminator <discriminator>\n"
