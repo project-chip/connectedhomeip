@@ -277,8 +277,14 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
 
     response.status = queryStatus;
     response.delayedActionTime.Emplace(delayedActionTimeSec);
-    response.userConsentNeeded.Emplace(requestorCanConsent);
-
+    if (mUserConsentNeeded)
+    {
+        response.userConsentNeeded.Emplace(mUserConsentNeeded);
+    }
+    else
+    {
+        response.userConsentNeeded.Emplace(requestorCanConsent);
+    }
     // For test coverage, sending empty metadata when (requestorNodeId % 2) == 0 and not sending otherwise.
     if (commandObj->GetSubjectDescriptor().subject % 2 == 0)
     {

@@ -53,11 +53,12 @@ constexpr chip::EndpointId kOtaProviderEndpoint = 0;
 constexpr uint16_t kOptionFilepath             = 'f';
 constexpr uint16_t kOptionOtaImageList         = 'o';
 constexpr uint16_t kOptionQueryImageBehavior   = 'q';
-constexpr uint16_t kOptionUserConsent          = 'u';
+constexpr uint16_t kOptionUserConsentState     = 'u';
 constexpr uint16_t kOptionDelayedActionTimeSec = 't';
 constexpr uint16_t kOptionDiscriminator        = 'd';
 constexpr uint16_t kOptionPasscode             = 'p';
 constexpr uint16_t kOptionSoftwareVersion      = 's';
+constexpr uint16_t kOptionUserConsentNeeded    = 'c';
 
 static constexpr uint16_t kMaximumDiscriminatorValue = 0xFFF;
 static constexpr uint32_t kMinimumPasscodeValue      = 0x0000001;
@@ -69,6 +70,7 @@ static uint32_t gDelayedActionTimeSec                                 = 0;
 static const char * gOtaFilepath                                      = nullptr;
 static const char * gOtaImageListFilepath                             = nullptr;
 static chip::ota::UserConsentState gUserConsentState                  = chip::ota::UserConsentState::kUnknown;
+static bool gUserConsentNeeded                                        = false;
 static chip::Optional<uint16_t> gSetupDiscriminator;
 static chip::Optional<uint32_t> gSetupPasscode;
 static chip::Optional<uint32_t> gSoftwareVersion;
@@ -195,7 +197,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
     case kOptionDelayedActionTimeSec:
         gDelayedActionTimeSec = static_cast<uint32_t>(strtol(aValue, NULL, 0));
         break;
-    case kOptionUserConsent:
+    case kOptionUserConsentState:
         if (aValue == NULL)
         {
             PrintArgError("%s: ERROR: NULL UserConsent parameter\n", aProgram);
@@ -242,6 +244,9 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
     case kOptionSoftwareVersion:
         gSoftwareVersion.SetValue(static_cast<uint32_t>(strtol(aValue, NULL, 0)));
         break;
+    case kOptionUserConsentNeeded:
+        gUserConsentNeeded = true;
+        break;
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
         retval = false;
@@ -256,10 +261,11 @@ OptionDef cmdLineOptionsDef[] = {
     { "otaImageList", chip::ArgParser::kArgumentRequired, kOptionOtaImageList },
     { "QueryImageBehavior", chip::ArgParser::kArgumentRequired, kOptionQueryImageBehavior },
     { "DelayedActionTimeSec", chip::ArgParser::kArgumentRequired, kOptionDelayedActionTimeSec },
-    { "UserConsent", chip::ArgParser::kArgumentRequired, kOptionUserConsent },
+    { "UserConsentState", chip::ArgParser::kArgumentRequired, kOptionUserConsentState },
     { "discriminator", chip::ArgParser::kArgumentRequired, kOptionDiscriminator },
     { "passcode", chip::ArgParser::kArgumentRequired, kOptionPasscode },
     { "softwareVersion", chip::ArgParser::kArgumentRequired, kOptionSoftwareVersion },
+    { "UserConsentNeeded", chip::ArgParser::kNoArgument, kOptionUserConsentNeeded },
     {},
 };
 
@@ -273,7 +279,7 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "  -t/--DelayedActionTimeSec <time>\n"
                              "        Value in seconds for the DelayedActionTime in the Query Image Response\n"
                              "        and Apply Update Response\n"
-                             "  -u/--UserConsent <granted | denied | deferred>\n"
+                             "  -u/--UserConsentState <granted | denied | deferred>\n"
                              "        granted: Status value in QueryImageResponse is set to UpdateAvailable\n"
                              "        denied: Status value in QueryImageResponse is set to UpdateNotAvailable\n"
                              "        deferred: Status value in QueryImageResponse is set to Busy\n"
@@ -289,7 +295,9 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "        Value of SoftwareVersion in the Query Image Response\n"
                              "        If ota image list is present along with this option\n"
                              "        then value from ota image list is used.\n"
-                             "        Otherwise, this value will be used is then value from that will be used\n" };
+                             "        Otherwise, this value will be used is then value from that will be used\n"
+                             "  -c/--UserConsentNeeded\n"
+                             "        If provided, Value of UserConsentNeeded in the Query Image Response is set to true\n" };
 
 HelpOptions helpOptions("ota-provider-app", "Usage: ota-provider-app [options]", "1.0");
 
@@ -377,6 +385,11 @@ int main(int argc, char * argv[])
     {
         userConsentProvider.SetGlobalUserConsentState(gUserConsentState);
         otaProvider.SetUserConsentDelegate(&userConsentProvider);
+    }
+
+    if (gUserConsentNeeded)
+    {
+        otaProvider.SetUserConsentNeeded(true);
     }
 
     ChipLogDetail(SoftwareUpdate, "Using ImageList file: %s", gOtaImageListFilepath ? gOtaImageListFilepath : "(none)");
