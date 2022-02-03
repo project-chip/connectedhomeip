@@ -313,12 +313,14 @@ private:
 // TODO: Reimplement FabricTable to only have one backing store.
 class DLL_EXPORT FabricTableDelegate
 {
+    friend class FabricTable;
+
 public:
     virtual ~FabricTableDelegate() {}
     /**
      * Gets called when a fabric is deleted from KVS store.
      **/
-    virtual void OnFabricDeletedFromStorage(FabricIndex fabricIndex) = 0;
+    virtual void OnFabricDeletedFromStorage(CompressedFabricId compressedId, FabricIndex fabricIndex) = 0;
 
     /**
      * Gets called when a fabric is loaded into Fabric Table from KVS store.
@@ -329,6 +331,9 @@ public:
      * Gets called when a fabric in Fabric Table is persisted to KVS store.
      **/
     virtual void OnFabricPersistedToStorage(FabricInfo * fabricInfo) = 0;
+
+private:
+    FabricTableDelegate * mNext = nullptr;
 };
 
 /**
@@ -432,7 +437,7 @@ public:
     void Reset();
 
     CHIP_ERROR Init(FabricStorage * storage);
-    CHIP_ERROR SetFabricDelegate(FabricTableDelegate * delegate);
+    CHIP_ERROR AddFabricDelegate(FabricTableDelegate * delegate);
 
     uint8_t FabricCount() const { return mFabricCount; }
 
@@ -448,7 +453,6 @@ private:
     FabricInfo mStates[CHIP_CONFIG_MAX_DEVICE_ADMINS];
     FabricStorage * mStorage = nullptr;
 
-    // TODO: Fabric table should be backed by a single backing store (attribute store), remove delegate callbacks #6419
     FabricTableDelegate * mDelegate = nullptr;
 
     FabricIndex mNextAvailableFabricIndex = kMinValidFabricIndex;
