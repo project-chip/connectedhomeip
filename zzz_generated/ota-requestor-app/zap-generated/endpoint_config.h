@@ -116,7 +116,11 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
+<<<<<<< HEAD
 #define GENERATED_ATTRIBUTE_COUNT 63
+=======
+#define GENERATED_ATTRIBUTE_COUNT 59
+>>>>>>> Using responseRef instead of the complicated logic in the template
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
                                                                                                                                    \
@@ -307,6 +311,7 @@
 // clang-format on
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
+<<<<<<< HEAD
 #define GENERATED_CLUSTER_COUNT 11
 
 // clang-format off
@@ -435,6 +440,51 @@
 }
 
 // clang-format on
+=======
+#define GENERATED_CLUSTER_COUNT 10
+#define GENERATED_CLUSTERS                                                                                                         \
+    {                                                                                                                              \
+        { 0x00000028,                                                                                                              \
+          ZAP_ATTRIBUTE_INDEX(0),                                                                                                  \
+          20,                                                                                                                      \
+          39,                                                                                                                      \
+          ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                              \
+          chipFuncArrayBasicServer }, /* Endpoint: 0, Cluster: Basic (server) */                                                   \
+            {                                                                                                                      \
+                0x00000029, ZAP_ATTRIBUTE_INDEX(20), 0, 0, ZAP_CLUSTER_MASK(CLIENT), NULL                                          \
+            }, /* Endpoint: 0, Cluster: OTA Software Update Provider (client) */                                                   \
+            {                                                                                                                      \
+                0x0000002A, ZAP_ATTRIBUTE_INDEX(20), 5, 5, ZAP_CLUSTER_MASK(SERVER), NULL                                          \
+            }, /* Endpoint: 0, Cluster: OTA Software Update Requestor (server) */                                                  \
+            { 0x0000002B,                                                                                                          \
+              ZAP_ATTRIBUTE_INDEX(25),                                                                                             \
+              3,                                                                                                                   \
+              38,                                                                                                                  \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION),       \
+              chipFuncArrayLocalizationConfigurationServer }, /* Endpoint: 0, Cluster: Localization Configuration (server) */      \
+            { 0x0000002C,                                                                                                          \
+              ZAP_ATTRIBUTE_INDEX(28),                                                                                             \
+              4,                                                                                                                   \
+              4,                                                                                                                   \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION),       \
+              chipFuncArrayTimeFormatLocalizationServer }, /* Endpoint: 0, Cluster: Time Format Localization (server) */           \
+            {                                                                                                                      \
+                0x00000030, ZAP_ATTRIBUTE_INDEX(32), 6, 270, ZAP_CLUSTER_MASK(SERVER), NULL                                        \
+            }, /* Endpoint: 0, Cluster: General Commissioning (server) */                                                          \
+            {                                                                                                                      \
+                0x00000031, ZAP_ATTRIBUTE_INDEX(38), 10, 60, ZAP_CLUSTER_MASK(SERVER), NULL                                        \
+            }, /* Endpoint: 0, Cluster: Network Commissioning (server) */                                                          \
+            {                                                                                                                      \
+                0x0000003E, ZAP_ATTRIBUTE_INDEX(48), 7, 4, ZAP_CLUSTER_MASK(SERVER), NULL                                          \
+            }, /* Endpoint: 0, Cluster: Operational Credentials (server) */                                                        \
+            {                                                                                                                      \
+                0x00000040, ZAP_ATTRIBUTE_INDEX(55), 2, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                          \
+            }, /* Endpoint: 0, Cluster: Fixed Label (server) */                                                                    \
+            {                                                                                                                      \
+                0x00000041, ZAP_ATTRIBUTE_INDEX(57), 2, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                          \
+            }, /* Endpoint: 0, Cluster: User Label (server) */                                                                     \
+    }
+>>>>>>> Using responseRef instead of the complicated logic in the template
 
 #define ZAP_CLUSTER_INDEX(index) (&generatedClusters[index])
 
@@ -443,7 +493,11 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
+<<<<<<< HEAD
         { ZAP_CLUSTER_INDEX(0), 11, 172 },                                                                                         \
+=======
+        { ZAP_CLUSTER_INDEX(0), 10, 424 },                                                                                         \
+>>>>>>> Using responseRef instead of the complicated logic in the template
     }
 
 // Largest attribute size is needed for various buffers
@@ -453,7 +507,11 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (39)
 
 // Total size of attribute storage
+<<<<<<< HEAD
 #define ATTRIBUTE_MAX_SIZE (172)
+=======
+#define ATTRIBUTE_MAX_SIZE (424)
+>>>>>>> Using responseRef instead of the complicated logic in the template
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (1)

@@ -11,17 +11,9 @@
         {{asUpperCamelCase parent.commandName}}Request
     {{~/first~}}
 {{~/zcl_command_arguments~}}
-): {{#if responseName~}}
-    {{~responseName~}}
+): {{#if responseRef~}}
+    {{getResponseCommandName responseRef}}
 {{~else~}}
-    {{~#if_command_has_response commandName ''~}}
-        {{~commandName~}}Response
-    {{~else~}}
-        {{~#if_command_has_response commandName 'Request'~}}
-            {{~replace_string commandName 'Request' ''}}Response
-        {{~else~}}
-            DefaultSuccess
-        {{~/if_command_has_response~}}
-    {{~/if_command_has_response~}}
+    DefaultSuccess
 {{~/if~}}
 {{~indent 0}} = {{code}};
