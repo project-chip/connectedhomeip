@@ -57,4 +57,27 @@ static constexpr CommandId kInvalidCommandId     = 0xFFFF'FFFF;
 static constexpr EventId kInvalidEventId         = 0xFFFF'FFFF;
 static constexpr FieldId kInvalidFieldId         = 0xFFFF'FFFF;
 
+constexpr bool IsValidClusterId(ClusterId aClusterId)
+{
+    const ClusterId kIdMask     = 0x0000'FFFF;
+    const ClusterId kVendorMask = 0xFFFF'0000;
+    const auto id               = aClusterId & kIdMask;
+    const auto vendor           = aClusterId & kVendorMask;
+    return (vendor == 0x0000 && id <= 0x7FFF) || (vendor >= 0x0001 && vendor <= 0xFFFE && id >= 0xFC00 && id <= 0xFFFE);
+}
+
+constexpr bool IsValidDeviceTypeId(DeviceTypeId aDeviceTypeId)
+{
+    const DeviceTypeId kIdMask     = 0x0000'FFFF;
+    const DeviceTypeId kVendorMask = 0xFFFF'0000;
+    const auto id                  = aDeviceTypeId & kIdMask;
+    const auto vendor              = aDeviceTypeId & kVendorMask;
+    return vendor <= 0xFFFE && id <= 0xBFFF;
+}
+
+constexpr bool IsValidEndpointId(EndpointId aEndpointId)
+{
+    return aEndpointId != kInvalidEndpointId;
+}
+
 } // namespace chip

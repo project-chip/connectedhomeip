@@ -273,7 +273,7 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
                 {
                     continue;
                 }
-                // TODO: check against target.deviceType (requires lookup)
+                // TODO(#14431): device type target not yet supported
                 targetMatched = true;
                 break;
             }
@@ -289,6 +289,81 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
 
     // No entry was found which passed all checks: access is denied.
     return CHIP_ERROR_ACCESS_DENIED;
+}
+
+bool AccessControl::IsValid(const Entry & entry)
+{
+    AuthMode authMode;
+    FabricIndex fabricIndex;
+    Privilege privilege;
+    size_t subjectCount = 0;
+    size_t targetCount  = 0;
+
+    SuccessOrExit(entry.GetAuthMode(authMode));
+    SuccessOrExit(entry.GetFabricIndex(fabricIndex));
+    SuccessOrExit(entry.GetPrivilege(privilege));
+    SuccessOrExit(entry.GetSubjectCount(subjectCount));
+    SuccessOrExit(entry.GetTargetCount(targetCount));
+
+    if (fabricIndex == kUndefinedFabricIndex)
+    {
+        ChipLogError(DataManagement, "AccessControl: invalid fabric index");
+        return false;
+    }
+
+    // Operational PASE not supported for v1.0.
+    if (authMode != AuthMode::kCase && authMode != AuthMode::kGroup)
+    {
+        ChipLogError(DataManagement, "AccessControl: invalid auth mode");
+        return false;
+    }
+
+    if (privilege == Privilege::kAdminister && authMode != AuthMode::kCase)
+    {
+        ChipLogError(DataManagement, "AccessControl: invalid privilege");
+        return false;
+    }
+
+    for (size_t i = 0; i < subjectCount; ++i)
+    {
+        NodeId subject;
+        SuccessOrExit(entry.GetSubject(i, subject));
+        const bool kIsCase  = authMode == AuthMode::kCase;
+        const bool kIsGroup = authMode == AuthMode::kGroup;
+        if ((kIsCase && !IsValidCaseNodeId(subject)) || (kIsGroup && !IsValidGroupNodeId(subject)))
+        {
+            ChipLogError(DataManagement, "AccessControl: invalid subject");
+            return false;
+        }
+    }
+
+    for (size_t i = 0; i < targetCount; ++i)
+    {
+        Entry::Target target;
+        SuccessOrExit(entry.GetTarget(i, target));
+        const bool kHasCluster    = target.flags & Entry::Target::kCluster;
+        const bool kHasEndpoint   = target.flags & Entry::Target::kEndpoint;
+        const bool kHasDeviceType = target.flags & Entry::Target::kDeviceType;
+        if ((!kHasCluster && !kHasEndpoint && !kHasDeviceType) || (kHasEndpoint && kHasDeviceType) ||
+            (kHasCluster && !IsValidClusterId(target.cluster)) || (kHasEndpoint && !IsValidEndpointId(target.endpoint)) ||
+            (kHasDeviceType && !IsValidDeviceTypeId(target.deviceType)))
+        {
+            ChipLogError(DataManagement, "AccessControl: invalid target");
+            return false;
+        }
+        // TODO(#14431): device type target not yet supported
+        if (kHasDeviceType)
+        {
+            ChipLogError(DataManagement, "AccessControl: device type target not yet supported");
+            return false;
+        }
+    }
+
+    return true;
+
+exit:
+    ChipLogError(DataManagement, "AccessControl: unexpected error");
+    return false;
 }
 
 AccessControl & GetAccessControl()
