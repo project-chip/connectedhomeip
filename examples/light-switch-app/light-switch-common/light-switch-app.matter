@@ -640,6 +640,13 @@ client cluster Groups = 4 {
   request struct ViewGroupRequest {
     INT16U groupId = 0;
   }
+
+  command AddGroup(AddGroupRequest): AddGroupResponse = 0;
+  command AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
+  command GetGroupMembership(GetGroupMembershipRequest): GetGroupMembershipResponse = 2;
+  command RemoveAllGroups(): DefaultSuccess = 4;
+  command RemoveGroup(RemoveGroupRequest): RemoveGroupResponse = 3;
+  command ViewGroup(ViewGroupRequest): ViewGroupResponse = 1;
 }
 
 client cluster Identify = 3 {
@@ -1009,6 +1016,10 @@ client cluster OnOff = 6 {
   readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
+
+  command Off(): DefaultSuccess = 0;
+  command On(): DefaultSuccess = 1;
+  command Toggle(): DefaultSuccess = 2;
 }
 
 server cluster OperationalCredentials = 62 {
@@ -1215,6 +1226,14 @@ client cluster Scenes = 5 {
     CHAR_STRING sceneName = 4;
     SceneExtensionFieldSet extensionFieldSets[] = 5;
   }
+
+  command AddScene(AddSceneRequest): AddSceneResponse = 0;
+  command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
+  command RecallScene(RecallSceneRequest): DefaultSuccess = 5;
+  command RemoveAllScenes(RemoveAllScenesRequest): RemoveAllScenesResponse = 3;
+  command RemoveScene(RemoveSceneRequest): RemoveSceneResponse = 2;
+  command StoreScene(StoreSceneRequest): StoreSceneResponse = 4;
+  command ViewScene(ViewSceneRequest): ViewSceneResponse = 1;
 }
 
 server cluster SoftwareDiagnostics = 52 {

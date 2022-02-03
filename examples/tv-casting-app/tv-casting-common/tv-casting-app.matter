@@ -312,7 +312,7 @@ server cluster BridgedDeviceBasic = 57 {
   }
 
   readonly attribute char_string<32> vendorName = 1;
-  readonly attribute int16u vendorID = 2;
+  readonly attribute vendor_id vendorID = 2;
   readonly attribute char_string<32> productName = 3;
   attribute char_string<32> nodeLabel = 5;
   readonly attribute int16u hardwareVersion = 7;
@@ -325,6 +325,7 @@ server cluster BridgedDeviceBasic = 57 {
   readonly attribute char_string<64> productLabel = 14;
   readonly attribute char_string<32> serialNumber = 15;
   readonly attribute boolean reachable = 17;
+  readonly attribute char_string<32> uniqueID = 18;
   readonly global attribute int16u clusterRevision = 65533;
 }
 

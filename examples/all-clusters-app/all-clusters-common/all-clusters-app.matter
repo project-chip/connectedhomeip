@@ -359,7 +359,7 @@ server cluster BridgedDeviceBasic = 57 {
   }
 
   readonly attribute char_string<32> vendorName = 1;
-  readonly attribute int16u vendorID = 2;
+  readonly attribute vendor_id vendorID = 2;
   readonly attribute char_string<32> productName = 3;
   attribute char_string<32> nodeLabel = 5;
   readonly attribute int16u hardwareVersion = 7;

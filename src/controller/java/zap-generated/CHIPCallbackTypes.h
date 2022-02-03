@@ -257,6 +257,8 @@ typedef void (*CHIPBridgedDeviceBasicClusterSerialNumberAttributeCallbackType)(
     void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::SerialNumber::TypeInfo::DecodableArgType);
 typedef void (*CHIPBridgedDeviceBasicClusterReachableAttributeCallbackType)(
     void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::Reachable::TypeInfo::DecodableArgType);
+typedef void (*CHIPBridgedDeviceBasicClusterUniqueIDAttributeCallbackType)(
+    void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::UniqueID::TypeInfo::DecodableArgType);
 typedef void (*CHIPBridgedDeviceBasicClusterServerGeneratedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::BridgedDeviceBasic::Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPBridgedDeviceBasicClusterClientGeneratedCommandListAttributeCallbackType)(
