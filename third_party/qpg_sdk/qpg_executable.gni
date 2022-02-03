@@ -25,9 +25,9 @@ template("qpg_executable") {
 
   qpg_target_name = target_name
   executable_target_name = "${target_name}.out"
-  ota_target_name = "${target_name}_ota"
   if (chip_enable_ota_requestor) {
     # Generate OTA image after executable
+    ota_target_name = "${target_name}_ota"
     final_target = ota_target_name
   } else {
     # The executable is the final target.
