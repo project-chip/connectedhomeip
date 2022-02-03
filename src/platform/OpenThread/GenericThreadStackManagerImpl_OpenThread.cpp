@@ -85,10 +85,19 @@ namespace Internal {
 
 // Network commissioning
 namespace {
+#ifndef _NO_NETWORK_COMMISSIONING_DRIVER_
 NetworkCommissioning::GenericThreadDriver sGenericThreadDriver;
 Clusters::NetworkCommissioning::Instance sThreadNetworkCommissioningInstance(0 /* Endpoint Id */, &sGenericThreadDriver);
-} // namespace
+#endif
 
+void initNetworkCommissioningThreadDriver(void)
+{
+#ifndef _NO_NETWORK_COMMISSIONING_DRIVER_
+    sThreadNetworkCommissioningInstance.Init();
+#endif
+}
+
+} // namespace
 // Fully instantiate the generic implementation class in whatever compilation unit includes this file.
 template class GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>;
 
@@ -305,7 +314,6 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetThreadProvis
     }
 
     assert(Thread::kSizeOperationalDataset <= netInfo.size());
-    // memcpy(tlvs.mTlvs, netInfo.data(), netInfo.size());
     netInfo = ByteSpan(datasetTlv.mTlvs, datasetTlv.mLength);
 
     return CHIP_NO_ERROR;
@@ -1574,7 +1582,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
         ChipLogProgress(DeviceLayer, "OpenThread ifconfig up and thread start");
     }
 
-    sThreadNetworkCommissioningInstance.Init();
+    initNetworkCommissioningThreadDriver();
 
 exit:
     ChipLogProgress(DeviceLayer, "OpenThread started: %s", otThreadErrorToString(otErr));

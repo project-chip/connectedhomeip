@@ -95,7 +95,9 @@ static_library("EFR32") {
       sources += [ "../OpenThread/DnssdImpl.cpp" ]
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
-  } else {
+  }
+
+  if (chip_enable_wifi) {
     sources += [
       "ConnectivityManagerImpl_WIFI.cpp",
       "ServiceProvisioning.cpp",
