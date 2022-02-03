@@ -65,7 +65,7 @@
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* 288 - FeatureMap, */                                                                                                \
-            0x00, 0x00, 0x00, 0x01,                                                                                                \
+            0x00, 0x00, 0x00, 0x02,                                                                                                \
     }
 
 #else // !BIGENDIAN_CPU
@@ -110,7 +110,7 @@
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* 288 - FeatureMap, */                                                                                                \
-            0x01, 0x00, 0x00, 0x00,                                                                                                \
+            0x02, 0x00, 0x00, 0x00,                                                                                                \
     }
 
 #endif // BIGENDIAN_CPU

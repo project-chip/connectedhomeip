@@ -40,7 +40,7 @@
             /* Endpoint: 1, Cluster: Network Commissioning (client), big-endian */                                                 \
                                                                                                                                    \
             /* 8 - FeatureMap, */                                                                                                  \
-            0x00, 0x00, 0x00, 0x01,                                                                                                \
+            0x00, 0x00, 0x00, 0x02,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Software Diagnostics (client), big-endian */                                                  \
                                                                                                                                    \
@@ -80,7 +80,7 @@
             /* Endpoint: 1, Cluster: Network Commissioning (client), little-endian */                                              \
                                                                                                                                    \
             /* 8 - FeatureMap, */                                                                                                  \
-            0x01, 0x00, 0x00, 0x00,                                                                                                \
+            0x02, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Software Diagnostics (client), little-endian */                                               \
                                                                                                                                    \

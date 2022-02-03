@@ -86,7 +86,7 @@
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* 546 - FeatureMap, */                                                                                                \
-            0x00, 0x00, 0x00, 0x01,                                                                                                \
+            0x00, 0x00, 0x00, 0x02,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: General Diagnostics (server), big-endian */                                                   \
                                                                                                                                    \
@@ -326,7 +326,7 @@
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* 919 - FeatureMap, */                                                                                                \
-            0x00, 0x00, 0x00, 0x00,                                                                                                \
+            0x00, 0x00, 0x00, 0x02,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Bridged Device Basic (server), big-endian */                                                  \
                                                                                                                                    \
@@ -777,7 +777,7 @@
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* 546 - FeatureMap, */                                                                                                \
-            0x01, 0x00, 0x00, 0x00,                                                                                                \
+            0x02, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: General Diagnostics (server), little-endian */                                                \
                                                                                                                                    \
@@ -1017,7 +1017,7 @@
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* 919 - FeatureMap, */                                                                                                \
-            0x00, 0x00, 0x00, 0x00,                                                                                                \
+            0x02, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Bridged Device Basic (server), little-endian */                                               \
                                                                                                                                    \

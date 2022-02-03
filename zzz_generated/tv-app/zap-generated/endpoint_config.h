@@ -64,7 +64,7 @@
             /* Endpoint: 0, Cluster: Network Commissioning (client), big-endian */                                                 \
                                                                                                                                    \
             /* 276 - FeatureMap, */                                                                                                \
-            0x00, 0x00, 0x00, 0x00,                                                                                                \
+            0x00, 0x00, 0x00, 0x02,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Network Commissioning (server), big-endian */                                                 \
                                                                                                                                    \
@@ -75,7 +75,7 @@
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* 296 - FeatureMap, */                                                                                                \
-            0x00, 0x00, 0x00, 0x01,                                                                                                \
+            0x00, 0x00, 0x00, 0x02,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: General Diagnostics (server), big-endian */                                                   \
                                                                                                                                    \
@@ -545,7 +545,7 @@
             /* Endpoint: 0, Cluster: Network Commissioning (client), little-endian */                                              \
                                                                                                                                    \
             /* 276 - FeatureMap, */                                                                                                \
-            0x00, 0x00, 0x00, 0x00,                                                                                                \
+            0x02, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Network Commissioning (server), little-endian */                                              \
                                                                                                                                    \
@@ -556,7 +556,7 @@
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* 296 - FeatureMap, */                                                                                                \
-            0x01, 0x00, 0x00, 0x00,                                                                                                \
+            0x02, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: General Diagnostics (server), little-endian */                                                \
                                                                                                                                    \
