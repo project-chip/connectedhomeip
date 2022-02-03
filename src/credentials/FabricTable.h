@@ -405,6 +405,7 @@ public:
     CHIP_ERROR Store(FabricIndex index);
     CHIP_ERROR LoadFromStorage(FabricInfo * info);
 
+    // Returns CHIP_ERROR_NOT_FOUND if there is no fabric for that index.
     CHIP_ERROR Delete(FabricIndex index);
     void DeleteAllFabrics();
 

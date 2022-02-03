@@ -331,10 +331,10 @@ typedef void (*AdministratorCommissioningClusterStatusCodeAttributeCallback)(
     void *, chip::app::Clusters::AdministratorCommissioning::StatusCode);
 typedef void (*NullableAdministratorCommissioningClusterStatusCodeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::AdministratorCommissioning::StatusCode> &);
-typedef void (*OperationalCredentialsClusterNodeOperationalCertStatusAttributeCallback)(
-    void *, chip::app::Clusters::OperationalCredentials::NodeOperationalCertStatus);
-typedef void (*NullableOperationalCredentialsClusterNodeOperationalCertStatusAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalCredentials::NodeOperationalCertStatus> &);
+typedef void (*OperationalCredentialsClusterOperationalCertStatusAttributeCallback)(
+    void *, chip::app::Clusters::OperationalCredentials::OperationalCertStatus);
+typedef void (*NullableOperationalCredentialsClusterOperationalCertStatusAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalCredentials::OperationalCertStatus> &);
 typedef void (*GroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallback)(
     void *, chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy);
 typedef void (*NullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallback)(
@@ -11558,28 +11558,26 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPOperationalCredentialsClusterNodeOperationalCertStatusAttributeCallbackBridge
-    : public CHIPCallbackBridge<OperationalCredentialsClusterNodeOperationalCertStatusAttributeCallback>
+class CHIPOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge
+    : public CHIPCallbackBridge<OperationalCredentialsClusterOperationalCertStatusAttributeCallback>
 {
 public:
-    CHIPOperationalCredentialsClusterNodeOperationalCertStatusAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                      ResponseHandler handler,
-                                                                                      CHIPActionBlock action,
-                                                                                      bool keepAlive = false) :
-        CHIPCallbackBridge<OperationalCredentialsClusterNodeOperationalCertStatusAttributeCallback>(queue, handler, action,
-                                                                                                    OnSuccessFn, keepAlive){};
+    CHIPOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<OperationalCredentialsClusterOperationalCertStatusAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                                keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::OperationalCredentials::NodeOperationalCertStatus value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::OperationalCredentials::OperationalCertStatus value);
 };
 
-class CHIPOperationalCredentialsClusterNodeOperationalCertStatusAttributeCallbackSubscriptionBridge
-    : public CHIPOperationalCredentialsClusterNodeOperationalCertStatusAttributeCallbackBridge
+class CHIPOperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubscriptionBridge
+    : public CHIPOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge
 {
 public:
-    CHIPOperationalCredentialsClusterNodeOperationalCertStatusAttributeCallbackSubscriptionBridge(
+    CHIPOperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
-        CHIPOperationalCredentialsClusterNodeOperationalCertStatusAttributeCallbackBridge(queue, handler, action, true),
+        CHIPOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -11589,30 +11587,30 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPNullableOperationalCredentialsClusterNodeOperationalCertStatusAttributeCallbackBridge
-    : public CHIPCallbackBridge<NullableOperationalCredentialsClusterNodeOperationalCertStatusAttributeCallback>
+class CHIPNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge
+    : public CHIPCallbackBridge<NullableOperationalCredentialsClusterOperationalCertStatusAttributeCallback>
 {
 public:
-    CHIPNullableOperationalCredentialsClusterNodeOperationalCertStatusAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                              ResponseHandler handler,
-                                                                                              CHIPActionBlock action,
-                                                                                              bool keepAlive = false) :
-        CHIPCallbackBridge<NullableOperationalCredentialsClusterNodeOperationalCertStatusAttributeCallback>(
-            queue, handler, action, OnSuccessFn, keepAlive){};
+    CHIPNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                          ResponseHandler handler,
+                                                                                          CHIPActionBlock action,
+                                                                                          bool keepAlive = false) :
+        CHIPCallbackBridge<NullableOperationalCredentialsClusterOperationalCertStatusAttributeCallback>(queue, handler, action,
+                                                                                                        OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalCredentials::NodeOperationalCertStatus> & value);
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalCredentials::OperationalCertStatus> & value);
 };
 
-class CHIPNullableOperationalCredentialsClusterNodeOperationalCertStatusAttributeCallbackSubscriptionBridge
-    : public CHIPNullableOperationalCredentialsClusterNodeOperationalCertStatusAttributeCallbackBridge
+class CHIPNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubscriptionBridge
+    : public CHIPNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge
 {
 public:
-    CHIPNullableOperationalCredentialsClusterNodeOperationalCertStatusAttributeCallbackSubscriptionBridge(
+    CHIPNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
-        CHIPNullableOperationalCredentialsClusterNodeOperationalCertStatusAttributeCallbackBridge(queue, handler, action, true),
+        CHIPNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 

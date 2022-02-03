@@ -615,6 +615,10 @@ exit:
             mDelegate->OnFabricDeletedFromStorage(index);
         }
     }
+    if (!fabricIsInitialized)
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
     return CHIP_NO_ERROR;
 }
 
