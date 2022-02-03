@@ -309,6 +309,10 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
         {
         case CommissioningStage::kReadCommissioningInfo:
             mDeviceCommissioingInfo = report.Get<ReadCommissioningInfo>();
+            if (!mParams.GetFailsafeTimerSeconds().HasValue() && mDeviceCommissioingInfo.general.recommendedFailsafe > 0)
+            {
+                mParams.SetFailsafeTimerSeconds(mDeviceCommissioingInfo.general.recommendedFailsafe);
+            }
             break;
         case CommissioningStage::kSendPAICertificateRequest:
             SetPAI(report.Get<RequestedCertificate>().certificate);

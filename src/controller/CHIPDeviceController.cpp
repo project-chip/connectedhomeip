@@ -1725,12 +1725,11 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     switch (step)
     {
     case CommissioningStage::kArmFailsafe: {
-        ChipLogProgress(Controller, "Arming failsafe");
-        // TODO: should get the endpoint information from the descriptor cluster.
         GeneralCommissioning::Commands::ArmFailSafe::Type request;
-        request.expiryLengthSeconds = params.GetFailsafeTimerSeconds();
+        request.expiryLengthSeconds = params.GetFailsafeTimerSeconds().ValueOr(params.kDefaultFailsafeTimeout);
         request.breadcrumb          = breadcrumb;
         request.timeoutMs           = kCommandTimeoutMs;
+        ChipLogProgress(Controller, "Arming failsafe (%u seconds)", request.expiryLengthSeconds);
         SendCommand<GeneralCommissioningCluster>(proxy, request, OnArmFailSafe, OnBasicFailure, endpoint, timeout);
     }
     break;
