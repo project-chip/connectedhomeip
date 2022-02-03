@@ -45,9 +45,6 @@ using namespace chip::app::Clusters::DoorLock;
 static constexpr uint8_t DOOR_LOCK_SCHEDULE_MAX_HOUR   = 23;
 static constexpr uint8_t DOOR_LOCK_SCHEDULE_MAX_MINUTE = 59;
 
-EmberEventControl emberAfPluginDoorLockServerLockoutEventControl;
-EmberEventControl emberAfPluginDoorLockServerRelockEventControl;
-
 DoorLockServer DoorLockServer::instance;
 
 /**********************************************************
