@@ -1058,6 +1058,7 @@ SetDns
 SetImageProcessorDelegate
 SetOtaRequestorDriver
 setpin
+setpoint
 SetpointRaiseLower
 SetRequestorInstance
 SetUpPINCode
@@ -1067,6 +1068,7 @@ SHA
 ShadeConfiguration
 showDocumentation
 shubhamdp
+signgin
 SIGINT
 SiLabs
 SiliconLabs

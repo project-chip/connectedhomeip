@@ -20,9 +20,12 @@
 
 #include "commands/pairing/Commands.h"
 
+#include <zap-generated/cluster/CommandsBridge.h>
+
 int main(int argc, const char * argv[])
 {
     Commands commands;
     registerCommandsPairing(commands);
+    registerClusters(commands);
     return commands.Run(argc, (char **) argv);
 }

@@ -1,0 +1,40 @@
+{
+    "name": "CHIP Tool templates",
+    "version": "chip-v1",
+    "helpers": [
+        "../../../examples/chip-tool/templates/helper.js",
+        "../../../src/app/zap-templates/common/StringHelper.js",
+        "../../../src/app/zap-templates/partials/helper.js",
+        "../../../src/app/zap-templates/templates/app/helper.js",
+        "../../../src/app/zap-templates/templates/chip/helper.js",
+        "../../../src/darwin/Framework/CHIP/templates/helper.js",
+        "helper.js"
+    ],
+    "override": "../../../src/app/zap-templates/common/override.js",
+    "partials": [
+        {
+            "name": "header",
+            "path": "../../../src/app/zap-templates/partials/header.zapt"
+        },
+        {
+            "name": "clusters_header",
+            "path": "../../../src/app/zap-templates/partials/clusters_header.zapt"
+        },
+        {
+            "name": "cluster_header",
+            "path": "../../../src/app/zap-templates/partials/cluster_header.zapt"
+        }
+    ],
+    "templates": [
+        {
+            "path": "commands.zapt",
+            "name": "Cluster Commands header",
+            "output": "cluster/CommandsBridge.h"
+        },
+        {
+            "path": "README.zapt",
+            "name": "Tests Commands header",
+            "output": "../../../examples/chip-tool-darwin/README.md"
+        }
+    ]
+}
