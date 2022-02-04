@@ -24,6 +24,7 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
 #include <app-common/zap-generated/ids/Events.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/EventLoggingTypes.h>
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/Decode.h>
@@ -43271,5 +43272,8 @@ struct TypeInfo
 } // namespace ElectricalMeasurement
 
 } // namespace Clusters
+
+bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand);
+
 } // namespace app
 } // namespace chip

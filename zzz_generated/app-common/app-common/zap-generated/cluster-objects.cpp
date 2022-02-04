@@ -26194,5 +26194,71 @@ namespace Events {
 } // namespace ElectricalMeasurement
 
 } // namespace Clusters
+
+bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand)
+{
+    // Maybe it would be smaller code to codegen a table and walk over it?
+    // Not sure.
+    switch (aCluster)
+    {
+    case Clusters::AdministratorCommissioning::Id: {
+        switch (aCommand)
+        {
+        case Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Id:
+        case Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id:
+        case Clusters::AdministratorCommissioning::Commands::RevokeCommissioning::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
+    case Clusters::DoorLock::Id: {
+        switch (aCommand)
+        {
+        case Clusters::DoorLock::Commands::LockDoor::Id:
+        case Clusters::DoorLock::Commands::UnlockDoor::Id:
+        case Clusters::DoorLock::Commands::UnlockWithTimeout::Id:
+        case Clusters::DoorLock::Commands::SetPINCode::Id:
+        case Clusters::DoorLock::Commands::ClearPINCode::Id:
+        case Clusters::DoorLock::Commands::ClearAllPINCodes::Id:
+        case Clusters::DoorLock::Commands::SetRFIDCode::Id:
+        case Clusters::DoorLock::Commands::ClearRFIDCode::Id:
+        case Clusters::DoorLock::Commands::ClearAllRFIDCodes::Id:
+        case Clusters::DoorLock::Commands::SetUser::Id:
+        case Clusters::DoorLock::Commands::ClearUser::Id:
+        case Clusters::DoorLock::Commands::SetCredential::Id:
+        case Clusters::DoorLock::Commands::ClearCredential::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
+    case Clusters::AccountLogin::Id: {
+        switch (aCommand)
+        {
+        case Clusters::AccountLogin::Commands::GetSetupPINRequest::Id:
+        case Clusters::AccountLogin::Commands::LoginRequest::Id:
+        case Clusters::AccountLogin::Commands::LogoutRequest::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
+    case Clusters::TestCluster::Id: {
+        switch (aCommand)
+        {
+        case Clusters::TestCluster::Commands::TimedInvokeRequest::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
+    default:
+        break;
+    }
+
+    return false;
+}
+
 } // namespace app
 } // namespace chip
