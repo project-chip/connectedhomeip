@@ -41,6 +41,8 @@ static_library("ESP32") {
     "Logging.cpp",
     "LwIPCoreLock.cpp",
     "NetworkCommissioningDriver.h",
+    "OTARequestorNVSHelper.cpp",
+    "OTARequestorNVSHelper.h",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SystemTimeSupport.cpp",

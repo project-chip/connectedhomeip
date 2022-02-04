@@ -74,8 +74,12 @@ public:
     virtual CHIP_ERROR GetState(EndpointId endpointId,
                                 chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum & state) = 0;
 
-    // Manually set OTA Provider parameters
+    // Manually Set OTA Provider parameters
     virtual void TestModeSetProviderParameters(NodeId nodeId, FabricIndex fabIndex, EndpointId endpointId) = 0;
+
+    // TODO : Must be removed once non volatile storage implementation is in place.
+    // Manually Get OTA Provider parameters
+    virtual void TestModeGetProviderParameters(NodeId & nodeId, FabricIndex & fabIndex, EndpointId & endpointId) = 0;
 
     // Application directs the Requestor to cancel image update in progress. All the Requestor state is
     // cleared, UpdateState is reset to Idle

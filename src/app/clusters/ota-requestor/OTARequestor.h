@@ -122,6 +122,12 @@ public:
 
     // Called to set optional RequestorCanConsent value provided by Requestor.
     void SetRequestorCanConsent(bool RequestorCanConsent) { mRequestorCanConsent.SetValue(RequestorCanConsent); }
+    void TestModeGetProviderParameters(NodeId & nodeId, FabricIndex & fabIndex, EndpointId & endpointId) override
+    {
+        nodeId     = mProviderNodeId;
+        fabIndex   = mProviderFabricIndex;
+        endpointId = mProviderEndpointId;
+    }
 
     // Application directs the Requestor to cancel image update in progress. All the Requestor state is
     // cleared, UpdateState is reset to Idle
