@@ -38,7 +38,6 @@ sometimes resolve issues due to stale configuration.
 To initiate a client commissioning request to a device, run the built executable
 and choose the pairing mode.
 
-
 #### Pair a device over IP
 
 The command below will pair devices with the provided IP, discriminator and
@@ -118,6 +117,7 @@ with the target cluster name and the target command name
     $ chip-tool-darwin onoff on
 
 # Command Reference
+
 ## Command Details
 
 <details><summary>All Clusters</summary><p>
