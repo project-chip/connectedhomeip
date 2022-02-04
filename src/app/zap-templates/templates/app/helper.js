@@ -725,14 +725,6 @@ function getPythonFieldDefault(type, options)
   return _getPythonFieldDefault.call(this, type, options)
 }
 
-async function getResponseCommandName(responseRef, options)
-{
-  let pkgId = await templateUtil.ensureZclPackageId(this);
-
-  const { db, sessionId } = this.global;
-  return queryCommand.selectCommandById(db, responseRef, pkgId).then(response => asUpperCamelCase(response.name));
-}
-
 // Allow-list of enums that we generate as enums, not enum classes.  The goal is
 // to drive this down to 0.
 function isWeaklyTypedEnum(label)
@@ -840,7 +832,6 @@ exports.asMEI                                 = asMEI;
 exports.zapTypeToEncodableClusterObjectType   = zapTypeToEncodableClusterObjectType;
 exports.zapTypeToDecodableClusterObjectType   = zapTypeToDecodableClusterObjectType;
 exports.zapTypeToPythonClusterObjectType      = zapTypeToPythonClusterObjectType;
-exports.getResponseCommandName                = getResponseCommandName;
 exports.isWeaklyTypedEnum                     = isWeaklyTypedEnum;
 exports.getPythonFieldDefault                 = getPythonFieldDefault;
 exports.incrementDepth                        = incrementDepth;

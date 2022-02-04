@@ -118,8 +118,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter &writer, TLV::Tag tag) const;
 
     using ResponseType =
-    {{~#if responseRef}}
-      Clusters::{{asUpperCamelCase parent.name}}::Commands::{{getResponseCommandName responseRef}}::DecodableType;
+    {{~#if responseName}}
+      Clusters::{{asUpperCamelCase parent.name}}::Commands::{{responseName}}::DecodableType;
     {{else}}
       DataModel::NullObjectType;
     {{/if}}
