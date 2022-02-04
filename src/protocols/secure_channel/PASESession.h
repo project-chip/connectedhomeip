@@ -123,7 +123,7 @@ public:
      *
      * @return CHIP_ERROR     The result of initialization
      */
-    CHIP_ERROR WaitForPairing(const PASEVerifier & verifier, uint32_t pbkdf2IterCount, const ByteSpan & salt, uint16_t passcodeID,
+    CHIP_ERROR WaitForPairing(const PASEVerifier & verifier, uint32_t pbkdf2IterCount, const ByteSpan & salt, PasscodeId passcodeID,
                               uint16_t mySessionId, Optional<ReliableMessageProtocolConfig> mrpConfig,
                               SessionEstablishmentDelegate * delegate);
 
@@ -284,7 +284,7 @@ private:
     /* w0s and w1s */
     PASEVerifier mPASEVerifier;
 
-    uint16_t mPasscodeID = 0;
+    PasscodeId mPasscodeID = kDefaultCommissioningPasscodeId;
 
     uint32_t mSetupPINCode;
 
