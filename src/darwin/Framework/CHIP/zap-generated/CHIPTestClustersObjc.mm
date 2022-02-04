@@ -620,6 +620,26 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)writeAttributeApplicationAppWithValue:(CHIPApplicationBasicClusterApplicationBasicApplication * _Nonnull)value
+                            completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = ApplicationBasic::Attributes::ApplicationApp::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue.catalogVendorId = value.catalogVendorId.unsignedShortValue;
+            cppValue.applicationId = [self asCharSpan:value.applicationId];
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)writeAttributeApplicationStatusWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(

@@ -368,29 +368,6 @@ private:
 | Events:                                                             |        |
 \*----------------------------------------------------------------------------*/
 
-class WriteApplicationBasicApplicationApp : public WriteAttribute
-{
-public:
-    WriteApplicationBasicApplicationApp(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("ApplicationApp", credsIssuerConfig), mComplex(&mValue)
-    {
-        AddArgument("attr-name", "application-app");
-        AddArgument("attr-value", &mComplex);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteApplicationBasicApplicationApp() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
-    {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050D, 0x00000004, mValue);
-    }
-
-private:
-    chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type mValue;
-    TypedComplexArgument<chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type> mComplex;
-};
-
 /*----------------------------------------------------------------------------*\
 | Cluster ApplicationLauncher                                         | 0x050C |
 |------------------------------------------------------------------------------|
@@ -9461,7 +9438,6 @@ void registerClusterApplicationBasic(Commands & commands, CredentialIssuerComman
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                //
-        make_unique<WriteApplicationBasicApplicationApp>(credsIssuerConfig),                                               //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                            //
         make_unique<SubscribeAttribute>(Id, "vendor-name", Attributes::VendorName::Id, credsIssuerConfig),                 //
         make_unique<SubscribeAttribute>(Id, "vendor-id", Attributes::VendorId::Id, credsIssuerConfig),                     //

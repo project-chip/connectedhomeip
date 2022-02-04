@@ -56,7 +56,7 @@ function asExpectedEndpointForCluster(clusterName)
   return 1;
 }
 
-function asTestValue()
+async function asTestValue(cluster, options)
 {
   if (StringHelper.isOctetString(this.type)) {
     return `[@"${"Test".substring(0, this.maxLength)}" dataUsingEncoding:NSUTF8StringEncoding]`;
@@ -64,6 +64,9 @@ function asTestValue()
     return `@"${"Test".substring(0, this.maxLength)}"`;
   } else if (this.isArray) {
     return '[NSArray array]';
+  } else if (this.isStruct) {
+    let ourClass = await asObjectiveCClass.call(this, this.type, cluster, options);
+    return `[[${ourClass} alloc] init]`;
   } else {
     return `@(${this.min || this.max || 0})`;
   }

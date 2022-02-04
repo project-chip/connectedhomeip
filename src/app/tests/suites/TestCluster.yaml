@@ -3754,3 +3754,36 @@ tests:
       attribute: "ServerGeneratedCommandList"
       response:
           value: [0, 1, 4, 5, 6, 9, 10, 11]
+
+    # Struct-typed attribute
+    - label: "Write struct-typed attribute"
+      command: "writeAttribute"
+      attribute: "struct_attr"
+      arguments:
+          value:
+              {
+                  a: 5,
+                  b: true,
+                  c: 2,
+                  d: "abc",
+                  e: "",
+                  f: 17,
+                  g: 1.5,
+                  h: 3.14159265358979,
+              }
+
+    - label: "Read struct-typed attribute"
+      command: "readAttribute"
+      attribute: "struct_attr"
+      response:
+          value:
+              {
+                  a: 5,
+                  b: true,
+                  c: 2,
+                  d: "abc",
+                  e: "",
+                  f: 17,
+                  g: 1.5,
+                  h: 3.14159265358979,
+              }
