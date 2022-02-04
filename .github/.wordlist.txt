@@ -29,6 +29,8 @@ AddOrUpdateWiFiNetwork
 addr
 AddThreadNetwork
 adk
+AdministratorCommissioning
+administratorcommissioning
 adoc
 AdvAutonomous
 AdvManagedFlag
@@ -375,6 +377,7 @@ endpointName
 eno
 entrypoint
 enum
+enums
 env
 eq
 esd
@@ -718,6 +721,7 @@ nrfdks
 nrfutil
 nrfxlib
 NTAG
+nullable
 nullptr
 NUM
 nwk
@@ -932,6 +936,7 @@ SetDns
 SetImageProcessorDelegate
 SetOtaRequestorDriver
 setpin
+setpoint
 SetpointRaiseLower
 SetRequestorInstance
 SetUpPINCode
@@ -940,6 +945,7 @@ sexualized
 SHA
 showDocumentation
 shubhamdp
+signgin
 SIGINT
 SiLabs
 SiliconLabs
@@ -976,6 +982,7 @@ sterm
 storagepath
 str
 strcpy
+struct
 su
 Subclassing
 subcommand
