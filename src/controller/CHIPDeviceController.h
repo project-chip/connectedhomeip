@@ -591,13 +591,11 @@ public:
      * @param[in] attestationNonce    Attestation nonce
      * @param[in] pai                 PAI certificate
      * @param[in] dac                 DAC certificates
-     * @param[in] remoteVendorId      vendor ID read from the device
-     * @param[in] remoteProductId     product ID read from the device
      * @param[in] proxy               device proxy that is being attested.
      */
     CHIP_ERROR ValidateAttestationInfo(const ByteSpan & attestationElements, const ByteSpan & signature,
                                        const ByteSpan & attestationNonce, const ByteSpan & pai, const ByteSpan & dac,
-                                       VendorId remoteVendorId, uint16_t remoteProductId, DeviceProxy * proxy);
+                                       DeviceProxy * proxy);
 
     /**
      * @brief
