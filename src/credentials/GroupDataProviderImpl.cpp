@@ -974,7 +974,7 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index,
 
     if (found)
     {
-        // Update existing entry        
+        // Update existing entry
         ChipLogDetail(DataManagement, "~~~DEBUG: SetGroupInfoAt.2.1, FOUND\n");
         return group.Save(mStorage);
     }
