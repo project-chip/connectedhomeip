@@ -91,7 +91,6 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, CHIP_ERRO
         proxy->OnNodeIdResolutionFailed(PeerId(), CHIP_ERROR_UNKNOWN_RESOURCE_ID);
         proxy->Release();
         return;
-
     }
 
     PeerId peerId;
@@ -101,7 +100,6 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, CHIP_ERRO
         proxy->OnNodeIdResolutionFailed(PeerId(), error);
         proxy->Release();
         return;
-
     }
 
     ResolvedNodeData nodeData;

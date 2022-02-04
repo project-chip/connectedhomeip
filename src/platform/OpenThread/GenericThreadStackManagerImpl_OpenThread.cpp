@@ -2321,7 +2321,6 @@ exit:
 
     dnsResult->error = error;
     DeviceLayer::PlatformMgr().ScheduleWork(DispatchResolve, reinterpret_cast<intptr_t>(dnsResult));
-
 }
 
 template <class ImplClass>
