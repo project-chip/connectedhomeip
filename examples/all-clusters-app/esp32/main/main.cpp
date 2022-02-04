@@ -45,6 +45,7 @@
 #include <string>
 #include <vector>
 
+#include <access/examples/ExampleAccessControlDelegate.h>
 #include <app-common/zap-generated/att-storage.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
@@ -68,6 +69,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/ErrorStr.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/ESP32/ACLPersistentStorage.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
 #include <platform/ESP32/OTAImageProcessorImpl.h>
 #include <platform/GenericOTARequestorDriver.h>
@@ -542,6 +544,8 @@ public:
 
 AppCallbacks sCallbacks;
 
+ACLPersistentStorage gACLStorage;
+
 } // namespace
 
 static void InitServer(intptr_t context)
@@ -590,6 +594,9 @@ extern "C" void app_main()
         ESP_LOGE(TAG, "nvs_flash_init() failed: %s", esp_err_to_name(err));
         return;
     }
+
+    Access::Examples::SetAccessControlDelegateStorage(&gACLStorage);
+
 #if CONFIG_ENABLE_PW_RPC
     chip::rpc::Init();
 #endif
