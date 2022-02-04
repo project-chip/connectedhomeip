@@ -601,10 +601,16 @@ CHIP_ERROR FabricTable::Delete(FabricIndex index)
     bool fabricIsInitialized = fabric != nullptr && fabric->IsInitialized();
     CompressedFabricId compressedFabricId =
         fabricIsInitialized ? fabric->GetPeerId().GetCompressedFabricId() : kUndefinedCompressedFabricId;
-    ReturnErrorOnFailure(FabricInfo::DeleteFromStorage(mStorage, index)); // Delete from storage regardless
+    CHIP_ERROR err = FabricInfo::DeleteFromStorage(mStorage, index); // Delete from storage regardless
+    if (!fabricIsInitialized) {
+        // Make sure to return the error our API promises, not whatever storage
+        // chose to return.
+        return CHIP_ERROR_NOT_FOUND;
+    }
+    ReturnErrorOnFailure(err);
 
     ReleaseFabricIndex(index);
-    if (mDelegate != nullptr && fabricIsInitialized)
+    if (mDelegate != nullptr)
     {
         if (mFabricCount == 0)
         {
@@ -621,10 +627,6 @@ CHIP_ERROR FabricTable::Delete(FabricIndex index)
             delegate->OnFabricDeletedFromStorage(compressedFabricId, index);
             delegate = delegate->mNext;
         }
-    }
-    if (!fabricIsInitialized)
-    {
-        return CHIP_ERROR_NOT_FOUND;
     }
     return CHIP_NO_ERROR;
 }
