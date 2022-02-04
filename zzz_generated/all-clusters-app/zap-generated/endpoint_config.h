@@ -2456,6 +2456,9 @@
     const EmberAfGenericClusterFunction chipFuncArrayLevelControlServer[] = {                                                      \
         (EmberAfGenericClusterFunction) emberAfLevelControlClusterServerInitCallback,                                              \
     };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArrayBridgedDeviceBasicServer[] = {                                                \
+        (EmberAfGenericClusterFunction) emberAfBridgedDeviceBasicClusterServerInitCallback,                                        \
+    };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayDoorLockServer[] = {                                                          \
         (EmberAfGenericClusterFunction) MatterDoorLockClusterServerAttributeChangedCallback,                                       \
         (EmberAfGenericClusterFunction) MatterDoorLockClusterServerPreAttributeChangedCallback,                                    \
@@ -3279,8 +3282,8 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(269), \
       .attributeCount = 16, \
       .clusterSize = 36, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
+      .functions = chipFuncArrayBridgedDeviceBasicServer, \
       .clientGeneratedCommandList = nullptr ,\
       .serverGeneratedCommandList = nullptr ,\
     },\
