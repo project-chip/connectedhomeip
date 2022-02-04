@@ -1215,9 +1215,9 @@ using namespace chip::app::Clusters;
 {
     ListFreer listFreer;
     ApplicationLauncher::Commands::LaunchAppRequest::Type request;
-    request.data = [self asCharSpan:params.data];
     request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
     request.application.applicationId = [self asCharSpan:params.application.applicationId];
+    request.data = [self asByteSpan:params.data];
 
     new CHIPApplicationLauncherClusterLauncherResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {

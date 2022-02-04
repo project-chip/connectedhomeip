@@ -431,8 +431,7 @@ public:
 
 private:
     chip::app::Clusters::ApplicationLauncher::Commands::HideAppRequest::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type>
-        mComplex_Application;
+    TypedComplexArgument<chip::app::Clusters::ApplicationLauncher::Structs::Application::Type> mComplex_Application;
 };
 
 /*
@@ -444,8 +443,8 @@ public:
     ApplicationLauncherLaunchAppRequest(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("launch-app-request", credsIssuerConfig), mComplex_Application(&mRequest.application)
     {
-        AddArgument("Data", &mRequest.data);
         AddArgument("Application", &mComplex_Application);
+        AddArgument("Data", &mRequest.data);
         ClusterCommand::AddArguments();
     }
 
@@ -458,8 +457,7 @@ public:
 
 private:
     chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppRequest::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type>
-        mComplex_Application;
+    TypedComplexArgument<chip::app::Clusters::ApplicationLauncher::Structs::Application::Type> mComplex_Application;
 };
 
 /*
@@ -484,8 +482,7 @@ public:
 
 private:
     chip::app::Clusters::ApplicationLauncher::Commands::StopAppRequest::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type>
-        mComplex_Application;
+    TypedComplexArgument<chip::app::Clusters::ApplicationLauncher::Structs::Application::Type> mComplex_Application;
 };
 
 /*----------------------------------------------------------------------------*\
