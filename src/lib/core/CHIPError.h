@@ -2408,6 +2408,15 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_IM_MALFORMED_TIMED_REQUEST_MESSAGE                    CHIP_CORE_ERROR(0xda)
 
 /**
+ * @def CHIP_ERROR_INVALID_FILE_IDENTIFIER
+ *
+ * @brief
+ *   The file identifier, encoded in the first few bytes of a processed file,
+ *   has unexpected value.
+ */
+#define CHIP_ERROR_INVALID_FILE_IDENTIFIER                     CHIP_CORE_ERROR(0xdb)
+
+/**
  *  @}
  */
 
