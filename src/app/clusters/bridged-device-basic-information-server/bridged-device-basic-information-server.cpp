@@ -16,7 +16,7 @@
  *
  */
 
-#include "bridged-device-basic-information.h"
+#include "bridged-device-basic-information-server.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
