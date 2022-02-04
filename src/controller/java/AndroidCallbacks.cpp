@@ -100,7 +100,7 @@ void GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(void * context, Pee
     env->CallVoidMethod(javaCallback, failureMethod, peerId.GetNodeId(), exception);
 }
 
-ReportCallback::ReportCallback(jobject subscriptionEstablishedCallback, jobject reportCallback) : mBufferedReadAdapter(*this)
+ReportCallback::ReportCallback(jobject wrapperCallback, jobject subscriptionEstablishedCallback, jobject reportCallback) : mBufferedReadAdapter(*this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
@@ -114,6 +114,11 @@ ReportCallback::ReportCallback(jobject subscriptionEstablishedCallback, jobject 
     }
     mReportCallbackRef = env->NewGlobalRef(reportCallback);
     if (mReportCallbackRef == nullptr)
+    {
+        ChipLogError(Controller, "Could not create global reference for Java callback");
+    }
+    mWrapperCallbackRef = env->NewGlobalRef(wrapperCallback);
+    if (mWrapperCallbackRef == nullptr)
     {
         ChipLogError(Controller, "Could not create global reference for Java callback");
     }
@@ -143,6 +148,8 @@ void ReportCallback::OnReportEnd()
 {
     // Transform C++ jobject pair list to a Java HashMap, and call onReport() on the Java callback.
     CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+
     jobject map;
     JniReferences::GetInstance().CreateHashMap(map);
     for (std::pair<jobject, jobject> reportPair : mReports)
@@ -150,7 +157,6 @@ void ReportCallback::OnReportEnd()
         JniReferences::GetInstance().PutInMap(map, reportPair.first, reportPair.second);
     }
 
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     jmethodID onReportMethod;
     err = JniReferences::GetInstance().FindMethod(env, mReportCallbackRef, "onReport", "(Ljava/util/Map;)V", &onReportMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find onReport method"));
@@ -221,7 +227,9 @@ void ReportCallback::OnError(CHIP_ERROR aError)
     ReportError(nullptr, aError);
 }
 
-void ReportCallback::OnDone() {}
+void ReportCallback::OnDone() {
+    JniReferences::GetInstance().GetEnvForCurrentThread()->DeleteGlobalRef(mWrapperCallbackRef);
+}
 
 void ReportCallback::OnSubscriptionEstablished(uint64_t aSubscriptionId)
 {

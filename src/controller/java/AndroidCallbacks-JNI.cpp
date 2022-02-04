@@ -17,6 +17,7 @@
 #include "AndroidCallbacks.h"
 
 #include <jni.h>
+#include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -41,7 +42,7 @@ JNI_METHOD(void, GetConnectedDeviceCallbackJni, deleteCallback)(JNIEnv * env, jo
 JNI_METHOD(jlong, ReportCallbackJni, newCallback)
 (JNIEnv * env, jobject self, jobject subscriptionEstablishedCallbackJava, jobject reportCallbackJava)
 {
-    ReportCallback * reportCallback = new ReportCallback(subscriptionEstablishedCallbackJava, reportCallbackJava);
+    ReportCallback * reportCallback = chip::Platform::New<ReportCallback>(self, subscriptionEstablishedCallbackJava, reportCallbackJava);
     return reinterpret_cast<jlong>(reportCallback);
 }
 
