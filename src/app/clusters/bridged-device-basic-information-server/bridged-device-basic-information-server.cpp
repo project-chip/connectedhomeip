@@ -38,11 +38,11 @@ using namespace chip::DeviceLayer;
 
 namespace {
 
-class BridgeDeviceBasicInformationAttrAccess : public AttributeAccessInterface
+class BridgedDeviceBasicInformationAttrAccess : public AttributeAccessInterface
 {
 public:
     // Register for the Bridged Device Basic Information cluster on all endpoints.
-    BridgedDeviceBasicInformationAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), BridgeDeviceBasic::Id) {}
+    BridgedDeviceBasicInformationAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), BridgedDeviceBasic::Id) {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 };
@@ -260,14 +260,14 @@ void emberAfBridgedDeviceBasicClusterServerInitCallback(EndpointId endpoint)
     EmberAfStatus status;
 
     char nodeLabel[DeviceLayer::ConfigurationManager::kMaxNodeLabelLength + 1];
-    if (DeviceLayer::PlatformMgr().GetBridgedNodeLabel(aPath.mEndpointId, nodeLabel, sizeof(nodeLabel)) == CHIP_NO_ERROR)
+    if (DeviceLayer::PlatformMgr().GetBridgedNodeLabel(endpoint, nodeLabel, sizeof(nodeLabel)) == CHIP_NO_ERROR)
     {
         status = Attributes::NodeLabel::Set(endpoint, CharSpan::fromCharString(nodeLabel));
         VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Bridged Node Label: 0x%02x", status));
     }
 
     bool reachable;
-    if (DeviceLayer::PlatformMgr().GetBridgedReachable(aPath.mEndpointId, reachable) == CHIP_NO_ERROR)
+    if (DeviceLayer::PlatformMgr().GetBridgedReachable(endpoint, reachable) == CHIP_NO_ERROR)
     {
         status = Attributes::Reachable::Set(endpoint, reachable);
         VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Bridged Reachable: 0x%02x", status));
