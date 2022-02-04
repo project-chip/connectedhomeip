@@ -13,14 +13,14 @@ touch my-firmware.bin
 
 ./src/app/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 1 -vs "1.0" -da sha256 my-firmware.bin my-firmware.ota
 
-if [ ! -f "my-firmware.ota"]; then
+if [ ! -f "my-firmware.ota" ]; then
     exit 1
 fi
 
 ./out/ota_provider_debug/chip-ota-provider-app -f my-firmware.ota | tee /tmp/ota/provider-log.txt &
 provider_pid=$!
 
-if [ ! -f "/tmp/ota/provider-log.txt"]; then
+if [ ! -f "/tmp/ota/provider-log.txt" ]; then
     exit 1
 fi
 
