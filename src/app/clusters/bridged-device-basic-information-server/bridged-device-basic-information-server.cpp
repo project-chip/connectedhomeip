@@ -70,9 +70,8 @@ CHIP_ERROR BridgedDeviceBasicInformationAttrAccess::Read(const ConcreteReadAttri
     case VendorName::Id: {
         constexpr size_t kMaxLen     = DeviceLayer::ConfigurationManager::kMaxVendorNameLength;
         char vendorName[kMaxLen + 1] = { 0 };
-        status                       =
-            DeviceLayer::PlatformMgr().GetBridgedVendorName(aPath.mEndpointId, vendorName, sizeof(vendorName));
-        status                       = EncodeStringOnSuccess(status, aEncoder, vendorName, kMaxLen);
+        status = DeviceLayer::PlatformMgr().GetBridgedVendorName(aPath.mEndpointId, vendorName, sizeof(vendorName));
+        status = EncodeStringOnSuccess(status, aEncoder, vendorName, kMaxLen);
         break;
     }
 
@@ -89,9 +88,8 @@ CHIP_ERROR BridgedDeviceBasicInformationAttrAccess::Read(const ConcreteReadAttri
     case ProductName::Id: {
         constexpr size_t kMaxLen      = DeviceLayer::ConfigurationManager::kMaxProductNameLength;
         char productName[kMaxLen + 1] = { 0 };
-        status                        =
-            DeviceLayer::PlatformMgr().GetBridgedProductName(aPath.mEndpointId, productName, sizeof(productName));
-        status                        = EncodeStringOnSuccess(status, aEncoder, productName, kMaxLen);
+        status = DeviceLayer::PlatformMgr().GetBridgedProductName(aPath.mEndpointId, productName, sizeof(productName));
+        status = EncodeStringOnSuccess(status, aEncoder, productName, kMaxLen);
         break;
     }
 
@@ -108,8 +106,8 @@ CHIP_ERROR BridgedDeviceBasicInformationAttrAccess::Read(const ConcreteReadAttri
     case HardwareVersionString::Id: {
         constexpr size_t kMaxLen                = DeviceLayer::ConfigurationManager::kMaxHardwareVersionStringLength;
         char hardwareVersionString[kMaxLen + 1] = { 0 };
-        status = DeviceLayer::PlatformMgr().GetBridgedHardwareVersionString(
-            aPath.mEndpointId, hardwareVersionString, sizeof(hardwareVersionString));
+        status = DeviceLayer::PlatformMgr().GetBridgedHardwareVersionString(aPath.mEndpointId, hardwareVersionString,
+                                                                            sizeof(hardwareVersionString));
         status = EncodeStringOnSuccess(status, aEncoder, hardwareVersionString, kMaxLen);
         break;
     }
@@ -127,8 +125,8 @@ CHIP_ERROR BridgedDeviceBasicInformationAttrAccess::Read(const ConcreteReadAttri
     case SoftwareVersionString::Id: {
         constexpr size_t kMaxLen                = DeviceLayer::ConfigurationManager::kMaxSoftwareVersionStringLength;
         char softwareVersionString[kMaxLen + 1] = { 0 };
-        status = DeviceLayer::PlatformMgr().GetBridgedSoftwareVersionString(
-            aPath.mEndpointId, softwareVersionString, sizeof(softwareVersionString));
+        status = DeviceLayer::PlatformMgr().GetBridgedSoftwareVersionString(aPath.mEndpointId, softwareVersionString,
+                                                                            sizeof(softwareVersionString));
         status = EncodeStringOnSuccess(status, aEncoder, softwareVersionString, kMaxLen);
         break;
     }
@@ -139,8 +137,8 @@ CHIP_ERROR BridgedDeviceBasicInformationAttrAccess::Read(const ConcreteReadAttri
         uint16_t manufacturingYear;
         uint8_t manufacturingMonth;
         uint8_t manufacturingDayOfMonth;
-        status = DeviceLayer::PlatformMgr().GetBridgedManufacturingDate(
-            aPath.mEndpointId, manufacturingYear, manufacturingMonth, manufacturingDayOfMonth);
+        status = DeviceLayer::PlatformMgr().GetBridgedManufacturingDate(aPath.mEndpointId, manufacturingYear, manufacturingMonth,
+                                                                        manufacturingDayOfMonth);
 
         // TODO: Remove defaulting once proper runtime defaulting of unimplemented factory data is done
         if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
@@ -164,8 +162,7 @@ CHIP_ERROR BridgedDeviceBasicInformationAttrAccess::Read(const ConcreteReadAttri
     case PartNumber::Id: {
         constexpr size_t kMaxLen     = DeviceLayer::ConfigurationManager::kMaxPartNumberLength;
         char partNumber[kMaxLen + 1] = { 0 };
-        status                       =
-            DeviceLayer::PlatformMgr().GetBridgedPartNumber(aPath.mEndpointId, partNumber, sizeof(partNumber));
+        status = DeviceLayer::PlatformMgr().GetBridgedPartNumber(aPath.mEndpointId, partNumber, sizeof(partNumber));
 
         // TODO: Remove defaulting once proper runtime defaulting of unimplemented factory data is done
         if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
@@ -181,8 +178,7 @@ CHIP_ERROR BridgedDeviceBasicInformationAttrAccess::Read(const ConcreteReadAttri
     case ProductURL::Id: {
         constexpr size_t kMaxLen     = DeviceLayer::ConfigurationManager::kMaxProductURLLength;
         char productUrl[kMaxLen + 1] = { 0 };
-        status                       =
-            DeviceLayer::PlatformMgr().GetBridgedProductURL(aPath.mEndpointId, productUrl, sizeof(productUrl));
+        status = DeviceLayer::PlatformMgr().GetBridgedProductURL(aPath.mEndpointId, productUrl, sizeof(productUrl));
 
         // TODO: Remove defaulting once proper runtime defaulting of unimplemented factory data is done
         if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
@@ -198,8 +194,7 @@ CHIP_ERROR BridgedDeviceBasicInformationAttrAccess::Read(const ConcreteReadAttri
     case ProductLabel::Id: {
         constexpr size_t kMaxLen       = DeviceLayer::ConfigurationManager::kMaxProductLabelLength;
         char productLabel[kMaxLen + 1] = { 0 };
-        status                         =
-            DeviceLayer::PlatformMgr().GetBridgedProductLabel(aPath.mEndpointId, productLabel, sizeof(productLabel));
+        status = DeviceLayer::PlatformMgr().GetBridgedProductLabel(aPath.mEndpointId, productLabel, sizeof(productLabel));
 
         // TODO: Remove defaulting once proper runtime defaulting of unimplemented factory data is done
         if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
@@ -215,7 +210,7 @@ CHIP_ERROR BridgedDeviceBasicInformationAttrAccess::Read(const ConcreteReadAttri
     case SerialNumber::Id: {
         constexpr size_t kMaxLen             = DeviceLayer::ConfigurationManager::kMaxSerialNumberLength;
         char serialNumberString[kMaxLen + 1] = { 0 };
-        status                               =
+        status =
             DeviceLayer::PlatformMgr().GetBridgedSerialNumber(aPath.mEndpointId, serialNumberString, sizeof(serialNumberString));
 
         // TODO: Remove defaulting once proper runtime defaulting of unimplemented factory data is done

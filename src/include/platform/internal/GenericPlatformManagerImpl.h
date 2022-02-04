@@ -168,8 +168,8 @@ inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetBridgedHardwareVers
 }
 
 template <class ImplClass>
-inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetBridgedHardwareVersionString(
-    EndpointId endpoint, char * buf, size_t bufSize)
+inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetBridgedHardwareVersionString(EndpointId endpoint, char * buf,
+                                                                                          size_t bufSize)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
@@ -181,15 +181,15 @@ inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetBridgedSoftwareVers
 }
 
 template <class ImplClass>
-inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetBridgedSoftwareVersionString(
-    EndpointId endpoint, char * buf, size_t bufSize)
+inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetBridgedSoftwareVersionString(EndpointId endpoint, char * buf,
+                                                                                          size_t bufSize)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template <class ImplClass>
-inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetBridgedManufacturingDate(
-    EndpointId endpoint, uint16_t & year, uint8_t & month, uint8_t & dayOfMonth)
+inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetBridgedManufacturingDate(EndpointId endpoint, uint16_t & year,
+                                                                                      uint8_t & month, uint8_t & dayOfMonth)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

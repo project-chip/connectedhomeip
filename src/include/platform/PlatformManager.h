@@ -522,8 +522,8 @@ inline CHIP_ERROR PlatformManager::GetBridgedSoftwareVersionString(EndpointId en
     return static_cast<ImplClass *>(this)->_GetBridgedSoftwareVersionString(endpoint, buf, bufSize);
 }
 
-inline CHIP_ERROR PlatformManager::GetBridgedManufacturingDate(
-    EndpointId endpoint, uint16_t & year, uint8_t & month, uint8_t & dayOfMonth)
+inline CHIP_ERROR PlatformManager::GetBridgedManufacturingDate(EndpointId endpoint, uint16_t & year, uint8_t & month,
+                                                               uint8_t & dayOfMonth)
 {
     return static_cast<ImplClass *>(this)->_GetBridgedManufacturingDate(endpoint, year, month, dayOfMonth);
 }
