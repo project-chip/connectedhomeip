@@ -452,6 +452,9 @@ GetDeviceInfo
 GetDns
 GetIP
 getstarted
+GH
+gh
+ghp
 githubusercontent
 gitignore
 glibc
@@ -844,6 +847,7 @@ PyEval
 PyFunction
 pylint
 PyObject
+pypi
 PyRun
 pytest
 QEMU
@@ -952,6 +956,7 @@ SiLabs
 SiliconLabs
 SimpleFileExFlags
 SimpleLink
+sizedb
 sl
 SLAAC
 SLTB
@@ -1034,6 +1039,7 @@ testws
 texinfo
 textboxes
 TFT
+ThIsIsNoTMyReAlGiThUbToKeNSoDoNoTtRy
 threadOperationalDataset
 ThreadStackManager
 ThreadStackManagerImpl
@@ -1045,6 +1051,7 @@ TLV
 tmp
 tngvndl
 TODO
+toJson
 tokenized
 toolchain
 toolchains
