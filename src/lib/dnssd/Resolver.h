@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include <algorithm>
 #include <cstdint>
 #include <limits>
+#include <utility>
 
 #include "lib/support/logging/CHIPLogging.h"
 #include <inet/IPAddress.h>
@@ -38,7 +38,34 @@ namespace Dnssd {
 struct ResolvedNodeData
 {
     // TODO: use pool to allow dynamic
-    static constexpr int kMaxIPAddresses = 5;
+    static constexpr unsigned kMaxIPAddresses = 5;
+
+    static bool IsIpLess(const Inet::IPAddress & a, const Inet::IPAddress & b)
+    {
+        // Link-local last
+        if (a.IsIPv6LinkLocal() && !b.IsIPv6LinkLocal())
+        {
+            return false;
+        }
+        if (!a.IsIPv6LinkLocal() && b.IsIPv6LinkLocal())
+        {
+            return true;
+        }
+
+        // IPv6 before IPv4
+        if (a.IsIPv6() && !b.IsIPv6())
+        {
+            return false;
+        }
+        if (!a.IsIPv6() && b.IsIPv6())
+        {
+            return true;
+        }
+
+        // no ordering, do not care
+        return false;
+    }
+
     void LogNodeIdResolved() const
     {
 #if CHIP_PROGRESS_LOGGING
@@ -47,10 +74,10 @@ struct ResolvedNodeData
         // Would be nice to log the interface id, but sorting out how to do so
         // across our differnet InterfaceId implementations is a pain.
         ChipLogProgress(Discovery, "Node ID resolved for 0x" ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
-        for (size_t i = 0; i < mNumIPs; ++i)
+        for (unsigned i = 0; i < mNumIPs; ++i)
         {
             mAddress[i].ToString(addrBuffer);
-            ChipLogProgress(Discovery, "    Addr %zu: [%s]:%" PRIu16, i, addrBuffer, mPort);
+            ChipLogProgress(Discovery, "    Addr %u: [%s]:%" PRIu16, i, addrBuffer, mPort);
         }
 #endif // CHIP_PROGRESS_LOGGING
     }
@@ -61,30 +88,17 @@ struct ResolvedNodeData
     /// before IPv4 ones.
     void PrioritizeAddresses()
     {
-        std::sort(mAddress, mAddress + mNumIPs, [](const Inet::IPAddress & a, const Inet::IPAddress & b) {
-            // Link-local last
-            if (a.IsIPv6LinkLocal() && !b.IsIPv6LinkLocal())
+        // Slow sort, however we have maximum kMaxIPAddreses, so this is good enough for now
+        for (unsigned i = 0; i + 1 < mNumIPs; i++)
+        {
+            for (unsigned j = i + 1; i < mNumIPs; i++)
             {
-                return false;
+                if (IsIpLess(mAddress[j], mAddress[i]))
+                {
+                    std::swap(mAddress[i], mAddress[j]);
+                }
             }
-            if (!a.IsIPv6LinkLocal() && b.IsIPv6LinkLocal())
-            {
-                return true;
-            }
-
-            // IPv6 before IPv4
-            if (a.IsIPv6() && !b.IsIPv6())
-            {
-                return false;
-            }
-            if (!a.IsIPv6() && b.IsIPv6())
-            {
-                return true;
-            }
-
-            // no ordering, do not care
-            return false;
-        });
+        }
     }
 
     ReliableMessageProtocolConfig GetMRPConfig() const
@@ -119,7 +133,7 @@ struct ResolvedNodeData
     Optional<System::Clock::Milliseconds32> mMrpRetryIntervalIdle;
     Optional<System::Clock::Milliseconds32> mMrpRetryIntervalActive;
     System::Clock::Timestamp mExpiryTime;
-};
+}; // namespace
 
 constexpr size_t kMaxDeviceNameLen         = 32;
 constexpr size_t kMaxRotatingIdLen         = 50;
@@ -128,7 +142,7 @@ constexpr size_t kMaxPairingInstructionLen = 128;
 struct DiscoveredNodeData
 {
     // TODO(cecille): is 4 OK? IPv6 LL, GUA, ULA, IPv4?
-    static constexpr int kMaxIPAddresses = 5;
+    static constexpr unsigned kMaxIPAddresses = 5;
     char hostName[kHostNameMaxLength + 1];
     char instanceName[Commission::kInstanceNameMaxLength + 1];
     uint16_t longDiscriminator;
@@ -146,7 +160,7 @@ struct DiscoveredNodeData
     Optional<System::Clock::Milliseconds32> mrpRetryIntervalIdle;
     Optional<System::Clock::Milliseconds32> mrpRetryIntervalActive;
     uint16_t port;
-    int numIPs;
+    unsigned numIPs;
     Inet::InterfaceId interfaceId[kMaxIPAddresses];
     Inet::IPAddress ipAddress[kMaxIPAddresses];
 
@@ -169,7 +183,7 @@ struct DiscoveredNodeData
         mrpRetryIntervalActive = NullOptional;
         numIPs                 = 0;
         port                   = 0;
-        for (int i = 0; i < kMaxIPAddresses; ++i)
+        for (unsigned i = 0; i < kMaxIPAddresses; ++i)
         {
             ipAddress[i] = chip::Inet::IPAddress::Any;
         }
@@ -239,7 +253,7 @@ struct DiscoveredNodeData
         {
             ChipLogDetail(Discovery, "\tInstance Name: %s", instanceName);
         }
-        for (int j = 0; j < numIPs; j++)
+        for (unsigned j = 0; j < numIPs; j++)
         {
 #if CHIP_DETAIL_LOGGING
             char buf[Inet::IPAddress::kMaxStringLength];
