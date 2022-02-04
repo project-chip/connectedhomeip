@@ -29,7 +29,7 @@ CHIPTool iOS can be built with the latest Xcode releases.
 Because we do not share a developer group, directly running this scheme will
 fail with missing signing configuration errors.
 
-We need to update the Project configuration for CHIPTool to use your Personal
+You need to update the Project configuration for CHIPTool to use your Personal
 Developer account and a unique Bundle ID.
 
 ### Compilation Fixes
