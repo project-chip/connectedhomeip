@@ -15,12 +15,12 @@ touch my-firmware.bin
 
 if [ ! -f "my-firmware.ota"]; then
     exit 1
-fi 
+fi
 
 ./out/ota_provider_debug/chip-ota-provider-app -f my-firmware.ota | tee /tmp/ota/provider-log.txt &
 provider_pid=$!
 
-if [ ! -f "/tmp/ota/provider-log.txt"]; then 
+if [ ! -f "/tmp/ota/provider-log.txt"]; then
     exit 1
 fi
 
