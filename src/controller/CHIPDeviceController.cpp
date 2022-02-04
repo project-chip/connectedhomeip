@@ -434,7 +434,7 @@ void DeviceController::OnOpenPairingWindowFailureResponse(void * context, CHIP_E
 }
 
 CHIP_ERROR DeviceController::ComputePASEVerifier(uint32_t iterations, uint32_t setupPincode, const ByteSpan & salt,
-                                                 PASEVerifier & outVerifier, uint32_t & outPasscodeId)
+                                                 PASEVerifier & outVerifier, PasscodeId & outPasscodeId)
 {
     ReturnErrorOnFailure(PASESession::GeneratePASEVerifier(outVerifier, iterations, salt, /* useRandomPIN= */ false, setupPincode));
 

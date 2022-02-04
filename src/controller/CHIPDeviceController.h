@@ -248,7 +248,7 @@ public:
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
     CHIP_ERROR ComputePASEVerifier(uint32_t iterations, uint32_t setupPincode, const ByteSpan & salt, PASEVerifier & outVerifier,
-                                   uint32_t & outPasscodeId);
+                                   PasscodeId & outPasscodeId);
 
     /**
      * @brief
@@ -434,7 +434,7 @@ private:
     static void OnOpenPairingWindowFailureResponse(void * context, CHIP_ERROR error);
 
     CHIP_ERROR ProcessControllerNOCChain(const ControllerInitParams & params);
-    uint16_t mPAKEVerifierID = 1;
+    PasscodeId mPAKEVerifierID = 1;
 };
 
 /**

@@ -294,7 +294,7 @@ CHIP_ERROR PASESession::WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2I
 
     mNextExpectedMsg = MsgType::PBKDFParamRequest;
     mPairingComplete = false;
-    mPasscodeID      = 0;
+    mPasscodeID      = kDefaultCommissioningPasscodeId;
     mLocalMRPConfig  = mrpConfig;
 
     SetPeerNodeId(NodeIdFromPAKEKeyId(mPasscodeID));
@@ -310,7 +310,7 @@ exit:
 }
 
 CHIP_ERROR PASESession::WaitForPairing(const PASEVerifier & verifier, uint32_t pbkdf2IterCount, const ByteSpan & salt,
-                                       uint16_t passcodeID, uint16_t mySessionId, Optional<ReliableMessageProtocolConfig> mrpConfig,
+                                       PasscodeId passcodeID, uint16_t mySessionId, Optional<ReliableMessageProtocolConfig> mrpConfig,
                                        SessionEstablishmentDelegate * delegate)
 {
     ReturnErrorCodeIf(passcodeID == 0, CHIP_ERROR_INVALID_ARGUMENT);
@@ -386,7 +386,7 @@ CHIP_ERROR PASESession::SendPBKDFParamRequest()
     const size_t mrpParamsSize = mLocalMRPConfig.HasValue() ? TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t)) : 0;
     const size_t max_msg_len   = TLV::EstimateStructOverhead(kPBKDFParamRandomNumberSize, // initiatorRandom,
                                                            sizeof(uint16_t),            // initiatorSessionId
-                                                           sizeof(uint16_t),            // passcodeId,
+                                                           sizeof(PasscodeId),          // passcodeId,
                                                            sizeof(uint8_t),             // hasPBKDFParameters
                                                            mrpParamsSize                // MRP Parameters
     );
