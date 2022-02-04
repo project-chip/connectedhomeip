@@ -5,7 +5,7 @@ control.
 
 ---
 
--   [CHIP Tool iOS Sample Commissioner App](#chip-tool-ios-samle-commissioner-app)
+-   [CHIP Tool iOS Sample Commissioner App](#chip-tool-ios-sample-commissioner-app)
     -   [Building the Application](#building-the-application)
         -   [Compilation Fixes](#compilation-fixes)
     -   [Installing the Application](#installing-the-application)
@@ -34,7 +34,7 @@ Developer account and a unique Bundle ID.
 
 ### Compilation Fixes
 
-Before you can run the `CHIP Tool App` scheme, you need to admend the
+Before you can run the `CHIP Tool App` scheme, you need to amend the
 `project.pbxproj` file for the CHIPTool project. The file is located here
 `src/darwin/CHIPTool/CHIPTool.xcodeproj/project.pbxproj`.
 
@@ -45,7 +45,7 @@ editor. This Readme will focus on doing it via Xcode.
     side pane in Xcode. `CHIPTool` and `CHIP`.
 
 -   Selecting `CHIPTool` should bring up the project configuration view in
-    Xcode. Next, select the `Signing & Capabalities` tab.
+    Xcode. Next, select the `Signing & Capabilities` tab.
 
 -   Perform the following steps to enable building CHIPTool:
 
@@ -54,7 +54,7 @@ editor. This Readme will focus on doing it via Xcode.
     2. Select your Personal Team in the "Team" dropdown.
 
     3. Change the bundle identifier from `com.chip.CHIPTool` to something
-       unique, like `com.chip.CHIPTool-username`. These bundle IDs get resvered
+       unique, like `com.chip.CHIPTool-username`. These bundle IDs get reserved
        for a short amount of time and so it's best to use something only you
        might think of to avoid conflicts (you'll see that the default bundle ID
        does not work if you skip this step).
@@ -88,7 +88,7 @@ Once you have CHIPTool up and running, to pair an accessory simply:
     password for network the accessory should join. Note - Thread is not
     supported by this application at this time.
 
-Look for `Commissioning complete.` and `Simga3` in the logs to know when the
+Look for `Commissioning complete.` and `Sigma3` in the logs to know when the
 device is commissioned and ready for use.
 
 Note - CHIPTool also supports pairing via the Matter manual codes. Instead of
