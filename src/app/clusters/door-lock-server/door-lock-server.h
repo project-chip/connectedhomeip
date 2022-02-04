@@ -303,6 +303,36 @@ private:
     template <typename T>
     void SendEvent(chip::EndpointId endpointId, T & event);
 
+    /**
+     * @brief Get generic attribute value
+     *
+     * @tparam T            attribute value type
+     * @param endpointId    endpoint where DoorLockServer is running
+     * @param attributeId   attribute Id (used for logging only)
+     * @param getFn         attribute getter function as defined in <Accessors.h>
+     * @param value         actual attribute value on success
+     * @return true         on success (value is set to the actual attribute value)
+     * @return false        if attribute reading failed (value is kept unchanged)
+     */
+    template <typename T>
+    bool GetAttribute(chip::EndpointId endpointId, chip::AttributeId attributeId,
+                      EmberAfStatus (*getFn)(chip::EndpointId endpointId, T * value), T & value);
+
+    /**
+     * @brief Set generic attribute value
+     *
+     * @tparam T            attribute value type
+     * @param endpointId    endpoint where DoorLockServer is running
+     * @param attributeId   attribute Id (used for logging only)
+     * @param setFn         attribute setter function as defined in <Accessors.h>
+     * @param value         new attribute value
+     * @return true         on success
+     * @return false        if attribute writing failed
+     */
+    template <typename T>
+    bool SetAttribute(chip::EndpointId endpointId, chip::AttributeId attributeId,
+                      EmberAfStatus (*setFn)(chip::EndpointId endpointId, T value), T value);
+
     friend bool
     emberAfDoorLockClusterLockDoorCallback(chip::app::CommandHandler * commandObj,
                                            const chip::app::ConcreteCommandPath & commandPath,
