@@ -147,19 +147,42 @@ struct FinishingPase : SdkStates::InitiatingPase
 
 struct PaseComplete : SdkStates::Base
 {
-    PaseComplete(Context & ctx, Commissionee & commissionee) : Base(ctx, commissionee, "PaseComplete") {}
-    void Enter() { this->mCtx.Dispatch(Event::Create<SdkEvents::ArmFailSafe>(SdkEvents::ArmFailSafe{ 60 })); }
+    PaseComplete(Context & ctx, Commissionee & commissionee, CommissioningParameters & commissioningParameters) :
+        Base(ctx, commissionee, "PaseComplete"), mCommissioningParameters(commissioningParameters)
+    {}
+    void Enter()
+    {
+        this->mCtx.Dispatch(
+            Event::Create<SdkEvents::ArmFailSafe>(SdkEvents::ArmFailSafe{ mCommissioningParameters.GetFailsafeTimerSeconds() }));
+    }
+
+private:
+    CommissioningParameters & mCommissioningParameters;
 };
 
 struct FailSafeArmed : SdkStates::Base
 {
-    FailSafeArmed(Context & ctx, Commissionee & commissionee) : Base(ctx, commissionee, "FailSafeArmed") {}
+    FailSafeArmed(Context & ctx, Commissionee & commissionee, CommissioningParameters & commissioningParameters) :
+        Base(ctx, commissionee, "FailSafeArmed"), mCommissioningParameters(commissioningParameters)
+    {}
     void Enter()
     {
-        uint8_t attestationNonce[chip::kAttestationNonceLength];
-        chip::Crypto::DRBG_get_bytes(attestationNonce, sizeof(attestationNonce));
-        this->mCtx.Dispatch(Event::Create<SdkEvents::AttestationInformation>(chip::ByteSpan(attestationNonce)));
+        uint8_t nonceBuf[chip::kAttestationNonceLength];
+        ByteSpan nonce;
+        if (mCommissioningParameters.GetAttestationNonce().HasValue())
+        {
+            nonce = mCommissioningParameters.GetAttestationNonce().Value();
+        }
+        else
+        {
+            chip::Crypto::DRBG_get_bytes(nonceBuf, sizeof(nonceBuf));
+            nonce = chip::ByteSpan(nonceBuf);
+        }
+        this->mCtx.Dispatch(Event::Create<SdkEvents::AttestationInformation>(nonce));
     }
+
+private:
+    CommissioningParameters & mCommissioningParameters;
 };
 
 struct AttestationVerification : SdkStates::Base
@@ -208,18 +231,30 @@ private:
 
 struct AttestationVerified : SdkStates::Base
 {
-    AttestationVerified(Context & ctx, Commissionee & commissionee, SdkEvents::AttestationInformation & attestationInformation) :
-        Base(ctx, commissionee, "AttestationVerified"), mAttestationInformation(attestationInformation)
+    AttestationVerified(Context & ctx, Commissionee & commissionee, SdkEvents::AttestationInformation & attestationInformation,
+                        CommissioningParameters & commissioningParameters) :
+        Base(ctx, commissionee, "AttestationVerified"),
+        mAttestationInformation(attestationInformation), mCommissioningParameters(commissioningParameters)
     {}
     void Enter()
     {
-        uint8_t csrNonce[kOpCSRNonceLength];
-        chip::Crypto::DRBG_get_bytes(csrNonce, sizeof(csrNonce));
-        this->mCtx.Dispatch(Event::Create<SdkEvents::NocsrInformation>(mAttestationInformation, chip::ByteSpan(csrNonce)));
+        uint8_t nonceBuf[kOpCSRNonceLength];
+        ByteSpan nonce;
+        if (mCommissioningParameters.GetCSRNonce().HasValue())
+        {
+            nonce = mCommissioningParameters.GetCSRNonce().Value();
+        }
+        else
+        {
+            chip::Crypto::DRBG_get_bytes(nonceBuf, sizeof(nonceBuf));
+            nonce = chip::ByteSpan(nonceBuf);
+        }
+        this->mCtx.Dispatch(Event::Create<SdkEvents::NocsrInformation>(mAttestationInformation, nonce));
     }
 
 private:
     SdkEvents::AttestationInformation mAttestationInformation;
+    CommissioningParameters & mCommissioningParameters;
 };
 
 struct OpCSRResponseReceived : SdkStates::Base
@@ -363,9 +398,9 @@ struct OpCredsWritten : SdkStates::Base
 struct NetworkFeatureMapRead : SdkStates::Base
 {
     NetworkFeatureMapRead(Context & ctx, Commissionee & commissionee, SdkEvents::NetworkFeatureMap featureMap,
-                          ByteSpan operationalDataset, ByteSpan ssid, ByteSpan wiFiCredentials) :
+                          CommissioningParameters & commissioningParameters) :
         Base(ctx, commissionee, "NetworkFeatureMapRead"),
-        mFeatureMap(featureMap), mOperationalDataset(operationalDataset), mSsid(ssid), mWiFiCredentials(wiFiCredentials)
+        mFeatureMap(featureMap), mCommissioningParameters(commissioningParameters)
     {}
     void Enter()
     {
@@ -376,15 +411,18 @@ struct NetworkFeatureMapRead : SdkStates::Base
         // until then, we will infer commissoinee network type from the
         // credentials given to us and only log the feature map.
         ChipLogDetail(Controller, "Network Feature Map = 0x%08" PRIX32, mFeatureMap);
-        if (mSsid.size())
+        if (mCommissioningParameters.GetWiFiCredentials().HasValue())
         {
+            auto ssid        = mCommissioningParameters.GetWiFiCredentials().Value().ssid;
+            auto credentials = mCommissioningParameters.GetWiFiCredentials().Value().credentials;
             this->mCtx.Dispatch(
-                Event::Create<SdkEvents::AddOrUpdateWiFiNetwork>(SdkEvents::AddOrUpdateWiFiNetwork{ mSsid, mWiFiCredentials }));
+                Event::Create<SdkEvents::AddOrUpdateWiFiNetwork>(SdkEvents::AddOrUpdateWiFiNetwork{ ssid, credentials }));
         }
-        else if (mOperationalDataset.size())
+        else if (mCommissioningParameters.GetThreadOperationalDataset().HasValue())
         {
+            auto operationalDataset = mCommissioningParameters.GetThreadOperationalDataset().Value();
             this->mCtx.Dispatch(
-                Event::Create<SdkEvents::AddOrUpdateThreadNetwork>(SdkEvents::AddOrUpdateThreadNetwork{ mOperationalDataset }));
+                Event::Create<SdkEvents::AddOrUpdateThreadNetwork>(SdkEvents::AddOrUpdateThreadNetwork{ operationalDataset }));
         }
         else
         {
@@ -397,9 +435,7 @@ struct NetworkFeatureMapRead : SdkStates::Base
 
 private:
     SdkEvents::NetworkFeatureMap mFeatureMap;
-    ByteSpan mOperationalDataset;
-    ByteSpan mSsid;
-    ByteSpan mWiFiCredentials;
+    CommissioningParameters & mCommissioningParameters;
 };
 
 struct NetworkAdded : SdkStates::Base
@@ -483,8 +519,7 @@ class StateFactory
 {
 public:
     StateFactory(Context & ctx, Commissionee & commissionee) : mCtx(ctx), mCommissionee(commissionee) {}
-    void Init(OpCredsIssuer * issuer, FabricIndex fabricIndex, NodeId nodeId, ByteSpan operationalDataset, ByteSpan ssid,
-              ByteSpan wiFiCredentials);
+    void Init(OpCredsIssuer * issuer, FabricIndex fabricIndex, NodeId nodeId, CommissioningParameters & commissioningParameters);
     void SetCallbacks(OnSuccess onSuccess, OnFailure onFailure);
 
     // clang-format off
@@ -578,11 +613,11 @@ public:
     }
     auto CreatePaseComplete()
     {
-        return State::Create<AppStates::PaseComplete>(mCtx, mCommissionee);
+        return State::Create<AppStates::PaseComplete>(mCtx, mCommissionee, mCommissioningParameters);
     }
     auto CreateFailSafeArmed()
     {
-        return State::Create<AppStates::FailSafeArmed>(mCtx, mCommissionee);
+        return State::Create<AppStates::FailSafeArmed>(mCtx, mCommissionee, mCommissioningParameters);
     }
     auto CreateAttestationVerification(SdkEvents::AttestationInformation attestationInformation)
     {
@@ -590,7 +625,7 @@ public:
     }
     auto CreateAttestationVerified(SdkEvents::AttestationInformation attestationInformation)
     {
-        return State::Create<AppStates::AttestationVerified>(mCtx, mCommissionee, attestationInformation);
+        return State::Create<AppStates::AttestationVerified>(mCtx, mCommissionee, attestationInformation, mCommissioningParameters);
     }
     auto CreateOpCSRResponseReceived(SdkEvents::NocsrInformation nocsrInformation)
     {
@@ -610,7 +645,7 @@ public:
     }
     auto CreateNetworkFeatureMapRead(SdkEvents::NetworkFeatureMap featureMap)
     {
-        return State::Create<AppStates::NetworkFeatureMapRead>(mCtx, mCommissionee, featureMap, mOperationalDataset, mSsid, mWiFiCredentials);
+        return State::Create<AppStates::NetworkFeatureMapRead>(mCtx, mCommissionee, featureMap, mCommissioningParameters);
     }
     auto CreateNetworkAdded(SdkEvents::NetworkId networkId)
     {
@@ -640,9 +675,7 @@ private:
     OpCredsIssuer * mIssuer;
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
     NodeId mNodeId           = kUndefinedNodeId;
-    ByteSpan mOperationalDataset;
-    ByteSpan mSsid;
-    ByteSpan mWiFiCredentials;
+    CommissioningParameters mCommissioningParameters;
     OnSuccess mOnSuccess;
     OnFailure mOnFailure;
 };
@@ -665,7 +698,7 @@ public:
     {}
     void Init(SystemState * systemState, OpCredsIssuer * issuer, FabricIndex fabricIndex, NodeId nodeId);
     void Init(SystemState * systemState, OpCredsIssuer * issuer, FabricIndex fabricIndex, NodeId nodeId,
-              ByteSpan operationalDataset, ByteSpan ssid, ByteSpan wiFiCredentials);
+              CommissioningParameters commissioningParameters);
     void Shutdown();
     CHIP_ERROR Commission(const char * onboardingPayload, OnSuccess onSuccess, OnFailure onFailure);
     CHIP_ERROR Commission(chip::SetupPayload & onboardingPayload, OnSuccess onSuccess, OnFailure onFailure);

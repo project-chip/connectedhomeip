@@ -92,7 +92,7 @@ CHIP_ERROR PairingCommand::PairWithQRCode(NodeId remoteId)
     auto onFailure = [this, stateMachine](Commissionee & commissionee) { OnCommissioningFailure(*stateMachine.get()); };
     stateMachine.get()->Init(chip::Controller::DeviceControllerFactory::GetInstance().GetSystemState(),
                              mCredIssuerCmds->GetCredentialIssuer(), CurrentController().GetFabricIndex(), mNodeId,
-                             mOperationalDataset, mSSID, mPassword);
+                             GetCommissioningParameters());
     CHIP_ERROR err = stateMachine.get()->Commission(mOnboardingPayload, onSuccess, onFailure);
     if (err != CHIP_NO_ERROR)
     {
@@ -109,7 +109,7 @@ CHIP_ERROR PairingCommand::PairWithManualCode(NodeId remoteId)
     auto onFailure = [this, stateMachine](Commissionee & commissionee) { OnCommissioningFailure(*stateMachine.get()); };
     stateMachine.get()->Init(chip::Controller::DeviceControllerFactory::GetInstance().GetSystemState(),
                              mCredIssuerCmds->GetCredentialIssuer(), CurrentController().GetFabricIndex(), mNodeId,
-                             mOperationalDataset, mSSID, mPassword);
+                             GetCommissioningParameters());
     CHIP_ERROR err = stateMachine.get()->Commission(mOnboardingPayload, onSuccess, onFailure);
     if (err != CHIP_NO_ERROR)
     {
@@ -126,7 +126,7 @@ CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
     auto onFailure = [this, stateMachine](Commissionee & commissionee) { OnCommissioningFailure(*stateMachine.get()); };
     stateMachine.get()->Init(chip::Controller::DeviceControllerFactory::GetInstance().GetSystemState(),
                              mCredIssuerCmds->GetCredentialIssuer(), CurrentController().GetFabricIndex(), mNodeId,
-                             mOperationalDataset, mSSID, mPassword);
+                             GetCommissioningParameters());
     CHIP_ERROR err =
         stateMachine.get()->Commission(chip::RendezvousInformationFlag::kNone, mDiscriminator, mSetupPINCode, onSuccess, onFailure);
     if (err != CHIP_NO_ERROR)
@@ -151,7 +151,7 @@ CHIP_ERROR PairingCommand::PairWithMdns(NodeId remoteId)
         auto onFailure = [this, stateMachine](Commissionee & commissionee) { OnCommissioningFailure(*stateMachine.get()); };
         stateMachine.get()->Init(chip::Controller::DeviceControllerFactory::GetInstance().GetSystemState(),
                                  mCredIssuerCmds->GetCredentialIssuer(), CurrentController().GetFabricIndex(), mNodeId,
-                                 mOperationalDataset, mSSID, mPassword);
+                                 GetCommissioningParameters());
         CHIP_ERROR err =
             stateMachine.get()->Commission(chip::RendezvousInformationFlag::kOnNetwork, static_cast<uint16_t>(mDiscoveryFilterCode),
                                            mSetupPINCode, onSuccess, onFailure);

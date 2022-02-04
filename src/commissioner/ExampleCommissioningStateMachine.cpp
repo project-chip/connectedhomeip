@@ -21,15 +21,13 @@ namespace chip {
 namespace Commissioner {
 namespace ExampleCommissioningStateMachine {
 
-void StateFactory::Init(OpCredsIssuer * issuer, FabricIndex fabricIndex, NodeId nodeId, ByteSpan operationalDataset, ByteSpan ssid,
-                        ByteSpan wiFiCredentials)
+void StateFactory::Init(OpCredsIssuer * issuer, FabricIndex fabricIndex, NodeId nodeId,
+                        CommissioningParameters & commissioningParameters)
 {
-    mIssuer             = issuer;
-    mFabricIndex        = fabricIndex;
-    mNodeId             = nodeId;
-    mOperationalDataset = operationalDataset;
-    mSsid               = ssid;
-    mWiFiCredentials    = wiFiCredentials;
+    mIssuer                  = issuer;
+    mFabricIndex             = fabricIndex;
+    mNodeId                  = nodeId;
+    mCommissioningParameters = commissioningParameters;
 }
 
 void StateFactory::SetCallbacks(OnSuccess onSuccess, OnFailure onFailure)
@@ -218,16 +216,16 @@ chip::StateMachine::Optional<State> Transitions::operator()(const State & state,
 }
 
 void ExampleCommissioningStateMachine::Init(SystemState * systemState, OpCredsIssuer * issuer, FabricIndex fabricIndex,
-                                            NodeId nodeId, ByteSpan operationalDataset, ByteSpan ssid, ByteSpan wiFiCredentials)
+                                            NodeId nodeId, CommissioningParameters commissioningParameeters)
 {
-    mTransitions.mFactory.Init(issuer, fabricIndex, nodeId, operationalDataset, ssid, wiFiCredentials);
+    mTransitions.mFactory.Init(issuer, fabricIndex, nodeId, commissioningParameeters);
     mCommissionee.Init(systemState);
 }
 
 void ExampleCommissioningStateMachine::Init(SystemState * systemState, OpCredsIssuer * issuer, FabricIndex fabricIndex,
                                             NodeId nodeId)
 {
-    Init(systemState, issuer, fabricIndex, nodeId, ByteSpan{}, ByteSpan{}, ByteSpan{});
+    Init(systemState, issuer, fabricIndex, nodeId, CommissioningParameters());
 }
 
 void ExampleCommissioningStateMachine::Shutdown()
