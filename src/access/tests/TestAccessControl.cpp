@@ -1025,26 +1025,19 @@ void TestSubjectsTargets(nlTestSuite * inSuite, void * inContext)
 
 void TestUpdateEntry(nlTestSuite * inSuite, void * inContext)
 {
-#if 0
     EntryData data[entryData1Count];
     memcpy(data, entryData1, sizeof(data));
     NL_TEST_ASSERT(inSuite, LoadAccessControl(accessControl, data, ArraySize(data)) == CHIP_NO_ERROR);
 
-    EntryData updateData;
     for (size_t i = 0; i < ArraySize(data); ++i)
     {
+        EntryData updateData;
         updateData.authMode    = authModes[i % ArraySize(authModes)];
         updateData.fabricIndex = fabricIndexes[i % ArraySize(fabricIndexes)];
-        updateData.privilege   = privileges[i % ArraySize(privileges)];
+        updateData.privilege   = privileges[i % (ArraySize(privileges) - 1)];
 
-        if (i < 3)
-        {
-            updateData.AddSubject(nullptr, subjects[i][i]);
-        }
-        else
-        {
-            updateData.AddTarget(nullptr, targets[i - 3]);
-        }
+        updateData.AddSubject(nullptr, subjects[i % ArraySize(authModes)][i % ArraySize(subjects[0])]);
+        updateData.AddTarget(nullptr, targets[i % ArraySize(targets)]);
 
         data[i] = updateData;
 
@@ -1057,7 +1050,6 @@ void TestUpdateEntry(nlTestSuite * inSuite, void * inContext)
 
         NL_TEST_ASSERT(inSuite, CompareAccessControl(accessControl, data, ArraySize(data)) == CHIP_NO_ERROR);
     }
-#endif
 }
 
 int Setup(void * inContext)
