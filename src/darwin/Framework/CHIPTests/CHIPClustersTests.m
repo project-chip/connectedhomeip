@@ -26203,7 +26203,7 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
             {
                 id actualValue = value;
                 XCTAssertFalse(actualValue == nil);
-                XCTAssertEqual([actualValue unsignedShortValue], 10000U);
+                XCTAssertEqual([actualValue unsignedShortValue], 0U);
             }
 
             [expectation fulfill];
@@ -26248,7 +26248,7 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
         }
 
         [expectation fulfill];
-    }];
+    };
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -26794,7 +26794,7 @@ ResponseHandler test_Test_TC_WNCV_3_2_OperationalStatus_Reported = nil;
             {
                 id actualValue = value;
                 XCTAssertFalse(actualValue == nil);
-                XCTAssertEqual([actualValue unsignedShortValue], 0U);
+                XCTAssertEqual([actualValue unsignedShortValue], 10000U);
             }
 
             [expectation fulfill];
@@ -27036,7 +27036,7 @@ ResponseHandler test_Test_TC_WNCV_3_2_OperationalStatus_Reported = nil;
         }
 
         [expectation fulfill];
-    };
+    }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
