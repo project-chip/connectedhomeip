@@ -10426,6 +10426,20 @@ void CHIPOperationalCredentialsClusterAttestationResponseCallbackBridge::OnSucce
     DispatchSuccess(context, response);
 };
 
+void CHIPOperationalCredentialsClusterCSRResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType & data)
+{
+    auto * response = [CHIPOperationalCredentialsClusterCSRResponseParams new];
+    {
+        response.nocsrElements = [NSData dataWithBytes:data.NOCSRElements.data() length:data.NOCSRElements.size()];
+    }
+    {
+        response.attestationSignature = [NSData dataWithBytes:data.attestationSignature.data()
+                                                       length:data.attestationSignature.size()];
+    }
+    DispatchSuccess(context, response);
+};
+
 void CHIPOperationalCredentialsClusterCertificateChainResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType & data)
 {
@@ -10458,20 +10472,6 @@ void CHIPOperationalCredentialsClusterNOCResponseCallbackBridge::OnSuccessFn(
         } else {
             response.debugText = nil;
         }
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPOperationalCredentialsClusterOpCSRResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::OperationalCredentials::Commands::OpCSRResponse::DecodableType & data)
-{
-    auto * response = [CHIPOperationalCredentialsClusterOpCSRResponseParams new];
-    {
-        response.nocsrElements = [NSData dataWithBytes:data.NOCSRElements.data() length:data.NOCSRElements.size()];
-    }
-    {
-        response.attestationSignature = [NSData dataWithBytes:data.attestationSignature.data()
-                                                       length:data.attestationSignature.size()];
     }
     DispatchSuccess(context, response);
 };

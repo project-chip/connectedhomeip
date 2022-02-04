@@ -15845,15 +15845,15 @@ struct Type;
 struct DecodableType;
 } // namespace CertificateChainResponse
 
-namespace OpCSRRequest {
+namespace CSRRequest {
 struct Type;
 struct DecodableType;
-} // namespace OpCSRRequest
+} // namespace CSRRequest
 
-namespace OpCSRResponse {
+namespace CSRResponse {
 struct Type;
 struct DecodableType;
-} // namespace OpCSRResponse
+} // namespace CSRResponse
 
 namespace AddNOC {
 struct Type;
@@ -16024,7 +16024,7 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace CertificateChainResponse
-namespace OpCSRRequest {
+namespace CSRRequest {
 enum class Fields
 {
     kCSRNonce = 0,
@@ -16034,14 +16034,14 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::OpCSRRequest::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CSRRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::ByteSpan CSRNonce;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::OperationalCredentials::Commands::OpCSRResponse::DecodableType;
+    using ResponseType = Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -16049,14 +16049,14 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::OpCSRRequest::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CSRRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::ByteSpan CSRNonce;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace OpCSRRequest
-namespace OpCSRResponse {
+}; // namespace CSRRequest
+namespace CSRResponse {
 enum class Fields
 {
     kNOCSRElements        = 0,
@@ -16067,7 +16067,7 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::OpCSRResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CSRResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::ByteSpan NOCSRElements;
@@ -16083,14 +16083,14 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::OpCSRResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CSRResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::ByteSpan NOCSRElements;
     chip::ByteSpan attestationSignature;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace OpCSRResponse
+}; // namespace CSRResponse
 namespace AddNOC {
 enum class Fields
 {

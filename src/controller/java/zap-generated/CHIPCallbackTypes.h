@@ -936,12 +936,12 @@ typedef void (*CHIPOnOffSwitchConfigurationClusterClusterRevisionAttributeCallba
     void *, chip::app::Clusters::OnOffSwitchConfiguration::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 typedef void (*CHIPOperationalCredentialsClusterAttestationResponseCallbackType)(
     void *, const chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType &);
+typedef void (*CHIPOperationalCredentialsClusterCSRResponseCallbackType)(
+    void *, const chip::app::Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType &);
 typedef void (*CHIPOperationalCredentialsClusterCertificateChainResponseCallbackType)(
     void *, const chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType &);
 typedef void (*CHIPOperationalCredentialsClusterNOCResponseCallbackType)(
     void *, const chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType &);
-typedef void (*CHIPOperationalCredentialsClusterOpCSRResponseCallbackType)(
-    void *, const chip::app::Clusters::OperationalCredentials::Commands::OpCSRResponse::DecodableType &);
 
 typedef void (*CHIPOperationalCredentialsClusterNOCsAttributeCallbackType)(
     void *, const chip::app::Clusters::OperationalCredentials::Attributes::NOCs::TypeInfo::DecodableType &);

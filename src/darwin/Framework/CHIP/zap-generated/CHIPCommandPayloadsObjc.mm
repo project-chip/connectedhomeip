@@ -1629,7 +1629,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPOperationalCredentialsClusterOpCSRRequestParams
+@implementation CHIPOperationalCredentialsClusterCSRRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1640,7 +1640,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPOperationalCredentialsClusterOpCSRResponseParams
+@implementation CHIPOperationalCredentialsClusterCSRResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {

@@ -710,11 +710,11 @@ exit:
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(app::CommandHandler * commandObj,
-                                                              const app::ConcreteCommandPath & commandPath,
-                                                              const Commands::OpCSRRequest::DecodableType & commandData)
+bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler * commandObj,
+                                                            const app::ConcreteCommandPath & commandPath,
+                                                            const Commands::CSRRequest::DecodableType & commandData)
 {
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has requested an OpCSR");
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has requested a CSR");
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     Platform::ScopedMemoryBuffer<uint8_t> csr;
@@ -766,7 +766,7 @@ bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(app::CommandHandle
 
     // Prepare response payload with signature
     {
-        Commands::OpCSRResponse::Type response;
+        Commands::CSRResponse::Type response;
 
         Credentials::DeviceAttestationCredentialsProvider * dacProvider = Credentials::GetDeviceAttestationCredentialsProvider();
 
@@ -784,7 +784,7 @@ exit:
     {
         // TODO: Replace this error handling with fail-safe since it's not transactional against root certs
         gFabricBeingCommissioned.Reset();
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed OpCSRRequest: %s", ErrorStr(err));
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed CSRRequest: %s", ErrorStr(err));
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
 

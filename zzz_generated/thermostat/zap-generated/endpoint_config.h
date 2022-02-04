@@ -1090,7 +1090,7 @@
   /*   client_generated */ \
   0x00000000 /* AttestationRequest */, \
   0x00000002 /* CertificateChainRequest */, \
-  0x00000004 /* OpCSRRequest */, \
+  0x00000004 /* CSRRequest */, \
   0x00000006 /* AddNOC */, \
   0x00000007 /* UpdateNOC */, \
   0x00000009 /* UpdateFabricLabel */, \
@@ -1101,7 +1101,7 @@
   /*   server_generated */ \
   0x00000001 /* AttestationResponse */, \
   0x00000003 /* CertificateChainResponse */, \
-  0x00000005 /* OpCSRResponse */, \
+  0x00000005 /* CSRResponse */, \
   0x00000008 /* NOCResponse */, \
   chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 1, Cluster: Identify (server) */\
