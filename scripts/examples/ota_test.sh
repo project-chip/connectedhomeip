@@ -13,8 +13,16 @@ touch my-firmware.bin
 
 ./src/app/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 1 -vs "1.0" -da sha256 my-firmware.bin my-firmware.ota
 
+if [ ! -f "my-firmware.ota"]; then
+    exit 1
+fi 
+
 ./out/ota_provider_debug/chip-ota-provider-app -f my-firmware.ota | tee /tmp/ota/provider-log.txt &
 provider_pid=$!
+
+if [ ! -f "/tmp/ota/provider-log.txt"]; then 
+    exit 1
+fi
 
 echo "Commissioning Provider "
 
@@ -23,6 +31,7 @@ if grep "Device commissioning completed with success" /tmp/ota/chip-tool-commiss
     echo Provider Commissioned
 else
     echo Provider not commissioned properly
+    exit 1
 fi
 
 rm /tmp/chip_kvs
@@ -38,6 +47,7 @@ if grep "Device commissioning completed with success" /tmp/ota/chip-tool-commiss
     echo Requestor Commissioned
 else
     echo Requestor not commissioned properly
+    exit 1
 fi
 
 echo "Sending announce-ota-provider "
