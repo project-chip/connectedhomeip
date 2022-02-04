@@ -1579,6 +1579,7 @@ void GroupDataProviderImpl::GroupKeyIteratorImpl::Release()
 //
 
 constexpr size_t GroupDataProvider::EpochKey::kLengthBytes;
+constexpr uint8_t kZeroKey[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0 };
 
 CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, const KeySet & in_keyset)
 {
@@ -1606,12 +1607,11 @@ CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, cons
     for (size_t i = 0; i < in_keyset.num_keys_used; ++i)
     {
         ByteSpan epoch_key(in_keyset.epoch_keys[i].key, Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
-        uint8_t key[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
-        MutableByteSpan key_span(key, sizeof(key));
+        MutableByteSpan key_span(keyset.operational_keys[i].value, sizeof(keyset.operational_keys[i].value));
         ReturnErrorOnFailure(Crypto::DeriveGroupOperationalKey(epoch_key, key_span));
-        ReturnErrorOnFailure(Crypto::DeriveGroupSessionId(ByteSpan(key, sizeof(key)), keyset.operational_keys[i].hash));
+        ReturnErrorOnFailure(Crypto::DeriveGroupSessionId(key_span, keyset.operational_keys[i].hash));
+        VerifyOrReturnError(memcmp(kZeroKey, key_span.data(), sizeof(kZeroKey)), CHIP_ERROR_INTERNAL);
     }
-
     if (found)
     {
         // Update existing keyset info, keep next
@@ -1817,19 +1817,20 @@ void GroupDataProviderImpl::GroupKeyContext::Release()
     mProvider.mKeyContexPool.ReleaseObject(this);
 }
 
-CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::EncryptMessage(MutableByteSpan & plaintext, const ByteSpan & aad,
-                                                                  const ByteSpan & nonce, MutableByteSpan & out_mic) const
-{
-    uint8_t * output = plaintext.data();
-    return Crypto::AES_CCM_encrypt(plaintext.data(), plaintext.size(), aad.data(), aad.size(), mKeyValue,
-                                   Crypto::kAES_CCM128_Key_Length, nonce.data(), nonce.size(), output, out_mic.data(),
-                                   out_mic.size());
-}
-
-CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::DecryptMessage(MutableByteSpan & ciphertext, const ByteSpan & aad,
-                                                                  const ByteSpan & nonce, const ByteSpan & mic) const
+CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::EncryptMessage(const ByteSpan & plaintext, const ByteSpan & aad,
+                                                                  const ByteSpan & nonce, MutableByteSpan & mic,
+                                                                  MutableByteSpan & ciphertext) const
 {
     uint8_t * output = ciphertext.data();
+    return Crypto::AES_CCM_encrypt(plaintext.data(), plaintext.size(), aad.data(), aad.size(), mKeyValue,
+                                   Crypto::kAES_CCM128_Key_Length, nonce.data(), nonce.size(), output, mic.data(), mic.size());
+}
+
+CHIP_ERROR GroupDataProviderImpl::GroupKeyContext::DecryptMessage(const ByteSpan & ciphertext, const ByteSpan & aad,
+                                                                  const ByteSpan & nonce, const ByteSpan & mic,
+                                                                  MutableByteSpan & plaintext) const
+{
+    uint8_t * output = plaintext.data();
     return Crypto::AES_CCM_decrypt(ciphertext.data(), ciphertext.size(), aad.data(), aad.size(), mic.data(), mic.size(), mKeyValue,
                                    Crypto::kAES_CCM128_Key_Length, nonce.data(), nonce.size(), output);
 }
