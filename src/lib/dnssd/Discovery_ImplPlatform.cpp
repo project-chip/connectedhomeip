@@ -83,12 +83,15 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, CHIP_ERRO
     {
         proxy->OnNodeIdResolutionFailed(PeerId(), error);
         proxy->Release();
+        return;
     }
 
     if (result == nullptr)
     {
         proxy->OnNodeIdResolutionFailed(PeerId(), CHIP_ERROR_UNKNOWN_RESOURCE_ID);
         proxy->Release();
+        return;
+
     }
 
     PeerId peerId;
@@ -97,6 +100,8 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, CHIP_ERRO
     {
         proxy->OnNodeIdResolutionFailed(PeerId(), error);
         proxy->Release();
+        return;
+
     }
 
     ResolvedNodeData nodeData;
@@ -124,9 +129,6 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, CHIP_ERRO
 #endif
     proxy->OnNodeIdResolved(nodeData);
     proxy->Release();
-
-    // Allocated in OnDnsResolveResult(), must be freed here
-    free(result);
 }
 
 static void HandleNodeBrowse(void * context, DnssdService * services, size_t servicesSize, CHIP_ERROR error)

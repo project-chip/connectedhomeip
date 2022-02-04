@@ -2317,13 +2317,11 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsResolveResult(otE
 
     error = FromOtDnsResponseToMdnsData(serviceInfo, type, dnsResult->mMdnsService, dnsResult->mServiceTxtEntry);
 
-    VerifyOrExit(error == CHIP_NO_ERROR, );
-
+exit:
+   
+    dnsResult->error = error;
     DeviceLayer::PlatformMgr().ScheduleWork(DispatchResolve, reinterpret_cast<intptr_t>(dnsResult));
 
-exit:
-
-    dnsResult->error = error;
 }
 
 template <class ImplClass>
