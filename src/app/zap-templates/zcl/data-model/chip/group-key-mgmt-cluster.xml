@@ -66,7 +66,7 @@ limitations under the License.
       <arg name="groupKeySet" type="GroupKeySet"/>
     </command>
 
-    <command source="client" code="0x01" name="KeySetRead" optional="false" cli="zcl GroupKeyManagement KeySetRead">
+    <command source="client" code="0x01" name="KeySetRead" response="KeySetReadResponse" optional="false" cli="zcl GroupKeyManagement KeySetRead">
       <description>Revoke a Root Key from a Group</description>
       <arg name="groupKeySetID" type="INT16U"/>
     </command>
@@ -83,7 +83,7 @@ limitations under the License.
       <arg name="groupKeySetID" type="INT16U"/>
     </command>
 
-    <command source="client" code="0x04" name="KeySetReadAllIndices" optional="false" cli="zcl GroupKeyManagement KeySetReadAllIndices">
+    <command source="client" code="0x04" name="KeySetReadAllIndices" response="KeySetReadAllIndicesResponse" optional="false" cli="zcl GroupKeyManagement KeySetReadAllIndices">
       <description>Revoke a Root Key from a Group</description>
       <arg name="groupKeySetIDs" type="INT16U" array="true"/>
     </command>

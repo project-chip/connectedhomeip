@@ -12762,7 +12762,7 @@ public class ChipClusters {
     }
 
     public interface NOCResponseCallback {
-      void onSuccess(Integer statusCode, Integer fabricIndex, String debugText);
+      void onSuccess(Integer statusCode, Optional<Integer> fabricIndex, Optional<String> debugText);
 
       void onError(Exception error);
     }

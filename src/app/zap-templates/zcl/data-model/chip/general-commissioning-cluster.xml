@@ -43,7 +43,7 @@ limitations under the License.
     <attribute side="server" code="0x01" define="BASICCOMMISSIONINGINFO" type="BasicCommissioningInfo" writable="false" optional="false">BasicCommissioningInfo</attribute>
     <attribute side="server" code="0x02" define="REGULATORYCONFIG" type="ENUM8" writable="false" optional="true">RegulatoryConfig</attribute>
     <attribute side="server" code="0x03" define="LOCATIONCAPABILITY" type="ENUM8" writable="false" optional="true">LocationCapability</attribute>
-    <command source="client" code="0x00" name="ArmFailSafe" optional="false" cli="chip fabric_commissioning armfailsafe">
+    <command source="client" code="0x00" name="ArmFailSafe" response="ArmFailSafeResponse" optional="false" cli="chip fabric_commissioning armfailsafe">
       <description>Arm the persistent fail-safe timer with an expiry time of now + ExpiryLengthSeconds using device clock</description>
       <arg name="expiryLengthSeconds" type="INT16U"/>
       <arg name="breadcrumb" type="INT64U"/>
@@ -54,7 +54,7 @@ limitations under the License.
       <arg name="errorCode" type="CommissioningError"/>
       <arg name="debugText" type="CHAR_STRING"/>
     </command>
-    <command source="client" code="0x02" name="SetRegulatoryConfig" optional="true" cli="chip fabric_commissioning setregulatoryconfig">
+    <command source="client" code="0x02" name="SetRegulatoryConfig" response="SetRegulatoryConfigResponse" optional="true" cli="chip fabric_commissioning setregulatoryconfig">
       <description>Add or update the regulatory configuration</description>
       <arg name="location" type="RegulatoryLocationType"/>
       <arg name="countryCode" type="CHAR_STRING"/>      
@@ -66,7 +66,7 @@ limitations under the License.
       <arg name="errorCode" type="CommissioningError"/>
       <arg name="debugText" type="CHAR_STRING"/>
     </command>
-    <command source="client" code="0x04" name="CommissioningComplete" optional="false" cli="chip fabric_commissioning commissioningcomplete">
+    <command source="client" code="0x04" name="CommissioningComplete" response="CommissioningCompleteResponse" optional="false" cli="chip fabric_commissioning commissioningcomplete">
       <description>Signals the Commissionee that the Commissioner has successfully completed all steps of commissioning</description>
     </command>
     <command source="server" code="0x05" name="CommissioningCompleteResponse" optional="false" cli="chip fabric_commissioning commissioningcompleteresponse">
