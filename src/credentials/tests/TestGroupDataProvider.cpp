@@ -829,11 +829,7 @@ void TestKeySetIterator(nlTestSuite * apSuite, void * apContext)
         while (it->Next(keyset) && count < expected_f1.size())
         {
             NL_TEST_ASSERT(apSuite, expected_f1.count(keyset.keyset_id) > 0);
-            NL_TEST_ASSERT(apSuite, keyset.keyset_id == expected_f1[keyset.keyset_id].keyset_id);
-            NL_TEST_ASSERT(apSuite, keyset.policy == expected_f1[keyset.keyset_id].policy);
-            NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKey, keyset.epoch_keys[0].key, sizeof(kZeroKey)));
-            NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKey, keyset.epoch_keys[1].key, sizeof(kZeroKey)));
-            NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKey, keyset.epoch_keys[2].key, sizeof(kZeroKey)));
+            NL_TEST_ASSERT(apSuite, CompareKeySets(keyset, expected_f1[keyset.keyset_id]));
             count++;
         }
         NL_TEST_ASSERT(apSuite, count == expected_f1.size());
@@ -854,11 +850,7 @@ void TestKeySetIterator(nlTestSuite * apSuite, void * apContext)
         while (it->Next(keyset) && count < expected_f2.size())
         {
             NL_TEST_ASSERT(apSuite, expected_f2.count(keyset.keyset_id) > 0);
-            NL_TEST_ASSERT(apSuite, keyset.keyset_id == expected_f2[keyset.keyset_id].keyset_id);
-            NL_TEST_ASSERT(apSuite, keyset.policy == expected_f2[keyset.keyset_id].policy);
-            NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKey, keyset.epoch_keys[0].key, sizeof(kZeroKey)));
-            NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKey, keyset.epoch_keys[1].key, sizeof(kZeroKey)));
-            NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKey, keyset.epoch_keys[2].key, sizeof(kZeroKey)));
+            NL_TEST_ASSERT(apSuite, CompareKeySets(keyset, expected_f2[keyset.keyset_id]));
             count++;
         }
         NL_TEST_ASSERT(apSuite, count == expected_f2.size());

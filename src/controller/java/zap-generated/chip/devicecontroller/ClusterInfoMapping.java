@@ -2927,9 +2927,9 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(ArrayList<Integer> groupKeySetIDs) {
+    public void onSuccess(ArrayList<Integer> GroupKeySetIDs) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      // groupKeySetIDs: /* TYPE WARNING: array array defaults to */ uint8_t *
+      // GroupKeySetIDs: /* TYPE WARNING: array array defaults to */ uint8_t *
       // Conversion from this type to Java is not properly implemented yet
       callback.onSuccess(responseValues);
     }
@@ -2951,9 +2951,9 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(ChipStructs.GroupKeyManagementClusterGroupKeySet groupKeySet) {
+    public void onSuccess(ChipStructs.GroupKeyManagementClusterGroupKeySetStruct GroupKeySet) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      // groupKeySet: Struct GroupKeySet
+      // GroupKeySet: Struct GroupKeySetStruct
       // Conversion from this type to Java is not properly implemented yet
       callback.onSuccess(responseValues);
     }
@@ -2975,11 +2975,11 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<ChipStructs.GroupKeyManagementClusterGroupKey> valueList) {
+    public void onSuccess(List<ChipStructs.GroupKeyManagementClusterGroupKeyMapStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
           new CommandResponseInfo(
-              "valueList", "List<ChipStructs.GroupKeyManagementClusterGroupKey>");
+              "valueList", "List<ChipStructs.GroupKeyManagementClusterGroupKeyMapStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }
@@ -3001,11 +3001,11 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<ChipStructs.GroupKeyManagementClusterGroupInfo> valueList) {
+    public void onSuccess(List<ChipStructs.GroupKeyManagementClusterGroupInfoMapStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
           new CommandResponseInfo(
-              "valueList", "List<ChipStructs.GroupKeyManagementClusterGroupInfo>");
+              "valueList", "List<ChipStructs.GroupKeyManagementClusterGroupInfoMapStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }
@@ -9693,7 +9693,7 @@ public class ClusterInfoMapping {
               ((ChipClusters.GroupKeyManagementCluster) cluster)
                   .keySetWrite(
                       (DefaultClusterCallback) callback,
-                      (ChipStructs.GroupKeyManagementClusterGroupKeySet)
+                      (ChipStructs.GroupKeyManagementClusterGroupKeySetStruct)
                           commandArguments.get("groupKeySet"));
             },
             () -> new DelegatedDefaultClusterCallback(),

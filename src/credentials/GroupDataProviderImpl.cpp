@@ -987,7 +987,7 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index,
     {
         // Insert last
         VerifyOrReturnError(fabric.group_count == index, CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(fabric.group_count < mMaxGroupsPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
+        // TODO: VerifyOrReturnError(fabric.group_count < mMaxGroupsPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
         fabric.group_count++;
     }
 
@@ -1102,7 +1102,7 @@ CHIP_ERROR GroupDataProviderImpl::AddEndpoint(chip::FabricIndex fabric_index, ch
     if (!group.Find(mStorage, fabric, group_id))
     {
         // New group
-        VerifyOrReturnError(fabric.group_count < mMaxGroupsPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
+        // TODO: VerifyOrReturnError(fabric.group_count < mMaxGroupsPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
         ReturnErrorOnFailure(EndpointData(fabric_index, group_id, endpoint_id).Save(mStorage));
         // Save the new group into the fabric
         group.group_id       = group_id;
@@ -1434,7 +1434,7 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupKeyAt(chip::FabricIndex fabric_index, 
 
     // Insert last
     VerifyOrReturnError(fabric.map_count == index, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(fabric.map_count < mMaxGroupKeysPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
+    // TODO: VerifyOrReturnError(fabric.map_count < mMaxGroupKeysPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
 
     map.next = 0;
     ReturnErrorOnFailure(map.Save(mStorage));
@@ -1643,7 +1643,7 @@ CHIP_ERROR GroupDataProviderImpl::GetKeySet(chip::FabricIndex fabric_index, uint
     out_keyset.keyset_id     = keyset.keyset_id;
     out_keyset.policy        = keyset.policy;
     out_keyset.num_keys_used = keyset.keys_count;
-    // Epoch keys are not read back, only the times
+    // Epoch keys are not read back, only start times
     memset(out_keyset.epoch_keys, 0x00, sizeof(out_keyset.epoch_keys));
     out_keyset.epoch_keys[0].start_time = keyset.operational_keys[0].start_time;
     out_keyset.epoch_keys[1].start_time = keyset.operational_keys[1].start_time;
@@ -1718,8 +1718,11 @@ bool GroupDataProviderImpl::KeySetIteratorImpl::Next(KeySet & output)
     output.keyset_id     = keyset.keyset_id;
     output.policy        = keyset.policy;
     output.num_keys_used = keyset.keys_count;
-    // Epoch keys are not read back
+    // Epoch keys are not read back, only start times
     memset(output.epoch_keys, 0x00, sizeof(output.epoch_keys));
+    output.epoch_keys[0].start_time = keyset.operational_keys[0].start_time;
+    output.epoch_keys[1].start_time = keyset.operational_keys[1].start_time;
+    output.epoch_keys[2].start_time = keyset.operational_keys[2].start_time;
     return true;
 }
 

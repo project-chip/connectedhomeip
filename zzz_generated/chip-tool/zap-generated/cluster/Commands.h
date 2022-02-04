@@ -3331,7 +3331,7 @@ public:
 
 private:
     chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySet::Type> mComplex_GroupKeySet;
+    TypedComplexArgument<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySetStruct::Type> mComplex_GroupKeySet;
 };
 
 class WriteGroupKeyManagementGroupKeyMap : public WriteAttribute
@@ -3353,8 +3353,9 @@ public:
     }
 
 private:
-    chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::Type> mValue;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::Type>>
+    chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type> mValue;
+    TypedComplexArgument<
+        chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type>>
         mComplex;
 };
 
