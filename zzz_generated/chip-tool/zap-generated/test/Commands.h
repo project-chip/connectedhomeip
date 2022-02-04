@@ -61,11 +61,6 @@ public:
         printf("Test_TC_CC_9_1\n");
         printf("Test_TC_CC_9_2\n");
         printf("Test_TC_CC_9_3\n");
-        printf("Test_TC_DD_1_5\n");
-        printf("Test_TC_DD_1_6\n");
-        printf("Test_TC_DD_1_7\n");
-        printf("Test_TC_DD_1_8\n");
-        printf("Test_TC_DD_1_9\n");
         printf("Test_TC_DM_1_1\n");
         printf("Test_TC_DM_3_1\n");
         printf("Test_TC_DM_2_2\n");
@@ -180,9 +175,25 @@ public:
         printf("DL_Schedules\n");
         printf("TestGroupMessaging\n");
         printf("TestGroupsCluster\n");
+        printf("TestGroupKeyManagementCluster\n");
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+class ManualTestList : public Command
+{
+public:
+    ManualTestList() : Command("list-manual"){};
+    CHIP_ERROR Run() override
+    {
+        printf("Test_TC_DD_1_5\n");
+        printf("Test_TC_DD_1_6\n");
+        printf("Test_TC_DD_1_7\n");
+        printf("Test_TC_DD_1_8\n");
+        printf("Test_TC_DD_1_9\n");
         printf("TestGroupDemoCommand\n");
         printf("TestGroupDemoConfig\n");
-        printf("TestGroupKeyManagementCluster\n");
 
         return CHIP_NO_ERROR;
     }
@@ -16219,406 +16230,6 @@ private:
     }
 
     void OnSuccessResponse_14() { NextTest(); }
-};
-
-class Test_TC_DD_1_5 : public TestCommand
-{
-public:
-    Test_TC_DD_1_5(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_5", credsIssuerConfig), mTestIndex(0)
-    {
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-    }
-
-    ~Test_TC_DD_1_5() {}
-
-    /////////// TestCommand Interface /////////
-    void NextTest() override
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        if (0 == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_1_5\n");
-        }
-
-        if (mTestCount == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_1_5\n");
-            SetCommandExitStatus(CHIP_NO_ERROR);
-            return;
-        }
-
-        Wait();
-
-        // Ensure we increment mTestIndex before we start running the relevant
-        // command.  That way if we lose the timeslice after we send the message
-        // but before our function call returns, we won't end up with an
-        // incorrect mTestIndex value observed when we get the response.
-        switch (mTestIndex++)
-        {
-        case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Step 1\n");
-            err = TestStep1_0();
-            break;
-        }
-
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }
-    }
-
-private:
-    std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 1;
-
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-
-    //
-    // Tests methods
-    //
-
-    CHIP_ERROR TestStep1_0()
-    {
-        SetIdentity(kIdentityAlpha);
-        return Log("Verify that the onboarding payload for NFC tags SHALL use NDEF URI Record Type Definition as defined by NFC "
-                   "Forum in URI Record Type Definition RTD URI");
-    }
-};
-
-class Test_TC_DD_1_6 : public TestCommand
-{
-public:
-    Test_TC_DD_1_6(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_6", credsIssuerConfig), mTestIndex(0)
-    {
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-    }
-
-    ~Test_TC_DD_1_6() {}
-
-    /////////// TestCommand Interface /////////
-    void NextTest() override
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        if (0 == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_1_6\n");
-        }
-
-        if (mTestCount == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_1_6\n");
-            SetCommandExitStatus(CHIP_NO_ERROR);
-            return;
-        }
-
-        Wait();
-
-        // Ensure we increment mTestIndex before we start running the relevant
-        // command.  That way if we lose the timeslice after we send the message
-        // but before our function call returns, we won't end up with an
-        // incorrect mTestIndex value observed when we get the response.
-        switch (mTestIndex++)
-        {
-        case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Step 1\n");
-            err = TestStep1_0();
-            break;
-        case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Step 1 verification\n");
-            err = TestStep1Verification_1();
-            break;
-        case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Step 2 verificaiton\n");
-            err = TestStep2Verificaiton_2();
-            break;
-        }
-
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }
-    }
-
-private:
-    std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 3;
-
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-
-    //
-    // Tests methods
-    //
-
-    CHIP_ERROR TestStep1_0()
-    {
-        SetIdentity(kIdentityAlpha);
-        return Log("Scan the DUTs QR code using a QR code reader");
-    }
-
-    CHIP_ERROR TestStep1Verification_1()
-    {
-        SetIdentity(kIdentityAlpha);
-        return Log(
-            "Verify the QR code gets scanned successfully and the QR code must be of sufficient size and contrast respective to "
-            "surface material as to be readable with standard readers such as smartphones in normal lighting conditions");
-    }
-
-    CHIP_ERROR TestStep2Verificaiton_2()
-    {
-        SetIdentity(kIdentityAlpha);
-        return Log("Verify QR code version is 1 or higher");
-    }
-};
-
-class Test_TC_DD_1_7 : public TestCommand
-{
-public:
-    Test_TC_DD_1_7(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_7", credsIssuerConfig), mTestIndex(0)
-    {
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-    }
-
-    ~Test_TC_DD_1_7() {}
-
-    /////////// TestCommand Interface /////////
-    void NextTest() override
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        if (0 == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_1_7\n");
-        }
-
-        if (mTestCount == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_1_7\n");
-            SetCommandExitStatus(CHIP_NO_ERROR);
-            return;
-        }
-
-        Wait();
-
-        // Ensure we increment mTestIndex before we start running the relevant
-        // command.  That way if we lose the timeslice after we send the message
-        // but before our function call returns, we won't end up with an
-        // incorrect mTestIndex value observed when we get the response.
-        switch (mTestIndex++)
-        {
-        case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Precondition\n");
-            err = TestPrecondition_0();
-            break;
-        case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Step 1\n");
-            err = TestStep1_1();
-            break;
-        }
-
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }
-    }
-
-private:
-    std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 2;
-
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-
-    //
-    // Tests methods
-    //
-
-    CHIP_ERROR TestPrecondition_0()
-    {
-        SetIdentity(kIdentityAlpha);
-        return Log("Verify manual pairing code is printed on the device or in additional provided materials");
-    }
-
-    CHIP_ERROR TestStep1_1()
-    {
-        SetIdentity(kIdentityAlpha);
-        return Log("Verify that the Manual Pairing Code should be printed using a minimum font size of 6 points typically "
-                   "producing a typeface height of 2.1 mm");
-    }
-};
-
-class Test_TC_DD_1_8 : public TestCommand
-{
-public:
-    Test_TC_DD_1_8(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_8", credsIssuerConfig), mTestIndex(0)
-    {
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-    }
-
-    ~Test_TC_DD_1_8() {}
-
-    /////////// TestCommand Interface /////////
-    void NextTest() override
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        if (0 == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_1_8\n");
-        }
-
-        if (mTestCount == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_1_8\n");
-            SetCommandExitStatus(CHIP_NO_ERROR);
-            return;
-        }
-
-        Wait();
-
-        // Ensure we increment mTestIndex before we start running the relevant
-        // command.  That way if we lose the timeslice after we send the message
-        // but before our function call returns, we won't end up with an
-        // incorrect mTestIndex value observed when we get the response.
-        switch (mTestIndex++)
-        {
-        case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Step 1\n");
-            err = TestStep1_0();
-            break;
-        case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Step 1 verification\n");
-            err = TestStep1Verification_1();
-            break;
-        }
-
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }
-    }
-
-private:
-    std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 2;
-
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-
-    //
-    // Tests methods
-    //
-
-    CHIP_ERROR TestStep1_0()
-    {
-        SetIdentity(kIdentityAlpha);
-        return Log("Scan the device QR code using DUT");
-    }
-
-    CHIP_ERROR TestStep1Verification_1()
-    {
-        SetIdentity(kIdentityAlpha);
-        return Log("Verify the DUT is able to scan and parse the QR code successfully to onboard the device onto the CHIP network");
-    }
-};
-
-class Test_TC_DD_1_9 : public TestCommand
-{
-public:
-    Test_TC_DD_1_9(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_9", credsIssuerConfig), mTestIndex(0)
-    {
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-    }
-
-    ~Test_TC_DD_1_9() {}
-
-    /////////// TestCommand Interface /////////
-    void NextTest() override
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        if (0 == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_1_9\n");
-        }
-
-        if (mTestCount == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_1_9\n");
-            SetCommandExitStatus(CHIP_NO_ERROR);
-            return;
-        }
-
-        Wait();
-
-        // Ensure we increment mTestIndex before we start running the relevant
-        // command.  That way if we lose the timeslice after we send the message
-        // but before our function call returns, we won't end up with an
-        // incorrect mTestIndex value observed when we get the response.
-        switch (mTestIndex++)
-        {
-        case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Precondition\n");
-            err = TestPrecondition_0();
-            break;
-        case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Step 1\n");
-            err = TestStep1_1();
-            break;
-        case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Step 1 verification\n");
-            err = TestStep1Verification_2();
-            break;
-        }
-
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }
-    }
-
-private:
-    std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 3;
-
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-
-    //
-    // Tests methods
-    //
-
-    CHIP_ERROR TestPrecondition_0()
-    {
-        SetIdentity(kIdentityAlpha);
-        return Log("Verify that the manual pairing code is printed on the device or in additional provided materials");
-    }
-
-    CHIP_ERROR TestStep1_1()
-    {
-        SetIdentity(kIdentityAlpha);
-        return Log("Provide the 11 digit or 21 digit pairing code from the Device in text speech or any format supported by DUT");
-    }
-
-    CHIP_ERROR TestStep1Verification_2()
-    {
-        SetIdentity(kIdentityAlpha);
-        return Log(
-            "Verify that the manual pairing code can be provided to DUT and parsed to onboard the device onto the CHIP network");
-    }
 };
 
 class Test_TC_DM_1_1 : public TestCommand
@@ -84833,642 +84444,6 @@ private:
     }
 };
 
-class TestGroupDemoCommand : public TestCommand
-{
-public:
-    TestGroupDemoCommand(CredentialIssuerCommands * credsIssuerConfig) :
-        TestCommand("TestGroupDemoCommand", credsIssuerConfig), mTestIndex(0)
-    {
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-    }
-
-    ~TestGroupDemoCommand() {}
-
-    /////////// TestCommand Interface /////////
-    void NextTest() override
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        if (0 == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Start: TestGroupDemoCommand\n");
-        }
-
-        if (mTestCount == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Complete: TestGroupDemoCommand\n");
-            SetCommandExitStatus(CHIP_NO_ERROR);
-            return;
-        }
-
-        Wait();
-
-        // Ensure we increment mTestIndex before we start running the relevant
-        // command.  That way if we lose the timeslice after we send the message
-        // but before our function call returns, we won't end up with an
-        // incorrect mTestIndex value observed when we get the response.
-        switch (mTestIndex++)
-        {
-        case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
-            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
-            break;
-        case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Turn On the light to see attribute change\n");
-            err = TestTurnOnTheLightToSeeAttributeChange_1();
-            break;
-        case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Wait 100ms\n");
-            err = TestWait100ms_2();
-            break;
-        case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Turn Off the light to see attribute change\n");
-            err = TestTurnOffTheLightToSeeAttributeChange_3();
-            break;
-        case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Wait 100ms\n");
-            err = TestWait100ms_4();
-            break;
-        case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Turn On the light to see attribute change\n");
-            err = TestTurnOnTheLightToSeeAttributeChange_5();
-            break;
-        case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Wait 100ms\n");
-            err = TestWait100ms_6();
-            break;
-        case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Turn Off the light to see attribute change\n");
-            err = TestTurnOffTheLightToSeeAttributeChange_7();
-            break;
-        case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Wait 100ms\n");
-            err = TestWait100ms_8();
-            break;
-        case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : Turn On the light to see attribute change\n");
-            err = TestTurnOnTheLightToSeeAttributeChange_9();
-            break;
-        case 10:
-            ChipLogProgress(chipTool, " ***** Test Step 10 : Wait 100ms\n");
-            err = TestWait100ms_10();
-            break;
-        case 11:
-            ChipLogProgress(chipTool, " ***** Test Step 11 : Turn Off the light to see attribute change\n");
-            err = TestTurnOffTheLightToSeeAttributeChange_11();
-            break;
-        case 12:
-            ChipLogProgress(chipTool, " ***** Test Step 12 : Wait 100ms\n");
-            err = TestWait100ms_12();
-            break;
-        case 13:
-            ChipLogProgress(chipTool, " ***** Test Step 13 : Turn On the light to see attribute change\n");
-            err = TestTurnOnTheLightToSeeAttributeChange_13();
-            break;
-        case 14:
-            ChipLogProgress(chipTool, " ***** Test Step 14 : Wait 100ms\n");
-            err = TestWait100ms_14();
-            break;
-        case 15:
-            ChipLogProgress(chipTool, " ***** Test Step 15 : Turn Off the light to see attribute change\n");
-            err = TestTurnOffTheLightToSeeAttributeChange_15();
-            break;
-        case 16:
-            ChipLogProgress(chipTool, " ***** Test Step 16 : Wait 100ms\n");
-            err = TestWait100ms_16();
-            break;
-        case 17:
-            ChipLogProgress(chipTool, " ***** Test Step 17 : Turn On the light to see attribute change\n");
-            err = TestTurnOnTheLightToSeeAttributeChange_17();
-            break;
-        case 18:
-            ChipLogProgress(chipTool, " ***** Test Step 18 : Wait 100ms\n");
-            err = TestWait100ms_18();
-            break;
-        case 19:
-            ChipLogProgress(chipTool, " ***** Test Step 19 : Turn Off the light to see attribute change\n");
-            err = TestTurnOffTheLightToSeeAttributeChange_19();
-            break;
-        case 20:
-            ChipLogProgress(chipTool, " ***** Test Step 20 : Wait 100ms\n");
-            err = TestWait100ms_20();
-            break;
-        }
-
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }
-    }
-
-private:
-    std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 21;
-
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-
-    //
-    // Tests methods
-    //
-
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
-    {
-        SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
-    }
-
-    CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_1()
-    {
-        const chip::GroupId groupId = 4660;
-        using RequestType           = chip::app::Clusters::OnOff::Commands::On::Type;
-
-        RequestType request;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupDemoCommand *>(context))->OnSuccessResponse_1();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<TestGroupDemoCommand *>(context))->OnFailureResponse_1(error);
-        };
-
-        auto done = [](void * context) { (static_cast<TestGroupDemoCommand *>(context))->OnDoneResponse_1(); };
-
-        ReturnErrorOnFailure(
-            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_1(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_1() { NextTest(); }
-
-    void OnDoneResponse_1() { NextTest(); }
-
-    CHIP_ERROR TestWait100ms_2()
-    {
-        SetIdentity(kIdentityAlpha);
-        return WaitForMs(1000);
-    }
-
-    CHIP_ERROR TestTurnOffTheLightToSeeAttributeChange_3()
-    {
-        const chip::GroupId groupId = 4660;
-        using RequestType           = chip::app::Clusters::OnOff::Commands::Off::Type;
-
-        RequestType request;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupDemoCommand *>(context))->OnSuccessResponse_3();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<TestGroupDemoCommand *>(context))->OnFailureResponse_3(error);
-        };
-
-        auto done = [](void * context) { (static_cast<TestGroupDemoCommand *>(context))->OnDoneResponse_3(); };
-
-        ReturnErrorOnFailure(
-            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_3(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_3() { NextTest(); }
-
-    void OnDoneResponse_3() { NextTest(); }
-
-    CHIP_ERROR TestWait100ms_4()
-    {
-        SetIdentity(kIdentityAlpha);
-        return WaitForMs(1000);
-    }
-
-    CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_5()
-    {
-        const chip::GroupId groupId = 4660;
-        using RequestType           = chip::app::Clusters::OnOff::Commands::On::Type;
-
-        RequestType request;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupDemoCommand *>(context))->OnSuccessResponse_5();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<TestGroupDemoCommand *>(context))->OnFailureResponse_5(error);
-        };
-
-        auto done = [](void * context) { (static_cast<TestGroupDemoCommand *>(context))->OnDoneResponse_5(); };
-
-        ReturnErrorOnFailure(
-            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_5(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_5() { NextTest(); }
-
-    void OnDoneResponse_5() { NextTest(); }
-
-    CHIP_ERROR TestWait100ms_6()
-    {
-        SetIdentity(kIdentityAlpha);
-        return WaitForMs(1000);
-    }
-
-    CHIP_ERROR TestTurnOffTheLightToSeeAttributeChange_7()
-    {
-        const chip::GroupId groupId = 4660;
-        using RequestType           = chip::app::Clusters::OnOff::Commands::Off::Type;
-
-        RequestType request;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupDemoCommand *>(context))->OnSuccessResponse_7();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<TestGroupDemoCommand *>(context))->OnFailureResponse_7(error);
-        };
-
-        auto done = [](void * context) { (static_cast<TestGroupDemoCommand *>(context))->OnDoneResponse_7(); };
-
-        ReturnErrorOnFailure(
-            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_7(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_7() { NextTest(); }
-
-    void OnDoneResponse_7() { NextTest(); }
-
-    CHIP_ERROR TestWait100ms_8()
-    {
-        SetIdentity(kIdentityAlpha);
-        return WaitForMs(1000);
-    }
-
-    CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_9()
-    {
-        const chip::GroupId groupId = 4660;
-        using RequestType           = chip::app::Clusters::OnOff::Commands::On::Type;
-
-        RequestType request;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupDemoCommand *>(context))->OnSuccessResponse_9();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<TestGroupDemoCommand *>(context))->OnFailureResponse_9(error);
-        };
-
-        auto done = [](void * context) { (static_cast<TestGroupDemoCommand *>(context))->OnDoneResponse_9(); };
-
-        ReturnErrorOnFailure(
-            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_9(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_9() { NextTest(); }
-
-    void OnDoneResponse_9() { NextTest(); }
-
-    CHIP_ERROR TestWait100ms_10()
-    {
-        SetIdentity(kIdentityAlpha);
-        return WaitForMs(1000);
-    }
-
-    CHIP_ERROR TestTurnOffTheLightToSeeAttributeChange_11()
-    {
-        const chip::GroupId groupId = 4660;
-        using RequestType           = chip::app::Clusters::OnOff::Commands::Off::Type;
-
-        RequestType request;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupDemoCommand *>(context))->OnSuccessResponse_11();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<TestGroupDemoCommand *>(context))->OnFailureResponse_11(error);
-        };
-
-        auto done = [](void * context) { (static_cast<TestGroupDemoCommand *>(context))->OnDoneResponse_11(); };
-
-        ReturnErrorOnFailure(
-            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_11(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_11() { NextTest(); }
-
-    void OnDoneResponse_11() { NextTest(); }
-
-    CHIP_ERROR TestWait100ms_12()
-    {
-        SetIdentity(kIdentityAlpha);
-        return WaitForMs(1000);
-    }
-
-    CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_13()
-    {
-        const chip::GroupId groupId = 4660;
-        using RequestType           = chip::app::Clusters::OnOff::Commands::On::Type;
-
-        RequestType request;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupDemoCommand *>(context))->OnSuccessResponse_13();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<TestGroupDemoCommand *>(context))->OnFailureResponse_13(error);
-        };
-
-        auto done = [](void * context) { (static_cast<TestGroupDemoCommand *>(context))->OnDoneResponse_13(); };
-
-        ReturnErrorOnFailure(
-            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_13(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_13() { NextTest(); }
-
-    void OnDoneResponse_13() { NextTest(); }
-
-    CHIP_ERROR TestWait100ms_14()
-    {
-        SetIdentity(kIdentityAlpha);
-        return WaitForMs(1000);
-    }
-
-    CHIP_ERROR TestTurnOffTheLightToSeeAttributeChange_15()
-    {
-        const chip::GroupId groupId = 4660;
-        using RequestType           = chip::app::Clusters::OnOff::Commands::Off::Type;
-
-        RequestType request;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupDemoCommand *>(context))->OnSuccessResponse_15();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<TestGroupDemoCommand *>(context))->OnFailureResponse_15(error);
-        };
-
-        auto done = [](void * context) { (static_cast<TestGroupDemoCommand *>(context))->OnDoneResponse_15(); };
-
-        ReturnErrorOnFailure(
-            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_15(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_15() { NextTest(); }
-
-    void OnDoneResponse_15() { NextTest(); }
-
-    CHIP_ERROR TestWait100ms_16()
-    {
-        SetIdentity(kIdentityAlpha);
-        return WaitForMs(1000);
-    }
-
-    CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_17()
-    {
-        const chip::GroupId groupId = 4660;
-        using RequestType           = chip::app::Clusters::OnOff::Commands::On::Type;
-
-        RequestType request;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupDemoCommand *>(context))->OnSuccessResponse_17();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<TestGroupDemoCommand *>(context))->OnFailureResponse_17(error);
-        };
-
-        auto done = [](void * context) { (static_cast<TestGroupDemoCommand *>(context))->OnDoneResponse_17(); };
-
-        ReturnErrorOnFailure(
-            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_17(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_17() { NextTest(); }
-
-    void OnDoneResponse_17() { NextTest(); }
-
-    CHIP_ERROR TestWait100ms_18()
-    {
-        SetIdentity(kIdentityAlpha);
-        return WaitForMs(1000);
-    }
-
-    CHIP_ERROR TestTurnOffTheLightToSeeAttributeChange_19()
-    {
-        const chip::GroupId groupId = 4660;
-        using RequestType           = chip::app::Clusters::OnOff::Commands::Off::Type;
-
-        RequestType request;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupDemoCommand *>(context))->OnSuccessResponse_19();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<TestGroupDemoCommand *>(context))->OnFailureResponse_19(error);
-        };
-
-        auto done = [](void * context) { (static_cast<TestGroupDemoCommand *>(context))->OnDoneResponse_19(); };
-
-        ReturnErrorOnFailure(
-            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_19(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_19() { NextTest(); }
-
-    void OnDoneResponse_19() { NextTest(); }
-
-    CHIP_ERROR TestWait100ms_20()
-    {
-        SetIdentity(kIdentityAlpha);
-        return WaitForMs(1000);
-    }
-};
-
-class TestGroupDemoConfig : public TestCommand
-{
-public:
-    TestGroupDemoConfig(CredentialIssuerCommands * credsIssuerConfig) :
-        TestCommand("TestGroupDemoConfig", credsIssuerConfig), mTestIndex(0)
-    {
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-    }
-
-    ~TestGroupDemoConfig() {}
-
-    /////////// TestCommand Interface /////////
-    void NextTest() override
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        if (0 == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Start: TestGroupDemoConfig\n");
-        }
-
-        if (mTestCount == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Complete: TestGroupDemoConfig\n");
-            SetCommandExitStatus(CHIP_NO_ERROR);
-            return;
-        }
-
-        Wait();
-
-        // Ensure we increment mTestIndex before we start running the relevant
-        // command.  That way if we lose the timeslice after we send the message
-        // but before our function call returns, we won't end up with an
-        // incorrect mTestIndex value observed when we get the response.
-        switch (mTestIndex++)
-        {
-        case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
-            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
-            break;
-        case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Add Group 1 - endpoint 1\n");
-            err = TestAddGroup1Endpoint1_1();
-            break;
-        }
-
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }
-    }
-
-private:
-    std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 2;
-
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-
-    //
-    // Tests methods
-    //
-
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
-    {
-        SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
-    }
-
-    CHIP_ERROR TestAddGroup1Endpoint1_1()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::Groups::Commands::AddGroup::Type;
-
-        RequestType request;
-        request.groupId   = 4660U;
-        request.groupName = chip::Span<const char>("Group #1garbage: not in length on purpose", 8);
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupDemoConfig *>(context))->OnSuccessResponse_1(data.status, data.groupId);
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<TestGroupDemoConfig *>(context))->OnFailureResponse_1(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_1(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_1(uint8_t status, uint16_t groupId)
-    {
-        VerifyOrReturn(CheckValue("status", status, 0));
-
-        VerifyOrReturn(CheckValue("groupId", groupId, 4660U));
-
-        NextTest();
-    }
-};
-
 class TestGroupKeyManagementCluster : public TestCommand
 {
 public:
@@ -86228,12 +85203,1049 @@ private:
     }
 };
 
+class Test_TC_DD_1_5 : public TestCommand
+{
+public:
+    Test_TC_DD_1_5(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_5", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_DD_1_5() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_1_5\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_1_5\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Step 1\n");
+            err = TestStep1_0();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 1;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestStep1_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("Verify that the onboarding payload for NFC tags SHALL use NDEF URI Record Type Definition as defined by NFC "
+                   "Forum in URI Record Type Definition RTD URI");
+    }
+};
+
+class Test_TC_DD_1_6 : public TestCommand
+{
+public:
+    Test_TC_DD_1_6(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_6", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_DD_1_6() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_1_6\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_1_6\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Step 1\n");
+            err = TestStep1_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Step 1 verification\n");
+            err = TestStep1Verification_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Step 2 verificaiton\n");
+            err = TestStep2Verificaiton_2();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 3;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestStep1_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("Scan the DUTs QR code using a QR code reader");
+    }
+
+    CHIP_ERROR TestStep1Verification_1()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log(
+            "Verify the QR code gets scanned successfully and the QR code must be of sufficient size and contrast respective to "
+            "surface material as to be readable with standard readers such as smartphones in normal lighting conditions");
+    }
+
+    CHIP_ERROR TestStep2Verificaiton_2()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("Verify QR code version is 1 or higher");
+    }
+};
+
+class Test_TC_DD_1_7 : public TestCommand
+{
+public:
+    Test_TC_DD_1_7(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_7", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_DD_1_7() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_1_7\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_1_7\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Precondition\n");
+            err = TestPrecondition_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Step 1\n");
+            err = TestStep1_1();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 2;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestPrecondition_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("Verify manual pairing code is printed on the device or in additional provided materials");
+    }
+
+    CHIP_ERROR TestStep1_1()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("Verify that the Manual Pairing Code should be printed using a minimum font size of 6 points typically "
+                   "producing a typeface height of 2.1 mm");
+    }
+};
+
+class Test_TC_DD_1_8 : public TestCommand
+{
+public:
+    Test_TC_DD_1_8(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_8", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_DD_1_8() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_1_8\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_1_8\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Step 1\n");
+            err = TestStep1_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Step 1 verification\n");
+            err = TestStep1Verification_1();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 2;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestStep1_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("Scan the device QR code using DUT");
+    }
+
+    CHIP_ERROR TestStep1Verification_1()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("Verify the DUT is able to scan and parse the QR code successfully to onboard the device onto the CHIP network");
+    }
+};
+
+class Test_TC_DD_1_9 : public TestCommand
+{
+public:
+    Test_TC_DD_1_9(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_9", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_DD_1_9() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_1_9\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_1_9\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Precondition\n");
+            err = TestPrecondition_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Step 1\n");
+            err = TestStep1_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Step 1 verification\n");
+            err = TestStep1Verification_2();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 3;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestPrecondition_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("Verify that the manual pairing code is printed on the device or in additional provided materials");
+    }
+
+    CHIP_ERROR TestStep1_1()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("Provide the 11 digit or 21 digit pairing code from the Device in text speech or any format supported by DUT");
+    }
+
+    CHIP_ERROR TestStep1Verification_2()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log(
+            "Verify that the manual pairing code can be provided to DUT and parsed to onboard the device onto the CHIP network");
+    }
+};
+
+class TestGroupDemoCommand : public TestCommand
+{
+public:
+    TestGroupDemoCommand(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestGroupDemoCommand", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~TestGroupDemoCommand() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: TestGroupDemoCommand\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: TestGroupDemoCommand\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Turn On the light to see attribute change\n");
+            err = TestTurnOnTheLightToSeeAttributeChange_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Wait 100ms\n");
+            err = TestWait100ms_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Turn Off the light to see attribute change\n");
+            err = TestTurnOffTheLightToSeeAttributeChange_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Wait 100ms\n");
+            err = TestWait100ms_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Turn On the light to see attribute change\n");
+            err = TestTurnOnTheLightToSeeAttributeChange_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Wait 100ms\n");
+            err = TestWait100ms_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Turn Off the light to see attribute change\n");
+            err = TestTurnOffTheLightToSeeAttributeChange_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Wait 100ms\n");
+            err = TestWait100ms_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Turn On the light to see attribute change\n");
+            err = TestTurnOnTheLightToSeeAttributeChange_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Wait 100ms\n");
+            err = TestWait100ms_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Turn Off the light to see attribute change\n");
+            err = TestTurnOffTheLightToSeeAttributeChange_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Wait 100ms\n");
+            err = TestWait100ms_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : Turn On the light to see attribute change\n");
+            err = TestTurnOnTheLightToSeeAttributeChange_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : Wait 100ms\n");
+            err = TestWait100ms_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool, " ***** Test Step 15 : Turn Off the light to see attribute change\n");
+            err = TestTurnOffTheLightToSeeAttributeChange_15();
+            break;
+        case 16:
+            ChipLogProgress(chipTool, " ***** Test Step 16 : Wait 100ms\n");
+            err = TestWait100ms_16();
+            break;
+        case 17:
+            ChipLogProgress(chipTool, " ***** Test Step 17 : Turn On the light to see attribute change\n");
+            err = TestTurnOnTheLightToSeeAttributeChange_17();
+            break;
+        case 18:
+            ChipLogProgress(chipTool, " ***** Test Step 18 : Wait 100ms\n");
+            err = TestWait100ms_18();
+            break;
+        case 19:
+            ChipLogProgress(chipTool, " ***** Test Step 19 : Turn Off the light to see attribute change\n");
+            err = TestTurnOffTheLightToSeeAttributeChange_19();
+            break;
+        case 20:
+            ChipLogProgress(chipTool, " ***** Test Step 20 : Wait 100ms\n");
+            err = TestWait100ms_20();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 21;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_1()
+    {
+        const chip::GroupId groupId = 4660;
+        using RequestType           = chip::app::Clusters::OnOff::Commands::On::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnSuccessResponse_1();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnFailureResponse_1(error);
+        };
+
+        auto done = [](void * context) { (static_cast<TestGroupDemoCommand *>(context))->OnDoneResponse_1(); };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_1() { NextTest(); }
+
+    void OnDoneResponse_1() { NextTest(); }
+
+    CHIP_ERROR TestWait100ms_2()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(1000);
+    }
+
+    CHIP_ERROR TestTurnOffTheLightToSeeAttributeChange_3()
+    {
+        const chip::GroupId groupId = 4660;
+        using RequestType           = chip::app::Clusters::OnOff::Commands::Off::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnSuccessResponse_3();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnFailureResponse_3(error);
+        };
+
+        auto done = [](void * context) { (static_cast<TestGroupDemoCommand *>(context))->OnDoneResponse_3(); };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_3() { NextTest(); }
+
+    void OnDoneResponse_3() { NextTest(); }
+
+    CHIP_ERROR TestWait100ms_4()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(1000);
+    }
+
+    CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_5()
+    {
+        const chip::GroupId groupId = 4660;
+        using RequestType           = chip::app::Clusters::OnOff::Commands::On::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnSuccessResponse_5();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnFailureResponse_5(error);
+        };
+
+        auto done = [](void * context) { (static_cast<TestGroupDemoCommand *>(context))->OnDoneResponse_5(); };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_5() { NextTest(); }
+
+    void OnDoneResponse_5() { NextTest(); }
+
+    CHIP_ERROR TestWait100ms_6()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(1000);
+    }
+
+    CHIP_ERROR TestTurnOffTheLightToSeeAttributeChange_7()
+    {
+        const chip::GroupId groupId = 4660;
+        using RequestType           = chip::app::Clusters::OnOff::Commands::Off::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnSuccessResponse_7();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnFailureResponse_7(error);
+        };
+
+        auto done = [](void * context) { (static_cast<TestGroupDemoCommand *>(context))->OnDoneResponse_7(); };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_7(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_7() { NextTest(); }
+
+    void OnDoneResponse_7() { NextTest(); }
+
+    CHIP_ERROR TestWait100ms_8()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(1000);
+    }
+
+    CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_9()
+    {
+        const chip::GroupId groupId = 4660;
+        using RequestType           = chip::app::Clusters::OnOff::Commands::On::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnSuccessResponse_9();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnFailureResponse_9(error);
+        };
+
+        auto done = [](void * context) { (static_cast<TestGroupDemoCommand *>(context))->OnDoneResponse_9(); };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_9(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_9() { NextTest(); }
+
+    void OnDoneResponse_9() { NextTest(); }
+
+    CHIP_ERROR TestWait100ms_10()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(1000);
+    }
+
+    CHIP_ERROR TestTurnOffTheLightToSeeAttributeChange_11()
+    {
+        const chip::GroupId groupId = 4660;
+        using RequestType           = chip::app::Clusters::OnOff::Commands::Off::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnSuccessResponse_11();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnFailureResponse_11(error);
+        };
+
+        auto done = [](void * context) { (static_cast<TestGroupDemoCommand *>(context))->OnDoneResponse_11(); };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_11(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_11() { NextTest(); }
+
+    void OnDoneResponse_11() { NextTest(); }
+
+    CHIP_ERROR TestWait100ms_12()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(1000);
+    }
+
+    CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_13()
+    {
+        const chip::GroupId groupId = 4660;
+        using RequestType           = chip::app::Clusters::OnOff::Commands::On::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnSuccessResponse_13();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnFailureResponse_13(error);
+        };
+
+        auto done = [](void * context) { (static_cast<TestGroupDemoCommand *>(context))->OnDoneResponse_13(); };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_13(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_13() { NextTest(); }
+
+    void OnDoneResponse_13() { NextTest(); }
+
+    CHIP_ERROR TestWait100ms_14()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(1000);
+    }
+
+    CHIP_ERROR TestTurnOffTheLightToSeeAttributeChange_15()
+    {
+        const chip::GroupId groupId = 4660;
+        using RequestType           = chip::app::Clusters::OnOff::Commands::Off::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnSuccessResponse_15();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnFailureResponse_15(error);
+        };
+
+        auto done = [](void * context) { (static_cast<TestGroupDemoCommand *>(context))->OnDoneResponse_15(); };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_15(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_15() { NextTest(); }
+
+    void OnDoneResponse_15() { NextTest(); }
+
+    CHIP_ERROR TestWait100ms_16()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(1000);
+    }
+
+    CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_17()
+    {
+        const chip::GroupId groupId = 4660;
+        using RequestType           = chip::app::Clusters::OnOff::Commands::On::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnSuccessResponse_17();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnFailureResponse_17(error);
+        };
+
+        auto done = [](void * context) { (static_cast<TestGroupDemoCommand *>(context))->OnDoneResponse_17(); };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_17(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_17() { NextTest(); }
+
+    void OnDoneResponse_17() { NextTest(); }
+
+    CHIP_ERROR TestWait100ms_18()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(1000);
+    }
+
+    CHIP_ERROR TestTurnOffTheLightToSeeAttributeChange_19()
+    {
+        const chip::GroupId groupId = 4660;
+        using RequestType           = chip::app::Clusters::OnOff::Commands::Off::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnSuccessResponse_19();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupDemoCommand *>(context))->OnFailureResponse_19(error);
+        };
+
+        auto done = [](void * context) { (static_cast<TestGroupDemoCommand *>(context))->OnDoneResponse_19(); };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeGroupCommand(mDevices[kIdentityAlpha], this, success, failure, done, groupId, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_19(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_19() { NextTest(); }
+
+    void OnDoneResponse_19() { NextTest(); }
+
+    CHIP_ERROR TestWait100ms_20()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(1000);
+    }
+};
+
+class TestGroupDemoConfig : public TestCommand
+{
+public:
+    TestGroupDemoConfig(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestGroupDemoConfig", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~TestGroupDemoConfig() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: TestGroupDemoConfig\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: TestGroupDemoConfig\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Add Group 1 - endpoint 1\n");
+            err = TestAddGroup1Endpoint1_1();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 2;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestAddGroup1Endpoint1_1()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::Groups::Commands::AddGroup::Type;
+
+        RequestType request;
+        request.groupId   = 4660U;
+        request.groupName = chip::Span<const char>("Group #1garbage: not in length on purpose", 8);
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupDemoConfig *>(context))->OnSuccessResponse_1(data.status, data.groupId);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupDemoConfig *>(context))->OnFailureResponse_1(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_1(uint8_t status, uint16_t groupId)
+    {
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValue("groupId", groupId, 4660U));
+
+        NextTest();
+    }
+};
+
 void registerCommandsTests(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     const char * clusterName = "Tests";
 
     commands_list clusterCommands = {
         make_unique<TestList>(),
+        make_unique<ManualTestList>(),
         make_unique<Test_TC_BI_1_1>(credsIssuerConfig),
         make_unique<Test_TC_BI_2_1>(credsIssuerConfig),
         make_unique<Test_TC_BI_2_2>(credsIssuerConfig),
@@ -86263,11 +86275,6 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_CC_9_1>(credsIssuerConfig),
         make_unique<Test_TC_CC_9_2>(credsIssuerConfig),
         make_unique<Test_TC_CC_9_3>(credsIssuerConfig),
-        make_unique<Test_TC_DD_1_5>(credsIssuerConfig),
-        make_unique<Test_TC_DD_1_6>(credsIssuerConfig),
-        make_unique<Test_TC_DD_1_7>(credsIssuerConfig),
-        make_unique<Test_TC_DD_1_8>(credsIssuerConfig),
-        make_unique<Test_TC_DD_1_9>(credsIssuerConfig),
         make_unique<Test_TC_DM_1_1>(credsIssuerConfig),
         make_unique<Test_TC_DM_3_1>(credsIssuerConfig),
         make_unique<Test_TC_DM_2_2>(credsIssuerConfig),
@@ -86382,9 +86389,14 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<DL_Schedules>(credsIssuerConfig),
         make_unique<TestGroupMessaging>(credsIssuerConfig),
         make_unique<TestGroupsCluster>(credsIssuerConfig),
+        make_unique<TestGroupKeyManagementCluster>(credsIssuerConfig),
+        make_unique<Test_TC_DD_1_5>(credsIssuerConfig),
+        make_unique<Test_TC_DD_1_6>(credsIssuerConfig),
+        make_unique<Test_TC_DD_1_7>(credsIssuerConfig),
+        make_unique<Test_TC_DD_1_8>(credsIssuerConfig),
+        make_unique<Test_TC_DD_1_9>(credsIssuerConfig),
         make_unique<TestGroupDemoCommand>(credsIssuerConfig),
         make_unique<TestGroupDemoConfig>(credsIssuerConfig),
-        make_unique<TestGroupKeyManagementCluster>(credsIssuerConfig),
     };
 
     commands.Register(clusterName, clusterCommands);
