@@ -602,7 +602,8 @@ CHIP_ERROR FabricTable::Delete(FabricIndex index)
     CompressedFabricId compressedFabricId =
         fabricIsInitialized ? fabric->GetPeerId().GetCompressedFabricId() : kUndefinedCompressedFabricId;
     CHIP_ERROR err = FabricInfo::DeleteFromStorage(mStorage, index); // Delete from storage regardless
-    if (!fabricIsInitialized) {
+    if (!fabricIsInitialized)
+    {
         // Make sure to return the error our API promises, not whatever storage
         // chose to return.
         return CHIP_ERROR_NOT_FOUND;
