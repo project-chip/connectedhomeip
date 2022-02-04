@@ -119,6 +119,7 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, CHIP_ERRO
     }
 
     nodeData.LogNodeIdResolved();
+    nodeData.PrioritizeAddresses();
 #if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
     LogErrorOnFailure(sDnssdCache.Insert(nodeData));
 #endif
