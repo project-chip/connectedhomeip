@@ -523,6 +523,24 @@ void SetupPretendDevices()
     AddCluster("Contact Sensor");
     AddAttribute("BooleanState", "true");
     app::Clusters::BooleanState::Attributes::StateValue::Set(1, true);
+
+    AddDevice("Thermostat");
+    AddEndpoint("1");
+    AddCluster("Thermostat");
+    app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(21 * 100));
+    app::Clusters::Thermostat::Attributes::LocalTemperature::Set(1, static_cast<int16_t>(21 * 100));
+    AddAttribute("SystemMode", "4");
+    app::Clusters::Thermostat::Attributes::SystemMode::Set(1, 4);
+    AddAttribute("OccupiedCoolingSetpoint", "19");
+    app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::Set(1,  static_cast<int16_t>(19 * 100));
+    AddAttribute("OccupiedHeatingSetpoint", "25");
+    app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::Set(1,  static_cast<int16_t>(25 * 100));
+
+    AddDevice("Humidity Sensor");
+    AddEndpoint("External");
+    AddCluster("Humidity Sensor");
+    AddAttribute("MeasuredValue", "30");
+    app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(30 * 100));
 }
 
 WiFiWidget pairingWindowLED;
