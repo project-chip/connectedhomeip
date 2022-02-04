@@ -34,12 +34,13 @@ CHIP_ERROR ApplicationLauncherManager::HandleGetCatalogList(AttributeValueEncode
     });
 }
 
-void ApplicationLauncherManager::HandleLaunchApp(CommandResponseHelper<LauncherResponseType> & helper, const CharSpan & data,
+void ApplicationLauncherManager::HandleLaunchApp(CommandResponseHelper<LauncherResponseType> & helper, const ByteSpan & data,
                                                  const ApplicationLauncherApplicationType & application)
 {
     // TODO: Insert code here
     Commands::LauncherResponse::Type response;
-    response.data   = chip::CharSpan::fromCharString("data");
+    const char * buf = "data";
+    response.data    = ByteSpan(from_const_char(buf), strlen(buf));
     response.status = StatusEnum::kSuccess;
     helper.Success(response);
 }
@@ -49,7 +50,8 @@ void ApplicationLauncherManager::HandleStopApp(CommandResponseHelper<LauncherRes
 {
     // TODO: Insert code here
     Commands::LauncherResponse::Type response;
-    response.data   = chip::CharSpan::fromCharString("data");
+    const char * buf = "data";
+    response.data    = ByteSpan(from_const_char(buf), strlen(buf));
     response.status = StatusEnum::kSuccess;
     helper.Success(response);
 }
@@ -59,7 +61,8 @@ void ApplicationLauncherManager::HandleHideApp(CommandResponseHelper<LauncherRes
 {
     // TODO: Insert code here
     Commands::LauncherResponse::Type response;
-    response.data   = chip::CharSpan::fromCharString("data");
+    const char * buf = "data";
+    response.data    = ByteSpan(from_const_char(buf), strlen(buf));
     response.status = StatusEnum::kSuccess;
     helper.Success(response);
 }
