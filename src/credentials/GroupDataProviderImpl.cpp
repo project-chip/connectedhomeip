@@ -899,6 +899,8 @@ void GroupDataProviderImpl::Finish()
 
 CHIP_ERROR GroupDataProviderImpl::SetGroupInfo(chip::FabricIndex fabric_index, const GroupInfo & info)
 {
+    ChipLogDetail(DataManagement, "~~~DEBUG: SetGroupInfo, fabric:%d, group:#%x, name:'%s'\n\n", fabric_index, info.group_id,
+                  info.name);
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
 
     FabricData fabric(fabric_index);
@@ -906,17 +908,20 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfo(chip::FabricIndex fabric_index, c
 
     // Load fabric data (defaults to zero)
     CHIP_ERROR err = fabric.Load(mStorage);
+    ChipLogDetail(DataManagement, "~~~DEBUG: SetGroupInfo.1: %s\n", err.AsString());
     VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
 
     if (group.Find(mStorage, fabric, info.group_id))
     {
         // Existing group_id
+        ChipLogDetail(DataManagement, "~~~DEBUG: SetGroupInfo.2.1, EXISTING\n");
         group.SetName(info.name);
         return group.Save(mStorage);
     }
     else
     {
         // New group_id
+        ChipLogDetail(DataManagement, "~~~DEBUG: SetGroupInfo.2.1, NEW\n");
         group.group_id = info.group_id;
         group.SetName(info.name);
         return SetGroupInfoAt(fabric_index, fabric.group_count, group);
@@ -949,6 +954,9 @@ CHIP_ERROR GroupDataProviderImpl::RemoveGroupInfo(chip::FabricIndex fabric_index
 
 CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index, size_t index, const GroupInfo & info)
 {
+    ChipLogDetail(DataManagement, "~~~DEBUG: SetGroupInfoAt[%zu], fabric:%d, group:#%x, name:'%s'\n\n", index, fabric_index,
+                  info.group_id, info.name);
+
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
 
     FabricData fabric(fabric_index);
@@ -960,6 +968,7 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index,
 
     // If the group exists, the index must match
     bool found = group.Find(mStorage, fabric, info.group_id);
+    ChipLogDetail(DataManagement, "~~~DEBUG: SetGroupInfoAt.1, found:%u\n", found);
     VerifyOrReturnError(!found || (group.index == index), CHIP_ERROR_DUPLICATE_KEY_ID);
 
     group.group_id = info.group_id;
@@ -968,11 +977,13 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index,
     if (found)
     {
         // Update existing entry
+        ChipLogDetail(DataManagement, "~~~DEBUG: SetGroupInfoAt.2.1, FOUND\n");
         return group.Save(mStorage);
     }
     else if (index < fabric.group_count)
     {
         // Replace existing entry with a new group
+        ChipLogDetail(DataManagement, "~~~DEBUG: SetGroupInfoAt.2.1, REPLACE\n");
         GroupData old_group;
         old_group.Get(mStorage, fabric, index);
         group.first = old_group.first;
@@ -980,27 +991,33 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index,
         group.next  = old_group.next;
 
         ReturnErrorOnFailure(RemoveEndpoints(fabric_index, old_group.group_id));
+        ChipLogDetail(DataManagement, "~~~DEBUG: SetGroupInfoAt.2.1.1\n");
         ReturnErrorOnFailure(old_group.Delete(mStorage));
+        ChipLogDetail(DataManagement, "~~~DEBUG: SetGroupInfoAt.2.1.2\n");
         GroupRemoved(fabric_index, old_group);
     }
     else
     {
         // Insert last
+        ChipLogDetail(DataManagement, "~~~DEBUG: SetGroupInfoAt.2.2, INSERT\n");
         VerifyOrReturnError(fabric.group_count == index, CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(fabric.group_count < mMaxGroupsPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
+        ChipLogDetail(DataManagement, "~~~DEBUG: SetGroupInfoAt.2.2.1, count:%u, max:%u\n", abric.group_count, mMaxGroupsPerFabric);
+        // TODO: VerifyOrReturnError(fabric.group_count < mMaxGroupsPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
         fabric.group_count++;
     }
-
+    ChipLogDetail(DataManagement, "~~~DEBUG: SetGroupInfoAt.3.0\n");
     ReturnErrorOnFailure(group.Save(mStorage));
 
     if (group.first)
     {
         // First group, update fabric
         fabric.first_group = group.group_id;
+        ChipLogDetail(DataManagement, "~~~DEBUG: SetGroupInfoAt.3.1\n");
     }
     else
     {
         // Second to last group, update previous
+        ChipLogDetail(DataManagement, "~~~DEBUG: SetGroupInfoAt.3.2\n");
         GroupData prev(fabric_index, group.prev);
         ReturnErrorOnFailure(prev.Load(mStorage));
         prev.next = group.group_id;
@@ -1008,6 +1025,7 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index,
     }
     // Update fabric
     ReturnErrorOnFailure(fabric.Save(mStorage));
+    ChipLogDetail(DataManagement, "~~~DEBUG: SetGroupInfoAt.4\n");
     GroupAdded(fabric_index, group);
     return CHIP_NO_ERROR;
 }
@@ -1102,7 +1120,7 @@ CHIP_ERROR GroupDataProviderImpl::AddEndpoint(chip::FabricIndex fabric_index, ch
     if (!group.Find(mStorage, fabric, group_id))
     {
         // New group
-        VerifyOrReturnError(fabric.group_count < mMaxGroupsPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
+        // TODO: VerifyOrReturnError(fabric.group_count < mMaxGroupsPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
         ReturnErrorOnFailure(EndpointData(fabric_index, group_id, endpoint_id).Save(mStorage));
         // Save the new group into the fabric
         group.group_id       = group_id;

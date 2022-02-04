@@ -207,7 +207,10 @@ public:
                       uint16_t maxGroupKeysPerFabric = CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC) :
         mMaxGroupsPerFabric(maxGroupsPerFabric),
         mMaxGroupKeysPerFabric(maxGroupKeysPerFabric)
-    {}
+    {
+        ChipLogDetail(DataManagement, "~~~DEBUG: GroupDataProvider(%u, %u) [%u, %u]\n", mMaxGroupsPerFabric, maxGroupKeysPerFabric,
+                      CHIP_CONFIG_MAX_GROUPS_PER_FABRIC, CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC);
+    }
 
     virtual ~GroupDataProvider() = default;
 

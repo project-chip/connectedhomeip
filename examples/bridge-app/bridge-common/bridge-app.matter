@@ -243,7 +243,7 @@ server cluster DiagnosticLogs = 50 {
     OCTET_STRING transferFileDesignator = 2;
   }
 
-  command RetrieveLogsRequest(RetrieveLogsRequestRequest): DefaultSuccess = 0;
+  command RetrieveLogsRequest(RetrieveLogsRequestRequest): RetrieveLogsResponse = 0;
 }
 
 server cluster EthernetNetworkDiagnostics = 55 {
@@ -331,9 +331,9 @@ server cluster GeneralCommissioning = 48 {
     CHAR_STRING debugText = 1;
   }
 
-  command ArmFailSafe(ArmFailSafeRequest): DefaultSuccess = 0;
-  command CommissioningComplete(): DefaultSuccess = 4;
-  command SetRegulatoryConfig(SetRegulatoryConfigRequest): DefaultSuccess = 2;
+  command ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
+  command CommissioningComplete(): CommissioningCompleteResponse = 4;
+  command SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
 }
 
 server cluster GeneralDiagnostics = 51 {
@@ -635,12 +635,12 @@ server cluster NetworkCommissioning = 49 {
     optional ThreadInterfaceScanResult threadScanResults[] = 3;
   }
 
-  command AddOrUpdateThreadNetwork(AddOrUpdateThreadNetworkRequest): DefaultSuccess = 3;
-  command AddOrUpdateWiFiNetwork(AddOrUpdateWiFiNetworkRequest): DefaultSuccess = 2;
-  command ConnectNetwork(ConnectNetworkRequest): DefaultSuccess = 6;
-  command RemoveNetwork(RemoveNetworkRequest): DefaultSuccess = 4;
-  command ReorderNetwork(ReorderNetworkRequest): DefaultSuccess = 8;
-  command ScanNetworks(ScanNetworksRequest): DefaultSuccess = 0;
+  command AddOrUpdateThreadNetwork(AddOrUpdateThreadNetworkRequest): NetworkConfigResponse = 3;
+  command AddOrUpdateWiFiNetwork(AddOrUpdateWiFiNetworkRequest): NetworkConfigResponse = 2;
+  command ConnectNetwork(ConnectNetworkRequest): ConnectNetworkResponse = 6;
+  command RemoveNetwork(RemoveNetworkRequest): NetworkConfigResponse = 4;
+  command ReorderNetwork(ReorderNetworkRequest): NetworkConfigResponse = 8;
+  command ScanNetworks(ScanNetworksRequest): ScanNetworksResponse = 0;
 }
 
 server cluster OnOff = 6 {
@@ -769,15 +769,15 @@ server cluster OperationalCredentials = 62 {
     OCTET_STRING attestationSignature = 1;
   }
 
-  command AddNOC(AddNOCRequest): DefaultSuccess = 6;
+  command AddNOC(AddNOCRequest): NOCResponse = 6;
   command AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
-  command AttestationRequest(AttestationRequestRequest): DefaultSuccess = 0;
-  command CertificateChainRequest(CertificateChainRequestRequest): DefaultSuccess = 2;
-  command OpCSRRequest(OpCSRRequestRequest): DefaultSuccess = 4;
-  command RemoveFabric(RemoveFabricRequest): DefaultSuccess = 10;
+  command AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
+  command CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
+  command OpCSRRequest(OpCSRRequestRequest): OpCSRResponse = 4;
+  command RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
   command RemoveTrustedRootCertificate(RemoveTrustedRootCertificateRequest): DefaultSuccess = 12;
-  command UpdateFabricLabel(UpdateFabricLabelRequest): DefaultSuccess = 9;
-  command UpdateNOC(UpdateNOCRequest): DefaultSuccess = 7;
+  command UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
+  command UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
 }
 
 server cluster SoftwareDiagnostics = 52 {

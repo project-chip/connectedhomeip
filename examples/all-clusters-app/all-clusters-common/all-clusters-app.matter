@@ -802,7 +802,7 @@ server cluster DiagnosticLogs = 50 {
     OCTET_STRING transferFileDesignator = 2;
   }
 
-  command RetrieveLogsRequest(RetrieveLogsRequestRequest): DefaultSuccess = 0;
+  command RetrieveLogsRequest(RetrieveLogsRequestRequest): RetrieveLogsResponse = 0;
 }
 
 server cluster DoorLock = 257 {
@@ -1281,10 +1281,10 @@ server cluster DoorLock = 257 {
 
   timed command ClearCredential(ClearCredentialRequest): DefaultSuccess = 38;
   timed command ClearUser(ClearUserRequest): DefaultSuccess = 29;
-  command GetCredentialStatus(GetCredentialStatusRequest): DefaultSuccess = 36;
-  command GetUser(GetUserRequest): DefaultSuccess = 27;
+  command GetCredentialStatus(GetCredentialStatusRequest): GetCredentialStatusResponse = 36;
+  command GetUser(GetUserRequest): GetUserResponse = 27;
   timed command LockDoor(LockDoorRequest): DefaultSuccess = 0;
-  timed command SetCredential(SetCredentialRequest): DefaultSuccess = 34;
+  timed command SetCredential(SetCredentialRequest): SetCredentialResponse = 34;
   timed command SetUser(SetUserRequest): DefaultSuccess = 26;
   timed command UnlockDoor(UnlockDoorRequest): DefaultSuccess = 1;
 }
@@ -1399,9 +1399,9 @@ server cluster GeneralCommissioning = 48 {
     CHAR_STRING debugText = 1;
   }
 
-  command ArmFailSafe(ArmFailSafeRequest): DefaultSuccess = 0;
-  command CommissioningComplete(): DefaultSuccess = 4;
-  command SetRegulatoryConfig(SetRegulatoryConfigRequest): DefaultSuccess = 2;
+  command ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
+  command CommissioningComplete(): CommissioningCompleteResponse = 4;
+  command SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
 }
 
 server cluster GeneralDiagnostics = 51 {
@@ -1553,8 +1553,8 @@ server cluster GroupKeyManagement = 63 {
     GroupKeySetStruct groupKeySet = 0;
   }
 
-  command KeySetRead(KeySetReadRequest): DefaultSuccess = 1;
-  command KeySetReadAllIndices(KeySetReadAllIndicesRequest): DefaultSuccess = 4;
+  command KeySetRead(KeySetReadRequest): KeySetReadResponse = 1;
+  command KeySetReadAllIndices(KeySetReadAllIndicesRequest): KeySetReadAllIndicesResponse = 4;
   command KeySetRemove(KeySetRemoveRequest): DefaultSuccess = 3;
   command KeySetWrite(KeySetWriteRequest): DefaultSuccess = 0;
 }
@@ -1606,12 +1606,12 @@ server cluster Groups = 4 {
     CHAR_STRING groupName = 2;
   }
 
-  command AddGroup(AddGroupRequest): DefaultSuccess = 0;
+  command AddGroup(AddGroupRequest): AddGroupResponse = 0;
   command AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
-  command GetGroupMembership(GetGroupMembershipRequest): DefaultSuccess = 2;
+  command GetGroupMembership(GetGroupMembershipRequest): GetGroupMembershipResponse = 2;
   command RemoveAllGroups(): DefaultSuccess = 4;
-  command RemoveGroup(RemoveGroupRequest): DefaultSuccess = 3;
-  command ViewGroup(ViewGroupRequest): DefaultSuccess = 1;
+  command RemoveGroup(RemoveGroupRequest): RemoveGroupResponse = 3;
+  command ViewGroup(ViewGroupRequest): ViewGroupResponse = 1;
 }
 
 server cluster IasZone = 1280 {
@@ -1722,7 +1722,7 @@ server cluster Identify = 3 {
   }
 
   command Identify(IdentifyRequest): DefaultSuccess = 0;
-  command IdentifyQuery(): DefaultSuccess = 1;
+  command IdentifyQuery(): IdentifyQueryResponse = 1;
   command TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
 }
 
@@ -2140,12 +2140,12 @@ server cluster NetworkCommissioning = 49 {
     optional ThreadInterfaceScanResult threadScanResults[] = 3;
   }
 
-  command AddOrUpdateThreadNetwork(AddOrUpdateThreadNetworkRequest): DefaultSuccess = 3;
-  command AddOrUpdateWiFiNetwork(AddOrUpdateWiFiNetworkRequest): DefaultSuccess = 2;
-  command ConnectNetwork(ConnectNetworkRequest): DefaultSuccess = 6;
-  command RemoveNetwork(RemoveNetworkRequest): DefaultSuccess = 4;
-  command ReorderNetwork(ReorderNetworkRequest): DefaultSuccess = 8;
-  command ScanNetworks(ScanNetworksRequest): DefaultSuccess = 0;
+  command AddOrUpdateThreadNetwork(AddOrUpdateThreadNetworkRequest): NetworkConfigResponse = 3;
+  command AddOrUpdateWiFiNetwork(AddOrUpdateWiFiNetworkRequest): NetworkConfigResponse = 2;
+  command ConnectNetwork(ConnectNetworkRequest): ConnectNetworkResponse = 6;
+  command RemoveNetwork(RemoveNetworkRequest): NetworkConfigResponse = 4;
+  command ReorderNetwork(ReorderNetworkRequest): NetworkConfigResponse = 8;
+  command ScanNetworks(ScanNetworksRequest): ScanNetworksResponse = 0;
 }
 
 client cluster OtaSoftwareUpdateProvider = 41 {
@@ -2197,9 +2197,9 @@ client cluster OtaSoftwareUpdateProvider = 41 {
     INT32U delayedActionTime = 1;
   }
 
-  command ApplyUpdateRequest(ApplyUpdateRequestRequest): DefaultSuccess = 2;
+  command ApplyUpdateRequest(ApplyUpdateRequestRequest): ApplyUpdateResponse = 2;
   command NotifyUpdateApplied(NotifyUpdateAppliedRequest): DefaultSuccess = 4;
-  command QueryImage(QueryImageRequest): DefaultSuccess = 0;
+  command QueryImage(QueryImageRequest): QueryImageResponse = 0;
 }
 
 server cluster OtaSoftwareUpdateRequestor = 42 {
@@ -2429,15 +2429,15 @@ server cluster OperationalCredentials = 62 {
     OCTET_STRING attestationSignature = 1;
   }
 
-  command AddNOC(AddNOCRequest): DefaultSuccess = 6;
+  command AddNOC(AddNOCRequest): NOCResponse = 6;
   command AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
-  command AttestationRequest(AttestationRequestRequest): DefaultSuccess = 0;
-  command CertificateChainRequest(CertificateChainRequestRequest): DefaultSuccess = 2;
-  command OpCSRRequest(OpCSRRequestRequest): DefaultSuccess = 4;
-  command RemoveFabric(RemoveFabricRequest): DefaultSuccess = 10;
+  command AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
+  command CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
+  command OpCSRRequest(OpCSRRequestRequest): OpCSRResponse = 4;
+  command RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
   command RemoveTrustedRootCertificate(RemoveTrustedRootCertificateRequest): DefaultSuccess = 12;
-  command UpdateFabricLabel(UpdateFabricLabelRequest): DefaultSuccess = 9;
-  command UpdateNOC(UpdateNOCRequest): DefaultSuccess = 7;
+  command UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
+  command UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
 }
 
 server cluster PowerSource = 47 {
@@ -2742,13 +2742,13 @@ server cluster Scenes = 5 {
     SceneExtensionFieldSet extensionFieldSets[] = 5;
   }
 
-  command AddScene(AddSceneRequest): DefaultSuccess = 0;
-  command GetSceneMembership(GetSceneMembershipRequest): DefaultSuccess = 6;
+  command AddScene(AddSceneRequest): AddSceneResponse = 0;
+  command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
   command RecallScene(RecallSceneRequest): DefaultSuccess = 5;
-  command RemoveAllScenes(RemoveAllScenesRequest): DefaultSuccess = 3;
-  command RemoveScene(RemoveSceneRequest): DefaultSuccess = 2;
-  command StoreScene(StoreSceneRequest): DefaultSuccess = 4;
-  command ViewScene(ViewSceneRequest): DefaultSuccess = 1;
+  command RemoveAllScenes(RemoveAllScenesRequest): RemoveAllScenesResponse = 3;
+  command RemoveScene(RemoveSceneRequest): RemoveSceneResponse = 2;
+  command StoreScene(StoreSceneRequest): StoreSceneResponse = 4;
+  command ViewScene(ViewSceneRequest): ViewSceneResponse = 1;
 }
 
 server cluster SoftwareDiagnostics = 52 {
@@ -3093,23 +3093,23 @@ server cluster TestCluster = 1295 {
     INT8U returnValue = 0;
   }
 
-  command SimpleStructEchoRequest(SimpleStructEchoRequestRequest): DefaultSuccess = 17;
+  command SimpleStructEchoRequest(SimpleStructEchoRequestRequest): SimpleStructResponse = 17;
   command Test(): DefaultSuccess = 0;
-  command TestAddArguments(TestAddArgumentsRequest): DefaultSuccess = 4;
-  command TestEmitTestEventRequest(TestEmitTestEventRequestRequest): DefaultSuccess = 20;
-  command TestEmitTestFabricScopedEventRequest(TestEmitTestFabricScopedEventRequestRequest): DefaultSuccess = 21;
-  command TestEnumsRequest(TestEnumsRequestRequest): DefaultSuccess = 14;
-  command TestListInt8UArgumentRequest(TestListInt8UArgumentRequestRequest): DefaultSuccess = 10;
-  command TestListInt8UReverseRequest(TestListInt8UReverseRequestRequest): DefaultSuccess = 13;
-  command TestListNestedStructListArgumentRequest(TestListNestedStructListArgumentRequestRequest): DefaultSuccess = 12;
-  command TestListStructArgumentRequest(TestListStructArgumentRequestRequest): DefaultSuccess = 9;
-  command TestNestedStructArgumentRequest(TestNestedStructArgumentRequestRequest): DefaultSuccess = 8;
-  command TestNestedStructListArgumentRequest(TestNestedStructListArgumentRequestRequest): DefaultSuccess = 11;
+  command TestAddArguments(TestAddArgumentsRequest): TestAddArgumentsResponse = 4;
+  command TestEmitTestEventRequest(TestEmitTestEventRequestRequest): TestEmitTestEventResponse = 20;
+  command TestEmitTestFabricScopedEventRequest(TestEmitTestFabricScopedEventRequestRequest): TestEmitTestFabricScopedEventResponse = 21;
+  command TestEnumsRequest(TestEnumsRequestRequest): TestEnumsResponse = 14;
+  command TestListInt8UArgumentRequest(TestListInt8UArgumentRequestRequest): BooleanResponse = 10;
+  command TestListInt8UReverseRequest(TestListInt8UReverseRequestRequest): TestListInt8UReverseResponse = 13;
+  command TestListNestedStructListArgumentRequest(TestListNestedStructListArgumentRequestRequest): BooleanResponse = 12;
+  command TestListStructArgumentRequest(TestListStructArgumentRequestRequest): BooleanResponse = 9;
+  command TestNestedStructArgumentRequest(TestNestedStructArgumentRequestRequest): BooleanResponse = 8;
+  command TestNestedStructListArgumentRequest(TestNestedStructListArgumentRequestRequest): BooleanResponse = 11;
   command TestNotHandled(): DefaultSuccess = 1;
-  command TestNullableOptionalRequest(TestNullableOptionalRequestRequest): DefaultSuccess = 15;
+  command TestNullableOptionalRequest(TestNullableOptionalRequestRequest): TestNullableOptionalResponse = 15;
   command TestSimpleOptionalArgumentRequest(TestSimpleOptionalArgumentRequestRequest): DefaultSuccess = 19;
-  command TestSpecific(): DefaultSuccess = 2;
-  command TestStructArgumentRequest(TestStructArgumentRequestRequest): DefaultSuccess = 7;
+  command TestSpecific(): TestSpecificResponse = 2;
+  command TestStructArgumentRequest(TestStructArgumentRequestRequest): BooleanResponse = 7;
   timed command TimedInvokeRequest(): DefaultSuccess = 18;
 }
 
