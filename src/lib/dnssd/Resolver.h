@@ -133,7 +133,7 @@ struct ResolvedNodeData
     Optional<System::Clock::Milliseconds32> mMrpRetryIntervalIdle;
     Optional<System::Clock::Milliseconds32> mMrpRetryIntervalActive;
     System::Clock::Timestamp mExpiryTime;
-}; // namespace
+};
 
 constexpr size_t kMaxDeviceNameLen         = 32;
 constexpr size_t kMaxRotatingIdLen         = 50;
