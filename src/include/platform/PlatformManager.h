@@ -29,6 +29,9 @@
 #include <system/PlatformEventSupport.h>
 #include <system/SystemLayer.h>
 
+#include <cstddef>
+#include <cstdint>
+
 namespace chip {
 
 namespace Dnssd {
@@ -192,6 +195,21 @@ public:
     CHIP_ERROR GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales);
     CHIP_ERROR GetSupportedCalendarTypes(
         AttributeList<app::Clusters::TimeFormatLocalization::CalendarType, kMaxCalendarTypes> & supportedCalendarTypes);
+    CHIP_ERROR GetBridgedVendorName(EndpointId endpoint, char * buf, size_t bufSize);
+    CHIP_ERROR GetBridgedVendorId(EndpointId endpoint, uint16_t & vendorId);
+    CHIP_ERROR GetBridgedProductName(EndpointId endpoint, char * buf, size_t bufSize);
+    CHIP_ERROR GetBridgedNodeLabel(EndpointId endpoint, char * buf, size_t bufSize);
+    CHIP_ERROR GetBridgedHardwareVersion(EndpointId endpoint, uint16_t & hardwareVer);
+    CHIP_ERROR GetBridgedHardwareVersionString(EndpointId endpoint, char * buf, size_t bufSize);
+    CHIP_ERROR GetBridgedSoftwareVersion(EndpointId endpoint, uint32_t & softwareVer);
+    CHIP_ERROR GetBridgedSoftwareVersionString(EndpointId endpoint, char * buf, size_t bufSize);
+    CHIP_ERROR GetBridgedManufacturingDate(EndpointId endpoint, uint16_t & year, uint8_t & month, uint8_t & dayOfMonth);
+    CHIP_ERROR GetBridgedPartNumber(EndpointId endpoint, char * buf, size_t bufSize);
+    CHIP_ERROR GetBridgedProductURL(EndpointId endpoint, char * buf, size_t bufSize);
+    CHIP_ERROR GetBridgedProductLabel(EndpointId endpoint, char * buf, size_t bufSize);
+    CHIP_ERROR GetBridgedSerialNumber(EndpointId endpoint, char * buf, size_t bufSize);
+    CHIP_ERROR GetBridgedReachable(EndpointId endpoint, bool & reachable);
+    CHIP_ERROR GetBridgedUniqueId(EndpointId endpoint, char * buf, size_t bufSize);
 
 private:
     bool mInitialized                   = false;
@@ -462,6 +480,82 @@ inline CHIP_ERROR PlatformManager::GetSupportedCalendarTypes(
     AttributeList<app::Clusters::TimeFormatLocalization::CalendarType, kMaxCalendarTypes> & supportedCalendarTypes)
 {
     return static_cast<ImplClass *>(this)->_GetSupportedCalendarTypes(supportedCalendarTypes);
+}
+
+inline CHIP_ERROR PlatformManager::GetBridgedVendorName(EndpointId endpoint, char * buf, size_t bufSize)
+{
+    return static_cast<ImplClass *>(this)->_GetBridgedVendorName(endpoint, buf, bufSize);
+}
+
+inline CHIP_ERROR PlatformManager::GetBridgedVendorId(EndpointId endpoint, uint16_t & vendorId)
+{
+    return static_cast<ImplClass *>(this)->_GetBridgedVendorId(endpoint, vendorId);
+}
+
+inline CHIP_ERROR PlatformManager::GetBridgedProductName(EndpointId endpoint, char * buf, size_t bufSize)
+{
+    return static_cast<ImplClass *>(this)->_GetBridgedProductName(endpoint, buf, bufSize);
+}
+
+inline CHIP_ERROR PlatformManager::GetBridgedNodeLabel(EndpointId endpoint, char * buf, size_t bufSize)
+{
+    return static_cast<ImplClass *>(this)->_GetBridgedNodeLabel(endpoint, buf, bufSize);
+}
+
+inline CHIP_ERROR PlatformManager::GetBridgedHardwareVersion(EndpointId endpoint, uint16_t & hardwareVer)
+{
+    return static_cast<ImplClass *>(this)->_GetBridgedHardwareVersion(endpoint, hardwareVer);
+}
+
+inline CHIP_ERROR PlatformManager::GetBridgedHardwareVersionString(EndpointId endpoint, char * buf, size_t bufSize)
+{
+    return static_cast<ImplClass *>(this)->_GetBridgedHardwareVersionString(endpoint, buf, bufSize);
+}
+
+inline CHIP_ERROR PlatformManager::GetBridgedSoftwareVersion(EndpointId endpoint, uint32_t & softwareVer)
+{
+    return static_cast<ImplClass *>(this)->_GetBridgedSoftwareVersion(endpoint, softwareVer);
+}
+
+inline CHIP_ERROR PlatformManager::GetBridgedSoftwareVersionString(EndpointId endpoint, char * buf, size_t bufSize)
+{
+    return static_cast<ImplClass *>(this)->_GetBridgedSoftwareVersionString(endpoint, buf, bufSize);
+}
+
+inline CHIP_ERROR PlatformManager::GetBridgedManufacturingDate(
+    EndpointId endpoint, uint16_t & year, uint8_t & month, uint8_t & dayOfMonth)
+{
+    return static_cast<ImplClass *>(this)->_GetBridgedManufacturingDate(endpoint, year, month, dayOfMonth);
+}
+
+inline CHIP_ERROR PlatformManager::GetBridgedPartNumber(EndpointId endpoint, char * buf, size_t bufSize)
+{
+    return static_cast<ImplClass *>(this)->_GetBridgedPartNumber(endpoint, buf, bufSize);
+}
+
+inline CHIP_ERROR PlatformManager::GetBridgedProductURL(EndpointId endpoint, char * buf, size_t bufSize)
+{
+    return static_cast<ImplClass *>(this)->_GetBridgedProductURL(endpoint, buf, bufSize);
+}
+
+inline CHIP_ERROR PlatformManager::GetBridgedProductLabel(EndpointId endpoint, char * buf, size_t bufSize)
+{
+    return static_cast<ImplClass *>(this)->_GetBridgedProductLabel(endpoint, buf, bufSize);
+}
+
+inline CHIP_ERROR PlatformManager::GetBridgedSerialNumber(EndpointId endpoint, char * buf, size_t bufSize)
+{
+    return static_cast<ImplClass *>(this)->_GetBridgedSerialNumber(endpoint, buf, bufSize);
+}
+
+inline CHIP_ERROR PlatformManager::GetBridgedReachable(EndpointId endpoint, bool & reachable)
+{
+    return static_cast<ImplClass *>(this)->_GetBridgedReachable(endpoint, reachable);
+}
+
+inline CHIP_ERROR PlatformManager::GetBridgedUniqueId(EndpointId endpoint, char * buf, size_t bufSize)
+{
+    return static_cast<ImplClass *>(this)->_GetBridgedUniqueId(endpoint, buf, bufSize);
 }
 
 } // namespace DeviceLayer

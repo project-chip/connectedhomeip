@@ -22,7 +22,7 @@ SERVER_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'BINDING_CLUSTER': ['bindings'],
     'BOOLEAN_STATE_CLUSTER': [],
     'BRIDGED_ACTIONS_CLUSTER': [],
-    'BRIDGED_DEVICE_BASIC_CLUSTER': [],
+    'BRIDGED_DEVICE_BASIC_CLUSTER': ['bridged-device-basic-information-server'],
     'CHANNEL_CLUSTER': ['channel-server'],
     'COLOR_CONTROL_CLUSTER': ['color-control-server'],
     'COMMISSIONING_CLUSTER': [],

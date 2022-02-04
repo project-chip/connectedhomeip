@@ -84,13 +84,13 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_CLUSTERS}/basic/basic.cpp
                ${APP_CLUSTERS}/bindings/BindingManager.cpp
                ${APP_CLUSTERS}/bindings/bindings.cpp
+               ${APP_CLUSTERS}/bridged-device-basic-information-server/bridged-device-basic-information-server.cpp
                ${APP_CLUSTERS}/on-off-server/on-off-server.cpp
                ${APP_CLUSTERS}/access-control-server/access-control-server.cpp
                ${APP_CLUSTERS}/account-login-server/account-login-server.cpp
                ${APP_CLUSTERS}/application-launcher-server/application-launcher-server.cpp
                ${APP_CLUSTERS}/audio-output-server/audio-output-server.cpp   
                ${APP_CLUSTERS}/barrier-control-server/barrier-control-server.cpp
-               ${APP_CLUSTERS}/basic/basic.cpp
                ${APP_CLUSTERS}/bindings/bindings.cpp
                ${APP_CLUSTERS}/color-control-server/color-control-server.cpp
                ${APP_CLUSTERS}/content-launch-server/content-launch-server.cpp
