@@ -222,12 +222,6 @@ void ExampleCommissioningStateMachine::Init(SystemState * systemState, OpCredsIs
     mCommissionee.Init(systemState);
 }
 
-void ExampleCommissioningStateMachine::Init(SystemState * systemState, OpCredsIssuer * issuer, FabricIndex fabricIndex,
-                                            NodeId nodeId)
-{
-    Init(systemState, issuer, fabricIndex, nodeId, CommissioningParameters());
-}
-
 void ExampleCommissioningStateMachine::Shutdown()
 {
     this->Dispatch(Event::Create<AppEvents::Shutdown>());

@@ -696,7 +696,6 @@ public:
     ExampleCommissioningStateMachine() :
         chip::StateMachine::StateMachine<Context, State, Event, Transitions>(mTransitions), mTransitions(*this, mCommissionee)
     {}
-    void Init(SystemState * systemState, OpCredsIssuer * issuer, FabricIndex fabricIndex, NodeId nodeId);
     void Init(SystemState * systemState, OpCredsIssuer * issuer, FabricIndex fabricIndex, NodeId nodeId,
               CommissioningParameters commissioningParameters);
     void Shutdown();
