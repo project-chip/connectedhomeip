@@ -297,7 +297,7 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "        then value from ota image list is used.\n"
                              "        Otherwise, this value will be used is then value from that will be used\n"
                              "  -c/--UserConsentNeeded\n"
-                             "        If provided, Value of UserConsentNeeded in the Query Image Response is set to true\n" };
+                             "        If provided, value of UserConsentNeeded in the Query Image Response is set to true\n" };
 
 HelpOptions helpOptions("ota-provider-app", "Usage: ota-provider-app [options]", "1.0");
 
