@@ -1678,8 +1678,7 @@ server cluster IasZone = 1280 {
     INT16U delay = 3;
   }
 
-  command ZoneEnrollRequest(ZoneEnrollRequestRequest): ZoneEnrollResponse = 1;
-  command ZoneStatusChangeNotification(ZoneStatusChangeNotificationRequest): DefaultSuccess = 0;
+  command ZoneEnrollResponse(ZoneEnrollResponseRequest): DefaultSuccess = 0;
 }
 
 server cluster Identify = 3 {

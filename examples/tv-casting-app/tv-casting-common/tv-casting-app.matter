@@ -1559,8 +1559,7 @@ server cluster IasZone = 1280 {
     INT16U delay = 3;
   }
 
-  command ZoneEnrollRequest(ZoneEnrollRequestRequest): ZoneEnrollResponse = 1;
-  command ZoneStatusChangeNotification(ZoneStatusChangeNotificationRequest): DefaultSuccess = 0;
+  command ZoneEnrollResponse(ZoneEnrollResponseRequest): DefaultSuccess = 0;
 }
 
 server cluster Identify = 3 {
@@ -2497,7 +2496,6 @@ server cluster TestCluster = 1295 {
 
   command Test(): DefaultSuccess = 0;
   command TestNotHandled(): DefaultSuccess = 1;
-  command TestSpecific(): TestSpecificResponse = 2;
 }
 
 server cluster Thermostat = 513 {
