@@ -591,11 +591,13 @@ public:
      * @param[in] attestationNonce    Attestation nonce
      * @param[in] pai                 PAI certificate
      * @param[in] dac                 DAC certificates
+     * @param[in] remoteVendorId      vendor ID read from the device
+     * @param[in] remoteProductId     product ID read from the device
      * @param[in] proxy               device proxy that is being attested.
      */
     CHIP_ERROR ValidateAttestationInfo(const ByteSpan & attestationElements, const ByteSpan & signature,
                                        const ByteSpan & attestationNonce, const ByteSpan & pai, const ByteSpan & dac,
-                                       DeviceProxy * proxy);
+                                       VendorId remoteVendorId, uint16_t remoteProductId, DeviceProxy * proxy);
 
     /**
      * @brief
@@ -852,7 +854,7 @@ private:
         return cluster.InvokeCommand(request, this, successCb, failureCb);
     }
 
-    static CHIP_ERROR ConvertFromNodeOperationalCertStatus(uint8_t err);
+    static CHIP_ERROR ConvertFromOperationalCertStatus(chip::app::Clusters::OperationalCredentials::OperationalCertStatus err);
 
     chip::Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;

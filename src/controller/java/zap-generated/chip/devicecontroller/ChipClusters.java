@@ -8290,13 +8290,13 @@ public class ChipClusters {
 
     public void keySetWrite(
         DefaultClusterCallback callback,
-        ChipStructs.GroupKeyManagementClusterGroupKeySet groupKeySet) {
+        ChipStructs.GroupKeyManagementClusterGroupKeySetStruct groupKeySet) {
       keySetWrite(chipClusterPtr, callback, groupKeySet, null);
     }
 
     public void keySetWrite(
         DefaultClusterCallback callback,
-        ChipStructs.GroupKeyManagementClusterGroupKeySet groupKeySet,
+        ChipStructs.GroupKeyManagementClusterGroupKeySetStruct groupKeySet,
         int timedInvokeTimeoutMs) {
       keySetWrite(chipClusterPtr, callback, groupKeySet, timedInvokeTimeoutMs);
     }
@@ -8322,7 +8322,7 @@ public class ChipClusters {
     private native void keySetWrite(
         long chipClusterPtr,
         DefaultClusterCallback Callback,
-        ChipStructs.GroupKeyManagementClusterGroupKeySet groupKeySet,
+        ChipStructs.GroupKeyManagementClusterGroupKeySetStruct groupKeySet,
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface KeySetReadAllIndicesResponseCallback {
@@ -8332,13 +8332,13 @@ public class ChipClusters {
     }
 
     public interface KeySetReadResponseCallback {
-      void onSuccess(ChipStructs.GroupKeyManagementClusterGroupKeySet groupKeySet);
+      void onSuccess(ChipStructs.GroupKeyManagementClusterGroupKeySetStruct groupKeySet);
 
       void onError(Exception error);
     }
 
     public interface GroupKeyMapAttributeCallback {
-      void onSuccess(List<ChipStructs.GroupKeyManagementClusterGroupKey> valueList);
+      void onSuccess(List<ChipStructs.GroupKeyManagementClusterGroupKeyMapStruct> valueList);
 
       void onError(Exception ex);
 
@@ -8346,7 +8346,7 @@ public class ChipClusters {
     }
 
     public interface GroupTableAttributeCallback {
-      void onSuccess(List<ChipStructs.GroupKeyManagementClusterGroupInfo> valueList);
+      void onSuccess(List<ChipStructs.GroupKeyManagementClusterGroupInfoMapStruct> valueList);
 
       void onError(Exception ex);
 
@@ -8383,13 +8383,13 @@ public class ChipClusters {
 
     public void writeGroupKeyMapAttribute(
         DefaultClusterCallback callback,
-        ArrayList<ChipStructs.GroupKeyManagementClusterGroupKey> value) {
+        ArrayList<ChipStructs.GroupKeyManagementClusterGroupKeyMapStruct> value) {
       writeGroupKeyMapAttribute(chipClusterPtr, callback, value, null);
     }
 
     public void writeGroupKeyMapAttribute(
         DefaultClusterCallback callback,
-        ArrayList<ChipStructs.GroupKeyManagementClusterGroupKey> value,
+        ArrayList<ChipStructs.GroupKeyManagementClusterGroupKeyMapStruct> value,
         int timedWriteTimeoutMs) {
       writeGroupKeyMapAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
     }
@@ -8472,7 +8472,7 @@ public class ChipClusters {
     private native void writeGroupKeyMapAttribute(
         long chipClusterPtr,
         DefaultClusterCallback callback,
-        ArrayList<ChipStructs.GroupKeyManagementClusterGroupKey> value,
+        ArrayList<ChipStructs.GroupKeyManagementClusterGroupKeyMapStruct> value,
         @Nullable Integer timedWriteTimeoutMs);
 
     private native void subscribeGroupKeyMapAttribute(
@@ -12736,7 +12736,7 @@ public class ChipClusters {
     }
 
     public interface NOCResponseCallback {
-      void onSuccess(Integer statusCode, Integer fabricIndex, String debugText);
+      void onSuccess(Integer statusCode, Optional<Integer> fabricIndex, Optional<String> debugText);
 
       void onError(Exception error);
     }

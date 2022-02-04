@@ -1153,7 +1153,8 @@ void DeviceCommissioner::OnDeviceAttestationInformationVerification(void * conte
 
 CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const ByteSpan & attestationElements, const ByteSpan & signature,
                                                        const ByteSpan & attestationNonce, const ByteSpan & pai,
-                                                       const ByteSpan & dac, DeviceProxy * proxy)
+                                                       const ByteSpan & dac, VendorId remoteVendorId, uint16_t remoteProductId,
+                                                       DeviceProxy * proxy)
 {
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(proxy != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -1165,7 +1166,7 @@ CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const ByteSpan & attestat
         proxy->GetSecureSession().Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
 
     dac_verifier->VerifyAttestationInformation(attestationElements, attestationChallenge, signature, pai, dac, attestationNonce,
-                                               &mDeviceAttestationInformationVerificationCallback);
+                                               remoteVendorId, remoteProductId, &mDeviceAttestationInformationVerificationCallback);
 
     // TODO: Validate Firmware Information
 
@@ -1284,27 +1285,28 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(DeviceProxy * device, 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceCommissioner::ConvertFromNodeOperationalCertStatus(uint8_t err)
+CHIP_ERROR DeviceCommissioner::ConvertFromOperationalCertStatus(OperationalCredentials::OperationalCertStatus err)
 {
+    using OperationalCredentials::OperationalCertStatus;
     switch (err)
     {
-    case EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_SUCCESS:
+    case OperationalCertStatus::kSuccess:
         return CHIP_NO_ERROR;
-    case EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_INVALID_PUBLIC_KEY:
+    case OperationalCertStatus::kInvalidPublicKey:
         return CHIP_ERROR_INVALID_PUBLIC_KEY;
-    case EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_INVALID_NODE_OP_ID:
+    case OperationalCertStatus::kInvalidNodeOpId:
         return CHIP_ERROR_WRONG_NODE_ID;
-    case EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_INVALID_NOC:
-        return CHIP_ERROR_CERT_LOAD_FAILED;
-    case EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_MISSING_CSR:
+    case OperationalCertStatus::kInvalidNOC:
+        return CHIP_ERROR_UNSUPPORTED_CERT_FORMAT;
+    case OperationalCertStatus::kMissingCsr:
         return CHIP_ERROR_INCORRECT_STATE;
-    case EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_TABLE_FULL:
+    case OperationalCertStatus::kTableFull:
         return CHIP_ERROR_NO_MEMORY;
-    case EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_INSUFFICIENT_PRIVILEGE:
-    case EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_FABRIC_CONFLICT:
-    case EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_LABEL_CONFLICT:
+    case OperationalCertStatus::kInsufficientPrivilege:
+    case OperationalCertStatus::kFabricConflict:
+    case OperationalCertStatus::kLabelConflict:
         return CHIP_ERROR_INVALID_ARGUMENT;
-    case EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_INVALID_FABRIC_INDEX:
+    case OperationalCertStatus::kInvalidFabricIndex:
         return CHIP_ERROR_INVALID_FABRIC_ID;
     }
 
@@ -1321,7 +1323,7 @@ void DeviceCommissioner::OnAddNOCFailureResponse(void * context, CHIP_ERROR erro
 void DeviceCommissioner::OnOperationalCertificateAddResponse(
     void * context, const OperationalCredentials::Commands::NOCResponse::DecodableType & data)
 {
-    ChipLogProgress(Controller, "Device returned status %d on receiving the NOC", data.statusCode);
+    ChipLogProgress(Controller, "Device returned status %d on receiving the NOC", to_underlying(data.statusCode));
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
 
     CHIP_ERROR err                   = CHIP_NO_ERROR;
@@ -1331,7 +1333,7 @@ void DeviceCommissioner::OnOperationalCertificateAddResponse(
 
     VerifyOrExit(commissioner->mDeviceBeingCommissioned != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = ConvertFromNodeOperationalCertStatus(data.statusCode);
+    err = ConvertFromOperationalCertStatus(data.statusCode);
     SuccessOrExit(err);
 
     device = commissioner->mDeviceBeingCommissioned;
@@ -1797,7 +1799,6 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
         mAttributeCache = std::move(attributeCache);
         mReadClient     = std::move(readClient);
-        return;
     }
     break;
     case CommissioningStage::kConfigRegulatory: {
@@ -1865,7 +1866,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     case CommissioningStage::kAttestationVerification:
         ChipLogProgress(Controller, "Verifying attestation");
         if (!params.GetAttestationElements().HasValue() || !params.GetAttestationSignature().HasValue() ||
-            !params.GetAttestationNonce().HasValue() || !params.GetDAC().HasValue() || !params.GetPAI().HasValue())
+            !params.GetAttestationNonce().HasValue() || !params.GetDAC().HasValue() || !params.GetPAI().HasValue() ||
+            !params.GetRemoteVendorId().HasValue() || !params.GetRemoteProductId().HasValue())
         {
             ChipLogError(Controller, "Missing attestation information");
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
@@ -1873,6 +1875,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
         if (ValidateAttestationInfo(params.GetAttestationElements().Value(), params.GetAttestationSignature().Value(),
                                     params.GetAttestationNonce().Value(), params.GetPAI().Value(), params.GetDAC().Value(),
+                                    params.GetRemoteVendorId().Value(), params.GetRemoteProductId().Value(),
                                     proxy) != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "Error validating attestation information");

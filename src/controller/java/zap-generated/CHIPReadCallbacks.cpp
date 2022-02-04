@@ -7902,7 +7902,8 @@ CHIPGroupKeyManagementGroupKeyMapAttributeCallback::~CHIPGroupKeyManagementGroup
 
 void CHIPGroupKeyManagementGroupKeyMapAttributeCallback::CallbackFn(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> & list)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType> &
+        list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7950,19 +7951,19 @@ void CHIPGroupKeyManagementGroupKeyMapAttributeCallback::CallbackFn(
                                                                        newElement_0_groupKeySetIDCtorSignature.c_str(),
                                                                        entry_0.groupKeySetID, newElement_0_groupKeySetID);
 
-        jclass groupKeyStructClass;
+        jclass groupKeyMapStructStructClass;
         err = chip::JniReferences::GetInstance().GetClassRef(
-            env, "chip/devicecontroller/ChipStructs$GroupKeyManagementClusterGroupKey", groupKeyStructClass);
+            env, "chip/devicecontroller/ChipStructs$GroupKeyManagementClusterGroupKeyMapStruct", groupKeyMapStructStructClass);
         VerifyOrReturn(err == CHIP_NO_ERROR,
-                       ChipLogError(Zcl, "Could not find class ChipStructs$GroupKeyManagementClusterGroupKey"));
-        chip::JniClass structJniClass(groupKeyStructClass);
-        jmethodID groupKeyStructCtor =
-            env->GetMethodID(groupKeyStructClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V");
-        VerifyOrReturn(groupKeyStructCtor != nullptr,
-                       ChipLogError(Zcl, "Could not find ChipStructs$GroupKeyManagementClusterGroupKey constructor"));
+                       ChipLogError(Zcl, "Could not find class ChipStructs$GroupKeyManagementClusterGroupKeyMapStruct"));
+        chip::JniClass structJniClass(groupKeyMapStructStructClass);
+        jmethodID groupKeyMapStructStructCtor = env->GetMethodID(groupKeyMapStructStructClass, "<init>",
+                                                                 "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V");
+        VerifyOrReturn(groupKeyMapStructStructCtor != nullptr,
+                       ChipLogError(Zcl, "Could not find ChipStructs$GroupKeyManagementClusterGroupKeyMapStruct constructor"));
 
-        newElement_0 = env->NewObject(groupKeyStructClass, groupKeyStructCtor, newElement_0_fabricIndex, newElement_0_groupId,
-                                      newElement_0_groupKeySetID);
+        newElement_0 = env->NewObject(groupKeyMapStructStructClass, groupKeyMapStructStructCtor, newElement_0_fabricIndex,
+                                      newElement_0_groupId, newElement_0_groupKeySetID);
         chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
 
@@ -8002,7 +8003,8 @@ CHIPGroupKeyManagementGroupTableAttributeCallback::~CHIPGroupKeyManagementGroupT
 
 void CHIPGroupKeyManagementGroupTableAttributeCallback::CallbackFn(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::DecodableType> & list)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType> &
+        list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -8034,9 +8036,9 @@ void CHIPGroupKeyManagementGroupTableAttributeCallback::CallbackFn(
         jobject newElement_0_fabricIndex;
         std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
         std::string newElement_0_fabricIndexCtorSignature = "(I)V";
-        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_fabricIndexClassName.c_str(),
-                                                                       newElement_0_fabricIndexCtorSignature.c_str(),
-                                                                       entry_0.fabricIndex, newElement_0_fabricIndex);
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_fabricIndexClassName.c_str(),
+                                                                      newElement_0_fabricIndexCtorSignature.c_str(),
+                                                                      entry_0.fabricIndex, newElement_0_fabricIndex);
         jobject newElement_0_groupId;
         std::string newElement_0_groupIdClassName     = "java/lang/Integer";
         std::string newElement_0_groupIdCtorSignature = "(I)V";
@@ -8058,21 +8060,30 @@ void CHIPGroupKeyManagementGroupTableAttributeCallback::CallbackFn(
             chip::JniReferences::GetInstance().AddToArrayList(newElement_0_endpoints, newElement_NaN);
         }
         jobject newElement_0_groupName;
-        newElement_0_groupName = env->NewStringUTF(std::string(entry_0.groupName.data(), entry_0.groupName.size()).c_str());
+        if (!entry_0.groupName.HasValue())
+        {
+            chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_groupName);
+        }
+        else
+        {
+            newElement_0_groupName =
+                env->NewStringUTF(std::string(entry_0.groupName.Value().data(), entry_0.groupName.Value().size()).c_str());
+        }
 
-        jclass groupInfoStructClass;
+        jclass groupInfoMapStructStructClass;
         err = chip::JniReferences::GetInstance().GetClassRef(
-            env, "chip/devicecontroller/ChipStructs$GroupKeyManagementClusterGroupInfo", groupInfoStructClass);
+            env, "chip/devicecontroller/ChipStructs$GroupKeyManagementClusterGroupInfoMapStruct", groupInfoMapStructStructClass);
         VerifyOrReturn(err == CHIP_NO_ERROR,
-                       ChipLogError(Zcl, "Could not find class ChipStructs$GroupKeyManagementClusterGroupInfo"));
-        chip::JniClass structJniClass(groupInfoStructClass);
-        jmethodID groupInfoStructCtor = env->GetMethodID(
-            groupInfoStructClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/ArrayList;Ljava/lang/String;)V");
-        VerifyOrReturn(groupInfoStructCtor != nullptr,
-                       ChipLogError(Zcl, "Could not find ChipStructs$GroupKeyManagementClusterGroupInfo constructor"));
+                       ChipLogError(Zcl, "Could not find class ChipStructs$GroupKeyManagementClusterGroupInfoMapStruct"));
+        chip::JniClass structJniClass(groupInfoMapStructStructClass);
+        jmethodID groupInfoMapStructStructCtor =
+            env->GetMethodID(groupInfoMapStructStructClass, "<init>",
+                             "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/ArrayList;Ljava/util/Optional;)V");
+        VerifyOrReturn(groupInfoMapStructStructCtor != nullptr,
+                       ChipLogError(Zcl, "Could not find ChipStructs$GroupKeyManagementClusterGroupInfoMapStruct constructor"));
 
-        newElement_0 = env->NewObject(groupInfoStructClass, groupInfoStructCtor, newElement_0_fabricIndex, newElement_0_groupId,
-                                      newElement_0_endpoints, newElement_0_groupName);
+        newElement_0 = env->NewObject(groupInfoMapStructStructClass, groupInfoMapStructStructCtor, newElement_0_fabricIndex,
+                                      newElement_0_groupId, newElement_0_endpoints, newElement_0_groupName);
         chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
 

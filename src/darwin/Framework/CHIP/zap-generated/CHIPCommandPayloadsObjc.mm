@@ -1692,9 +1692,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _statusCode = @(0);
 
-        _fabricIndex = @(0);
+        _fabricIndex = nil;
 
-        _debugText = @"";
+        _debugText = nil;
     }
     return self;
 }
@@ -1749,7 +1749,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _groupKeySet = [CHIPGroupKeyManagementClusterGroupKeySet new];
+        _groupKeySet = [CHIPGroupKeyManagementClusterGroupKeySetStruct new];
     }
     return self;
 }
@@ -1771,7 +1771,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _groupKeySet = [CHIPGroupKeyManagementClusterGroupKeySet new];
+        _groupKeySet = [CHIPGroupKeyManagementClusterGroupKeySetStruct new];
     }
     return self;
 }

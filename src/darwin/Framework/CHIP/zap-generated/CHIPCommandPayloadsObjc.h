@@ -801,8 +801,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPOperationalCredentialsClusterNOCResponseParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull statusCode;
-@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
-@property (strong, nonatomic) NSString * _Nonnull debugText;
+@property (strong, nonatomic) NSNumber * _Nullable fabricIndex;
+@property (strong, nonatomic) NSString * _Nullable debugText;
 - (instancetype)init;
 @end
 
@@ -827,7 +827,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CHIPGroupKeyManagementClusterKeySetWriteParams : NSObject
-@property (strong, nonatomic) CHIPGroupKeyManagementClusterGroupKeySet * _Nonnull groupKeySet;
+@property (strong, nonatomic) CHIPGroupKeyManagementClusterGroupKeySetStruct * _Nonnull groupKeySet;
 - (instancetype)init;
 @end
 
@@ -837,7 +837,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CHIPGroupKeyManagementClusterKeySetReadResponseParams : NSObject
-@property (strong, nonatomic) CHIPGroupKeyManagementClusterGroupKeySet * _Nonnull groupKeySet;
+@property (strong, nonatomic) CHIPGroupKeyManagementClusterGroupKeySetStruct * _Nonnull groupKeySet;
 - (instancetype)init;
 @end
 

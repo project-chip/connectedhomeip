@@ -773,7 +773,6 @@ function isWeaklyTypedEnum(label)
     "LevelControlOptions",
     "MoveMode",
     "NetworkFaultType",
-    "NodeOperationalCertStatus",
     "OnOffDelayedAllOffEffectVariant",
     "OnOffDyingLightEffectVariant",
     "OnOffEffectIdentifier",

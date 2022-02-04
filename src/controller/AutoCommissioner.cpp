@@ -316,10 +316,10 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
         switch (report.stageCompleted)
         {
         case CommissioningStage::kReadVendorId:
-            mVendorId = report.Get<BasicVendor>().vendorId;
+            mParams.SetRemoteVendorId(report.Get<BasicVendor>().vendorId);
             break;
         case CommissioningStage::kReadProductId:
-            mProductId = report.Get<BasicProduct>().productId;
+            mParams.SetRemoteProductId(report.Get<BasicProduct>().productId);
             break;
         case CommissioningStage::kReadSoftwareVersion:
             mSoftwareVersion = report.Get<BasicSoftware>().softwareVersion;
@@ -394,7 +394,6 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
     }
 
     mParams.SetCompletionStatus(err);
-    // TODO: Get real endpoint
     mCommissioner->PerformCommissioningStep(proxy, nextStage, mParams, this, GetEndpoint(nextStage), GetCommandTimeout(nextStage));
     return CHIP_NO_ERROR;
 }

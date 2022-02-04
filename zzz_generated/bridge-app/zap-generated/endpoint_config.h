@@ -54,7 +54,7 @@
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* 38 - FeatureMap, */                                                                                                 \
-            0x00, 0x00, 0x00, 0x01,                                                                                                \
+            0x00, 0x00, 0x00, 0x02,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: General Diagnostics (server), big-endian */                                                   \
                                                                                                                                    \
@@ -321,7 +321,7 @@
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* 38 - FeatureMap, */                                                                                                 \
-            0x01, 0x00, 0x00, 0x00,                                                                                                \
+            0x02, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: General Diagnostics (server), little-endian */                                                \
                                                                                                                                    \

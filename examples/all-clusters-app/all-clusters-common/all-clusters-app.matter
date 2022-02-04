@@ -1499,32 +1499,32 @@ server cluster GroupKeyManagement = 63 {
     kLowLatency = 1;
   }
 
-  struct GroupKey {
+  struct GroupKeyMapStruct {
     fabric_idx fabricIndex = 0;
-    INT16U groupId = 1;
+    group_id groupId = 1;
     INT16U groupKeySetID = 2;
   }
 
-  struct GroupInfo {
-    INT16U fabricIndex = 0;
-    INT16U groupId = 1;
-    INT16U endpoints[] = 2;
-    CHAR_STRING<16> groupName = 3;
+  struct GroupInfoMapStruct {
+    fabric_idx fabricIndex = 0;
+    group_id groupId = 1;
+    endpoint_no endpoints[] = 2;
+    optional CHAR_STRING<16> groupName = 3;
   }
 
-  struct GroupKeySet {
+  struct GroupKeySetStruct {
     INT16U groupKeySetID = 0;
-    GroupKeySecurityPolicy securityPolicy = 1;
-    OCTET_STRING<16> epochKey0 = 2;
-    INT64U epochStartTime0 = 3;
-    OCTET_STRING<16> epochKey1 = 4;
-    INT64U epochStartTime1 = 5;
-    OCTET_STRING<16> epochKey2 = 6;
-    INT64U epochStartTime2 = 7;
+    GroupKeySecurityPolicy groupKeySecurityPolicy = 1;
+    nullable OCTET_STRING<16> epochKey0 = 2;
+    nullable epoch_us epochStartTime0 = 3;
+    nullable OCTET_STRING<16> epochKey1 = 4;
+    nullable epoch_us epochStartTime1 = 5;
+    nullable OCTET_STRING<16> epochKey2 = 6;
+    nullable epoch_us epochStartTime2 = 7;
   }
 
-  attribute GroupKey groupKeyMap[] = 0;
-  readonly attribute GroupInfo groupTable[] = 1;
+  attribute GroupKeyMapStruct groupKeyMap[] = 0;
+  readonly attribute GroupInfoMapStruct groupTable[] = 1;
   readonly attribute int16u maxGroupsPerFabric = 2;
   readonly attribute int16u maxGroupKeysPerFabric = 3;
   readonly global attribute int16u clusterRevision = 65533;
@@ -1542,7 +1542,7 @@ server cluster GroupKeyManagement = 63 {
   }
 
   request struct KeySetWriteRequest {
-    GroupKeySet groupKeySet = 0;
+    GroupKeySetStruct groupKeySet = 0;
   }
 
   response struct KeySetReadAllIndicesResponse {
@@ -1550,7 +1550,7 @@ server cluster GroupKeyManagement = 63 {
   }
 
   response struct KeySetReadResponse {
-    GroupKeySet groupKeySet = 0;
+    GroupKeySetStruct groupKeySet = 0;
   }
 
   command KeySetRead(KeySetReadRequest): KeySetReadResponse = 1;
@@ -1678,8 +1678,7 @@ server cluster IasZone = 1280 {
     INT16U delay = 3;
   }
 
-  command ZoneEnrollRequest(ZoneEnrollRequestRequest): ZoneEnrollResponse = 1;
-  command ZoneStatusChangeNotification(ZoneStatusChangeNotificationRequest): DefaultSuccess = 0;
+  command ZoneEnrollResponse(ZoneEnrollResponseRequest): DefaultSuccess = 0;
 }
 
 server cluster Identify = 3 {
@@ -2333,7 +2332,7 @@ server cluster OnOffSwitchConfiguration = 7 {
 }
 
 server cluster OperationalCredentials = 62 {
-  enum NodeOperationalCertStatus : ENUM8 {
+  enum OperationalCertStatus : ENUM8 {
     kSuccess = 0;
     kInvalidPublicKey = 1;
     kInvalidNodeOpId = 2;
@@ -2394,7 +2393,7 @@ server cluster OperationalCredentials = 62 {
   }
 
   request struct RemoveFabricRequest {
-    INT8U fabricIndex = 0;
+    fabric_idx fabricIndex = 0;
   }
 
   request struct RemoveTrustedRootCertificateRequest {
@@ -2420,9 +2419,9 @@ server cluster OperationalCredentials = 62 {
   }
 
   response struct NOCResponse {
-    INT8U statusCode = 0;
-    INT8U fabricIndex = 1;
-    CHAR_STRING debugText = 2;
+    OperationalCertStatus statusCode = 0;
+    optional fabric_idx fabricIndex = 1;
+    optional CHAR_STRING debugText = 2;
   }
 
   response struct OpCSRResponse {

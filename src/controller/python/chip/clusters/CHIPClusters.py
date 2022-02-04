@@ -2595,7 +2595,7 @@ class ChipClusters:
                     "commandName": "KeySetWrite",
                     "args": {
                         "groupKeySetID": "int",
-                        "securityPolicy": "int",
+                        "groupKeySecurityPolicy": "int",
                         "epochKey0": "bytes",
                         "epochStartTime0": "int",
                         "epochKey1": "bytes",

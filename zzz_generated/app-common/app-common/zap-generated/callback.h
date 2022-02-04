@@ -14083,7 +14083,8 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(
  * @brief Operational Credentials Cluster NOCResponse Command callback (from server)
  */
 bool emberAfOperationalCredentialsClusterNOCResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                             uint8_t StatusCode, uint8_t FabricIndex, chip::CharSpan DebugText);
+                                                             uint8_t StatusCode, chip::FabricIndex FabricIndex,
+                                                             chip::CharSpan DebugText);
 /**
  * @brief Operational Credentials Cluster UpdateFabricLabel Command callback (from client)
  */
@@ -14125,7 +14126,7 @@ bool emberAfGroupKeyManagementClusterKeySetReadCallback(
  */
 bool emberAfGroupKeyManagementClusterKeySetReadResponseCallback(
     chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-    chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySet::DecodableType groupKeySet);
+    chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySetStruct::DecodableType GroupKeySet);
 /**
  * @brief Group Key Management Cluster KeySetRemove Command callback (from client)
  */
@@ -14143,7 +14144,7 @@ bool emberAfGroupKeyManagementClusterKeySetReadAllIndicesCallback(
  */
 bool emberAfGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback(
     chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-    /* TYPE WARNING: array array defaults to */ uint8_t * groupKeySetIDs);
+    /* TYPE WARNING: array array defaults to */ uint8_t * GroupKeySetIDs);
 /**
  * @brief Mode Select Cluster ChangeToMode Command callback (from client)
  */

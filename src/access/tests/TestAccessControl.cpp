@@ -33,7 +33,7 @@ using Entry         = AccessControl::Entry;
 using EntryIterator = AccessControl::EntryIterator;
 using Target        = Entry::Target;
 
-AccessControl accessControl(Examples::GetAccessControlDelegate());
+AccessControl accessControl(Examples::GetAccessControlDelegate(nullptr));
 
 constexpr ClusterId kOnOffCluster         = 0x0006;
 constexpr ClusterId kLevelControlCluster  = 0x0008;

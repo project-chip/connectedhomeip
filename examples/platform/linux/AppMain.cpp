@@ -33,8 +33,6 @@
 #include <credentials/examples/DefaultDeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
-#include <access/examples/ExampleAccessControlDelegate.h>
-
 #include <lib/support/CHIPMem.h>
 #include <lib/support/ScopedBuffer.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
@@ -66,27 +64,6 @@ using namespace chip::DeviceLayer;
 using namespace chip::Inet;
 using namespace chip::Transport;
 
-class GeneralStorageDelegate : public PersistentStorageDelegate
-{
-    CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
-    {
-        ChipLogProgress(NotSpecified, "Retrieved value from general storage.");
-        return PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size);
-    }
-
-    CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
-    {
-        ChipLogProgress(NotSpecified, "Stored value in general storage");
-        return PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
-    }
-
-    CHIP_ERROR SyncDeleteKeyValue(const char * key) override
-    {
-        ChipLogProgress(NotSpecified, "Delete value in general storage");
-        return PersistedStorage::KeyValueStoreMgr().Delete(key);
-    }
-};
-
 #if defined(ENABLE_CHIP_SHELL)
 using chip::Shell::Engine;
 #endif
@@ -111,8 +88,6 @@ void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
         ChipLogProgress(DeviceLayer, "Receive kCHIPoBLEConnectionEstablished");
     }
 }
-
-GeneralStorageDelegate gAclStorageDelegate;
 } // namespace
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -160,8 +135,6 @@ int ChipLinuxAppInit(int argc, char ** argv)
     ConfigurationMgr().LogDeviceConfig();
 
     PrintOnboardingCodes(LinuxDeviceOptions::GetInstance().payload);
-
-    Access::Examples::SetAccessControlDelegateStorage(&gAclStorageDelegate);
 
 #if defined(PW_RPC_ENABLED)
     rpc::Init();

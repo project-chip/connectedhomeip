@@ -24,6 +24,7 @@
 #define MATTER_PLUGINS_INIT                                                                                                        \
     MatterAccessControlPluginClientInitCallback();                                                                                 \
     MatterAccessControlPluginServerInitCallback();                                                                                 \
+    MatterBasicPluginServerInitCallback();                                                                                         \
     MatterFixedLabelPluginServerInitCallback();                                                                                    \
     MatterGeneralCommissioningPluginServerInitCallback();                                                                          \
     MatterLocalizationConfigurationPluginServerInitCallback();                                                                     \
