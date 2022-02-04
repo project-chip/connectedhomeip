@@ -55,6 +55,14 @@ const uint8 chipOBleProfileRxCharUUID[ATT_UUID_SIZE] = {
     CHIPOBLEPROFILE_CHAR_UUID_BASE128(CHIPOBLEPROFILE_RX_CHAR_UUID)
 };
 
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+// CHIPoBLE Rx characteristic UUID
+const uint8 chipOBleProfileC3CharUUID[ATT_UUID_SIZE] = {
+    // 0x04, 0x8F, 0x21, 0x83, 0x8A, 0x74, 0x7D, 0xB8, 0xF2, 0x45, 0x72, 0x87, 0x38, 0x02, 0x63, 0x64
+    CHIPOBLEPROFILE_C3_CHAR_UUID128
+};
+#endif
+
 /*********************************************************************
  * Profile Attributes - variables
  */
@@ -81,6 +89,17 @@ static uint8_t chipOBleProfileRxCharVal[CHIPOBLEPROFILE_CHAR_LEN] = { 0x00 };
 
 // CHIPoBLE Rx Characteristic User Description
 static uint8_t chipOBleProfileRxdDataUserDesp[CHIPOBLEPROFILE_MAX_DESCRIPTION_LEN] = "ChipOBLE Rx Char";
+
+#ifdef CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+// CHIPoBLE C3 Characteristic Properties
+static uint8_t chipOBleProfileC3CharProps = GATT_PROP_READ;
+
+// CHIPoBLE C3 Characteristic Value
+static uint8_t chipOBleProfileC3CharVal[CHIPOBLEPROFILE_CHAR_LEN] = { 0x00 };
+
+// CHIPoBLE C3 Characteristic User Description
+static uint8_t chipOBleProfileC3dDataUserDesp[CHIPOBLEPROFILE_MAX_DESCRIPTION_LEN] = "ChipOBLE C3 Char";
+#endif
 
 /*********************************************************************
  * LOCAL VARIABLES
@@ -121,6 +140,18 @@ static gattAttribute_t chipoBleProfileAttrTbl[] = {
 
     // CHIPoBLE Rx Characteristic User Description
     { { ATT_BT_UUID_SIZE, charUserDescUUID }, GATT_PERMIT_READ, 0, chipOBleProfileRxdDataUserDesp },
+
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    // CHIPoBLE C3 Characteristic Declaration
+    { { ATT_BT_UUID_SIZE, characterUUID }, GATT_PERMIT_READ, 0, &chipOBleProfileC3CharProps },
+    
+    // CHIPoBLE C3 Characteristic Value
+    { { ATT_UUID_SIZE, chipOBleProfileC3CharUUID }, GATT_PERMIT_READ, 0, chipOBleProfileC3CharVal },
+    
+    // CHIPoBLE C3 Characteristic User Description
+    { { ATT_BT_UUID_SIZE, charUserDescUUID }, GATT_PERMIT_READ, 0, chipOBleProfileC3dDataUserDesp },
+#endif
+
 };
 
 /*********************************************************************

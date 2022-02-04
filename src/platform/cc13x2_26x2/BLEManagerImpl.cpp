@@ -487,6 +487,10 @@ void BLEManagerImpl::ConfigureAdvertisements(void)
     sInstance.mAdvDatachipOBle[advIndex++] = static_cast<uint8_t>(HI_UINT16(CHIPOBLE_SERV_UUID));
     memcpy(&sInstance.mAdvDatachipOBle[advIndex], (void *) &mDeviceIdInfo, static_cast<uint8_t>(sizeof(mDeviceIdInfo)));
 
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    mDeviceIdInfo.SetAdditionalDataFlag(true);
+#endif
+
     // Setup and start Advertising
     // For more information, see the GAP section in the User's Guide:
     // http://software-dl.ti.com/lprf/ble5stack-latest/

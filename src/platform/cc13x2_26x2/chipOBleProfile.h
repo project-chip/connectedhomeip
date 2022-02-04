@@ -54,6 +54,12 @@ extern "C" {
 #define CHIPOBLEPROFILE_CHAR_UUID_BASE128(uuid)                                                                                    \
     HI_UINT16(uuid), LO_UINT16(uuid), 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, 0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18
 
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+// for C3 (additional commissioning-related data); (spec: 4.16.3.2 BTP GATT Service)
+#define CHIPOBLEPROFILE_C3_CHAR_UUID128                                                                                             \
+    0x04, 0x8F, 0x21, 0x83, 0x8A, 0x74, 0x7D, 0xB8, 0xF2, 0x45, 0x72, 0x87, 0x38, 0x02, 0x63, 0x64
+#endif
+
 #define CHIPOBLEPROFILE_TX_CHAR 0  // R uint8 - Profile Characteristic 1 (CHIPOBLE Tx) value
 #define CHIPOBLEPROFILE_RX_CHAR 1  // W uint8 - Profile Characteristic 2 (CHIPOBLE Rx) value
 #define CHIPOBLEPROFILE_CCCWrite 2 // Client Characteristic Configuration
