@@ -21,6 +21,7 @@ assert(chip_build_tools)
 
 executable("chip-tool-darwin") {
   sources = [
+    "commands/clusters/ModelCommandBridge.mm",
     "commands/common/CHIPCommandBridge.mm",
     "commands/pairing/Commands.h",
     "commands/pairing/PairingCommandBridge.mm",
@@ -28,7 +29,10 @@ executable("chip-tool-darwin") {
     "main.mm",
   ]
 
-  include_dirs = [ "." ]
+  include_dirs = [
+    ".",
+    "${chip_root}/zzz_generated/chip-tool-darwin",
+  ]
 
   deps = [
     "${chip_root}/examples/chip-tool:chip-tool-utils",
