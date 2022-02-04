@@ -54,13 +54,6 @@ public:
         return *this;
     }
 
-    ReliableMessageProtocolConfig GetMRPConfig() const { return mMRPConfig; }
-    RendezvousParameters & SetMRPConfig(ReliableMessageProtocolConfig config)
-    {
-        mMRPConfig = config;
-        return *this;
-    }
-
     bool HasDiscriminator() const { return mDiscriminator <= kMaxRendezvousDiscriminatorValue; }
     uint16_t GetDiscriminator() const { return mDiscriminator; }
     RendezvousParameters & SetDiscriminator(uint16_t discriminator)
@@ -99,10 +92,9 @@ public:
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 private:
-    Transport::PeerAddress mPeerAddress;                          ///< the peer node address
-    ReliableMessageProtocolConfig mMRPConfig = gDefaultMRPConfig; ///< MRP parameters for the peer
-    uint32_t mSetupPINCode                   = 0;                 ///< the target peripheral setup PIN Code
-    uint16_t mDiscriminator                  = UINT16_MAX;        ///< the target peripheral discriminator
+    Transport::PeerAddress mPeerAddress;  ///< the peer node address
+    uint32_t mSetupPINCode  = 0;          ///< the target peripheral setup PIN Code
+    uint16_t mDiscriminator = UINT16_MAX; ///< the target peripheral discriminator
 
     PASEVerifier mPASEVerifier;
     bool mHasPASEVerifier = false;

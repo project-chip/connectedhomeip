@@ -24,6 +24,7 @@
 #include <credentials/DeviceAttestationVerifier.h>
 #include <lib/dnssd/ResolverProxy.h>
 #include <lib/support/StateMachine.h>
+#include <messaging/ReliableMessageProtocolConfig.h>
 #include <protocols/secure_channel/SessionEstablishmentDelegate.h>
 
 namespace chip {
@@ -168,7 +169,7 @@ protected:
         mPairing = Platform::MakeShared<PASESession>();
         VerifyOrExit(mPairing.get() != nullptr, err = CHIP_ERROR_NO_MEMORY);
         session = this->mCommissionee.mSystemState->SessionMgr()->CreateUnauthenticatedSession(
-            this->mCommissionee.mCommissionableNodeAddress.Value(), this->mCommissionee.mMrpConfig.ValueOr(gDefaultMRPConfig));
+            this->mCommissionee.mCommissionableNodeAddress.Value(), this->mCommissionee.mMrpConfig.ValueOr(GetLocalMRPConfig()));
         VerifyOrExit(session.HasValue(), err = CHIP_ERROR_NO_MEMORY);
         {
             uint16_t allocatedSessionId = 0;
@@ -776,7 +777,7 @@ protected:
         mPairing = Platform::MakeShared<CASESession>();
         VerifyOrExit(mPairing.get() != nullptr, err = CHIP_ERROR_NO_MEMORY);
         session = this->mCommissionee.mSystemState->SessionMgr()->CreateUnauthenticatedSession(
-            this->mCommissionee.mOperationalAddress.Value(), this->mCommissionee.mMrpConfig.ValueOr(gDefaultMRPConfig));
+            this->mCommissionee.mOperationalAddress.Value(), this->mCommissionee.mMrpConfig.ValueOr(GetLocalMRPConfig()));
         VerifyOrExit(session.HasValue(), err = CHIP_ERROR_NO_MEMORY);
         {
             uint16_t allocatedSessionId = 0;

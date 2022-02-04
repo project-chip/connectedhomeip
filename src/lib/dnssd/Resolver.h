@@ -114,8 +114,8 @@ struct DiscoveredNodeData
     Optional<System::Clock::Milliseconds32> mrpRetryIntervalActive;
     ReliableMessageProtocolConfig GetMRPConfig() const
     {
-        return ReliableMessageProtocolConfig(mrpRetryIntervalIdle.ValueOr(gDefaultMRPConfig.mIdleRetransTimeout),
-                                             mrpRetryIntervalActive.ValueOr(gDefaultMRPConfig.mActiveRetransTimeout));
+        return ReliableMessageProtocolConfig(mrpRetryIntervalIdle.ValueOr(GetLocalMRPConfig().mIdleRetransTimeout),
+                                             mrpRetryIntervalActive.ValueOr(GetLocalMRPConfig().mActiveRetransTimeout));
     }
     uint16_t port;
     int numIPs;
