@@ -149,20 +149,34 @@ jobs:
                     scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
             - name: Setup Build, Run Build and Run Tests
               timeout-minutes: 90
-              env:
-                  LSAN_OPTIONS: detect_leaks=0
               run: |
-                  for BUILD_TYPE  in fake gcc_release clang asan mbedtls; do
+                  for BUILD_TYPE  in fake gcc_release clang mbedtls; do
                       case $BUILD_TYPE in
                           "fake") GN_ARGS='chip_device_platform="fake"';;
                           "gcc_release") GN_ARGS='is_debug=false';;
                           "clang") GN_ARGS='is_clang=true';;
-                          "asan") GN_ARGS='is_clang=true is_asan=true';;
                           "mbedtls") GN_ARGS='chip_crypto="mbedtls"';;
                       esac
 
                       scripts/build/gn_gen.sh --args="$GN_ARGS"
                       scripts/run_in_build_env.sh "ninja -C ./out"
+                      scripts/tests/gn_tests.sh
+                  done
+            - name: Run Tests with sanitizers
+              timeout-minutes: 30
+              env:
+                  LSAN_OPTIONS: detect_leaks=0
+              run: |
+                # for BUILD_TYPE in asan msan tsan ubsan; do
+                  for BUILD_TYPE in asan ubsan; do
+                      case $BUILD_TYPE in
+                          "asan") GN_ARGS='is_clang=true is_asan=true';;
+                          "msan") GN_ARGS='is_clang=true is_msan=true';;
+                          "tsan") GN_ARGS='is_clang=true is_tsan=true';;
+                          "ubsan") GN_ARGS='is_clang=true is_ubsan=true';;
+                      esac
+
+                      scripts/build/gn_gen.sh --args="$GN_ARGS"
                       scripts/tests/gn_tests.sh
                   done
             - name: Build using build_examples.py
