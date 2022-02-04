@@ -22,7 +22,6 @@
 #include <core/CHIPBuildConfig.h>
 #include <lib/support/CodeUtils.h>
 
-
 const uint16_t kListenPort = 5541;
 
 CHIP_ERROR CHIPCommandBridge::Run()

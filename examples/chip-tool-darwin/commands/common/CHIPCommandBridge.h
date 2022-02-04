@@ -26,9 +26,7 @@
 class CHIPCommandBridge : public Command
 {
 public:
-    CHIPCommandBridge(const char * commandName) : Command(commandName)
-    {
-    }
+    CHIPCommandBridge(const char * commandName) : Command(commandName) {}
 
     CHIPCommandBridge(const char * commandName, CredentialIssuerCommands * credIssuerCmds) : CHIPCommandBridge(commandName) {}
 
@@ -79,5 +77,4 @@ private:
     std::mutex cvWaitingForResponseMutex;
     bool mWaitingForResponse{ true };
 #endif // CONFIG_USE_SEPARATE_EVENTLOOP
-
 };
