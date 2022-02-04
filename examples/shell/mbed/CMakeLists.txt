@@ -59,6 +59,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${SHELL_COMMON}/cmd_otcli.cpp
                ${SHELL_COMMON}/cmd_ping.cpp
                ${SHELL_COMMON}/cmd_send.cpp
+               ${SHELL_COMMON}/cmd_server.cpp
                ${SHELL_COMMON}/globals.cpp
                ${MBED_COMMON}/util/DFUManager.cpp
 )
