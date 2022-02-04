@@ -30,18 +30,18 @@ limitations under the License.
 
     <command source="client" code="0x00" name="LaunchAppRequest" response="LauncherResponse" optional="false">
       <description>Upon receipt, this SHALL launch the specified app with optional data. The TV Device SHALL launch and bring to foreground the identified application in the command if the application is not already launched and in foreground. The TV Device SHALL update state attribute on the Application Basic cluster of the Endpoint corresponding to the launched application. This command returns a Launch Response.</description>
-      <arg name="data"  type="OCTET_STRING"/>
       <arg name="application" type="Application"/>
+      <arg name="data"  type="OCTET_STRING"/>
     </command>
 
     <command source="client" code="0x01" name="StopAppRequest" response="LauncherResponse" optional="false">
       <description>Upon receipt on a Video Player endpoint this SHALL stop the specified application if it is running.</description>
-      <arg name="application" type="ApplicationLauncherApplication"/>
+      <arg name="application" type="Application"/>
     </command>
 
     <command source="client" code="0x02" name="HideAppRequest" response="LauncherResponse" optional="false">
       <description>Upon receipt on a Video Player endpoint this SHALL hide the specified application if it is running and visible.</description>
-      <arg name="application" type="ApplicationLauncherApplication"/>
+      <arg name="application" type="Application"/>
     </command>
 
     <command source="server" code="0x03" name="LauncherResponse" optional="false">
@@ -54,11 +54,11 @@ limitations under the License.
 
   <struct name="ApplicationEP">
     <cluster code="0x050c"/>
-    <item name="application" type="ApplicationLauncherApplication"/>
+    <item name="application" type="Application"/>
     <item name="endpoint" type="CHAR_STRING"/>
   </struct>
       
-  <struct name="ApplicationLauncherApplication">
+  <struct name="Application">
     <cluster code="0x050c"/>
     <item name="catalogVendorId" type="INT16U"/>
     <item name="applicationId" type="CHAR_STRING"/>

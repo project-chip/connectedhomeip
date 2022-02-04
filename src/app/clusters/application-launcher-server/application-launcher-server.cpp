@@ -217,7 +217,7 @@ bool emberAfApplicationLauncherClusterLaunchAppRequestCallback(app::CommandHandl
         // chip-tool can't send structs from command line so treat data value as appid if appid is blank
         // TODO: fix this once chip-tool support sending structs from command line
         ChipLogError(Zcl, "ApplicationLauncher blank content id, taking data as appid");
-        appId = std::string(data.data(), data.size());
+        appId = std::string((char*)data.data(), data.size());
     }
     CatalogVendorApp vendorApp(application.catalogVendorId, appId.c_str());
 
@@ -239,7 +239,7 @@ bool emberAfApplicationLauncherClusterLaunchAppRequestCallback(app::CommandHandl
             {
                 ChipLogError(Zcl, "ApplicationLauncher target app not found");
                 LauncherResponseType response;
-                response.data   = CharSpan("data", strlen("data"));
+                response.data   = CharSpan::fromCharString("data");
                 response.status = StatusEnum::kAppNotAvailable;
                 responder.Success(response);
                 return true;
@@ -319,7 +319,7 @@ bool emberAfApplicationLauncherClusterStopAppRequestCallback(app::CommandHandler
             {
                 ChipLogError(Zcl, "ApplicationLauncher target app not loaded");
                 LauncherResponseType response;
-                response.data   = CharSpan("data", strlen("data"));
+                response.data   = CharSpan::fromCharString("data");
                 response.status = StatusEnum::kAppNotAvailable;
                 responder.Success(response);
                 return true;
@@ -402,7 +402,7 @@ bool emberAfApplicationLauncherClusterHideAppRequestCallback(app::CommandHandler
             {
                 ChipLogError(Zcl, "ApplicationLauncher target app not loaded");
                 LauncherResponseType response;
-                response.data   = CharSpan("data", strlen("data"));
+                response.data   = CharSpan::fromCharString("data");
                 response.status = StatusEnum::kAppNotAvailable;
                 responder.Success(response);
                 return true;
