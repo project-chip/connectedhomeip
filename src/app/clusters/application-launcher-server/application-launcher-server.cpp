@@ -217,7 +217,7 @@ bool emberAfApplicationLauncherClusterLaunchAppRequestCallback(app::CommandHandl
         // chip-tool can't send structs from command line so treat data value as appid if appid is blank
         // TODO: fix this once chip-tool support sending structs from command line
         ChipLogError(Zcl, "ApplicationLauncher blank content id, taking data as appid");
-        appId = std::string((char*)data.data(), data.size());
+        appId = std::string((char *) data.data(), data.size());
     }
     CatalogVendorApp vendorApp(application.catalogVendorId, appId.c_str());
 
