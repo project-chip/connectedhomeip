@@ -42,6 +42,7 @@
 #include "OTAImageProcessorImpl.h"
 #include "platform/GenericOTARequestorDriver.h"
 #include "platform/OTARequestorInterface.h"
+#include <platform/ESP32/OTARequestorNVSHelper.h>
 
 using namespace ::chip;
 using namespace ::chip::System;
@@ -79,6 +80,35 @@ static void InitServer(intptr_t context)
 
 } // namespace
 
+// Test mode operation
+void NotifyUpdateAppliedHandler(Layer * systemLayer, void * appState)
+{
+    OTARequestor * requestorCore = static_cast<OTARequestor *>(appState);
+    uint32_t softwareVersion;
+    // TODO : With persistent storage working later on in the OTA Requestor core,thisnd the calling of TestModeSetProviderParameters
+    // will not be needed later.
+    NodeId nodeId;
+    FabricIndex fabIndex;
+    EndpointId endpointId;
+    esp_err_t err = OTARequestorNVSHelper::ReadProviderLocation(nodeId, fabIndex, endpointId);
+
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "Failed to read provider location: %s", esp_err_to_name(err));
+        return;
+    }
+    requestorCore->TestModeSetProviderParameters(nodeId, fabIndex, endpointId);
+    DeviceLayer::ConfigurationMgr().GetSoftwareVersion(softwareVersion);
+    requestorCore->NotifyUpdateApplied(softwareVersion);
+    err = OTARequestorNVSHelper::ClearAllData();
+
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "Failed to clear NVS data: %s", esp_err_to_name(err));
+        return;
+    }
+}
+
 extern "C" void app_main()
 {
     ESP_LOGI(TAG, "OTA Requester!");
@@ -112,4 +142,14 @@ extern "C" void app_main()
     }
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
+
+    uint32_t prevSoftwareVersion, currSoftwareVersion;
+
+    err = OTARequestorNVSHelper::ReadSoftwareVersion(prevSoftwareVersion);
+    DeviceLayer::ConfigurationMgr().GetSoftwareVersion(currSoftwareVersion);
+    if (err == ESP_OK && currSoftwareVersion > prevSoftwareVersion)
+    {
+        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(5 * 1000), NotifyUpdateAppliedHandler,
+                                                    &gRequestorCore);
+    }
 }

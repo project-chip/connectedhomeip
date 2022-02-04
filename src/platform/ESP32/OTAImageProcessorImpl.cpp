@@ -24,10 +24,12 @@
 #include "esp_ota_ops.h"
 #include "esp_system.h"
 #include "lib/core/CHIPError.h"
+#include <platform/ESP32/OTARequestorNVSHelper.h>
+#include <platform/OTARequestorInterface.h>
 
 #define TAG "OTAImageProcessor"
 using namespace chip::System;
-using namespace ::chip::DeviceLayer::Internal;
+using namespace chip::DeviceLayer::Internal;
 
 namespace chip {
 namespace {
@@ -191,6 +193,24 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     ESP_LOGI(TAG, "Applying, Boot partition set offset:0x%x", imageProcessor->mOTAUpdatePartition->address);
 
     // HandleApply is called after delayed action time seconds are elapsed, so it would be safe to schedule the restart
+    uint32_t softwareVersion;
+    DeviceLayer::ConfigurationMgr().GetSoftwareVersion(softwareVersion);
+    err = OTARequestorNVSHelper::WriteSoftwareVersion(softwareVersion);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "Failed to write software version: (%s)", esp_err_to_name(err));
+    }
+    NodeId nodeId;
+    FabricIndex fabIndex;
+    EndpointId endpointId;
+    // TODO : The ProviderLocation should be persisted by the OTA core and read from there, once available.
+    OTARequestorInterface * requestorInstance = GetRequestorInstance();
+    requestorInstance->TestModeGetProviderParameters(nodeId, fabIndex, endpointId);
+    err = OTARequestorNVSHelper::WriteProviderParameters(nodeId, fabIndex, endpointId);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "Failed to write provider parameters: (%s)", esp_err_to_name(err));
+    }
     chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(2 * 1000), HandleRestart, nullptr);
 }
 
