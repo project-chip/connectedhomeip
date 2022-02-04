@@ -1559,8 +1559,7 @@ server cluster IasZone = 1280 {
     INT16U delay = 3;
   }
 
-  command ZoneEnrollRequest(ZoneEnrollRequestRequest): ZoneEnrollResponse = 1;
-  command ZoneStatusChangeNotification(ZoneStatusChangeNotificationRequest): DefaultSuccess = 0;
+  command ZoneEnrollResponse(ZoneEnrollResponseRequest): DefaultSuccess = 0;
 }
 
 server cluster Identify = 3 {
@@ -2124,7 +2123,7 @@ server cluster OnOff = 6 {
 }
 
 server cluster OperationalCredentials = 62 {
-  enum NodeOperationalCertStatus : ENUM8 {
+  enum OperationalCertStatus : ENUM8 {
     kSuccess = 0;
     kInvalidPublicKey = 1;
     kInvalidNodeOpId = 2;
@@ -2185,7 +2184,7 @@ server cluster OperationalCredentials = 62 {
   }
 
   request struct RemoveFabricRequest {
-    INT8U fabricIndex = 0;
+    fabric_idx fabricIndex = 0;
   }
 
   request struct RemoveTrustedRootCertificateRequest {
@@ -2211,9 +2210,9 @@ server cluster OperationalCredentials = 62 {
   }
 
   response struct NOCResponse {
-    INT8U statusCode = 0;
-    INT8U fabricIndex = 1;
-    CHAR_STRING debugText = 2;
+    OperationalCertStatus statusCode = 0;
+    optional fabric_idx fabricIndex = 1;
+    optional CHAR_STRING debugText = 2;
   }
 
   response struct OpCSRResponse {
@@ -2497,7 +2496,6 @@ server cluster TestCluster = 1295 {
 
   command Test(): DefaultSuccess = 0;
   command TestNotHandled(): DefaultSuccess = 1;
-  command TestSpecific(): TestSpecificResponse = 2;
 }
 
 server cluster Thermostat = 513 {

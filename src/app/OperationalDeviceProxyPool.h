@@ -37,6 +37,8 @@ public:
 
     virtual OperationalDeviceProxy * FindDevice(PeerId peerId) = 0;
 
+    virtual void ReleaseDeviceForFabric(CompressedFabricId compressedFabricId) = 0;
+
     virtual ~OperationalDeviceProxyPoolDelegate() {}
 };
 
@@ -87,6 +89,17 @@ public:
         });
 
         return foundDevice;
+    }
+
+    void ReleaseDeviceForFabric(CompressedFabricId compressedFabricId) override
+    {
+        mDevicePool.ForEachActiveObject([&](auto * activeDevice) {
+            if (activeDevice->GetPeerId().GetCompressedFabricId() == compressedFabricId)
+            {
+                Release(activeDevice);
+            }
+            return Loop::Continue;
+        });
     }
 
 private:

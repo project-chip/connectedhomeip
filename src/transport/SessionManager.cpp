@@ -604,6 +604,8 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
     // MCSP check
     if (packetHeader.IsValidMCSPMsg())
     {
+        // TODO: When MCSP Msg, create Secure Session instead of a Group session
+
         // TODO
         // if (packetHeader.GetDestinationNodeId().Value() == ThisDeviceNodeID)
         // {
@@ -638,6 +640,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
 
     if (mCB != nullptr)
     {
+        // TODO : When MCSP is done, clean up session creation logique
         Optional<SessionHandle> session = CreateGroupSession(groupContext.group_id, groupContext.fabric_index);
 
         VerifyOrReturn(session.HasValue(), ChipLogError(Inet, "Error when creating group session handle."));
