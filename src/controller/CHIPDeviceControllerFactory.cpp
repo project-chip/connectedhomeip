@@ -211,6 +211,11 @@ CHIP_ERROR DeviceControllerFactory::ServiceEvents()
 
 DeviceControllerFactory::~DeviceControllerFactory()
 {
+    Shutdown();
+}
+
+void DeviceControllerFactory::Shutdown()
+{
     if (mSystemState != nullptr)
     {
         mSystemState->Release();
