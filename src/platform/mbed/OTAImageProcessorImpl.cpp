@@ -23,6 +23,8 @@
 #ifdef BOOT_ENABLED
 #include "bootutil/bootutil.h"
 #include "flash_map_backend/secondary_bd.h"
+#include "platform/mbed_power_mgmt.h"
+#include "rtos/ThisThread.h"
 #endif
 
 using namespace ::chip::DeviceLayer::Internal;
@@ -379,6 +381,11 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     {
         ChipLogError(SoftwareUpdate, "Setting the update candidate as pending failed: %d", ret);
     }
+
+    // Restart the device
+    ChipLogProgress(SoftwareUpdate, "Device restarting....");
+    rtos::ThisThread::sleep_for(3000);
+    system_reset();
 #endif
 }
 
