@@ -70,7 +70,7 @@ struct ReportCallback : public app::ReadClient::Callback
     app::ReadClient * mReadClient = nullptr;
 
     app::BufferedReadCallback mBufferedReadAdapter;
-    jobject mWrapperCallbackRef = nullptr;
+    jobject mWrapperCallbackRef                 = nullptr;
     jobject mSubscriptionEstablishedCallbackRef = nullptr;
     jobject mReportCallbackRef                  = nullptr;
     // List of pairs of Java ChipAttributePath and report value. Not using map because jobjects should not be keys.

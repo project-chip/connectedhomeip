@@ -100,7 +100,8 @@ void GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(void * context, Pee
     env->CallVoidMethod(javaCallback, failureMethod, peerId.GetNodeId(), exception);
 }
 
-ReportCallback::ReportCallback(jobject wrapperCallback, jobject subscriptionEstablishedCallback, jobject reportCallback) : mBufferedReadAdapter(*this)
+ReportCallback::ReportCallback(jobject wrapperCallback, jobject subscriptionEstablishedCallback, jobject reportCallback) :
+    mBufferedReadAdapter(*this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
@@ -148,7 +149,7 @@ void ReportCallback::OnReportEnd()
 {
     // Transform C++ jobject pair list to a Java HashMap, and call onReport() on the Java callback.
     CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
     jobject map;
     JniReferences::GetInstance().CreateHashMap(map);
@@ -227,7 +228,8 @@ void ReportCallback::OnError(CHIP_ERROR aError)
     ReportError(nullptr, aError);
 }
 
-void ReportCallback::OnDone() {
+void ReportCallback::OnDone()
+{
     JniReferences::GetInstance().GetEnvForCurrentThread()->DeleteGlobalRef(mWrapperCallbackRef);
 }
 
