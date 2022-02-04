@@ -532,9 +532,9 @@ void SetupPretendDevices()
     AddAttribute("SystemMode", "4");
     app::Clusters::Thermostat::Attributes::SystemMode::Set(1, 4);
     AddAttribute("OccupiedCoolingSetpoint", "19");
-    app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::Set(1,  static_cast<int16_t>(19 * 100));
+    app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::Set(1, static_cast<int16_t>(19 * 100));
     AddAttribute("OccupiedHeatingSetpoint", "25");
-    app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::Set(1,  static_cast<int16_t>(25 * 100));
+    app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::Set(1, static_cast<int16_t>(25 * 100));
 
     AddDevice("Humidity Sensor");
     AddEndpoint("External");
