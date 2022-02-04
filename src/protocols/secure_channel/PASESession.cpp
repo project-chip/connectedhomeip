@@ -310,8 +310,8 @@ exit:
 }
 
 CHIP_ERROR PASESession::WaitForPairing(const PASEVerifier & verifier, uint32_t pbkdf2IterCount, const ByteSpan & salt,
-                                       PasscodeId passcodeID, uint16_t mySessionId, Optional<ReliableMessageProtocolConfig> mrpConfig,
-                                       SessionEstablishmentDelegate * delegate)
+                                       PasscodeId passcodeID, uint16_t mySessionId,
+                                       Optional<ReliableMessageProtocolConfig> mrpConfig, SessionEstablishmentDelegate * delegate)
 {
     ReturnErrorCodeIf(passcodeID == 0, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(WaitForPairing(0, pbkdf2IterCount, salt, mySessionId, mrpConfig, delegate));
