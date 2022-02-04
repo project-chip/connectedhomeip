@@ -899,7 +899,8 @@ void GroupDataProviderImpl::Finish()
 
 CHIP_ERROR GroupDataProviderImpl::SetGroupInfo(chip::FabricIndex fabric_index, const GroupInfo & info)
 {
-    ChipLogDetail(DataManagement, "~~~DEBUG: SetGroupInfo, fabric:%d, group:#%x, name:'%s'\n\n", fabric_index, info.group_id, info.name);
+    ChipLogDetail(DataManagement, "~~~DEBUG: SetGroupInfo, fabric:%d, group:#%x, name:'%s'\n\n", fabric_index, info.group_id,
+                  info.name);
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
 
     FabricData fabric(fabric_index);
@@ -953,7 +954,8 @@ CHIP_ERROR GroupDataProviderImpl::RemoveGroupInfo(chip::FabricIndex fabric_index
 
 CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index, size_t index, const GroupInfo & info)
 {
-    ChipLogDetail(DataManagement, "~~~DEBUG: SetGroupInfoAt[%zu], fabric:%d, group:#%x, name:'%s'\n\n", index, fabric_index, info.group_id, info.name);
+    ChipLogDetail(DataManagement, "~~~DEBUG: SetGroupInfoAt[%zu], fabric:%d, group:#%x, name:'%s'\n\n", index, fabric_index,
+                  info.group_id, info.name);
 
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
 
@@ -1000,7 +1002,7 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index,
         ChipLogDetail(DataManagement, "~~~DEBUG: SetGroupInfoAt.2.2, INSERT\n");
         VerifyOrReturnError(fabric.group_count == index, CHIP_ERROR_INVALID_ARGUMENT);
         ChipLogDetail(DataManagement, "~~~DEBUG: SetGroupInfoAt.2.2.1, count:%u, max:%u\n", abric.group_count, mMaxGroupsPerFabric);
-        //TODO: VerifyOrReturnError(fabric.group_count < mMaxGroupsPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
+        // TODO: VerifyOrReturnError(fabric.group_count < mMaxGroupsPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
         fabric.group_count++;
     }
     ChipLogDetail(DataManagement, "~~~DEBUG: SetGroupInfoAt.3.0\n");

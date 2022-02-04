@@ -78,7 +78,8 @@ static bool GroupExists(FabricIndex fabricIndex, EndpointId endpointId, GroupId 
 
 static EmberAfStatus GroupAdd(FabricIndex fabricIndex, EndpointId endpointId, GroupId groupId, const CharSpan & groupName)
 {
-    ChipLogDetail(DataManagement, "~~~DEBUG: GroupAdd, fabric:%d, end:%u, group:#%x, name(%zu):'%s'\n\n", fabricIndex, endpointId, groupId, groupName.size(), groupName.data());
+    ChipLogDetail(DataManagement, "~~~DEBUG: GroupAdd, fabric:%d, end:%u, group:#%x, name(%zu):'%s'\n\n", fabricIndex, endpointId,
+                  groupId, groupName.size(), groupName.data());
     VerifyOrReturnError(IsFabricGroupId(groupId), EMBER_ZCL_STATUS_INVALID_VALUE);
 
     GroupDataProvider * provider = GetGroupDataProvider();

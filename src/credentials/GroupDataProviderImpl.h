@@ -33,8 +33,7 @@ public:
                           uint16_t maxGroupKeysPerFabric) :
         GroupDataProvider(maxGroupsPerFabric, maxGroupKeysPerFabric),
         mStorage(storage_delegate)
-    {
-    }
+    {}
     virtual ~GroupDataProviderImpl() {}
 
     CHIP_ERROR Init() override;
