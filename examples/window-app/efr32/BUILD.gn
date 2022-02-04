@@ -220,7 +220,8 @@ efr32_executable("window_app") {
   }
   if (use_rs911x || use_wf200) {
     ldflags += [
-      "-Wl,--defsym","-Wl,SILABS_WIFI=1",
+      "-Wl,--defsym",
+      "-Wl,SILABS_WIFI=1",
     ]
   }
 }
