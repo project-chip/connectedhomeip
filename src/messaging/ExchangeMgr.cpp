@@ -96,12 +96,6 @@ CHIP_ERROR ExchangeManager::Shutdown()
 {
     mReliableMessageMgr.Shutdown();
 
-    mContextPool.ForEachActiveObject([](auto * ec) {
-        // There should be no active object in the pool
-        VerifyOrDie(false);
-        return Loop::Continue;
-    });
-
     if (mSessionManager != nullptr)
     {
         mSessionManager->SetMessageDelegate(nullptr);

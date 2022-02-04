@@ -108,7 +108,7 @@
     <string name="basic_cluster_write_location_hint_text">Enter Location</string>
     <string name="basic_cluster_local_config_disabled_btn_text">Set LocalConfigDisabled</string>
     <string name="basic_cluster_read_attribute_btn_text">Read Attribute</string>
-    <string name="basic_cluster_interaction_mode_version_text">InteractionModelVersion</string>
+    <string name="basic_cluster_data_model_revision_text">DataModelRevision</string>
     <string name="basic_cluster_vendor_name_text">VendorName</string>
     <string name="basic_cluster_vendor_id_text">VendorID</string>
     <string name="basic_cluster_product_name_text">ProductName</string>

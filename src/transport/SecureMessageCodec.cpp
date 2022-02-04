@@ -36,7 +36,7 @@ using System::PacketBufferHandle;
 
 namespace SecureMessageCodec {
 
-CHIP_ERROR Encrypt(Transport::SecureSession * session, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
+CHIP_ERROR Encrypt(const CryptoContext & context, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
                    System::PacketBufferHandle & msgBuf)
 {
     VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -52,7 +52,7 @@ CHIP_ERROR Encrypt(Transport::SecureSession * session, PayloadHeader & payloadHe
     uint16_t totalLen = msgBuf->TotalLength();
 
     MessageAuthenticationCode mac;
-    ReturnErrorOnFailure(session->EncryptBeforeSend(data, totalLen, data, packetHeader, mac));
+    ReturnErrorOnFailure(context.Encrypt(data, totalLen, data, packetHeader, mac));
 
     uint16_t taglen = 0;
     ReturnErrorOnFailure(mac.Encode(packetHeader, &data[totalLen], msgBuf->AvailableDataLength(), &taglen));
@@ -63,7 +63,7 @@ CHIP_ERROR Encrypt(Transport::SecureSession * session, PayloadHeader & payloadHe
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Decrypt(Transport::SecureSession * session, PayloadHeader & payloadHeader, const PacketHeader & packetHeader,
+CHIP_ERROR Decrypt(const CryptoContext & context, PayloadHeader & payloadHeader, const PacketHeader & packetHeader,
                    System::PacketBufferHandle & msg)
 {
     ReturnErrorCodeIf(msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -93,7 +93,7 @@ CHIP_ERROR Decrypt(Transport::SecureSession * session, PayloadHeader & payloadHe
     msg->SetDataLength(len);
 
     uint8_t * plainText = msg->Start();
-    ReturnErrorOnFailure(session->DecryptOnReceive(data, len, plainText, packetHeader, mac));
+    ReturnErrorOnFailure(context.Decrypt(data, len, plainText, packetHeader, mac));
 
     ReturnErrorOnFailure(payloadHeader.DecodeAndConsume(msg));
     return CHIP_NO_ERROR;

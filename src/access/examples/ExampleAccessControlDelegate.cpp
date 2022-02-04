@@ -1069,12 +1069,13 @@ public:
         CHIP_ERROR err = LoadFromFlash();
         if (err != CHIP_NO_ERROR)
         {
+            ChipLogDetail(DataManagement, "AccessControl: unable to load stored ACL entries; using empty list instead");
             for (auto & storage : EntryStorage::acl)
             {
                 storage.Clear();
             }
         }
-        return err;
+        return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR Finish() override
@@ -1309,17 +1310,11 @@ namespace chip {
 namespace Access {
 namespace Examples {
 
-AccessControl::Delegate & GetAccessControlDelegate()
+AccessControl::Delegate & GetAccessControlDelegate(PersistentStorageDelegate * storageDelegate)
 {
     static AccessControlDelegate accessControlDelegate;
-    return accessControlDelegate;
-}
-
-void SetAccessControlDelegateStorage(chip::PersistentStorageDelegate * storageDelegate)
-{
-    ChipLogDetail(DataManagement, "Examples::SetAccessControlDelegateStorage");
-    AccessControlDelegate & accessControlDelegate = static_cast<AccessControlDelegate &>(GetAccessControlDelegate());
     accessControlDelegate.SetStorageDelegate(storageDelegate);
+    return accessControlDelegate;
 }
 
 } // namespace Examples

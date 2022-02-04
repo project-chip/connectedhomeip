@@ -37,6 +37,7 @@
 
 #include <arpa/inet.h>
 #include <dirent.h>
+#include <errno.h>
 #include <linux/netlink.h>
 #include <linux/rtnetlink.h>
 #include <net/if.h>
@@ -170,13 +171,19 @@ void PlatformManagerImpl::WiFIIPChangeListener()
                     if (routeInfo->rta_type == IFA_LOCAL)
                     {
                         char name[IFNAMSIZ];
-                        ChipDeviceEvent event;
-                        if_indextoname(addressMessage->ifa_index, name);
+                        if (if_indextoname(addressMessage->ifa_index, name) == NULL)
+                        {
+                            ChipLogError(DeviceLayer, "Error %d when getting the interface name at index: %d", errno,
+                                         addressMessage->ifa_index);
+                            continue;
+                        }
+
                         if (strcmp(name, ConnectivityManagerImpl::GetWiFiIfName()) != 0)
                         {
                             continue;
                         }
 
+                        ChipDeviceEvent event;
                         event.Type                            = DeviceEventType::kInternetConnectivityChange;
                         event.InternetConnectivityChange.IPv4 = kConnectivity_Established;
                         event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;

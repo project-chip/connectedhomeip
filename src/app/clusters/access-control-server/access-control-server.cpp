@@ -16,7 +16,6 @@
  */
 
 #include <access/AccessControl.h>
-#include <access/examples/ExampleAccessControlDelegate.h>
 
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -282,6 +281,8 @@ struct AccessControlEntryCodec
         return fabricIndex;
     }
 
+    void SetFabricIndex(FabricIndex fabricIndex) { entry.SetFabricIndex(fabricIndex); }
+
     AccessControl::Entry entry;
 };
 
@@ -435,16 +436,31 @@ CHIP_ERROR AccessControlAttribute::Write(const ConcreteDataAttributePath & aPath
 
 CHIP_ERROR AccessControlAttribute::WriteAcl(AttributeValueDecoder & aDecoder)
 {
+    FabricIndex accessingFabricIndex = aDecoder.AccessingFabricIndex();
+
     DataModel::DecodableList<AccessControlEntryCodec> list;
     ReturnErrorOnFailure(aDecoder.Decode(list));
 
-    size_t oldCount;
+    size_t oldCount = 0;
+    size_t allCount;
     size_t newCount;
     size_t maxCount;
-    ReturnErrorOnFailure(GetAccessControl().GetEntryCount(oldCount));
+
+    {
+        AccessControl::EntryIterator it;
+        AccessControl::Entry entry;
+        ReturnErrorOnFailure(GetAccessControl().Entries(it, &accessingFabricIndex));
+        while (it.Next(entry) == CHIP_NO_ERROR)
+        {
+            oldCount++;
+        }
+    }
+
+    ReturnErrorOnFailure(GetAccessControl().GetEntryCount(allCount));
     ReturnErrorOnFailure(list.ComputeSize(&newCount));
     ReturnErrorOnFailure(GetAccessControl().GetMaxEntryCount(maxCount));
-    ReturnErrorCodeIf(newCount > maxCount, CHIP_ERROR_INVALID_LIST_LENGTH);
+    VerifyOrReturnError(allCount >= oldCount, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(static_cast<size_t>(allCount - oldCount + newCount) <= maxCount, CHIP_ERROR_INVALID_LIST_LENGTH);
 
     auto iterator = list.begin();
     size_t i      = 0;
@@ -452,13 +468,13 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(AttributeValueDecoder & aDecoder)
     {
         if (i < oldCount)
         {
-            ReturnErrorOnFailure(GetAccessControl().UpdateEntry(i, iterator.GetValue().entry));
+            ReturnErrorOnFailure(GetAccessControl().UpdateEntry(i, iterator.GetValue().entry, &accessingFabricIndex));
             ReturnErrorOnFailure(LogAccessControlEvent(iterator.GetValue().entry, aDecoder.GetSubjectDescriptor(),
                                                        AccessControlCluster::ChangeTypeEnum::kChanged));
         }
         else
         {
-            ReturnErrorOnFailure(GetAccessControl().CreateEntry(nullptr, iterator.GetValue().entry));
+            ReturnErrorOnFailure(GetAccessControl().CreateEntry(nullptr, iterator.GetValue().entry, &accessingFabricIndex));
             ReturnErrorOnFailure(LogAccessControlEvent(iterator.GetValue().entry, aDecoder.GetSubjectDescriptor(),
                                                        AccessControlCluster::ChangeTypeEnum::kAdded));
         }
@@ -469,7 +485,7 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(AttributeValueDecoder & aDecoder)
     while (i < oldCount)
     {
         --oldCount;
-        ReturnErrorOnFailure(GetAccessControl().DeleteEntry(oldCount));
+        ReturnErrorOnFailure(GetAccessControl().DeleteEntry(oldCount, &accessingFabricIndex));
         ReturnErrorOnFailure(LogAccessControlEvent(iterator.GetValue().entry, aDecoder.GetSubjectDescriptor(),
                                                    AccessControlCluster::ChangeTypeEnum::kRemoved));
     }
@@ -486,16 +502,9 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(AttributeValueDecoder & aDecod
 
 AccessControlAttribute gAttribute;
 
-AccessControl gAccessControl(Examples::GetAccessControlDelegate());
-
 } // namespace
 
 void MatterAccessControlPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttribute);
-
-    // TODO: move access control setup to lower level
-    //       (it's OK and convenient here during development)
-    gAccessControl.Init();
-    SetAccessControl(gAccessControl);
 }

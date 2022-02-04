@@ -24,15 +24,20 @@
 namespace chip {
 namespace Controller {
 
+class DeviceCommissioner;
+
 enum CommissioningStage : uint8_t
 {
     kError,
     kSecurePairing,
+    kReadVendorId,
+    kReadProductId,
+    kReadSoftwareVersion,
+    kGetNetworkTechnology,
     kArmFailsafe,
     // kConfigTime,  // NOT YET IMPLEMENTED
     // kConfigTimeZone,  // NOT YET IMPLEMENTED
     // kConfigDST,  // NOT YET IMPLEMENTED
-    kGetNetworkTechnology,
     kConfigRegulatory,
     kSendPAICertificateRequest,
     kSendDACCertificateRequest,
@@ -92,6 +97,8 @@ public:
     const Optional<ByteSpan> GetAttestationSignature() const { return mAttestationSignature; }
     const Optional<ByteSpan> GetPAI() const { return mPAI; }
     const Optional<ByteSpan> GetDAC() const { return mDAC; }
+    const Optional<VendorId> GetRemoteVendorId() const { return mRemoteVendorId; }
+    const Optional<uint16_t> GetRemoteProductId() const { return mRemoteProductId; }
     CHIP_ERROR GetCompletionStatus() { return completionStatus; }
 
     CommissioningParameters & SetFailsafeTimerSeconds(uint16_t seconds)
@@ -180,6 +187,16 @@ public:
         mDAC = MakeOptional(dac);
         return *this;
     }
+    CommissioningParameters & SetRemoteVendorId(VendorId id)
+    {
+        mRemoteVendorId = MakeOptional(id);
+        return *this;
+    }
+    CommissioningParameters & SetRemoteProductId(uint16_t id)
+    {
+        mRemoteProductId = MakeOptional(id);
+        return *this;
+    }
     void SetCompletionStatus(CHIP_ERROR err) { completionStatus = err; }
 
 private:
@@ -198,6 +215,8 @@ private:
     Optional<ByteSpan> mAttestationSignature;
     Optional<ByteSpan> mPAI;
     Optional<ByteSpan> mDAC;
+    Optional<VendorId> mRemoteVendorId;
+    Optional<uint16_t> mRemoteProductId;
     CHIP_ERROR completionStatus = CHIP_NO_ERROR;
 };
 
@@ -233,24 +252,46 @@ struct OperationalNodeFoundData
     OperationalNodeFoundData(OperationalDeviceProxy * proxy) : operationalProxy(proxy) {}
     OperationalDeviceProxy * operationalProxy;
 };
-struct FeatureMap
+
+struct BasicVendor
 {
-    FeatureMap(uint32_t featureBitmap) : features(featureBitmap) {}
-    uint32_t features;
+    BasicVendor(VendorId id) : vendorId(id) {}
+    VendorId vendorId;
+};
+
+struct BasicProduct
+{
+    BasicProduct(uint16_t id) : productId(id) {}
+    uint16_t productId;
+};
+
+struct BasicSoftware
+{
+    BasicSoftware(uint32_t version) : softwareVersion(version) {}
+    uint32_t softwareVersion;
+};
+
+struct NetworkClusters
+{
+    EndpointId wifi   = kInvalidEndpointId;
+    EndpointId thread = kInvalidEndpointId;
+    EndpointId eth    = kInvalidEndpointId;
 };
 
 class CommissioningDelegate
 {
 public:
     virtual ~CommissioningDelegate(){};
-
-    struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, NocChain, OperationalNodeFoundData, FeatureMap>
+    struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, NocChain, OperationalNodeFoundData, BasicVendor,
+                                         BasicProduct, BasicSoftware, NetworkClusters>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;
-        // TODO: Add other things the delegate needs to know.
     };
-    virtual CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err, CommissioningReport report) = 0;
+    virtual CHIP_ERROR SetCommissioningParameters(const CommissioningParameters & params)                           = 0;
+    virtual void SetOperationalCredentialsDelegate(OperationalCredentialsDelegate * operationalCredentialsDelegate) = 0;
+    virtual CHIP_ERROR StartCommissioning(DeviceCommissioner * commissioner, CommissioneeDeviceProxy * proxy)       = 0;
+    virtual CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err, CommissioningReport report)                        = 0;
 };
 
 } // namespace Controller

@@ -23,9 +23,9 @@ tests:
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
 
-    - label: "Query Interaction Model Version"
+    - label: "Query Data Model Revision"
       command: "readAttribute"
-      attribute: "InteractionModelVersion"
+      attribute: "DataModelRevision"
       response:
           constraints:
               type: uint16

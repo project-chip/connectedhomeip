@@ -72,6 +72,7 @@
 #include <app/util/debug-printing.h>
 #include <app/util/ember-print.h>
 
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/Iterators.h>
 #include <lib/support/SafeInt.h>
 
@@ -315,11 +316,6 @@ uint16_t emberAfFindClusterServerEndpointIndex(chip::EndpointId endpoint, chip::
  * @brief Macro that takes index of endpoint, and returns device version for it
  */
 #define emberAfDeviceVersionFromIndex(index) (emAfEndpoints[(index)].deviceVersion)
-
-/**
- * @brief Macro that takes index of endpoint, and returns network index for it
- */
-#define emberAfNetworkIndexFromEndpointIndex(index) (emAfEndpoints[(index)].networkIndex)
 
 /**
  * @brief Macro that returns the primary endpoint.
@@ -1364,53 +1360,6 @@ EmberStatus emberAfStartSearchForJoinableNetwork(void);
 #define emberAfStartSearchForJoinableNetwork() emberAfStartSearchForJoinableNetworkCallback()
 #endif
 
-/** @brief Sets the current network to that of the given index and adds it to
- * the stack of networks maintained by the framework.  Every call to this API
- * must be paired with a subsequent call to ::emberAfPopNetworkIndex.
- */
-
-EmberStatus emberAfPushNetworkIndex(uint8_t networkIndex);
-/** @brief Sets the current network to the callback network and adds it to
- * the stack of networks maintained by the framework.  Every call to this API
- * must be paired with a subsequent call to ::emberAfPopNetworkIndex.
- */
-
-EmberStatus emberAfPushCallbackNetworkIndex(void);
-/** @brief Sets the current network to that of the given endpoint and adds it
- * to the stack of networks maintained by the framework.  Every call to this
- * API must be paired with a subsequent call to ::emberAfPopNetworkIndex.
- */
-
-EmberStatus emberAfPushEndpointNetworkIndex(chip::EndpointId endpoint);
-/** @brief Removes the topmost network from the stack of networks maintained by
- * the framework and sets the current network to the new topmost network.
- * Every call to this API must be paired with a prior call to
- * ::emberAfPushNetworkIndex, ::emberAfPushCallbackNetworkIndex, or
- * ::emberAfPushEndpointNetworkIndex.
- */
-
-EmberStatus emberAfPopNetworkIndex(void);
-/** @brief Returns the primary endpoint of the given network index or 0xFF if
- * no endpoints belong to the network.
- */
-
-uint8_t emberAfPrimaryEndpointForNetworkIndex(uint8_t networkIndex);
-/** @brief Returns the primary endpoint of the current network index or 0xFF if
- * no endpoints belong to the current network.
- */
-
-uint8_t emberAfPrimaryEndpointForCurrentNetworkIndex(void);
-
-#if !defined(DOXYGEN_SHOULD_SKIP_THIS)
-/** @brief Initializes the stack of networks maintained by the framework,
- * including setting the default network.
- *
- * @return An ::EmberStatus value that indicates either that the network stack
- * has been successfully initialized or the reason for failure.
- */
-EmberStatus emAfInitializeNetworkIndexStack(void);
-void emAfAssertNetworkIndexStackIsEmpty(void);
-#endif
 /** @brief Basic initialization API to be invoked before ::emberAfMain.
  */
 void emberAfMainInit(void);

@@ -81,6 +81,16 @@ class AppsRegister:
             return accessory.stop() and accessory.start(discriminator)
         return False
 
+    def factoryResetAll(self):
+        for accessory in self.__accessories.values():
+            accessory.factoryReset()
+
+    def factoryReset(self, name):
+        accessory = self.__accessories[name]
+        if accessory:
+            return accessory.factoryReset()
+        return False
+
     def ping(self):
         return True
 
@@ -90,6 +100,7 @@ class AppsRegister:
         self.server.register_function(self.start, 'start')
         self.server.register_function(self.stop, 'stop')
         self.server.register_function(self.reboot, 'reboot')
+        self.server.register_function(self.factoryReset, 'factoryReset')
         self.server.register_function(self.ping, 'ping')
 
         self.server_thread = threading.Thread(target=self.__handle_request)

@@ -21,12 +21,15 @@ from .gn import GnBuilder
 class Cyw30739App(Enum):
     LIGHT = auto()
     LOCK = auto()
+    OTA_REQUESTOR = auto()
 
     def ExampleName(self):
         if self == Cyw30739App.LIGHT:
             return "lighting-app"
         elif self == Cyw30739App.LOCK:
             return "lock-app"
+        elif self == Cyw30739App.OTA_REQUESTOR:
+            return "ota-requestor-app"
         else:
             raise Exception("Unknown app type: %r" % self)
 
@@ -35,6 +38,8 @@ class Cyw30739App(Enum):
             return "chip-cyw30739-lighting-example"
         elif self == Cyw30739App.LOCK:
             return "chip-cyw30739-lock-example"
+        elif self == Cyw30739App.OTA_REQUESTOR:
+            return "chip-cyw30739-ota-requestor-example"
         else:
             raise Exception("Unknown app type: %r" % self)
 

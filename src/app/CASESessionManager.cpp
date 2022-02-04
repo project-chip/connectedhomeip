@@ -67,6 +67,11 @@ void CASESessionManager::ReleaseSession(PeerId peerId)
     ReleaseSession(FindExistingSession(peerId));
 }
 
+void CASESessionManager::ReleaseSessionForFabric(CompressedFabricId compressedFabricId)
+{
+    mConfig.devicePool->ReleaseDeviceForFabric(compressedFabricId);
+}
+
 CHIP_ERROR CASESessionManager::ResolveDeviceAddress(FabricInfo * fabric, NodeId nodeId)
 {
     VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INCORRECT_STATE);

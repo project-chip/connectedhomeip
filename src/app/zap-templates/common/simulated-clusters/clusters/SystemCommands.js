@@ -42,9 +42,15 @@ const Reboot = {
   response : { arguments : [] }
 };
 
+const FactoryReset = {
+  name : 'FactoryReset',
+  arguments : [],
+  response : { arguments : [] }
+};
+
 const SystemCommands = {
   name : 'SystemCommands',
-  commands : [ Start, Stop, Reboot ],
+  commands : [ Start, Stop, Reboot, FactoryReset ],
 };
 
 //

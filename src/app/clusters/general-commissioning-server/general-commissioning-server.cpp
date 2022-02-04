@@ -62,6 +62,7 @@ public:
 
 private:
     CHIP_ERROR ReadIfSupported(CHIP_ERROR (ConfigurationManager::*getter)(uint8_t &), AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadBasicCommissioningInfo(AttributeValueEncoder & aEncoder);
 };
 
 GeneralCommissioningAttrAccess gAttrAccess;
@@ -82,9 +83,8 @@ CHIP_ERROR GeneralCommissioningAttrAccess::Read(const ConcreteReadAttributePath 
     case LocationCapability::Id: {
         return ReadIfSupported(&ConfigurationManager::GetLocationCapability, aEncoder);
     }
-    case BasicCommissioningInfoList::Id: {
-        // TODO: This should not be a list at all!
-        return aEncoder.EncodeEmptyList();
+    case BasicCommissioningInfo::Id: {
+        return ReadBasicCommissioningInfo(aEncoder);
     }
     default: {
         break;
@@ -110,6 +110,17 @@ CHIP_ERROR GeneralCommissioningAttrAccess::ReadIfSupported(CHIP_ERROR (Configura
     return aEncoder.Encode(data);
 }
 
+CHIP_ERROR GeneralCommissioningAttrAccess::ReadBasicCommissioningInfo(AttributeValueEncoder & aEncoder)
+{
+    BasicCommissioningInfo::TypeInfo::Type basicCommissioningInfo;
+
+    // TODO: The commissioner might use the critical parameters in BasicCommissioningInfo to initialize
+    // the CommissioningParameters at the beginning of commissioning flow.
+    basicCommissioningInfo.failSafeExpiryLengthSeconds = CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC;
+
+    return aEncoder.Encode(basicCommissioningInfo);
+}
+
 } // anonymous namespace
 
 bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler * commandObj,
@@ -120,7 +131,7 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
     CheckSuccess(server->ArmFailSafe(System::Clock::Seconds16(commandData.expiryLengthSeconds)), Failure);
 
     Commands::ArmFailSafeResponse::Type response;
-    response.errorCode = GeneralCommissioningError::kOk;
+    response.errorCode = CommissioningError::kOk;
     response.debugText = CharSpan("", 0);
     CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
 
@@ -145,7 +156,7 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
     CheckSuccess(server->CommissioningComplete(), Failure);
 
     Commands::CommissioningCompleteResponse::Type response;
-    response.errorCode = GeneralCommissioningError::kOk;
+    response.errorCode = CommissioningError::kOk;
     response.debugText = CharSpan("", 0);
     CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
 
@@ -162,7 +173,7 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandH
                  Failure);
 
     Commands::SetRegulatoryConfigResponse::Type response;
-    response.errorCode = GeneralCommissioningError::kOk;
+    response.errorCode = CommissioningError::kOk;
     response.debugText = CharSpan("", 0);
     CheckSuccess(commandObj->AddResponseData(commandPath, response), Failure);
 

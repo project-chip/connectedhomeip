@@ -44,10 +44,10 @@ static CHIP_ERROR Setup(const char * label,
 
 static void Finalize(chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & request);
 static CHIP_ERROR Setup(const char * label,
-                        chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::Type & request,
+                        chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfo::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::Type & request);
+static void Finalize(chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfo::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::PowerSource::Structs::BatChargeFaultChangeType::Type & request,
                         Json::Value & value);
 
@@ -96,18 +96,18 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::OperationalCred
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::Type & request);
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::Type & request);
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::Type & request,
+static void Finalize(chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::Type & request);
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::Type & request);
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySet::Type & request,
+static void Finalize(chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type & request);
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySetStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySet::Type & request);
+static void Finalize(chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySetStruct::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::IasAce::Structs::IasAceZoneStatusResult::Type & request,
                         Json::Value & value);
 

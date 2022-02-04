@@ -136,18 +136,6 @@ public:
 
     CryptoContext & GetCryptoContext() { return mCryptoContext; }
 
-    CHIP_ERROR EncryptBeforeSend(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
-                                 MessageAuthenticationCode & mac) const
-    {
-        return mCryptoContext.Encrypt(input, input_length, output, header, mac);
-    }
-
-    CHIP_ERROR DecryptOnReceive(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
-                                const MessageAuthenticationCode & mac) const
-    {
-        return mCryptoContext.Decrypt(input, input_length, output, header, mac);
-    }
-
     SessionMessageCounter & GetSessionMessageCounter() { return mSessionMessageCounter; }
 
 private:

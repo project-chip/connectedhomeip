@@ -20,6 +20,7 @@
 
 #include <app/AttributePathParams.h>
 #include <app/EventPathParams.h>
+#include <app/InteractionModelTimeout.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
