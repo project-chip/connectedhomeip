@@ -56,13 +56,10 @@ constexpr uint16_t kOptionQueryImageBehavior   = 'q';
 constexpr uint16_t kOptionUserConsentState     = 'u';
 constexpr uint16_t kOptionDelayedActionTimeSec = 't';
 constexpr uint16_t kOptionDiscriminator        = 'd';
-constexpr uint16_t kOptionPasscode             = 'p';
 constexpr uint16_t kOptionSoftwareVersion      = 's';
 constexpr uint16_t kOptionUserConsentNeeded    = 'c';
 
 static constexpr uint16_t kMaximumDiscriminatorValue = 0xFFF;
-static constexpr uint32_t kMinimumPasscodeValue      = 0x0000001;
-static constexpr uint32_t kMaximumPasscodeValue      = 0x5F5E0FE;
 
 // Global variables used for passing the CLI arguments to the OTAProviderExample object
 static OTAProviderExample::QueryImageBehaviorType gQueryImageBehavior = OTAProviderExample::kRespondWithUnknown;
@@ -72,7 +69,6 @@ static const char * gOtaImageListFilepath                             = nullptr;
 static chip::ota::UserConsentState gUserConsentState                  = chip::ota::UserConsentState::kUnknown;
 static bool gUserConsentNeeded                                        = false;
 static chip::Optional<uint16_t> gSetupDiscriminator;
-static chip::Optional<uint32_t> gSetupPasscode;
 static chip::Optional<uint32_t> gSoftwareVersion;
 
 // Parses the JSON filepath and extracts DeviceSoftwareVersionModel parameters
@@ -195,7 +191,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         }
         break;
     case kOptionDelayedActionTimeSec:
-        gDelayedActionTimeSec = static_cast<uint32_t>(strtol(aValue, NULL, 0));
+        gDelayedActionTimeSec = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
         break;
     case kOptionUserConsentState:
         if (aValue == NULL)
@@ -222,7 +218,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         }
         break;
     case kOptionDiscriminator: {
-        uint16_t discriminator = static_cast<uint16_t>(strtol(aValue, NULL, 0));
+        uint16_t discriminator = static_cast<uint16_t>(strtoul(aValue, NULL, 0));
         if (discriminator > kMaximumDiscriminatorValue)
         {
             PrintArgError("%s: Input ERROR: setupDiscriminator value %s is out of range \n", aProgram, aValue);
@@ -231,18 +227,8 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         gSetupDiscriminator.SetValue(discriminator);
         break;
     }
-    case kOptionPasscode: {
-        uint32_t passcode = static_cast<uint32_t>(strtol(aValue, NULL, 0));
-        if (passcode < kMinimumPasscodeValue || passcode > kMaximumPasscodeValue)
-        {
-            PrintArgError("%s: Input ERROR: setupPasscode value %s is out of range \n", aProgram, aValue);
-            retval = false;
-        }
-        gSetupPasscode.SetValue(passcode);
-        break;
-    }
     case kOptionSoftwareVersion:
-        gSoftwareVersion.SetValue(static_cast<uint32_t>(strtol(aValue, NULL, 0)));
+        gSoftwareVersion.SetValue(static_cast<uint32_t>(strtoul(aValue, NULL, 0)));
         break;
     case kOptionUserConsentNeeded:
         gUserConsentNeeded = true;
@@ -263,7 +249,6 @@ OptionDef cmdLineOptionsDef[] = {
     { "DelayedActionTimeSec", chip::ArgParser::kArgumentRequired, kOptionDelayedActionTimeSec },
     { "UserConsentState", chip::ArgParser::kArgumentRequired, kOptionUserConsentState },
     { "discriminator", chip::ArgParser::kArgumentRequired, kOptionDiscriminator },
-    { "passcode", chip::ArgParser::kArgumentRequired, kOptionPasscode },
     { "softwareVersion", chip::ArgParser::kArgumentRequired, kOptionSoftwareVersion },
     { "UserConsentNeeded", chip::ArgParser::kNoArgument, kOptionUserConsentNeeded },
     {},
@@ -287,10 +272,6 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "  -d/--discriminator <discriminator>\n"
                              "        A 12-bit value used to discern between multiple commissionable CHIP device\n"
                              "        advertisements. If none is specified, default value is 3840.\n"
-                             "  -p/--passcode <passcode>\n"
-                             "        A Passcode SHALL be included as a 27-bit unsigned integer,\n"
-                             "        which serves as proof of possession during commissioning.\n"
-                             "        If none is specified, default value is 20202021.\n"
                              "  -s/--softwareVersion <version>\n"
                              "        Value of SoftwareVersion in the Query Image Response\n"
                              "        If ota image list is present along with this option\n"
@@ -336,18 +317,6 @@ int main(int argc, char * argv[])
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(SoftwareUpdate, "Setup discriminator setting failed with code: %" CHIP_ERROR_FORMAT, err.Format());
-            return 1;
-        }
-    }
-
-    if (gSetupPasscode.HasValue())
-    {
-        // Set passcode to user specified value
-        ChipLogProgress(SoftwareUpdate, "Setting passcode to: %" PRIu32, gSetupPasscode.Value());
-        err = chip::DeviceLayer::ConfigurationMgr().StoreSetupPinCode(gSetupPasscode.Value());
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(SoftwareUpdate, "Setup passcode setting failed with code: %" CHIP_ERROR_FORMAT, err.Format());
             return 1;
         }
     }
