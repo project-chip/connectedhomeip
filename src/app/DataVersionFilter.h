@@ -24,22 +24,22 @@
 
 namespace chip {
 namespace app {
-struct DataVersionFilterParams
+struct DataVersionFilter
 {
-    DataVersionFilterParams(EndpointId aEndpointId, ClusterId aClusterId, DataVersion aDataVersion) :
+    DataVersionFilter(EndpointId aEndpointId, ClusterId aClusterId, DataVersion aDataVersion) :
         mEndpointId(aEndpointId), mClusterId(aClusterId), mDataVersion(aDataVersion)
     {}
 
-    DataVersionFilterParams() {}
+    DataVersionFilter() {}
 
     bool IsValidDataVersionFilter()
     {
-        return (mEndpointId != kInvalidEndpointId) && (mClusterId != kInvalidClusterId) && (mDataVersion != kUndefinedDataVersion);
+        return (mEndpointId != kInvalidEndpointId) && (mClusterId != kInvalidClusterId) && (mDataVersion.HasValue());
     }
 
     EndpointId mEndpointId   = kInvalidEndpointId;
     ClusterId mClusterId     = kInvalidClusterId;
-    DataVersion mDataVersion = kUndefinedDataVersion;
+    Optional<DataVersion> mDataVersion;
 };
 } // namespace app
 } // namespace chip

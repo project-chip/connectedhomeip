@@ -95,7 +95,8 @@ void TestWriteInteraction::AddAttributeDataIB(nlTestSuite * apSuite, void * apCo
     attributePathParams.mClusterId   = 3;
     attributePathParams.mAttributeId = 4;
 
-    err = aWriteClient.PrepareAttribute(attributePathParams);
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = aWriteClient.PrepareAttribute(attributePathParams, dataVersion);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     chip::TLV::TLVWriter * writer = aWriteClient.GetAttributeDataIBTLVWriter();
@@ -302,7 +303,7 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
 }
 
 CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
-                                  TLV::TLVReader & aReader, WriteHandler * aWriteHandler)
+                                  TLV::TLVReader & aReader, WriteHandler * aWriteHandler, Optional<DataVersion> &aRequiredDataVersion)
 {
     TLV::TLVWriter writer;
     writer.Init(attributeDataTLV);
@@ -347,7 +348,7 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjects(nlTestSuite * ap
     // Spec A.11.2 strings SHALL NOT include a terminating null character to mark the end of a string.
     dataTx.e = chip::Span<const char>(charSpanData, strlen(charSpanData));
 
-    DataVersion version = kUndefinedDataVersion;
+    Optional<DataVersion> version;
     writeClient.EncodeAttributeWritePayload(attributePathParams, version, dataTx);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 

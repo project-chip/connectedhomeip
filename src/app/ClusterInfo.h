@@ -81,7 +81,7 @@ public:
 
     bool IsValidDataVersionFilter() const
     {
-        return !HasWildcardEndpointId() && !HasWildcardClusterId() && mDataVersion != kUndefinedDataVersion;
+        return !HasWildcardEndpointId() && !HasWildcardClusterId() && mDataVersion.HasValue();
     }
 
     inline bool HasWildcardNodeId() const { return mNodeId == kUndefinedNodeId; }
@@ -105,7 +105,7 @@ public:
     EventId mEventId         = kInvalidEventId;       // uint32
     ListIndex mListIndex     = kInvalidListIndex;     // uint16
     EndpointId mEndpointId   = kInvalidEndpointId;    // uint16
-    DataVersion mDataVersion = kUndefinedDataVersion; // uint32
+    Optional<DataVersion> mDataVersion; // uint32
 };
 } // namespace app
 } // namespace chip

@@ -47,16 +47,19 @@ void Engine::Shutdown()
     mGlobalDirtySet.ReleaseAll();
 }
 
-bool Engine::IsClusterVersionAllowed(ClusterInfo * aDataVersionFilterList, const ConcreteReadAttributePath & aPath)
+bool Engine::IsClusterDataVersionMatch(ClusterInfo * aDataVersionFilterList, const ConcreteReadAttributePath & aPath)
 {
     for (auto filter = aDataVersionFilterList; filter != nullptr; filter = filter->mpNext)
     {
-        if (aPath.mEndpointId == filter->mEndpointId && aPath.mClusterId == filter->mClusterId)
+        if (aPath.mEndpointId == filter->mEndpointId && aPath.mClusterId == filter->mClusterId && filter->mDataVersion.HasValue())
         {
-            return IsClusterDataVersionAllowed(filter->mEndpointId, filter->mClusterId, filter->mDataVersion);
+            if(IsClusterDataVersionEqual(filter->mEndpointId, filter->mClusterId, filter->mDataVersion.Value()))
+            {
+                return true;
+            }
         }
     }
-    return true;
+    return false;
 }
 
 CHIP_ERROR
@@ -125,7 +128,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
             }
             else
             {
-                if (!IsClusterVersionAllowed(apReadHandler->GetDataVersionFilterlist(), readPath))
+                if (IsClusterDataVersionMatch(apReadHandler->GetDataVersionFilterlist(), readPath))
                 {
                     continue;
                 }

@@ -19,7 +19,7 @@
 #pragma once
 
 #include <app/AttributePathParams.h>
-#include <app/DataVersionFilterParams.h>
+#include <app/DataVersionFilter.h>
 #include <app/EventPathParams.h>
 #include <app/InteractionModelTimeout.h>
 #include <app/util/basic-types.h>
@@ -46,8 +46,8 @@ struct ReadPrepareParams
     size_t mEventPathParamsListSize                         = 0;
     AttributePathParams * mpAttributePathParamsList         = nullptr;
     size_t mAttributePathParamsListSize                     = 0;
-    DataVersionFilterParams * mpDataVersionFilterParamsList = nullptr;
-    size_t mDataVersionFilterParamsListSize                 = 0;
+    DataVersionFilter * mpDataVersionFilterList = nullptr;
+    size_t mDataVersionFilterListSize                 = 0;
     EventNumber mEventNumber                                = 0;
     System::Clock::Timeout mTimeout                         = kImMessageTimeout;
     uint16_t mMinIntervalFloorSeconds                       = 0;
@@ -65,8 +65,8 @@ struct ReadPrepareParams
         mEventPathParamsListSize           = other.mEventPathParamsListSize;
         mpAttributePathParamsList          = other.mpAttributePathParamsList;
         mAttributePathParamsListSize       = other.mAttributePathParamsListSize;
-        mpDataVersionFilterParamsList      = other.mpDataVersionFilterParamsList;
-        mDataVersionFilterParamsListSize   = other.mDataVersionFilterParamsListSize;
+        mpDataVersionFilterList      = other.mpDataVersionFilterList;
+        mDataVersionFilterListSize   = other.mDataVersionFilterListSize;
         mEventNumber                       = other.mEventNumber;
         mMinIntervalFloorSeconds           = other.mMinIntervalFloorSeconds;
         mMaxIntervalCeilingSeconds         = other.mMaxIntervalCeilingSeconds;
@@ -90,8 +90,8 @@ struct ReadPrepareParams
         mEventPathParamsListSize           = other.mEventPathParamsListSize;
         mpAttributePathParamsList          = other.mpAttributePathParamsList;
         mAttributePathParamsListSize       = other.mAttributePathParamsListSize;
-        mpDataVersionFilterParamsList      = other.mpDataVersionFilterParamsList;
-        mDataVersionFilterParamsListSize   = other.mDataVersionFilterParamsListSize;
+        mpDataVersionFilterList      = other.mpDataVersionFilterList;
+        mDataVersionFilterListSize   = other.mDataVersionFilterListSize;
         mEventNumber                       = other.mEventNumber;
         mMinIntervalFloorSeconds           = other.mMinIntervalFloorSeconds;
         mMaxIntervalCeilingSeconds         = other.mMaxIntervalCeilingSeconds;

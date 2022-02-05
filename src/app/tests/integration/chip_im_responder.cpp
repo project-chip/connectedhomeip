@@ -106,7 +106,7 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
 }
 
 CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
-                                  TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
+                                  TLV::TLVReader & aReader, WriteHandler * apWriteHandler, Optional<DataVersion> &aRequiredDataVersion)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     ConcreteAttributePath attributePath(2, 3, 4);
@@ -114,12 +114,7 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
     return err;
 }
 
-bool IsClusterDataVersionAllowed(const EndpointId & aEndpointId, const ClusterId & aClusterId, const DataVersion & aDataVersion)
-{
-    return true;
-}
-
-bool IsClusterDataVersionEqual(const EndpointId & aEndpointId, const ClusterId & aClusterId, const DataVersion & aRequiredVersion)
+bool IsClusterDataVersionEqual(EndpointId aEndpointId, ClusterId aClusterId, DataVersion aRequiredVersion)
 {
     return true;
 }

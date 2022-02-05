@@ -145,7 +145,7 @@ public:
             }
         }
     }
-    void OnAttributeData(const chip::app::ConcreteDataAttributePath & aPath, chip::DataVersion aVersion,
+    void OnAttributeData(const chip::app::ConcreteDataAttributePath & aPath,
                          chip::TLV::TLVReader * aData, const chip::app::StatusIB & status) override
     {}
 
@@ -371,7 +371,8 @@ CHIP_ERROR SendWriteRequest(chip::app::WriteClient & apWriteClient)
     attributePathParams.mClusterId   = 3;
     attributePathParams.mAttributeId = 4;
 
-    SuccessOrExit(err = apWriteClient.PrepareAttribute(attributePathParams));
+    chip::Optional<chip::DataVersion> dataVersion;
+    SuccessOrExit(err = apWriteClient.PrepareAttribute(attributePathParams, dataVersion));
 
     writer = apWriteClient.GetAttributeDataIBTLVWriter();
 
@@ -664,18 +665,13 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
     return attributeReport.EndOfAttributeReportIB().GetError();
 }
 
-bool IsClusterDataVersionAllowed(const EndpointId & aEndpointId, const ClusterId & aClusterId, const DataVersion & aDataVersion)
-{
-    return true;
-}
-
-bool IsClusterDataVersionEqual(const EndpointId & aEndpointId, const ClusterId & aClusterId, const DataVersion & aRequiredVersion)
+bool IsClusterDataVersionEqual(EndpointId aEndpointId, ClusterId aClusterId, DataVersion aRequiredVersion)
 {
     return true;
 }
 
 CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
-                                  TLV::TLVReader & aReader, WriteHandler *)
+                                  TLV::TLVReader & aReader, WriteHandler *, Optional<DataVersion> &aRequiredDataVersion)
 {
     if (aClusterInfo.mClusterId != kTestClusterId || aClusterInfo.mEndpointId != kTestEndpointId)
     {

@@ -110,12 +110,11 @@ public:
          * receives an OnDone call to destroy the object.
          *
          * @param[in] aPath        The attribute path field in report response.
-         * @param[in] aVersion     The data version for cluster in report response.
          * @param[in] apData       The attribute data of the given path, will be a nullptr if status is not Success.
          * @param[in] aStatus      Attribute-specific status, containing an InteractionModel::Status code as well as an
          *                         optional cluster-specific status code.
          */
-        virtual void OnAttributeData(const ConcreteDataAttributePath & aPath, DataVersion aVersion, TLV::TLVReader * apData,
+        virtual void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                                      const StatusIB & aStatus)
         {}
 
@@ -294,8 +293,8 @@ private:
     CHIP_ERROR GenerateAttributePathList(AttributePathIBs::Builder & aAttributePathIBsBuilder,
                                          AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize);
     CHIP_ERROR GenerateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
-                                             DataVersionFilterParams * apDataVersionFilterParamsList,
-                                             size_t aDataVersionFilterParamsListSize);
+                                             DataVersionFilter * apDataVersionFilterList,
+                                             size_t aDataVersionFilterListSize);
     CHIP_ERROR ProcessAttributeReportIBs(TLV::TLVReader & aAttributeDataIBsReader);
     CHIP_ERROR ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsReader);
 
@@ -313,7 +312,7 @@ private:
     // Specialized request-sending functions.
     CHIP_ERROR SendReadRequest(ReadPrepareParams & aReadPrepareParams);
     CHIP_ERROR SendSubscribeRequest(ReadPrepareParams & aSubscribePrepareParams);
-    void UpdateDataVersionFilters(const EndpointId aEndpointId, const ClusterId & aClusterId, const DataVersion & aDataVersion);
+    void UpdateDataVersionFilters(EndpointId aEndpointId, ClusterId aClusterId, DataVersion aDataVersion);
     static void OnResubscribeTimerCallback(System::Layer * apSystemLayer, void * apAppState);
 
     /*

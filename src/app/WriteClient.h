@@ -124,7 +124,7 @@ public:
      */
     template <class T>
     CHIP_ERROR EncodeAttributeWritePayload(const chip::app::AttributePathParams & attributePath,
-                                           const chip::DataVersion aDataVersion, const T & value)
+                                           const Optional<chip::DataVersion> & aDataVersion, const T & value)
     {
         chip::TLV::TLVWriter * writer = nullptr;
 
@@ -154,7 +154,7 @@ public:
      */
     void Shutdown();
 
-    CHIP_ERROR PrepareAttribute(const AttributePathParams & aAttributePathParams, DataVersion aDataVersion = kUndefinedDataVersion);
+    CHIP_ERROR PrepareAttribute(const AttributePathParams & aAttributePathParams, const Optional<chip::DataVersion> & aDataVersion);
     CHIP_ERROR FinishAttribute();
     TLV::TLVWriter * GetAttributeDataIBTLVWriter();
 
@@ -247,6 +247,7 @@ private:
     // If mTimedWriteTimeoutMs has a value, we are expected to do a timed
     // write.
     Optional<uint16_t> mTimedWriteTimeoutMs;
+    bool mHasDataVersion = false;
 };
 
 } // namespace app

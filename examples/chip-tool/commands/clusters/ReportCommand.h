@@ -34,7 +34,7 @@ public:
     virtual void OnEventSubscription(){};
 
     /////////// ReadClient Callback Interface /////////
-    void OnAttributeData(const chip::app::ConcreteDataAttributePath & path, chip::DataVersion aVersion, chip::TLV::TLVReader * data,
+    void OnAttributeData(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data,
                          const chip::app::StatusIB & status) override
     {
         CHIP_ERROR error = status.ToChipError();
@@ -108,7 +108,7 @@ public:
 protected:
     CHIP_ERROR ReportAttribute(ChipDevice * device, chip::EndpointId endpointId, chip::ClusterId clusterId,
                                chip::AttributeId attributeId, chip::app::ReadClient::InteractionType interactionType,
-                               chip::DataVersion dataVersion = chip::kUndefinedDataVersion, uint16_t minInterval = 0,
+                               const chip::Optional<chip::DataVersion> & aDataVersion, uint16_t minInterval = 0,
                                uint16_t maxInterval = 0)
     {
         chip::app::AttributePathParams attributePathParams[1];
@@ -121,14 +121,14 @@ protected:
         params.mEventPathParamsListSize     = 0;
         params.mpAttributePathParamsList    = attributePathParams;
         params.mAttributePathParamsListSize = 1;
-        if (dataVersion != chip::kUndefinedDataVersion)
+        if (aDataVersion.HasValue())
         {
-            chip::app::DataVersionFilterParams dataVersionFilterParams[1];
-            dataVersionFilterParams[0].mEndpointId  = endpointId;
-            dataVersionFilterParams[0].mClusterId   = clusterId;
-            dataVersionFilterParams[0].mDataVersion = dataVersion;
-            params.mpDataVersionFilterParamsList    = dataVersionFilterParams;
-            params.mDataVersionFilterParamsListSize = 1;
+            chip::app::DataVersionFilter dataVersionFilter[1];
+            dataVersionFilter[0].mEndpointId  = endpointId;
+            dataVersionFilter[0].mClusterId   = clusterId;
+            dataVersionFilter[0].mDataVersion = aDataVersion;
+            params.mpDataVersionFilterList    = dataVersionFilter;
+            params.mDataVersionFilterListSize = 1;
         }
         if (interactionType == chip::app::ReadClient::InteractionType::Subscribe)
         {
@@ -203,8 +203,10 @@ public:
     {
         ChipLogProgress(chipTool, "Sending ReadAttribute to cluster " ChipLogFormatMEI " on endpoint %" PRIu16,
                         ChipLogValueMEI(mClusterId), endpointId);
+        //TODO: Extend data version to Chip-tool for read
+        chip::Optional<chip::DataVersion> dataVersion;
         return ReportCommand::ReportAttribute(device, endpointId, mClusterId, mAttributeId,
-                                              chip::app::ReadClient::InteractionType::Read);
+                                              chip::app::ReadClient::InteractionType::Read, dataVersion);
     }
 
 private:
@@ -253,8 +255,10 @@ public:
     {
         ChipLogProgress(chipTool, "Sending SubscribeAttribute to cluster " ChipLogFormatMEI " on endpoint %" PRIu16,
                         ChipLogValueMEI(mClusterId), endpointId);
+        //TODO: Extend data version to Chip-tool for subscribe
+        chip::Optional<chip::DataVersion> dataVersion;
         return ReportCommand::ReportAttribute(device, endpointId, mClusterId, mAttributeId,
-                                              chip::app::ReadClient::InteractionType::Subscribe, mMinInterval, mMaxInterval);
+                                              chip::app::ReadClient::InteractionType::Subscribe, dataVersion, mMinInterval, mMaxInterval);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override

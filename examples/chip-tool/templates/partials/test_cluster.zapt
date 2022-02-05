@@ -282,7 +282,8 @@ class {{filename}}: public TestCommand
         {{/chip_tests_item_parameters}}
 
         {{#if isWriteAttribute}}
-          ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::{{asUpperCamelCase cluster}}::Attributes::{{asUpperCamelCase attribute}}::TypeInfo>({{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument, {{/chip_tests_item_parameters}}this, {{>staticSuccessResponse}}, {{>staticFailureResponse}}
+          chip::Optional<chip::DataVersion> dataVersion;
+          ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::{{asUpperCamelCase cluster}}::Attributes::{{asUpperCamelCase attribute}}::TypeInfo>({{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument, {{/chip_tests_item_parameters}}this, dataVersion, {{>staticSuccessResponse}}, {{>staticFailureResponse}}
             {{~> maybeTimedInteractionTimeout ~}}
             {{~#if isGroupCommand}}, {{>staticDoneResponse}}{{/if~}}
             ));
@@ -292,9 +293,11 @@ class {{filename}}: public TestCommand
         {{else if isSubscribeEvent}}
           ReturnErrorOnFailure(cluster.SubscribeEvent<{{zapTypeToDecodableClusterObjectType event ns=cluster isArgument=true}}>(this, {{>staticSuccessResponse}}, {{>staticFailureResponse}}, minIntervalArgument, maxIntervalArgument, {{>staticSubscriptionEstablished}}));
         {{else if isReadAttribute}}
-          ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::{{asUpperCamelCase cluster}}::Attributes::{{asUpperCamelCase attribute}}::TypeInfo>({{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument, {{/chip_tests_item_parameters}}this, {{>staticSuccessResponse}}, {{>staticFailureResponse}}));
+          chip::Optional<chip::DataVersion> dataVersion;
+          ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::{{asUpperCamelCase cluster}}::Attributes::{{asUpperCamelCase attribute}}::TypeInfo>({{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument, {{/chip_tests_item_parameters}}this, dataVersion, {{>staticSuccessResponse}}, {{>staticFailureResponse}}));
         {{else if isSubscribeAttribute}}
-          ReturnErrorOnFailure(cluster.SubscribeAttribute<chip::app::Clusters::{{asUpperCamelCase cluster}}::Attributes::{{asUpperCamelCase attribute}}::TypeInfo>(this, {{>staticSuccessResponse}}, {{>staticFailureResponse}}, minIntervalArgument, maxIntervalArgument, {{>staticSubscriptionEstablished}}));
+          chip::Optional<chip::DataVersion> dataVersion;
+          ReturnErrorOnFailure(cluster.SubscribeAttribute<chip::app::Clusters::{{asUpperCamelCase cluster}}::Attributes::{{asUpperCamelCase attribute}}::TypeInfo>(this, dataVersion, {{>staticSuccessResponse}}, {{>staticFailureResponse}}, minIntervalArgument, maxIntervalArgument, {{>staticSubscriptionEstablished}}));
         {{else if isWaitForReport}}
           {{> subscribeDataCallback}} = {{> staticSuccessResponse}};
         {{else}}

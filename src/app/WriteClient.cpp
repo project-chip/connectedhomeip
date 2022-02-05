@@ -144,7 +144,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR WriteClient::PrepareAttribute(const AttributePathParams & aAttributePathParams, DataVersion aDataVersion)
+CHIP_ERROR WriteClient::PrepareAttribute(const AttributePathParams & aAttributePathParams, const Optional<DataVersion> & aDataVersion)
 {
     if (mState == State::Uninitialized)
     {
@@ -154,9 +154,9 @@ CHIP_ERROR WriteClient::PrepareAttribute(const AttributePathParams & aAttributeP
     AttributeDataIBs::Builder & writeRequests  = mWriteRequestBuilder.GetWriteRequests();
     AttributeDataIB::Builder & attributeDataIB = writeRequests.CreateAttributeDataIBBuilder();
     ReturnErrorOnFailure(writeRequests.GetError());
-    if (aDataVersion != kUndefinedDataVersion)
+    if (aDataVersion.HasValue() && !aAttributePathParams.HasWildcardEndpointId() && !aAttributePathParams.HasWildcardClusterId())
     {
-        attributeDataIB.DataVersion(aDataVersion);
+        attributeDataIB.DataVersion(aDataVersion.Value());
     }
     ReturnErrorOnFailure(attributeDataIB.GetError());
     AttributePathIB::Builder & path = attributeDataIB.CreatePath();
@@ -243,7 +243,7 @@ CHIP_ERROR WriteClient::SendWriteRequest(const SessionHandle & session, System::
     // Create a new exchange context.
     mpExchangeCtx = mpExchangeMgr->NewContext(session, this);
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
-
+    VerifyOrReturnError(!(mpExchangeCtx->IsGroupExchangeContext() && mHasDataVersion), CHIP_ERROR_INVALID_MESSAGE_TYPE);
     mpExchangeCtx->SetResponseTimeout(timeout);
 
     if (mTimedWriteTimeoutMs.HasValue())

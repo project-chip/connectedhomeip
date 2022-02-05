@@ -111,7 +111,8 @@ using namespace chip::app::Clusters;
           using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
           auto successFn = Callback<{{>callbackName}}Callback>::FromCancelable(success);
           auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-          return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+          chip::Optional<chip::DataVersion> dataVersion;
+          return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, dataVersion, successFn->mCall, failureFn->mCall);
       });
 }
 
@@ -133,7 +134,8 @@ using namespace chip::app::Clusters;
         {{>encode_value target="cppValue" source="value" cluster=parent.name errorCode="return CHIP_ERROR_INVALID_ARGUMENT;" depth=0}}
         auto successFn = Callback<CHIP{{>callbackName}}CallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall
+        chip::Optional<chip::DataVersion> dataVersion;
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, dataVersion, successFn->mCall, failureFn->mCall
         {{#if mustUseTimedWrite}}
           {{!TODO Fix Darwin API to pass in this information.  For now, 10 seconds.}}
           , 10000
@@ -170,7 +172,8 @@ using namespace chip::app::Clusters;
           using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
           auto successFn = Callback<{{>callbackName}}Callback>::FromCancelable(success);
           auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-          return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall, minInterval, maxInterval, CHIP{{>callbackName}}CallbackSubscriptionBridge::OnSubscriptionEstablished);
+          chip::Optional<chip::DataVersion> dataVersion;
+          return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, dataVersion, successFn->mCall, failureFn->mCall, minInterval, maxInterval, CHIP{{>callbackName}}CallbackSubscriptionBridge::OnSubscriptionEstablished);
       }, subscriptionEstablishedHandler);
 }
 

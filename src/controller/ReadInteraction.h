@@ -43,8 +43,7 @@ struct ReportAttributeParams : public app::ReadPrepareParams
 
 template <typename DecodableAttributeType>
 CHIP_ERROR ReportAttribute(Messaging::ExchangeManager * exchangeMgr, EndpointId endpointId, ClusterId clusterId,
-                           AttributeId attributeId, ReportAttributeParams<DecodableAttributeType> && readParams,
-                           DataVersion aDataVersion = kUndefinedDataVersion)
+                           AttributeId attributeId, const Optional<DataVersion> & aDataVersion, ReportAttributeParams<DecodableAttributeType> && readParams)
 {
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
     CHIP_ERROR err                       = CHIP_NO_ERROR;
@@ -53,13 +52,13 @@ CHIP_ERROR ReportAttribute(Messaging::ExchangeManager * exchangeMgr, EndpointId 
     VerifyOrReturnError(readPaths != nullptr, CHIP_ERROR_NO_MEMORY);
     readParams.mpAttributePathParamsList    = readPaths.get();
     readParams.mAttributePathParamsListSize = 1;
-
-    auto dataVersionFilters = Platform::MakeUnique<app::DataVersionFilterParams>(endpointId, clusterId, aDataVersion);
-    VerifyOrReturnError(dataVersionFilters != nullptr, CHIP_ERROR_NO_MEMORY);
-    if (aDataVersion != 0)
+    chip::Platform::UniquePtr<chip::app::DataVersionFilter> dataVersionFilters;
+    if (aDataVersion.HasValue())
     {
-        readParams.mpDataVersionFilterParamsList    = dataVersionFilters.get();
-        readParams.mDataVersionFilterParamsListSize = 1;
+        dataVersionFilters = Platform::MakeUnique<app::DataVersionFilter>(endpointId, clusterId, aDataVersion.Value());
+        VerifyOrReturnError(dataVersionFilters != nullptr, CHIP_ERROR_NO_MEMORY);
+        readParams.mpDataVersionFilterList    = dataVersionFilters.get();
+        readParams.mDataVersionFilterListSize = 1;
     }
     auto onDone = [](TypedReadAttributeCallback<DecodableAttributeType> * callback) { chip::Platform::Delete(callback); };
 
@@ -74,7 +73,11 @@ CHIP_ERROR ReportAttribute(Messaging::ExchangeManager * exchangeMgr, EndpointId 
     if (readClient->IsSubscriptionType())
     {
         readPaths.release();
-        dataVersionFilters.release();
+        if (aDataVersion.HasValue())
+        {
+            dataVersionFilters.release();
+        }
+
         err = readClient->SendAutoResubscribeRequest(std::move(readParams));
         ReturnErrorOnFailure(err);
     }
@@ -103,16 +106,16 @@ CHIP_ERROR ReportAttribute(Messaging::ExchangeManager * exchangeMgr, EndpointId 
  */
 template <typename DecodableAttributeType>
 CHIP_ERROR ReadAttribute(Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle, EndpointId endpointId,
-                         ClusterId clusterId, AttributeId attributeId,
+                         ClusterId clusterId, AttributeId attributeId, const Optional<DataVersion> & aDataVersion,
                          typename TypedReadAttributeCallback<DecodableAttributeType>::OnSuccessCallbackType onSuccessCb,
                          typename TypedReadAttributeCallback<DecodableAttributeType>::OnErrorCallbackType onErrorCb,
-                         DataVersion aDataVersion = kUndefinedDataVersion, bool fabricFiltered = true)
+                         bool fabricFiltered = true)
 {
     detail::ReportAttributeParams<DecodableAttributeType> params(sessionHandle);
     params.mOnReportCb       = onSuccessCb;
     params.mOnErrorCb        = onErrorCb;
     params.mIsFabricFiltered = fabricFiltered;
-    return detail::ReportAttribute(exchangeMgr, endpointId, clusterId, attributeId, std::move(params), aDataVersion);
+    return detail::ReportAttribute(exchangeMgr, endpointId, clusterId, attributeId, aDataVersion, std::move(params));
 }
 
 /*
@@ -126,26 +129,26 @@ CHIP_ERROR ReadAttribute(Messaging::ExchangeManager * exchangeMgr, const Session
  */
 template <typename AttributeTypeInfo>
 CHIP_ERROR
-ReadAttribute(Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle, EndpointId endpointId,
+ReadAttribute(Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle, EndpointId endpointId, const Optional<DataVersion> & aDataVersion,
               typename TypedReadAttributeCallback<typename AttributeTypeInfo::DecodableType>::OnSuccessCallbackType onSuccessCb,
               typename TypedReadAttributeCallback<typename AttributeTypeInfo::DecodableType>::OnErrorCallbackType onErrorCb,
-              DataVersion aDataVersion = kUndefinedDataVersion, bool fabricFiltered = true)
+              bool fabricFiltered = true)
 {
     return ReadAttribute<typename AttributeTypeInfo::DecodableType>(
-        exchangeMgr, sessionHandle, endpointId, AttributeTypeInfo::GetClusterId(), AttributeTypeInfo::GetAttributeId(), onSuccessCb,
-        onErrorCb, aDataVersion, fabricFiltered);
+        exchangeMgr, sessionHandle, endpointId, AttributeTypeInfo::GetClusterId(), AttributeTypeInfo::GetAttributeId(), aDataVersion, onSuccessCb,
+        onErrorCb, fabricFiltered);
 }
 
 // Helper for SubscribeAttribute to reduce the amount of code generated.
 template <typename DecodableAttributeType>
 CHIP_ERROR SubscribeAttribute(
     Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle, EndpointId endpointId, ClusterId clusterId,
-    AttributeId attributeId, typename TypedReadAttributeCallback<DecodableAttributeType>::OnSuccessCallbackType onReportCb,
+    AttributeId attributeId, const Optional<DataVersion> & aDataVersion, typename TypedReadAttributeCallback<DecodableAttributeType>::OnSuccessCallbackType onReportCb,
     typename TypedReadAttributeCallback<DecodableAttributeType>::OnErrorCallbackType onErrorCb, uint16_t minIntervalFloorSeconds,
     uint16_t maxIntervalCeilingSeconds,
     typename TypedReadAttributeCallback<DecodableAttributeType>::OnSubscriptionEstablishedCallbackType onSubscriptionEstablishedCb =
         nullptr,
-    DataVersion aDataVersion = kUndefinedDataVersion, bool fabricFiltered = true, bool keepPreviousSubscriptions = false)
+    bool fabricFiltered = true, bool keepPreviousSubscriptions = false)
 {
     detail::ReportAttributeParams<DecodableAttributeType> params(sessionHandle);
     params.mOnReportCb                  = onReportCb;
@@ -156,7 +159,7 @@ CHIP_ERROR SubscribeAttribute(
     params.mKeepSubscriptions           = keepPreviousSubscriptions;
     params.mReportType                  = app::ReadClient::InteractionType::Subscribe;
     params.mIsFabricFiltered            = fabricFiltered;
-    return detail::ReportAttribute(exchangeMgr, endpointId, clusterId, attributeId, std::move(params), aDataVersion);
+    return detail::ReportAttribute(exchangeMgr, endpointId, clusterId, attributeId, aDataVersion, std::move(params));
 }
 
 /*
@@ -166,17 +169,17 @@ CHIP_ERROR SubscribeAttribute(
  */
 template <typename AttributeTypeInfo>
 CHIP_ERROR SubscribeAttribute(
-    Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle, EndpointId endpointId,
+    Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle, EndpointId endpointId, const Optional<DataVersion> & aDataVersion,
     typename TypedReadAttributeCallback<typename AttributeTypeInfo::DecodableType>::OnSuccessCallbackType onReportCb,
     typename TypedReadAttributeCallback<typename AttributeTypeInfo::DecodableType>::OnErrorCallbackType onErrorCb,
     uint16_t aMinIntervalFloorSeconds, uint16_t aMaxIntervalCeilingSeconds,
     typename TypedReadAttributeCallback<typename AttributeTypeInfo::DecodableType>::OnSubscriptionEstablishedCallbackType
         onSubscriptionEstablishedCb = nullptr,
-    DataVersion aDataVersion = kUndefinedDataVersion, bool fabricFiltered = true, bool keepPreviousSubscriptions = false)
+    bool fabricFiltered = true, bool keepPreviousSubscriptions = false)
 {
     return SubscribeAttribute<typename AttributeTypeInfo::DecodableType>(
-        exchangeMgr, sessionHandle, endpointId, AttributeTypeInfo::GetClusterId(), AttributeTypeInfo::GetAttributeId(), onReportCb,
-        onErrorCb, aMinIntervalFloorSeconds, aMaxIntervalCeilingSeconds, onSubscriptionEstablishedCb, aDataVersion, fabricFiltered,
+        exchangeMgr, sessionHandle, endpointId, AttributeTypeInfo::GetClusterId(), AttributeTypeInfo::GetAttributeId(), aDataVersion, onReportCb,
+        onErrorCb, aMinIntervalFloorSeconds, aMaxIntervalCeilingSeconds, onSubscriptionEstablishedCb, fabricFiltered,
         keepPreviousSubscriptions);
 }
 

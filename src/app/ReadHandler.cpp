@@ -297,7 +297,6 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     ReturnErrorOnFailure(readRequestParser.CheckSchemaValidity());
 #endif
-
     err = readRequestParser.GetAttributeRequests(&attributePathListParser);
     if (err == CHIP_END_OF_TLV)
     {
@@ -444,23 +443,20 @@ CHIP_ERROR ReadHandler::ProcessDataVersionFilterList(DataVersionFilterIBs::Parse
         ClusterPathIB::Parser path;
         DataVersionFilterIB::Parser filter;
         ReturnErrorOnFailure(filter.Init(reader));
-        ReturnErrorOnFailure(filter.GetDataVersion(&(clusterInfo.mDataVersion)));
+        DataVersion version = 0;
+        ReturnErrorOnFailure(filter.GetDataVersion(&version));
+        clusterInfo.mDataVersion.SetValue(version);
         ReturnErrorOnFailure(filter.GetPath(&path));
         ReturnErrorOnFailure(path.GetEndpoint(&(clusterInfo.mEndpointId)));
         ReturnErrorOnFailure(path.GetCluster(&(clusterInfo.mClusterId)));
         VerifyOrReturnError(clusterInfo.IsValidDataVersionFilter(), CHIP_ERROR_IM_MALFORMED_DATA_VERSION_FILTER_IB);
-
-        err = InteractionModelEngine::GetInstance()->PushFront(mpDataVersionFilterList, clusterInfo);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->PushFront(mpDataVersionFilterList, clusterInfo));
     }
-    // if we have exhausted this container
+
     if (CHIP_END_OF_TLV == err)
     {
-        mAttributePathExpandIterator = AttributePathExpandIterator(mpAttributeClusterInfoList);
-        err                          = CHIP_NO_ERROR;
+        err = CHIP_NO_ERROR;
     }
-
-exit:
     return err;
 }
 

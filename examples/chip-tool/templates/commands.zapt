@@ -79,7 +79,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, {{asHex parent.code 8}}, {{asHex code 8}}, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, {{asHex parent.code 8}}, {{asHex code 8}}, mValue, dataVersion);
     }
 
 private:

@@ -396,7 +396,8 @@ void DeviceController::OnVIDReadResponse(void * context, VendorId value)
     chip::Controller::BasicCluster cluster;
     cluster.Associate(device, kBasicClusterEndpoint);
 
-    if (cluster.ReadAttribute<app::Clusters::Basic::Attributes::ProductID::TypeInfo>(context, OnPIDReadResponse,
+    Optional<DataVersion> dataVersion;
+    if (cluster.ReadAttribute<app::Clusters::Basic::Attributes::ProductID::TypeInfo>(context, dataVersion, OnPIDReadResponse,
                                                                                      OnVIDPIDReadFailureResponse) != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Could not read PID for opening commissioning window");
@@ -483,8 +484,8 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowWithCallback(NodeId deviceId
         constexpr EndpointId kBasicClusterEndpoint = 0;
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, kBasicClusterEndpoint);
-
-        return cluster.ReadAttribute<app::Clusters::Basic::Attributes::VendorID::TypeInfo>(this, OnVIDReadResponse,
+        Optional<DataVersion> dataVersion;
+        return cluster.ReadAttribute<app::Clusters::Basic::Attributes::VendorID::TypeInfo>(this, dataVersion, OnVIDReadResponse,
                                                                                            OnVIDPIDReadFailureResponse);
     }
 
@@ -1745,7 +1746,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         ChipLogProgress(Controller, "Reading vendor ID");
         BasicCluster basic;
         SetupCluster(basic, proxy, endpoint, timeout);
-        basic.ReadAttribute<chip::app::Clusters::Basic::Attributes::VendorID::TypeInfo>(this, BasicVendorCallback,
+        Optional<DataVersion> dataVersion;
+        basic.ReadAttribute<chip::app::Clusters::Basic::Attributes::VendorID::TypeInfo>(this, dataVersion, BasicVendorCallback,
                                                                                         AttributeReadFailure);
     }
     break;
@@ -1753,7 +1755,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         ChipLogProgress(Controller, "Reading product ID");
         BasicCluster basic;
         SetupCluster(basic, proxy, endpoint, timeout);
-        basic.ReadAttribute<chip::app::Clusters::Basic::Attributes::ProductID::TypeInfo>(this, BasicProductCallback,
+        Optional<DataVersion> dataVersion;
+        basic.ReadAttribute<chip::app::Clusters::Basic::Attributes::ProductID::TypeInfo>(this, dataVersion, BasicProductCallback,
                                                                                          AttributeReadFailure);
     }
     break;
@@ -1761,7 +1764,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         ChipLogProgress(Controller, "Reading software version");
         BasicCluster basic;
         SetupCluster(basic, proxy, endpoint, timeout);
-        basic.ReadAttribute<chip::app::Clusters::Basic::Attributes::SoftwareVersion::TypeInfo>(this, BasicSoftwareCallback,
+        Optional<DataVersion> dataVersion;
+        basic.ReadAttribute<chip::app::Clusters::Basic::Attributes::SoftwareVersion::TypeInfo>(this, dataVersion, BasicSoftwareCallback,
                                                                                                AttributeReadFailure);
     }
     break;

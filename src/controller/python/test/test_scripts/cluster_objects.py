@@ -382,11 +382,14 @@ class ClusterObjectTests:
         req = [
             (0, Clusters.Basic.Attributes.VendorName),
         ]
-        res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req, dataVersionFilters=[(0, Clusters.Basic, data_version)])
+        res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req, dataVersionFilters=[(0, Clusters.Basic)])
         VerifyDecodeSuccess(res)
         new_data_version = res[1][0][40][1]
         if (data_version + 1) != new_data_version:
             raise AssertionError("Version mistmatch happens.")
+
+        res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req, dataVersionFilters=[(0, Clusters.Basic, new_data_version)])
+        VerifyDecodeSuccess(res)
 
         res = await devCtrl.WriteAttribute(nodeid=NODE_ID,
                                            attributes=[

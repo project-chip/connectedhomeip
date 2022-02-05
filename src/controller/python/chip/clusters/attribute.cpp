@@ -86,7 +86,7 @@ public:
 
     app::BufferedReadCallback * GetBufferedReadCallback() { return &mBufferedReadCallback; }
 
-    void OnAttributeData(const ConcreteDataAttributePath & aPath, DataVersion aVersion, TLV::TLVReader * apData,
+    void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                          const StatusIB & aStatus) override
     {
         //
@@ -115,7 +115,7 @@ public:
             size = writer.GetLengthWritten();
         }
 
-        gOnReadAttributeDataCallback(mAppContext, aVersion, aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId,
+        gOnReadAttributeDataCallback(mAppContext, aPath.mDataVersion, aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId,
                                      to_underlying(aStatus.mStatus), buffer.get(), size);
     }
 
@@ -172,9 +172,9 @@ public:
             delete[] aReadPrepareParams.mpEventPathParamsList;
         }
 
-        if (aReadPrepareParams.mpDataVersionFilterParamsList != nullptr)
+        if (aReadPrepareParams.mpDataVersionFilterList != nullptr)
         {
-            delete[] aReadPrepareParams.mpDataVersionFilterParamsList;
+            delete[] aReadPrepareParams.mpDataVersionFilterList;
         }
     }
 
@@ -310,9 +310,11 @@ chip::ChipError::StorageType pychip_WriteClient_WriteAttributes(void * appContex
             TLV::TLVWriter * writer;
             TLV::TLVReader reader;
 
+            Optional<chip::DataVersion> dataVersion;
+            dataVersion.SetValue(pathObj.dataVersion);
             SuccessOrExit(err = client->PrepareAttribute(
                               chip::app::AttributePathParams(pathObj.endpointId, pathObj.clusterId, pathObj.attributeId),
-                              pathObj.dataVersion));
+                              dataVersion));
             VerifyOrExit((writer = client->GetAttributeDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
             reader.Init(tlvBuffer, static_cast<uint32_t>(length));
@@ -358,7 +360,7 @@ chip::ChipError::StorageType pychip_ReadClient_ReadAttributes(void * appContext,
     va_start(args, total);
 
     std::unique_ptr<AttributePathParams[]> readPaths(new AttributePathParams[n]);
-    std::unique_ptr<DataVersionFilterParams[]> dataVersionFilters(new DataVersionFilterParams[n]);
+    std::unique_ptr<chip::app::DataVersionFilter[]> dataVersionFilters(new chip::app::DataVersionFilter[n]);
     std::unique_ptr<ReadClient> readClient;
 
     {
@@ -380,7 +382,7 @@ chip::ChipError::StorageType pychip_ReadClient_ReadAttributes(void * appContext,
         python::DataVersionFilter filterObj;
         memcpy(&filterObj, filter, sizeof(python::DataVersionFilter));
 
-        dataVersionFilters[j] = DataVersionFilterParams(filterObj.endpointId, filterObj.clusterId, filterObj.dataVersion);
+        dataVersionFilters[j] = chip::app::DataVersionFilter(filterObj.endpointId, filterObj.clusterId, filterObj.dataVersion);
     }
 
     Optional<SessionHandle> session = device->GetSecureSession();
@@ -396,8 +398,8 @@ chip::ChipError::StorageType pychip_ReadClient_ReadAttributes(void * appContext,
         params.mAttributePathParamsListSize = n;
         if (m != 0)
         {
-            params.mpDataVersionFilterParamsList    = dataVersionFilters.get();
-            params.mDataVersionFilterParamsListSize = m;
+            params.mpDataVersionFilterList    = dataVersionFilters.get();
+            params.mDataVersionFilterListSize = m;
         }
 
         params.mIsFabricFiltered = pyParams.isFabricFiltered;

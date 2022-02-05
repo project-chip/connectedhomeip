@@ -48,26 +48,14 @@ ResponseDirective responseDirective;
 
 namespace chip {
 namespace app {
-
-void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip::TLV::TLVReader & aReader,
-                                  CommandHandler * apCommandObj)
-{}
-
 bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
 {
     // Mock cluster catalog, only support one command on one cluster on one endpoint.
     return (aCommandPath.mEndpointId == kTestEndpointId && aCommandPath.mClusterId == TestCluster::Id);
 }
 
-CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
-                                 const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
-                                 AttributeValueEncoder::AttributeEncodeState * apEncoderState)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
 CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
-                                  TLV::TLVReader & aReader, WriteHandler * aWriteHandler)
+                                  TLV::TLVReader & aReader, WriteHandler * aWriteHandler, Optional<DataVersion> &aRequiredDataVersion)
 {
     if (aClusterInfo.mClusterId == TestCluster::Id &&
         aClusterInfo.mAttributeId == TestCluster::Attributes::ListStructOctetString::TypeInfo::GetAttributeId())
@@ -105,12 +93,7 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-bool IsClusterDataVersionAllowed(const EndpointId & aEndpointId, const ClusterId & aClusterId, const DataVersion & aDataVersion)
-{
-    return true;
-}
-
-bool IsClusterDataVersionEqual(const EndpointId & aEndpointId, const ClusterId & aClusterId, const DataVersion & aRequiredVersion)
+bool IsClusterDataVersionEqual(const EndpointId aEndpointId, const ClusterId aClusterId, const DataVersion aRequiredDataVersion)
 {
     return true;
 }
@@ -160,8 +143,9 @@ void TestWriteInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCont
         onFailureCbInvoked = true;
     };
 
+    chip::Optional<chip::DataVersion> dataVersion;
     chip::Controller::WriteAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(sessionHandle, kTestEndpointId,
-                                                                                               value, onSuccessCb, onFailureCb);
+                                                                                               value, dataVersion, onSuccessCb, onFailureCb);
 
     ctx.DrainAndServiceIO();
 
@@ -200,8 +184,9 @@ void TestWriteInteraction::TestAttributeError(nlTestSuite * apSuite, void * apCo
         onFailureCbInvoked = true;
     };
 
+    chip::Optional<chip::DataVersion> dataVersion;
     chip::Controller::WriteAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(sessionHandle, kTestEndpointId,
-                                                                                               value, onSuccessCb, onFailureCb);
+                                                                                               value, dataVersion, onSuccessCb, onFailureCb);
 
     ctx.DrainAndServiceIO();
 

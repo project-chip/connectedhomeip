@@ -143,7 +143,7 @@ public:
         mGotEventResponse = true;
     }
 
-    void OnAttributeData(const chip::app::ConcreteDataAttributePath & aPath, chip::DataVersion aVersion,
+    void OnAttributeData(const chip::app::ConcreteDataAttributePath & aPath,
                          chip::TLV::TLVReader * apData, const chip::app::StatusIB & status) override
     {
         if (status.mStatus == chip::Protocols::InteractionModel::Status::Success)
@@ -169,9 +169,9 @@ public:
             delete[] aReadPrepareParams.mpEventPathParamsList;
         }
 
-        if (aReadPrepareParams.mpDataVersionFilterParamsList != nullptr)
+        if (aReadPrepareParams.mpDataVersionFilterList != nullptr)
         {
-            delete[] aReadPrepareParams.mpDataVersionFilterParamsList;
+            delete[] aReadPrepareParams.mpDataVersionFilterList;
         }
     }
 
@@ -235,12 +235,7 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
     return AttributeValueEncoder(aAttributeReports, 0, aPath, 0).Encode(kTestFieldValue1);
 }
 
-bool IsClusterDataVersionAllowed(const EndpointId & aEndpointId, const ClusterId & aClusterId, const DataVersion & aDataVersion)
-{
-    return true;
-}
-
-bool IsClusterDataVersionEqual(const EndpointId & aEndpointId, const ClusterId & aClusterId, const DataVersion & aRequiredVersion)
+bool IsClusterDataVersionEqual(EndpointId aEndpointId, ClusterId aClusterId, DataVersion aRequiredVersion)
 {
     return true;
 }

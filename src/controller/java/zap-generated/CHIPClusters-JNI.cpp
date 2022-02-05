@@ -89,7 +89,8 @@ JNI_METHOD(void, AccessControlCluster, subscribeAclAttribute)
         chip::Callback::Callback<CHIPAccessControlClusterAclAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPAccessControlAclAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -127,7 +128,8 @@ JNI_METHOD(void, AccessControlCluster, subscribeExtensionAttribute)
         chip::Callback::Callback<CHIPAccessControlClusterExtensionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPAccessControlExtensionAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -167,8 +169,9 @@ JNI_METHOD(void, AccessControlCluster, subscribeServerGeneratedCommandListAttrib
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPAccessControlServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -208,8 +211,9 @@ JNI_METHOD(void, AccessControlCluster, subscribeClientGeneratedCommandListAttrib
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPAccessControlClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -247,7 +251,8 @@ JNI_METHOD(void, AccessControlCluster, subscribeAttributeListAttribute)
         chip::Callback::Callback<CHIPAccessControlClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPAccessControlAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -284,7 +289,8 @@ JNI_METHOD(void, AccessControlCluster, subscribeClusterRevisionAttribute)
         chip::Callback::Callback<CHIPAccessControlClusterClusterRevisionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -466,8 +472,9 @@ JNI_METHOD(void, AccountLoginCluster, subscribeServerGeneratedCommandListAttribu
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPAccountLoginServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -506,8 +513,9 @@ JNI_METHOD(void, AccountLoginCluster, subscribeClientGeneratedCommandListAttribu
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPAccountLoginClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -544,7 +552,8 @@ JNI_METHOD(void, AccountLoginCluster, subscribeAttributeListAttribute)
         chip::Callback::Callback<CHIPAccountLoginClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPAccountLoginAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -581,7 +590,8 @@ JNI_METHOD(void, AccountLoginCluster, subscribeClusterRevisionAttribute)
         chip::Callback::Callback<CHIPAccountLoginClusterClusterRevisionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -766,7 +776,8 @@ JNI_METHOD(void, AdministratorCommissioningCluster, subscribeWindowStatusAttribu
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -806,8 +817,9 @@ JNI_METHOD(void, AdministratorCommissioningCluster, subscribeAdminFabricIndexAtt
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPAdministratorCommissioningAdminFabricIndexAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -845,7 +857,8 @@ JNI_METHOD(void, AdministratorCommissioningCluster, subscribeAdminVendorIdAttrib
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -884,8 +897,9 @@ JNI_METHOD(void, AdministratorCommissioningCluster, subscribeServerGeneratedComm
         CHIPAdministratorCommissioningClusterServerGeneratedCommandListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPAdministratorCommissioningServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -924,8 +938,9 @@ JNI_METHOD(void, AdministratorCommissioningCluster, subscribeClientGeneratedComm
         CHIPAdministratorCommissioningClusterClientGeneratedCommandListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPAdministratorCommissioningClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -965,8 +980,9 @@ JNI_METHOD(void, AdministratorCommissioningCluster, subscribeAttributeListAttrib
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPAdministratorCommissioningAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -1004,7 +1020,8 @@ JNI_METHOD(void, AdministratorCommissioningCluster, subscribeClusterRevisionAttr
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -1050,7 +1067,8 @@ JNI_METHOD(void, ApplicationBasicCluster, subscribeVendorNameAttribute)
         chip::Callback::Callback<CHIPApplicationBasicClusterVendorNameAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -1087,7 +1105,8 @@ JNI_METHOD(void, ApplicationBasicCluster, subscribeVendorIdAttribute)
         chip::Callback::Callback<CHIPApplicationBasicClusterVendorIdAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -1124,7 +1143,8 @@ JNI_METHOD(void, ApplicationBasicCluster, subscribeApplicationNameAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -1161,7 +1181,8 @@ JNI_METHOD(void, ApplicationBasicCluster, subscribeProductIdAttribute)
         chip::Callback::Callback<CHIPApplicationBasicClusterProductIdAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -1198,7 +1219,8 @@ JNI_METHOD(void, ApplicationBasicCluster, subscribeApplicationStatusAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -1235,7 +1257,8 @@ JNI_METHOD(void, ApplicationBasicCluster, subscribeApplicationVersionAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -1274,8 +1297,9 @@ JNI_METHOD(void, ApplicationBasicCluster, subscribeAllowedVendorListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPApplicationBasicAllowedVendorListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -1314,8 +1338,9 @@ JNI_METHOD(void, ApplicationBasicCluster, subscribeServerGeneratedCommandListAtt
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPApplicationBasicServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -1355,8 +1380,9 @@ JNI_METHOD(void, ApplicationBasicCluster, subscribeClientGeneratedCommandListAtt
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPApplicationBasicClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -1395,7 +1421,8 @@ JNI_METHOD(void, ApplicationBasicCluster, subscribeAttributeListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPApplicationBasicAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -1432,7 +1459,8 @@ JNI_METHOD(void, ApplicationBasicCluster, subscribeClusterRevisionAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -1669,8 +1697,9 @@ JNI_METHOD(void, ApplicationLauncherCluster, subscribeApplicationLauncherListAtt
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPApplicationLauncherApplicationLauncherListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -1710,8 +1739,9 @@ JNI_METHOD(void, ApplicationLauncherCluster, subscribeServerGeneratedCommandList
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPApplicationLauncherServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -1751,8 +1781,9 @@ JNI_METHOD(void, ApplicationLauncherCluster, subscribeClientGeneratedCommandList
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPApplicationLauncherClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -1791,8 +1822,9 @@ JNI_METHOD(void, ApplicationLauncherCluster, subscribeAttributeListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPApplicationLauncherAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -1828,7 +1860,8 @@ JNI_METHOD(void, ApplicationLauncherCluster, subscribeClusterRevisionAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -1977,7 +2010,8 @@ JNI_METHOD(void, AudioOutputCluster, subscribeAudioOutputListAttribute)
         chip::Callback::Callback<CHIPAudioOutputClusterAudioOutputListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPAudioOutputAudioOutputListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -2014,7 +2048,8 @@ JNI_METHOD(void, AudioOutputCluster, subscribeCurrentAudioOutputAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -2054,8 +2089,9 @@ JNI_METHOD(void, AudioOutputCluster, subscribeServerGeneratedCommandListAttribut
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPAudioOutputServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -2094,8 +2130,9 @@ JNI_METHOD(void, AudioOutputCluster, subscribeClientGeneratedCommandListAttribut
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPAudioOutputClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -2132,7 +2169,8 @@ JNI_METHOD(void, AudioOutputCluster, subscribeAttributeListAttribute)
         chip::Callback::Callback<CHIPAudioOutputClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPAudioOutputAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -2169,7 +2207,8 @@ JNI_METHOD(void, AudioOutputCluster, subscribeClusterRevisionAttribute)
         chip::Callback::Callback<CHIPAudioOutputClusterClusterRevisionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -2313,7 +2352,8 @@ JNI_METHOD(void, BarrierControlCluster, subscribeBarrierMovingStateAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -2350,7 +2390,8 @@ JNI_METHOD(void, BarrierControlCluster, subscribeBarrierSafetyStatusAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -2387,7 +2428,8 @@ JNI_METHOD(void, BarrierControlCluster, subscribeBarrierCapabilitiesAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -2424,7 +2466,8 @@ JNI_METHOD(void, BarrierControlCluster, subscribeBarrierPositionAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -2464,8 +2507,9 @@ JNI_METHOD(void, BarrierControlCluster, subscribeServerGeneratedCommandListAttri
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPBarrierControlServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -2505,8 +2549,9 @@ JNI_METHOD(void, BarrierControlCluster, subscribeClientGeneratedCommandListAttri
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPBarrierControlClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -2544,7 +2589,8 @@ JNI_METHOD(void, BarrierControlCluster, subscribeAttributeListAttribute)
         chip::Callback::Callback<CHIPBarrierControlClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPBarrierControlAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -2581,7 +2627,8 @@ JNI_METHOD(void, BarrierControlCluster, subscribeClusterRevisionAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -2627,7 +2674,8 @@ JNI_METHOD(void, BasicCluster, subscribeDataModelRevisionAttribute)
         chip::Callback::Callback<CHIPBasicClusterDataModelRevisionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -2663,7 +2711,8 @@ JNI_METHOD(void, BasicCluster, subscribeVendorNameAttribute)
     auto successFn = chip::Callback::Callback<CHIPBasicClusterVendorNameAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -2700,7 +2749,8 @@ JNI_METHOD(void, BasicCluster, subscribeVendorIDAttribute)
     auto successFn = chip::Callback::Callback<CHIPBasicClusterVendorIDAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPBasicVendorIDAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -2737,7 +2787,8 @@ JNI_METHOD(void, BasicCluster, subscribeProductNameAttribute)
         chip::Callback::Callback<CHIPBasicClusterProductNameAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -2773,7 +2824,8 @@ JNI_METHOD(void, BasicCluster, subscribeProductIDAttribute)
     auto successFn = chip::Callback::Callback<CHIPBasicClusterProductIDAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -2809,7 +2861,8 @@ JNI_METHOD(void, BasicCluster, subscribeNodeLabelAttribute)
     auto successFn = chip::Callback::Callback<CHIPBasicClusterNodeLabelAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -2845,7 +2898,8 @@ JNI_METHOD(void, BasicCluster, subscribeLocationAttribute)
     auto successFn = chip::Callback::Callback<CHIPBasicClusterLocationAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -2882,7 +2936,8 @@ JNI_METHOD(void, BasicCluster, subscribeHardwareVersionAttribute)
         chip::Callback::Callback<CHIPBasicClusterHardwareVersionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -2919,7 +2974,8 @@ JNI_METHOD(void, BasicCluster, subscribeHardwareVersionStringAttribute)
         chip::Callback::Callback<CHIPBasicClusterHardwareVersionStringAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -2956,7 +3012,8 @@ JNI_METHOD(void, BasicCluster, subscribeSoftwareVersionAttribute)
         chip::Callback::Callback<CHIPBasicClusterSoftwareVersionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -2993,7 +3050,8 @@ JNI_METHOD(void, BasicCluster, subscribeSoftwareVersionStringAttribute)
         chip::Callback::Callback<CHIPBasicClusterSoftwareVersionStringAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -3030,7 +3088,8 @@ JNI_METHOD(void, BasicCluster, subscribeManufacturingDateAttribute)
         chip::Callback::Callback<CHIPBasicClusterManufacturingDateAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -3066,7 +3125,8 @@ JNI_METHOD(void, BasicCluster, subscribePartNumberAttribute)
     auto successFn = chip::Callback::Callback<CHIPBasicClusterPartNumberAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -3102,7 +3162,8 @@ JNI_METHOD(void, BasicCluster, subscribeProductURLAttribute)
     auto successFn = chip::Callback::Callback<CHIPBasicClusterProductURLAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -3139,7 +3200,8 @@ JNI_METHOD(void, BasicCluster, subscribeProductLabelAttribute)
         chip::Callback::Callback<CHIPBasicClusterProductLabelAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -3176,7 +3238,8 @@ JNI_METHOD(void, BasicCluster, subscribeSerialNumberAttribute)
         chip::Callback::Callback<CHIPBasicClusterSerialNumberAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -3213,7 +3276,8 @@ JNI_METHOD(void, BasicCluster, subscribeLocalConfigDisabledAttribute)
         chip::Callback::Callback<CHIPBasicClusterLocalConfigDisabledAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPBooleanAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -3249,7 +3313,8 @@ JNI_METHOD(void, BasicCluster, subscribeReachableAttribute)
     auto successFn = chip::Callback::Callback<CHIPBasicClusterReachableAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPBooleanAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -3285,7 +3350,8 @@ JNI_METHOD(void, BasicCluster, subscribeUniqueIDAttribute)
     auto successFn = chip::Callback::Callback<CHIPBasicClusterUniqueIDAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -3324,7 +3390,8 @@ JNI_METHOD(void, BasicCluster, subscribeServerGeneratedCommandListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPBasicServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -3363,7 +3430,8 @@ JNI_METHOD(void, BasicCluster, subscribeClientGeneratedCommandListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPBasicClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -3401,7 +3469,8 @@ JNI_METHOD(void, BasicCluster, subscribeAttributeListAttribute)
         chip::Callback::Callback<CHIPBasicClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPBasicAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -3438,7 +3507,8 @@ JNI_METHOD(void, BasicCluster, subscribeClusterRevisionAttribute)
         chip::Callback::Callback<CHIPBasicClusterClusterRevisionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -3484,7 +3554,8 @@ JNI_METHOD(void, BinaryInputBasicCluster, subscribeOutOfServiceAttribute)
         chip::Callback::Callback<CHIPBinaryInputBasicClusterOutOfServiceAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPBooleanAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -3521,7 +3592,8 @@ JNI_METHOD(void, BinaryInputBasicCluster, subscribePresentValueAttribute)
         chip::Callback::Callback<CHIPBinaryInputBasicClusterPresentValueAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPBooleanAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -3558,7 +3630,8 @@ JNI_METHOD(void, BinaryInputBasicCluster, subscribeStatusFlagsAttribute)
         chip::Callback::Callback<CHIPBinaryInputBasicClusterStatusFlagsAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -3598,8 +3671,9 @@ JNI_METHOD(void, BinaryInputBasicCluster, subscribeServerGeneratedCommandListAtt
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPBinaryInputBasicServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -3639,8 +3713,9 @@ JNI_METHOD(void, BinaryInputBasicCluster, subscribeClientGeneratedCommandListAtt
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPBinaryInputBasicClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -3679,7 +3754,8 @@ JNI_METHOD(void, BinaryInputBasicCluster, subscribeAttributeListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPBinaryInputBasicAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -3716,7 +3792,8 @@ JNI_METHOD(void, BinaryInputBasicCluster, subscribeClusterRevisionAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -3878,8 +3955,9 @@ JNI_METHOD(void, BindingCluster, subscribeServerGeneratedCommandListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPBindingServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -3917,8 +3995,9 @@ JNI_METHOD(void, BindingCluster, subscribeClientGeneratedCommandListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPBindingClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -3955,7 +4034,8 @@ JNI_METHOD(void, BindingCluster, subscribeAttributeListAttribute)
         chip::Callback::Callback<CHIPBindingClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPBindingAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -3992,7 +4072,8 @@ JNI_METHOD(void, BindingCluster, subscribeClusterRevisionAttribute)
         chip::Callback::Callback<CHIPBindingClusterClusterRevisionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -4038,7 +4119,8 @@ JNI_METHOD(void, BooleanStateCluster, subscribeStateValueAttribute)
         chip::Callback::Callback<CHIPBooleanStateClusterStateValueAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPBooleanAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -4078,8 +4160,9 @@ JNI_METHOD(void, BooleanStateCluster, subscribeServerGeneratedCommandListAttribu
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPBooleanStateServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -4118,8 +4201,9 @@ JNI_METHOD(void, BooleanStateCluster, subscribeClientGeneratedCommandListAttribu
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPBooleanStateClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -4156,7 +4240,8 @@ JNI_METHOD(void, BooleanStateCluster, subscribeAttributeListAttribute)
         chip::Callback::Callback<CHIPBooleanStateClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPBooleanStateAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -4193,7 +4278,8 @@ JNI_METHOD(void, BooleanStateCluster, subscribeClusterRevisionAttribute)
         chip::Callback::Callback<CHIPBooleanStateClusterClusterRevisionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -4951,7 +5037,8 @@ JNI_METHOD(void, BridgedActionsCluster, subscribeActionListAttribute)
         chip::Callback::Callback<CHIPBridgedActionsClusterActionListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPBridgedActionsActionListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -4989,7 +5076,8 @@ JNI_METHOD(void, BridgedActionsCluster, subscribeEndpointListAttribute)
         chip::Callback::Callback<CHIPBridgedActionsClusterEndpointListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPBridgedActionsEndpointListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -5026,7 +5114,8 @@ JNI_METHOD(void, BridgedActionsCluster, subscribeSetupUrlAttribute)
         chip::Callback::Callback<CHIPBridgedActionsClusterSetupUrlAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -5066,8 +5155,9 @@ JNI_METHOD(void, BridgedActionsCluster, subscribeServerGeneratedCommandListAttri
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPBridgedActionsServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -5107,8 +5197,9 @@ JNI_METHOD(void, BridgedActionsCluster, subscribeClientGeneratedCommandListAttri
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPBridgedActionsClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -5146,7 +5237,8 @@ JNI_METHOD(void, BridgedActionsCluster, subscribeAttributeListAttribute)
         chip::Callback::Callback<CHIPBridgedActionsClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPBridgedActionsAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -5183,7 +5275,8 @@ JNI_METHOD(void, BridgedActionsCluster, subscribeClusterRevisionAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -5229,7 +5322,8 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, subscribeVendorNameAttribute)
         chip::Callback::Callback<CHIPBridgedDeviceBasicClusterVendorNameAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -5266,7 +5360,8 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, subscribeVendorIDAttribute)
         chip::Callback::Callback<CHIPBridgedDeviceBasicClusterVendorIDAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -5303,7 +5398,8 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, subscribeProductNameAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -5340,7 +5436,8 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, subscribeNodeLabelAttribute)
         chip::Callback::Callback<CHIPBridgedDeviceBasicClusterNodeLabelAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -5377,7 +5474,8 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, subscribeHardwareVersionAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -5415,7 +5513,8 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, subscribeHardwareVersionStringAttrib
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -5452,7 +5551,8 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, subscribeSoftwareVersionAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -5490,7 +5590,8 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, subscribeSoftwareVersionStringAttrib
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -5527,7 +5628,8 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, subscribeManufacturingDateAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -5564,7 +5666,8 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, subscribePartNumberAttribute)
         chip::Callback::Callback<CHIPBridgedDeviceBasicClusterPartNumberAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -5601,7 +5704,8 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, subscribeProductURLAttribute)
         chip::Callback::Callback<CHIPBridgedDeviceBasicClusterProductURLAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -5638,7 +5742,8 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, subscribeProductLabelAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -5675,7 +5780,8 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, subscribeSerialNumberAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -5712,7 +5818,8 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, subscribeReachableAttribute)
         chip::Callback::Callback<CHIPBridgedDeviceBasicClusterReachableAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPBooleanAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -5752,8 +5859,9 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, subscribeServerGeneratedCommandListA
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPBridgedDeviceBasicServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -5793,8 +5901,9 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, subscribeClientGeneratedCommandListA
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPBridgedDeviceBasicClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -5833,7 +5942,8 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, subscribeAttributeListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPBridgedDeviceBasicAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -5870,7 +5980,8 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, subscribeClusterRevisionAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -6072,7 +6183,8 @@ JNI_METHOD(void, ChannelCluster, subscribeChannelListAttribute)
         chip::Callback::Callback<CHIPChannelClusterChannelListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPChannelChannelListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -6111,8 +6223,9 @@ JNI_METHOD(void, ChannelCluster, subscribeServerGeneratedCommandListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPChannelServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -6150,8 +6263,9 @@ JNI_METHOD(void, ChannelCluster, subscribeClientGeneratedCommandListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPChannelClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -6188,7 +6302,8 @@ JNI_METHOD(void, ChannelCluster, subscribeAttributeListAttribute)
         chip::Callback::Callback<CHIPChannelClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPChannelAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -6225,7 +6340,8 @@ JNI_METHOD(void, ChannelCluster, subscribeClusterRevisionAttribute)
         chip::Callback::Callback<CHIPChannelClusterClusterRevisionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -7385,7 +7501,8 @@ JNI_METHOD(void, ColorControlCluster, subscribeCurrentHueAttribute)
         chip::Callback::Callback<CHIPColorControlClusterCurrentHueAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -7422,7 +7539,8 @@ JNI_METHOD(void, ColorControlCluster, subscribeCurrentSaturationAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -7459,7 +7577,8 @@ JNI_METHOD(void, ColorControlCluster, subscribeRemainingTimeAttribute)
         chip::Callback::Callback<CHIPColorControlClusterRemainingTimeAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -7496,7 +7615,8 @@ JNI_METHOD(void, ColorControlCluster, subscribeCurrentXAttribute)
         chip::Callback::Callback<CHIPColorControlClusterCurrentXAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -7533,7 +7653,8 @@ JNI_METHOD(void, ColorControlCluster, subscribeCurrentYAttribute)
         chip::Callback::Callback<CHIPColorControlClusterCurrentYAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -7570,7 +7691,8 @@ JNI_METHOD(void, ColorControlCluster, subscribeDriftCompensationAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -7607,7 +7729,8 @@ JNI_METHOD(void, ColorControlCluster, subscribeCompensationTextAttribute)
         chip::Callback::Callback<CHIPColorControlClusterCompensationTextAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -7644,7 +7767,8 @@ JNI_METHOD(void, ColorControlCluster, subscribeColorTemperatureAttribute)
         chip::Callback::Callback<CHIPColorControlClusterColorTemperatureAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -7681,7 +7805,8 @@ JNI_METHOD(void, ColorControlCluster, subscribeColorModeAttribute)
         chip::Callback::Callback<CHIPColorControlClusterColorModeAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -7718,7 +7843,8 @@ JNI_METHOD(void, ColorControlCluster, subscribeColorControlOptionsAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -7755,7 +7881,8 @@ JNI_METHOD(void, ColorControlCluster, subscribeNumberOfPrimariesAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -7792,7 +7919,8 @@ JNI_METHOD(void, ColorControlCluster, subscribePrimary1XAttribute)
         chip::Callback::Callback<CHIPColorControlClusterPrimary1XAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -7829,7 +7957,8 @@ JNI_METHOD(void, ColorControlCluster, subscribePrimary1YAttribute)
         chip::Callback::Callback<CHIPColorControlClusterPrimary1YAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -7866,7 +7995,8 @@ JNI_METHOD(void, ColorControlCluster, subscribePrimary1IntensityAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -7903,7 +8033,8 @@ JNI_METHOD(void, ColorControlCluster, subscribePrimary2XAttribute)
         chip::Callback::Callback<CHIPColorControlClusterPrimary2XAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -7940,7 +8071,8 @@ JNI_METHOD(void, ColorControlCluster, subscribePrimary2YAttribute)
         chip::Callback::Callback<CHIPColorControlClusterPrimary2YAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -7977,7 +8109,8 @@ JNI_METHOD(void, ColorControlCluster, subscribePrimary2IntensityAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -8014,7 +8147,8 @@ JNI_METHOD(void, ColorControlCluster, subscribePrimary3XAttribute)
         chip::Callback::Callback<CHIPColorControlClusterPrimary3XAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -8051,7 +8185,8 @@ JNI_METHOD(void, ColorControlCluster, subscribePrimary3YAttribute)
         chip::Callback::Callback<CHIPColorControlClusterPrimary3YAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -8088,7 +8223,8 @@ JNI_METHOD(void, ColorControlCluster, subscribePrimary3IntensityAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -8125,7 +8261,8 @@ JNI_METHOD(void, ColorControlCluster, subscribePrimary4XAttribute)
         chip::Callback::Callback<CHIPColorControlClusterPrimary4XAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -8162,7 +8299,8 @@ JNI_METHOD(void, ColorControlCluster, subscribePrimary4YAttribute)
         chip::Callback::Callback<CHIPColorControlClusterPrimary4YAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -8199,7 +8337,8 @@ JNI_METHOD(void, ColorControlCluster, subscribePrimary4IntensityAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -8236,7 +8375,8 @@ JNI_METHOD(void, ColorControlCluster, subscribePrimary5XAttribute)
         chip::Callback::Callback<CHIPColorControlClusterPrimary5XAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -8273,7 +8413,8 @@ JNI_METHOD(void, ColorControlCluster, subscribePrimary5YAttribute)
         chip::Callback::Callback<CHIPColorControlClusterPrimary5YAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -8310,7 +8451,8 @@ JNI_METHOD(void, ColorControlCluster, subscribePrimary5IntensityAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -8347,7 +8489,8 @@ JNI_METHOD(void, ColorControlCluster, subscribePrimary6XAttribute)
         chip::Callback::Callback<CHIPColorControlClusterPrimary6XAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -8384,7 +8527,8 @@ JNI_METHOD(void, ColorControlCluster, subscribePrimary6YAttribute)
         chip::Callback::Callback<CHIPColorControlClusterPrimary6YAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -8421,7 +8565,8 @@ JNI_METHOD(void, ColorControlCluster, subscribePrimary6IntensityAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -8458,7 +8603,8 @@ JNI_METHOD(void, ColorControlCluster, subscribeWhitePointXAttribute)
         chip::Callback::Callback<CHIPColorControlClusterWhitePointXAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -8495,7 +8641,8 @@ JNI_METHOD(void, ColorControlCluster, subscribeWhitePointYAttribute)
         chip::Callback::Callback<CHIPColorControlClusterWhitePointYAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -8532,7 +8679,8 @@ JNI_METHOD(void, ColorControlCluster, subscribeColorPointRXAttribute)
         chip::Callback::Callback<CHIPColorControlClusterColorPointRXAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -8569,7 +8717,8 @@ JNI_METHOD(void, ColorControlCluster, subscribeColorPointRYAttribute)
         chip::Callback::Callback<CHIPColorControlClusterColorPointRYAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -8606,7 +8755,8 @@ JNI_METHOD(void, ColorControlCluster, subscribeColorPointRIntensityAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -8643,7 +8793,8 @@ JNI_METHOD(void, ColorControlCluster, subscribeColorPointGXAttribute)
         chip::Callback::Callback<CHIPColorControlClusterColorPointGXAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -8680,7 +8831,8 @@ JNI_METHOD(void, ColorControlCluster, subscribeColorPointGYAttribute)
         chip::Callback::Callback<CHIPColorControlClusterColorPointGYAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -8717,7 +8869,8 @@ JNI_METHOD(void, ColorControlCluster, subscribeColorPointGIntensityAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -8754,7 +8907,8 @@ JNI_METHOD(void, ColorControlCluster, subscribeColorPointBXAttribute)
         chip::Callback::Callback<CHIPColorControlClusterColorPointBXAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -8791,7 +8945,8 @@ JNI_METHOD(void, ColorControlCluster, subscribeColorPointBYAttribute)
         chip::Callback::Callback<CHIPColorControlClusterColorPointBYAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -8828,7 +8983,8 @@ JNI_METHOD(void, ColorControlCluster, subscribeColorPointBIntensityAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -8865,7 +9021,8 @@ JNI_METHOD(void, ColorControlCluster, subscribeEnhancedCurrentHueAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -8902,7 +9059,8 @@ JNI_METHOD(void, ColorControlCluster, subscribeEnhancedColorModeAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -8939,7 +9097,8 @@ JNI_METHOD(void, ColorControlCluster, subscribeColorLoopActiveAttribute)
         chip::Callback::Callback<CHIPColorControlClusterColorLoopActiveAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -8976,7 +9135,8 @@ JNI_METHOD(void, ColorControlCluster, subscribeColorLoopDirectionAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -9013,7 +9173,8 @@ JNI_METHOD(void, ColorControlCluster, subscribeColorLoopTimeAttribute)
         chip::Callback::Callback<CHIPColorControlClusterColorLoopTimeAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -9051,7 +9212,8 @@ JNI_METHOD(void, ColorControlCluster, subscribeColorLoopStartEnhancedHueAttribut
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -9089,7 +9251,8 @@ JNI_METHOD(void, ColorControlCluster, subscribeColorLoopStoredEnhancedHueAttribu
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -9126,7 +9289,8 @@ JNI_METHOD(void, ColorControlCluster, subscribeColorCapabilitiesAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -9163,7 +9327,8 @@ JNI_METHOD(void, ColorControlCluster, subscribeColorTempPhysicalMinAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -9200,7 +9365,8 @@ JNI_METHOD(void, ColorControlCluster, subscribeColorTempPhysicalMaxAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -9238,7 +9404,8 @@ JNI_METHOD(void, ColorControlCluster, subscribeCoupleColorTempToLevelMinMiredsAt
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -9276,7 +9443,8 @@ JNI_METHOD(void, ColorControlCluster, subscribeStartUpColorTemperatureMiredsAttr
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -9316,8 +9484,9 @@ JNI_METHOD(void, ColorControlCluster, subscribeServerGeneratedCommandListAttribu
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPColorControlServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -9356,8 +9525,9 @@ JNI_METHOD(void, ColorControlCluster, subscribeClientGeneratedCommandListAttribu
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPColorControlClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -9394,7 +9564,8 @@ JNI_METHOD(void, ColorControlCluster, subscribeAttributeListAttribute)
         chip::Callback::Callback<CHIPColorControlClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPColorControlAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -9431,7 +9602,8 @@ JNI_METHOD(void, ColorControlCluster, subscribeClusterRevisionAttribute)
         chip::Callback::Callback<CHIPColorControlClusterClusterRevisionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -9893,7 +10065,8 @@ JNI_METHOD(void, ContentLauncherCluster, subscribeAcceptHeaderListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPContentLauncherAcceptHeaderListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -9931,7 +10104,8 @@ JNI_METHOD(void, ContentLauncherCluster, subscribeSupportedStreamingProtocolsAtt
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -9971,8 +10145,9 @@ JNI_METHOD(void, ContentLauncherCluster, subscribeServerGeneratedCommandListAttr
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPContentLauncherServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -10012,8 +10187,9 @@ JNI_METHOD(void, ContentLauncherCluster, subscribeClientGeneratedCommandListAttr
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPContentLauncherClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -10052,7 +10228,8 @@ JNI_METHOD(void, ContentLauncherCluster, subscribeAttributeListAttribute)
         chip::Callback::Callback<CHIPContentLauncherClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPContentLauncherAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -10089,7 +10266,8 @@ JNI_METHOD(void, ContentLauncherCluster, subscribeClusterRevisionAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -10136,7 +10314,8 @@ JNI_METHOD(void, DescriptorCluster, subscribeDeviceListAttribute)
         chip::Callback::Callback<CHIPDescriptorClusterDeviceListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPDescriptorDeviceListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -10174,7 +10353,8 @@ JNI_METHOD(void, DescriptorCluster, subscribeServerListAttribute)
         chip::Callback::Callback<CHIPDescriptorClusterServerListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPDescriptorServerListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -10212,7 +10392,8 @@ JNI_METHOD(void, DescriptorCluster, subscribeClientListAttribute)
         chip::Callback::Callback<CHIPDescriptorClusterClientListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPDescriptorClientListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -10250,7 +10431,8 @@ JNI_METHOD(void, DescriptorCluster, subscribePartsListAttribute)
         chip::Callback::Callback<CHIPDescriptorClusterPartsListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPDescriptorPartsListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -10289,8 +10471,9 @@ JNI_METHOD(void, DescriptorCluster, subscribeServerGeneratedCommandListAttribute
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPDescriptorServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -10328,8 +10511,9 @@ JNI_METHOD(void, DescriptorCluster, subscribeClientGeneratedCommandListAttribute
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPDescriptorClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -10366,7 +10550,8 @@ JNI_METHOD(void, DescriptorCluster, subscribeAttributeListAttribute)
         chip::Callback::Callback<CHIPDescriptorClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPDescriptorAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -10403,7 +10588,8 @@ JNI_METHOD(void, DescriptorCluster, subscribeClusterRevisionAttribute)
         chip::Callback::Callback<CHIPDescriptorClusterClusterRevisionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -10511,8 +10697,9 @@ JNI_METHOD(void, DiagnosticLogsCluster, subscribeServerGeneratedCommandListAttri
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPDiagnosticLogsServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -10552,8 +10739,9 @@ JNI_METHOD(void, DiagnosticLogsCluster, subscribeClientGeneratedCommandListAttri
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPDiagnosticLogsClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -10591,7 +10779,8 @@ JNI_METHOD(void, DiagnosticLogsCluster, subscribeAttributeListAttribute)
         chip::Callback::Callback<CHIPDiagnosticLogsClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPDiagnosticLogsAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -11523,7 +11712,8 @@ JNI_METHOD(void, DoorLockCluster, subscribeLockStateAttribute)
         chip::Callback::Callback<CHIPDoorLockClusterLockStateAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPDoorLockLockStateAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -11560,7 +11750,8 @@ JNI_METHOD(void, DoorLockCluster, subscribeLockTypeAttribute)
         chip::Callback::Callback<CHIPDoorLockClusterLockTypeAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -11597,7 +11788,8 @@ JNI_METHOD(void, DoorLockCluster, subscribeActuatorEnabledAttribute)
         chip::Callback::Callback<CHIPDoorLockClusterActuatorEnabledAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPBooleanAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -11635,7 +11827,8 @@ JNI_METHOD(void, DoorLockCluster, subscribeDoorStateAttribute)
         chip::Callback::Callback<CHIPDoorLockClusterDoorStateAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPDoorLockDoorStateAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -11672,7 +11865,8 @@ JNI_METHOD(void, DoorLockCluster, subscribeNumberOfTotalUsersSupportedAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -11709,7 +11903,8 @@ JNI_METHOD(void, DoorLockCluster, subscribeNumberOfPINUsersSupportedAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -11746,7 +11941,8 @@ JNI_METHOD(void, DoorLockCluster, subscribeNumberOfRFIDUsersSupportedAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -11784,7 +11980,8 @@ JNI_METHOD(void, DoorLockCluster, subscribeNumberOfWeekDaySchedulesSupportedPerU
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -11822,7 +12019,8 @@ JNI_METHOD(void, DoorLockCluster, subscribeNumberOfYearDaySchedulesSupportedPerU
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -11859,7 +12057,8 @@ JNI_METHOD(void, DoorLockCluster, subscribeMaxPINCodeLengthAttribute)
         chip::Callback::Callback<CHIPDoorLockClusterMaxPINCodeLengthAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -11896,7 +12095,8 @@ JNI_METHOD(void, DoorLockCluster, subscribeMinPINCodeLengthAttribute)
         chip::Callback::Callback<CHIPDoorLockClusterMinPINCodeLengthAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -11933,7 +12133,8 @@ JNI_METHOD(void, DoorLockCluster, subscribeMaxRFIDCodeLengthAttribute)
         chip::Callback::Callback<CHIPDoorLockClusterMaxRFIDCodeLengthAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -11970,7 +12171,8 @@ JNI_METHOD(void, DoorLockCluster, subscribeMinRFIDCodeLengthAttribute)
         chip::Callback::Callback<CHIPDoorLockClusterMinRFIDCodeLengthAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -12007,7 +12209,8 @@ JNI_METHOD(void, DoorLockCluster, subscribeLanguageAttribute)
         chip::Callback::Callback<CHIPDoorLockClusterLanguageAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -12044,7 +12247,8 @@ JNI_METHOD(void, DoorLockCluster, subscribeAutoRelockTimeAttribute)
         chip::Callback::Callback<CHIPDoorLockClusterAutoRelockTimeAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -12081,7 +12285,8 @@ JNI_METHOD(void, DoorLockCluster, subscribeSoundVolumeAttribute)
         chip::Callback::Callback<CHIPDoorLockClusterSoundVolumeAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -12118,7 +12323,8 @@ JNI_METHOD(void, DoorLockCluster, subscribeOperatingModeAttribute)
         chip::Callback::Callback<CHIPDoorLockClusterOperatingModeAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -12155,7 +12361,8 @@ JNI_METHOD(void, DoorLockCluster, subscribeSupportedOperatingModesAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -12192,7 +12399,8 @@ JNI_METHOD(void, DoorLockCluster, subscribeEnableOneTouchLockingAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPBooleanAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -12229,7 +12437,8 @@ JNI_METHOD(void, DoorLockCluster, subscribeEnablePrivacyModeButtonAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPBooleanAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -12266,7 +12475,8 @@ JNI_METHOD(void, DoorLockCluster, subscribeWrongCodeEntryLimitAttribute)
         chip::Callback::Callback<CHIPDoorLockClusterWrongCodeEntryLimitAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -12305,8 +12515,9 @@ JNI_METHOD(void, DoorLockCluster, subscribeServerGeneratedCommandListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPDoorLockServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -12344,8 +12555,9 @@ JNI_METHOD(void, DoorLockCluster, subscribeClientGeneratedCommandListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPDoorLockClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -12382,7 +12594,8 @@ JNI_METHOD(void, DoorLockCluster, subscribeAttributeListAttribute)
         chip::Callback::Callback<CHIPDoorLockClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPDoorLockAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -12419,7 +12632,8 @@ JNI_METHOD(void, DoorLockCluster, subscribeClusterRevisionAttribute)
         chip::Callback::Callback<CHIPDoorLockClusterClusterRevisionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -12465,7 +12679,8 @@ JNI_METHOD(void, ElectricalMeasurementCluster, subscribeMeasurementTypeAttribute
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -12503,7 +12718,8 @@ JNI_METHOD(void, ElectricalMeasurementCluster, subscribeTotalActivePowerAttribut
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -12540,7 +12756,8 @@ JNI_METHOD(void, ElectricalMeasurementCluster, subscribeRmsVoltageAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -12577,7 +12794,8 @@ JNI_METHOD(void, ElectricalMeasurementCluster, subscribeRmsVoltageMinAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -12614,7 +12832,8 @@ JNI_METHOD(void, ElectricalMeasurementCluster, subscribeRmsVoltageMaxAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -12651,7 +12870,8 @@ JNI_METHOD(void, ElectricalMeasurementCluster, subscribeRmsCurrentAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -12688,7 +12908,8 @@ JNI_METHOD(void, ElectricalMeasurementCluster, subscribeRmsCurrentMinAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -12725,7 +12946,8 @@ JNI_METHOD(void, ElectricalMeasurementCluster, subscribeRmsCurrentMaxAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -12762,7 +12984,8 @@ JNI_METHOD(void, ElectricalMeasurementCluster, subscribeActivePowerAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -12799,7 +13022,8 @@ JNI_METHOD(void, ElectricalMeasurementCluster, subscribeActivePowerMinAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -12836,7 +13060,8 @@ JNI_METHOD(void, ElectricalMeasurementCluster, subscribeActivePowerMaxAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -12876,8 +13101,9 @@ JNI_METHOD(void, ElectricalMeasurementCluster, subscribeServerGeneratedCommandLi
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPElectricalMeasurementServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -12917,8 +13143,9 @@ JNI_METHOD(void, ElectricalMeasurementCluster, subscribeClientGeneratedCommandLi
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPElectricalMeasurementClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -12957,8 +13184,9 @@ JNI_METHOD(void, ElectricalMeasurementCluster, subscribeAttributeListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPElectricalMeasurementAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -12994,7 +13222,8 @@ JNI_METHOD(void, ElectricalMeasurementCluster, subscribeClusterRevisionAttribute
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -13088,7 +13317,8 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, subscribePHYRateAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -13125,7 +13355,8 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, subscribeFullDuplexAttribute
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPBooleanAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -13163,7 +13394,8 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, subscribePacketRxCountAttrib
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt64uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -13201,7 +13433,8 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, subscribePacketTxCountAttrib
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt64uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -13238,7 +13471,8 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, subscribeTxErrCountAttribute
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt64uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -13276,7 +13510,8 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, subscribeCollisionCountAttri
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt64uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -13314,7 +13549,8 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, subscribeOverrunCountAttribu
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt64uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -13352,7 +13588,8 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, subscribeCarrierDetectAttrib
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPBooleanAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -13390,7 +13627,8 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, subscribeTimeSinceResetAttri
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt64uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -13429,8 +13667,9 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, subscribeServerGeneratedComm
         CHIPEthernetNetworkDiagnosticsClusterServerGeneratedCommandListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPEthernetNetworkDiagnosticsServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -13469,8 +13708,9 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, subscribeClientGeneratedComm
         CHIPEthernetNetworkDiagnosticsClusterClientGeneratedCommandListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPEthernetNetworkDiagnosticsClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -13510,8 +13750,9 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, subscribeAttributeListAttrib
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPEthernetNetworkDiagnosticsAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -13548,7 +13789,8 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, subscribeFeatureMapAttribute
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -13586,7 +13828,8 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, subscribeClusterRevisionAttr
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -13633,7 +13876,8 @@ JNI_METHOD(void, FixedLabelCluster, subscribeLabelListAttribute)
         chip::Callback::Callback<CHIPFixedLabelClusterLabelListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPFixedLabelLabelListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -13672,8 +13916,9 @@ JNI_METHOD(void, FixedLabelCluster, subscribeServerGeneratedCommandListAttribute
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPFixedLabelServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -13711,8 +13956,9 @@ JNI_METHOD(void, FixedLabelCluster, subscribeClientGeneratedCommandListAttribute
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPFixedLabelClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -13749,7 +13995,8 @@ JNI_METHOD(void, FixedLabelCluster, subscribeAttributeListAttribute)
         chip::Callback::Callback<CHIPFixedLabelClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPFixedLabelAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -13786,7 +14033,8 @@ JNI_METHOD(void, FixedLabelCluster, subscribeClusterRevisionAttribute)
         chip::Callback::Callback<CHIPFixedLabelClusterClusterRevisionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -13832,7 +14080,8 @@ JNI_METHOD(void, FlowMeasurementCluster, subscribeMeasuredValueAttribute)
         chip::Callback::Callback<CHIPFlowMeasurementClusterMeasuredValueAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -13869,7 +14118,8 @@ JNI_METHOD(void, FlowMeasurementCluster, subscribeMinMeasuredValueAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -13906,7 +14156,8 @@ JNI_METHOD(void, FlowMeasurementCluster, subscribeMaxMeasuredValueAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -13943,7 +14194,8 @@ JNI_METHOD(void, FlowMeasurementCluster, subscribeToleranceAttribute)
         chip::Callback::Callback<CHIPFlowMeasurementClusterToleranceAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -13983,8 +14235,9 @@ JNI_METHOD(void, FlowMeasurementCluster, subscribeServerGeneratedCommandListAttr
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPFlowMeasurementServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -14024,8 +14277,9 @@ JNI_METHOD(void, FlowMeasurementCluster, subscribeClientGeneratedCommandListAttr
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPFlowMeasurementClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -14064,7 +14318,8 @@ JNI_METHOD(void, FlowMeasurementCluster, subscribeAttributeListAttribute)
         chip::Callback::Callback<CHIPFlowMeasurementClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPFlowMeasurementAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -14101,7 +14356,8 @@ JNI_METHOD(void, FlowMeasurementCluster, subscribeClusterRevisionAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -14318,7 +14574,8 @@ JNI_METHOD(void, GeneralCommissioningCluster, subscribeBreadcrumbAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt64uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -14355,7 +14612,8 @@ JNI_METHOD(void, GeneralCommissioningCluster, subscribeRegulatoryConfigAttribute
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -14393,7 +14651,8 @@ JNI_METHOD(void, GeneralCommissioningCluster, subscribeLocationCapabilityAttribu
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -14433,8 +14692,9 @@ JNI_METHOD(void, GeneralCommissioningCluster, subscribeServerGeneratedCommandLis
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPGeneralCommissioningServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -14474,8 +14734,9 @@ JNI_METHOD(void, GeneralCommissioningCluster, subscribeClientGeneratedCommandLis
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPGeneralCommissioningClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -14514,8 +14775,9 @@ JNI_METHOD(void, GeneralCommissioningCluster, subscribeAttributeListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPGeneralCommissioningAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -14551,7 +14813,8 @@ JNI_METHOD(void, GeneralCommissioningCluster, subscribeClusterRevisionAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -14599,8 +14862,9 @@ JNI_METHOD(void, GeneralDiagnosticsCluster, subscribeNetworkInterfacesAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -14636,7 +14900,8 @@ JNI_METHOD(void, GeneralDiagnosticsCluster, subscribeRebootCountAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -14673,7 +14938,8 @@ JNI_METHOD(void, GeneralDiagnosticsCluster, subscribeUpTimeAttribute)
         chip::Callback::Callback<CHIPGeneralDiagnosticsClusterUpTimeAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt64uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -14711,7 +14977,8 @@ JNI_METHOD(void, GeneralDiagnosticsCluster, subscribeTotalOperationalHoursAttrib
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -14748,7 +15015,8 @@ JNI_METHOD(void, GeneralDiagnosticsCluster, subscribeBootReasonsAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -14788,8 +15056,9 @@ JNI_METHOD(void, GeneralDiagnosticsCluster, subscribeActiveHardwareFaultsAttribu
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPGeneralDiagnosticsActiveHardwareFaultsAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -14827,8 +15096,9 @@ JNI_METHOD(void, GeneralDiagnosticsCluster, subscribeActiveRadioFaultsAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPGeneralDiagnosticsActiveRadioFaultsAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -14867,8 +15137,9 @@ JNI_METHOD(void, GeneralDiagnosticsCluster, subscribeActiveNetworkFaultsAttribut
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPGeneralDiagnosticsActiveNetworkFaultsAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -14907,8 +15178,9 @@ JNI_METHOD(void, GeneralDiagnosticsCluster, subscribeServerGeneratedCommandListA
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPGeneralDiagnosticsServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -14948,8 +15220,9 @@ JNI_METHOD(void, GeneralDiagnosticsCluster, subscribeClientGeneratedCommandListA
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPGeneralDiagnosticsClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -14988,7 +15261,8 @@ JNI_METHOD(void, GeneralDiagnosticsCluster, subscribeAttributeListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPGeneralDiagnosticsAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -15025,7 +15299,8 @@ JNI_METHOD(void, GeneralDiagnosticsCluster, subscribeClusterRevisionAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -15340,7 +15615,8 @@ JNI_METHOD(void, GroupKeyManagementCluster, subscribeGroupKeyMapAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPGroupKeyManagementGroupKeyMapAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -15379,7 +15655,8 @@ JNI_METHOD(void, GroupKeyManagementCluster, subscribeGroupTableAttribute)
         chip::Callback::Callback<CHIPGroupKeyManagementClusterGroupTableAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPGroupKeyManagementGroupTableAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -15416,7 +15693,8 @@ JNI_METHOD(void, GroupKeyManagementCluster, subscribeMaxGroupsPerFabricAttribute
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -15454,7 +15732,8 @@ JNI_METHOD(void, GroupKeyManagementCluster, subscribeMaxGroupKeysPerFabricAttrib
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -15494,8 +15773,9 @@ JNI_METHOD(void, GroupKeyManagementCluster, subscribeServerGeneratedCommandListA
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPGroupKeyManagementServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -15535,8 +15815,9 @@ JNI_METHOD(void, GroupKeyManagementCluster, subscribeClientGeneratedCommandListA
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPGroupKeyManagementClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -15575,7 +15856,8 @@ JNI_METHOD(void, GroupKeyManagementCluster, subscribeAttributeListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPGroupKeyManagementAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -15612,7 +15894,8 @@ JNI_METHOD(void, GroupKeyManagementCluster, subscribeClusterRevisionAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -15989,7 +16272,8 @@ JNI_METHOD(void, GroupsCluster, subscribeNameSupportAttribute)
         chip::Callback::Callback<CHIPGroupsClusterNameSupportAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -16028,8 +16312,9 @@ JNI_METHOD(void, GroupsCluster, subscribeServerGeneratedCommandListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPGroupsServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -16067,8 +16352,9 @@ JNI_METHOD(void, GroupsCluster, subscribeClientGeneratedCommandListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPGroupsClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -16105,7 +16391,8 @@ JNI_METHOD(void, GroupsCluster, subscribeAttributeListAttribute)
         chip::Callback::Callback<CHIPGroupsClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPGroupsAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -16142,7 +16429,8 @@ JNI_METHOD(void, GroupsCluster, subscribeClusterRevisionAttribute)
         chip::Callback::Callback<CHIPGroupsClusterClusterRevisionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -16341,7 +16629,8 @@ JNI_METHOD(void, IdentifyCluster, subscribeIdentifyTimeAttribute)
         chip::Callback::Callback<CHIPIdentifyClusterIdentifyTimeAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -16378,7 +16667,8 @@ JNI_METHOD(void, IdentifyCluster, subscribeIdentifyTypeAttribute)
         chip::Callback::Callback<CHIPIdentifyClusterIdentifyTypeAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -16417,8 +16707,9 @@ JNI_METHOD(void, IdentifyCluster, subscribeServerGeneratedCommandListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPIdentifyServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -16456,8 +16747,9 @@ JNI_METHOD(void, IdentifyCluster, subscribeClientGeneratedCommandListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPIdentifyClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -16494,7 +16786,8 @@ JNI_METHOD(void, IdentifyCluster, subscribeAttributeListAttribute)
         chip::Callback::Callback<CHIPIdentifyClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPIdentifyAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -16531,7 +16824,8 @@ JNI_METHOD(void, IdentifyCluster, subscribeClusterRevisionAttribute)
         chip::Callback::Callback<CHIPIdentifyClusterClusterRevisionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -16579,8 +16873,9 @@ JNI_METHOD(void, IlluminanceMeasurementCluster, subscribeMeasuredValueAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPIlluminanceMeasurementMeasuredValueAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -16619,8 +16914,9 @@ JNI_METHOD(void, IlluminanceMeasurementCluster, subscribeMinMeasuredValueAttribu
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPIlluminanceMeasurementMinMeasuredValueAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -16659,8 +16955,9 @@ JNI_METHOD(void, IlluminanceMeasurementCluster, subscribeMaxMeasuredValueAttribu
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPIlluminanceMeasurementMaxMeasuredValueAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -16696,7 +16993,8 @@ JNI_METHOD(void, IlluminanceMeasurementCluster, subscribeToleranceAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -16736,8 +17034,9 @@ JNI_METHOD(void, IlluminanceMeasurementCluster, subscribeLightSensorTypeAttribut
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPIlluminanceMeasurementLightSensorTypeAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -16776,8 +17075,9 @@ JNI_METHOD(void, IlluminanceMeasurementCluster, subscribeServerGeneratedCommandL
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPIlluminanceMeasurementServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -16817,8 +17117,9 @@ JNI_METHOD(void, IlluminanceMeasurementCluster, subscribeClientGeneratedCommandL
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPIlluminanceMeasurementClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -16857,8 +17158,9 @@ JNI_METHOD(void, IlluminanceMeasurementCluster, subscribeAttributeListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPIlluminanceMeasurementAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -16895,7 +17197,8 @@ JNI_METHOD(void, IlluminanceMeasurementCluster, subscribeClusterRevisionAttribut
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -16996,8 +17299,9 @@ JNI_METHOD(void, KeypadInputCluster, subscribeServerGeneratedCommandListAttribut
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPKeypadInputServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -17036,8 +17340,9 @@ JNI_METHOD(void, KeypadInputCluster, subscribeClientGeneratedCommandListAttribut
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPKeypadInputClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -17074,7 +17379,8 @@ JNI_METHOD(void, KeypadInputCluster, subscribeAttributeListAttribute)
         chip::Callback::Callback<CHIPKeypadInputClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPKeypadInputAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -17111,7 +17417,8 @@ JNI_METHOD(void, KeypadInputCluster, subscribeClusterRevisionAttribute)
         chip::Callback::Callback<CHIPKeypadInputClusterClusterRevisionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -17591,7 +17898,8 @@ JNI_METHOD(void, LevelControlCluster, subscribeCurrentLevelAttribute)
         chip::Callback::Callback<CHIPLevelControlClusterCurrentLevelAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -17628,7 +17936,8 @@ JNI_METHOD(void, LevelControlCluster, subscribeRemainingTimeAttribute)
         chip::Callback::Callback<CHIPLevelControlClusterRemainingTimeAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -17665,7 +17974,8 @@ JNI_METHOD(void, LevelControlCluster, subscribeMinLevelAttribute)
         chip::Callback::Callback<CHIPLevelControlClusterMinLevelAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -17702,7 +18012,8 @@ JNI_METHOD(void, LevelControlCluster, subscribeMaxLevelAttribute)
         chip::Callback::Callback<CHIPLevelControlClusterMaxLevelAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -17739,7 +18050,8 @@ JNI_METHOD(void, LevelControlCluster, subscribeCurrentFrequencyAttribute)
         chip::Callback::Callback<CHIPLevelControlClusterCurrentFrequencyAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -17776,7 +18088,8 @@ JNI_METHOD(void, LevelControlCluster, subscribeMinFrequencyAttribute)
         chip::Callback::Callback<CHIPLevelControlClusterMinFrequencyAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -17813,7 +18126,8 @@ JNI_METHOD(void, LevelControlCluster, subscribeMaxFrequencyAttribute)
         chip::Callback::Callback<CHIPLevelControlClusterMaxFrequencyAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -17850,7 +18164,8 @@ JNI_METHOD(void, LevelControlCluster, subscribeOptionsAttribute)
         chip::Callback::Callback<CHIPLevelControlClusterOptionsAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -17887,7 +18202,8 @@ JNI_METHOD(void, LevelControlCluster, subscribeOnOffTransitionTimeAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -17925,7 +18241,8 @@ JNI_METHOD(void, LevelControlCluster, subscribeOnLevelAttribute)
         chip::Callback::Callback<CHIPLevelControlClusterOnLevelAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPLevelControlOnLevelAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -17964,7 +18281,8 @@ JNI_METHOD(void, LevelControlCluster, subscribeOnTransitionTimeAttribute)
         chip::Callback::Callback<CHIPLevelControlClusterOnTransitionTimeAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPLevelControlOnTransitionTimeAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -18003,7 +18321,8 @@ JNI_METHOD(void, LevelControlCluster, subscribeOffTransitionTimeAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPLevelControlOffTransitionTimeAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -18041,7 +18360,8 @@ JNI_METHOD(void, LevelControlCluster, subscribeDefaultMoveRateAttribute)
         chip::Callback::Callback<CHIPLevelControlClusterDefaultMoveRateAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPLevelControlDefaultMoveRateAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -18080,7 +18400,8 @@ JNI_METHOD(void, LevelControlCluster, subscribeStartUpCurrentLevelAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPLevelControlStartUpCurrentLevelAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -18120,8 +18441,9 @@ JNI_METHOD(void, LevelControlCluster, subscribeServerGeneratedCommandListAttribu
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPLevelControlServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -18160,8 +18482,9 @@ JNI_METHOD(void, LevelControlCluster, subscribeClientGeneratedCommandListAttribu
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPLevelControlClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -18198,7 +18521,8 @@ JNI_METHOD(void, LevelControlCluster, subscribeAttributeListAttribute)
         chip::Callback::Callback<CHIPLevelControlClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPLevelControlAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -18235,7 +18559,8 @@ JNI_METHOD(void, LevelControlCluster, subscribeFeatureMapAttribute)
         chip::Callback::Callback<CHIPLevelControlClusterFeatureMapAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -18272,7 +18597,8 @@ JNI_METHOD(void, LevelControlCluster, subscribeClusterRevisionAttribute)
         chip::Callback::Callback<CHIPLevelControlClusterClusterRevisionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -18319,7 +18645,8 @@ JNI_METHOD(void, LocalizationConfigurationCluster, subscribeActiveLocaleAttribut
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -18359,8 +18686,9 @@ JNI_METHOD(void, LocalizationConfigurationCluster, subscribeSupportedLocalesAttr
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPLocalizationConfigurationSupportedLocalesAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -18399,8 +18727,9 @@ JNI_METHOD(void, LocalizationConfigurationCluster, subscribeServerGeneratedComma
         CHIPLocalizationConfigurationClusterServerGeneratedCommandListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPLocalizationConfigurationServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -18439,8 +18768,9 @@ JNI_METHOD(void, LocalizationConfigurationCluster, subscribeClientGeneratedComma
         CHIPLocalizationConfigurationClusterClientGeneratedCommandListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPLocalizationConfigurationClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -18478,7 +18808,8 @@ JNI_METHOD(void, LocalizationConfigurationCluster, subscribeClusterRevisionAttri
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -18574,8 +18905,9 @@ JNI_METHOD(void, LowPowerCluster, subscribeServerGeneratedCommandListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPLowPowerServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -18613,8 +18945,9 @@ JNI_METHOD(void, LowPowerCluster, subscribeClientGeneratedCommandListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPLowPowerClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -18651,7 +18984,8 @@ JNI_METHOD(void, LowPowerCluster, subscribeAttributeListAttribute)
         chip::Callback::Callback<CHIPLowPowerClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPLowPowerAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -18688,7 +19022,8 @@ JNI_METHOD(void, LowPowerCluster, subscribeClusterRevisionAttribute)
         chip::Callback::Callback<CHIPLowPowerClusterClusterRevisionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -18933,7 +19268,8 @@ JNI_METHOD(void, MediaInputCluster, subscribeMediaInputListAttribute)
         chip::Callback::Callback<CHIPMediaInputClusterMediaInputListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPMediaInputMediaInputListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -18970,7 +19306,8 @@ JNI_METHOD(void, MediaInputCluster, subscribeCurrentMediaInputAttribute)
         chip::Callback::Callback<CHIPMediaInputClusterCurrentMediaInputAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -19009,8 +19346,9 @@ JNI_METHOD(void, MediaInputCluster, subscribeServerGeneratedCommandListAttribute
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPMediaInputServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -19048,8 +19386,9 @@ JNI_METHOD(void, MediaInputCluster, subscribeClientGeneratedCommandListAttribute
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPMediaInputClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -19086,7 +19425,8 @@ JNI_METHOD(void, MediaInputCluster, subscribeAttributeListAttribute)
         chip::Callback::Callback<CHIPMediaInputClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPMediaInputAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -19123,7 +19463,8 @@ JNI_METHOD(void, MediaInputCluster, subscribeClusterRevisionAttribute)
         chip::Callback::Callback<CHIPMediaInputClusterClusterRevisionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -19725,7 +20066,8 @@ JNI_METHOD(void, MediaPlaybackCluster, subscribePlaybackStateAttribute)
         chip::Callback::Callback<CHIPMediaPlaybackClusterPlaybackStateAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -19762,7 +20104,8 @@ JNI_METHOD(void, MediaPlaybackCluster, subscribeStartTimeAttribute)
         chip::Callback::Callback<CHIPMediaPlaybackClusterStartTimeAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt64uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -19799,7 +20142,8 @@ JNI_METHOD(void, MediaPlaybackCluster, subscribeDurationAttribute)
         chip::Callback::Callback<CHIPMediaPlaybackClusterDurationAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt64uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -19836,7 +20180,8 @@ JNI_METHOD(void, MediaPlaybackCluster, subscribePlaybackSpeedAttribute)
         chip::Callback::Callback<CHIPMediaPlaybackClusterPlaybackSpeedAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPFloatAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -19873,7 +20218,8 @@ JNI_METHOD(void, MediaPlaybackCluster, subscribeSeekRangeEndAttribute)
         chip::Callback::Callback<CHIPMediaPlaybackClusterSeekRangeEndAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt64uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -19910,7 +20256,8 @@ JNI_METHOD(void, MediaPlaybackCluster, subscribeSeekRangeStartAttribute)
         chip::Callback::Callback<CHIPMediaPlaybackClusterSeekRangeStartAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt64uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -19950,8 +20297,9 @@ JNI_METHOD(void, MediaPlaybackCluster, subscribeServerGeneratedCommandListAttrib
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPMediaPlaybackServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -19991,8 +20339,9 @@ JNI_METHOD(void, MediaPlaybackCluster, subscribeClientGeneratedCommandListAttrib
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPMediaPlaybackClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -20030,7 +20379,8 @@ JNI_METHOD(void, MediaPlaybackCluster, subscribeAttributeListAttribute)
         chip::Callback::Callback<CHIPMediaPlaybackClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPMediaPlaybackAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -20067,7 +20417,8 @@ JNI_METHOD(void, MediaPlaybackCluster, subscribeClusterRevisionAttribute)
         chip::Callback::Callback<CHIPMediaPlaybackClusterClusterRevisionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -20163,7 +20514,8 @@ JNI_METHOD(void, ModeSelectCluster, subscribeCurrentModeAttribute)
         chip::Callback::Callback<CHIPModeSelectClusterCurrentModeAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -20201,7 +20553,8 @@ JNI_METHOD(void, ModeSelectCluster, subscribeSupportedModesAttribute)
         chip::Callback::Callback<CHIPModeSelectClusterSupportedModesAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPModeSelectSupportedModesAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -20238,7 +20591,8 @@ JNI_METHOD(void, ModeSelectCluster, subscribeOnModeAttribute)
         chip::Callback::Callback<CHIPModeSelectClusterOnModeAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -20275,7 +20629,8 @@ JNI_METHOD(void, ModeSelectCluster, subscribeStartUpModeAttribute)
         chip::Callback::Callback<CHIPModeSelectClusterStartUpModeAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -20312,7 +20667,8 @@ JNI_METHOD(void, ModeSelectCluster, subscribeDescriptionAttribute)
         chip::Callback::Callback<CHIPModeSelectClusterDescriptionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -20351,8 +20707,9 @@ JNI_METHOD(void, ModeSelectCluster, subscribeServerGeneratedCommandListAttribute
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPModeSelectServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -20390,8 +20747,9 @@ JNI_METHOD(void, ModeSelectCluster, subscribeClientGeneratedCommandListAttribute
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPModeSelectClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -20428,7 +20786,8 @@ JNI_METHOD(void, ModeSelectCluster, subscribeAttributeListAttribute)
         chip::Callback::Callback<CHIPModeSelectClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPModeSelectAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -20465,7 +20824,8 @@ JNI_METHOD(void, ModeSelectCluster, subscribeClusterRevisionAttribute)
         chip::Callback::Callback<CHIPModeSelectClusterClusterRevisionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -20850,7 +21210,8 @@ JNI_METHOD(void, NetworkCommissioningCluster, subscribeMaxNetworksAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -20889,7 +21250,8 @@ JNI_METHOD(void, NetworkCommissioningCluster, subscribeNetworksAttribute)
         chip::Callback::Callback<CHIPNetworkCommissioningClusterNetworksAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPNetworkCommissioningNetworksAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -20927,7 +21289,8 @@ JNI_METHOD(void, NetworkCommissioningCluster, subscribeScanMaxTimeSecondsAttribu
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -20965,7 +21328,8 @@ JNI_METHOD(void, NetworkCommissioningCluster, subscribeConnectMaxTimeSecondsAttr
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -21002,7 +21366,8 @@ JNI_METHOD(void, NetworkCommissioningCluster, subscribeInterfaceEnabledAttribute
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPBooleanAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -21040,7 +21405,8 @@ JNI_METHOD(void, NetworkCommissioningCluster, subscribeLastNetworkingStatusAttri
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -21077,7 +21443,8 @@ JNI_METHOD(void, NetworkCommissioningCluster, subscribeLastNetworkIDAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPOctetStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -21115,7 +21482,8 @@ JNI_METHOD(void, NetworkCommissioningCluster, subscribeLastConnectErrorValueAttr
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -21155,8 +21523,9 @@ JNI_METHOD(void, NetworkCommissioningCluster, subscribeServerGeneratedCommandLis
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPNetworkCommissioningServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -21196,8 +21565,9 @@ JNI_METHOD(void, NetworkCommissioningCluster, subscribeClientGeneratedCommandLis
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPNetworkCommissioningClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -21234,7 +21604,8 @@ JNI_METHOD(void, NetworkCommissioningCluster, subscribeFeatureMapAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -21271,7 +21642,8 @@ JNI_METHOD(void, NetworkCommissioningCluster, subscribeClusterRevisionAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -21544,8 +21916,9 @@ JNI_METHOD(void, OtaSoftwareUpdateProviderCluster, subscribeAttributeListAttribu
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPOtaSoftwareUpdateProviderAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -21582,7 +21955,8 @@ JNI_METHOD(void, OtaSoftwareUpdateProviderCluster, subscribeClusterRevisionAttri
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -21696,8 +22070,9 @@ JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, subscribeDefaultOtaProviders
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -21735,7 +22110,8 @@ JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, subscribeUpdatePossibleAttri
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPBooleanAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -21773,7 +22149,8 @@ JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, subscribeUpdateStateAttribut
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -21813,8 +22190,9 @@ JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, subscribeUpdateStateProgress
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPOtaSoftwareUpdateRequestorUpdateStateProgressAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -21854,8 +22232,9 @@ JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, subscribeAttributeListAttrib
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPOtaSoftwareUpdateRequestorAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -21893,7 +22272,8 @@ JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, subscribeClusterRevisionAttr
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -21939,7 +22319,8 @@ JNI_METHOD(void, OccupancySensingCluster, subscribeOccupancyAttribute)
         chip::Callback::Callback<CHIPOccupancySensingClusterOccupancyAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -21976,7 +22357,8 @@ JNI_METHOD(void, OccupancySensingCluster, subscribeOccupancySensorTypeAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -22014,7 +22396,8 @@ JNI_METHOD(void, OccupancySensingCluster, subscribeOccupancySensorTypeBitmapAttr
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -22054,8 +22437,9 @@ JNI_METHOD(void, OccupancySensingCluster, subscribeServerGeneratedCommandListAtt
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPOccupancySensingServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -22095,8 +22479,9 @@ JNI_METHOD(void, OccupancySensingCluster, subscribeClientGeneratedCommandListAtt
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPOccupancySensingClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -22135,7 +22520,8 @@ JNI_METHOD(void, OccupancySensingCluster, subscribeAttributeListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPOccupancySensingAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -22172,7 +22558,8 @@ JNI_METHOD(void, OccupancySensingCluster, subscribeClusterRevisionAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -22514,7 +22901,8 @@ JNI_METHOD(void, OnOffCluster, subscribeOnOffAttribute)
     auto successFn = chip::Callback::Callback<CHIPOnOffClusterOnOffAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPBooleanAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -22551,7 +22939,8 @@ JNI_METHOD(void, OnOffCluster, subscribeGlobalSceneControlAttribute)
         chip::Callback::Callback<CHIPOnOffClusterGlobalSceneControlAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPBooleanAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -22587,7 +22976,8 @@ JNI_METHOD(void, OnOffCluster, subscribeOnTimeAttribute)
     auto successFn = chip::Callback::Callback<CHIPOnOffClusterOnTimeAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -22624,7 +23014,8 @@ JNI_METHOD(void, OnOffCluster, subscribeOffWaitTimeAttribute)
         chip::Callback::Callback<CHIPOnOffClusterOffWaitTimeAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -22661,7 +23052,8 @@ JNI_METHOD(void, OnOffCluster, subscribeStartUpOnOffAttribute)
         chip::Callback::Callback<CHIPOnOffClusterStartUpOnOffAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -22700,7 +23092,8 @@ JNI_METHOD(void, OnOffCluster, subscribeServerGeneratedCommandListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPOnOffServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -22739,7 +23132,8 @@ JNI_METHOD(void, OnOffCluster, subscribeClientGeneratedCommandListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPOnOffClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -22777,7 +23171,8 @@ JNI_METHOD(void, OnOffCluster, subscribeAttributeListAttribute)
         chip::Callback::Callback<CHIPOnOffClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPOnOffAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -22813,7 +23208,8 @@ JNI_METHOD(void, OnOffCluster, subscribeFeatureMapAttribute)
     auto successFn = chip::Callback::Callback<CHIPOnOffClusterFeatureMapAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -22850,7 +23246,8 @@ JNI_METHOD(void, OnOffCluster, subscribeClusterRevisionAttribute)
         chip::Callback::Callback<CHIPOnOffClusterClusterRevisionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -22896,7 +23293,8 @@ JNI_METHOD(void, OnOffSwitchConfigurationCluster, subscribeSwitchTypeAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -22934,7 +23332,8 @@ JNI_METHOD(void, OnOffSwitchConfigurationCluster, subscribeSwitchActionsAttribut
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -22973,8 +23372,9 @@ JNI_METHOD(void, OnOffSwitchConfigurationCluster, subscribeServerGeneratedComman
         CHIPOnOffSwitchConfigurationClusterServerGeneratedCommandListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPOnOffSwitchConfigurationServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -23013,8 +23413,9 @@ JNI_METHOD(void, OnOffSwitchConfigurationCluster, subscribeClientGeneratedComman
         CHIPOnOffSwitchConfigurationClusterClientGeneratedCommandListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPOnOffSwitchConfigurationClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -23054,8 +23455,9 @@ JNI_METHOD(void, OnOffSwitchConfigurationCluster, subscribeAttributeListAttribut
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPOnOffSwitchConfigurationAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -23092,7 +23494,8 @@ JNI_METHOD(void, OnOffSwitchConfigurationCluster, subscribeClusterRevisionAttrib
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -23636,7 +24039,8 @@ JNI_METHOD(void, OperationalCredentialsCluster, subscribeNOCsAttribute)
         chip::Callback::Callback<CHIPOperationalCredentialsClusterNOCsAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPOperationalCredentialsNOCsAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -23675,8 +24079,9 @@ JNI_METHOD(void, OperationalCredentialsCluster, subscribeFabricsListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPOperationalCredentialsFabricsListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -23713,7 +24118,8 @@ JNI_METHOD(void, OperationalCredentialsCluster, subscribeSupportedFabricsAttribu
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -23751,7 +24157,8 @@ JNI_METHOD(void, OperationalCredentialsCluster, subscribeCommissionedFabricsAttr
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -23791,8 +24198,9 @@ JNI_METHOD(void, OperationalCredentialsCluster, subscribeTrustedRootCertificates
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPOperationalCredentialsTrustedRootCertificatesAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -23832,8 +24240,9 @@ JNI_METHOD(void, OperationalCredentialsCluster, subscribeCurrentFabricIndexAttri
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPOperationalCredentialsCurrentFabricIndexAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -23873,8 +24282,9 @@ JNI_METHOD(void, OperationalCredentialsCluster, subscribeServerGeneratedCommandL
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPOperationalCredentialsServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -23914,8 +24324,9 @@ JNI_METHOD(void, OperationalCredentialsCluster, subscribeClientGeneratedCommandL
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPOperationalCredentialsClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -23954,8 +24365,9 @@ JNI_METHOD(void, OperationalCredentialsCluster, subscribeAttributeListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPOperationalCredentialsAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -23992,7 +24404,8 @@ JNI_METHOD(void, OperationalCredentialsCluster, subscribeClusterRevisionAttribut
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -24038,7 +24451,8 @@ JNI_METHOD(void, PowerSourceCluster, subscribeStatusAttribute)
         chip::Callback::Callback<CHIPPowerSourceClusterStatusAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -24075,7 +24489,8 @@ JNI_METHOD(void, PowerSourceCluster, subscribeOrderAttribute)
         chip::Callback::Callback<CHIPPowerSourceClusterOrderAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -24112,7 +24527,8 @@ JNI_METHOD(void, PowerSourceCluster, subscribeDescriptionAttribute)
         chip::Callback::Callback<CHIPPowerSourceClusterDescriptionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -24149,7 +24565,8 @@ JNI_METHOD(void, PowerSourceCluster, subscribeBatteryVoltageAttribute)
         chip::Callback::Callback<CHIPPowerSourceClusterBatteryVoltageAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -24186,7 +24603,8 @@ JNI_METHOD(void, PowerSourceCluster, subscribeBatteryPercentRemainingAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -24223,7 +24641,8 @@ JNI_METHOD(void, PowerSourceCluster, subscribeBatteryTimeRemainingAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -24260,7 +24679,8 @@ JNI_METHOD(void, PowerSourceCluster, subscribeBatteryChargeLevelAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -24299,7 +24719,8 @@ JNI_METHOD(void, PowerSourceCluster, subscribeActiveBatteryFaultsAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPPowerSourceActiveBatteryFaultsAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -24336,7 +24757,8 @@ JNI_METHOD(void, PowerSourceCluster, subscribeBatteryChargeStateAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -24376,8 +24798,9 @@ JNI_METHOD(void, PowerSourceCluster, subscribeServerGeneratedCommandListAttribut
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPPowerSourceServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -24416,8 +24839,9 @@ JNI_METHOD(void, PowerSourceCluster, subscribeClientGeneratedCommandListAttribut
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPPowerSourceClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -24454,7 +24878,8 @@ JNI_METHOD(void, PowerSourceCluster, subscribeAttributeListAttribute)
         chip::Callback::Callback<CHIPPowerSourceClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPPowerSourceAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -24491,7 +24916,8 @@ JNI_METHOD(void, PowerSourceCluster, subscribeFeatureMapAttribute)
         chip::Callback::Callback<CHIPPowerSourceClusterFeatureMapAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -24528,7 +24954,8 @@ JNI_METHOD(void, PowerSourceCluster, subscribeClusterRevisionAttribute)
         chip::Callback::Callback<CHIPPowerSourceClusterClusterRevisionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -24576,7 +25003,8 @@ JNI_METHOD(void, PowerSourceConfigurationCluster, subscribeSourcesAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPPowerSourceConfigurationSourcesAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -24615,8 +25043,9 @@ JNI_METHOD(void, PowerSourceConfigurationCluster, subscribeServerGeneratedComman
         CHIPPowerSourceConfigurationClusterServerGeneratedCommandListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPPowerSourceConfigurationServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -24655,8 +25084,9 @@ JNI_METHOD(void, PowerSourceConfigurationCluster, subscribeClientGeneratedComman
         CHIPPowerSourceConfigurationClusterClientGeneratedCommandListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPPowerSourceConfigurationClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -24696,8 +25126,9 @@ JNI_METHOD(void, PowerSourceConfigurationCluster, subscribeAttributeListAttribut
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPPowerSourceConfigurationAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -24734,7 +25165,8 @@ JNI_METHOD(void, PowerSourceConfigurationCluster, subscribeClusterRevisionAttrib
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -24780,7 +25212,8 @@ JNI_METHOD(void, PressureMeasurementCluster, subscribeMeasuredValueAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -24817,7 +25250,8 @@ JNI_METHOD(void, PressureMeasurementCluster, subscribeMinMeasuredValueAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -24854,7 +25288,8 @@ JNI_METHOD(void, PressureMeasurementCluster, subscribeMaxMeasuredValueAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -24893,8 +25328,9 @@ JNI_METHOD(void, PressureMeasurementCluster, subscribeAttributeListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPPressureMeasurementAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -24930,7 +25366,8 @@ JNI_METHOD(void, PressureMeasurementCluster, subscribeClusterRevisionAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -24977,7 +25414,8 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, subscribeMaxPressureAttribu
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -25014,7 +25452,8 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, subscribeMaxSpeedAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -25051,7 +25490,8 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, subscribeMaxFlowAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -25089,7 +25529,8 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, subscribeMinConstPressureAt
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -25127,7 +25568,8 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, subscribeMaxConstPressureAt
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -25165,7 +25607,8 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, subscribeMinCompPressureAtt
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -25203,7 +25646,8 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, subscribeMaxCompPressureAtt
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -25241,7 +25685,8 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, subscribeMinConstSpeedAttri
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -25279,7 +25724,8 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, subscribeMaxConstSpeedAttri
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -25317,7 +25763,8 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, subscribeMinConstFlowAttrib
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -25355,7 +25802,8 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, subscribeMaxConstFlowAttrib
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -25393,7 +25841,8 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, subscribeMinConstTempAttrib
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -25431,7 +25880,8 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, subscribeMaxConstTempAttrib
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -25469,7 +25919,8 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, subscribePumpStatusAttribut
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -25507,7 +25958,8 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, subscribeEffectiveOperation
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -25545,7 +25997,8 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, subscribeEffectiveControlMo
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -25582,7 +26035,8 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, subscribeCapacityAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -25619,7 +26073,8 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, subscribeSpeedAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -25659,8 +26114,9 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, subscribeLifetimeRunningHou
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPPumpConfigurationAndControlLifetimeRunningHoursAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -25697,7 +26153,8 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, subscribePowerAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -25737,8 +26194,9 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, subscribeLifetimeEnergyCons
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPPumpConfigurationAndControlLifetimeEnergyConsumedAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -25776,7 +26234,8 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, subscribeOperationModeAttri
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -25814,7 +26273,8 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, subscribeControlModeAttribu
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -25851,7 +26311,8 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, subscribeAlarmMaskAttribute
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -25890,8 +26351,9 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, subscribeServerGeneratedCom
         CHIPPumpConfigurationAndControlClusterServerGeneratedCommandListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPPumpConfigurationAndControlServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -25930,8 +26392,9 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, subscribeClientGeneratedCom
         CHIPPumpConfigurationAndControlClusterClientGeneratedCommandListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPPumpConfigurationAndControlClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -25971,8 +26434,9 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, subscribeAttributeListAttri
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPPumpConfigurationAndControlAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -26010,7 +26474,8 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, subscribeFeatureMapAttribut
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -26048,7 +26513,8 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, subscribeClusterRevisionAtt
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -26095,7 +26561,8 @@ JNI_METHOD(void, RelativeHumidityMeasurementCluster, subscribeMeasuredValueAttri
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -26133,7 +26600,8 @@ JNI_METHOD(void, RelativeHumidityMeasurementCluster, subscribeMinMeasuredValueAt
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -26171,7 +26639,8 @@ JNI_METHOD(void, RelativeHumidityMeasurementCluster, subscribeMaxMeasuredValueAt
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -26208,7 +26677,8 @@ JNI_METHOD(void, RelativeHumidityMeasurementCluster, subscribeToleranceAttribute
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -26247,8 +26717,9 @@ JNI_METHOD(void, RelativeHumidityMeasurementCluster, subscribeServerGeneratedCom
         CHIPRelativeHumidityMeasurementClusterServerGeneratedCommandListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPRelativeHumidityMeasurementServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -26287,8 +26758,9 @@ JNI_METHOD(void, RelativeHumidityMeasurementCluster, subscribeClientGeneratedCom
         CHIPRelativeHumidityMeasurementClusterClientGeneratedCommandListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPRelativeHumidityMeasurementClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -26328,8 +26800,9 @@ JNI_METHOD(void, RelativeHumidityMeasurementCluster, subscribeAttributeListAttri
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPRelativeHumidityMeasurementAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -26367,7 +26840,8 @@ JNI_METHOD(void, RelativeHumidityMeasurementCluster, subscribeClusterRevisionAtt
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -26828,7 +27302,8 @@ JNI_METHOD(void, ScenesCluster, subscribeSceneCountAttribute)
         chip::Callback::Callback<CHIPScenesClusterSceneCountAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -26865,7 +27340,8 @@ JNI_METHOD(void, ScenesCluster, subscribeCurrentSceneAttribute)
         chip::Callback::Callback<CHIPScenesClusterCurrentSceneAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -26902,7 +27378,8 @@ JNI_METHOD(void, ScenesCluster, subscribeCurrentGroupAttribute)
         chip::Callback::Callback<CHIPScenesClusterCurrentGroupAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -26939,7 +27416,8 @@ JNI_METHOD(void, ScenesCluster, subscribeSceneValidAttribute)
         chip::Callback::Callback<CHIPScenesClusterSceneValidAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPBooleanAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -26976,7 +27454,8 @@ JNI_METHOD(void, ScenesCluster, subscribeNameSupportAttribute)
         chip::Callback::Callback<CHIPScenesClusterNameSupportAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -27015,8 +27494,9 @@ JNI_METHOD(void, ScenesCluster, subscribeServerGeneratedCommandListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPScenesServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -27054,8 +27534,9 @@ JNI_METHOD(void, ScenesCluster, subscribeClientGeneratedCommandListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPScenesClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -27092,7 +27573,8 @@ JNI_METHOD(void, ScenesCluster, subscribeAttributeListAttribute)
         chip::Callback::Callback<CHIPScenesClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPScenesAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -27129,7 +27611,8 @@ JNI_METHOD(void, ScenesCluster, subscribeClusterRevisionAttribute)
         chip::Callback::Callback<CHIPScenesClusterClusterRevisionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -27225,8 +27708,9 @@ JNI_METHOD(void, SoftwareDiagnosticsCluster, subscribeThreadMetricsAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -27262,7 +27746,8 @@ JNI_METHOD(void, SoftwareDiagnosticsCluster, subscribeCurrentHeapFreeAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt64uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -27299,7 +27784,8 @@ JNI_METHOD(void, SoftwareDiagnosticsCluster, subscribeCurrentHeapUsedAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt64uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -27337,7 +27823,8 @@ JNI_METHOD(void, SoftwareDiagnosticsCluster, subscribeCurrentHeapHighWatermarkAt
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt64uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -27377,8 +27864,9 @@ JNI_METHOD(void, SoftwareDiagnosticsCluster, subscribeServerGeneratedCommandList
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPSoftwareDiagnosticsServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -27418,8 +27906,9 @@ JNI_METHOD(void, SoftwareDiagnosticsCluster, subscribeClientGeneratedCommandList
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPSoftwareDiagnosticsClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -27458,8 +27947,9 @@ JNI_METHOD(void, SoftwareDiagnosticsCluster, subscribeAttributeListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPSoftwareDiagnosticsAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -27495,7 +27985,8 @@ JNI_METHOD(void, SoftwareDiagnosticsCluster, subscribeFeatureMapAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -27532,7 +28023,8 @@ JNI_METHOD(void, SoftwareDiagnosticsCluster, subscribeClusterRevisionAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -27578,7 +28070,8 @@ JNI_METHOD(void, SwitchCluster, subscribeNumberOfPositionsAttribute)
         chip::Callback::Callback<CHIPSwitchClusterNumberOfPositionsAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -27615,7 +28108,8 @@ JNI_METHOD(void, SwitchCluster, subscribeCurrentPositionAttribute)
         chip::Callback::Callback<CHIPSwitchClusterCurrentPositionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -27652,7 +28146,8 @@ JNI_METHOD(void, SwitchCluster, subscribeMultiPressMaxAttribute)
         chip::Callback::Callback<CHIPSwitchClusterMultiPressMaxAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -27691,8 +28186,9 @@ JNI_METHOD(void, SwitchCluster, subscribeServerGeneratedCommandListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPSwitchServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -27730,8 +28226,9 @@ JNI_METHOD(void, SwitchCluster, subscribeClientGeneratedCommandListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPSwitchClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -27768,7 +28265,8 @@ JNI_METHOD(void, SwitchCluster, subscribeAttributeListAttribute)
         chip::Callback::Callback<CHIPSwitchClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPSwitchAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -27805,7 +28303,8 @@ JNI_METHOD(void, SwitchCluster, subscribeFeatureMapAttribute)
         chip::Callback::Callback<CHIPSwitchClusterFeatureMapAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -27842,7 +28341,8 @@ JNI_METHOD(void, SwitchCluster, subscribeClusterRevisionAttribute)
         chip::Callback::Callback<CHIPSwitchClusterClusterRevisionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -27945,8 +28445,9 @@ JNI_METHOD(void, TargetNavigatorCluster, subscribeTargetNavigatorListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPTargetNavigatorTargetNavigatorListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -27983,7 +28484,8 @@ JNI_METHOD(void, TargetNavigatorCluster, subscribeCurrentNavigatorTargetAttribut
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -28023,8 +28525,9 @@ JNI_METHOD(void, TargetNavigatorCluster, subscribeServerGeneratedCommandListAttr
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPTargetNavigatorServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -28064,8 +28567,9 @@ JNI_METHOD(void, TargetNavigatorCluster, subscribeClientGeneratedCommandListAttr
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPTargetNavigatorClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -28104,7 +28608,8 @@ JNI_METHOD(void, TargetNavigatorCluster, subscribeAttributeListAttribute)
         chip::Callback::Callback<CHIPTargetNavigatorClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPTargetNavigatorAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -28141,7 +28646,8 @@ JNI_METHOD(void, TargetNavigatorCluster, subscribeClusterRevisionAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -28187,7 +28693,8 @@ JNI_METHOD(void, TemperatureMeasurementCluster, subscribeMeasuredValueAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -28225,7 +28732,8 @@ JNI_METHOD(void, TemperatureMeasurementCluster, subscribeMinMeasuredValueAttribu
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -28263,7 +28771,8 @@ JNI_METHOD(void, TemperatureMeasurementCluster, subscribeMaxMeasuredValueAttribu
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -28300,7 +28809,8 @@ JNI_METHOD(void, TemperatureMeasurementCluster, subscribeToleranceAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -28339,8 +28849,9 @@ JNI_METHOD(void, TemperatureMeasurementCluster, subscribeAttributeListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPTemperatureMeasurementAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -28377,7 +28888,8 @@ JNI_METHOD(void, TemperatureMeasurementCluster, subscribeClusterRevisionAttribut
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -29960,7 +30472,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeBooleanAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterBooleanAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPBooleanAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -29997,7 +30510,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeBitmap8Attribute)
         chip::Callback::Callback<CHIPTestClusterClusterBitmap8AttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -30034,7 +30548,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeBitmap16Attribute)
         chip::Callback::Callback<CHIPTestClusterClusterBitmap16AttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -30071,7 +30586,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeBitmap32Attribute)
         chip::Callback::Callback<CHIPTestClusterClusterBitmap32AttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -30108,7 +30624,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeBitmap64Attribute)
         chip::Callback::Callback<CHIPTestClusterClusterBitmap64AttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt64uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -30145,7 +30662,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeInt8uAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterInt8uAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -30182,7 +30700,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeInt16uAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterInt16uAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -30219,7 +30738,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeInt24uAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterInt24uAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -30256,7 +30776,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeInt32uAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterInt32uAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -30293,7 +30814,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeInt40uAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterInt40uAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt64uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -30330,7 +30852,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeInt48uAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterInt48uAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt64uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -30367,7 +30890,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeInt56uAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterInt56uAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt64uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -30404,7 +30928,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeInt64uAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterInt64uAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt64uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -30441,7 +30966,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeInt8sAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterInt8sAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -30478,7 +31004,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeInt16sAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterInt16sAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -30515,7 +31042,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeInt24sAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterInt24sAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -30552,7 +31080,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeInt32sAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterInt32sAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -30589,7 +31118,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeInt40sAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterInt40sAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt64sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -30626,7 +31156,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeInt48sAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterInt48sAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt64sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -30663,7 +31194,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeInt56sAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterInt56sAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt64sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -30700,7 +31232,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeInt64sAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterInt64sAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt64sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -30737,7 +31270,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeEnum8Attribute)
         chip::Callback::Callback<CHIPTestClusterClusterEnum8AttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -30774,7 +31308,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeEnum16Attribute)
         chip::Callback::Callback<CHIPTestClusterClusterEnum16AttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -30811,7 +31346,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeFloatSingleAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterFloatSingleAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPFloatAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -30848,7 +31384,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeFloatDoubleAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterFloatDoubleAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPDoubleAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -30885,7 +31422,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeOctetStringAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterOctetStringAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPOctetStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -30923,7 +31461,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeListInt8uAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterListInt8uAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPTestClusterListInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -30961,7 +31500,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeListOctetStringAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterListOctetStringAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPTestClusterListOctetStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -31000,8 +31540,9 @@ JNI_METHOD(void, TestClusterCluster, subscribeListStructOctetStringAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPTestClusterListStructOctetStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -31037,7 +31578,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeLongOctetStringAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterLongOctetStringAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPOctetStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -31074,7 +31616,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeCharStringAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterCharStringAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -31111,7 +31654,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeLongCharStringAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterLongCharStringAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -31148,7 +31692,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeEpochUsAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterEpochUsAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt64uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -31185,7 +31730,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeEpochSAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterEpochSAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -31223,7 +31769,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeVendorIdAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterVendorIdAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPTestClusterVendorIdAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -31263,8 +31810,9 @@ JNI_METHOD(void, TestClusterCluster, subscribeListNullablesAndOptionalsStructAtt
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -31301,7 +31849,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeEnumAttrAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterEnumAttrAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -31338,7 +31887,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeRangeRestrictedInt8uAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -31375,7 +31925,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeRangeRestrictedInt8sAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -31412,7 +31963,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeRangeRestrictedInt16uAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -31449,7 +32001,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeRangeRestrictedInt16sAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -31488,7 +32041,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeListLongOctetStringAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPTestClusterListLongOctetStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -31525,7 +32079,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeTimedWriteBooleanAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterTimedWriteBooleanAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPBooleanAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -31562,7 +32117,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeGeneralErrorBooleanAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPBooleanAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -31599,7 +32155,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeClusterErrorBooleanAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPBooleanAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -31636,7 +32193,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeUnsupportedAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterUnsupportedAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPBooleanAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -31674,7 +32232,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableBooleanAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterNullableBooleanAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPTestClusterNullableBooleanAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -31712,7 +32271,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableBitmap8Attribute)
         chip::Callback::Callback<CHIPTestClusterClusterNullableBitmap8AttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPTestClusterNullableBitmap8AttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -31750,7 +32310,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableBitmap16Attribute)
         chip::Callback::Callback<CHIPTestClusterClusterNullableBitmap16AttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPTestClusterNullableBitmap16AttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -31788,7 +32349,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableBitmap32Attribute)
         chip::Callback::Callback<CHIPTestClusterClusterNullableBitmap32AttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPTestClusterNullableBitmap32AttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -31826,7 +32388,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableBitmap64Attribute)
         chip::Callback::Callback<CHIPTestClusterClusterNullableBitmap64AttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPTestClusterNullableBitmap64AttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -31864,7 +32427,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableInt8uAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterNullableInt8uAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPTestClusterNullableInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -31902,7 +32466,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableInt16uAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterNullableInt16uAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPTestClusterNullableInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -31940,7 +32505,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableInt24uAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterNullableInt24uAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPTestClusterNullableInt24uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -31978,7 +32544,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableInt32uAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterNullableInt32uAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPTestClusterNullableInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -32016,7 +32583,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableInt40uAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterNullableInt40uAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPTestClusterNullableInt40uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -32054,7 +32622,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableInt48uAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterNullableInt48uAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPTestClusterNullableInt48uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -32092,7 +32661,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableInt56uAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterNullableInt56uAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPTestClusterNullableInt56uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -32130,7 +32700,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableInt64uAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterNullableInt64uAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPTestClusterNullableInt64uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -32168,7 +32739,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableInt8sAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterNullableInt8sAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPTestClusterNullableInt8sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -32206,7 +32778,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableInt16sAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterNullableInt16sAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPTestClusterNullableInt16sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -32244,7 +32817,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableInt24sAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterNullableInt24sAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPTestClusterNullableInt24sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -32282,7 +32856,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableInt32sAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterNullableInt32sAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPTestClusterNullableInt32sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -32320,7 +32895,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableInt40sAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterNullableInt40sAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPTestClusterNullableInt40sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -32358,7 +32934,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableInt48sAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterNullableInt48sAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPTestClusterNullableInt48sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -32396,7 +32973,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableInt56sAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterNullableInt56sAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPTestClusterNullableInt56sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -32434,7 +33012,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableInt64sAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterNullableInt64sAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPTestClusterNullableInt64sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -32472,7 +33051,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableEnum8Attribute)
         chip::Callback::Callback<CHIPTestClusterClusterNullableEnum8AttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPTestClusterNullableEnum8AttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -32510,7 +33090,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableEnum16Attribute)
         chip::Callback::Callback<CHIPTestClusterClusterNullableEnum16AttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPTestClusterNullableEnum16AttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -32549,7 +33130,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableFloatSingleAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPTestClusterNullableFloatSingleAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -32588,7 +33170,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableFloatDoubleAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPTestClusterNullableFloatDoubleAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -32627,7 +33210,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableOctetStringAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPTestClusterNullableOctetStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -32666,7 +33250,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableCharStringAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPTestClusterNullableCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -32704,7 +33289,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableEnumAttrAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterNullableEnumAttrAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPTestClusterNullableEnumAttrAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -32744,8 +33330,9 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableRangeRestrictedInt8uAttrib
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPTestClusterNullableRangeRestrictedInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -32785,8 +33372,9 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableRangeRestrictedInt8sAttrib
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPTestClusterNullableRangeRestrictedInt8sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -32826,8 +33414,9 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableRangeRestrictedInt16uAttri
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPTestClusterNullableRangeRestrictedInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -32867,8 +33456,9 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableRangeRestrictedInt16sAttri
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPTestClusterNullableRangeRestrictedInt16sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -32908,8 +33498,9 @@ JNI_METHOD(void, TestClusterCluster, subscribeServerGeneratedCommandListAttribut
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPTestClusterServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -32948,8 +33539,9 @@ JNI_METHOD(void, TestClusterCluster, subscribeClientGeneratedCommandListAttribut
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPTestClusterClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -32986,7 +33578,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeAttributeListAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPTestClusterAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -33023,7 +33616,8 @@ JNI_METHOD(void, TestClusterCluster, subscribeClusterRevisionAttribute)
         chip::Callback::Callback<CHIPTestClusterClusterClusterRevisionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -33355,7 +33949,8 @@ JNI_METHOD(void, ThermostatCluster, subscribeLocalTemperatureAttribute)
         chip::Callback::Callback<CHIPThermostatClusterLocalTemperatureAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -33392,7 +33987,8 @@ JNI_METHOD(void, ThermostatCluster, subscribeAbsMinHeatSetpointLimitAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -33429,7 +34025,8 @@ JNI_METHOD(void, ThermostatCluster, subscribeAbsMaxHeatSetpointLimitAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -33466,7 +34063,8 @@ JNI_METHOD(void, ThermostatCluster, subscribeAbsMinCoolSetpointLimitAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -33503,7 +34101,8 @@ JNI_METHOD(void, ThermostatCluster, subscribeAbsMaxCoolSetpointLimitAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -33540,7 +34139,8 @@ JNI_METHOD(void, ThermostatCluster, subscribeOccupiedCoolingSetpointAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -33577,7 +34177,8 @@ JNI_METHOD(void, ThermostatCluster, subscribeOccupiedHeatingSetpointAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -33614,7 +34215,8 @@ JNI_METHOD(void, ThermostatCluster, subscribeMinHeatSetpointLimitAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -33651,7 +34253,8 @@ JNI_METHOD(void, ThermostatCluster, subscribeMaxHeatSetpointLimitAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -33688,7 +34291,8 @@ JNI_METHOD(void, ThermostatCluster, subscribeMinCoolSetpointLimitAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -33725,7 +34329,8 @@ JNI_METHOD(void, ThermostatCluster, subscribeMaxCoolSetpointLimitAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -33762,7 +34367,8 @@ JNI_METHOD(void, ThermostatCluster, subscribeMinSetpointDeadBandAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -33799,7 +34405,8 @@ JNI_METHOD(void, ThermostatCluster, subscribeControlSequenceOfOperationAttribute
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -33836,7 +34443,8 @@ JNI_METHOD(void, ThermostatCluster, subscribeSystemModeAttribute)
         chip::Callback::Callback<CHIPThermostatClusterSystemModeAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -33873,7 +34481,8 @@ JNI_METHOD(void, ThermostatCluster, subscribeStartOfWeekAttribute)
         chip::Callback::Callback<CHIPThermostatClusterStartOfWeekAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -33910,7 +34519,8 @@ JNI_METHOD(void, ThermostatCluster, subscribeNumberOfWeeklyTransitionsAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -33947,7 +34557,8 @@ JNI_METHOD(void, ThermostatCluster, subscribeNumberOfDailyTransitionsAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -33985,7 +34596,8 @@ JNI_METHOD(void, ThermostatCluster, subscribeAttributeListAttribute)
         chip::Callback::Callback<CHIPThermostatClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPThermostatAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -34022,7 +34634,8 @@ JNI_METHOD(void, ThermostatCluster, subscribeFeatureMapAttribute)
         chip::Callback::Callback<CHIPThermostatClusterFeatureMapAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -34059,7 +34672,8 @@ JNI_METHOD(void, ThermostatCluster, subscribeClusterRevisionAttribute)
         chip::Callback::Callback<CHIPThermostatClusterClusterRevisionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -34108,7 +34722,8 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, subscribeTemperatu
             FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -34147,7 +34762,8 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, subscribeKeypadLoc
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -34186,7 +34802,8 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, subscribeScheduleP
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -34228,8 +34845,9 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, subscribeServerGen
             FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPThermostatUserInterfaceConfigurationServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -34271,8 +34889,9 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, subscribeClientGen
             FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPThermostatUserInterfaceConfigurationClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -34313,8 +34932,9 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, subscribeAttribute
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPThermostatUserInterfaceConfigurationAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -34352,7 +34972,8 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, subscribeClusterRe
         CHIPThermostatUserInterfaceConfigurationClusterClusterRevisionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -34446,7 +35067,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeChannelAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -34483,7 +35105,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeRoutingRoleAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -34520,7 +35143,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeNetworkNameAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -34557,7 +35181,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribePanIdAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -34595,7 +35220,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeExtendedPanIdAttribut
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt64uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -34633,7 +35259,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeMeshLocalPrefixAttrib
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPOctetStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -34670,7 +35297,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeOverrunCountAttribute
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt64uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -34710,8 +35338,9 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeNeighborTableListAttr
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -34751,8 +35380,9 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeRouteTableListAttribu
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -34788,7 +35418,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribePartitionIdAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -34825,7 +35456,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeWeightingAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -34862,7 +35494,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeDataVersionAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -34900,7 +35533,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeStableDataVersionAttr
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -34938,7 +35572,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeLeaderRouterIdAttribu
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -34976,7 +35611,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeDetachedRoleCountAttr
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -35014,7 +35650,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeChildRoleCountAttribu
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -35052,7 +35689,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeRouterRoleCountAttrib
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -35090,7 +35728,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeLeaderRoleCountAttrib
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -35128,7 +35767,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeAttachAttemptCountAtt
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -35166,7 +35806,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribePartitionIdChangeCoun
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -35204,7 +35845,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeBetterPartitionAttach
             FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -35242,7 +35884,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeParentChangeCountAttr
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -35279,7 +35922,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeTxTotalCountAttribute
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -35317,7 +35961,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeTxUnicastCountAttribu
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -35355,7 +36000,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeTxBroadcastCountAttri
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -35393,7 +36039,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeTxAckRequestedCountAt
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -35430,7 +36077,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeTxAckedCountAttribute
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -35468,7 +36116,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeTxNoAckRequestedCount
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -35505,7 +36154,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeTxDataCountAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -35543,7 +36193,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeTxDataPollCountAttrib
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -35581,7 +36232,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeTxBeaconCountAttribut
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -35619,7 +36271,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeTxBeaconRequestCountA
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -35656,7 +36309,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeTxOtherCountAttribute
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -35693,7 +36347,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeTxRetryCountAttribute
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -35730,7 +36385,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeTxDirectMaxRetryExpir
         CHIPThreadNetworkDiagnosticsClusterTxDirectMaxRetryExpiryCountAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -35767,7 +36423,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeTxIndirectMaxRetryExp
         CHIPThreadNetworkDiagnosticsClusterTxIndirectMaxRetryExpiryCountAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -35805,7 +36462,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeTxErrCcaCountAttribut
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -35843,7 +36501,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeTxErrAbortCountAttrib
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -35881,7 +36540,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeTxErrBusyChannelCount
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -35918,7 +36578,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeRxTotalCountAttribute
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -35956,7 +36617,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeRxUnicastCountAttribu
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -35994,7 +36656,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeRxBroadcastCountAttri
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -36031,7 +36694,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeRxDataCountAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -36069,7 +36733,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeRxDataPollCountAttrib
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -36107,7 +36772,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeRxBeaconCountAttribut
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -36145,7 +36811,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeRxBeaconRequestCountA
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -36182,7 +36849,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeRxOtherCountAttribute
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -36220,7 +36888,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeRxAddressFilteredCoun
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -36258,7 +36927,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeRxDestAddrFilteredCou
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -36296,7 +36966,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeRxDuplicatedCountAttr
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -36334,7 +37005,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeRxErrNoFrameCountAttr
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -36372,7 +37044,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeRxErrUnknownNeighborC
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -36410,7 +37083,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeRxErrInvalidSrcAddrCo
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -36448,7 +37122,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeRxErrSecCountAttribut
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -36486,7 +37161,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeRxErrFcsCountAttribut
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -36524,7 +37200,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeRxErrOtherCountAttrib
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -36562,7 +37239,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeActiveTimestampAttrib
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt64uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -36600,7 +37278,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribePendingTimestampAttri
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt64uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -36637,7 +37316,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeDelayAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -36677,8 +37357,9 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeSecurityPolicyAttribu
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPThreadNetworkDiagnosticsSecurityPolicyAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -36714,7 +37395,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeChannelMaskAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPOctetStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -36753,8 +37435,9 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeOperationalDatasetCom
         CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponentsAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -36794,8 +37477,9 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeActiveNetworkFaultsLi
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -36834,8 +37518,9 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeServerGeneratedComman
         CHIPThreadNetworkDiagnosticsClusterServerGeneratedCommandListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPThreadNetworkDiagnosticsServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -36874,8 +37559,9 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeClientGeneratedComman
         CHIPThreadNetworkDiagnosticsClusterClientGeneratedCommandListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPThreadNetworkDiagnosticsClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -36915,8 +37601,9 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeAttributeListAttribut
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPThreadNetworkDiagnosticsAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -36952,7 +37639,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeFeatureMapAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -36990,7 +37678,8 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeClusterRevisionAttrib
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -37036,7 +37725,8 @@ JNI_METHOD(void, TimeFormatLocalizationCluster, subscribeHourFormatAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -37074,7 +37764,8 @@ JNI_METHOD(void, TimeFormatLocalizationCluster, subscribeActiveCalendarTypeAttri
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -37114,8 +37805,9 @@ JNI_METHOD(void, TimeFormatLocalizationCluster, subscribeSupportedCalendarTypesA
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPTimeFormatLocalizationSupportedCalendarTypesAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -37155,8 +37847,9 @@ JNI_METHOD(void, TimeFormatLocalizationCluster, subscribeServerGeneratedCommandL
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPTimeFormatLocalizationServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -37196,8 +37889,9 @@ JNI_METHOD(void, TimeFormatLocalizationCluster, subscribeClientGeneratedCommandL
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPTimeFormatLocalizationClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -37235,7 +37929,8 @@ JNI_METHOD(void, TimeFormatLocalizationCluster, subscribeClusterRevisionAttribut
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -37281,7 +37976,8 @@ JNI_METHOD(void, UnitLocalizationCluster, subscribeTemperatureUnitAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -37320,7 +38016,8 @@ JNI_METHOD(void, UnitLocalizationCluster, subscribeAttributeListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPUnitLocalizationAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -37357,7 +38054,8 @@ JNI_METHOD(void, UnitLocalizationCluster, subscribeFeatureMapAttribute)
         chip::Callback::Callback<CHIPUnitLocalizationClusterFeatureMapAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -37394,7 +38092,8 @@ JNI_METHOD(void, UnitLocalizationCluster, subscribeClusterRevisionAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -37441,7 +38140,8 @@ JNI_METHOD(void, UserLabelCluster, subscribeLabelListAttribute)
         chip::Callback::Callback<CHIPUserLabelClusterLabelListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPUserLabelLabelListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -37480,8 +38180,9 @@ JNI_METHOD(void, UserLabelCluster, subscribeServerGeneratedCommandListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPUserLabelServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -37519,8 +38220,9 @@ JNI_METHOD(void, UserLabelCluster, subscribeClientGeneratedCommandListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPUserLabelClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -37556,7 +38258,8 @@ JNI_METHOD(void, UserLabelCluster, subscribeClusterRevisionAttribute)
         chip::Callback::Callback<CHIPUserLabelClusterClusterRevisionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -37602,7 +38305,8 @@ JNI_METHOD(void, WakeOnLanCluster, subscribeWakeOnLanMacAddressAttribute)
         chip::Callback::Callback<CHIPWakeOnLanClusterWakeOnLanMacAddressAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -37641,8 +38345,9 @@ JNI_METHOD(void, WakeOnLanCluster, subscribeServerGeneratedCommandListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPWakeOnLanServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -37680,8 +38385,9 @@ JNI_METHOD(void, WakeOnLanCluster, subscribeClientGeneratedCommandListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPWakeOnLanClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -37718,7 +38424,8 @@ JNI_METHOD(void, WakeOnLanCluster, subscribeAttributeListAttribute)
         chip::Callback::Callback<CHIPWakeOnLanClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPWakeOnLanAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -37755,7 +38462,8 @@ JNI_METHOD(void, WakeOnLanCluster, subscribeClusterRevisionAttribute)
         chip::Callback::Callback<CHIPWakeOnLanClusterClusterRevisionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -37849,7 +38557,8 @@ JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, subscribeBssidAttribute)
         chip::Callback::Callback<CHIPWiFiNetworkDiagnosticsClusterBssidAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPOctetStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -37886,7 +38595,8 @@ JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, subscribeSecurityTypeAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -37923,7 +38633,8 @@ JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, subscribeWiFiVersionAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -37960,7 +38671,8 @@ JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, subscribeChannelNumberAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -37997,7 +38709,8 @@ JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, subscribeRssiAttribute)
         chip::Callback::Callback<CHIPWiFiNetworkDiagnosticsClusterRssiAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8sAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -38035,7 +38748,8 @@ JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, subscribeBeaconLostCountAttribut
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -38072,7 +38786,8 @@ JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, subscribeBeaconRxCountAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -38110,7 +38825,8 @@ JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, subscribePacketMulticastRxCountA
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -38148,7 +38864,8 @@ JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, subscribePacketMulticastTxCountA
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -38186,7 +38903,8 @@ JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, subscribePacketUnicastRxCountAtt
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -38224,7 +38942,8 @@ JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, subscribePacketUnicastTxCountAtt
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -38261,7 +38980,8 @@ JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, subscribeCurrentMaxRateAttribute
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt64uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -38298,7 +39018,8 @@ JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, subscribeOverrunCountAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt64uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -38338,8 +39059,9 @@ JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, subscribeServerGeneratedCommandL
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPWiFiNetworkDiagnosticsServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -38379,8 +39101,9 @@ JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, subscribeClientGeneratedCommandL
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPWiFiNetworkDiagnosticsClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -38419,8 +39142,9 @@ JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, subscribeAttributeListAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPWiFiNetworkDiagnosticsAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -38456,7 +39180,8 @@ JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, subscribeFeatureMapAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -38494,7 +39219,8 @@ JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, subscribeClusterRevisionAttribut
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -38890,7 +39616,8 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeTypeAttribute)
         chip::Callback::Callback<CHIPWindowCoveringClusterTypeAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -38929,8 +39656,9 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeCurrentPositionLiftAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPWindowCoveringCurrentPositionLiftAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -38968,8 +39696,9 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeCurrentPositionTiltAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval), CHIPWindowCoveringCurrentPositionTiltAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
@@ -39005,7 +39734,8 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeConfigStatusAttribute)
         chip::Callback::Callback<CHIPWindowCoveringClusterConfigStatusAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -39045,8 +39775,9 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeCurrentPositionLiftPercentageAt
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPWindowCoveringCurrentPositionLiftPercentageAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -39086,8 +39817,9 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeCurrentPositionTiltPercentageAt
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPWindowCoveringCurrentPositionTiltPercentageAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -39124,7 +39856,8 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeOperationalStatusAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -39164,8 +39897,9 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeTargetPositionLiftPercent100ths
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPWindowCoveringTargetPositionLiftPercent100thsAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -39205,8 +39939,9 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeTargetPositionTiltPercent100ths
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPWindowCoveringTargetPositionTiltPercent100thsAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -39243,7 +39978,8 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeEndProductTypeAttribute)
         chip::Callback::Callback<CHIPWindowCoveringClusterEndProductTypeAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -39283,8 +40019,9 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeCurrentPositionLiftPercent100th
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPWindowCoveringCurrentPositionLiftPercent100thsAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -39324,8 +40061,9 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeCurrentPositionTiltPercent100th
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPWindowCoveringCurrentPositionTiltPercent100thsAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -39362,7 +40100,8 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeInstalledOpenLimitLiftAttribute
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -39400,7 +40139,8 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeInstalledClosedLimitLiftAttribu
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -39437,7 +40177,8 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeInstalledOpenLimitTiltAttribute
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -39475,7 +40216,8 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeInstalledClosedLimitTiltAttribu
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -39512,7 +40254,8 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeModeAttribute)
         chip::Callback::Callback<CHIPWindowCoveringClusterModeAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -39549,7 +40292,8 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeSafetyStatusAttribute)
         chip::Callback::Callback<CHIPWindowCoveringClusterSafetyStatusAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -39589,8 +40333,9 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeServerGeneratedCommandListAttri
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPWindowCoveringServerGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -39630,8 +40375,9 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeClientGeneratedCommandListAttri
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
+    chip::Optional<chip::DataVersion> dataVersion;
     err = cppCluster->SubscribeAttribute<TypeInfo>(
-        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPWindowCoveringClientGeneratedCommandListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -39669,7 +40415,8 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeAttributeListAttribute)
         chip::Callback::Callback<CHIPWindowCoveringClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPWindowCoveringAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -39706,7 +40453,8 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeFeatureMapAttribute)
         chip::Callback::Callback<CHIPWindowCoveringClusterFeatureMapAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -39743,7 +40491,8 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeClusterRevisionAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+    chip::Optional<chip::DataVersion> dataVersion;
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, dataVersion, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,

@@ -49,8 +49,8 @@ class TypedReadAttributeCallback final : public app::ReadClient::Callback
 {
 public:
     using OnSuccessCallbackType =
-        std::function<void(const app::ConcreteAttributePath & aPath, const DecodableAttributeType & aData)>;
-    using OnErrorCallbackType                   = std::function<void(const app::ConcreteAttributePath * aPath, CHIP_ERROR aError)>;
+        std::function<void(const app::ConcreteDataAttributePath & aPath, const DecodableAttributeType & aData)>;
+    using OnErrorCallbackType                   = std::function<void(const app::ConcreteDataAttributePath * aPath, CHIP_ERROR aError)>;
     using OnDoneCallbackType                    = std::function<void(TypedReadAttributeCallback * callback)>;
     using OnSubscriptionEstablishedCallbackType = std::function<void()>;
 
@@ -67,7 +67,7 @@ public:
     void AdoptReadClient(Platform::UniquePtr<app::ReadClient> aReadClient) { mReadClient = std::move(aReadClient); }
 
 private:
-    void OnAttributeData(const app::ConcreteDataAttributePath & aPath, DataVersion aVersion, TLV::TLVReader * apData,
+    void OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                          const app::StatusIB & aStatus) override
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -84,7 +84,7 @@ private:
         VerifyOrExit(apData != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
         SuccessOrExit(err = app::DataModel::Decode(*apData, value));
-
+        ChipLogProgress(DataManagement, "debugxx %u", aPath.mDataVersion);
         mOnSuccess(aPath, value);
 
     exit:
@@ -116,11 +116,11 @@ private:
             }
         }
 
-        if (aReadPrepareParams.mpDataVersionFilterParamsList != nullptr)
+        if (aReadPrepareParams.mpDataVersionFilterList != nullptr)
         {
-            for (size_t i = 0; i < aReadPrepareParams.mDataVersionFilterParamsListSize; i++)
+            for (size_t i = 0; i < aReadPrepareParams.mDataVersionFilterListSize; i++)
             {
-                chip::Platform::Delete<app::DataVersionFilterParams>(&aReadPrepareParams.mpDataVersionFilterParamsList[i]);
+                chip::Platform::Delete<app::DataVersionFilter>(&aReadPrepareParams.mpDataVersionFilterList[i]);
             }
         }
     }

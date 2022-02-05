@@ -383,7 +383,7 @@ CHIP_ERROR ReadViaAccessInterface(FabricIndex aAccessingFabricIndex, bool aIsFab
 {
     AttributeValueEncoder::AttributeEncodeState state =
         (aEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *aEncoderState);
-    DataVersion version = kUndefinedDataVersion;
+    DataVersion version = 0;
     ReturnErrorOnFailure(ReadClusterDataVersion(aPath.mEndpointId, aPath.mClusterId, version));
     AttributeValueEncoder valueEncoder(aAttributeReports, aAccessingFabricIndex, aPath, version, aIsFabricFiltered, state);
     CHIP_ERROR err = aAccessInterface->Read(aPath, valueEncoder);
@@ -492,7 +492,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
     AttributeDataIB::Builder & attributeDataIBBuilder = attributeReport.CreateAttributeData();
     ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
 
-    DataVersion version = kUndefinedDataVersion;
+    DataVersion version = 0;
     ReturnErrorOnFailure(ReadClusterDataVersion(aPath.mEndpointId, aPath.mClusterId, version));
     attributeDataIBBuilder.DataVersion(version);
     ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
@@ -863,7 +863,7 @@ CHIP_ERROR prepareWriteData(const EmberAfAttributeMetadata * attributeMetadata, 
 // TODO: Refactor WriteSingleClusterData and all dependent functions to take ConcreteAttributePath instead of ClusterInfo
 // as the input argument.
 CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
-                                  TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
+                                  TLV::TLVReader & aReader, WriteHandler * apWriteHandler, Optional<DataVersion> &aRequiredDataVersion)
 {
     // Named aPath for now to reduce the amount of code change that needs to
     // happen when the above TODO is resolved.
@@ -897,6 +897,11 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
             // TODO: when wildcard/group writes are supported, handle them to discard rather than fail with status
             return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::UnsupportedAccess);
         }
+    }
+
+    if (aRequiredDataVersion.HasValue() && !IsClusterDataVersionEqual(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aRequiredDataVersion.Value()))
+    {
+        return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::DataVersionMismatch);
     }
 
     if (attributeMetadata->MustUseTimedWrite() && !apWriteHandler->IsTimedWrite())
@@ -936,22 +941,7 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
     return apWriteHandler->AddStatus(aPath, status);
 }
 
-bool IsClusterDataVersionAllowed(const EndpointId & aEndpointId, const ClusterId & aClusterId, const DataVersion & aDataVersion)
-{
-    DataVersion * version = emberAfDataVersionStorage(aEndpointId, aClusterId);
-    if (version == nullptr)
-    {
-        ChipLogError(DataManagement, "Endpoint %" PRIx16 ", Cluster " ChipLogFormatMEI " not found in IsClusterDataVersionAllowed!",
-                     aEndpointId, ChipLogValueMEI(aClusterId));
-        return false;
-    }
-    else
-    {
-        return (*(version)) > aDataVersion;
-    }
-}
-
-bool IsClusterDataVersionEqual(const EndpointId & aEndpointId, const ClusterId & aClusterId, const DataVersion & aRequiredVersion)
+bool IsClusterDataVersionEqual(EndpointId aEndpointId, ClusterId aClusterId, DataVersion aRequiredVersion)
 {
     DataVersion * version = emberAfDataVersionStorage(aEndpointId, aClusterId);
     if (version == nullptr)

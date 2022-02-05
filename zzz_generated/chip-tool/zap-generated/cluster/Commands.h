@@ -130,7 +130,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000001F, 0x00000000, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000001F, 0x00000000, mValue, dataVersion);
     }
 
 private:
@@ -154,7 +155,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000001F, 0x00000001, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000001F, 0x00000001, mValue, dataVersion);
     }
 
 private:
@@ -383,7 +385,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050D, 0x00000004, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050D, 0x00000004, mValue, dataVersion);
     }
 
 private:
@@ -673,7 +676,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000028, 0x00000005, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000028, 0x00000005, mValue, dataVersion);
     }
 
 private:
@@ -694,7 +698,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000028, 0x00000006, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000028, 0x00000006, mValue, dataVersion);
     }
 
 private:
@@ -716,7 +721,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000028, 0x00000010, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000028, 0x00000010, mValue, dataVersion);
     }
 
 private:
@@ -755,7 +761,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000000F, 0x00000051, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000000F, 0x00000051, mValue, dataVersion);
     }
 
 private:
@@ -777,7 +784,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000000F, 0x00000055, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000000F, 0x00000055, mValue, dataVersion);
     }
 
 private:
@@ -1243,7 +1251,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000039, 0x00000005, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000039, 0x00000005, mValue, dataVersion);
     }
 
 private:
@@ -1959,7 +1968,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000300, 0x0000000F, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000300, 0x0000000F, mValue, dataVersion);
     }
 
 private:
@@ -1980,7 +1990,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000300, 0x00000030, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000300, 0x00000030, mValue, dataVersion);
     }
 
 private:
@@ -2001,7 +2012,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000300, 0x00000031, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000300, 0x00000031, mValue, dataVersion);
     }
 
 private:
@@ -2022,7 +2034,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000300, 0x00000032, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000300, 0x00000032, mValue, dataVersion);
     }
 
 private:
@@ -2043,7 +2056,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000300, 0x00000033, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000300, 0x00000033, mValue, dataVersion);
     }
 
 private:
@@ -2065,7 +2079,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000300, 0x00000034, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000300, 0x00000034, mValue, dataVersion);
     }
 
 private:
@@ -2086,7 +2101,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000300, 0x00000036, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000300, 0x00000036, mValue, dataVersion);
     }
 
 private:
@@ -2107,7 +2123,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000300, 0x00000037, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000300, 0x00000037, mValue, dataVersion);
     }
 
 private:
@@ -2129,7 +2146,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000300, 0x00000038, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000300, 0x00000038, mValue, dataVersion);
     }
 
 private:
@@ -2150,7 +2168,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000300, 0x0000003A, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000300, 0x0000003A, mValue, dataVersion);
     }
 
 private:
@@ -2171,7 +2190,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000300, 0x0000003B, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000300, 0x0000003B, mValue, dataVersion);
     }
 
 private:
@@ -2193,7 +2213,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000300, 0x0000003C, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000300, 0x0000003C, mValue, dataVersion);
     }
 
 private:
@@ -2215,7 +2236,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000300, 0x00004010, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000300, 0x00004010, mValue, dataVersion);
     }
 
 private:
@@ -2310,7 +2332,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050A, 0x00000001, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050A, 0x00000001, mValue, dataVersion);
     }
 
 private:
@@ -2828,7 +2851,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000101, 0x00000021, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000101, 0x00000021, mValue, dataVersion);
     }
 
 private:
@@ -2849,7 +2873,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000101, 0x00000023, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000101, 0x00000023, mValue, dataVersion);
     }
 
 private:
@@ -2870,7 +2895,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000101, 0x00000024, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000101, 0x00000024, mValue, dataVersion);
     }
 
 private:
@@ -2891,7 +2917,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000101, 0x00000025, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000101, 0x00000025, mValue, dataVersion);
     }
 
 private:
@@ -2913,7 +2940,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000101, 0x00000029, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000101, 0x00000029, mValue, dataVersion);
     }
 
 private:
@@ -2935,7 +2963,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000101, 0x0000002B, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000101, 0x0000002B, mValue, dataVersion);
     }
 
 private:
@@ -2957,7 +2986,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000101, 0x00000030, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000101, 0x00000030, mValue, dataVersion);
     }
 
 private:
@@ -3182,7 +3212,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000030, 0x00000000, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000030, 0x00000000, mValue, dataVersion);
     }
 
 private:
@@ -3349,7 +3380,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000003F, 0x00000000, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000003F, 0x00000000, mValue, dataVersion);
     }
 
 private:
@@ -3623,7 +3655,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000003, 0x00000000, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000003, 0x00000000, mValue, dataVersion);
     }
 
 private:
@@ -3937,7 +3970,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000008, 0x0000000F, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000008, 0x0000000F, mValue, dataVersion);
     }
 
 private:
@@ -3959,7 +3993,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000008, 0x00000010, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000008, 0x00000010, mValue, dataVersion);
     }
 
 private:
@@ -3980,7 +4015,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000008, 0x00000011, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000008, 0x00000011, mValue, dataVersion);
     }
 
 private:
@@ -4002,7 +4038,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000008, 0x00000012, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000008, 0x00000012, mValue, dataVersion);
     }
 
 private:
@@ -4024,7 +4061,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000008, 0x00000013, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000008, 0x00000013, mValue, dataVersion);
     }
 
 private:
@@ -4046,7 +4084,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000008, 0x00000014, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000008, 0x00000014, mValue, dataVersion);
     }
 
 private:
@@ -4068,7 +4107,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000008, 0x00004000, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000008, 0x00004000, mValue, dataVersion);
     }
 
 private:
@@ -4105,7 +4145,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000002B, 0x00000001, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000002B, 0x00000001, mValue, dataVersion);
     }
 
 private:
@@ -4602,7 +4643,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000050, 0x00000002, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000050, 0x00000002, mValue, dataVersion);
     }
 
 private:
@@ -4804,7 +4846,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000031, 0x00000004, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000031, 0x00000004, mValue, dataVersion);
     }
 
 private:
@@ -4972,7 +5015,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000002A, 0x00000000, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000002A, 0x00000000, mValue, dataVersion);
     }
 
 private:
@@ -5177,7 +5221,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000006, 0x00004001, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000006, 0x00004001, mValue, dataVersion);
     }
 
 private:
@@ -5198,7 +5243,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000006, 0x00004002, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000006, 0x00004002, mValue, dataVersion);
     }
 
 private:
@@ -5219,7 +5265,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000006, 0x00004003, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000006, 0x00004003, mValue, dataVersion);
     }
 
 private:
@@ -5257,7 +5304,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000007, 0x00000010, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000007, 0x00000010, mValue, dataVersion);
     }
 
 private:
@@ -5637,7 +5685,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000200, 0x00000015, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000200, 0x00000015, mValue, dataVersion);
     }
 
 private:
@@ -5659,7 +5708,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000200, 0x00000017, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000200, 0x00000017, mValue, dataVersion);
     }
 
 private:
@@ -5681,7 +5731,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000200, 0x00000020, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000200, 0x00000020, mValue, dataVersion);
     }
 
 private:
@@ -5703,7 +5754,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000200, 0x00000021, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000200, 0x00000021, mValue, dataVersion);
     }
 
 private:
@@ -6621,7 +6673,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000000, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000000, mValue, dataVersion);
     }
 
 private:
@@ -6642,7 +6695,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000001, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000001, mValue, dataVersion);
     }
 
 private:
@@ -6663,7 +6717,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000002, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000002, mValue, dataVersion);
     }
 
 private:
@@ -6684,7 +6739,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000003, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000003, mValue, dataVersion);
     }
 
 private:
@@ -6705,7 +6761,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000004, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000004, mValue, dataVersion);
     }
 
 private:
@@ -6726,7 +6783,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000005, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000005, mValue, dataVersion);
     }
 
 private:
@@ -6747,7 +6805,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000006, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000006, mValue, dataVersion);
     }
 
 private:
@@ -6768,7 +6827,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000007, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000007, mValue, dataVersion);
     }
 
 private:
@@ -6789,7 +6849,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000008, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000008, mValue, dataVersion);
     }
 
 private:
@@ -6810,7 +6871,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000009, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000009, mValue, dataVersion);
     }
 
 private:
@@ -6831,7 +6893,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000000A, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000000A, mValue, dataVersion);
     }
 
 private:
@@ -6852,7 +6915,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000000B, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000000B, mValue, dataVersion);
     }
 
 private:
@@ -6873,7 +6937,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000000C, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000000C, mValue, dataVersion);
     }
 
 private:
@@ -6894,7 +6959,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000000D, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000000D, mValue, dataVersion);
     }
 
 private:
@@ -6915,7 +6981,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000000E, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000000E, mValue, dataVersion);
     }
 
 private:
@@ -6936,7 +7003,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000000F, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000000F, mValue, dataVersion);
     }
 
 private:
@@ -6957,7 +7025,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000010, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000010, mValue, dataVersion);
     }
 
 private:
@@ -6978,7 +7047,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000011, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000011, mValue, dataVersion);
     }
 
 private:
@@ -6999,7 +7069,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000012, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000012, mValue, dataVersion);
     }
 
 private:
@@ -7020,7 +7091,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000013, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000013, mValue, dataVersion);
     }
 
 private:
@@ -7041,7 +7113,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000014, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000014, mValue, dataVersion);
     }
 
 private:
@@ -7062,7 +7135,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000015, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000015, mValue, dataVersion);
     }
 
 private:
@@ -7083,7 +7157,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000016, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000016, mValue, dataVersion);
     }
 
 private:
@@ -7104,7 +7179,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000017, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000017, mValue, dataVersion);
     }
 
 private:
@@ -7125,7 +7201,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000018, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000018, mValue, dataVersion);
     }
 
 private:
@@ -7146,7 +7223,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000019, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000019, mValue, dataVersion);
     }
 
 private:
@@ -7168,7 +7246,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000001A, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000001A, mValue, dataVersion);
     }
 
 private:
@@ -7191,7 +7270,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000001B, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000001B, mValue, dataVersion);
     }
 
 private:
@@ -7214,7 +7294,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000001C, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000001C, mValue, dataVersion);
     }
 
 private:
@@ -7238,7 +7319,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000001D, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000001D, mValue, dataVersion);
     }
 
 private:
@@ -7259,7 +7341,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000001E, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000001E, mValue, dataVersion);
     }
 
 private:
@@ -7281,7 +7364,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000001F, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000001F, mValue, dataVersion);
     }
 
 private:
@@ -7302,7 +7386,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000020, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000020, mValue, dataVersion);
     }
 
 private:
@@ -7323,7 +7408,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000021, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000021, mValue, dataVersion);
     }
 
 private:
@@ -7344,7 +7430,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000022, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000022, mValue, dataVersion);
     }
 
 private:
@@ -7366,7 +7453,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000023, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000023, mValue, dataVersion);
     }
 
 private:
@@ -7390,7 +7478,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000024, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000024, mValue, dataVersion);
     }
 
 private:
@@ -7412,7 +7501,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000025, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000025, mValue, dataVersion);
     }
 
 private:
@@ -7435,7 +7525,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000026, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000026, mValue, dataVersion);
     }
 
 private:
@@ -7457,7 +7548,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000027, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000027, mValue, dataVersion);
     }
 
 private:
@@ -7479,7 +7571,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000028, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000028, mValue, dataVersion);
     }
 
 private:
@@ -7501,7 +7594,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000029, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000029, mValue, dataVersion);
     }
 
 private:
@@ -7523,7 +7617,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000030, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000030, mValue, dataVersion);
     }
 
 private:
@@ -7545,7 +7640,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000031, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000031, mValue, dataVersion);
     }
 
 private:
@@ -7567,7 +7663,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000032, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00000032, mValue, dataVersion);
     }
 
 private:
@@ -7588,7 +7685,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x000000FF, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x000000FF, mValue, dataVersion);
     }
 
 private:
@@ -7610,7 +7708,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008000, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008000, mValue, dataVersion);
     }
 
 private:
@@ -7632,7 +7731,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008001, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008001, mValue, dataVersion);
     }
 
 private:
@@ -7654,7 +7754,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008002, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008002, mValue, dataVersion);
     }
 
 private:
@@ -7676,7 +7777,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008003, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008003, mValue, dataVersion);
     }
 
 private:
@@ -7698,7 +7800,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008004, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008004, mValue, dataVersion);
     }
 
 private:
@@ -7719,7 +7822,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008005, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008005, mValue, dataVersion);
     }
 
 private:
@@ -7741,7 +7845,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008006, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008006, mValue, dataVersion);
     }
 
 private:
@@ -7763,7 +7868,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008007, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008007, mValue, dataVersion);
     }
 
 private:
@@ -7785,7 +7891,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008008, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008008, mValue, dataVersion);
     }
 
 private:
@@ -7807,7 +7914,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008009, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008009, mValue, dataVersion);
     }
 
 private:
@@ -7829,7 +7937,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000800A, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000800A, mValue, dataVersion);
     }
 
 private:
@@ -7851,7 +7960,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000800B, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000800B, mValue, dataVersion);
     }
 
 private:
@@ -7873,7 +7983,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000800C, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000800C, mValue, dataVersion);
     }
 
 private:
@@ -7894,7 +8005,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000800D, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000800D, mValue, dataVersion);
     }
 
 private:
@@ -7916,7 +8028,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000800E, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000800E, mValue, dataVersion);
     }
 
 private:
@@ -7938,7 +8051,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000800F, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000800F, mValue, dataVersion);
     }
 
 private:
@@ -7960,7 +8074,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008010, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008010, mValue, dataVersion);
     }
 
 private:
@@ -7982,7 +8097,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008011, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008011, mValue, dataVersion);
     }
 
 private:
@@ -8004,7 +8120,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008012, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008012, mValue, dataVersion);
     }
 
 private:
@@ -8026,7 +8143,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008013, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008013, mValue, dataVersion);
     }
 
 private:
@@ -8048,7 +8166,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008014, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008014, mValue, dataVersion);
     }
 
 private:
@@ -8069,7 +8188,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008015, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008015, mValue, dataVersion);
     }
 
 private:
@@ -8091,7 +8211,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008016, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008016, mValue, dataVersion);
     }
 
 private:
@@ -8113,7 +8234,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008017, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008017, mValue, dataVersion);
     }
 
 private:
@@ -8135,7 +8257,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008018, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008018, mValue, dataVersion);
     }
 
 private:
@@ -8157,7 +8280,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008019, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008019, mValue, dataVersion);
     }
 
 private:
@@ -8179,7 +8303,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000801E, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x0000801E, mValue, dataVersion);
     }
 
 private:
@@ -8201,7 +8326,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008024, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008024, mValue, dataVersion);
     }
 
 private:
@@ -8223,7 +8349,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008025, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008025, mValue, dataVersion);
     }
 
 private:
@@ -8246,7 +8373,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008026, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008026, mValue, dataVersion);
     }
 
 private:
@@ -8268,7 +8396,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008027, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008027, mValue, dataVersion);
     }
 
 private:
@@ -8290,7 +8419,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008028, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008028, mValue, dataVersion);
     }
 
 private:
@@ -8312,7 +8442,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008029, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000050F, 0x00008029, mValue, dataVersion);
     }
 
 private:
@@ -8493,7 +8624,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000201, 0x00000011, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000201, 0x00000011, mValue, dataVersion);
     }
 
 private:
@@ -8515,7 +8647,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000201, 0x00000012, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000201, 0x00000012, mValue, dataVersion);
     }
 
 private:
@@ -8537,7 +8670,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000201, 0x00000015, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000201, 0x00000015, mValue, dataVersion);
     }
 
 private:
@@ -8559,7 +8693,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000201, 0x00000016, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000201, 0x00000016, mValue, dataVersion);
     }
 
 private:
@@ -8581,7 +8716,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000201, 0x00000017, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000201, 0x00000017, mValue, dataVersion);
     }
 
 private:
@@ -8603,7 +8739,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000201, 0x00000018, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000201, 0x00000018, mValue, dataVersion);
     }
 
 private:
@@ -8625,7 +8762,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000201, 0x00000019, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000201, 0x00000019, mValue, dataVersion);
     }
 
 private:
@@ -8647,7 +8785,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000201, 0x0000001B, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000201, 0x0000001B, mValue, dataVersion);
     }
 
 private:
@@ -8668,7 +8807,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000201, 0x0000001C, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000201, 0x0000001C, mValue, dataVersion);
     }
 
 private:
@@ -8707,7 +8847,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000204, 0x00000000, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000204, 0x00000000, mValue, dataVersion);
     }
 
 private:
@@ -8729,7 +8870,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000204, 0x00000001, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000204, 0x00000001, mValue, dataVersion);
     }
 
 private:
@@ -8751,7 +8893,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000204, 0x00000002, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000204, 0x00000002, mValue, dataVersion);
     }
 
 private:
@@ -8892,7 +9035,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000002C, 0x00000000, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000002C, 0x00000000, mValue, dataVersion);
     }
 
 private:
@@ -8914,7 +9058,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000002C, 0x00000001, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000002C, 0x00000001, mValue, dataVersion);
     }
 
 private:
@@ -8950,7 +9095,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x0000002D, 0x00000000, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000002D, 0x00000000, mValue, dataVersion);
     }
 
 private:
@@ -8986,7 +9132,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000041, 0x00000000, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000041, 0x00000000, mValue, dataVersion);
     }
 
 private:
@@ -9282,7 +9429,8 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000102, 0x00000017, mValue);
+        chip::Optional<chip::DataVersion> dataVersion;
+        return WriteAttribute::SendCommand(device, endpointId, 0x00000102, 0x00000017, mValue, dataVersion);
     }
 
 private:
