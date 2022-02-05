@@ -25,6 +25,8 @@
 #ifndef CHIPOBLEPROFILE_H
 #define CHIPOBLEPROFILE_H
 
+#include <platform/CHIPDeviceBuildConfig.h>
+
 #ifdef __cplusplus
 #include <ble/BleUUID.h>
 #include <platform/internal/BLEManager.h>
