@@ -278,7 +278,10 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
 
             TestExchangeDelegate delegate;
             Messaging::ExchangeContext * exchange = ctx.NewExchangeToBob(&delegate);
-            Status status                         = writeHandler.OnWriteRequest(exchange, std::move(buf), transactionIsTimed);
+
+            writeHandler.EnableResponseGeneration(false);
+
+            Status status = writeHandler.OnWriteRequest(exchange, std::move(buf), transactionIsTimed);
             if (messageIsTimed == transactionIsTimed)
             {
                 NL_TEST_ASSERT(apSuite, status == Status::Success);
@@ -286,14 +289,21 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
             else
             {
                 NL_TEST_ASSERT(apSuite, status == Status::UnsupportedAccess);
-                // In the normal code flow, the exchange would now get closed
-                // when we send the error status on it (of if that fails when
-                // the stack unwinds).  In the success case it's been closed
-                // already by the WriteHandler sending the response on it, but
-                // if we are in the error case we need to make sure it gets
-                // closed.
-                exchange->Close();
             }
+
+            //
+            // In both failure and success cases, we've disabled generation of responses in WriteHandler.
+            // This is needed since we don't have a matching ReadClient instance that generated the original
+            // request. This means that the InteractionModelEngine is going to handle that response, causing it to
+            // incorrectly send back a further failure to that response. Ordinarily, this would have been discarded
+            // by the exchange layer since the exchange on the handler-side would have been closed already, but given
+            // we're not in a representative async work loop model in this test, every call is synchronous. This results
+            // in the erroneous response being processed while the exchange is still open, and we end up processing the message
+            // and triggering a fault.
+            //
+            // Since we're not generating responses, close the exchange in all cases.
+            //
+            exchange->Close();
 
             Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
             NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
