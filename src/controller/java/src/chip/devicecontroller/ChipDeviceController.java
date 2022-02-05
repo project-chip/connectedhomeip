@@ -174,6 +174,9 @@ public class ChipDeviceController {
   /**
    * Through GetConnectedDeviceCallback, returns a pointer to a connected device or an error.
    *
+   * <p>The native code invoked by this method creates a strong reference to the provided callback,
+   * which is released only when GetConnectedDeviceCallback has returned success or failure.
+   *
    * <p>TODO(#8443): This method could benefit from a ChipDevice abstraction to hide the pointer
    * passing.
    */

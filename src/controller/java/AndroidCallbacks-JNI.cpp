@@ -17,6 +17,7 @@
 #include "AndroidCallbacks.h"
 
 #include <jni.h>
+#include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -27,7 +28,7 @@ using namespace chip::Controller;
 
 JNI_METHOD(jlong, GetConnectedDeviceCallbackJni, newCallback)(JNIEnv * env, jobject self, jobject callback)
 {
-    GetConnectedDeviceCallback * connectedDeviceCallback = new GetConnectedDeviceCallback(callback);
+    GetConnectedDeviceCallback * connectedDeviceCallback = chip::Platform::New<GetConnectedDeviceCallback>(self, callback);
     return reinterpret_cast<jlong>(connectedDeviceCallback);
 }
 

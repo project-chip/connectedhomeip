@@ -25,7 +25,7 @@ namespace Controller {
 // Callback for success and failure cases of GetConnectedDevice().
 struct GetConnectedDeviceCallback
 {
-    GetConnectedDeviceCallback(jobject javaCallback);
+    GetConnectedDeviceCallback(jobject wrapperCallback, jobject javaCallback);
     ~GetConnectedDeviceCallback();
 
     static void OnDeviceConnectedFn(void * context, OperationalDeviceProxy * device);
@@ -33,7 +33,8 @@ struct GetConnectedDeviceCallback
 
     Callback::Callback<OnDeviceConnected> mOnSuccess;
     Callback::Callback<OnDeviceConnectionFailure> mOnFailure;
-    jobject mJavaCallbackRef;
+    jobject mWrapperCallbackRef = nullptr;
+    jobject mJavaCallbackRef    = nullptr;
 };
 
 } // namespace Controller

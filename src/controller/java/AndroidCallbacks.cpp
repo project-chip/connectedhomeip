@@ -25,11 +25,16 @@
 
 using namespace chip::Controller;
 
-GetConnectedDeviceCallback::GetConnectedDeviceCallback(jobject javaCallback) :
+GetConnectedDeviceCallback::GetConnectedDeviceCallback(jobject wrapperCallback, jobject javaCallback) :
     mOnSuccess(OnDeviceConnectedFn, this), mOnFailure(OnDeviceConnectionFailureFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+    mWrapperCallbackRef = env->NewGlobalRef(wrapperCallback);
+    if (mWrapperCallbackRef == nullptr)
+    {
+        ChipLogError(Controller, "Could not create global reference for Java callback");
+    }
     mJavaCallbackRef = env->NewGlobalRef(javaCallback);
     if (mJavaCallbackRef == nullptr)
     {
@@ -49,6 +54,9 @@ void GetConnectedDeviceCallback::OnDeviceConnectedFn(void * context, Operational
     JNIEnv * env         = JniReferences::GetInstance().GetEnvForCurrentThread();
     auto * self          = static_cast<GetConnectedDeviceCallback *>(context);
     jobject javaCallback = self->mJavaCallbackRef;
+
+    // Release global ref so application can clean up.
+    env->DeleteGlobalRef(self->mWrapperCallbackRef);
 
     jclass getConnectedDeviceCallbackCls = nullptr;
     JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/GetConnectedDeviceCallbackJni$GetConnectedDeviceCallback",
@@ -70,6 +78,9 @@ void GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(void * context, Pee
     JNIEnv * env         = JniReferences::GetInstance().GetEnvForCurrentThread();
     auto * self          = static_cast<GetConnectedDeviceCallback *>(context);
     jobject javaCallback = self->mJavaCallbackRef;
+
+    // Release global ref so application can clean up.
+    env->DeleteGlobalRef(self->mWrapperCallbackRef);
 
     jclass getConnectedDeviceCallbackCls = nullptr;
     JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/GetConnectedDeviceCallbackJni$GetConnectedDeviceCallback",
