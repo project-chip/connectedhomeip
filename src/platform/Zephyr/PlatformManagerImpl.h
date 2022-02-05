@@ -56,7 +56,6 @@ private:
 
     static void OperationalHoursSavingTimerEventHandler(k_timer * timer);
     static void UpdateOperationalHours(intptr_t arg);
-    static void OnDeviceBoot(intptr_t arg);
 
     // ===== Members for internal use by the following friends.
 

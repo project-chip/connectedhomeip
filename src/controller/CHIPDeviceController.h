@@ -570,13 +570,11 @@ public:
      * @param[in] attestationNonce    Attestation nonce
      * @param[in] pai                 PAI certificate
      * @param[in] dac                 DAC certificates
-     * @param[in] remoteVendorId      vendor ID read from the device
-     * @param[in] remoteProductId     product ID read from the device
      * @param[in] proxy               device proxy that is being attested.
      */
     CHIP_ERROR ValidateAttestationInfo(const ByteSpan & attestationElements, const ByteSpan & signature,
                                        const ByteSpan & attestationNonce, const ByteSpan & pai, const ByteSpan & dac,
-                                       VendorId remoteVendorId, uint16_t remoteProductId, DeviceProxy * proxy);
+                                       DeviceProxy * proxy);
 
     /**
      * @brief
@@ -708,7 +706,7 @@ private:
        The function does not hold a reference to the device object.
      */
     CHIP_ERROR SendAttestationRequestCommand(DeviceProxy * device, const ByteSpan & attestationNonce);
-    /* This function sends an OpCSR request to the device.
+    /* This function sends an CSR request to the device.
        The function does not hold a reference to the device object.
      */
     CHIP_ERROR SendOperationalCertificateSigningRequestCommand(DeviceProxy * device, const ByteSpan & csrNonce);
@@ -743,7 +741,7 @@ private:
     /**
      * @brief
      *   This function is called by the IM layer when the commissioner receives the CSR from the device.
-     *   (Reference: Specifications section 11.22.5.8. OpCSR Elements)
+     *   (Reference: Specifications section 11.18.5.6. NOCSR Elements)
      *
      * @param[in] context               The context provided while registering the callback.
      * @param[in] data                  The response struct containing the following fields:
@@ -752,7 +750,7 @@ private:
      * message.
      */
     static void OnOperationalCertificateSigningRequest(
-        void * context, const app::Clusters::OperationalCredentials::Commands::OpCSRResponse::DecodableType & data);
+        void * context, const app::Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType & data);
 
     /* Callback when adding operational certs to device results in failure */
     static void OnAddNOCFailureResponse(void * context, CHIP_ERROR errro);
@@ -790,7 +788,7 @@ private:
     /**
      * @brief
      *   This function processes the CSR sent by the device.
-     *   (Reference: Specifications section 11.22.5.8. OpCSR Elements)
+     *   (Reference: Specifications section 11.18.5.6. NOCSR Elements)
      *
      * @param[in] proxy           device proxy
      * @param[in] NOCSRElements   CSR elements as per specifications section 11.22.5.6. NOCSR Elements.
@@ -798,8 +796,8 @@ private:
      * @param[in] dac               device attestation certificate
      * @param[in] csrNonce          certificate signing request nonce
      */
-    CHIP_ERROR ProcessOpCSR(DeviceProxy * proxy, const ByteSpan & NOCSRElements, const ByteSpan & AttestationSignature,
-                            ByteSpan dac, ByteSpan csrNonce);
+    CHIP_ERROR ProcessCSR(DeviceProxy * proxy, const ByteSpan & NOCSRElements, const ByteSpan & AttestationSignature, ByteSpan dac,
+                          ByteSpan csrNonce);
 
     /**
      * @brief

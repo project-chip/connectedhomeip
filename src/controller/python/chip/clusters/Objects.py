@@ -14184,7 +14184,7 @@ class OperationalCredentials(Cluster):
             certificate: 'bytes' = b""
 
         @dataclass
-        class OpCSRRequest(ClusterCommand):
+        class CSRRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x003E
             command_id: typing.ClassVar[int] = 0x0004
             is_client: typing.ClassVar[bool] = True
@@ -14199,7 +14199,7 @@ class OperationalCredentials(Cluster):
             CSRNonce: 'bytes' = b""
 
         @dataclass
-        class OpCSRResponse(ClusterCommand):
+        class CSRResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x003E
             command_id: typing.ClassVar[int] = 0x0005
             is_client: typing.ClassVar[bool] = False

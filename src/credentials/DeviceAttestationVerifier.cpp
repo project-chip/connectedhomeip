@@ -32,8 +32,7 @@ class UnimplementedDACVerifier : public DeviceAttestationVerifier
 public:
     void VerifyAttestationInformation(const ByteSpan & attestationInfoBuffer, const ByteSpan & attestationChallengeBuffer,
                                       const ByteSpan & attestationSignatureBuffer, const ByteSpan & paiDerBuffer,
-                                      const ByteSpan & dacDerBuffer, const ByteSpan & attestationNonce, VendorId vendorId,
-                                      uint16_t productId,
+                                      const ByteSpan & dacDerBuffer, const ByteSpan & attestationNonce,
                                       Callback::Callback<OnAttestationInformationVerification> * onCompletion) override
     {
         (void) attestationInfoBuffer;

@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2021 Project CHIP Authors
+ *   Copyright (c) 2022 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +15,8 @@
  *   limitations under the License.
  *
  */
+package chip.devicecontroller;
 
-#import <CHIP/CHIP.h>
-#import <Foundation/Foundation.h>
-
-int main(int argc, const char * argv[]) { return EXIT_SUCCESS; }
+public interface SubscriptionEstablishedCallback {
+  void onSubscriptionEstablished();
+}

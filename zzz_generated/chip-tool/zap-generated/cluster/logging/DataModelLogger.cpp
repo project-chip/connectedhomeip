@@ -3704,6 +3704,15 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const OperationalCredentials::Commands::CSRResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("NOCSRElements", indent + 1, value.NOCSRElements));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("attestationSignature", indent + 1, value.attestationSignature));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const OperationalCredentials::Commands::CertificateChainResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -3718,15 +3727,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     ReturnErrorOnFailure(DataModelLogger::LogValue("statusCode", indent + 1, value.statusCode));
     ReturnErrorOnFailure(DataModelLogger::LogValue("fabricIndex", indent + 1, value.fabricIndex));
     ReturnErrorOnFailure(DataModelLogger::LogValue("debugText", indent + 1, value.debugText));
-    DataModelLogger::LogString(indent, "}");
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const OperationalCredentials::Commands::OpCSRResponse::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    ReturnErrorOnFailure(DataModelLogger::LogValue("NOCSRElements", indent + 1, value.NOCSRElements));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("attestationSignature", indent + 1, value.attestationSignature));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -3939,6 +3939,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case AccountLogin::Id: {
         switch (path.mAttributeId)
@@ -3964,6 +3965,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case AdministratorCommissioning::Id: {
         switch (path.mAttributeId)
@@ -4004,6 +4006,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case ApplicationBasic::Id: {
         switch (path.mAttributeId)
@@ -4069,6 +4072,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case ApplicationLauncher::Id: {
         switch (path.mAttributeId)
@@ -4099,6 +4103,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case AudioOutput::Id: {
         switch (path.mAttributeId)
@@ -4134,6 +4139,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case BarrierControl::Id: {
         switch (path.mAttributeId)
@@ -4179,6 +4185,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case Basic::Id: {
         switch (path.mAttributeId)
@@ -4299,6 +4306,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case BinaryInputBasic::Id: {
         switch (path.mAttributeId)
@@ -4339,6 +4347,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case Binding::Id: {
         switch (path.mAttributeId)
@@ -4364,6 +4373,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case BooleanState::Id: {
         switch (path.mAttributeId)
@@ -4394,6 +4404,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case BridgedActions::Id: {
         switch (path.mAttributeId)
@@ -4435,6 +4446,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case BridgedDeviceBasic::Id: {
         switch (path.mAttributeId)
@@ -4530,6 +4542,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case Channel::Id: {
         switch (path.mAttributeId)
@@ -4560,6 +4573,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case ColorControl::Id: {
         switch (path.mAttributeId)
@@ -4845,6 +4859,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case ContentLauncher::Id: {
         switch (path.mAttributeId)
@@ -4880,6 +4895,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case Descriptor::Id: {
         switch (path.mAttributeId)
@@ -4925,6 +4941,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case DiagnosticLogs::Id: {
         switch (path.mAttributeId)
@@ -4945,6 +4962,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
         }
+        break;
     }
     case DoorLock::Id: {
         switch (path.mAttributeId)
@@ -5075,6 +5093,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case ElectricalMeasurement::Id: {
         switch (path.mAttributeId)
@@ -5155,6 +5174,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case EthernetNetworkDiagnostics::Id: {
         switch (path.mAttributeId)
@@ -5230,6 +5250,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case FixedLabel::Id: {
         switch (path.mAttributeId)
@@ -5260,6 +5281,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case FlowMeasurement::Id: {
         switch (path.mAttributeId)
@@ -5305,6 +5327,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case GeneralCommissioning::Id: {
         switch (path.mAttributeId)
@@ -5350,6 +5373,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case GeneralDiagnostics::Id: {
         switch (path.mAttributeId)
@@ -5417,6 +5441,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case GroupKeyManagement::Id: {
         switch (path.mAttributeId)
@@ -5464,6 +5489,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case Groups::Id: {
         switch (path.mAttributeId)
@@ -5494,6 +5520,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case Identify::Id: {
         switch (path.mAttributeId)
@@ -5529,6 +5556,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case IlluminanceMeasurement::Id: {
         switch (path.mAttributeId)
@@ -5579,6 +5607,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case KeypadInput::Id: {
         switch (path.mAttributeId)
@@ -5604,6 +5633,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case LevelControl::Id: {
         switch (path.mAttributeId)
@@ -5704,6 +5734,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case LocalizationConfiguration::Id: {
         switch (path.mAttributeId)
@@ -5734,6 +5765,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case LowPower::Id: {
         switch (path.mAttributeId)
@@ -5759,6 +5791,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case MediaInput::Id: {
         switch (path.mAttributeId)
@@ -5794,6 +5827,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case MediaPlayback::Id: {
         switch (path.mAttributeId)
@@ -5849,6 +5883,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case ModeSelect::Id: {
         switch (path.mAttributeId)
@@ -5899,6 +5934,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case NetworkCommissioning::Id: {
         switch (path.mAttributeId)
@@ -5965,6 +6001,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case OtaSoftwareUpdateProvider::Id: {
         switch (path.mAttributeId)
@@ -5980,6 +6017,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case OtaSoftwareUpdateRequestor::Id: {
         switch (path.mAttributeId)
@@ -6017,6 +6055,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case OccupancySensing::Id: {
         switch (path.mAttributeId)
@@ -6057,6 +6096,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case OnOff::Id: {
         switch (path.mAttributeId)
@@ -6112,6 +6152,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case OnOffSwitchConfiguration::Id: {
         switch (path.mAttributeId)
@@ -6147,6 +6188,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case OperationalCredentials::Id: {
         switch (path.mAttributeId)
@@ -6205,6 +6247,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case PowerSource::Id: {
         switch (path.mAttributeId)
@@ -6280,6 +6323,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case PowerSourceConfiguration::Id: {
         switch (path.mAttributeId)
@@ -6310,6 +6354,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case PressureMeasurement::Id: {
         switch (path.mAttributeId)
@@ -6340,6 +6385,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case PumpConfigurationAndControl::Id: {
         switch (path.mAttributeId)
@@ -6490,6 +6536,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case RelativeHumidityMeasurement::Id: {
         switch (path.mAttributeId)
@@ -6535,6 +6582,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case Scenes::Id: {
         switch (path.mAttributeId)
@@ -6585,6 +6633,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case SoftwareDiagnostics::Id: {
         switch (path.mAttributeId)
@@ -6636,6 +6685,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case Switch::Id: {
         switch (path.mAttributeId)
@@ -6681,6 +6731,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case TargetNavigator::Id: {
         switch (path.mAttributeId)
@@ -6716,6 +6767,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case TemperatureMeasurement::Id: {
         switch (path.mAttributeId)
@@ -6751,6 +6803,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case TestCluster::Id: {
         switch (path.mAttributeId)
@@ -7179,6 +7232,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case Thermostat::Id: {
         switch (path.mAttributeId)
@@ -7284,6 +7338,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case ThermostatUserInterfaceConfiguration::Id: {
         switch (path.mAttributeId)
@@ -7324,6 +7379,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case ThreadNetworkDiagnostics::Id: {
         switch (path.mAttributeId)
@@ -7676,6 +7732,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case TimeFormatLocalization::Id: {
         switch (path.mAttributeId)
@@ -7711,6 +7768,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case UnitLocalization::Id: {
         switch (path.mAttributeId)
@@ -7736,6 +7794,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case UserLabel::Id: {
         switch (path.mAttributeId)
@@ -7761,6 +7820,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case WakeOnLan::Id: {
         switch (path.mAttributeId)
@@ -7791,6 +7851,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case WiFiNetworkDiagnostics::Id: {
         switch (path.mAttributeId)
@@ -7886,6 +7947,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     case WindowCovering::Id: {
         switch (path.mAttributeId)
@@ -8006,10 +8068,13 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
         }
+        break;
     }
     default:
-        return CHIP_NO_ERROR;
+        break;
     }
+    ChipLogProgress(chipTool, "  Don't know how to log atribute value");
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & path, chip::TLV::TLVReader * data)
@@ -8028,6 +8093,7 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             return DataModelLogger::LogValue("GetSetupPINResponse", 1, value);
         }
         }
+        break;
     }
     case ApplicationLauncher::Id: {
         switch (path.mCommandId)
@@ -8038,6 +8104,7 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             return DataModelLogger::LogValue("LauncherResponse", 1, value);
         }
         }
+        break;
     }
     case Channel::Id: {
         switch (path.mCommandId)
@@ -8048,6 +8115,7 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             return DataModelLogger::LogValue("ChangeChannelResponse", 1, value);
         }
         }
+        break;
     }
     case ContentLauncher::Id: {
         switch (path.mCommandId)
@@ -8058,6 +8126,7 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             return DataModelLogger::LogValue("LaunchResponse", 1, value);
         }
         }
+        break;
     }
     case DiagnosticLogs::Id: {
         switch (path.mCommandId)
@@ -8068,6 +8137,7 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             return DataModelLogger::LogValue("RetrieveLogsResponse", 1, value);
         }
         }
+        break;
     }
     case DoorLock::Id: {
         switch (path.mCommandId)
@@ -8098,6 +8168,7 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             return DataModelLogger::LogValue("SetCredentialResponse", 1, value);
         }
         }
+        break;
     }
     case GeneralCommissioning::Id: {
         switch (path.mCommandId)
@@ -8118,6 +8189,7 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             return DataModelLogger::LogValue("SetRegulatoryConfigResponse", 1, value);
         }
         }
+        break;
     }
     case GroupKeyManagement::Id: {
         switch (path.mCommandId)
@@ -8133,6 +8205,7 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             return DataModelLogger::LogValue("KeySetReadResponse", 1, value);
         }
         }
+        break;
     }
     case Groups::Id: {
         switch (path.mCommandId)
@@ -8158,6 +8231,7 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             return DataModelLogger::LogValue("ViewGroupResponse", 1, value);
         }
         }
+        break;
     }
     case Identify::Id: {
         switch (path.mCommandId)
@@ -8168,6 +8242,7 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             return DataModelLogger::LogValue("IdentifyQueryResponse", 1, value);
         }
         }
+        break;
     }
     case KeypadInput::Id: {
         switch (path.mCommandId)
@@ -8178,6 +8253,7 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             return DataModelLogger::LogValue("SendKeyResponse", 1, value);
         }
         }
+        break;
     }
     case MediaPlayback::Id: {
         switch (path.mCommandId)
@@ -8188,6 +8264,7 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             return DataModelLogger::LogValue("PlaybackResponse", 1, value);
         }
         }
+        break;
     }
     case NetworkCommissioning::Id: {
         switch (path.mCommandId)
@@ -8208,6 +8285,7 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             return DataModelLogger::LogValue("ScanNetworksResponse", 1, value);
         }
         }
+        break;
     }
     case OtaSoftwareUpdateProvider::Id: {
         switch (path.mCommandId)
@@ -8223,6 +8301,7 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             return DataModelLogger::LogValue("QueryImageResponse", 1, value);
         }
         }
+        break;
     }
     case OperationalCredentials::Id: {
         switch (path.mCommandId)
@@ -8231,6 +8310,11 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             OperationalCredentials::Commands::AttestationResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AttestationResponse", 1, value);
+        }
+        case OperationalCredentials::Commands::CSRResponse::Id: {
+            OperationalCredentials::Commands::CSRResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CSRResponse", 1, value);
         }
         case OperationalCredentials::Commands::CertificateChainResponse::Id: {
             OperationalCredentials::Commands::CertificateChainResponse::DecodableType value;
@@ -8242,12 +8326,8 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("NOCResponse", 1, value);
         }
-        case OperationalCredentials::Commands::OpCSRResponse::Id: {
-            OperationalCredentials::Commands::OpCSRResponse::DecodableType value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("OpCSRResponse", 1, value);
         }
-        }
+        break;
     }
     case Scenes::Id: {
         switch (path.mCommandId)
@@ -8283,6 +8363,7 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             return DataModelLogger::LogValue("ViewSceneResponse", 1, value);
         }
         }
+        break;
     }
     case TargetNavigator::Id: {
         switch (path.mCommandId)
@@ -8293,6 +8374,7 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             return DataModelLogger::LogValue("NavigateTargetResponse", 1, value);
         }
         }
+        break;
     }
     case TestCluster::Id: {
         switch (path.mCommandId)
@@ -8338,6 +8420,7 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             return DataModelLogger::LogValue("TestSpecificResponse", 1, value);
         }
         }
+        break;
     }
     case Thermostat::Id: {
         switch (path.mCommandId)
@@ -8353,10 +8436,13 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             return DataModelLogger::LogValue("GetWeeklyScheduleResponse", 1, value);
         }
         }
+        break;
     }
     default:
-        return CHIP_NO_ERROR;
+        break;
     }
+    ChipLogProgress(chipTool, "  Don't know how to log command response data");
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip::TLV::TLVReader * data)
@@ -8401,6 +8487,7 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             return DataModelLogger::LogValue("AccessControlExtensionChanged", 1, value);
         }
         }
+        break;
     }
     case Basic::Id: {
         switch (header.mPath.mEventId)
@@ -8426,6 +8513,7 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             return DataModelLogger::LogValue("ReachableChanged", 1, value);
         }
         }
+        break;
     }
     case BooleanState::Id: {
         switch (header.mPath.mEventId)
@@ -8436,6 +8524,7 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             return DataModelLogger::LogValue("StateChange", 1, value);
         }
         }
+        break;
     }
     case BridgedActions::Id: {
         switch (header.mPath.mEventId)
@@ -8451,6 +8540,7 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             return DataModelLogger::LogValue("ActionFailed", 1, value);
         }
         }
+        break;
     }
     case BridgedDeviceBasic::Id: {
         switch (header.mPath.mEventId)
@@ -8476,6 +8566,7 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             return DataModelLogger::LogValue("ReachableChanged", 1, value);
         }
         }
+        break;
     }
     case DoorLock::Id: {
         switch (header.mPath.mEventId)
@@ -8506,6 +8597,7 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             return DataModelLogger::LogValue("LockUserChange", 1, value);
         }
         }
+        break;
     }
     case GeneralDiagnostics::Id: {
         switch (header.mPath.mEventId)
@@ -8531,6 +8623,7 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             return DataModelLogger::LogValue("BootReason", 1, value);
         }
         }
+        break;
     }
     case OtaSoftwareUpdateRequestor::Id: {
         switch (header.mPath.mEventId)
@@ -8551,6 +8644,7 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             return DataModelLogger::LogValue("DownloadError", 1, value);
         }
         }
+        break;
     }
     case PumpConfigurationAndControl::Id: {
         switch (header.mPath.mEventId)
@@ -8641,6 +8735,7 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             return DataModelLogger::LogValue("TurbineOperation", 1, value);
         }
         }
+        break;
     }
     case SoftwareDiagnostics::Id: {
         switch (header.mPath.mEventId)
@@ -8651,6 +8746,7 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             return DataModelLogger::LogValue("SoftwareFault", 1, value);
         }
         }
+        break;
     }
     case Switch::Id: {
         switch (header.mPath.mEventId)
@@ -8691,6 +8787,7 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             return DataModelLogger::LogValue("MultiPressComplete", 1, value);
         }
         }
+        break;
     }
     case TestCluster::Id: {
         switch (header.mPath.mEventId)
@@ -8706,6 +8803,7 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             return DataModelLogger::LogValue("TestFabricScopedEvent", 1, value);
         }
         }
+        break;
     }
     case ThreadNetworkDiagnostics::Id: {
         switch (header.mPath.mEventId)
@@ -8716,6 +8814,7 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             return DataModelLogger::LogValue("ConnectionStatus", 1, value);
         }
         }
+        break;
     }
     case WiFiNetworkDiagnostics::Id: {
         switch (header.mPath.mEventId)
@@ -8736,8 +8835,11 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             return DataModelLogger::LogValue("ConnectionStatus", 1, value);
         }
         }
+        break;
     }
     default:
-        return CHIP_NO_ERROR;
+        break;
     }
+    ChipLogProgress(chipTool, "  Don't know how to log event data");
+    return CHIP_NO_ERROR;
 }

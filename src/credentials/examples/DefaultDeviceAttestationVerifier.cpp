@@ -150,8 +150,7 @@ public:
 
     void VerifyAttestationInformation(const ByteSpan & attestationInfoBuffer, const ByteSpan & attestationChallengeBuffer,
                                       const ByteSpan & attestationSignatureBuffer, const ByteSpan & paiDerBuffer,
-                                      const ByteSpan & dacDerBuffer, const ByteSpan & attestationNonce, VendorId vendorId,
-                                      uint16_t productId,
+                                      const ByteSpan & dacDerBuffer, const ByteSpan & attestationNonce,
                                       Callback::Callback<OnAttestationInformationVerification> * onCompletion) override;
 
     AttestationVerificationResult ValidateCertificationDeclarationSignature(const ByteSpan & cmsEnvelopeBuffer,
@@ -176,7 +175,6 @@ void DefaultDACVerifier::VerifyAttestationInformation(const ByteSpan & attestati
                                                       const ByteSpan & attestationChallengeBuffer,
                                                       const ByteSpan & attestationSignatureBuffer, const ByteSpan & paiDerBuffer,
                                                       const ByteSpan & dacDerBuffer, const ByteSpan & attestationNonce,
-                                                      VendorId vendorId, uint16_t productId,
                                                       Callback::Callback<OnAttestationInformationVerification> * onCompletion)
 {
     AttestationVerificationResult attestationError = AttestationVerificationResult::kSuccess;
@@ -273,8 +271,8 @@ void DefaultDACVerifier::VerifyAttestationInformation(const ByteSpan & attestati
         ByteSpan certificationDeclarationPayload;
 
         DeviceInfoForAttestation deviceInfo{
-            .vendorId    = vendorId,
-            .productId   = productId,
+            .vendorId    = 0xFFF1,
+            .productId   = 0x8000, // TODO: Retrieve vendorId and ProductId from Basic Information Cluster
             .dacVendorId = dacVendorId,
             .paiVendorId = dacVendorId,
         };
@@ -404,7 +402,7 @@ CHIP_ERROR DefaultDACVerifier::VerifyNodeOperationalCSRInformation(const ByteSpa
                             !attestationSignatureBuffer.empty() && !csrNonce.empty(),
                         CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrReturnError(csrNonce.size() == Controller::kOpCSRNonceLength, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(csrNonce.size() == Controller::kCSRNonceLength, CHIP_ERROR_INVALID_ARGUMENT);
 
     ByteSpan csrSpan;
     ByteSpan csrNonceSpan;

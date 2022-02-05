@@ -1170,6 +1170,8 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
     uint16_t epCount = emberAfEndpointCount();
     uint8_t attrData[ATTRIBUTE_LARGEST];
     auto * attrStorage = ignoreStorage ? nullptr : app::GetAttributePersistenceProvider();
+    // Don't check whether we actually have an attrStorage here, because it's OK
+    // to have one if none of our attributes have NVM storage.
 
     for (ep = 0; ep < epCount; ep++)
     {
@@ -1211,6 +1213,7 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
                 // First check for a persisted value.
                 if (!ignoreStorage && am->IsNonVolatile())
                 {
+                    VerifyOrDie(attrStorage && "Attribute persistence needs a persistence provider");
                     MutableByteSpan bytes(attrData);
                     CHIP_ERROR err = attrStorage->ReadValue(
                         app::ConcreteAttributePath(de->endpoint, cluster->clusterId, am->attributeId), am, bytes);
@@ -1331,8 +1334,15 @@ void emAfSaveAttributeToStorageIfNeeded(uint8_t * data, EndpointId endpoint, Clu
     }
 
     auto * attrStorage = app::GetAttributePersistenceProvider();
-    attrStorage->WriteValue(app::ConcreteAttributePath(endpoint, clusterId, metadata->attributeId), metadata,
-                            ByteSpan(data, dataSize));
+    if (attrStorage)
+    {
+        attrStorage->WriteValue(app::ConcreteAttributePath(endpoint, clusterId, metadata->attributeId), metadata,
+                                ByteSpan(data, dataSize));
+    }
+    else
+    {
+        ChipLogProgress(DataManagement, "Can't store attribute value: no persistence provider");
+    }
 }
 
 // This function returns the actual function point from the array,

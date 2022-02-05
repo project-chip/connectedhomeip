@@ -727,12 +727,12 @@ private:
     CHIP_ERROR TestWaitForCsrRequest_5()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
-        ChipLogError(chipTool, "[Endpoint: 0x%08x Cluster: Operational Credentials Command: OpCSRRequest] Wait for CSR Request",
+        ChipLogError(chipTool, "[Endpoint: 0x%08x Cluster: Operational Credentials Command: CSRRequest] Wait for CSR Request",
                      endpoint);
 
         ClearAttributeAndCommandPaths();
         mCommandPath = chip::app::ConcreteCommandPath(endpoint, chip::app::Clusters::OperationalCredentials::Id,
-                                                      chip::app::Clusters::OperationalCredentials::Commands::OpCSRRequest::Id);
+                                                      chip::app::Clusters::OperationalCredentials::Commands::CSRRequest::Id);
         return CHIP_NO_ERROR;
     }
 
