@@ -69,8 +69,8 @@ limitations under the License.
     <cluster code="0x0033"/>
     <item name="Name" type="CHAR_STRING" length="32"/>
     <item name="FabricConnected" type="BOOLEAN"/>
-    <item name="OffPremiseServicesReachableIPv4" type="BOOLEAN"/>
-    <item name="OffPremiseServicesReachableIPv6" type="BOOLEAN"/>
+    <item name="OffPremiseServicesReachableIPv4" type="BOOLEAN" isNullable="true"/>
+    <item name="OffPremiseServicesReachableIPv6" type="BOOLEAN" isNullable="true"/>
     <!-- TODO: HWADR not supported yet -->
     <item name="HardwareAddress" type="OCTET_STRING" length="8"/>
     <item name="Type" type="InterfaceType"/>
