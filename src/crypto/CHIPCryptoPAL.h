@@ -1112,24 +1112,25 @@ protected:
     /**
      * @brief Return the hash.
      *
-     * @param out    Output buffer. The size is implicit and is determined by the hash used.
+     * @param out_span Output buffer. The size available must be >= the hash size. It gets resized
+     *                 to hash size on success.
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR HashFinalize(uint8_t * out) = 0;
+    virtual CHIP_ERROR HashFinalize(MutableByteSpan & out_span) = 0;
 
     /**
      * @brief Generate a message authentication code.
      *
-     * @param key     The MAC key buffer.
-     * @param key_len The size of the MAC key in bytes.
-     * @param in      The input buffer.
-     * @param in_len  The size of the input data to MAC in bytes.
-     * @param out     The output MAC buffer. Size is implicit and is determined by the hash used.
+     * @param key      The MAC key buffer.
+     * @param key_len  The size of the MAC key in bytes.
+     * @param in       The input buffer.
+     * @param in_len   The size of the input data to MAC in bytes.
+     * @param out_span The output MAC buffer span. Size must be >= the hash_size. Output size is updated to fit on success.
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len, uint8_t * out) = 0;
+    virtual CHIP_ERROR Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len, MutableByteSpan & out_span) = 0;
 
     /**
      * @brief Verify a message authentication code.
@@ -1192,7 +1193,7 @@ public:
     ~Spake2p_P256_SHA256_HKDF_HMAC() override { Spake2p_P256_SHA256_HKDF_HMAC::Clear(); }
 
     void Clear() override;
-    CHIP_ERROR Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len, uint8_t * out) override;
+    CHIP_ERROR Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len, MutableByteSpan & out_span) override;
     CHIP_ERROR MacVerify(const uint8_t * key, size_t key_len, const uint8_t * mac, size_t mac_len, const uint8_t * in,
                          size_t in_len) override;
     CHIP_ERROR FELoad(const uint8_t * in, size_t in_len, void * fe) override;
@@ -1212,7 +1213,7 @@ public:
 protected:
     CHIP_ERROR InitImpl() override;
     CHIP_ERROR Hash(const uint8_t * in, size_t in_len) override;
-    CHIP_ERROR HashFinalize(uint8_t * out) override;
+    CHIP_ERROR HashFinalize(MutableByteSpan & out_span) override;
     CHIP_ERROR KDF(const uint8_t * secret, size_t secret_length, const uint8_t * salt, size_t salt_length, const uint8_t * info,
                    size_t info_length, uint8_t * out, size_t out_length) override;
 
