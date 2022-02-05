@@ -12119,9 +12119,9 @@ struct Type
 {
 public:
     chip::CharSpan name;
-    bool fabricConnected                 = static_cast<bool>(0);
-    bool offPremiseServicesReachableIPv4 = static_cast<bool>(0);
-    bool offPremiseServicesReachableIPv6 = static_cast<bool>(0);
+    bool fabricConnected = static_cast<bool>(0);
+    DataModel::Nullable<bool> offPremiseServicesReachableIPv4;
+    DataModel::Nullable<bool> offPremiseServicesReachableIPv6;
     chip::ByteSpan hardwareAddress;
     InterfaceType type = static_cast<InterfaceType>(0);
 

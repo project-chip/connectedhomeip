@@ -7450,19 +7450,33 @@ void CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback::CallbackFn(
                                                                    newElement_0_fabricConnectedCtorSignature.c_str(),
                                                                    entry_0.fabricConnected, newElement_0_fabricConnected);
         jobject newElement_0_offPremiseServicesReachableIPv4;
-        std::string newElement_0_offPremiseServicesReachableIPv4ClassName     = "java/lang/Boolean";
-        std::string newElement_0_offPremiseServicesReachableIPv4CtorSignature = "(Z)V";
-        chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
-            newElement_0_offPremiseServicesReachableIPv4ClassName.c_str(),
-            newElement_0_offPremiseServicesReachableIPv4CtorSignature.c_str(), entry_0.offPremiseServicesReachableIPv4,
-            newElement_0_offPremiseServicesReachableIPv4);
+        if (entry_0.offPremiseServicesReachableIPv4.IsNull())
+        {
+            newElement_0_offPremiseServicesReachableIPv4 = nullptr;
+        }
+        else
+        {
+            std::string newElement_0_offPremiseServicesReachableIPv4ClassName     = "java/lang/Boolean";
+            std::string newElement_0_offPremiseServicesReachableIPv4CtorSignature = "(Z)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
+                newElement_0_offPremiseServicesReachableIPv4ClassName.c_str(),
+                newElement_0_offPremiseServicesReachableIPv4CtorSignature.c_str(), entry_0.offPremiseServicesReachableIPv4.Value(),
+                newElement_0_offPremiseServicesReachableIPv4);
+        }
         jobject newElement_0_offPremiseServicesReachableIPv6;
-        std::string newElement_0_offPremiseServicesReachableIPv6ClassName     = "java/lang/Boolean";
-        std::string newElement_0_offPremiseServicesReachableIPv6CtorSignature = "(Z)V";
-        chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
-            newElement_0_offPremiseServicesReachableIPv6ClassName.c_str(),
-            newElement_0_offPremiseServicesReachableIPv6CtorSignature.c_str(), entry_0.offPremiseServicesReachableIPv6,
-            newElement_0_offPremiseServicesReachableIPv6);
+        if (entry_0.offPremiseServicesReachableIPv6.IsNull())
+        {
+            newElement_0_offPremiseServicesReachableIPv6 = nullptr;
+        }
+        else
+        {
+            std::string newElement_0_offPremiseServicesReachableIPv6ClassName     = "java/lang/Boolean";
+            std::string newElement_0_offPremiseServicesReachableIPv6CtorSignature = "(Z)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
+                newElement_0_offPremiseServicesReachableIPv6ClassName.c_str(),
+                newElement_0_offPremiseServicesReachableIPv6CtorSignature.c_str(), entry_0.offPremiseServicesReachableIPv6.Value(),
+                newElement_0_offPremiseServicesReachableIPv6);
+        }
         jobject newElement_0_hardwareAddress;
         jbyteArray newElement_0_hardwareAddressByteArray = env->NewByteArray(static_cast<jsize>(entry_0.hardwareAddress.size()));
         env->SetByteArrayRegion(newElement_0_hardwareAddressByteArray, 0, static_cast<jsize>(entry_0.hardwareAddress.size()),

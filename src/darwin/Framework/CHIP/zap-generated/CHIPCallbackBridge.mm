@@ -4240,8 +4240,18 @@ void CHIPGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge::OnSucce
                                                      length:entry_0.name.size()
                                                    encoding:NSUTF8StringEncoding];
         newElement_0.fabricConnected = [NSNumber numberWithBool:entry_0.fabricConnected];
-        newElement_0.offPremiseServicesReachableIPv4 = [NSNumber numberWithBool:entry_0.offPremiseServicesReachableIPv4];
-        newElement_0.offPremiseServicesReachableIPv6 = [NSNumber numberWithBool:entry_0.offPremiseServicesReachableIPv6];
+        if (entry_0.offPremiseServicesReachableIPv4.IsNull()) {
+            newElement_0.offPremiseServicesReachableIPv4 = nil;
+        } else {
+            newElement_0.offPremiseServicesReachableIPv4 =
+                [NSNumber numberWithBool:entry_0.offPremiseServicesReachableIPv4.Value()];
+        }
+        if (entry_0.offPremiseServicesReachableIPv6.IsNull()) {
+            newElement_0.offPremiseServicesReachableIPv6 = nil;
+        } else {
+            newElement_0.offPremiseServicesReachableIPv6 =
+                [NSNumber numberWithBool:entry_0.offPremiseServicesReachableIPv6.Value()];
+        }
         newElement_0.hardwareAddress = [NSData dataWithBytes:entry_0.hardwareAddress.data() length:entry_0.hardwareAddress.size()];
         newElement_0.type = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.type)];
         [array_0 addObject:newElement_0];
