@@ -16,19 +16,13 @@
  */
 #include "DeviceAttestationCredsExample.h"
 
+#include <credentials/examples/ExampleDACs.h>
+#include <credentials/examples/ExamplePAI.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
 
 // TODO: Remove once the Attestation Credentials storage mechanism is updated.
-namespace chip {
-namespace TestCerts {
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0004_Cert;
-extern const ByteSpan sTestCert_PAI_FFF1_8000_Cert;
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0004_PublicKey;
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0004_PrivateKey;
-} // namespace TestCerts
-} // namespace chip
 
 namespace chip {
 namespace Credentials {
@@ -58,12 +52,12 @@ public:
 
 CHIP_ERROR ExampleDACProvider::GetDeviceAttestationCert(MutableByteSpan & out_dac_buffer)
 {
-    return CopySpanToMutableSpan(TestCerts::sTestCert_DAC_FFF1_8000_0004_Cert, out_dac_buffer);
+    return CopySpanToMutableSpan(DevelopmentCerts::kDacCert, out_dac_buffer);
 }
 
 CHIP_ERROR ExampleDACProvider::GetProductAttestationIntermediateCert(MutableByteSpan & out_pai_buffer)
 {
-    return CopySpanToMutableSpan(TestCerts::sTestCert_PAI_FFF1_8000_Cert, out_pai_buffer);
+    return CopySpanToMutableSpan(ByteSpan(DevelopmentCerts::kDevelopmentPAI_Cert_FFF1), out_pai_buffer);
 }
 
 CHIP_ERROR ExampleDACProvider::GetCertificationDeclaration(MutableByteSpan & out_cd_buffer)
@@ -116,8 +110,7 @@ CHIP_ERROR ExampleDACProvider::SignWithDeviceAttestationKey(const ByteSpan & dig
 
     // In a non-exemplary implementation, the public key is not needed here. It is used here merely because
     // Crypto::P256Keypair is only (currently) constructable from raw keys if both private/public keys are present.
-    ReturnErrorOnFailure(LoadKeypairFromRaw(TestCerts::sTestCert_DAC_FFF1_8000_0004_PrivateKey,
-                                            TestCerts::sTestCert_DAC_FFF1_8000_0004_PublicKey, keypair));
+    ReturnErrorOnFailure(LoadKeypairFromRaw(DevelopmentCerts::kDacPrivateKey, DevelopmentCerts::kDacPublicKey, keypair));
     ReturnErrorOnFailure(keypair.ECDSA_sign_hash(digest_to_sign.data(), digest_to_sign.size(), signature));
 
     return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, out_signature_buffer);
