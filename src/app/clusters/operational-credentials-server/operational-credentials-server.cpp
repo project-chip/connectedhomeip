@@ -661,7 +661,7 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
     Platform::ScopedMemoryBuffer<uint8_t> attestationElements;
     size_t attestationElementsLen = 0;
     MutableByteSpan attestationElementsSpan;
-    uint8_t certDeclBuf[512];
+    uint8_t certDeclBuf[541]; // Sized to hold the example certificate declaration wtih 100 PIDs. See DeviceAttestationCredsExample
     MutableByteSpan certDeclSpan(certDeclBuf);
     Credentials::DeviceAttestationCredentialsProvider * dacProvider = Credentials::GetDeviceAttestationCredentialsProvider();
 
