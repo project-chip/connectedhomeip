@@ -31,9 +31,9 @@ using namespace chip::Thread;
 namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
-// NOTE: For ThreadDriver, we uses two network configs, one is mSavedNetwork, and another is mStagingNetwork, during init, it will
+// NOTE: For ThreadDriver, we use two network configs, one is mSavedNetwork, and another is mStagingNetwork, during init, it will
 // load the network config from thread persistent info, and loads it into both mSavedNetwork and mStagingNetwork. When updating the
-// networks, all changed are made on the staging network. When validated we can commit it and save it to the persisten info
+// networks, all changes are made on the staging network. When validated we can commit it and save it to the persistent info
 
 CHIP_ERROR GenericThreadDriver::Init()
 {
@@ -49,9 +49,9 @@ CHIP_ERROR GenericThreadDriver::Init()
 
 CHIP_ERROR GenericThreadDriver::CommitConfiguration()
 {
-    // Note: on AttachToThreadNetwork OpenThread will persist the networks by their own,
+    // Note: on AttachToThreadNetwork OpenThread will persist the networks on its own,
     // we don't have much to do for saving the networks (see Init() above,
-    // we just loads the saved dataset from ot instance.)
+    // we just load the saved dataset from ot instance.)
     mSavedNetwork = mStagingNetwork;
     return CHIP_NO_ERROR;
 }
@@ -71,6 +71,11 @@ Status GenericThreadDriver::AddOrUpdateNetwork(ByteSpan operationalDataset)
     newDataset.Init(operationalDataset);
     VerifyOrReturnError(newDataset.IsCommissioned(), Status::kOutOfRange);
 
+    newDataset.GetExtendedPanId(newExtpanid);
+    mStagingNetwork.GetExtendedPanId(extpanid);
+
+    // We only support one active operational dataset. Add/Update based on either:
+    // Staging network not commissioned yet (active) or we are updating the dataset with same Extended Pan ID.
     VerifyOrReturnError(!mStagingNetwork.IsCommissioned() || memcmp(extpanid, newExtpanid, kSizeExtendedPanId) == 0,
                         Status::kBoundsExceeded);
 

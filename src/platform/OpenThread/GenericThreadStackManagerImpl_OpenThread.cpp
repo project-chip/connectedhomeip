@@ -313,8 +313,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetThreadProvis
         return MapOpenThreadError(otErr);
     }
 
-    assert(Thread::kSizeOperationalDataset <= netInfo.size());
-    netInfo = ByteSpan(datasetTlv.mTlvs, datasetTlv.mLength);
+    ReturnErrorOnFailure(mActiveDataset.Init(ByteSpan(datasetTlv.mTlvs, datasetTlv.mLength)));
+    netInfo = mActiveDataset.AsByteSpan();
 
     return CHIP_NO_ERROR;
 }

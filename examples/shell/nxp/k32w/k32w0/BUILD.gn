@@ -45,7 +45,7 @@ k32w0_sdk("sdk") {
   ]
 
   defines = [
-    # shell app use openthread but do not have the NETWORK_COMMISSIONING cluster or zap config.
+    # shell app uses openthread but does not have the NETWORK_COMMISSIONING cluster or zap config.
     "_NO_NETWORK_COMMISSIONING_DRIVER_",
   ]
 

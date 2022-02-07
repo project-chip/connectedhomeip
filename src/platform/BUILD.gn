@@ -301,7 +301,7 @@ if (chip_device_platform != "none") {
       "PlatformEventSupport.cpp",
     ]
 
-    # Linux has his own NetworkCommissioningThreadDriver
+    # Linux has its own NetworkCommissioningThreadDriver
     if (chip_enable_openthread && chip_device_platform != "linux") {
       sources += [
         "OpenThread/GenericNetworkCommissioningThreadDriver.cpp",
