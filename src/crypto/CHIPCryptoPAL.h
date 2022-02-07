@@ -1356,24 +1356,28 @@ public:
     virtual ~SymmetricKeyContext() = default;
     /**
      * @brief Perform the message encryption as described in 4.7.2. (Security Processing of Outgoing Messages)
-     * @param[in,out] plaintext     Outgoing message payload.
+     * @param[in] plaintext     Outgoing message payload.
      * @param[in] aad           Additional data (message header contents)
      * @param[in] nonce         Nonce (Security Flags | Message Counter | Source Node ID)
-     * @param[out] out_mic      Outgoing Message Integrity Check
+     * @param[out] mic          Outgoing Message Integrity Check
+     * @param[out] ciphertext   Outgoing encrypted payload. Must be at least as big as plaintext. The same buffer may be used both
+     * for ciphertext, and plaintext.
      * @return CHIP_ERROR
      */
-    virtual CHIP_ERROR EncryptMessage(MutableByteSpan & plaintext, const ByteSpan & aad, const ByteSpan & nonce,
-                                      MutableByteSpan & out_mic) const = 0;
+    virtual CHIP_ERROR EncryptMessage(const ByteSpan & plaintext, const ByteSpan & aad, const ByteSpan & nonce,
+                                      MutableByteSpan & mic, MutableByteSpan & ciphertext) const = 0;
     /**
      * @brief Perform the message decryption as described in 4.7.3.(Security Processing of Incoming Messages)
-     * @param[in,out] ciphertext Incoming encrypted payload
-     * @param[in] aad   Additional data (message header contents)
-     * @param[in] nonce Nonce (Security Flags | Message Counter | Source Node ID)
-     * @param[in] mic   Incoming Message Integrity Check
+     * @param[in] ciphertext    Incoming encrypted payload
+     * @param[in] aad           Additional data (message header contents)
+     * @param[in] nonce         Nonce (Security Flags | Message Counter | Source Node ID)
+     * @param[in] mic           Incoming Message Integrity Check
+     * @param[out] plaintext     Incoming message payload. Must be at least as big as ciphertext. The same buffer may be used both
+     * for plaintext, and ciphertext.
      * @return CHIP_ERROR
      */
-    virtual CHIP_ERROR DecryptMessage(MutableByteSpan & ciphertext, const ByteSpan & aad, const ByteSpan & nonce,
-                                      const ByteSpan & mic) const = 0;
+    virtual CHIP_ERROR DecryptMessage(const ByteSpan & ciphertext, const ByteSpan & aad, const ByteSpan & nonce,
+                                      const ByteSpan & mic, MutableByteSpan & plaintext) const = 0;
 
     /**
      * @brief Perform privacy encoding as described in 4.8.2. (Privacy Processing of Outgoing Messages)

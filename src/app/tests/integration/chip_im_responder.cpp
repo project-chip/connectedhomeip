@@ -45,11 +45,27 @@
 namespace chip {
 namespace app {
 
-bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
+Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
 {
     // The Mock cluster catalog -- only have one command on one cluster on one endpoint.
-    return (aCommandPath.mEndpointId == kTestEndpointId && aCommandPath.mClusterId == kTestClusterId &&
-            aCommandPath.mCommandId == kTestCommandId);
+    using Protocols::InteractionModel::Status;
+
+    if (aCommandPath.mEndpointId != kTestEndpointId)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+
+    if (aCommandPath.mClusterId != kTestClusterId)
+    {
+        return Status::UnsupportedCluster;
+    }
+
+    if (aCommandPath.mCommandId != kTestCommandId)
+    {
+        return Status::UnsupportedCommand;
+    }
+
+    return Status::Success;
 }
 
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip::TLV::TLVReader & aReader,
@@ -57,7 +73,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
 {
     static bool statusCodeFlipper = false;
 
-    if (!ServerClusterCommandExists(aCommandPath))
+    if (ServerClusterCommandExists(aCommandPath) != Protocols::InteractionModel::Status::Success)
     {
         return;
     }

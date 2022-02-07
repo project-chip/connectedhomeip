@@ -84,6 +84,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_CLUSTERS}/basic/basic.cpp
                ${APP_CLUSTERS}/bindings/BindingManager.cpp
                ${APP_CLUSTERS}/bindings/bindings.cpp
+               ${APP_CLUSTERS}/bindings/PendingNotificationMap.cpp
                ${APP_CLUSTERS}/on-off-server/on-off-server.cpp
                ${APP_CLUSTERS}/access-control-server/access-control-server.cpp
                ${APP_CLUSTERS}/account-login-server/account-login-server.cpp

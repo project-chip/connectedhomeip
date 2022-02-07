@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -248,7 +248,7 @@ public:
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
     CHIP_ERROR ComputePASEVerifier(uint32_t iterations, uint32_t setupPincode, const ByteSpan & salt, PASEVerifier & outVerifier,
-                                   uint32_t & outPasscodeId);
+                                   PasscodeId & outPasscodeId);
 
     /**
      * @brief
@@ -270,7 +270,7 @@ public:
      *
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
-    CHIP_ERROR OpenCommissioningWindow(NodeId deviceId, uint16_t timeout, uint16_t iteration, uint16_t discriminator,
+    CHIP_ERROR OpenCommissioningWindow(NodeId deviceId, uint16_t timeout, uint32_t iteration, uint16_t discriminator,
                                        uint8_t option, SetupPayload & payload)
     {
         mSuggestedSetUpPINCode = payload.setUpPINCode;
@@ -301,30 +301,9 @@ public:
      *
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
-    CHIP_ERROR OpenCommissioningWindowWithCallback(NodeId deviceId, uint16_t timeout, uint16_t iteration, uint16_t discriminator,
+    CHIP_ERROR OpenCommissioningWindowWithCallback(NodeId deviceId, uint16_t timeout, uint32_t iteration, uint16_t discriminator,
                                                    uint8_t option, Callback::Callback<OnOpenCommissioningWindow> * callback,
                                                    bool readVIDPIDAttributes = false);
-
-    /**
-     * @brief
-     *   Add a binding.
-     *
-     * @param[in] deviceId           The device Id.
-     * @param[in] deviceEndpointId   The endpoint on the device containing the binding cluster.
-     * @param[in] bindingNodeId      The NodeId for the binding that will be created.
-     * @param[in] bindingGroupId     The GroupId for the binding that will be created.
-     * @param[in] bindingEndpointId  The EndpointId for the binding that will be created.
-     * @param[in] bindingClusterId   The ClusterId for the binding that will be created.
-     * @param[in] onSuccessCallback        The function to be called on success of adding the binding.
-     * @param[in] onFailureCallback        The function to be called on failure of adding the binding.
-     *
-     * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
-     */
-    CHIP_ERROR
-    CreateBindingWithCallback(chip::NodeId deviceId, chip::EndpointId deviceEndpointId, chip::NodeId bindingNodeId,
-                              chip::GroupId bindingGroupId, chip::EndpointId bindingEndpointId, chip::ClusterId bindingClusterId,
-                              CommandResponseSuccessCallback<app::DataModel::NullObjectType> successCb,
-                              CommandResponseFailureCallback failureCb);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     void RegisterDeviceAddressUpdateDelegate(DeviceAddressUpdateDelegate * delegate) { mDeviceAddressUpdateDelegate = delegate; }
@@ -426,7 +405,7 @@ private:
     uint32_t mSuggestedSetUpPINCode = 0;
 
     uint16_t mCommissioningWindowTimeout;
-    uint16_t mCommissioningWindowIteration;
+    uint32_t mCommissioningWindowIteration;
 
     CommissioningWindowOption mCommissioningWindowOption;
 
@@ -434,7 +413,7 @@ private:
     static void OnOpenPairingWindowFailureResponse(void * context, CHIP_ERROR error);
 
     CHIP_ERROR ProcessControllerNOCChain(const ControllerInitParams & params);
-    uint16_t mPAKEVerifierID = 1;
+    PasscodeId mPAKEVerifierID = 1;
 };
 
 /**

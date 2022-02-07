@@ -504,6 +504,7 @@ ImplClass
 implementers
 imx
 imxlinux
+incomingCommands
 indexhtml
 Inet
 InetLayer
@@ -550,6 +551,7 @@ jupyterlab
 KA
 Kconfig
 KeypadInput
+kInvalidCommandId
 KitProg
 kNodeIdNotSpecified
 knownissues
@@ -716,6 +718,7 @@ nrfdks
 nrfutil
 nrfxlib
 NTAG
+nullptr
 NUM
 nwk
 NXP
@@ -763,6 +766,7 @@ otasoftwareupdaterequestor
 otaURL
 OTBR
 otcli
+outgoingCommands
 PAA
 PacketBuffer
 PAI

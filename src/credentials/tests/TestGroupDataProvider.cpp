@@ -1050,7 +1050,7 @@ void TestGroupDecryption(nlTestSuite * apSuite, void * apContext)
     //
 
     // Load the plaintext to encrypt
-    memcpy(ciphertext_buffer, kMessage, sizeof(kMessage));
+    memcpy(plaintext_buffer, kMessage, sizeof(kMessage));
 
     // Get the key context
     Crypto::SymmetricKeyContext * key_context = provider->GetKeyContext(kFabric2, kGroup2);
@@ -1058,9 +1058,10 @@ void TestGroupDecryption(nlTestSuite * apSuite, void * apContext)
     uint16_t session_id = key_context->GetKeyHash();
 
     // Encrypt the message
-    NL_TEST_ASSERT(apSuite,
-                   CHIP_NO_ERROR ==
-                       key_context->EncryptMessage(ciphertext, ByteSpan(aad, sizeof(aad)), ByteSpan(nonce, sizeof(nonce)), tag));
+    NL_TEST_ASSERT(
+        apSuite,
+        CHIP_NO_ERROR ==
+            key_context->EncryptMessage(plaintext, ByteSpan(aad, sizeof(aad)), ByteSpan(nonce, sizeof(nonce)), tag, ciphertext));
 
     // The ciphertext must be different to the original message
     NL_TEST_ASSERT(apSuite, memcmp(ciphertext.data(), kMessage, sizeof(kMessage)));
@@ -1088,14 +1089,11 @@ void TestGroupDecryption(nlTestSuite * apSuite, void * apContext)
             NL_TEST_ASSERT(apSuite, expected.count(found) > 0);
             NL_TEST_ASSERT(apSuite, session.key != nullptr);
 
-            // Load ciphertext to decrypt
-            memcpy(plaintext_buffer, ciphertext_buffer, sizeof(plaintext_buffer));
-
             // Decrypt de ciphertext
-            NL_TEST_ASSERT(
-                apSuite,
-                CHIP_NO_ERROR ==
-                    session.key->DecryptMessage(plaintext, ByteSpan(aad, sizeof(aad)), ByteSpan(nonce, sizeof(nonce)), tag));
+            NL_TEST_ASSERT(apSuite,
+                           CHIP_NO_ERROR ==
+                               session.key->DecryptMessage(ciphertext, ByteSpan(aad, sizeof(aad)), ByteSpan(nonce, sizeof(nonce)),
+                                                           tag, plaintext));
 
             // The new plaintext must match the original message
             NL_TEST_ASSERT(apSuite, 0 == memcmp(plaintext.data(), kMessage, sizeof(kMessage)));

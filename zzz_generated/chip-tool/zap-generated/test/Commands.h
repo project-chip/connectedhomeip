@@ -40758,12 +40758,8 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Reads CurrentMaxRate attribute from DUT\n");
-            err = TestReadsCurrentMaxRateAttributeFromDut_1();
-            break;
-        case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Reads CurrentMaxRate attribute constraints\n");
-            err = TestReadsCurrentMaxRateAttributeConstraints_2();
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Reads NetworkInterface structure attribute from DUT\n");
+            err = TestReadsNetworkInterfaceStructureAttributeFromDut_1();
             break;
         }
 
@@ -40776,7 +40772,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 3;
+    const uint16_t mTestCount = 2;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
@@ -40786,19 +40782,12 @@ private:
         (static_cast<Test_TC_WIFIDIAG_1_1 *>(context))->OnFailureResponse_1(error);
     }
 
-    static void OnSuccessCallback_1(void * context, uint64_t currentMaxRate)
+    static void OnSuccessCallback_1(
+        void * context,
+        const chip::app::DataModel::DecodableList<
+            chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType> & networkInterfaces)
     {
-        (static_cast<Test_TC_WIFIDIAG_1_1 *>(context))->OnSuccessResponse_1(currentMaxRate);
-    }
-
-    static void OnFailureCallback_2(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_WIFIDIAG_1_1 *>(context))->OnFailureResponse_2(error);
-    }
-
-    static void OnSuccessCallback_2(void * context, uint64_t currentMaxRate)
-    {
-        (static_cast<Test_TC_WIFIDIAG_1_1 *>(context))->OnSuccessResponse_2(currentMaxRate);
+        (static_cast<Test_TC_WIFIDIAG_1_1 *>(context))->OnSuccessResponse_1(networkInterfaces);
     }
 
     //
@@ -40811,14 +40800,14 @@ private:
         return WaitForCommissionee();
     }
 
-    CHIP_ERROR TestReadsCurrentMaxRateAttributeFromDut_1()
+    CHIP_ERROR TestReadsNetworkInterfaceStructureAttributeFromDut_1()
     {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::WiFiNetworkDiagnosticsClusterTest cluster;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::GeneralDiagnosticsClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ReturnErrorOnFailure(
-            cluster.ReadAttribute<chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::TypeInfo>(
+            cluster.ReadAttribute<chip::app::Clusters::GeneralDiagnostics::Attributes::NetworkInterfaces::TypeInfo>(
                 this, OnSuccessCallback_1, OnFailureCallback_1));
         return CHIP_NO_ERROR;
     }
@@ -40826,37 +40815,14 @@ private:
     void OnFailureResponse_1(CHIP_ERROR error)
     {
         chip::app::StatusIB status(error);
-        (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
+        ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1(uint64_t currentMaxRate)
+    void
+    OnSuccessResponse_1(const chip::app::DataModel::DecodableList<
+                        chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType> & networkInterfaces)
     {
-        VerifyOrReturn(CheckValue("currentMaxRate", currentMaxRate, 0ULL));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadsCurrentMaxRateAttributeConstraints_2()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::WiFiNetworkDiagnosticsClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(
-            cluster.ReadAttribute<chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::TypeInfo>(
-                this, OnSuccessCallback_2, OnFailureCallback_2));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_2(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_2(uint64_t currentMaxRate)
-    {
-        VerifyOrReturn(CheckConstraintType("currentMaxRate", "", "uint64"));
+        VerifyOrReturn(CheckConstraintType("networkInterfaces", "", "list"));
         NextTest();
     }
 };
@@ -44879,10 +44845,11 @@ private:
         using RequestType               = chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppRequest::Type;
 
         RequestType request;
-        request.data = chip::Span<const char>("datagarbage: not in length on purpose", 4);
 
         request.application.catalogVendorId = 123U;
         request.application.applicationId   = chip::Span<const char>("applicationIdgarbage: not in length on purpose", 13);
+
+        request.data = chip::ByteSpan(chip::Uint8::from_const_char("datagarbage: not in length on purpose"), 4);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_2(data.status, data.data);
@@ -44902,11 +44869,11 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_2(chip::app::Clusters::ApplicationLauncher::StatusEnum status, chip::CharSpan data)
+    void OnSuccessResponse_2(chip::app::Clusters::ApplicationLauncher::StatusEnum status, chip::ByteSpan data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
-        VerifyOrReturn(CheckValueAsString("data", data, chip::CharSpan("data", 4)));
+        VerifyOrReturn(CheckValueAsString("data", data, chip::ByteSpan(chip::Uint8::from_const_char("data"), 4)));
 
         NextTest();
     }
@@ -44939,11 +44906,11 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3(chip::app::Clusters::ApplicationLauncher::StatusEnum status, chip::CharSpan data)
+    void OnSuccessResponse_3(chip::app::Clusters::ApplicationLauncher::StatusEnum status, chip::ByteSpan data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
-        VerifyOrReturn(CheckValueAsString("data", data, chip::CharSpan("data", 4)));
+        VerifyOrReturn(CheckValueAsString("data", data, chip::ByteSpan(chip::Uint8::from_const_char("data"), 4)));
 
         NextTest();
     }
@@ -44976,11 +44943,11 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4(chip::app::Clusters::ApplicationLauncher::StatusEnum status, chip::CharSpan data)
+    void OnSuccessResponse_4(chip::app::Clusters::ApplicationLauncher::StatusEnum status, chip::ByteSpan data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
-        VerifyOrReturn(CheckValueAsString("data", data, chip::CharSpan("data", 4)));
+        VerifyOrReturn(CheckValueAsString("data", data, chip::ByteSpan(chip::Uint8::from_const_char("data"), 4)));
 
         NextTest();
     }
@@ -56704,7 +56671,7 @@ private:
     void OnFailureResponse_144(CHIP_ERROR error)
     {
         chip::app::StatusIB status(error);
-        VerifyOrReturn(CheckConstraintNotValue("status", chip::to_underlying(status.mStatus), 0));
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT));
         NextTest();
     }
 
@@ -56732,7 +56699,7 @@ private:
     void OnFailureResponse_145(CHIP_ERROR error)
     {
         chip::app::StatusIB status(error);
-        VerifyOrReturn(CheckConstraintNotValue("status", chip::to_underlying(status.mStatus), 0));
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER));
         NextTest();
     }
 
@@ -62526,7 +62493,7 @@ private:
     void OnFailureResponse_360(CHIP_ERROR error)
     {
         chip::app::StatusIB status(error);
-        VerifyOrReturn(CheckConstraintNotValue("status", chip::to_underlying(status.mStatus), 0));
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT));
         NextTest();
     }
 
@@ -62546,7 +62513,7 @@ private:
     void OnFailureResponse_361(CHIP_ERROR error)
     {
         chip::app::StatusIB status(error);
-        VerifyOrReturn(CheckConstraintNotValue("status", chip::to_underlying(status.mStatus), 0));
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER));
         NextTest();
     }
 
@@ -73039,26 +73006,35 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Reads CurrentHeapFree non-global attribute value from DUT\n");
-            err = TestReadsCurrentHeapFreeNonGlobalAttributeValueFromDut_1();
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Reads a list of ThreadMetrics struct non-global attribute from DUT.\n");
+            if (ShouldSkip("A_THREADMETRICS"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsAListOfThreadMetricsStructNonGlobalAttributeFromDut_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Reads CurrentHeapUsed non-global attribute value from DUT\n");
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Reads CurrentHeapFree non-global attribute value from DUT\n");
+            err = TestReadsCurrentHeapFreeNonGlobalAttributeValueFromDut_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Reads CurrentHeapUsed non-global attribute value from DUT\n");
             if (ShouldSkip("A_CURRENTHEAPUSED"))
             {
                 NextTest();
                 return;
             }
-            err = TestReadsCurrentHeapUsedNonGlobalAttributeValueFromDut_2();
+            err = TestReadsCurrentHeapUsedNonGlobalAttributeValueFromDut_3();
             break;
-        case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Reads CurrentHeapHighWaterMark non-global attribute value from DUT\n");
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Reads CurrentHeapHighWaterMark non-global attribute value from DUT\n");
             if (ShouldSkip("A_CURRENTHEAPHIGHWATERMARK"))
             {
                 NextTest();
                 return;
             }
-            err = TestReadsCurrentHeapHighWaterMarkNonGlobalAttributeValueFromDut_3();
+            err = TestReadsCurrentHeapHighWaterMarkNonGlobalAttributeValueFromDut_4();
             break;
         }
 
@@ -73071,7 +73047,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 4;
+    const uint16_t mTestCount = 5;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
@@ -73081,9 +73057,12 @@ private:
         (static_cast<Test_TC_SWDIAG_1_1 *>(context))->OnFailureResponse_1(error);
     }
 
-    static void OnSuccessCallback_1(void * context, uint64_t currentHeapFree)
+    static void OnSuccessCallback_1(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
+            threadMetrics)
     {
-        (static_cast<Test_TC_SWDIAG_1_1 *>(context))->OnSuccessResponse_1(currentHeapFree);
+        (static_cast<Test_TC_SWDIAG_1_1 *>(context))->OnSuccessResponse_1(threadMetrics);
     }
 
     static void OnFailureCallback_2(void * context, CHIP_ERROR error)
@@ -73091,9 +73070,9 @@ private:
         (static_cast<Test_TC_SWDIAG_1_1 *>(context))->OnFailureResponse_2(error);
     }
 
-    static void OnSuccessCallback_2(void * context, uint64_t currentHeapUsed)
+    static void OnSuccessCallback_2(void * context, uint64_t currentHeapFree)
     {
-        (static_cast<Test_TC_SWDIAG_1_1 *>(context))->OnSuccessResponse_2(currentHeapUsed);
+        (static_cast<Test_TC_SWDIAG_1_1 *>(context))->OnSuccessResponse_2(currentHeapFree);
     }
 
     static void OnFailureCallback_3(void * context, CHIP_ERROR error)
@@ -73101,9 +73080,19 @@ private:
         (static_cast<Test_TC_SWDIAG_1_1 *>(context))->OnFailureResponse_3(error);
     }
 
-    static void OnSuccessCallback_3(void * context, uint64_t currentHeapHighWatermark)
+    static void OnSuccessCallback_3(void * context, uint64_t currentHeapUsed)
     {
-        (static_cast<Test_TC_SWDIAG_1_1 *>(context))->OnSuccessResponse_3(currentHeapHighWatermark);
+        (static_cast<Test_TC_SWDIAG_1_1 *>(context))->OnSuccessResponse_3(currentHeapUsed);
+    }
+
+    static void OnFailureCallback_4(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_SWDIAG_1_1 *>(context))->OnFailureResponse_4(error);
+    }
+
+    static void OnSuccessCallback_4(void * context, uint64_t currentHeapHighWatermark)
+    {
+        (static_cast<Test_TC_SWDIAG_1_1 *>(context))->OnSuccessResponse_4(currentHeapHighWatermark);
     }
 
     //
@@ -73116,13 +73105,13 @@ private:
         return WaitForCommissionee();
     }
 
-    CHIP_ERROR TestReadsCurrentHeapFreeNonGlobalAttributeValueFromDut_1()
+    CHIP_ERROR TestReadsAListOfThreadMetricsStructNonGlobalAttributeFromDut_1()
     {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::SoftwareDiagnosticsClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapFree::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::ThreadMetrics::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1));
         return CHIP_NO_ERROR;
     }
@@ -73130,22 +73119,24 @@ private:
     void OnFailureResponse_1(CHIP_ERROR error)
     {
         chip::app::StatusIB status(error);
-        (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
+        ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1(uint64_t currentHeapFree)
+    void OnSuccessResponse_1(
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
+            threadMetrics)
     {
-        VerifyOrReturn(CheckConstraintType("currentHeapFree", "", "uint64"));
+
         NextTest();
     }
 
-    CHIP_ERROR TestReadsCurrentHeapUsedNonGlobalAttributeValueFromDut_2()
+    CHIP_ERROR TestReadsCurrentHeapFreeNonGlobalAttributeValueFromDut_2()
     {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::SoftwareDiagnosticsClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapUsed::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapFree::TypeInfo>(
             this, OnSuccessCallback_2, OnFailureCallback_2));
         return CHIP_NO_ERROR;
     }
@@ -73156,21 +73147,20 @@ private:
         (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_2(uint64_t currentHeapUsed)
+    void OnSuccessResponse_2(uint64_t currentHeapFree)
     {
-        VerifyOrReturn(CheckConstraintType("currentHeapUsed", "", "uint64"));
+        VerifyOrReturn(CheckConstraintType("currentHeapFree", "", "uint64"));
         NextTest();
     }
 
-    CHIP_ERROR TestReadsCurrentHeapHighWaterMarkNonGlobalAttributeValueFromDut_3()
+    CHIP_ERROR TestReadsCurrentHeapUsedNonGlobalAttributeValueFromDut_3()
     {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::SoftwareDiagnosticsClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(
-            cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::TypeInfo>(
-                this, OnSuccessCallback_3, OnFailureCallback_3));
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapUsed::TypeInfo>(
+            this, OnSuccessCallback_3, OnFailureCallback_3));
         return CHIP_NO_ERROR;
     }
 
@@ -73180,7 +73170,31 @@ private:
         (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3(uint64_t currentHeapHighWatermark)
+    void OnSuccessResponse_3(uint64_t currentHeapUsed)
+    {
+        VerifyOrReturn(CheckConstraintType("currentHeapUsed", "", "uint64"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsCurrentHeapHighWaterMarkNonGlobalAttributeValueFromDut_4()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::SoftwareDiagnosticsClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::TypeInfo>(
+                this, OnSuccessCallback_4, OnFailureCallback_4));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_4(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_4(uint64_t currentHeapHighWatermark)
     {
         VerifyOrReturn(CheckConstraintType("currentHeapHighWatermark", "", "uint64"));
         NextTest();
@@ -73287,22 +73301,31 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Reads CurrentHeapUsed attribute value from DUT\n");
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Sends ResetWatermarks to DUT\n");
+            if (ShouldSkip("CR_RESETWATERMARKS"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSendsResetWatermarksToDut_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Reads CurrentHeapUsed attribute value from DUT\n");
             if (ShouldSkip("A_CURRENTHEAPUSED"))
             {
                 NextTest();
                 return;
             }
-            err = TestReadsCurrentHeapUsedAttributeValueFromDut_1();
+            err = TestReadsCurrentHeapUsedAttributeValueFromDut_2();
             break;
-        case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Reads CurrentHeapHighWaterMark attribute value from DUT\n");
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Reads CurrentHeapHighWaterMark attribute value from DUT\n");
             if (ShouldSkip("A_CURRENTHEAPHIGHWATERMARK"))
             {
                 NextTest();
                 return;
             }
-            err = TestReadsCurrentHeapHighWaterMarkAttributeValueFromDut_2();
+            err = TestReadsCurrentHeapHighWaterMarkAttributeValueFromDut_3();
             break;
         }
 
@@ -73315,29 +73338,29 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 3;
+    const uint16_t mTestCount = 4;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
-
-    static void OnFailureCallback_1(void * context, CHIP_ERROR error)
-    {
-        (static_cast<Test_TC_SWDIAG_3_1 *>(context))->OnFailureResponse_1(error);
-    }
-
-    static void OnSuccessCallback_1(void * context, uint64_t currentHeapUsed)
-    {
-        (static_cast<Test_TC_SWDIAG_3_1 *>(context))->OnSuccessResponse_1(currentHeapUsed);
-    }
 
     static void OnFailureCallback_2(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_SWDIAG_3_1 *>(context))->OnFailureResponse_2(error);
     }
 
-    static void OnSuccessCallback_2(void * context, uint64_t currentHeapHighWatermark)
+    static void OnSuccessCallback_2(void * context, uint64_t currentHeapUsed)
     {
-        (static_cast<Test_TC_SWDIAG_3_1 *>(context))->OnSuccessResponse_2(currentHeapHighWatermark);
+        (static_cast<Test_TC_SWDIAG_3_1 *>(context))->OnSuccessResponse_2(currentHeapUsed);
+    }
+
+    static void OnFailureCallback_3(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_SWDIAG_3_1 *>(context))->OnFailureResponse_3(error);
+    }
+
+    static void OnSuccessCallback_3(void * context, uint64_t currentHeapHighWatermark)
+    {
+        (static_cast<Test_TC_SWDIAG_3_1 *>(context))->OnSuccessResponse_3(currentHeapHighWatermark);
     }
 
     //
@@ -73350,39 +73373,41 @@ private:
         return WaitForCommissionee();
     }
 
-    CHIP_ERROR TestReadsCurrentHeapUsedAttributeValueFromDut_1()
+    CHIP_ERROR TestSendsResetWatermarksToDut_1()
     {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::SoftwareDiagnosticsClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        using RequestType               = chip::app::Clusters::SoftwareDiagnostics::Commands::ResetWatermarks::Type;
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapUsed::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_SWDIAG_3_1 *>(context))->OnSuccessResponse_1();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<Test_TC_SWDIAG_3_1 *>(context))->OnFailureResponse_1(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_1(CHIP_ERROR error)
     {
         chip::app::StatusIB status(error);
-        (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
+        ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1(uint64_t currentHeapUsed)
-    {
-        VerifyOrReturn(CheckValue("currentHeapUsed", currentHeapUsed, 0ULL));
+    void OnSuccessResponse_1() { NextTest(); }
 
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadsCurrentHeapHighWaterMarkAttributeValueFromDut_2()
+    CHIP_ERROR TestReadsCurrentHeapUsedAttributeValueFromDut_2()
     {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::SoftwareDiagnosticsClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(
-            cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::TypeInfo>(
-                this, OnSuccessCallback_2, OnFailureCallback_2));
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapUsed::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2));
         return CHIP_NO_ERROR;
     }
 
@@ -73392,7 +73417,32 @@ private:
         (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_2(uint64_t currentHeapHighWatermark)
+    void OnSuccessResponse_2(uint64_t currentHeapUsed)
+    {
+        VerifyOrReturn(CheckValue("currentHeapUsed", currentHeapUsed, 0ULL));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsCurrentHeapHighWaterMarkAttributeValueFromDut_3()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::SoftwareDiagnosticsClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::TypeInfo>(
+                this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        (status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_3(uint64_t currentHeapHighWatermark)
     {
         VerifyOrReturn(CheckValue("currentHeapHighWatermark", currentHeapHighWatermark, 0ULL));
 

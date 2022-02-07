@@ -63,7 +63,8 @@ constexpr uint32_t kSetupPINCodeMaximumValue = 99999998;
 
 using namespace Crypto;
 
-constexpr size_t kSpake2p_WS_Length = kP256_FE_Length + 8;
+constexpr size_t kSpake2p_WS_Length             = kP256_FE_Length + 8;
+constexpr size_t kSpake2pSerializedVerifierSize = kSpake2p_WS_Length * 2;
 
 struct PASESessionSerialized;
 
@@ -76,10 +77,24 @@ struct PASESessionSerializable
     uint16_t mPeerSessionId;
 };
 
+/** @brief Serialized format of the PASE Verifier components.
+ *
+ *  This is used when the Verifier should be presented in a serialized form.
+ *  For example, when it is generated using PBKDF function, when stored in the
+ *  memory or when sent over the wire.
+ *  The serialized format is concatentation of 'W0' and 'L' verifier components
+ *  each exactly 'kSpake2p_WS_Length' bytes of length:
+ *      { PASEVerifier.mW0[kSpake2p_WS_Length], PASEVerifier.mL[kSpake2p_WS_Length] }
+ **/
+typedef uint8_t PASEVerifierSerialized[kSpake2pSerializedVerifierSize];
+
 struct PASEVerifier
 {
     uint8_t mW0[kSpake2p_WS_Length];
     uint8_t mL[kSpake2p_WS_Length];
+
+    CHIP_ERROR Serialize(MutableByteSpan & outSerialized);
+    CHIP_ERROR Deserialize(ByteSpan inSerialized);
 };
 
 class DLL_EXPORT PASESession : public Messaging::ExchangeDelegate, public PairingSession
@@ -123,7 +138,7 @@ public:
      *
      * @return CHIP_ERROR     The result of initialization
      */
-    CHIP_ERROR WaitForPairing(const PASEVerifier & verifier, uint32_t pbkdf2IterCount, const ByteSpan & salt, uint16_t passcodeID,
+    CHIP_ERROR WaitForPairing(const PASEVerifier & verifier, uint32_t pbkdf2IterCount, const ByteSpan & salt, PasscodeId passcodeID,
                               uint16_t mySessionId, Optional<ReliableMessageProtocolConfig> mrpConfig,
                               SessionEstablishmentDelegate * delegate);
 
@@ -284,7 +299,7 @@ private:
     /* w0s and w1s */
     PASEVerifier mPASEVerifier;
 
-    uint16_t mPasscodeID = 0;
+    PasscodeId mPasscodeID = kDefaultCommissioningPasscodeId;
 
     uint32_t mSetupPINCode;
 

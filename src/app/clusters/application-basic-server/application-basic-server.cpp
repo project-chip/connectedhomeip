@@ -111,7 +111,7 @@ bool Delegate::Matches(ApplicationBasicApplication match)
 {
     std::string appId(match.applicationId.data(), match.applicationId.size());
     CatalogVendorApp matchApp(match.catalogVendorId, appId.c_str());
-    return mCatalogVendorApp.Matches(matchApp);
+    return mCatalogVendorApp.Matches(&matchApp);
 }
 
 } // namespace ApplicationBasic

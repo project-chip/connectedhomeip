@@ -21984,7 +21984,7 @@ namespace Events {
 } // namespace AudioOutput
 namespace ApplicationLauncher {
 namespace Structs {
-namespace ApplicationLauncherApplication {
+namespace Application {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -22024,7 +22024,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace ApplicationLauncherApplication
+} // namespace Application
 namespace ApplicationEP {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
@@ -22074,8 +22074,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kData)), data));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kApplication)), application));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kData)), data));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -22091,11 +22091,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kData):
-            ReturnErrorOnFailure(DataModel::Decode(reader, data));
-            break;
         case to_underlying(Fields::kApplication):
             ReturnErrorOnFailure(DataModel::Decode(reader, application));
+            break;
+        case to_underlying(Fields::kData):
+            ReturnErrorOnFailure(DataModel::Decode(reader, data));
             break;
         default:
             break;

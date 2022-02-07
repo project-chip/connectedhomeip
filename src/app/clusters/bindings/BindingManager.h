@@ -18,6 +18,7 @@
 #pragma once
 
 #include <app/CASESessionManager.h>
+#include <app/clusters/bindings/PendingNotificationMap.h>
 #include <app/server/Server.h>
 #include <app/util/binding-table.h>
 
@@ -53,8 +54,6 @@ using BoundDeviceChangedHandler = void (*)(const EmberBindingTableEntry * bindin
  */
 class BindingManager
 {
-    friend class PendingNotificationEntry;
-
 public:
     BindingManager() :
         mOnConnectedCallback(HandleDeviceConnected, this), mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
@@ -68,19 +67,19 @@ public:
      * Notifies the BindingManager that a new unicast binding is created.
      *
      */
-    CHIP_ERROR UnicastBindingCreated(FabricIndex fabric, NodeId node) { return EstablishConnection(fabric, node); }
+    CHIP_ERROR UnicastBindingCreated(const EmberBindingTableEntry & bindingEntry);
+
+    /*
+     * Notifies the BindingManager that a unicast binding is about to be removed from the given index.
+     *
+     */
+    CHIP_ERROR UnicastBindingRemoved(uint8_t bindingEntryId);
 
     /*
      * Notifies the BindingManager that a fabric is removed from the device
      *
      */
     void FabricRemoved(CompressedFabricId compressedId, FabricIndex fabricIndex);
-
-    /*
-     * Notfies the BindingManager that the **last** unicast binding to a device has been removed.
-     *
-     */
-    CHIP_ERROR LastUnicastBindingRemoved(FabricIndex fabricIndex, NodeId node);
 
     /*
      * Notify a cluster change to **all** bound devices associated with the (endpoint, cluster) tuple.
@@ -99,104 +98,6 @@ public:
 private:
     static BindingManager sBindingManager;
 
-    static constexpr uint8_t kMaxPendingNotifications = 3;
-
-    struct ClusterPath
-    {
-        void * context;
-        ClusterId cluster;
-        EndpointId endpoint;
-    };
-
-    // A pending notification to be sent to a binding waiting for the CASE session to be established.
-    class PendingNotificationEntry
-    {
-    public:
-        PendingNotificationEntry(FabricIndex fabricIndex, NodeId node) : mNodeId(node), mFabricIndex(fabricIndex) {}
-
-        PeerId GetPeerId()
-        {
-            PeerId peer;
-            if (BindingManager::GetInstance().mAppServer == nullptr)
-            {
-                return peer;
-            }
-            FabricInfo * fabric = BindingManager::GetInstance().mAppServer->GetFabricTable().FindFabricWithIndex(mFabricIndex);
-            if (fabric == nullptr)
-            {
-                return peer;
-            }
-            return fabric->GetPeerIdForNode(mNodeId);
-        }
-
-        NodeId GetNodeId() { return mNodeId; }
-
-        FabricIndex GetFabricIndex() { return mFabricIndex; }
-
-        System::Clock::Timestamp GetLastUpdateTime() { return mLastUpdateTime; }
-        void Touch() { mLastUpdateTime = System::SystemClock().GetMonotonicTimestamp(); }
-
-        ClusterPath * begin() { return &mPendingNotifications[0]; }
-        ClusterPath * end() { return &mPendingNotifications[mNumPendingNotifications]; }
-
-        void AddPendingNotification(EndpointId endpoint, ClusterId cluster, void * context)
-        {
-            for (ClusterPath & path : *this)
-            {
-                // New notifications for the same (endpoint, cluster) shall
-                // simply overrride the old ones
-                if (path.cluster == cluster && path.endpoint == endpoint)
-                {
-                    path.context = context;
-                    return;
-                }
-            }
-            if (mNumPendingNotifications < kMaxPendingNotifications)
-            {
-                mPendingNotifications[mNumPendingNotifications++] = { context, cluster, endpoint };
-            }
-            else
-            {
-                mPendingNotifications[mNextToOverride] = { context, cluster, endpoint };
-                mNextToOverride++;
-                mNextToOverride %= kMaxPendingNotifications;
-            }
-        }
-
-    private:
-        System::Clock::Timestamp mLastUpdateTime;
-        // TODO: Make the pending notifications list of binding table indecies and list of contexts
-        ClusterPath mPendingNotifications[kMaxPendingNotifications];
-
-        NodeId mNodeId;
-        uint8_t mNumPendingNotifications = 0;
-        uint8_t mNextToOverride          = 0;
-        FabricIndex mFabricIndex;
-    };
-
-    // The pool for all the pending comands.
-    class PendingNotificationMap
-    {
-    public:
-        PendingNotificationEntry * FindLRUEntry();
-
-        PendingNotificationEntry * FindEntry(FabricIndex fabricIndex, NodeId node);
-
-        CHIP_ERROR AddPendingNotification(FabricIndex fabricIndex, NodeId node, EndpointId endpoint, ClusterId cluster,
-                                          void * context);
-
-        void RemoveEntry(PendingNotificationEntry * entry) { mPendingNotificationMap.ReleaseObject(entry); }
-
-        template <typename Function>
-        Loop ForEachActiveObject(Function && function)
-        {
-            return mPendingNotificationMap.ForEachActiveObject(std::forward<Function>(function));
-        }
-
-    private:
-        ObjectPool<PendingNotificationEntry, EMBER_BINDING_TABLE_SIZE> mPendingNotificationMap;
-    };
-
     static void HandleDeviceConnected(void * context, OperationalDeviceProxy * device);
     void HandleDeviceConnected(OperationalDeviceProxy * device);
 
@@ -204,9 +105,6 @@ private:
     void HandleDeviceConnectionFailure(PeerId peerId, CHIP_ERROR error);
 
     CHIP_ERROR EstablishConnection(FabricIndex fabric, NodeId node);
-
-    // Called when CASE session is established to a peer device. Will send all the pending commands to the peer.
-    void SyncPendingNotificationsToPeer(OperationalDeviceProxy * device, PendingNotificationEntry * pendingClusters);
 
     PendingNotificationMap mPendingNotificationMap;
     BoundDeviceChangedHandler mBoundDeviceChangedHandler;

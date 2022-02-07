@@ -136,8 +136,7 @@ void CHIPApplicationLauncherClusterLauncherResponseCallback::CallbackFn(
     // Java callback is allowed to be null, exit early if this is the case.
     VerifyOrReturn(javaCallbackRef != nullptr);
 
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;Ljava/lang/String;)V",
-                                                  &javaMethod);
+    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;[B)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject status;
@@ -146,7 +145,10 @@ void CHIPApplicationLauncherClusterLauncherResponseCallback::CallbackFn(
     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(statusClassName.c_str(), statusCtorSignature.c_str(),
                                                                   static_cast<uint8_t>(dataResponse.status), status);
     jobject data;
-    data = env->NewStringUTF(std::string(dataResponse.data.data(), dataResponse.data.size()).c_str());
+    jbyteArray dataByteArray = env->NewByteArray(static_cast<jsize>(dataResponse.data.size()));
+    env->SetByteArrayRegion(dataByteArray, 0, static_cast<jsize>(dataResponse.data.size()),
+                            reinterpret_cast<const jbyte *>(dataResponse.data.data()));
+    data = dataByteArray;
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, status, data);
 }

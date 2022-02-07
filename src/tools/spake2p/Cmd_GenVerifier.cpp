@@ -291,14 +291,22 @@ bool Cmd_GenVerifier(int argc, char * argv[])
             return false;
         }
 
+        chip::PASEVerifierSerialized serializedVerifier;
+        chip::MutableByteSpan serializedVerifierSpan(serializedVerifier);
+        err = verifier.Serialize(serializedVerifierSpan);
+        if (err != CHIP_NO_ERROR)
+        {
+            fprintf(stderr, "PASEVerifier::Serialize() failed.\n");
+            return false;
+        }
+
         char saltB64[BASE64_ENCODED_LEN(chip::kPBKDFMaximumSaltLen) + 1];
         uint32_t saltB64Len = chip::Base64Encode32(salt, gSaltLen, saltB64);
-        saltB64[saltB64Len] = 0;
+        saltB64[saltB64Len] = '\0';
 
-        char verifierB64[BASE64_ENCODED_LEN(sizeof(chip::PASEVerifier)) + 1];
-        uint32_t verifierB64Len =
-            chip::Base64Encode32(reinterpret_cast<uint8_t *>(&verifier), sizeof(chip::PASEVerifier), verifierB64);
-        verifierB64[verifierB64Len] = 0;
+        char verifierB64[BASE64_ENCODED_LEN(chip::kSpake2pSerializedVerifierSize) + 1];
+        uint32_t verifierB64Len     = chip::Base64Encode32(serializedVerifier, chip::kSpake2pSerializedVerifierSize, verifierB64);
+        verifierB64[verifierB64Len] = '\0';
 
         if (fprintf(outFile, "%d,%08d,%d,%s,%s\n", i, gPinCode, gIterationCount, saltB64, verifierB64) < 0 || ferror(outFile))
         {

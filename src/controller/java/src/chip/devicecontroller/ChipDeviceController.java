@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2020-2021 Project CHIP Authors
+ *   Copyright (c) 2020-2022 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -286,7 +286,7 @@ public class ChipDeviceController {
   }
 
   public boolean openPairingWindowWithPIN(
-      long devicePtr, int duration, int iteration, int discriminator, long setupPinCode) {
+      long devicePtr, int duration, long iteration, int discriminator, long setupPinCode) {
     return openPairingWindowWithPIN(
         deviceControllerPtr, devicePtr, duration, iteration, discriminator, setupPinCode);
   }
@@ -334,12 +334,12 @@ public class ChipDeviceController {
    * @param salt the 16-byte salt
    */
   public PaseVerifierParams computePaseVerifier(
-      long devicePtr, long setupPincode, int iterations, byte[] salt) {
+      long devicePtr, long setupPincode, long iterations, byte[] salt) {
     return computePaseVerifier(deviceControllerPtr, devicePtr, setupPincode, iterations, salt);
   }
 
   private native PaseVerifierParams computePaseVerifier(
-      long deviceControllerPtr, long devicePtr, long setupPincode, int iterations, byte[] salt);
+      long deviceControllerPtr, long devicePtr, long setupPincode, long iterations, byte[] salt);
 
   private native void subscribeToPath(
       long deviceControllerPtr,
@@ -411,7 +411,7 @@ public class ChipDeviceController {
       long deviceControllerPtr,
       long devicePtr,
       int duration,
-      int iteration,
+      long iteration,
       int discriminator,
       long setupPinCode);
 
