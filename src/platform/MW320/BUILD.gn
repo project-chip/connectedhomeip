@@ -35,15 +35,15 @@ static_library("MW320") {
     "ConnectivityManagerImpl.h",
     "DeviceNetworkProvisioningDelegateImpl.cpp",
     "DeviceNetworkProvisioningDelegateImpl.h",
+    "KeyValueStoreManagerImpl.cpp",
+    "KeyValueStoreManagerImpl.h",
+    "Logging.cpp",
     "MW320Config.cpp",
     "MW320Config.h",
-    "Logging.cpp",
     "NetworkProvisioningServerImpl.h",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SoftwareUpdateManagerImpl.h",
-    "KeyValueStoreManagerImpl.cpp",
-    "KeyValueStoreManagerImpl.h",
   ]
 
   deps = []

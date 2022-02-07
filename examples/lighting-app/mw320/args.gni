@@ -16,5 +16,3 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/examples/platform/mw320/args.gni")
 
 mw320_sdk_target = get_label_info(":sdk", "label_no_toolchain")
-
-

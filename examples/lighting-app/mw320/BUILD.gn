@@ -30,8 +30,8 @@ mw320_sdk("sdk") {
     "${examples_plat_dir}/app/project_include",
     "${chip_root}/src/app/util",
   ]
-      
-   sources = [
+
+  sources = [
     "${examples_plat_dir}/app/project_include/CHIPProjectConfig.h",
     "${examples_plat_dir}/app/project_include/FreeRTOSConfig.h",
   ]
@@ -51,12 +51,12 @@ mw320_executable("light_app") {
   output_name = "chip-mw320-light-example"
 
   public_deps = [
-    "${chip_root}/src/lib",
-    "${chip_root}/src/lib/shell",
+    ":sdk",
     "${chip_root}/examples/all-clusters-app/all-clusters-common",
     "${chip_root}/examples/shell/shell_common:shell_common",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/lib/shell",
     "${chip_root}/src/setup_payload",
-    ":sdk",
   ]
 
   include_dirs = [
@@ -65,18 +65,17 @@ mw320_executable("light_app") {
     "${chip_root}/src/app/util",
   ]
   sources = [
+    "${chip_root}/src/lib/shell/streamer_mw320.cpp",
     "${examples_plat_dir}/app/project_include/CHIPProjectConfig.h",
     "${examples_plat_dir}/app/project_include/FreeRTOSConfig.h",
-    "${chip_root}/src/lib/shell/streamer_mw320.cpp",
     "main.cpp",
-    
   ]
 
   output_dir = root_out_dir
-  
+
   ldscript = "${examples_plat_dir}/app/ldscripts/88MW320_xx_xxxx_flash.ld"
-      
-  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir)]
+
+  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
   defines = [
     "MW320_SHELL_STREAMER",
     "SHELL_STREAMER_APP_SPECIFIC",
