@@ -1126,12 +1126,14 @@ void DeviceCommissioner::OnDeviceAttestationInformationVerification(void * conte
 
     if (result != AttestationVerificationResult::kSuccess)
     {
+        CommissioningDelegate::CommissioningReport report;
+        report.Set<AdditionalErrorInfo>(result);
         if (result == AttestationVerificationResult::kNotImplemented)
         {
             ChipLogError(Controller,
                          "Failed in verifying 'Attestation Information' command received from the device due to default "
                          "DeviceAttestationVerifier Class not being overridden by a real implementation.");
-            commissioner->CommissioningStageComplete(CHIP_ERROR_NOT_IMPLEMENTED);
+            commissioner->CommissioningStageComplete(CHIP_ERROR_NOT_IMPLEMENTED, report);
             return;
         }
         else
@@ -1142,7 +1144,7 @@ void DeviceCommissioner::OnDeviceAttestationInformationVerification(void * conte
                          static_cast<uint16_t>(result));
             // Go look at AttestationVerificationResult enum in src/credentials/DeviceAttestationVerifier.h to understand the
             // errors.
-            commissioner->CommissioningStageComplete(CHIP_ERROR_INTERNAL);
+            commissioner->CommissioningStageComplete(CHIP_ERROR_INTERNAL, report);
             return;
         }
     }

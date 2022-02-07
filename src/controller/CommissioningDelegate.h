@@ -19,6 +19,7 @@
 #pragma once
 #include <app/OperationalDeviceProxy.h>
 #include <controller/CommissioneeDeviceProxy.h>
+#include <credentials/DeviceAttestationVerifier.h>
 #include <lib/support/Variant.h>
 
 namespace chip {
@@ -264,12 +265,18 @@ struct NetworkClusters
     EndpointId eth    = kInvalidEndpointId;
 };
 
+struct AdditionalErrorInfo
+{
+    AdditionalErrorInfo(Credentials::AttestationVerificationResult result) : attestationResult(result) {}
+    Credentials::AttestationVerificationResult attestationResult;
+};
+
 class CommissioningDelegate
 {
 public:
     virtual ~CommissioningDelegate(){};
     struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, NocChain, OperationalNodeFoundData, BasicVendor,
-                                         BasicProduct, BasicSoftware, NetworkClusters>
+                                         BasicProduct, BasicSoftware, NetworkClusters, AdditionalErrorInfo>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;

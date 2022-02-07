@@ -310,6 +310,16 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed to perform commissioning step %d", static_cast<int>(report.stageCompleted));
+        if (report.stageCompleted == CommissioningStage::kAttestationVerification &&
+            (report.Get<AdditionalErrorInfo>().attestationResult ==
+                 Credentials::AttestationVerificationResult::kDacProductIdMismatch ||
+             report.Get<AdditionalErrorInfo>().attestationResult ==
+                 Credentials::AttestationVerificationResult::kDacVendorIdMismatch))
+        {
+            ChipLogError(Controller,
+                         "Failed device attestation. Device vendor and/or product ID do not match the IDs given in the device "
+                         "attestation certificate");
+        }
     }
     else
     {
