@@ -1155,7 +1155,8 @@ void DeviceCommissioner::OnDeviceAttestationInformationVerification(void * conte
 
 CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const ByteSpan & attestationElements, const ByteSpan & signature,
                                                        const ByteSpan & attestationNonce, const ByteSpan & pai,
-                                                       const ByteSpan & dac, DeviceProxy * proxy)
+                                                       const ByteSpan & dac, VendorId remoteVendorId, uint16_t remoteProductId,
+                                                       DeviceProxy * proxy)
 {
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(proxy != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -1167,7 +1168,7 @@ CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const ByteSpan & attestat
         proxy->GetSecureSession().Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
 
     dac_verifier->VerifyAttestationInformation(attestationElements, attestationChallenge, signature, pai, dac, attestationNonce,
-                                               &mDeviceAttestationInformationVerificationCallback);
+                                               remoteVendorId, remoteProductId, &mDeviceAttestationInformationVerificationCallback);
 
     // TODO: Validate Firmware Information
 
@@ -1800,7 +1801,6 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
         mAttributeCache = std::move(attributeCache);
         mReadClient     = std::move(readClient);
-        return;
     }
     break;
     case CommissioningStage::kConfigRegulatory: {
@@ -1868,7 +1868,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     case CommissioningStage::kAttestationVerification:
         ChipLogProgress(Controller, "Verifying attestation");
         if (!params.GetAttestationElements().HasValue() || !params.GetAttestationSignature().HasValue() ||
-            !params.GetAttestationNonce().HasValue() || !params.GetDAC().HasValue() || !params.GetPAI().HasValue())
+            !params.GetAttestationNonce().HasValue() || !params.GetDAC().HasValue() || !params.GetPAI().HasValue() ||
+            !params.GetRemoteVendorId().HasValue() || !params.GetRemoteProductId().HasValue())
         {
             ChipLogError(Controller, "Missing attestation information");
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
@@ -1876,6 +1877,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
         if (ValidateAttestationInfo(params.GetAttestationElements().Value(), params.GetAttestationSignature().Value(),
                                     params.GetAttestationNonce().Value(), params.GetPAI().Value(), params.GetDAC().Value(),
+                                    params.GetRemoteVendorId().Value(), params.GetRemoteProductId().Value(),
                                     proxy) != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "Error validating attestation information");

@@ -150,7 +150,8 @@ public:
 
     void VerifyAttestationInformation(const ByteSpan & attestationInfoBuffer, const ByteSpan & attestationChallengeBuffer,
                                       const ByteSpan & attestationSignatureBuffer, const ByteSpan & paiDerBuffer,
-                                      const ByteSpan & dacDerBuffer, const ByteSpan & attestationNonce,
+                                      const ByteSpan & dacDerBuffer, const ByteSpan & attestationNonce, VendorId vendorId,
+                                      uint16_t productId,
                                       Callback::Callback<OnAttestationInformationVerification> * onCompletion) override;
 
     AttestationVerificationResult ValidateCertificationDeclarationSignature(const ByteSpan & cmsEnvelopeBuffer,
@@ -175,6 +176,7 @@ void DefaultDACVerifier::VerifyAttestationInformation(const ByteSpan & attestati
                                                       const ByteSpan & attestationChallengeBuffer,
                                                       const ByteSpan & attestationSignatureBuffer, const ByteSpan & paiDerBuffer,
                                                       const ByteSpan & dacDerBuffer, const ByteSpan & attestationNonce,
+                                                      VendorId vendorId, uint16_t productId,
                                                       Callback::Callback<OnAttestationInformationVerification> * onCompletion)
 {
     AttestationVerificationResult attestationError = AttestationVerificationResult::kSuccess;
@@ -271,8 +273,8 @@ void DefaultDACVerifier::VerifyAttestationInformation(const ByteSpan & attestati
         ByteSpan certificationDeclarationPayload;
 
         DeviceInfoForAttestation deviceInfo{
-            .vendorId    = 0xFFF1,
-            .productId   = 0x8000, // TODO: Retrieve vendorId and ProductId from Basic Information Cluster
+            .vendorId    = vendorId,
+            .productId   = productId,
             .dacVendorId = dacVendorId,
             .paiVendorId = dacVendorId,
         };
