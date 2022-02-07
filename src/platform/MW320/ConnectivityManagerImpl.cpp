@@ -56,7 +56,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 
     mWiFiStationMode                = kWiFiStationMode_Disabled;
     mWiFiStationReconnectIntervalMS = CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL;
-                    
+
     // Initialize the generic base classes that require it.
 
 
@@ -137,7 +137,7 @@ bool ConnectivityManagerImpl::_IsWiFiStationApplicationControlled()
 
 void ConnectivityManagerImpl::StartWiFiManagement()
 {
-   
+
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
@@ -154,7 +154,7 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, cons
     char arg5[64];
     char* argv[] = { &arg0[0], &arg1[0], &arg2[0], &arg3[0], &arg4[0], &arg5[0], NULL };
     int   argc   = (int)(sizeof(argv) / sizeof(argv[0])) - 1;
-    
+
     sprintf( (char *) arg1, "%s", ssid);
     sprintf( (char *) arg3, "%s", ssid);
     sprintf( (char *) arg5, "%s", key);

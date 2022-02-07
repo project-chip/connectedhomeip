@@ -17,4 +17,3 @@ echo "echo \"MW320 LIGHTING is at \$MW320_LIGHTING\"" >> ./third_party/mw320_sdk
 
 echo "MW320 SDK and Flsahing tool  was install to $MW320_FOLDER !"
 exit 0
-

@@ -62,7 +62,7 @@ int streamer_mw320_init(streamer_t * streamer)
     config.fifoConfig.txFifoWatermark = kUART_TxfifoHalfEmpty;
     config.fifoConfig.rxFifoWatermark = kUART_RxfifoByte1;
 	UART_Init(DEMO_LPUART, &config, DEMO_LPUART_CLK_FREQ);
-	
+
     return 0;
 }
 

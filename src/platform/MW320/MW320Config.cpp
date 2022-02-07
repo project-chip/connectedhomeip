@@ -40,7 +40,7 @@ namespace Internal {
 
 CHIP_ERROR MW320Config::Init()
 {
-    
+
 
     return CHIP_NO_ERROR;
 }
@@ -48,7 +48,7 @@ CHIP_ERROR MW320Config::Init()
 CHIP_ERROR MW320Config::ReadConfigValue(Key key, bool & val)
 {
     CHIP_ERROR err;
-   
+
 
     err = CHIP_NO_ERROR;
     err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
@@ -60,8 +60,8 @@ CHIP_ERROR MW320Config::ReadConfigValue(Key key, uint32_t & val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    
-    
+
+
 
     return err;
 }
@@ -69,11 +69,11 @@ CHIP_ERROR MW320Config::ReadConfigValue(Key key, uint32_t & val)
 CHIP_ERROR MW320Config::ReadConfigValue(Key key, uint64_t & val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-   
-    
-    
-    
-   
+
+
+
+
+
 
 
     return err;
@@ -83,9 +83,9 @@ CHIP_ERROR MW320Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize, 
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    
-   
-         
+
+
+
 
     return err;
 }
@@ -93,13 +93,13 @@ CHIP_ERROR MW320Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize, 
 CHIP_ERROR MW320Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    
+
     if (buf == NULL)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    
+
 
     return err;
 }
@@ -107,9 +107,9 @@ CHIP_ERROR MW320Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSiz
 CHIP_ERROR MW320Config::ReadConfigValueCounter(uint8_t counterIdx, uint32_t & val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    
 
-    
+
+
 
 
 
@@ -118,22 +118,22 @@ CHIP_ERROR MW320Config::ReadConfigValueCounter(uint8_t counterIdx, uint32_t & va
 
 CHIP_ERROR MW320Config::WriteConfigValue(Key key, bool val)
 {
-    
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR MW320Config::WriteConfigValue(Key key, uint32_t val)
 {
-   
+
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR MW320Config::WriteConfigValue(Key key, uint64_t val)
 {
-    
 
-    
+
+
     return CHIP_NO_ERROR;
 }
 
@@ -151,21 +151,21 @@ CHIP_ERROR MW320Config::WriteConfigValueStr(Key key, const char * str, size_t st
 
 CHIP_ERROR MW320Config::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
-   
+
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR MW320Config::ClearConfigValue(Key key)
 {
-    
+
     return CHIP_NO_ERROR;
 }
 
 bool MW320Config::ConfigValueExists(Key key)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    
+
     // Return true if the record was found.
     return (err == CHIP_NO_ERROR);
 }
@@ -183,11 +183,11 @@ CHIP_ERROR MW320Config::FactoryResetConfig(void)
 CHIP_ERROR MW320Config::ForEachRecord(Key firstKey, Key lastKey, bool addNewRecord, ForEachRecordFunct funct)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    
+
 
     for (Key nvmKey = firstKey; nvmKey <= lastKey; ++nvmKey)
     {
-        
+
 
         SuccessOrExit(err);
     }

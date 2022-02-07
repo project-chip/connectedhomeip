@@ -158,7 +158,7 @@ void Engine::RunMainLoop()
     char line[CHIP_SHELL_MAX_LINE_SIZE];
 
     Engine::Root().RegisterDefaultCommands();
-    
+
     while (true)
     {
         streamer_printf(streamer_get(), CHIP_SHELL_PROMPT);

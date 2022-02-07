@@ -24,4 +24,3 @@
  */
 
 /* this file behaves like a config.h, comes first */
-

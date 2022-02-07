@@ -148,7 +148,7 @@ public:
 protected:
     using ForEachRecordFunct = std::function<CHIP_ERROR(const Key & key, const size_t & length)>;
     static CHIP_ERROR ForEachRecord(Key firstKey, Key lastKey, bool addNewRecord, ForEachRecordFunct funct);
-   
+
 
 private:
     static CHIP_ERROR FactoryResetConfigInternal(Key firstKey, Key lastKey);
