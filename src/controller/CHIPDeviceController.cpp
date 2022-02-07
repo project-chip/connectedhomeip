@@ -1570,10 +1570,8 @@ void DeviceCommissioner::OnDone()
             {
                 return CHIP_NO_ERROR;
             }
-            TLV::TLVReader reader;
-            ReturnErrorOnFailure(this->mAttributeCache->Get(path, reader));
             app::Clusters::GeneralCommissioning::Attributes::BasicCommissioningInfo::TypeInfo::DecodableType basicInfo;
-            ReturnErrorOnFailure(app::DataModel::Decode(reader, basicInfo));
+            ReturnErrorOnFailure(this->mAttributeCache->Get(path, basicInfo));
             info.general.recommendedFailsafe = basicInfo.failSafeExpiryLengthSeconds;
             return CHIP_NO_ERROR;
         });
