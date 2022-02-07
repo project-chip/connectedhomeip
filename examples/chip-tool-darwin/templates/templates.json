@@ -33,7 +33,7 @@
         {
             "path": "README.zapt",
             "name": "Tests Commands header",
-            "output": "../../../examples/chip-tool-darwin/README.md"
+            "output": "README_CLUSTER_COMMANDS.md"
         }
     ]
 }
