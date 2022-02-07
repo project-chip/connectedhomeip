@@ -86,7 +86,7 @@ limitations under the License.
       <arg name="modeForSequence" type="ModeForSequence"/>
       <arg name="payload" type="INT8U" array="true"/>
     </command>
-    <command source="client" code="0x02" name="GetWeeklySchedule" optional="true">
+    <command source="client" code="0x02" name="GetWeeklySchedule" response="GetWeeklyScheduleResponse" optional="true">
       <description>
         Command description for GetWeeklySchedule
       </description>
@@ -98,7 +98,7 @@ limitations under the License.
         The Clear Weekly Schedule command is used to clear the weekly schedule.
       </description>
     </command>
-    <command source="client" code="0x04" name="GetRelayStatusLog" optional="true">
+    <command source="client" code="0x04" name="GetRelayStatusLog" response="GetRelayStatusLogResponse" optional="true">
       <description>
         The Get Relay Status Log command is used to query the thermostat internal relay status log.
       </description>

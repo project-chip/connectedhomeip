@@ -23,16 +23,16 @@
 
 #include "MessageDefHelper.h"
 #include <algorithm>
+#include <app/AppBuildConfig.h>
+#include <app/InteractionModelRevision.h>
+#include <app/util/basic-types.h>
 #include <inttypes.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <stdarg.h>
 #include <stdio.h>
 
-#include <app/AppBuildConfig.h>
-#include <lib/support/logging/CHIPLogging.h>
-
 namespace chip {
 namespace app {
-
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK && CHIP_DETAIL_LOGGING
 // this is used to run in signle thread for IM message debug purpose
 namespace {
@@ -94,5 +94,6 @@ void DecreaseDepth()
     gPrettyPrintingDepthLevel--;
 }
 #endif
+
 }; // namespace app
 }; // namespace chip

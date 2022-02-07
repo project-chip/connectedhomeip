@@ -249,8 +249,6 @@ uint8_t emberAfPluginEsiManagementUpdateEsiAndGetIndex(const EmberAfClusterComma
         return 0;
     }
 
-    emberAfPushNetworkIndex(cmd->networkIndex);
-
     /*emberLookupEui64ByNodeId(cmd->source, esiEui64); #2552*/
     esiEntry = emberAfPluginEsiManagementEsiLookUpByLongIdAndEndpoint(esiEui64, cmd->apsFrame->sourceEndpoint);
     // The source ESI is not in the ESI table.
@@ -284,7 +282,6 @@ uint8_t emberAfPluginEsiManagementUpdateEsiAndGetIndex(const EmberAfClusterComma
     }
 
     index = emberAfPluginEsiManagementIndexLookUpByLongIdAndEndpoint(esiEui64, cmd->apsFrame->sourceEndpoint);
-    emberAfPopNetworkIndex();
     return index;
 }
 

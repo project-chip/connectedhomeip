@@ -24,6 +24,11 @@ namespace chip {
 
 CHIP_ERROR PendingNotificationMap::FindLRUConnectPeer(FabricIndex * fabric, NodeId * node)
 {
+    // When entries are added to PendingNotificationMap, they are appended to the end.
+    // To find the LRU peer, we need to find the peer whose last entry in the map is closer
+    // to the start of the list than the last entry of any other peer.
+
+    // First, set up a way to easily track which entries correspond to the same peer.
     uint8_t bindingWithSamePeer[EMBER_BINDING_TABLE_SIZE];
 
     for (uint8_t i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
@@ -65,16 +70,16 @@ CHIP_ERROR PendingNotificationMap::FindLRUConnectPeer(FabricIndex * fabric, Node
         appearIndex++;
     }
     uint8_t lruBindingEntryIndex;
-    uint16_t minApperValue = UINT16_MAX;
+    uint16_t minLastAppearValue = UINT16_MAX;
     for (uint8_t i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
     {
-        if (lastAppear[i] < minApperValue)
+        if (lastAppear[i] < minLastAppearValue)
         {
             lruBindingEntryIndex = i;
-            minApperValue        = lastAppear[i];
+            minLastAppearValue   = lastAppear[i];
         }
     }
-    if (minApperValue < UINT16_MAX)
+    if (minLastAppearValue < UINT16_MAX)
     {
         EmberBindingTableEntry entry;
         emberGetBinding(lruBindingEntryIndex, &entry);
@@ -117,6 +122,24 @@ void PendingNotificationMap::RemoveAllEntriesForNode(FabricIndex fabric, NodeId 
         emberGetBinding(mPendingBindingEntries[i], &entry);
 
         if (entry.fabricIndex != fabric || entry.nodeId != node)
+        {
+            mPendingBindingEntries[newEntryCount] = mPendingBindingEntries[i];
+            mPendingContexts[newEntryCount]       = mPendingContexts[i];
+            newEntryCount++;
+        }
+    }
+    mNumEntries = newEntryCount;
+}
+
+void PendingNotificationMap::RemoveAllEntriesForFabric(FabricIndex fabric)
+{
+    uint8_t newEntryCount = 0;
+    for (int i = 0; i < mNumEntries; i++)
+    {
+        EmberBindingTableEntry entry;
+        emberGetBinding(mPendingBindingEntries[i], &entry);
+
+        if (entry.fabricIndex != fabric)
         {
             mPendingBindingEntries[newEntryCount] = mPendingBindingEntries[i];
             mPendingContexts[newEntryCount]       = mPendingContexts[i];

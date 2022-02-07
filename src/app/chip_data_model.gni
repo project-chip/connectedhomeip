@@ -35,9 +35,6 @@ _zap_cluster_list_script = get_path_info("zap_cluster_list.py", "abspath")
 #    Names of the clusters directories to compile.
 #    Deprecated, specify zap_file instead.
 #
-#  use_default_client_callbacks
-#    Include CHIPClientCallbacks.cpp.
-#
 # Forwards all the remaining variables to the source_set.
 #
 template("chip_data_model") {
@@ -56,10 +53,6 @@ template("chip_data_model") {
 
   _use_tests_apis = defined(invoker.use_tests_apis) && invoker.use_tests_apis
 
-  _use_default_client_callbacks =
-      defined(invoker.use_default_client_callbacks) &&
-      invoker.use_default_client_callbacks
-
   source_set(_data_model_name) {
     forward_variables_from(invoker,
                            "*",
@@ -67,7 +60,6 @@ template("chip_data_model") {
                              "zap_pregenerated_dir",
                              "cluster_sources",
                              "zap_file",
-                             "use_default_client_callbacks",
                              "is_server",
                            ])
 
@@ -95,16 +87,13 @@ template("chip_data_model") {
       "${_app_root}/clusters/zll-level-control-server/zll-level-control-server.h",
       "${_app_root}/clusters/zll-on-off-server/zll-on-off-server.h",
       "${_app_root}/clusters/zll-scenes-server/zll-scenes-server.h",
-      "${_app_root}/encoder-common.cpp",
       "${_app_root}/reporting/reporting.h",
       "${_app_root}/util/DataModelHandler.cpp",
       "${_app_root}/util/af-event.cpp",
-      "${_app_root}/util/af-main-common.cpp",
       "${_app_root}/util/attribute-size-util.cpp",
       "${_app_root}/util/attribute-storage.cpp",
       "${_app_root}/util/attribute-table.cpp",
       "${_app_root}/util/binding-table.cpp",
-      "${_app_root}/util/chip-message-send.cpp",
       "${_app_root}/util/client-api.cpp",
       "${_app_root}/util/ember-compatibility-functions.cpp",
       "${_app_root}/util/ember-print.cpp",
@@ -142,9 +131,9 @@ template("chip_data_model") {
         ]
       } else if (cluster == "application-launcher-server") {
         sources += [
+          "${_app_root}/app-platform/ContentApp.cpp",
+          "${_app_root}/app-platform/ContentAppPlatform.cpp",
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
-          "${_app_root}/util/ContentApp.cpp",
-          "${_app_root}/util/ContentAppPlatform.cpp",
         ]
       } else if (cluster == "ota-requestor") {
         sources += [
@@ -171,17 +160,7 @@ template("chip_data_model") {
       sources += [ "${invoker.zap_pregenerated_dir}/callback-stub.cpp" ]
 
       if (chip_controller) {
-        sources += [
-          "${invoker.zap_pregenerated_dir}/CHIPClusters.cpp",
-          "${invoker.zap_pregenerated_dir}/CHIPClusters.h",
-        ]
-      }
-
-      if (_use_default_client_callbacks) {
-        sources += [
-          "${_app_root}/util/im-client-callbacks.cpp",
-          "${invoker.zap_pregenerated_dir}/CHIPClientCallbacks.cpp",
-        ]
+        sources += [ "${invoker.zap_pregenerated_dir}/CHIPClusters.h" ]
       }
 
       if (_use_default_im_dispatch) {

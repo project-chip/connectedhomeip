@@ -241,6 +241,7 @@ CHIP_ERROR FabricInfo::GenerateKey(FabricIndex id, char * key, size_t len)
 
 CHIP_ERROR FabricInfo::SetOperationalKeypair(const P256Keypair * keyPair)
 {
+    VerifyOrReturnError(keyPair != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     P256SerializedKeypair serialized;
     ReturnErrorOnFailure(keyPair->Serialize(serialized));
     if (mOperationalKey == nullptr)
@@ -402,6 +403,30 @@ void FabricTable::ReleaseFabricIndex(FabricIndex fabricIndex)
     }
 }
 
+FabricInfo * FabricTable::FindFabric(P256PublicKeySpan rootPubKey, FabricId fabricId)
+{
+    static_assert(kMaxValidFabricIndex <= UINT8_MAX, "Cannot create more fabrics than UINT8_MAX");
+    for (FabricIndex i = kMinValidFabricIndex; i <= kMaxValidFabricIndex; i++)
+    {
+        FabricInfo * fabric = FindFabricWithIndex(i);
+        if (fabric == nullptr)
+        {
+            continue;
+        }
+        P256PublicKeySpan candidatePubKey;
+        if (fabric->GetRootPubkey(candidatePubKey) != CHIP_NO_ERROR)
+        {
+            continue;
+        }
+        if (rootPubKey.data_equal(candidatePubKey) && fabricId == fabric->GetFabricId())
+        {
+            LoadFromStorage(fabric);
+            return fabric;
+        }
+    }
+    return nullptr;
+}
+
 FabricInfo * FabricTable::FindFabricWithIndex(FabricIndex fabricIndex)
 {
     if (fabricIndex >= kMinValidFabricIndex && fabricIndex <= kMaxValidFabricIndex)
@@ -446,22 +471,27 @@ void FabricTable::Reset()
     }
 }
 
-CHIP_ERROR FabricTable::Store(FabricIndex id)
+CHIP_ERROR FabricTable::Store(FabricIndex index)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     FabricInfo * fabric = nullptr;
 
     VerifyOrExit(mStorage != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    fabric = FindFabricWithIndex(id);
+    fabric = FindFabricWithIndex(index);
     VerifyOrExit(fabric != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     err = fabric->CommitToStorage(mStorage);
 exit:
     if (err == CHIP_NO_ERROR && mDelegate != nullptr)
     {
-        ChipLogProgress(Discovery, "Fabric (%d) persisted to storage. Calling OnFabricPersistedToStorage", id);
-        mDelegate->OnFabricPersistedToStorage(fabric);
+        ChipLogProgress(Discovery, "Fabric (%d) persisted to storage. Calling OnFabricPersistedToStorage", index);
+        FabricTableDelegate * delegate = mDelegate;
+        while (delegate)
+        {
+            delegate->OnFabricPersistedToStorage(fabric);
+            delegate = delegate->mNext;
+        }
     }
     return err;
 }
@@ -475,11 +505,13 @@ CHIP_ERROR FabricTable::LoadFromStorage(FabricInfo * fabric)
         ReturnErrorOnFailure(fabric->LoadFromStorage(mStorage));
     }
 
-    if (mDelegate != nullptr)
+    FabricTableDelegate * delegate = mDelegate;
+    while (delegate)
     {
         ChipLogProgress(Discovery, "Fabric (%d) loaded from storage. Calling OnFabricRetrievedFromStorage",
                         fabric->GetFabricIndex());
-        mDelegate->OnFabricRetrievedFromStorage(fabric);
+        delegate->OnFabricRetrievedFromStorage(fabric);
+        delegate = delegate->mNext;
     }
     return CHIP_NO_ERROR;
 }
@@ -561,33 +593,40 @@ CHIP_ERROR FabricTable::AddNewFabric(FabricInfo & newFabric, FabricIndex * outpu
     return CHIP_ERROR_NO_MEMORY;
 }
 
-CHIP_ERROR FabricTable::Delete(FabricIndex id)
+CHIP_ERROR FabricTable::Delete(FabricIndex index)
 {
-    FabricInfo * fabric      = nullptr;
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    bool fabricIsInitialized = false;
-    VerifyOrExit(mStorage != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    fabric              = FindFabricWithIndex(id);
-    fabricIsInitialized = fabric != nullptr && fabric->IsInitialized();
-    err                 = FabricInfo::DeleteFromStorage(mStorage, id); // Delete from storage regardless
-
-exit:
-    if (err == CHIP_NO_ERROR)
+    FabricInfo * fabric      = FindFabricWithIndex(index);
+    bool fabricIsInitialized = fabric != nullptr && fabric->IsInitialized();
+    CompressedFabricId compressedFabricId =
+        fabricIsInitialized ? fabric->GetPeerId().GetCompressedFabricId() : kUndefinedCompressedFabricId;
+    CHIP_ERROR err = FabricInfo::DeleteFromStorage(mStorage, index); // Delete from storage regardless
+    if (!fabricIsInitialized)
     {
-        ReleaseFabricIndex(id);
-        if (mDelegate != nullptr && fabricIsInitialized)
+        // Make sure to return the error our API promises, not whatever storage
+        // chose to return.
+        return CHIP_ERROR_NOT_FOUND;
+    }
+    ReturnErrorOnFailure(err);
+
+    ReleaseFabricIndex(index);
+    if (mDelegate != nullptr)
+    {
+        if (mFabricCount == 0)
         {
-            if (mFabricCount == 0)
-            {
-                ChipLogError(Discovery, "!!Trying to delete a fabric, but the current fabric count is already 0");
-            }
-            else
-            {
-                mFabricCount--;
-            }
-            ChipLogProgress(Discovery, "Fabric (%d) deleted. Calling OnFabricDeletedFromStorage", id);
-            mDelegate->OnFabricDeletedFromStorage(id);
+            ChipLogError(Discovery, "!!Trying to delete a fabric, but the current fabric count is already 0");
+        }
+        else
+        {
+            mFabricCount--;
+        }
+        ChipLogProgress(Discovery, "Fabric (%d) deleted. Calling OnFabricDeletedFromStorage", index);
+        FabricTableDelegate * delegate = mDelegate;
+        while (delegate)
+        {
+            delegate->OnFabricDeletedFromStorage(compressedFabricId, index);
+            delegate = delegate->mNext;
         }
     }
     return CHIP_NO_ERROR;
@@ -624,11 +663,19 @@ CHIP_ERROR FabricTable::Init(FabricStorage * storage)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FabricTable::SetFabricDelegate(FabricTableDelegate * delegate)
+CHIP_ERROR FabricTable::AddFabricDelegate(FabricTableDelegate * delegate)
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    mDelegate = delegate;
-    ChipLogDetail(Discovery, "Set the fabric pairing table delegate");
+    for (FabricTableDelegate * iter = mDelegate; iter != nullptr; iter = iter->mNext)
+    {
+        if (iter == delegate)
+        {
+            return CHIP_NO_ERROR;
+        }
+    }
+    delegate->mNext = mDelegate;
+    mDelegate       = delegate;
+    ChipLogDetail(Discovery, "Add fabric pairing table delegate");
     return CHIP_NO_ERROR;
 }
 

@@ -17,6 +17,37 @@
 
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/util/binding-table.h>
+#include <credentials/FabricTable.h>
+
+namespace {
+
+class BindingFabricTableDelegate : public chip::FabricTableDelegate
+{
+    void OnFabricDeletedFromStorage(chip::CompressedFabricId compressedFabricId, chip::FabricIndex fabricIndex)
+    {
+        for (uint8_t i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
+        {
+            EmberBindingTableEntry entry;
+            emberGetBinding(i, &entry);
+            if (entry.fabricIndex == fabricIndex)
+            {
+                ChipLogProgress(Zcl, "Remove binding for fabric %d\n", entry.fabricIndex);
+                entry.type = EMBER_UNUSED_BINDING;
+            }
+        }
+        chip::BindingManager::GetInstance().FabricRemoved(compressedFabricId, fabricIndex);
+    }
+
+    // Intentionally left blank
+    void OnFabricRetrievedFromStorage(chip::FabricInfo * fabricInfo) {}
+
+    // Intentionally left blank
+    void OnFabricPersistedToStorage(chip::FabricInfo * fabricInfo) {}
+};
+
+BindingFabricTableDelegate gFabricTableDelegate;
+
+} // namespace
 
 namespace {
 
@@ -45,12 +76,14 @@ CHIP_ERROR BindingManager::UnicastBindingRemoved(uint8_t bindingEntryId)
 {
     EmberBindingTableEntry entry{};
     emberGetBinding(bindingEntryId, &entry);
-    if (entry.type != EMBER_UNICAST_BINDING)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
     mPendingNotificationMap.RemoveEntry(bindingEntryId);
     return CHIP_NO_ERROR;
+}
+
+void BindingManager::SetAppServer(Server * appServer)
+{
+    mAppServer = appServer;
+    mAppServer->GetFabricTable().AddFabricDelegate(&gFabricTableDelegate);
 }
 
 CHIP_ERROR BindingManager::EstablishConnection(FabricIndex fabric, NodeId node)
@@ -119,6 +152,12 @@ void BindingManager::HandleDeviceConnectionFailure(PeerId peerId, CHIP_ERROR err
     // Simply release the entry, the connection will be re-established as needed.
     ChipLogError(AppServer, "Failed to establish connection to node 0x" ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
     mAppServer->GetCASESessionManager()->ReleaseSession(peerId);
+}
+
+void BindingManager::FabricRemoved(CompressedFabricId compressedFabricId, FabricIndex fabricIndex)
+{
+    mPendingNotificationMap.RemoveAllEntriesForFabric(fabricIndex);
+    mAppServer->GetCASESessionManager()->ReleaseSessionForFabric(compressedFabricId);
 }
 
 CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, void * context)

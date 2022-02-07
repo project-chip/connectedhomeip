@@ -27,6 +27,7 @@
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app/clusters/identify-server/identify-server.h>
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
@@ -59,16 +60,20 @@ constexpr int kFactoryResetTriggerTimeout      = 3000;
 constexpr int kFactoryResetCancelWindowTimeout = 3000;
 constexpr int kExtDiscoveryTimeoutSecs         = 20;
 constexpr int kAppEventQueueSize               = 10;
-constexpr int kExampleVendorID                 = 0xabcd;
 constexpr uint8_t kButtonPushEvent             = 1;
 constexpr uint8_t kButtonReleaseEvent          = 0;
+constexpr chip::EndpointId kIdentifyEndpointId = 1;
+constexpr uint32_t kIdentifyBlinkRateMs        = 500;
 
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), kAppEventQueueSize, alignof(AppEvent));
 k_timer sFunctionTimer;
 
+Identify sIdentify = { kIdentifyEndpointId, AppTask::IdentifyStartHandler, AppTask::IdentifyStopHandler,
+                       EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED };
+
 LEDWidget sStatusLED;
+LEDWidget sIdentifyLED;
 LEDWidget sUnusedLED;
-LEDWidget sUnusedLED_1;
 
 bool sIsThreadProvisioned = false;
 bool sIsThreadEnabled     = false;
@@ -92,8 +97,8 @@ int AppTask::Init()
     LEDWidget::SetStateUpdateCallback(LEDStateUpdateHandler);
 
     sStatusLED.Init(SYSTEM_STATE_LED);
-    sUnusedLED.Init(DK_LED3);
-    sUnusedLED_1.Init(DK_LED4);
+    sIdentifyLED.Init(DK_LED3);
+    sUnusedLED.Init(DK_LED4);
 
     UpdateStatusLED();
 
@@ -238,6 +243,22 @@ void AppTask::TimerEventHandler(k_timer * timer)
     sAppTask.PostEvent(&event);
 }
 
+void AppTask::IdentifyStartHandler(Identify *)
+{
+    AppEvent event;
+    event.Type    = AppEvent::kEventType_IdentifyStart;
+    event.Handler = [](AppEvent *) { sIdentifyLED.Blink(kIdentifyBlinkRateMs); };
+    sAppTask.PostEvent(&event);
+}
+
+void AppTask::IdentifyStopHandler(Identify *)
+{
+    AppEvent event;
+    event.Type    = AppEvent::kEventType_IdentifyStop;
+    event.Handler = [](AppEvent *) { sIdentifyLED.Set(false); };
+    sAppTask.PostEvent(&event);
+}
+
 void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
 {
     if (aEvent->Type != AppEvent::kEventType_Timer)
@@ -254,12 +275,12 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
 
         // Turn off all LEDs before starting blink to make sure blink is co-ordinated.
         sStatusLED.Set(false);
-        sUnusedLED_1.Set(false);
+        sIdentifyLED.Set(false);
         sUnusedLED.Set(false);
 
         sStatusLED.Blink(500);
+        sIdentifyLED.Blink(500);
         sUnusedLED.Blink(500);
-        sUnusedLED_1.Blink(500);
     }
     else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
     {
@@ -314,8 +335,8 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
         }
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
         {
+            sIdentifyLED.Set(false);
             sUnusedLED.Set(false);
-            sUnusedLED_1.Set(false);
             UpdateStatusLED();
             sAppTask.CancelTimer();
             sAppTask.mFunction = kFunction_NoneSelected;

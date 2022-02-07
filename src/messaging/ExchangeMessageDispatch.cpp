@@ -120,7 +120,7 @@ CHIP_ERROR ExchangeMessageDispatch::OnMessageReceived(uint32_t messageCounter, c
     ReturnErrorCodeIf(!MessagePermitted(payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetMessageType()),
                       CHIP_ERROR_INVALID_ARGUMENT);
 
-    if (IsReliableTransmissionAllowed())
+    if (IsReliableTransmissionAllowed() && !reliableMessageContext->GetExchangeContext()->IsGroupExchangeContext())
     {
         if (!msgFlags.Has(MessageFlagValues::kDuplicateMessage) && payloadHeader.IsAckMsg() &&
             payloadHeader.GetAckMessageCounter().HasValue())

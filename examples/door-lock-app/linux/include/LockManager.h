@@ -18,24 +18,48 @@
 
 #pragma once
 
-#include <stdbool.h>
-#include <stdint.h>
-
-#include <functional>
+#include <LockEndpoint.h>
+#include <app/clusters/door-lock-server/door-lock-server.h>
+#include <cstdint>
 
 #include <app/util/af.h>
 
 class LockManager
 {
 public:
-    LockManager() : mLocked(false) {}
+    LockManager() {}
 
-    bool Lock(chip::Optional<chip::ByteSpan> pin);
-    bool Unlock(chip::Optional<chip::ByteSpan> pin);
+    bool InitEndpoint(chip::EndpointId endpointId);
+
+    bool Lock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, DlOperationError & err);
+    bool Unlock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, DlOperationError & err);
+
+    bool GetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user);
+    bool SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
+                 const chip::CharSpan & userName, uint32_t uniqueId, DlUserStatus userStatus, DlUserType usertype,
+                 DlCredentialRule credentialRule, const DlCredential * credentials, size_t totalCredentials);
+
+    bool GetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialType credentialType,
+                       EmberAfPluginDoorLockCredentialInfo & credential);
+
+    bool SetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialStatus credentialStatus,
+                       DlCredentialType credentialType, const chip::ByteSpan & credentialData);
+
+    DlStatus GetSchedule(chip::EndpointId endpointId, uint8_t weekDayIndex, uint16_t userIndex,
+                         EmberAfPluginDoorLockWeekDaySchedule & schedule);
+    DlStatus GetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
+                         EmberAfPluginDoorLockYearDaySchedule & schedule);
+    DlStatus SetSchedule(chip::EndpointId endpointId, uint8_t weekDayIndex, uint16_t userIndex, DlScheduleStatus status,
+                         DlDaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute);
+    DlStatus SetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex, DlScheduleStatus status,
+                         uint32_t localStartTime, uint32_t localEndTime);
 
     static LockManager & Instance();
 
 private:
-    bool mLocked;
+    LockEndpoint * getEndpoint(chip::EndpointId endpointId);
+
+    std::vector<LockEndpoint> mEndpoints;
+
     static LockManager instance;
 };

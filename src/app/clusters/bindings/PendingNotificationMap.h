@@ -16,6 +16,7 @@
  */
 
 #include <app/util/binding-table.h>
+#include <credentials/FabricTable.h>
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {
@@ -68,7 +69,11 @@ public:
 
     void RemoveEntry(uint8_t bindingEntryId);
 
+    void RemoveAllEntriesForNode(FabricTable * fabricTable, PeerId peer);
+
     void RemoveAllEntriesForNode(FabricIndex fabric, NodeId node);
+
+    void RemoveAllEntriesForFabric(FabricIndex fabric);
 
 private:
     uint8_t mPendingBindingEntries[kMaxPendingNotifications];

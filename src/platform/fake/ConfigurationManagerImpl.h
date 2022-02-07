@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -60,6 +60,12 @@ private:
     CHIP_ERROR StoreSetupPinCode(uint32_t setupPinCode) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR StoreSetupDiscriminator(uint16_t setupDiscriminator) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetSpake2pIterationCount(uint32_t & iterationCount) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetSpake2pSalt(uint8_t * buf, size_t bufSize, size_t & saltLen) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetSpake2pVerifier(uint8_t * buf, size_t bufSize, size_t & verifierLen) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
     CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR IncrementLifetimeCounter() override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetFailSafeArmed(bool & val) override { return CHIP_ERROR_NOT_IMPLEMENTED; }

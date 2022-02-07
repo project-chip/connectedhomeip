@@ -128,7 +128,14 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
             ChipLogDetail(SoftwareUpdate, "Update available from %" PRIu32 " to %" PRIu32 " version",
                           requestorCore->mCurrentVersion, update.softwareVersion);
             MutableByteSpan updateToken(requestorCore->mUpdateTokenBuffer);
-            CopySpanToMutableSpan(update.updateToken, updateToken);
+            // This function copies the bytespan to mutablebytespan only if size of mutablebytespan buffer is greater or equal to
+            // bytespan otherwise we are copying data upto available size.
+            err = CopySpanToMutableSpan(update.updateToken, updateToken);
+            if (err == CHIP_ERROR_BUFFER_TOO_SMALL)
+            {
+                memset(updateToken.data(), 0, updateToken.size());
+                requestorCore->GenerateUpdateToken();
+            }
             requestorCore->mTargetVersion = update.softwareVersion;
             requestorCore->mUpdateToken   = updateToken;
 
@@ -554,12 +561,13 @@ CHIP_ERROR OTARequestor::SendQueryImageRequest(OperationalDeviceProxy & devicePr
 
     char location[DeviceLayer::ConfigurationManager::kMaxLocationLength];
     size_t codeLen = 0;
-    if ((DeviceLayer::ConfigurationMgr().GetCountryCode(location, sizeof(location), codeLen) == CHIP_NO_ERROR) && (codeLen > 0))
+    if ((DeviceLayer::ConfigurationMgr().GetCountryCode(location, sizeof(location), codeLen) == CHIP_NO_ERROR) && (codeLen == 2))
     {
         args.location.SetValue(CharSpan(location, codeLen));
     }
     else
     {
+        // Country code unavailable or invalid, use default
         args.location.SetValue(CharSpan("XX", strlen("XX")));
     }
 
@@ -584,8 +592,6 @@ CHIP_ERROR OTARequestor::ExtractUpdateDescription(const QueryImageResponseDecoda
     update.softwareVersion = response.softwareVersion.Value();
 
     VerifyOrReturnError(response.updateToken.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(response.updateToken.Value().size() >= 8 && response.updateToken.Value().size() <= 32,
-                        CHIP_ERROR_INVALID_ARGUMENT);
     update.updateToken = response.updateToken.Value();
 
     update.userConsentNeeded    = response.userConsentNeeded.ValueOr(false);

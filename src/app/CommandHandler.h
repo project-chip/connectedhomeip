@@ -25,7 +25,6 @@
 #pragma once
 
 #include <app/ConcreteCommandPath.h>
-#include <app/InteractionModelDelegate.h>
 #include <app/data-model/Encode.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
@@ -193,6 +192,8 @@ public:
      *         has been released.
      */
     Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }
+
+    Access::SubjectDescriptor GetSubjectDescriptor() const { return mpExchangeCtx->GetSessionHandle()->GetSubjectDescriptor(); }
 
 private:
     friend class TestCommandInteraction;

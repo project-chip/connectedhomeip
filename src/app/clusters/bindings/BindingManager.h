@@ -61,7 +61,7 @@ public:
 
     void RegisterBoundDeviceChangedHandler(BoundDeviceChangedHandler handler) { mBoundDeviceChangedHandler = handler; }
 
-    void SetAppServer(Server * appServer) { mAppServer = appServer; }
+    void SetAppServer(Server * appServer);
 
     /*
      * Notifies the BindingManager that a new unicast binding is created.
@@ -74,6 +74,12 @@ public:
      *
      */
     CHIP_ERROR UnicastBindingRemoved(uint8_t bindingEntryId);
+
+    /*
+     * Notifies the BindingManager that a fabric is removed from the device
+     *
+     */
+    void FabricRemoved(CompressedFabricId compressedId, FabricIndex fabricIndex);
 
     /*
      * Notify a cluster change to **all** bound devices associated with the (endpoint, cluster) tuple.
@@ -91,13 +97,6 @@ public:
 
 private:
     static BindingManager sBindingManager;
-
-    struct ClusterPath
-    {
-        void * context;
-        ClusterId cluster;
-        EndpointId endpoint;
-    };
 
     static void HandleDeviceConnected(void * context, OperationalDeviceProxy * device);
     void HandleDeviceConnected(OperationalDeviceProxy * device);

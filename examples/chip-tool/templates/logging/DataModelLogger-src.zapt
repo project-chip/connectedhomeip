@@ -2,6 +2,8 @@
 
 #include <commands/clusters/DataModelLogger.h>
 
+using namespace chip::app::Clusters;
+
 {{#structs_with_cluster_name}}
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, {{zapTypeToDecodableClusterObjectType name ns=clusterName isArgument=true}} value)
 {
@@ -24,7 +26,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, {{zapTyp
 
 {{#zcl_clusters}}
 {{#zcl_events}}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Events::{{asUpperCamelCase name}}::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const {{asUpperCamelCase parent.name}}::Events::{{asUpperCamelCase name}}::DecodableType & value)
 {
   DataModelLogger::LogString(label, indent, "{");
 {{#zcl_event_fields}}
@@ -43,3 +45,143 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const ch
 }
 {{/zcl_events}}
 {{/zcl_clusters}}
+
+{{#chip_client_clusters}}
+{{#chip_cluster_responses}}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType & value)
+{
+  DataModelLogger::LogString(label, indent, "{");
+  {{#chip_cluster_response_arguments}}
+  ReturnErrorOnFailure(DataModelLogger::LogValue("{{asLowerCamelCase label}}", indent + 1, value.{{asLowerCamelCase label}}));
+  {{/chip_cluster_response_arguments}}
+  DataModelLogger::LogString(indent, "}");
+  return CHIP_NO_ERROR;
+}
+{{/chip_cluster_responses}}
+{{/chip_client_clusters}}
+
+CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data)
+{
+    ChipLogProgress(chipTool, "Endpoint: %" PRIu16 " Cluster: " ChipLogFormatMEI " Attribute " ChipLogFormatMEI, path.mEndpointId,
+                    ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
+
+    switch (path.mClusterId)
+    {
+{{#chip_client_clusters}}
+{{#chip_server_cluster_attributes}}
+{{#first}}
+        case {{asUpperCamelCase parent.name}}::Id:
+        {
+          switch(path.mAttributeId)
+          {
+{{/first}}
+            case {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::Id:
+            {
+                {{zapTypeToDecodableClusterObjectType type ns=parent.name}} value;
+                ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+                return DataModelLogger::LogValue("{{name}}", 1, value);
+            }
+{{#last}}
+          }
+          break;
+        }
+{{/last}}
+{{/chip_server_cluster_attributes}}
+{{/chip_client_clusters}}
+        default:
+          break;
+    }
+    ChipLogProgress(chipTool, "  Don't know how to log atribute value");
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & path, chip::TLV::TLVReader * data)
+{
+    ChipLogProgress(chipTool, "Endpoint: %" PRIu16 " Cluster: " ChipLogFormatMEI " Command " ChipLogFormatMEI, path.mEndpointId,
+                    ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mCommandId));
+
+    switch (path.mClusterId)
+    {
+{{#chip_client_clusters}}
+{{#chip_cluster_responses}}
+{{#first}}
+        case {{asUpperCamelCase parent.name}}::Id:
+        {
+          switch(path.mCommandId)
+          {
+{{/first}}
+            case {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Id:
+            {
+                {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType value;
+                ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+                return DataModelLogger::LogValue("{{name}}", 1, value);
+            }
+{{#last}}
+          }
+          break;
+        }
+{{/last}}
+{{/chip_cluster_responses}}
+{{/chip_client_clusters}}
+        default:
+          break;
+    }
+    ChipLogProgress(chipTool, "  Don't know how to log command response data");
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip::TLV::TLVReader * data)
+{
+    ChipLogProgress(chipTool, "Endpoint: %" PRIu16 " Cluster: " ChipLogFormatMEI " Event " ChipLogFormatMEI, header.mPath.mEndpointId,
+                    ChipLogValueMEI(header.mPath.mClusterId), ChipLogValueMEI(header.mPath.mEventId));
+
+    ChipLogProgress(chipTool, "\t Event number: %" PRIu64, header.mEventNumber);
+
+    if (header.mPriorityLevel == chip::app::PriorityLevel::Info)
+    {
+        ChipLogProgress(chipTool, "\t Priority: Info");
+    }
+    else if (header.mPriorityLevel == chip::app::PriorityLevel::Critical)
+    {
+        ChipLogProgress(chipTool, "\t Priority: Critical");
+    }
+    else if (header.mPriorityLevel == chip::app::PriorityLevel::Debug)
+    {
+        ChipLogProgress(chipTool, "\t Priority: Debug");
+    }
+    else
+    {
+        ChipLogProgress(chipTool, "\t Priority: Unknown");
+    }
+
+    ChipLogProgress(chipTool, "\t Timestamp: %" PRIu64, header.mTimestamp.mValue);
+
+    switch (header.mPath.mClusterId)
+    {
+{{#chip_client_clusters}}
+{{#chip_server_cluster_events}}
+{{#first}}
+        case {{asUpperCamelCase parent.name}}::Id:
+        {
+          switch(header.mPath.mEventId)
+          {
+{{/first}}
+            case {{asUpperCamelCase parent.name}}::Events::{{asUpperCamelCase name}}::Id:
+            {
+                {{zapTypeToDecodableClusterObjectType name ns=parent.name}} value;
+                ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+                return DataModelLogger::LogValue("{{name}}", 1, value);
+            }
+{{#last}}
+          }
+          break;
+        }
+{{/last}}
+{{/chip_server_cluster_events}}
+{{/chip_client_clusters}}
+        default:
+          break;
+    }
+    ChipLogProgress(chipTool, "  Don't know how to log event data");
+    return CHIP_NO_ERROR;
+}

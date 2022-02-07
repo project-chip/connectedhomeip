@@ -47,8 +47,9 @@ public:
 
     const ReliableMessageProtocolConfig & GetMRPConfig() const override
     {
+        static const ReliableMessageProtocolConfig cfg(GetLocalMRPConfig());
         VerifyOrDie(false);
-        return gDefaultMRPConfig;
+        return cfg;
     }
 
     System::Clock::Milliseconds32 GetAckTimeout() const override

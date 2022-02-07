@@ -27,8 +27,8 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/EventHeader.h>
 #include <app/EventPathParams.h>
-#include <app/InteractionModelDelegate.h>
 #include <app/MessageDef/ReadRequestMessage.h>
+#include <app/MessageDef/StatusIB.h>
 #include <app/MessageDef/StatusResponseMessage.h>
 #include <app/MessageDef/SubscribeRequestMessage.h>
 #include <app/MessageDef/SubscribeResponseMessage.h>
@@ -110,11 +110,14 @@ public:
          * receives an OnDone call to destroy the object.
          *
          * @param[in] aPath        The attribute path field in report response.
+         * @param[in] aVersion     The data version for cluster in report response.
          * @param[in] apData       The attribute data of the given path, will be a nullptr if status is not Success.
          * @param[in] aStatus      Attribute-specific status, containing an InteractionModel::Status code as well as an
          *                         optional cluster-specific status code.
          */
-        virtual void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) {}
+        virtual void OnAttributeData(const ConcreteDataAttributePath & aPath, DataVersion aVersion, TLV::TLVReader * apData,
+                                     const StatusIB & aStatus)
+        {}
 
         /**
          * OnSubscriptionEstablished will be called when a subscription is established for the given subscription transaction.
@@ -156,6 +159,15 @@ public:
          *
          */
         virtual void OnDone() = 0;
+
+        /**
+         * This function is invoked when using SendAutoResubscribeRequest, where the ReadClient was configured to auto re-subscribe
+         * and the ReadPrepareParams was moved into this client for management. This will have to be free'ed appropriately by the
+         * application. If SendAutoResubscribeRequest fails, this function will be called before it returns the failure. If
+         * SendAutoResubscribeRequest succeeds, this function will be called immediately before calling OnDone. If
+         * SendAutoResubscribeRequest is not called, this function will not be called.
+         */
+        virtual void OnDeallocatePaths(ReadPrepareParams && aReadPrepareParams) {}
     };
 
     enum class InteractionType : uint8_t
@@ -175,7 +187,7 @@ public:
      *
      *  @param[in]    apImEngine       A valid pointer to the IM engine.
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
-     *  @param[in]    apCallback       InteractionModelDelegate set by application.
+     *  @param[in]    apCallback       Callback set by application.
      *  @param[in]    aInteractionType Type of interaction (read or subscribe)
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE incorrect state if it is already initialized
@@ -232,6 +244,21 @@ public:
     ReadClient * GetNextClient() { return mpNext; }
     void SetNextClient(ReadClient * apClient) { mpNext = apClient; }
 
+    // Like SendSubscribeRequest, but the ReadClient will automatically attempt to re-establish the subscription if
+    // we decide that the subscription has dropped.  The exact behavior of the re-establishment can be controlled
+    // by setting mResubscribePolicy in the ReadPrepareParams.  If not set, a default behavior with exponential backoff will be
+    // used.
+    //
+    // The application has to know to
+    // a) allocate a ReadPrepareParams object that will have fields mpEventPathParamsList and mpAttributePathParamsList with
+    // lifetimes as long as the ReadClient itself and b) free those up later in the call to OnDeallocatePaths. Note: At a given
+    // time in the system, you can either have a single subscription with re-sub enabled that that has mKeepSubscriptions = false,
+    // OR, multiple subs with re-sub enabled with mKeepSubscriptions = true. You shall not have a mix of both simultaneously.
+    // If SendAutoResubscribeRequest is called at all, it guarantees that it will call OnDeallocatePaths when OnDone is called.
+    // SendAutoResubscribeRequest is the only case that calls OnDeallocatePaths, since that's the only case when the consumer moved
+    // a ReadParams into the client.
+    CHIP_ERROR SendAutoResubscribeRequest(ReadPrepareParams && aReadPrepareParams);
+
 private:
     friend class TestReadInteraction;
     friend class InteractionModelEngine;
@@ -274,14 +301,17 @@ private:
     CHIP_ERROR ProcessSubscribeResponse(System::PacketBufferHandle && aPayload);
     CHIP_ERROR RefreshLivenessCheckTimer();
     void CancelLivenessCheckTimer();
+    void CancelResubscribeTimer();
     void MoveToState(const ClientState aTargetState);
     CHIP_ERROR ProcessAttributePath(AttributePathIB::Parser & aAttributePath, ConcreteDataAttributePath & aClusterInfo);
     CHIP_ERROR ProcessReportData(System::PacketBufferHandle && aPayload);
     const char * GetStateStr() const;
-
+    bool ResubscribeIfNeeded();
     // Specialized request-sending functions.
     CHIP_ERROR SendReadRequest(ReadPrepareParams & aReadPrepareParams);
     CHIP_ERROR SendSubscribeRequest(ReadPrepareParams & aSubscribePrepareParams);
+
+    static void OnResubscribeTimerCallback(System::Layer * apSystemLayer, void * apAppState);
 
     /*
      * Called internally to signal the completion of all work on this object, gracefully close the
@@ -292,6 +322,9 @@ private:
      *
      */
     void Close(CHIP_ERROR aError);
+
+    void StopResubscription();
+    void ClearActiveSubscriptionState();
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
@@ -311,6 +344,8 @@ private:
 
     ReadClient * mpNext                 = nullptr;
     InteractionModelEngine * mpImEngine = nullptr;
+    ReadPrepareParams mReadPrepareParams;
+    uint32_t mNumRetries = 0;
 };
 
 }; // namespace app

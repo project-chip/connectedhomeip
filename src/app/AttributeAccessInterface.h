@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <access/SubjectDescriptor.h>
 #include <app/ClusterInfo.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/MessageDef/AttributeReportIBs.h>
@@ -311,15 +312,26 @@ private:
 class AttributeValueDecoder
 {
 public:
-    AttributeValueDecoder(TLV::TLVReader & aReader, FabricIndex aAccessingFabricIndex) :
-        mReader(aReader), mAccessingFabricIndex(aAccessingFabricIndex)
+    AttributeValueDecoder(TLV::TLVReader & aReader, const Access::SubjectDescriptor & aSubjectDescriptor) :
+        mReader(aReader), mSubjectDescriptor(aSubjectDescriptor)
     {}
 
-    template <typename T>
+    template <typename T, typename std::enable_if_t<!DataModel::IsFabricScoped<T>::value, bool> = true>
     CHIP_ERROR Decode(T & aArg)
     {
         mTriedDecode = true;
         return DataModel::Decode(mReader, aArg);
+    }
+
+    template <typename T, typename std::enable_if_t<DataModel::IsFabricScoped<T>::value, bool> = true>
+    CHIP_ERROR Decode(T & aArg)
+    {
+        mTriedDecode = true;
+        // TODO: We may want to reject kUndefinedFabricIndex for writing fabric scoped data. mAccessingFabricIndex will be
+        // kUndefinedFabricIndex on PASE sessions.
+        ReturnErrorOnFailure(DataModel::Decode(mReader, aArg));
+        aArg.SetFabricIndex(AccessingFabricIndex());
+        return CHIP_NO_ERROR;
     }
 
     bool TriedDecode() const { return mTriedDecode; }
@@ -327,12 +339,17 @@ public:
     /**
      * The accessing fabric index for this write interaction.
      */
-    FabricIndex AccessingFabricIndex() const { return mAccessingFabricIndex; }
+    FabricIndex AccessingFabricIndex() const { return mSubjectDescriptor.fabricIndex; }
+
+    /**
+     * The accessing subject descriptor for this write interaction.
+     */
+    const Access::SubjectDescriptor & GetSubjectDescriptor() const { return mSubjectDescriptor; }
 
 private:
     TLV::TLVReader & mReader;
     bool mTriedDecode = false;
-    const FabricIndex mAccessingFabricIndex;
+    const Access::SubjectDescriptor mSubjectDescriptor;
 };
 
 class AttributeAccessInterface

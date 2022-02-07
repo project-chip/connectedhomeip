@@ -279,6 +279,7 @@ public:
                 }
             }
         }
+        return CHIP_NO_ERROR;
     }
 
     /*
@@ -341,7 +342,8 @@ private:
     //
     void OnReportBegin() override;
     void OnReportEnd() override;
-    void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
+    void OnAttributeData(const ConcreteDataAttributePath & aPath, DataVersion aVersion, TLV::TLVReader * apData,
+                         const StatusIB & aStatus) override;
     void OnError(CHIP_ERROR aError) override { return mCallback.OnError(aError); }
 
     void OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus) override
@@ -351,6 +353,11 @@ private:
 
     void OnDone() override { return mCallback.OnDone(); }
     void OnSubscriptionEstablished(uint64_t aSubscriptionId) override { mCallback.OnSubscriptionEstablished(aSubscriptionId); }
+
+    void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
+    {
+        return mCallback.OnDeallocatePaths(std::move(aReadPrepareParams));
+    }
 
 private:
     Callback & mCallback;
