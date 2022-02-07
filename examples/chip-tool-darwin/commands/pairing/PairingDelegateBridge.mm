@@ -26,8 +26,7 @@
 - (void)onStatusUpdate:(CHIPPairingStatus)status
 {
     NSLog(@"Pairing Status Update: %lu", status);
-    switch (status)
-    {
+    switch (status) {
     case kSecurePairingSuccess:
         ChipLogProgress(chipTool, "Secure Pairing Success");
         break;
