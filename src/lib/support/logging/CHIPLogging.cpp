@@ -100,12 +100,8 @@ static const char ModuleNames[] = "-\0\0" // None
 
 #define ModuleNamesCount ((sizeof(ModuleNames) - 1) / chip::Logging::kMaxModuleNameLen)
 
-void GetModuleName(char * buf, uint8_t bufSize, uint8_t module)
+void GetModuleName(char (&buf)[chip::Logging::kMaxModuleNameLen + 1], uint8_t module)
 {
-    if (bufSize == 0)
-    {
-        return; // no space for anything
-    }
 
     const char * module_name = ModuleNames;
     if (module < ModuleNamesCount)
@@ -113,19 +109,8 @@ void GetModuleName(char * buf, uint8_t bufSize, uint8_t module)
         module_name += module * chip::Logging::kMaxModuleNameLen;
     }
 
-    // module names are NOT generally 0 terminated.
-    // Need to copy exactly kMaxModuleNameLen plus a 0 terminator
-    uint8_t toCopy = chip::Logging::kMaxModuleNameLen + 1; // include 0 terminator
-    if (toCopy > bufSize)
-    {
-        toCopy = bufSize; // at least 1 because of the check at top
-    }
-
-    if (toCopy > 1)
-    {
-        memcpy(buf, module_name, toCopy - 1);
-    }
-    buf[toCopy - 1] = 0; // ensure null termination
+    memcpy(buf, module_name, chip::Logging::kMaxModuleNameLen);
+    buf[chip::Logging::kMaxModuleNameLen] = 0; // ensure null termination
 }
 
 void SetLogRedirectCallback(LogRedirectCallback_t callback)
@@ -203,7 +188,7 @@ void LogV(uint8_t module, uint8_t category, const char * msg, va_list args)
     }
 
     char moduleName[chip::Logging::kMaxModuleNameLen + 1];
-    GetModuleName(moduleName, sizeof(moduleName), module);
+    GetModuleName(moduleName, module);
 
     LogRedirectCallback_t redirect = sLogRedirectCallback.load();
 
