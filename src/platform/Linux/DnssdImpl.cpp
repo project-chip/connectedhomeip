@@ -811,7 +811,7 @@ CHIP_ERROR ChipDnssdShutdown()
     return MdnsAvahi::GetInstance().Shutdown();
 }
 
-CHIP_ERROR ChipDnssdPublishService(const DnssdService * service)
+CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdAsyncReturnCallback callback, void * context)
 {
     if (strcmp(service->mHostName, "") != 0)
     {

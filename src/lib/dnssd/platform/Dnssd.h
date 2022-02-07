@@ -107,6 +107,19 @@ using DnssdResolveCallback = void (*)(void * context, DnssdService * result, CHI
  */
 using DnssdBrowseCallback = void (*)(void * context, DnssdService * services, size_t servicesSize, CHIP_ERROR error);
 
+/**
+ * The callback function for mDNS publish.
+ *
+ * The callback function SHALL NOT take the ownership of the service pointer or
+ * any pointer inside this structure.
+ *
+ * @param[in] context       The context passed to ChipDnssdPublish.
+ * @param[in] type          The published type
+ * @param[in] error         The error code.
+ *
+ */
+using DnssdPublishCallback = void (*)(void * context, const char * type, CHIP_ERROR error);
+
 using DnssdAsyncReturnCallback = void (*)(void * context, CHIP_ERROR error);
 
 /**
@@ -150,13 +163,15 @@ CHIP_ERROR ChipDnssdRemoveServices();
  * This function will NOT take the ownership of service->mTextEntries memory.
  *
  * @param[in] service   The service entry.
+ * @param[in] callback  The callback when the service is published.
+ * @param[in] context   The context passed to the callbacks.
  *
  * @retval CHIP_NO_ERROR                The publish succeeds.
  * @retval CHIP_ERROR_INVALID_ARGUMENT  The service is nullptr.
  * @retval Error code                   The publish fails.
  *
  */
-CHIP_ERROR ChipDnssdPublishService(const DnssdService * service);
+CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback = nullptr, void * context = nullptr);
 
 /**
  * Finalizes updating advertised services.
