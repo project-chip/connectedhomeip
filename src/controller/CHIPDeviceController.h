@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -248,7 +248,7 @@ public:
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
     CHIP_ERROR ComputePASEVerifier(uint32_t iterations, uint32_t setupPincode, const ByteSpan & salt, PASEVerifier & outVerifier,
-                                   uint32_t & outPasscodeId);
+                                   PasscodeId & outPasscodeId);
 
     /**
      * @brief
@@ -270,7 +270,7 @@ public:
      *
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
-    CHIP_ERROR OpenCommissioningWindow(NodeId deviceId, uint16_t timeout, uint16_t iteration, uint16_t discriminator,
+    CHIP_ERROR OpenCommissioningWindow(NodeId deviceId, uint16_t timeout, uint32_t iteration, uint16_t discriminator,
                                        uint8_t option, SetupPayload & payload)
     {
         mSuggestedSetUpPINCode = payload.setUpPINCode;
@@ -301,30 +301,9 @@ public:
      *
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
-    CHIP_ERROR OpenCommissioningWindowWithCallback(NodeId deviceId, uint16_t timeout, uint16_t iteration, uint16_t discriminator,
+    CHIP_ERROR OpenCommissioningWindowWithCallback(NodeId deviceId, uint16_t timeout, uint32_t iteration, uint16_t discriminator,
                                                    uint8_t option, Callback::Callback<OnOpenCommissioningWindow> * callback,
                                                    bool readVIDPIDAttributes = false);
-
-    /**
-     * @brief
-     *   Add a binding.
-     *
-     * @param[in] deviceId           The device Id.
-     * @param[in] deviceEndpointId   The endpoint on the device containing the binding cluster.
-     * @param[in] bindingNodeId      The NodeId for the binding that will be created.
-     * @param[in] bindingGroupId     The GroupId for the binding that will be created.
-     * @param[in] bindingEndpointId  The EndpointId for the binding that will be created.
-     * @param[in] bindingClusterId   The ClusterId for the binding that will be created.
-     * @param[in] onSuccessCallback        The function to be called on success of adding the binding.
-     * @param[in] onFailureCallback        The function to be called on failure of adding the binding.
-     *
-     * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
-     */
-    CHIP_ERROR
-    CreateBindingWithCallback(chip::NodeId deviceId, chip::EndpointId deviceEndpointId, chip::NodeId bindingNodeId,
-                              chip::GroupId bindingGroupId, chip::EndpointId bindingEndpointId, chip::ClusterId bindingClusterId,
-                              CommandResponseSuccessCallback<app::DataModel::NullObjectType> successCb,
-                              CommandResponseFailureCallback failureCb);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     void RegisterDeviceAddressUpdateDelegate(DeviceAddressUpdateDelegate * delegate) { mDeviceAddressUpdateDelegate = delegate; }
@@ -426,7 +405,7 @@ private:
     uint32_t mSuggestedSetUpPINCode = 0;
 
     uint16_t mCommissioningWindowTimeout;
-    uint16_t mCommissioningWindowIteration;
+    uint32_t mCommissioningWindowIteration;
 
     CommissioningWindowOption mCommissioningWindowOption;
 
@@ -434,7 +413,7 @@ private:
     static void OnOpenPairingWindowFailureResponse(void * context, CHIP_ERROR error);
 
     CHIP_ERROR ProcessControllerNOCChain(const ControllerInitParams & params);
-    uint16_t mPAKEVerifierID = 1;
+    PasscodeId mPAKEVerifierID = 1;
 };
 
 /**
@@ -727,7 +706,7 @@ private:
        The function does not hold a reference to the device object.
      */
     CHIP_ERROR SendAttestationRequestCommand(DeviceProxy * device, const ByteSpan & attestationNonce);
-    /* This function sends an OpCSR request to the device.
+    /* This function sends an CSR request to the device.
        The function does not hold a reference to the device object.
      */
     CHIP_ERROR SendOperationalCertificateSigningRequestCommand(DeviceProxy * device, const ByteSpan & csrNonce);
@@ -762,7 +741,7 @@ private:
     /**
      * @brief
      *   This function is called by the IM layer when the commissioner receives the CSR from the device.
-     *   (Reference: Specifications section 11.22.5.8. OpCSR Elements)
+     *   (Reference: Specifications section 11.18.5.6. NOCSR Elements)
      *
      * @param[in] context               The context provided while registering the callback.
      * @param[in] data                  The response struct containing the following fields:
@@ -771,7 +750,7 @@ private:
      * message.
      */
     static void OnOperationalCertificateSigningRequest(
-        void * context, const app::Clusters::OperationalCredentials::Commands::OpCSRResponse::DecodableType & data);
+        void * context, const app::Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType & data);
 
     /* Callback when adding operational certs to device results in failure */
     static void OnAddNOCFailureResponse(void * context, CHIP_ERROR errro);
@@ -809,7 +788,7 @@ private:
     /**
      * @brief
      *   This function processes the CSR sent by the device.
-     *   (Reference: Specifications section 11.22.5.8. OpCSR Elements)
+     *   (Reference: Specifications section 11.18.5.6. NOCSR Elements)
      *
      * @param[in] proxy           device proxy
      * @param[in] NOCSRElements   CSR elements as per specifications section 11.22.5.6. NOCSR Elements.
@@ -817,8 +796,8 @@ private:
      * @param[in] dac               device attestation certificate
      * @param[in] csrNonce          certificate signing request nonce
      */
-    CHIP_ERROR ProcessOpCSR(DeviceProxy * proxy, const ByteSpan & NOCSRElements, const ByteSpan & AttestationSignature,
-                            ByteSpan dac, ByteSpan csrNonce);
+    CHIP_ERROR ProcessCSR(DeviceProxy * proxy, const ByteSpan & NOCSRElements, const ByteSpan & AttestationSignature, ByteSpan dac,
+                          ByteSpan csrNonce);
 
     /**
      * @brief

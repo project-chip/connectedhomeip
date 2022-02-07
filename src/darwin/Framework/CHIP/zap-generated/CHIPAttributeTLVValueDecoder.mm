@@ -4862,8 +4862,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                CHIPGroupKeyManagementClusterGroupKey * newElement_0;
-                newElement_0 = [CHIPGroupKeyManagementClusterGroupKey new];
+                CHIPGroupKeyManagementClusterGroupKeyMapStruct * newElement_0;
+                newElement_0 = [CHIPGroupKeyManagementClusterGroupKeyMapStruct new];
                 newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 newElement_0.groupId = [NSNumber numberWithUnsignedShort:entry_0.groupId];
                 newElement_0.groupKeySetID = [NSNumber numberWithUnsignedShort:entry_0.groupKeySetID];
@@ -4891,9 +4891,9 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                CHIPGroupKeyManagementClusterGroupInfo * newElement_0;
-                newElement_0 = [CHIPGroupKeyManagementClusterGroupInfo new];
-                newElement_0.fabricIndex = [NSNumber numberWithUnsignedShort:entry_0.fabricIndex];
+                CHIPGroupKeyManagementClusterGroupInfoMapStruct * newElement_0;
+                newElement_0 = [CHIPGroupKeyManagementClusterGroupInfoMapStruct new];
+                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 newElement_0.groupId = [NSNumber numberWithUnsignedShort:entry_0.groupId];
                 auto * array_2 = [NSMutableArray new];
                 auto iter_2 = entry_0.endpoints.begin();
@@ -4911,9 +4911,13 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                     }
                 }
                 newElement_0.endpoints = array_2;
-                newElement_0.groupName = [[NSString alloc] initWithBytes:entry_0.groupName.data()
-                                                                  length:entry_0.groupName.size()
-                                                                encoding:NSUTF8StringEncoding];
+                if (entry_0.groupName.HasValue()) {
+                    newElement_0.groupName = [[NSString alloc] initWithBytes:entry_0.groupName.Value().data()
+                                                                      length:entry_0.groupName.Value().size()
+                                                                    encoding:NSUTF8StringEncoding];
+                } else {
+                    newElement_0.groupName = nil;
+                }
                 [array_0 addObject:newElement_0];
             }
             { // Scope for the error so we will know what it's named

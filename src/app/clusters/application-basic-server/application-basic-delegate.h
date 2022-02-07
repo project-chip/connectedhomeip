@@ -43,7 +43,7 @@ public:
     };
     CatalogVendorApp(uint16_t vendorId, const char * appId) { Set(vendorId, appId); };
 
-    bool Matches(CatalogVendorApp app)
+    bool Matches(const CatalogVendorApp & app)
     {
         std::string appId1(applicationId);
         std::string appId2(app.applicationId);

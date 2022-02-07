@@ -8,7 +8,7 @@
 {{!TODO: consider #chip_clusters as iteration point as well.
 {{!      Unsure about the differences}}
 {{#all_user_clusters}}
-{{side}} cluster {{asUpperCamelCase name}} = {{code}} {
+  {{~side}} cluster {{asUpperCamelCase name}} = {{code}} {
   {{#zcl_enums}}
   enum {{asUpperCamelCase name}} : {{type}} {
     {{#zcl_enum_items}}
@@ -26,7 +26,7 @@
 
   {{/zcl_bitmaps}}
   {{#chip_cluster_specific_structs}}
-{{>idl_structure_definition extraIndent=1}}
+    {{~>idl_structure_definition extraIndent=1}}
 
   {{/chip_cluster_specific_structs}}
   {{#zcl_events}}
@@ -61,80 +61,44 @@
     {{/unless}} {{asLowerCamelCase name~}}
     {{~#if isArray~}} [] {{~/if}} = {{code}};
   {{/chip_server_cluster_attributes}}
+  {{~!--Open:Generating command request structs for all incoming commands into server side--~}}
   {{#if (is_server side)}}
-  {{#all_incoming_commands_for_cluster name 'server'}}
-  {{#zcl_command_arguments}}
-
-{{#first}}
-  request struct {{asUpperCamelCase parent.commandName}}Request {
-{{/first}}    
-    {{> idl_structure_member}}
-{{#last}}
-
-  }
-{{/last}}
-  {{/zcl_command_arguments}}
-  {{/all_incoming_commands_for_cluster}}
+    {{#all_incoming_commands_for_cluster name side}}
+      {{~>idl_command_request_struct}}
+    {{/all_incoming_commands_for_cluster}}
+  {{/if}}
+  {{~!--Close:Generating command request structs for all incoming commands into server side--~}}
+  {{~!--Open:Generating command request structs for all outgoing commands from client side--~}}
+  {{#if (is_client side)}}
+    {{#all_outgoing_commands_for_cluster name side}}
+      {{~>idl_command_request_struct}}
+    {{/all_outgoing_commands_for_cluster}}
+  {{/if}}
+  {{~!--Close:Generating command request structs for all outgoing commands from client side--~}}
+  {{~!--Open:Generating command response structs for all incoming commands into client side--~}}
+  {{#if (is_client side)}}
+    {{#all_incoming_commands_for_cluster name side}}
+      {{~>idl_command_response_struct}}
+    {{/all_incoming_commands_for_cluster}}
+  {{/if}}
+  {{~!--Close:Generating command response structs for all incoming commands into client side--~}}
+  {{~!--Open:Generating command response structs for all outgoing commands from server side--~}}
+  {{#if (is_server side)}}
+    {{#all_outgoing_commands_for_cluster name side}}
+      {{~>idl_command_response_struct}}
+    {{/all_outgoing_commands_for_cluster}}
+  {{/if}}
+  {{~!--Close:Generating command response structs for all outgoing commands from server side--~}}
+  {{#if (is_server side)}}
+    {{#all_incoming_commands_for_cluster name side}}
+      {{~>idl_command_request_response}}{{~new_line 1~}}
+    {{/all_incoming_commands_for_cluster}}
   {{/if}}
   {{#if (is_client side)}}
-  {{#all_outgoing_commands_for_cluster name 'client'}}
-  {{#zcl_command_arguments}}
-
-{{#first}}
-  request struct {{asUpperCamelCase parent.commandName}}Request {
-{{/first}}    
-    {{> idl_structure_member}}
-{{#last}}
-
-  }
-{{/last}}
-  {{/zcl_command_arguments}}
-  {{/all_outgoing_commands_for_cluster}}
+    {{#all_outgoing_commands_for_cluster name side}}
+      {{~>idl_command_request_response}}{{~new_line 1~}}
+    {{/all_outgoing_commands_for_cluster}}
   {{/if}}
-{{#if (is_client side)}}
-  {{#all_incoming_commands_for_cluster name 'client'}}
-  {{#zcl_command_arguments}}
-
-{{#first}}
-  response struct {{asUpperCamelCase parent.commandName}} {
-{{/first}}    
-    {{> idl_structure_member}}
-{{#last}}
-
-  }
-{{/last}}
-  {{/zcl_command_arguments}}
-  {{/all_incoming_commands_for_cluster}}
-  {{/if}}
-  {{#if (is_server side)}}
-  {{#all_outgoing_commands_for_cluster name 'server'}}
-  {{#zcl_command_arguments}}
-
-{{#first}}
-  response struct {{asUpperCamelCase parent.commandName}} {
-{{/first}}    
-    {{> idl_structure_member}}
-{{#last}}
-
-  }
-{{/last}}
-  {{/zcl_command_arguments}}
-  {{/all_outgoing_commands_for_cluster}}
-  {{/if}}
-  {{#chip_cluster_commands}}
-  {{#first}}
-
-  {{/first}}
-  {{#if mustUseTimedInvoke}}
-  timed command
-  {{~else}}
-  command
-  {{~/if}} {{asUpperCamelCase name}}(
-    {{~#if arguments~}}
-       {{asUpperCamelCase name}}Request
-    {{~/if~}}
-  ): {{asUpperCamelCase responseName}} = {{code}};
-  {{/chip_cluster_commands}}
 }
 
 {{/all_user_clusters}}

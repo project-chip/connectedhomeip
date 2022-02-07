@@ -448,12 +448,8 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
         MessageHandled();
     });
 
-    // TODO : Remove this bypass for group as to perform the MessagePermitted function Issue # 12101
-    if (!IsGroupExchangeContext())
-    {
-        ReturnErrorOnFailure(
-            mDispatch.OnMessageReceived(messageCounter, payloadHeader, peerAddress, msgFlags, GetReliableMessageContext()));
-    }
+    ReturnErrorOnFailure(
+        mDispatch.OnMessageReceived(messageCounter, payloadHeader, peerAddress, msgFlags, GetReliableMessageContext()));
 
     if (IsAckPending() && !mDelegate)
     {

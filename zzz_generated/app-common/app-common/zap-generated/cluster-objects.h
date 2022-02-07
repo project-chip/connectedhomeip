@@ -24,6 +24,7 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
 #include <app-common/zap-generated/ids/Events.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/EventLoggingTypes.h>
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/Decode.h>
@@ -15845,15 +15846,15 @@ struct Type;
 struct DecodableType;
 } // namespace CertificateChainResponse
 
-namespace OpCSRRequest {
+namespace CSRRequest {
 struct Type;
 struct DecodableType;
-} // namespace OpCSRRequest
+} // namespace CSRRequest
 
-namespace OpCSRResponse {
+namespace CSRResponse {
 struct Type;
 struct DecodableType;
-} // namespace OpCSRResponse
+} // namespace CSRResponse
 
 namespace AddNOC {
 struct Type;
@@ -16024,7 +16025,7 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace CertificateChainResponse
-namespace OpCSRRequest {
+namespace CSRRequest {
 enum class Fields
 {
     kCSRNonce = 0,
@@ -16034,14 +16035,14 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::OpCSRRequest::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CSRRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::ByteSpan CSRNonce;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::OperationalCredentials::Commands::OpCSRResponse::DecodableType;
+    using ResponseType = Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -16049,14 +16050,14 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::OpCSRRequest::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CSRRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::ByteSpan CSRNonce;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace OpCSRRequest
-namespace OpCSRResponse {
+}; // namespace CSRRequest
+namespace CSRResponse {
 enum class Fields
 {
     kNOCSRElements        = 0,
@@ -16067,7 +16068,7 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::OpCSRResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CSRResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::ByteSpan NOCSRElements;
@@ -16083,14 +16084,14 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::OpCSRResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CSRResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::ByteSpan NOCSRElements;
     chip::ByteSpan attestationSignature;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace OpCSRResponse
+}; // namespace CSRResponse
 namespace AddNOC {
 enum class Fields
 {
@@ -16509,7 +16510,7 @@ enum class GroupKeySecurityPolicy : uint8_t
 };
 
 namespace Structs {
-namespace GroupInfo {
+namespace GroupInfoMapStruct {
 enum class Fields
 {
     kFabricIndex = 0,
@@ -16521,31 +16522,39 @@ enum class Fields
 struct Type
 {
 public:
-    uint16_t fabricIndex = static_cast<uint16_t>(0);
-    uint16_t groupId     = static_cast<uint16_t>(0);
-    DataModel::List<const uint16_t> endpoints;
-    chip::CharSpan groupName;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+    chip::GroupId groupId         = static_cast<chip::GroupId>(0);
+    DataModel::List<const chip::EndpointId> endpoints;
+    Optional<chip::CharSpan> groupName;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    static constexpr bool kIsFabricScoped = false;
+    static constexpr bool kIsFabricScoped = true;
+
+    auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
 };
 
 struct DecodableType
 {
 public:
-    uint16_t fabricIndex = static_cast<uint16_t>(0);
-    uint16_t groupId     = static_cast<uint16_t>(0);
-    DataModel::DecodableList<uint16_t> endpoints;
-    chip::CharSpan groupName;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+    chip::GroupId groupId         = static_cast<chip::GroupId>(0);
+    DataModel::DecodableList<chip::EndpointId> endpoints;
+    Optional<chip::CharSpan> groupName;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
-    static constexpr bool kIsFabricScoped = false;
+    static constexpr bool kIsFabricScoped = true;
+
+    auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
 };
 
-} // namespace GroupInfo
-namespace GroupKey {
+} // namespace GroupInfoMapStruct
+namespace GroupKeyMapStruct {
 enum class Fields
 {
     kFabricIndex   = 0,
@@ -16557,7 +16566,7 @@ struct Type
 {
 public:
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
-    uint16_t groupId              = static_cast<uint16_t>(0);
+    chip::GroupId groupId         = static_cast<chip::GroupId>(0);
     uint16_t groupKeySetID        = static_cast<uint16_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -16572,31 +16581,31 @@ public:
 
 using DecodableType = Type;
 
-} // namespace GroupKey
-namespace GroupKeySet {
+} // namespace GroupKeyMapStruct
+namespace GroupKeySetStruct {
 enum class Fields
 {
-    kGroupKeySetID   = 0,
-    kSecurityPolicy  = 1,
-    kEpochKey0       = 2,
-    kEpochStartTime0 = 3,
-    kEpochKey1       = 4,
-    kEpochStartTime1 = 5,
-    kEpochKey2       = 6,
-    kEpochStartTime2 = 7,
+    kGroupKeySetID          = 0,
+    kGroupKeySecurityPolicy = 1,
+    kEpochKey0              = 2,
+    kEpochStartTime0        = 3,
+    kEpochKey1              = 4,
+    kEpochStartTime1        = 5,
+    kEpochKey2              = 6,
+    kEpochStartTime2        = 7,
 };
 
 struct Type
 {
 public:
-    uint16_t groupKeySetID                = static_cast<uint16_t>(0);
-    GroupKeySecurityPolicy securityPolicy = static_cast<GroupKeySecurityPolicy>(0);
-    chip::ByteSpan epochKey0;
-    uint64_t epochStartTime0 = static_cast<uint64_t>(0);
-    chip::ByteSpan epochKey1;
-    uint64_t epochStartTime1 = static_cast<uint64_t>(0);
-    chip::ByteSpan epochKey2;
-    uint64_t epochStartTime2 = static_cast<uint64_t>(0);
+    uint16_t groupKeySetID                        = static_cast<uint16_t>(0);
+    GroupKeySecurityPolicy groupKeySecurityPolicy = static_cast<GroupKeySecurityPolicy>(0);
+    DataModel::Nullable<chip::ByteSpan> epochKey0;
+    DataModel::Nullable<uint64_t> epochStartTime0;
+    DataModel::Nullable<chip::ByteSpan> epochKey1;
+    DataModel::Nullable<uint64_t> epochStartTime1;
+    DataModel::Nullable<chip::ByteSpan> epochKey2;
+    DataModel::Nullable<uint64_t> epochStartTime2;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -16606,7 +16615,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace GroupKeySet
+} // namespace GroupKeySetStruct
 } // namespace Structs
 
 namespace Commands {
@@ -16658,7 +16667,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::KeySetWrite::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
 
-    Structs::GroupKeySet::Type groupKeySet;
+    Structs::GroupKeySetStruct::Type groupKeySet;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -16673,7 +16682,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::KeySetWrite::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
 
-    Structs::GroupKeySet::DecodableType groupKeySet;
+    Structs::GroupKeySetStruct::DecodableType groupKeySet;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace KeySetWrite
@@ -16722,7 +16731,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::KeySetReadResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
 
-    Structs::GroupKeySet::Type groupKeySet;
+    Structs::GroupKeySetStruct::Type groupKeySet;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -16737,7 +16746,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::KeySetReadResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
 
-    Structs::GroupKeySet::DecodableType groupKeySet;
+    Structs::GroupKeySetStruct::DecodableType groupKeySet;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace KeySetReadResponse
@@ -16844,11 +16853,11 @@ namespace Attributes {
 namespace GroupKeyMap {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::Type>;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type>;
     using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType>;
-    using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> &;
+        chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::GroupKeyMap::Id; }
@@ -16858,11 +16867,11 @@ struct TypeInfo
 namespace GroupTable {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::Type>;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::Type>;
     using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::DecodableType>;
-    using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::DecodableType> &;
+        chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::GroupTable::Id; }
@@ -33723,9 +33732,9 @@ namespace TargetNavigator {
 // Enum for StatusEnum
 enum class StatusEnum : uint8_t
 {
-    kSuccess         = 0x00,
-    kAppNotAvailable = 0x01,
-    kSystemBusy      = 0x02,
+    kSuccess        = 0x00,
+    kTargetNotFound = 0x01,
+    kNotAllowed     = 0x02,
 };
 
 namespace Structs {
@@ -35998,7 +36007,7 @@ enum class ChannelFeature : uint32_t
 };
 
 namespace Structs {
-namespace ApplicationLauncherApplication {
+namespace Application {
 enum class Fields
 {
     kCatalogVendorId = 0,
@@ -36019,7 +36028,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace ApplicationLauncherApplication
+} // namespace Application
 namespace ApplicationEP {
 enum class Fields
 {
@@ -36030,7 +36039,7 @@ enum class Fields
 struct Type
 {
 public:
-    Structs::ApplicationLauncherApplication::Type application;
+    Structs::Application::Type application;
     chip::CharSpan endpoint;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -36073,8 +36082,8 @@ namespace Commands {
 namespace LaunchAppRequest {
 enum class Fields
 {
-    kData        = 0,
-    kApplication = 1,
+    kApplication = 0,
+    kData        = 1,
 };
 
 struct Type
@@ -36084,8 +36093,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    chip::CharSpan data;
-    Structs::ApplicationLauncherApplication::Type application;
+    Structs::Application::Type application;
+    chip::ByteSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -36100,8 +36109,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    chip::CharSpan data;
-    Structs::ApplicationLauncherApplication::DecodableType application;
+    Structs::Application::DecodableType application;
+    chip::ByteSpan data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LaunchAppRequest
@@ -36118,7 +36127,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StopAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::ApplicationLauncherApplication::Type application;
+    Structs::Application::Type application;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -36133,7 +36142,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StopAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::ApplicationLauncherApplication::DecodableType application;
+    Structs::Application::DecodableType application;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace StopAppRequest
@@ -36150,7 +36159,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::HideAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::ApplicationLauncherApplication::Type application;
+    Structs::Application::Type application;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -36165,7 +36174,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::HideAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::ApplicationLauncherApplication::DecodableType application;
+    Structs::Application::DecodableType application;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace HideAppRequest
@@ -36184,7 +36193,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
     StatusEnum status = static_cast<StatusEnum>(0);
-    chip::CharSpan data;
+    chip::ByteSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -36200,7 +36209,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
     StatusEnum status = static_cast<StatusEnum>(0);
-    chip::CharSpan data;
+    chip::ByteSpan data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LauncherResponse
@@ -43263,5 +43272,8 @@ struct TypeInfo
 } // namespace ElectricalMeasurement
 
 } // namespace Clusters
+
+bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand);
+
 } // namespace app
 } // namespace chip

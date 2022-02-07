@@ -166,11 +166,11 @@ server cluster ApplicationLauncher = 1292 {
   }
 
   struct ApplicationEP {
-    ApplicationLauncherApplication application = 0;
+    Application application = 0;
     CHAR_STRING endpoint = 1;
   }
 
-  struct ApplicationLauncherApplication {
+  struct Application {
     INT16U catalogVendorId = 0;
     CHAR_STRING applicationId = 1;
   }
@@ -180,21 +180,21 @@ server cluster ApplicationLauncher = 1292 {
   readonly global attribute int16u clusterRevision = 65533;
 
   request struct HideAppRequestRequest {
-    ApplicationLauncherApplication application = 0;
+    Application application = 0;
   }
 
   request struct LaunchAppRequestRequest {
-    CHAR_STRING data = 0;
-    ApplicationLauncherApplication application = 1;
+    Application application = 0;
+    OCTET_STRING data = 1;
   }
 
   request struct StopAppRequestRequest {
-    ApplicationLauncherApplication application = 0;
+    Application application = 0;
   }
 
   response struct LauncherResponse {
     StatusEnum status = 0;
-    CHAR_STRING data = 1;
+    OCTET_STRING data = 1;
   }
 
   command HideAppRequest(HideAppRequestRequest): LauncherResponse = 2;
@@ -756,21 +756,21 @@ server cluster GroupKeyManagement = 63 {
     kLowLatency = 1;
   }
 
-  struct GroupKey {
+  struct GroupKeyMapStruct {
     fabric_idx fabricIndex = 0;
-    INT16U groupId = 1;
+    group_id groupId = 1;
     INT16U groupKeySetID = 2;
   }
 
-  struct GroupInfo {
-    INT16U fabricIndex = 0;
-    INT16U groupId = 1;
-    INT16U endpoints[] = 2;
-    CHAR_STRING<16> groupName = 3;
+  struct GroupInfoMapStruct {
+    fabric_idx fabricIndex = 0;
+    group_id groupId = 1;
+    endpoint_no endpoints[] = 2;
+    optional CHAR_STRING<16> groupName = 3;
   }
 
-  attribute GroupKey groupKeyMap[] = 0;
-  readonly attribute GroupInfo groupTable[] = 1;
+  attribute GroupKeyMapStruct groupKeyMap[] = 0;
+  readonly attribute GroupInfoMapStruct groupTable[] = 1;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
@@ -1486,12 +1486,12 @@ client cluster OperationalCredentials = 62 {
     OCTET_STRING attestationNonce = 0;
   }
 
-  request struct CertificateChainRequestRequest {
-    INT8U certificateType = 0;
+  request struct CSRRequestRequest {
+    OCTET_STRING CSRNonce = 0;
   }
 
-  request struct OpCSRRequestRequest {
-    OCTET_STRING CSRNonce = 0;
+  request struct CertificateChainRequestRequest {
+    INT8U certificateType = 0;
   }
 
   request struct RemoveFabricRequest {
@@ -1507,6 +1507,11 @@ client cluster OperationalCredentials = 62 {
     OCTET_STRING signature = 1;
   }
 
+  response struct CSRResponse {
+    OCTET_STRING NOCSRElements = 0;
+    OCTET_STRING attestationSignature = 1;
+  }
+
   response struct CertificateChainResponse {
     OCTET_STRING certificate = 0;
   }
@@ -1517,16 +1522,11 @@ client cluster OperationalCredentials = 62 {
     optional CHAR_STRING debugText = 2;
   }
 
-  response struct OpCSRResponse {
-    OCTET_STRING NOCSRElements = 0;
-    OCTET_STRING attestationSignature = 1;
-  }
-
   command AddNOC(AddNOCRequest): NOCResponse = 6;
   command AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
   command AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
+  command CSRRequest(CSRRequestRequest): CSRResponse = 4;
   command CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
-  command OpCSRRequest(OpCSRRequestRequest): OpCSRResponse = 4;
   command RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
   command UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
 }
@@ -1584,12 +1584,12 @@ server cluster OperationalCredentials = 62 {
     OCTET_STRING attestationNonce = 0;
   }
 
-  request struct CertificateChainRequestRequest {
-    INT8U certificateType = 0;
+  request struct CSRRequestRequest {
+    OCTET_STRING CSRNonce = 0;
   }
 
-  request struct OpCSRRequestRequest {
-    OCTET_STRING CSRNonce = 0;
+  request struct CertificateChainRequestRequest {
+    INT8U certificateType = 0;
   }
 
   request struct RemoveFabricRequest {
@@ -1614,6 +1614,11 @@ server cluster OperationalCredentials = 62 {
     OCTET_STRING signature = 1;
   }
 
+  response struct CSRResponse {
+    OCTET_STRING NOCSRElements = 0;
+    OCTET_STRING attestationSignature = 1;
+  }
+
   response struct CertificateChainResponse {
     OCTET_STRING certificate = 0;
   }
@@ -1624,16 +1629,11 @@ server cluster OperationalCredentials = 62 {
     optional CHAR_STRING debugText = 2;
   }
 
-  response struct OpCSRResponse {
-    OCTET_STRING NOCSRElements = 0;
-    OCTET_STRING attestationSignature = 1;
-  }
-
   command AddNOC(AddNOCRequest): NOCResponse = 6;
   command AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
   command AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
+  command CSRRequest(CSRRequestRequest): CSRResponse = 4;
   command CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
-  command OpCSRRequest(OpCSRRequestRequest): OpCSRResponse = 4;
   command RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
   command RemoveTrustedRootCertificate(RemoveTrustedRootCertificateRequest): DefaultSuccess = 12;
   command UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
@@ -1671,8 +1671,8 @@ server cluster SoftwareDiagnostics = 52 {
 server cluster TargetNavigator = 1285 {
   enum StatusEnum : ENUM8 {
     kSuccess = 0;
-    kAppNotAvailable = 1;
-    kSystemBusy = 2;
+    kTargetNotFound = 1;
+    kNotAllowed = 2;
   }
 
   struct TargetInfo {

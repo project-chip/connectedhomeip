@@ -1752,6 +1752,23 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_RESUBSCRIBE_WAIT_TIME_MULTIPLIER_MS
 #define CHIP_RESUBSCRIBE_WAIT_TIME_MULTIPLIER_MS 10000
 #endif
+
+/*
+ * @def CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE
+ *
+ * @brief Safety limit to ensure that we don't end up with a
+ * larger-than-expected buffer for temporary attribute storage (on the stack or
+ * in .bss).  The SDK will fail to compile if this value is set below the value
+ * it thinks it needs for a buffer size that can store any simple (not list or
+ * struct) attribute value.
+ */
+#ifndef CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE
+// I can't figure out how to get all-clusters-app to sanely use a different
+// value here, and that app includes TestCluster, which has very large string
+// attributes (1000 octets, leading to a 1003 octet buffer).
+#define CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE 1003
+#endif // CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE
+
 /**
  * @}
  */

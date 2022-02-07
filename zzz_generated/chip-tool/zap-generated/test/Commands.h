@@ -61,11 +61,6 @@ public:
         printf("Test_TC_CC_9_1\n");
         printf("Test_TC_CC_9_2\n");
         printf("Test_TC_CC_9_3\n");
-        printf("Test_TC_DD_1_5\n");
-        printf("Test_TC_DD_1_6\n");
-        printf("Test_TC_DD_1_7\n");
-        printf("Test_TC_DD_1_8\n");
-        printf("Test_TC_DD_1_9\n");
         printf("Test_TC_DM_1_1\n");
         printf("Test_TC_DM_3_1\n");
         printf("Test_TC_DM_2_2\n");
@@ -180,9 +175,25 @@ public:
         printf("DL_Schedules\n");
         printf("TestGroupMessaging\n");
         printf("TestGroupsCluster\n");
+        printf("TestGroupKeyManagementCluster\n");
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+class ManualTestList : public Command
+{
+public:
+    ManualTestList() : Command("list-manual"){};
+    CHIP_ERROR Run() override
+    {
+        printf("Test_TC_DD_1_5\n");
+        printf("Test_TC_DD_1_6\n");
+        printf("Test_TC_DD_1_7\n");
+        printf("Test_TC_DD_1_8\n");
+        printf("Test_TC_DD_1_9\n");
         printf("TestGroupDemoCommand\n");
         printf("TestGroupDemoConfig\n");
-        printf("TestGroupKeyManagementCluster\n");
 
         return CHIP_NO_ERROR;
     }
@@ -16219,406 +16230,6 @@ private:
     }
 
     void OnSuccessResponse_14() { NextTest(); }
-};
-
-class Test_TC_DD_1_5 : public TestCommand
-{
-public:
-    Test_TC_DD_1_5(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_5", credsIssuerConfig), mTestIndex(0)
-    {
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-    }
-
-    ~Test_TC_DD_1_5() {}
-
-    /////////// TestCommand Interface /////////
-    void NextTest() override
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        if (0 == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_1_5\n");
-        }
-
-        if (mTestCount == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_1_5\n");
-            SetCommandExitStatus(CHIP_NO_ERROR);
-            return;
-        }
-
-        Wait();
-
-        // Ensure we increment mTestIndex before we start running the relevant
-        // command.  That way if we lose the timeslice after we send the message
-        // but before our function call returns, we won't end up with an
-        // incorrect mTestIndex value observed when we get the response.
-        switch (mTestIndex++)
-        {
-        case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Step 1\n");
-            err = TestStep1_0();
-            break;
-        }
-
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }
-    }
-
-private:
-    std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 1;
-
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-
-    //
-    // Tests methods
-    //
-
-    CHIP_ERROR TestStep1_0()
-    {
-        SetIdentity(kIdentityAlpha);
-        return Log("Verify that the onboarding payload for NFC tags SHALL use NDEF URI Record Type Definition as defined by NFC "
-                   "Forum in URI Record Type Definition RTD URI");
-    }
-};
-
-class Test_TC_DD_1_6 : public TestCommand
-{
-public:
-    Test_TC_DD_1_6(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_6", credsIssuerConfig), mTestIndex(0)
-    {
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-    }
-
-    ~Test_TC_DD_1_6() {}
-
-    /////////// TestCommand Interface /////////
-    void NextTest() override
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        if (0 == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_1_6\n");
-        }
-
-        if (mTestCount == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_1_6\n");
-            SetCommandExitStatus(CHIP_NO_ERROR);
-            return;
-        }
-
-        Wait();
-
-        // Ensure we increment mTestIndex before we start running the relevant
-        // command.  That way if we lose the timeslice after we send the message
-        // but before our function call returns, we won't end up with an
-        // incorrect mTestIndex value observed when we get the response.
-        switch (mTestIndex++)
-        {
-        case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Step 1\n");
-            err = TestStep1_0();
-            break;
-        case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Step 1 verification\n");
-            err = TestStep1Verification_1();
-            break;
-        case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Step 2 verificaiton\n");
-            err = TestStep2Verificaiton_2();
-            break;
-        }
-
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }
-    }
-
-private:
-    std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 3;
-
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-
-    //
-    // Tests methods
-    //
-
-    CHIP_ERROR TestStep1_0()
-    {
-        SetIdentity(kIdentityAlpha);
-        return Log("Scan the DUTs QR code using a QR code reader");
-    }
-
-    CHIP_ERROR TestStep1Verification_1()
-    {
-        SetIdentity(kIdentityAlpha);
-        return Log(
-            "Verify the QR code gets scanned successfully and the QR code must be of sufficient size and contrast respective to "
-            "surface material as to be readable with standard readers such as smartphones in normal lighting conditions");
-    }
-
-    CHIP_ERROR TestStep2Verificaiton_2()
-    {
-        SetIdentity(kIdentityAlpha);
-        return Log("Verify QR code version is 1 or higher");
-    }
-};
-
-class Test_TC_DD_1_7 : public TestCommand
-{
-public:
-    Test_TC_DD_1_7(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_7", credsIssuerConfig), mTestIndex(0)
-    {
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-    }
-
-    ~Test_TC_DD_1_7() {}
-
-    /////////// TestCommand Interface /////////
-    void NextTest() override
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        if (0 == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_1_7\n");
-        }
-
-        if (mTestCount == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_1_7\n");
-            SetCommandExitStatus(CHIP_NO_ERROR);
-            return;
-        }
-
-        Wait();
-
-        // Ensure we increment mTestIndex before we start running the relevant
-        // command.  That way if we lose the timeslice after we send the message
-        // but before our function call returns, we won't end up with an
-        // incorrect mTestIndex value observed when we get the response.
-        switch (mTestIndex++)
-        {
-        case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Precondition\n");
-            err = TestPrecondition_0();
-            break;
-        case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Step 1\n");
-            err = TestStep1_1();
-            break;
-        }
-
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }
-    }
-
-private:
-    std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 2;
-
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-
-    //
-    // Tests methods
-    //
-
-    CHIP_ERROR TestPrecondition_0()
-    {
-        SetIdentity(kIdentityAlpha);
-        return Log("Verify manual pairing code is printed on the device or in additional provided materials");
-    }
-
-    CHIP_ERROR TestStep1_1()
-    {
-        SetIdentity(kIdentityAlpha);
-        return Log("Verify that the Manual Pairing Code should be printed using a minimum font size of 6 points typically "
-                   "producing a typeface height of 2.1 mm");
-    }
-};
-
-class Test_TC_DD_1_8 : public TestCommand
-{
-public:
-    Test_TC_DD_1_8(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_8", credsIssuerConfig), mTestIndex(0)
-    {
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-    }
-
-    ~Test_TC_DD_1_8() {}
-
-    /////////// TestCommand Interface /////////
-    void NextTest() override
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        if (0 == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_1_8\n");
-        }
-
-        if (mTestCount == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_1_8\n");
-            SetCommandExitStatus(CHIP_NO_ERROR);
-            return;
-        }
-
-        Wait();
-
-        // Ensure we increment mTestIndex before we start running the relevant
-        // command.  That way if we lose the timeslice after we send the message
-        // but before our function call returns, we won't end up with an
-        // incorrect mTestIndex value observed when we get the response.
-        switch (mTestIndex++)
-        {
-        case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Step 1\n");
-            err = TestStep1_0();
-            break;
-        case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Step 1 verification\n");
-            err = TestStep1Verification_1();
-            break;
-        }
-
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }
-    }
-
-private:
-    std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 2;
-
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-
-    //
-    // Tests methods
-    //
-
-    CHIP_ERROR TestStep1_0()
-    {
-        SetIdentity(kIdentityAlpha);
-        return Log("Scan the device QR code using DUT");
-    }
-
-    CHIP_ERROR TestStep1Verification_1()
-    {
-        SetIdentity(kIdentityAlpha);
-        return Log("Verify the DUT is able to scan and parse the QR code successfully to onboard the device onto the CHIP network");
-    }
-};
-
-class Test_TC_DD_1_9 : public TestCommand
-{
-public:
-    Test_TC_DD_1_9(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_9", credsIssuerConfig), mTestIndex(0)
-    {
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-    }
-
-    ~Test_TC_DD_1_9() {}
-
-    /////////// TestCommand Interface /////////
-    void NextTest() override
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        if (0 == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_1_9\n");
-        }
-
-        if (mTestCount == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_1_9\n");
-            SetCommandExitStatus(CHIP_NO_ERROR);
-            return;
-        }
-
-        Wait();
-
-        // Ensure we increment mTestIndex before we start running the relevant
-        // command.  That way if we lose the timeslice after we send the message
-        // but before our function call returns, we won't end up with an
-        // incorrect mTestIndex value observed when we get the response.
-        switch (mTestIndex++)
-        {
-        case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Precondition\n");
-            err = TestPrecondition_0();
-            break;
-        case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Step 1\n");
-            err = TestStep1_1();
-            break;
-        case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Step 1 verification\n");
-            err = TestStep1Verification_2();
-            break;
-        }
-
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }
-    }
-
-private:
-    std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 3;
-
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-
-    //
-    // Tests methods
-    //
-
-    CHIP_ERROR TestPrecondition_0()
-    {
-        SetIdentity(kIdentityAlpha);
-        return Log("Verify that the manual pairing code is printed on the device or in additional provided materials");
-    }
-
-    CHIP_ERROR TestStep1_1()
-    {
-        SetIdentity(kIdentityAlpha);
-        return Log("Provide the 11 digit or 21 digit pairing code from the Device in text speech or any format supported by DUT");
-    }
-
-    CHIP_ERROR TestStep1Verification_2()
-    {
-        SetIdentity(kIdentityAlpha);
-        return Log(
-            "Verify that the manual pairing code can be provided to DUT and parsed to onboard the device onto the CHIP network");
-    }
 };
 
 class Test_TC_DM_1_1 : public TestCommand
@@ -45268,10 +44879,11 @@ private:
         using RequestType               = chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppRequest::Type;
 
         RequestType request;
-        request.data = chip::Span<const char>("datagarbage: not in length on purpose", 4);
 
         request.application.catalogVendorId = 123U;
         request.application.applicationId   = chip::Span<const char>("applicationIdgarbage: not in length on purpose", 13);
+
+        request.data = chip::ByteSpan(chip::Uint8::from_const_char("datagarbage: not in length on purpose"), 4);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_2(data.status, data.data);
@@ -45291,11 +44903,11 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_2(chip::app::Clusters::ApplicationLauncher::StatusEnum status, chip::CharSpan data)
+    void OnSuccessResponse_2(chip::app::Clusters::ApplicationLauncher::StatusEnum status, chip::ByteSpan data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
-        VerifyOrReturn(CheckValueAsString("data", data, chip::CharSpan("data", 4)));
+        VerifyOrReturn(CheckValueAsString("data", data, chip::ByteSpan(chip::Uint8::from_const_char("data"), 4)));
 
         NextTest();
     }
@@ -45328,11 +44940,11 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3(chip::app::Clusters::ApplicationLauncher::StatusEnum status, chip::CharSpan data)
+    void OnSuccessResponse_3(chip::app::Clusters::ApplicationLauncher::StatusEnum status, chip::ByteSpan data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
-        VerifyOrReturn(CheckValueAsString("data", data, chip::CharSpan("data", 4)));
+        VerifyOrReturn(CheckValueAsString("data", data, chip::ByteSpan(chip::Uint8::from_const_char("data"), 4)));
 
         NextTest();
     }
@@ -45365,11 +44977,11 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4(chip::app::Clusters::ApplicationLauncher::StatusEnum status, chip::CharSpan data)
+    void OnSuccessResponse_4(chip::app::Clusters::ApplicationLauncher::StatusEnum status, chip::ByteSpan data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
-        VerifyOrReturn(CheckValueAsString("data", data, chip::CharSpan("data", 4)));
+        VerifyOrReturn(CheckValueAsString("data", data, chip::ByteSpan(chip::Uint8::from_const_char("data"), 4)));
 
         NextTest();
     }
@@ -83549,11 +83161,11 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Add Group 1 - endpoint 1\n");
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Add Group 1 (endpoint 1)\n");
             err = TestAddGroup1Endpoint1_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Add Group 2 - endpoint 0\n");
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Add Group 2 (endpoint 0)\n");
             err = TestAddGroup2Endpoint0_2();
             break;
         case 3:
@@ -83680,7 +83292,7 @@ private:
         using RequestType               = chip::app::Clusters::Groups::Commands::AddGroup::Type;
 
         RequestType request;
-        request.groupId   = 4660U;
+        request.groupId   = 257U;
         request.groupName = chip::Span<const char>("Group #1garbage: not in length on purpose", 8);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
@@ -83705,7 +83317,7 @@ private:
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
-        VerifyOrReturn(CheckValue("groupId", groupId, 4660U));
+        VerifyOrReturn(CheckValue("groupId", groupId, 257U));
 
         NextTest();
     }
@@ -83716,7 +83328,7 @@ private:
         using RequestType               = chip::app::Clusters::Groups::Commands::AddGroup::Type;
 
         RequestType request;
-        request.groupId   = 1U;
+        request.groupId   = 258U;
         request.groupName = chip::Span<const char>("Group #2garbage: not in length on purpose", 8);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
@@ -83741,7 +83353,7 @@ private:
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
-        VerifyOrReturn(CheckValue("groupId", groupId, 1U));
+        VerifyOrReturn(CheckValue("groupId", groupId, 258U));
 
         NextTest();
     }
@@ -83753,23 +83365,30 @@ private:
 
         RequestType request;
 
-        request.groupKeySet.groupKeySetID  = 257U;
-        request.groupKeySet.securityPolicy = static_cast<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy>(0);
-        request.groupKeySet.epochKey0 =
+        request.groupKeySet.groupKeySetID = 417U;
+        request.groupKeySet.groupKeySecurityPolicy =
+            static_cast<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy>(0);
+        request.groupKeySet.epochKey0.SetNonNull();
+        request.groupKeySet.epochKey0.Value() =
             chip::ByteSpan(chip::Uint8::from_const_char(
                                "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xafgarbage: not in length on purpose"),
                            16);
-        request.groupKeySet.epochStartTime0 = 1110000ULL;
-        request.groupKeySet.epochKey1 =
+        request.groupKeySet.epochStartTime0.SetNonNull();
+        request.groupKeySet.epochStartTime0.Value() = 1110000ULL;
+        request.groupKeySet.epochKey1.SetNonNull();
+        request.groupKeySet.epochKey1.Value() =
             chip::ByteSpan(chip::Uint8::from_const_char(
                                "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbfgarbage: not in length on purpose"),
                            16);
-        request.groupKeySet.epochStartTime1 = 1110001ULL;
-        request.groupKeySet.epochKey2 =
+        request.groupKeySet.epochStartTime1.SetNonNull();
+        request.groupKeySet.epochStartTime1.Value() = 1110001ULL;
+        request.groupKeySet.epochKey2.SetNonNull();
+        request.groupKeySet.epochKey2.Value() =
             chip::ByteSpan(chip::Uint8::from_const_char(
                                "\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcfgarbage: not in length on purpose"),
                            16);
-        request.groupKeySet.epochStartTime2 = 1110002ULL;
+        request.groupKeySet.epochStartTime2.SetNonNull();
+        request.groupKeySet.epochStartTime2.Value() = 1110002ULL;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_3();
@@ -83798,23 +83417,30 @@ private:
 
         RequestType request;
 
-        request.groupKeySet.groupKeySetID  = 258U;
-        request.groupKeySet.securityPolicy = static_cast<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy>(0);
-        request.groupKeySet.epochKey0 =
+        request.groupKeySet.groupKeySetID = 418U;
+        request.groupKeySet.groupKeySecurityPolicy =
+            static_cast<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy>(1);
+        request.groupKeySet.epochKey0.SetNonNull();
+        request.groupKeySet.epochKey0.Value() =
             chip::ByteSpan(chip::Uint8::from_const_char(
                                "\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdfgarbage: not in length on purpose"),
                            16);
-        request.groupKeySet.epochStartTime0 = 2220000ULL;
-        request.groupKeySet.epochKey1 =
+        request.groupKeySet.epochStartTime0.SetNonNull();
+        request.groupKeySet.epochStartTime0.Value() = 2220000ULL;
+        request.groupKeySet.epochKey1.SetNonNull();
+        request.groupKeySet.epochKey1.Value() =
             chip::ByteSpan(chip::Uint8::from_const_char(
                                "\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xefgarbage: not in length on purpose"),
                            16);
-        request.groupKeySet.epochStartTime1 = 2220001ULL;
-        request.groupKeySet.epochKey2 =
+        request.groupKeySet.epochStartTime1.SetNonNull();
+        request.groupKeySet.epochStartTime1.Value() = 2220001ULL;
+        request.groupKeySet.epochKey2.SetNonNull();
+        request.groupKeySet.epochKey2.Value() =
             chip::ByteSpan(chip::Uint8::from_const_char(
                                "\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xffgarbage: not in length on purpose"),
                            16);
-        request.groupKeySet.epochStartTime2 = 2220002ULL;
+        request.groupKeySet.epochStartTime2.SetNonNull();
+        request.groupKeySet.epochStartTime2.Value() = 2220002ULL;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_4();
@@ -83842,17 +83468,18 @@ private:
         chip::Controller::GroupKeyManagementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::Type> groupKeyMapArgument;
+        chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type>
+            groupKeyMapArgument;
 
-        chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::Type groupKeyMapList_0[2];
+        chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type groupKeyMapList_0[2];
 
         groupKeyMapList_0[0].fabricIndex   = 1;
-        groupKeyMapList_0[0].groupId       = 4660U;
-        groupKeyMapList_0[0].groupKeySetID = 257U;
+        groupKeyMapList_0[0].groupId       = 257U;
+        groupKeyMapList_0[0].groupKeySetID = 417U;
 
         groupKeyMapList_0[1].fabricIndex   = 1;
-        groupKeyMapList_0[1].groupId       = 1U;
-        groupKeyMapList_0[1].groupKeySetID = 258U;
+        groupKeyMapList_0[1].groupId       = 258U;
+        groupKeyMapList_0[1].groupKeySetID = 418U;
 
         groupKeyMapArgument = groupKeyMapList_0;
 
@@ -83871,7 +83498,7 @@ private:
 
     CHIP_ERROR TestGroupWriteAttribute_6()
     {
-        const chip::GroupId groupId = 1;
+        const chip::GroupId groupId = 258;
         chip::Controller::BasicClusterTest cluster;
         cluster.AssociateWithGroup(mDevices[kIdentityAlpha], groupId);
 
@@ -83919,7 +83546,7 @@ private:
 
     CHIP_ERROR TestRestoreInitialLocationValue_8()
     {
-        const chip::GroupId groupId = 1;
+        const chip::GroupId groupId = 258;
         chip::Controller::BasicClusterTest cluster;
         cluster.AssociateWithGroup(mDevices[kIdentityAlpha], groupId);
 
@@ -83967,7 +83594,7 @@ private:
 
     CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_10()
     {
-        const chip::GroupId groupId = 4660;
+        const chip::GroupId groupId = 257;
         using RequestType           = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -84818,6 +84445,1165 @@ private:
     }
 };
 
+class TestGroupKeyManagementCluster : public TestCommand
+{
+public:
+    TestGroupKeyManagementCluster(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestGroupKeyManagementCluster", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~TestGroupKeyManagementCluster() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: TestGroupKeyManagementCluster\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: TestGroupKeyManagementCluster\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Read maxGroupsPerFabric\n");
+            err = TestReadMaxGroupsPerFabric_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read maxGroupKeysPerFabric\n");
+            err = TestReadMaxGroupKeysPerFabric_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Add Group 1\n");
+            err = TestAddGroup1_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Add Group 2\n");
+            err = TestAddGroup2_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : KeySet Write 1\n");
+            err = TestKeySetWrite1_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : KeySet Write 2\n");
+            err = TestKeySetWrite2_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : KeySet Read\n");
+            err = TestKeySetRead_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Write Group Keys\n");
+            err = TestWriteGroupKeys_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Read Group Keys\n");
+            err = TestReadGroupKeys_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Read GroupTable\n");
+            err = TestReadGroupTable_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : KeySet Remove 1\n");
+            err = TestKeySetRemove1_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : KeySet Read (removed)\n");
+            err = TestKeySetReadRemoved_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : KeySet Read (not removed)\n");
+            err = TestKeySetReadNotRemoved_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : Remove All\n");
+            err = TestRemoveAll_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool, " ***** Test Step 15 : KeySet Remove 2\n");
+            err = TestKeySetRemove2_15();
+            break;
+        case 16:
+            ChipLogProgress(chipTool, " ***** Test Step 16 : KeySet Read (also removed)\n");
+            err = TestKeySetReadAlsoRemoved_16();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 17;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    static void OnFailureCallback_1(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestGroupKeyManagementCluster *>(context))->OnFailureResponse_1(error);
+    }
+
+    static void OnSuccessCallback_1(void * context, uint16_t maxGroupsPerFabric)
+    {
+        (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_1(maxGroupsPerFabric);
+    }
+
+    static void OnFailureCallback_2(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestGroupKeyManagementCluster *>(context))->OnFailureResponse_2(error);
+    }
+
+    static void OnSuccessCallback_2(void * context, uint16_t maxGroupKeysPerFabric)
+    {
+        (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_2(maxGroupKeysPerFabric);
+    }
+
+    static void OnFailureCallback_8(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestGroupKeyManagementCluster *>(context))->OnFailureResponse_8(error);
+    }
+
+    static void OnSuccessCallback_8(void * context)
+    {
+        (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_8();
+    }
+
+    static void OnFailureCallback_9(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestGroupKeyManagementCluster *>(context))->OnFailureResponse_9(error);
+    }
+
+    static void
+    OnSuccessCallback_9(void * context,
+                        const chip::app::DataModel::DecodableList<
+                            chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType> & groupKeyMap)
+    {
+        (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_9(groupKeyMap);
+    }
+
+    static void OnFailureCallback_10(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestGroupKeyManagementCluster *>(context))->OnFailureResponse_10(error);
+    }
+
+    static void
+    OnSuccessCallback_10(void * context,
+                         const chip::app::DataModel::DecodableList<
+                             chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType> & groupTable)
+    {
+        (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_10(groupTable);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestReadMaxGroupsPerFabric_1()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::GroupKeyManagementClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::GroupKeyManagement::Attributes::MaxGroupsPerFabric::TypeInfo>(
+                this, OnSuccessCallback_1, OnFailureCallback_1));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_1(uint16_t maxGroupsPerFabric)
+    {
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("maxGroupsPerFabric", maxGroupsPerFabric, 2U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadMaxGroupKeysPerFabric_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::GroupKeyManagementClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::GroupKeyManagement::Attributes::MaxGroupKeysPerFabric::TypeInfo>(
+                this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_2(uint16_t maxGroupKeysPerFabric)
+    {
+        VerifyOrReturn(CheckValue("maxGroupKeysPerFabric", maxGroupKeysPerFabric, 2U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestAddGroup1_3()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::Groups::Commands::AddGroup::Type;
+
+        RequestType request;
+        request.groupId   = 257U;
+        request.groupName = chip::Span<const char>("Group #1garbage: not in length on purpose", 8);
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_3(data.status, data.groupId);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnFailureResponse_3(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_3(uint8_t status, uint16_t groupId)
+    {
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValue("groupId", groupId, 257U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestAddGroup2_4()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::Groups::Commands::AddGroup::Type;
+
+        RequestType request;
+        request.groupId   = 258U;
+        request.groupName = chip::Span<const char>("Group #2garbage: not in length on purpose", 8);
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_4(data.status, data.groupId);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnFailureResponse_4(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_4(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_4(uint8_t status, uint16_t groupId)
+    {
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValue("groupId", groupId, 258U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestKeySetWrite1_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        using RequestType               = chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::Type;
+
+        RequestType request;
+
+        request.groupKeySet.groupKeySetID = 417U;
+        request.groupKeySet.groupKeySecurityPolicy =
+            static_cast<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy>(0);
+        request.groupKeySet.epochKey0.SetNonNull();
+        request.groupKeySet.epochKey0.Value() =
+            chip::ByteSpan(chip::Uint8::from_const_char(
+                               "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xafgarbage: not in length on purpose"),
+                           16);
+        request.groupKeySet.epochStartTime0.SetNonNull();
+        request.groupKeySet.epochStartTime0.Value() = 1110000ULL;
+        request.groupKeySet.epochKey1.SetNonNull();
+        request.groupKeySet.epochKey1.Value() =
+            chip::ByteSpan(chip::Uint8::from_const_char(
+                               "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbfgarbage: not in length on purpose"),
+                           16);
+        request.groupKeySet.epochStartTime1.SetNonNull();
+        request.groupKeySet.epochStartTime1.Value() = 1110001ULL;
+        request.groupKeySet.epochKey2.SetNonNull();
+        request.groupKeySet.epochKey2.Value() =
+            chip::ByteSpan(chip::Uint8::from_const_char(
+                               "\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcfgarbage: not in length on purpose"),
+                           16);
+        request.groupKeySet.epochStartTime2.SetNonNull();
+        request.groupKeySet.epochStartTime2.Value() = 1110002ULL;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_5();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnFailureResponse_5(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_5() { NextTest(); }
+
+    CHIP_ERROR TestKeySetWrite2_6()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        using RequestType               = chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::Type;
+
+        RequestType request;
+
+        request.groupKeySet.groupKeySetID = 418U;
+        request.groupKeySet.groupKeySecurityPolicy =
+            static_cast<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy>(1);
+        request.groupKeySet.epochKey0.SetNonNull();
+        request.groupKeySet.epochKey0.Value() =
+            chip::ByteSpan(chip::Uint8::from_const_char(
+                               "\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdfgarbage: not in length on purpose"),
+                           16);
+        request.groupKeySet.epochStartTime0.SetNonNull();
+        request.groupKeySet.epochStartTime0.Value() = 2110000ULL;
+        request.groupKeySet.epochKey1.SetNonNull();
+        request.groupKeySet.epochKey1.Value() =
+            chip::ByteSpan(chip::Uint8::from_const_char(
+                               "\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xefgarbage: not in length on purpose"),
+                           16);
+        request.groupKeySet.epochStartTime1.SetNonNull();
+        request.groupKeySet.epochStartTime1.Value() = 2110001ULL;
+        request.groupKeySet.epochKey2.SetNonNull();
+        request.groupKeySet.epochKey2.Value() =
+            chip::ByteSpan(chip::Uint8::from_const_char(
+                               "\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xffgarbage: not in length on purpose"),
+                           16);
+        request.groupKeySet.epochStartTime2.SetNonNull();
+        request.groupKeySet.epochStartTime2.Value() = 2110002ULL;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_6();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnFailureResponse_6(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_6() { NextTest(); }
+
+    CHIP_ERROR TestKeySetRead_7()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        using RequestType               = chip::app::Clusters::GroupKeyManagement::Commands::KeySetRead::Type;
+
+        RequestType request;
+        request.groupKeySetID = 417U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_7(data.groupKeySet);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnFailureResponse_7(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_7(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_7(const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySetStruct::DecodableType & groupKeySet)
+    {
+        VerifyOrReturn(CheckValue("groupKeySet.groupKeySetID", groupKeySet.groupKeySetID, 417U));
+        VerifyOrReturn(CheckValue("groupKeySet.groupKeySecurityPolicy", groupKeySet.groupKeySecurityPolicy, 0));
+        VerifyOrReturn(CheckValueNull("groupKeySet.epochKey0", groupKeySet.epochKey0));
+        VerifyOrReturn(CheckValueNonNull("groupKeySet.epochStartTime0", groupKeySet.epochStartTime0));
+        VerifyOrReturn(CheckValue("groupKeySet.epochStartTime0.Value()", groupKeySet.epochStartTime0.Value(), 1110000ULL));
+        VerifyOrReturn(CheckValueNull("groupKeySet.epochKey1", groupKeySet.epochKey1));
+        VerifyOrReturn(CheckValueNonNull("groupKeySet.epochStartTime1", groupKeySet.epochStartTime1));
+        VerifyOrReturn(CheckValue("groupKeySet.epochStartTime1.Value()", groupKeySet.epochStartTime1.Value(), 1110001ULL));
+        VerifyOrReturn(CheckValueNull("groupKeySet.epochKey2", groupKeySet.epochKey2));
+        VerifyOrReturn(CheckValueNonNull("groupKeySet.epochStartTime2", groupKeySet.epochStartTime2));
+        VerifyOrReturn(CheckValue("groupKeySet.epochStartTime2.Value()", groupKeySet.epochStartTime2.Value(), 1110002ULL));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteGroupKeys_8()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::GroupKeyManagementClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type>
+            groupKeyMapArgument;
+
+        chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type groupKeyMapList_0[2];
+
+        groupKeyMapList_0[0].fabricIndex   = 1;
+        groupKeyMapList_0[0].groupId       = 257U;
+        groupKeyMapList_0[0].groupKeySetID = 417U;
+
+        groupKeyMapList_0[1].fabricIndex   = 1;
+        groupKeyMapList_0[1].groupId       = 258U;
+        groupKeyMapList_0[1].groupKeySetID = 418U;
+
+        groupKeyMapArgument = groupKeyMapList_0;
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::GroupKeyManagement::Attributes::GroupKeyMap::TypeInfo>(
+            groupKeyMapArgument, this, OnSuccessCallback_8, OnFailureCallback_8));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_8(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_8() { NextTest(); }
+
+    CHIP_ERROR TestReadGroupKeys_9()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::GroupKeyManagementClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::GroupKeyManagement::Attributes::GroupKeyMap::TypeInfo>(
+            this, OnSuccessCallback_9, OnFailureCallback_9));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_9(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_9(const chip::app::DataModel::DecodableList<
+                             chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType> & groupKeyMap)
+    {
+        {
+            auto iter_0 = groupKeyMap.begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(groupKeyMap)>("groupKeyMap", iter_0, 0));
+            VerifyOrReturn(CheckValue("groupKeyMap[0].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+            VerifyOrReturn(CheckValue("groupKeyMap[0].groupId", iter_0.GetValue().groupId, 257U));
+            VerifyOrReturn(CheckValue("groupKeyMap[0].groupKeySetID", iter_0.GetValue().groupKeySetID, 417U));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(groupKeyMap)>("groupKeyMap", iter_0, 1));
+            VerifyOrReturn(CheckValue("groupKeyMap[1].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+            VerifyOrReturn(CheckValue("groupKeyMap[1].groupId", iter_0.GetValue().groupId, 258U));
+            VerifyOrReturn(CheckValue("groupKeyMap[1].groupKeySetID", iter_0.GetValue().groupKeySetID, 418U));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(groupKeyMap)>("groupKeyMap", iter_0, 2));
+        }
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadGroupTable_10()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::GroupKeyManagementClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::GroupKeyManagement::Attributes::GroupTable::TypeInfo>(
+            this, OnSuccessCallback_10, OnFailureCallback_10));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_10(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_10(const chip::app::DataModel::DecodableList<
+                              chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType> & groupTable)
+    {
+        {
+            auto iter_0 = groupTable.begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(groupTable)>("groupTable", iter_0, 0));
+            VerifyOrReturn(CheckValue("groupTable[0].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+            VerifyOrReturn(CheckValue("groupTable[0].groupId", iter_0.GetValue().groupId, 257U));
+            VerifyOrReturn(CheckValuePresent("groupTable[0].groupName", iter_0.GetValue().groupName));
+            VerifyOrReturn(CheckValueAsString("groupTable[0].groupName.Value()", iter_0.GetValue().groupName.Value(),
+                                              chip::CharSpan("Group #1", 8)));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(groupTable)>("groupTable", iter_0, 1));
+            VerifyOrReturn(CheckValue("groupTable[1].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+            VerifyOrReturn(CheckValue("groupTable[1].groupId", iter_0.GetValue().groupId, 258U));
+            VerifyOrReturn(CheckValuePresent("groupTable[1].groupName", iter_0.GetValue().groupName));
+            VerifyOrReturn(CheckValueAsString("groupTable[1].groupName.Value()", iter_0.GetValue().groupName.Value(),
+                                              chip::CharSpan("Group #2", 8)));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(groupTable)>("groupTable", iter_0, 2));
+        }
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestKeySetRemove1_11()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        using RequestType               = chip::app::Clusters::GroupKeyManagement::Commands::KeySetRemove::Type;
+
+        RequestType request;
+        request.groupKeySetID = 417U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_11();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnFailureResponse_11(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_11(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_11() { NextTest(); }
+
+    CHIP_ERROR TestKeySetReadRemoved_12()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        using RequestType               = chip::app::Clusters::GroupKeyManagement::Commands::KeySetRead::Type;
+
+        RequestType request;
+        request.groupKeySetID = 417U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_12(data.groupKeySet);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnFailureResponse_12(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_12(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_NOT_FOUND));
+        NextTest();
+    }
+
+    void
+    OnSuccessResponse_12(const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySetStruct::DecodableType & groupKeySet)
+    {
+        ThrowSuccessResponse();
+    }
+
+    CHIP_ERROR TestKeySetReadNotRemoved_13()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        using RequestType               = chip::app::Clusters::GroupKeyManagement::Commands::KeySetRead::Type;
+
+        RequestType request;
+        request.groupKeySetID = 418U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_13(data.groupKeySet);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnFailureResponse_13(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_13(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void
+    OnSuccessResponse_13(const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySetStruct::DecodableType & groupKeySet)
+    {
+        VerifyOrReturn(CheckValue("groupKeySet.groupKeySetID", groupKeySet.groupKeySetID, 418U));
+        VerifyOrReturn(CheckValue("groupKeySet.groupKeySecurityPolicy", groupKeySet.groupKeySecurityPolicy, 1));
+        VerifyOrReturn(CheckValueNull("groupKeySet.epochKey0", groupKeySet.epochKey0));
+        VerifyOrReturn(CheckValueNonNull("groupKeySet.epochStartTime0", groupKeySet.epochStartTime0));
+        VerifyOrReturn(CheckValue("groupKeySet.epochStartTime0.Value()", groupKeySet.epochStartTime0.Value(), 2110000ULL));
+        VerifyOrReturn(CheckValueNull("groupKeySet.epochKey1", groupKeySet.epochKey1));
+        VerifyOrReturn(CheckValueNonNull("groupKeySet.epochStartTime1", groupKeySet.epochStartTime1));
+        VerifyOrReturn(CheckValue("groupKeySet.epochStartTime1.Value()", groupKeySet.epochStartTime1.Value(), 2110001ULL));
+        VerifyOrReturn(CheckValueNull("groupKeySet.epochKey2", groupKeySet.epochKey2));
+        VerifyOrReturn(CheckValueNonNull("groupKeySet.epochStartTime2", groupKeySet.epochStartTime2));
+        VerifyOrReturn(CheckValue("groupKeySet.epochStartTime2.Value()", groupKeySet.epochStartTime2.Value(), 2110002ULL));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestRemoveAll_14()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::Groups::Commands::RemoveAllGroups::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_14();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnFailureResponse_14(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_14(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_14() { NextTest(); }
+
+    CHIP_ERROR TestKeySetRemove2_15()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        using RequestType               = chip::app::Clusters::GroupKeyManagement::Commands::KeySetRemove::Type;
+
+        RequestType request;
+        request.groupKeySetID = 418U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_15();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnFailureResponse_15(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_15(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_15() { NextTest(); }
+
+    CHIP_ERROR TestKeySetReadAlsoRemoved_16()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        using RequestType               = chip::app::Clusters::GroupKeyManagement::Commands::KeySetRead::Type;
+
+        RequestType request;
+        request.groupKeySetID = 418U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_16(data.groupKeySet);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnFailureResponse_16(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_16(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_NOT_FOUND));
+        NextTest();
+    }
+
+    void
+    OnSuccessResponse_16(const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySetStruct::DecodableType & groupKeySet)
+    {
+        ThrowSuccessResponse();
+    }
+};
+
+class Test_TC_DD_1_5 : public TestCommand
+{
+public:
+    Test_TC_DD_1_5(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_5", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_DD_1_5() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_1_5\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_1_5\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Step 1\n");
+            err = TestStep1_0();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 1;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestStep1_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("Verify that the onboarding payload for NFC tags SHALL use NDEF URI Record Type Definition as defined by NFC "
+                   "Forum in URI Record Type Definition RTD URI");
+    }
+};
+
+class Test_TC_DD_1_6 : public TestCommand
+{
+public:
+    Test_TC_DD_1_6(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_6", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_DD_1_6() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_1_6\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_1_6\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Step 1\n");
+            err = TestStep1_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Step 1 verification\n");
+            err = TestStep1Verification_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Step 2 verificaiton\n");
+            err = TestStep2Verificaiton_2();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 3;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestStep1_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("Scan the DUTs QR code using a QR code reader");
+    }
+
+    CHIP_ERROR TestStep1Verification_1()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log(
+            "Verify the QR code gets scanned successfully and the QR code must be of sufficient size and contrast respective to "
+            "surface material as to be readable with standard readers such as smartphones in normal lighting conditions");
+    }
+
+    CHIP_ERROR TestStep2Verificaiton_2()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("Verify QR code version is 1 or higher");
+    }
+};
+
+class Test_TC_DD_1_7 : public TestCommand
+{
+public:
+    Test_TC_DD_1_7(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_7", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_DD_1_7() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_1_7\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_1_7\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Precondition\n");
+            err = TestPrecondition_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Step 1\n");
+            err = TestStep1_1();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 2;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestPrecondition_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("Verify manual pairing code is printed on the device or in additional provided materials");
+    }
+
+    CHIP_ERROR TestStep1_1()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("Verify that the Manual Pairing Code should be printed using a minimum font size of 6 points typically "
+                   "producing a typeface height of 2.1 mm");
+    }
+};
+
+class Test_TC_DD_1_8 : public TestCommand
+{
+public:
+    Test_TC_DD_1_8(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_8", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_DD_1_8() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_1_8\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_1_8\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Step 1\n");
+            err = TestStep1_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Step 1 verification\n");
+            err = TestStep1Verification_1();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 2;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestStep1_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("Scan the device QR code using DUT");
+    }
+
+    CHIP_ERROR TestStep1Verification_1()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("Verify the DUT is able to scan and parse the QR code successfully to onboard the device onto the CHIP network");
+    }
+};
+
+class Test_TC_DD_1_9 : public TestCommand
+{
+public:
+    Test_TC_DD_1_9(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_9", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_DD_1_9() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_1_9\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_1_9\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Precondition\n");
+            err = TestPrecondition_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Step 1\n");
+            err = TestStep1_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Step 1 verification\n");
+            err = TestStep1Verification_2();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 3;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestPrecondition_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("Verify that the manual pairing code is printed on the device or in additional provided materials");
+    }
+
+    CHIP_ERROR TestStep1_1()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("Provide the 11 digit or 21 digit pairing code from the Device in text speech or any format supported by DUT");
+    }
+
+    CHIP_ERROR TestStep1Verification_2()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log(
+            "Verify that the manual pairing code can be provided to DUT and parsed to onboard the device onto the CHIP network");
+    }
+};
+
 class TestGroupDemoCommand : public TestCommand
 {
 public:
@@ -85454,157 +86240,13 @@ private:
     }
 };
 
-class TestGroupKeyManagementCluster : public TestCommand
-{
-public:
-    TestGroupKeyManagementCluster(CredentialIssuerCommands * credsIssuerConfig) :
-        TestCommand("TestGroupKeyManagementCluster", credsIssuerConfig), mTestIndex(0)
-    {
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-    }
-
-    ~TestGroupKeyManagementCluster() {}
-
-    /////////// TestCommand Interface /////////
-    void NextTest() override
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        if (0 == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Start: TestGroupKeyManagementCluster\n");
-        }
-
-        if (mTestCount == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Complete: TestGroupKeyManagementCluster\n");
-            SetCommandExitStatus(CHIP_NO_ERROR);
-            return;
-        }
-
-        Wait();
-
-        // Ensure we increment mTestIndex before we start running the relevant
-        // command.  That way if we lose the timeslice after we send the message
-        // but before our function call returns, we won't end up with an
-        // incorrect mTestIndex value observed when we get the response.
-        switch (mTestIndex++)
-        {
-        case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
-            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
-            break;
-        case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Read maxGroupsPerFabric\n");
-            err = TestReadMaxGroupsPerFabric_1();
-            break;
-        case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Read maxGroupKeysPerFabric\n");
-            err = TestReadMaxGroupKeysPerFabric_2();
-            break;
-        }
-
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }
-    }
-
-private:
-    std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 3;
-
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-
-    static void OnFailureCallback_1(void * context, CHIP_ERROR error)
-    {
-        (static_cast<TestGroupKeyManagementCluster *>(context))->OnFailureResponse_1(error);
-    }
-
-    static void OnSuccessCallback_1(void * context, uint16_t maxGroupsPerFabric)
-    {
-        (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_1(maxGroupsPerFabric);
-    }
-
-    static void OnFailureCallback_2(void * context, CHIP_ERROR error)
-    {
-        (static_cast<TestGroupKeyManagementCluster *>(context))->OnFailureResponse_2(error);
-    }
-
-    static void OnSuccessCallback_2(void * context, uint16_t maxGroupKeysPerFabric)
-    {
-        (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_2(maxGroupKeysPerFabric);
-    }
-
-    //
-    // Tests methods
-    //
-
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
-    {
-        SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
-    }
-
-    CHIP_ERROR TestReadMaxGroupsPerFabric_1()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
-        chip::Controller::GroupKeyManagementClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(
-            cluster.ReadAttribute<chip::app::Clusters::GroupKeyManagement::Attributes::MaxGroupsPerFabric::TypeInfo>(
-                this, OnSuccessCallback_1, OnFailureCallback_1));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_1(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_1(uint16_t maxGroupsPerFabric)
-    {
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("maxGroupsPerFabric", maxGroupsPerFabric, 2U));
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadMaxGroupKeysPerFabric_2()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
-        chip::Controller::GroupKeyManagementClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(
-            cluster.ReadAttribute<chip::app::Clusters::GroupKeyManagement::Attributes::MaxGroupKeysPerFabric::TypeInfo>(
-                this, OnSuccessCallback_2, OnFailureCallback_2));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_2(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_2(uint16_t maxGroupKeysPerFabric)
-    {
-        VerifyOrReturn(CheckValue("maxGroupKeysPerFabric", maxGroupKeysPerFabric, 2U));
-
-        NextTest();
-    }
-};
-
 void registerCommandsTests(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     const char * clusterName = "Tests";
 
     commands_list clusterCommands = {
         make_unique<TestList>(),
+        make_unique<ManualTestList>(),
         make_unique<Test_TC_BI_1_1>(credsIssuerConfig),
         make_unique<Test_TC_BI_2_1>(credsIssuerConfig),
         make_unique<Test_TC_BI_2_2>(credsIssuerConfig),
@@ -85634,11 +86276,6 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_CC_9_1>(credsIssuerConfig),
         make_unique<Test_TC_CC_9_2>(credsIssuerConfig),
         make_unique<Test_TC_CC_9_3>(credsIssuerConfig),
-        make_unique<Test_TC_DD_1_5>(credsIssuerConfig),
-        make_unique<Test_TC_DD_1_6>(credsIssuerConfig),
-        make_unique<Test_TC_DD_1_7>(credsIssuerConfig),
-        make_unique<Test_TC_DD_1_8>(credsIssuerConfig),
-        make_unique<Test_TC_DD_1_9>(credsIssuerConfig),
         make_unique<Test_TC_DM_1_1>(credsIssuerConfig),
         make_unique<Test_TC_DM_3_1>(credsIssuerConfig),
         make_unique<Test_TC_DM_2_2>(credsIssuerConfig),
@@ -85753,9 +86390,14 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<DL_Schedules>(credsIssuerConfig),
         make_unique<TestGroupMessaging>(credsIssuerConfig),
         make_unique<TestGroupsCluster>(credsIssuerConfig),
+        make_unique<TestGroupKeyManagementCluster>(credsIssuerConfig),
+        make_unique<Test_TC_DD_1_5>(credsIssuerConfig),
+        make_unique<Test_TC_DD_1_6>(credsIssuerConfig),
+        make_unique<Test_TC_DD_1_7>(credsIssuerConfig),
+        make_unique<Test_TC_DD_1_8>(credsIssuerConfig),
+        make_unique<Test_TC_DD_1_9>(credsIssuerConfig),
         make_unique<TestGroupDemoCommand>(credsIssuerConfig),
         make_unique<TestGroupDemoConfig>(credsIssuerConfig),
-        make_unique<TestGroupKeyManagementCluster>(credsIssuerConfig),
     };
 
     commands.Register(clusterName, clusterCommands);

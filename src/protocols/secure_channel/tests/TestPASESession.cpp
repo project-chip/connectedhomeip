@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,6 +42,21 @@ using namespace chip::Messaging;
 using namespace chip::Protocols;
 
 namespace {
+
+constexpr PASEVerifier sTestSpake2p01_PASEVerifier = { .mW0 = { 0xab, 0xa6, 0x0c, 0x30, 0x41, 0x6b, 0x8f, 0x41, 0x77, 0xf5,
+                                                                0xe1, 0x6a, 0xd5, 0x14, 0xcf, 0xd9, 0x57, 0x75, 0x13, 0xf0,
+                                                                0x2f, 0xd6, 0x05, 0x06, 0xb1, 0x04, 0x9d, 0x0f, 0x2c, 0x73,
+                                                                0x10, 0x01, 0x0e, 0x5e, 0x40, 0xbf, 0xd8, 0x6b, 0x4e, 0xf6 },
+                                                       .mL  = { 0x81, 0xa8, 0x8b, 0x71, 0xe9, 0xe2, 0xa8, 0x53, 0x98, 0x5a,
+                                                               0x7d, 0xef, 0x91, 0x6e, 0xa3, 0x0e, 0x01, 0xb8, 0x72, 0x2f,
+                                                               0xbf, 0x7d, 0x0e, 0x38, 0x85, 0x6c, 0x12, 0xcd, 0x64, 0xc2,
+                                                               0x25, 0xbb, 0x24, 0xef, 0x21, 0x41, 0x7e, 0x0e, 0x44, 0xe5 } };
+constexpr PASEVerifierSerialized sTestSpake2p01_SerializedVerifier = {
+    0xab, 0xa6, 0x0c, 0x30, 0x41, 0x6b, 0x8f, 0x41, 0x77, 0xf5, 0xe1, 0x6a, 0xd5, 0x14, 0xcf, 0xd9, 0x57, 0x75, 0x13, 0xf0,
+    0x2f, 0xd6, 0x05, 0x06, 0xb1, 0x04, 0x9d, 0x0f, 0x2c, 0x73, 0x10, 0x01, 0x0e, 0x5e, 0x40, 0xbf, 0xd8, 0x6b, 0x4e, 0xf6,
+    0x81, 0xa8, 0x8b, 0x71, 0xe9, 0xe2, 0xa8, 0x53, 0x98, 0x5a, 0x7d, 0xef, 0x91, 0x6e, 0xa3, 0x0e, 0x01, 0xb8, 0x72, 0x2f,
+    0xbf, 0x7d, 0x0e, 0x38, 0x85, 0x6c, 0x12, 0xcd, 0x64, 0xc2, 0x25, 0xbb, 0x24, 0xef, 0x21, 0x41, 0x7e, 0x0e, 0x44, 0xe5
+};
 
 class PASETestLoopbackTransport : public Test::LoopbackTransport
 {
@@ -400,6 +415,26 @@ void SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
     chip::Platform::Delete(testPairingSession2);
 }
 
+void PASEVerifierSerializeTest(nlTestSuite * inSuite, void * inContext)
+{
+    PASEVerifier verifier;
+    NL_TEST_ASSERT(inSuite, verifier.Deserialize(ByteSpan(sTestSpake2p01_SerializedVerifier)) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, memcmp(&verifier, &sTestSpake2p01_PASEVerifier, sizeof(PASEVerifier)) == 0);
+
+    PASEVerifierSerialized serializedVerifier;
+    MutableByteSpan serializedVerifierSpan(serializedVerifier);
+    NL_TEST_ASSERT(inSuite, verifier.Serialize(serializedVerifierSpan) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, serializedVerifierSpan.size() == kSpake2pSerializedVerifierSize);
+    NL_TEST_ASSERT(inSuite, memcmp(serializedVerifier, sTestSpake2p01_SerializedVerifier, kSpake2pSerializedVerifierSize) == 0);
+
+    PASEVerifierSerialized serializedVerifier2;
+    MutableByteSpan serializedVerifier2Span(serializedVerifier2);
+    NL_TEST_ASSERT(inSuite, chip::Crypto::DRBG_get_bytes(serializedVerifier, kSpake2pSerializedVerifierSize) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, verifier.Deserialize(ByteSpan(serializedVerifier)) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, verifier.Serialize(serializedVerifier2Span) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, memcmp(serializedVerifier, serializedVerifier2, kSpake2pSerializedVerifierSize) == 0);
+}
+
 // Test Suite
 
 /**
@@ -417,6 +452,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("Handshake with packet loss", SecurePairingHandshakeWithPacketLossTest),
     NL_TEST_DEF("Failed Handshake", SecurePairingFailedHandshake),
     NL_TEST_DEF("Serialize",   SecurePairingSerializeTest),
+    NL_TEST_DEF("PASE Verifier Serialize", PASEVerifierSerializeTest),
 
     NL_TEST_SENTINEL()
 };

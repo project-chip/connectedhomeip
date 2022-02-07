@@ -431,8 +431,7 @@ public:
 
 private:
     chip::app::Clusters::ApplicationLauncher::Commands::HideAppRequest::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type>
-        mComplex_Application;
+    TypedComplexArgument<chip::app::Clusters::ApplicationLauncher::Structs::Application::Type> mComplex_Application;
 };
 
 /*
@@ -444,8 +443,8 @@ public:
     ApplicationLauncherLaunchAppRequest(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("launch-app-request", credsIssuerConfig), mComplex_Application(&mRequest.application)
     {
-        AddArgument("Data", &mRequest.data);
         AddArgument("Application", &mComplex_Application);
+        AddArgument("Data", &mRequest.data);
         ClusterCommand::AddArguments();
     }
 
@@ -458,8 +457,7 @@ public:
 
 private:
     chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppRequest::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type>
-        mComplex_Application;
+    TypedComplexArgument<chip::app::Clusters::ApplicationLauncher::Structs::Application::Type> mComplex_Application;
 };
 
 /*
@@ -484,8 +482,7 @@ public:
 
 private:
     chip::app::Clusters::ApplicationLauncher::Commands::StopAppRequest::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type>
-        mComplex_Application;
+    TypedComplexArgument<chip::app::Clusters::ApplicationLauncher::Structs::Application::Type> mComplex_Application;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -3332,7 +3329,7 @@ public:
 
 private:
     chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySet::Type> mComplex_GroupKeySet;
+    TypedComplexArgument<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySetStruct::Type> mComplex_GroupKeySet;
 };
 
 class WriteGroupKeyManagementGroupKeyMap : public WriteAttribute
@@ -3354,8 +3351,9 @@ public:
     }
 
 private:
-    chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::Type> mValue;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::Type>>
+    chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type> mValue;
+    TypedComplexArgument<
+        chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type>>
         mComplex;
 };
 
@@ -5272,8 +5270,8 @@ private:
 | * AddNOC                                                            |   0x06 |
 | * AddTrustedRootCertificate                                         |   0x0B |
 | * AttestationRequest                                                |   0x00 |
+| * CSRRequest                                                        |   0x04 |
 | * CertificateChainRequest                                           |   0x02 |
-| * OpCSRRequest                                                      |   0x04 |
 | * RemoveFabric                                                      |   0x0A |
 | * RemoveTrustedRootCertificate                                      |   0x0C |
 | * UpdateFabricLabel                                                 |   0x09 |
@@ -5370,6 +5368,29 @@ private:
 };
 
 /*
+ * Command CSRRequest
+ */
+class OperationalCredentialsCSRRequest : public ClusterCommand
+{
+public:
+    OperationalCredentialsCSRRequest(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("csrrequest", credsIssuerConfig)
+    {
+        AddArgument("CSRNonce", &mRequest.CSRNonce);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000004) on endpoint %" PRIu16, endpointId);
+
+        return ClusterCommand::SendCommand(device, endpointId, 0x0000003E, 0x00000004, mRequest);
+    }
+
+private:
+    chip::app::Clusters::OperationalCredentials::Commands::CSRRequest::Type mRequest;
+};
+
+/*
  * Command CertificateChainRequest
  */
 class OperationalCredentialsCertificateChainRequest : public ClusterCommand
@@ -5391,30 +5412,6 @@ public:
 
 private:
     chip::app::Clusters::OperationalCredentials::Commands::CertificateChainRequest::Type mRequest;
-};
-
-/*
- * Command OpCSRRequest
- */
-class OperationalCredentialsOpCSRRequest : public ClusterCommand
-{
-public:
-    OperationalCredentialsOpCSRRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("op-csrrequest", credsIssuerConfig)
-    {
-        AddArgument("CSRNonce", &mRequest.CSRNonce);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000004) on endpoint %" PRIu16, endpointId);
-
-        return ClusterCommand::SendCommand(device, endpointId, 0x0000003E, 0x00000004, mRequest);
-    }
-
-private:
-    chip::app::Clusters::OperationalCredentials::Commands::OpCSRRequest::Type mRequest;
 };
 
 /*
@@ -11628,8 +11625,8 @@ void registerClusterOperationalCredentials(Commands & commands, CredentialIssuer
         make_unique<OperationalCredentialsAddNOC>(credsIssuerConfig),                       //
         make_unique<OperationalCredentialsAddTrustedRootCertificate>(credsIssuerConfig),    //
         make_unique<OperationalCredentialsAttestationRequest>(credsIssuerConfig),           //
+        make_unique<OperationalCredentialsCSRRequest>(credsIssuerConfig),                   //
         make_unique<OperationalCredentialsCertificateChainRequest>(credsIssuerConfig),      //
-        make_unique<OperationalCredentialsOpCSRRequest>(credsIssuerConfig),                 //
         make_unique<OperationalCredentialsRemoveFabric>(credsIssuerConfig),                 //
         make_unique<OperationalCredentialsRemoveTrustedRootCertificate>(credsIssuerConfig), //
         make_unique<OperationalCredentialsUpdateFabricLabel>(credsIssuerConfig),            //

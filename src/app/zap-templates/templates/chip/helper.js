@@ -38,10 +38,9 @@ function throwErrorIfUndefined(item, errorMsg, conditions)
 
 function checkIsInsideClusterBlock(context, name)
 {
-  const clusterName = context.name;
-  const clusterSide = context.side;
+  const clusterName = context.name ? context.name : context.clusterName;
+  const clusterSide = context.side ? context.side : context.clusterSide;
   const errorMsg    = name + ': Not inside a ({#chip_server_clusters}} block.';
-
   throwErrorIfUndefined(context, errorMsg, [ clusterName, clusterSide ]);
 
   return { clusterName, clusterSide };

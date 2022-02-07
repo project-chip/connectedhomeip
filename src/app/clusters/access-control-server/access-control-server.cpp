@@ -16,7 +16,6 @@
  */
 
 #include <access/AccessControl.h>
-#include <access/examples/ExampleAccessControlDelegate.h>
 
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -503,16 +502,9 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(AttributeValueDecoder & aDecod
 
 AccessControlAttribute gAttribute;
 
-AccessControl gAccessControl(Examples::GetAccessControlDelegate());
-
 } // namespace
 
 void MatterAccessControlPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttribute);
-
-    // TODO: move access control setup to lower level
-    //       (it's OK and convenient here during development)
-    gAccessControl.Init();
-    SetAccessControl(gAccessControl);
 }

@@ -62,7 +62,7 @@ enum ArgumentType
     Number_int64,
     Float,
     Double,
-    Boolean,
+    Bool,
     String,
     CharString,
     OctetString,
@@ -132,7 +132,7 @@ public:
     size_t AddArgument(const char * name, CustomArgument * value);
     size_t AddArgument(const char * name, int64_t min, uint64_t max, bool * out, uint8_t flags = 0)
     {
-        return AddArgument(name, min, max, reinterpret_cast<void *>(out), Boolean, flags);
+        return AddArgument(name, min, max, reinterpret_cast<void *>(out), Bool, flags);
     }
     size_t AddArgument(const char * name, int64_t min, uint64_t max, int8_t * out, uint8_t flags = 0)
     {

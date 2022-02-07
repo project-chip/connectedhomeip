@@ -72,6 +72,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNOCChainAfterValidation(NodeI
     noc_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipNodeId, nodeId);
     ChipDN rcac_dn;
     rcac_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipRootId, mIssuerId);
+    rcac_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipFabricId, fabricId);
 
     ChipLogProgress(Controller, "Generating NOC");
     chip::Credentials::X509CertRequestParams noc_request = { 1, mNow, mNow + mValidity, noc_dn, rcac_dn };

@@ -113,18 +113,18 @@ public:
     CHIP_ERROR LookupCatalogVendorApp(uint16_t vendorId, uint16_t productId, CatalogVendorApp * destinationApp) override;
 
     // Lookup ContentApp for this catalog id / app id and load it
-    ContentApp * LoadContentApp(CatalogVendorApp vendorApp) override;
+    ContentApp * LoadContentApp(const CatalogVendorApp & vendorApp) override;
 
     // Gets the catalog vendor ID used by this platform
     uint16_t GetPlatformCatalogVendorId() override;
 
     // Converts application (any catalog) into the platform's catalog Vendor
     // and then writes it to destinationApp
-    CHIP_ERROR ConvertToPlatformCatalogVendorApp(CatalogVendorApp sourceApp, CatalogVendorApp * destinationApp) override;
+    CHIP_ERROR ConvertToPlatformCatalogVendorApp(const CatalogVendorApp & sourceApp, CatalogVendorApp * destinationApp) override;
 
 protected:
     ContentAppImpl mContentApps[APP_LIBRARY_SIZE] = { ContentAppImpl("Vendor1", 1, "App1", 11, "Version1", "34567890"),
-                                                      ContentAppImpl("Vendor2", 2222, "App2", 22, "Version2", "34567890"),
+                                                      ContentAppImpl("Vendor2", 65521, "App2", 32768, "Version2", "20202021"),
                                                       ContentAppImpl("Vendor3", 9050, "App3", 22, "Version3", "20202021"),
                                                       ContentAppImpl("TestSuiteVendor", 1111, "applicationId", 22, "v2",
                                                                      "20202021") };

@@ -26,6 +26,7 @@
 #pragma once
 
 #include <lib/support/BitFlags.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
 
 #if CHIP_ENABLE_ROTATING_DEVICE_ID

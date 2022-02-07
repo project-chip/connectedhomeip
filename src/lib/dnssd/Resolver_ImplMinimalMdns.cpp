@@ -331,6 +331,7 @@ void PacketDataReporter::OnComplete(ActiveResolveAttempts & activeAttempts)
         activeAttempts.Complete(mNodeData.mPeerId);
 
         mNodeData.LogNodeIdResolved();
+        mNodeData.PrioritizeAddresses();
         mDelegate->OnNodeIdResolved(mNodeData);
     }
 }
