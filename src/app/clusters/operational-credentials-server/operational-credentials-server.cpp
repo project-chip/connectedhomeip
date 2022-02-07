@@ -135,7 +135,7 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadNOCs(EndpointId endpoint, Attri
 
 CHIP_ERROR OperationalCredentialsAttrAccess::ReadSupportedFabrics(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    uint8_t fabricCount = CHIP_CONFIG_MAX_DEVICE_ADMINS;
+    uint8_t fabricCount = CHIP_CONFIG_MAX_FABRICS;
 
     return aEncoder.Encode(fabricCount);
 }
