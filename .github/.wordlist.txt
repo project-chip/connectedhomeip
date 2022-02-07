@@ -1068,7 +1068,6 @@ SHA
 ShadeConfiguration
 showDocumentation
 shubhamdp
-signgin
 SIGINT
 SiLabs
 SiliconLabs

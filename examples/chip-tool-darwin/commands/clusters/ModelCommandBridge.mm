@@ -28,7 +28,7 @@ CHIP_ERROR ModelCommand::RunCommand()
 {
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip-tool.command", DISPATCH_QUEUE_SERIAL);
 
-    ChipLogProgress(chipTool, "Sending command to node 0x%" PRIx64, mNodeId);
+    ChipLogProgress(chipTool, "Sending command to node 0x" ChipLogFormatX64, ChipLogValueX64(mNodeId));
     [CurrentCommissioner() getConnectedDevice:mNodeId
                                         queue:callbackQueue
                             completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
@@ -39,6 +39,7 @@ CHIP_ERROR ModelCommand::RunCommand()
                                     err = SendCommand(device, mEndPointId);
                                 }
 
+                                ChipLogProgress(chipTool, "Error: %s", chip::ErrorStr(err));
                                 VerifyOrReturn(CHIP_NO_ERROR == err, SetCommandExitStatus(err));
                             }];
     return CHIP_NO_ERROR;
