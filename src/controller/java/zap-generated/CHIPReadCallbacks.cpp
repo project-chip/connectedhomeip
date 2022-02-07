@@ -7657,12 +7657,12 @@ void CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback::CallbackFn(
         jobject newElement_0;
         jobject newElement_0_name;
         newElement_0_name = env->NewStringUTF(std::string(entry_0.name.data(), entry_0.name.size()).c_str());
-        jobject newElement_0_fabricConnected;
-        std::string newElement_0_fabricConnectedClassName     = "java/lang/Boolean";
-        std::string newElement_0_fabricConnectedCtorSignature = "(Z)V";
-        chip::JniReferences::GetInstance().CreateBoxedObject<bool>(newElement_0_fabricConnectedClassName.c_str(),
-                                                                   newElement_0_fabricConnectedCtorSignature.c_str(),
-                                                                   entry_0.fabricConnected, newElement_0_fabricConnected);
+        jobject newElement_0_isOperational;
+        std::string newElement_0_isOperationalClassName     = "java/lang/Boolean";
+        std::string newElement_0_isOperationalCtorSignature = "(Z)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<bool>(newElement_0_isOperationalClassName.c_str(),
+                                                                   newElement_0_isOperationalCtorSignature.c_str(),
+                                                                   entry_0.isOperational, newElement_0_isOperational);
         jobject newElement_0_offPremiseServicesReachableIPv4;
         if (entry_0.offPremiseServicesReachableIPv4.IsNull())
         {
@@ -7696,6 +7696,34 @@ void CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback::CallbackFn(
         env->SetByteArrayRegion(newElement_0_hardwareAddressByteArray, 0, static_cast<jsize>(entry_0.hardwareAddress.size()),
                                 reinterpret_cast<const jbyte *>(entry_0.hardwareAddress.data()));
         newElement_0_hardwareAddress = newElement_0_hardwareAddressByteArray;
+        jobject newElement_0_IPv4Addresses;
+        chip::JniReferences::GetInstance().CreateArrayList(newElement_0_IPv4Addresses);
+
+        auto iter_newElement_0_IPv4Addresses_NaN = entry_0.IPv4Addresses.begin();
+        while (iter_newElement_0_IPv4Addresses_NaN.Next())
+        {
+            auto & entry_NaN = iter_newElement_0_IPv4Addresses_NaN.GetValue();
+            jobject newElement_NaN;
+            jbyteArray newElement_NaNByteArray = env->NewByteArray(static_cast<jsize>(entry_NaN.size()));
+            env->SetByteArrayRegion(newElement_NaNByteArray, 0, static_cast<jsize>(entry_NaN.size()),
+                                    reinterpret_cast<const jbyte *>(entry_NaN.data()));
+            newElement_NaN = newElement_NaNByteArray;
+            chip::JniReferences::GetInstance().AddToArrayList(newElement_0_IPv4Addresses, newElement_NaN);
+        }
+        jobject newElement_0_IPv6Addresses;
+        chip::JniReferences::GetInstance().CreateArrayList(newElement_0_IPv6Addresses);
+
+        auto iter_newElement_0_IPv6Addresses_NaN = entry_0.IPv6Addresses.begin();
+        while (iter_newElement_0_IPv6Addresses_NaN.Next())
+        {
+            auto & entry_NaN = iter_newElement_0_IPv6Addresses_NaN.GetValue();
+            jobject newElement_NaN;
+            jbyteArray newElement_NaNByteArray = env->NewByteArray(static_cast<jsize>(entry_NaN.size()));
+            env->SetByteArrayRegion(newElement_NaNByteArray, 0, static_cast<jsize>(entry_NaN.size()),
+                                    reinterpret_cast<const jbyte *>(entry_NaN.data()));
+            newElement_NaN = newElement_NaNByteArray;
+            chip::JniReferences::GetInstance().AddToArrayList(newElement_0_IPv6Addresses, newElement_NaN);
+        }
         jobject newElement_0_type;
         std::string newElement_0_typeClassName     = "java/lang/Integer";
         std::string newElement_0_typeCtorSignature = "(I)V";
@@ -7714,17 +7742,18 @@ void CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback::CallbackFn(
         }
         jmethodID networkInterfaceTypeStructCtor =
             env->GetMethodID(networkInterfaceTypeStructClass, "<init>",
-                             "(Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;[BLjava/lang/Integer;)V");
+                             "(Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;[BLjava/util/"
+                             "ArrayList;Ljava/util/ArrayList;Ljava/lang/Integer;)V");
         if (networkInterfaceTypeStructCtor == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$GeneralDiagnosticsClusterNetworkInterfaceType constructor");
             return;
         }
 
-        newElement_0 =
-            env->NewObject(networkInterfaceTypeStructClass, networkInterfaceTypeStructCtor, newElement_0_name,
-                           newElement_0_fabricConnected, newElement_0_offPremiseServicesReachableIPv4,
-                           newElement_0_offPremiseServicesReachableIPv6, newElement_0_hardwareAddress, newElement_0_type);
+        newElement_0 = env->NewObject(networkInterfaceTypeStructClass, networkInterfaceTypeStructCtor, newElement_0_name,
+                                      newElement_0_isOperational, newElement_0_offPremiseServicesReachableIPv4,
+                                      newElement_0_offPremiseServicesReachableIPv6, newElement_0_hardwareAddress,
+                                      newElement_0_IPv4Addresses, newElement_0_IPv6Addresses, newElement_0_type);
         chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
     }
 

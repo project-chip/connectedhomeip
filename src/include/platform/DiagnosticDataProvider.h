@@ -36,6 +36,11 @@ static constexpr size_t kMaxThreadNameLength = 32;
 // 48-bit IEEE MAC Address or a 64-bit IEEE MAC Address (e.g. EUI-64).
 constexpr size_t kMaxHardwareAddrSize = 8;
 
+constexpr size_t kMaxIPv4AddrSize  = 4;
+constexpr size_t kMaxIPv6AddrSize  = 16;
+constexpr size_t kMaxIPv4AddrCount = 4;
+constexpr size_t kMaxIPv6AddrCount = 8;
+
 struct ThreadMetrics : public app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::Type
 {
     char NameBuf[kMaxThreadNameLength + 1];
@@ -46,6 +51,10 @@ struct NetworkInterface : public app::Clusters::GeneralDiagnostics::Structs::Net
 {
     char Name[Inet::InterfaceId::kMaxIfNameLength];
     uint8_t MacAddress[kMaxHardwareAddrSize];
+    uint8_t Ipv4AddressesBuffer[kMaxIPv4AddrCount][kMaxIPv4AddrSize];
+    uint8_t Ipv6AddressesBuffer[kMaxIPv6AddrCount][kMaxIPv6AddrSize];
+    chip::ByteSpan Ipv4Addresses[kMaxIPv4AddrCount];
+    chip::ByteSpan Ipv6Addresses[kMaxIPv6AddrCount];
     NetworkInterface * Next; /* Pointer to the next structure.  */
 };
 

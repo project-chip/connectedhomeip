@@ -12108,30 +12108,48 @@ namespace NetworkInterfaceType {
 enum class Fields
 {
     kName                            = 0,
-    kFabricConnected                 = 1,
+    kIsOperational                   = 1,
     kOffPremiseServicesReachableIPv4 = 2,
     kOffPremiseServicesReachableIPv6 = 3,
     kHardwareAddress                 = 4,
-    kType                            = 5,
+    kIPv4Addresses                   = 5,
+    kIPv6Addresses                   = 6,
+    kType                            = 7,
 };
 
 struct Type
 {
 public:
     chip::CharSpan name;
-    bool fabricConnected = static_cast<bool>(0);
+    bool isOperational = static_cast<bool>(0);
     DataModel::Nullable<bool> offPremiseServicesReachableIPv4;
     DataModel::Nullable<bool> offPremiseServicesReachableIPv6;
     chip::ByteSpan hardwareAddress;
+    DataModel::List<const chip::ByteSpan> IPv4Addresses;
+    DataModel::List<const chip::ByteSpan> IPv6Addresses;
     InterfaceType type = static_cast<InterfaceType>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
 };
 
-using DecodableType = Type;
+struct DecodableType
+{
+public:
+    chip::CharSpan name;
+    bool isOperational = static_cast<bool>(0);
+    DataModel::Nullable<bool> offPremiseServicesReachableIPv4;
+    DataModel::Nullable<bool> offPremiseServicesReachableIPv6;
+    chip::ByteSpan hardwareAddress;
+    DataModel::DecodableList<chip::ByteSpan> IPv4Addresses;
+    DataModel::DecodableList<chip::ByteSpan> IPv6Addresses;
+    InterfaceType type = static_cast<InterfaceType>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+};
 
 } // namespace NetworkInterfaceType
 } // namespace Structs

@@ -161,10 +161,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPGeneralDiagnosticsClusterNetworkInterfaceType : NSObject
 @property (strong, nonatomic) NSString * _Nonnull name;
-@property (strong, nonatomic) NSNumber * _Nonnull fabricConnected;
+@property (strong, nonatomic) NSNumber * _Nonnull isOperational;
 @property (strong, nonatomic) NSNumber * _Nullable offPremiseServicesReachableIPv4;
 @property (strong, nonatomic) NSNumber * _Nullable offPremiseServicesReachableIPv6;
 @property (strong, nonatomic) NSData * _Nonnull hardwareAddress;
+@property (strong, nonatomic) NSArray * _Nonnull iPv4Addresses;
+@property (strong, nonatomic) NSArray * _Nonnull iPv6Addresses;
 @property (strong, nonatomic) NSNumber * _Nonnull type;
 - (instancetype)init;
 @end
