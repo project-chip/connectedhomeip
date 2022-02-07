@@ -1,5 +1,5 @@
 {
-    "name": "CHIP Tool templates",
+    "name": "CHIP Tool Darwin templates",
     "version": "chip-v1",
     "helpers": [
         "../../../examples/chip-tool/templates/helper.js",

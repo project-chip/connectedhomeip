@@ -30,7 +30,6 @@ addr
 AddThreadNetwork
 adk
 AdministratorCommissioning
-administratorcommissioning
 adoc
 AdvAutonomous
 AdvManagedFlag
@@ -945,7 +944,6 @@ sexualized
 SHA
 showDocumentation
 shubhamdp
-signgin
 SIGINT
 SiLabs
 SiliconLabs

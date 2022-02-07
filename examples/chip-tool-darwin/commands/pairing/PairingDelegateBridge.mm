@@ -24,6 +24,23 @@
 @property (nonatomic, strong) ResponseHandler responseHandler;
 @end
 @implementation CHIPToolPairingDelegate
+- (void)onStatusUpdate:(CHIPPairingStatus)status
+{
+    NSLog(@"Pairing Status Update: %lu", status);
+    switch (status)
+    {
+    case kSecurePairingSuccess:
+        ChipLogProgress(chipTool, "Secure Pairing Success");
+        break;
+    case kSecurePairingFailed:
+        ChipLogError(chipTool, "Secure Pairing Failed");
+        break;
+    case kUnknownStatus:
+        ChipLogError(chipTool, "Uknown Pairing Status");
+        break;
+    }
+}
+
 - (void)onPairingComplete:(NSError *)error
 {
     CHIP_ERROR err = CHIP_NO_ERROR;

@@ -94,65 +94,6 @@ private:
 
 {{/chip_cluster_commands}}
 
-{{#chip_server_cluster_events}}
-/*
- * Event {{asUpperCamelCase name}}
- */
-class Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public ModelCommand
-{
-public:
-    Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): ModelCommand("read-event")
-    {
-        AddArgument("event-name", "{{asDelimitedCommand (asUpperCamelCase name)}}");
-        ModelCommand::AddArguments();
-    }
-
-    ~Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}()
-    {
-    }
-
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) ReadEvent ({{asHex code 8}}) on endpoint %" PRIu16, endpointId);
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-
-};
-
-class Report{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public ModelCommand
-{
-public:
-    Report{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): ModelCommand("subscribe-event")
-    {
-        AddArgument("event-name", "{{asDelimitedCommand (asUpperCamelCase name)}}");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~Report{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}()
-    {
-    }
-
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) ReportEvent ({{asHex code 8}}) on endpoint %" PRIu16, endpointId);
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-{{/chip_server_cluster_events}}
-
 {{#chip_server_cluster_attributes}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
 
@@ -257,11 +198,12 @@ private:
 };
 
 {{/if}}
+{{#unless (isStrEqual chipCallback.name "Unsupported")}}
 {{#if isReportableAttribute}}
-class Report{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public ModelCommand
+class SubscribeAttribute{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public ModelCommand
 {
 public:
-    Report{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): ModelCommand("subscribe")
+    SubscribeAttribute{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): ModelCommand("subscribe")
     {
         AddArgument("attr-name", "{{asDelimitedCommand (asUpperCamelCase name)}}");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
@@ -270,16 +212,21 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~Report{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}()
+    ~SubscribeAttribute{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}()
     {
     }
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) ReportAttribute ({{asHex code 8}}) on endpoint %" PRIu16, endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIP{{asUpperCamelCase parent.name}} * cluster = [[CHIP{{asUpperCamelCase parent.name}} alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        [cluster subscribe{{>attribute}}WithMinInterval: mMinInterval maxInterval:mMaxInterval subscriptionEstablished: NULL reportHandler:^({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error) {
+        NSLog(@"{{asUpperCamelCase parent.name}}.{{asUpperCamelCase name}} response %@", [value description]);
+        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+         }];
 
-
-        return CHIP_ERROR_NOT_IMPLEMENTED;
+        return CHIP_NO_ERROR;
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -294,6 +241,7 @@ private:
 };
 
 {{/if}}
+{{/unless}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
 
@@ -314,14 +262,12 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
         {{#if isWritableAttribute}}
         make_unique<Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
         {{/if}}
+        {{#unless (isStrEqual chipCallback.name "Unsupported")}}
         {{#if isReportableAttribute}}
-        make_unique<Report{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
+        make_unique<SubscribeAttribute{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
         {{/if}}
+        {{/unless}}
         {{/chip_server_cluster_attributes}}
-        {{#chip_server_cluster_events}}
-        make_unique<Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
-        make_unique<Report{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
-        {{/chip_server_cluster_events}}
     };
 
     commands.Register(clusterName, clusterCommands);
