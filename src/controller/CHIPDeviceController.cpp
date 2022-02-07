@@ -1593,7 +1593,7 @@ void DeviceCommissioner::OnDone()
         switch (path.mAttributeId)
         {
         case app::Clusters::Basic::Attributes::VendorID::Id:
-            return app::DataModel::Decode(reader, info.basic.vendorId);
+            return this->mAttributeCache->Get(path, info.basic.vendorId);
         case app::Clusters::Basic::Attributes::ProductID::Id:
             return app::DataModel::Decode(reader, info.basic.productId);
         case app::Clusters::Basic::Attributes::SoftwareVersion::Id:
