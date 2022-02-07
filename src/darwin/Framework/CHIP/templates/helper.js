@@ -187,6 +187,9 @@ function objCEnumItemLabel(itemLabel)
   }
 
   return appHelper.asUpperCamelCase(itemLabel);
+function hasArguments()
+{
+  return !!this.arguments.length
 }
 
 //
@@ -201,3 +204,4 @@ exports.asGetterName            = asGetterName;
 exports.commandHasRequiredField = commandHasRequiredField;
 exports.objCEnumName            = objCEnumName;
 exports.objCEnumItemLabel       = objCEnumItemLabel;
+exports.hasArguments            = hasArguments;
