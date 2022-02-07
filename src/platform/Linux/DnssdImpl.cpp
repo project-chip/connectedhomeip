@@ -453,7 +453,7 @@ void MdnsAvahi::HandleGroupState(AvahiEntryGroup * group, AvahiEntryGroupState s
     }
 }
 
-CHIP_ERROR MdnsAvahi::PublishService(const DnssdService & service)
+CHIP_ERROR MdnsAvahi::PublishService(const DnssdService & service, DnssdPublishCallback callback, void * context)
 {
     std::ostringstream keyBuilder;
     std::string key;
@@ -505,9 +505,13 @@ exit:
     {
         avahi_string_list_free(text);
     }
-    if (error != CHIP_NO_ERROR)
+    if (CHIP_NO_ERROR == err)
     {
-        ChipLogError(DeviceLayer, "Avahi publish service failed: %" CHIP_ERROR_FORMAT, error.Format());
+        callback(context, type.c_str(), CHIP_NO_ERROR);
+    }
+    else
+    {
+        callback(context, nullptr, err);
     }
 
     return error;
@@ -811,13 +815,16 @@ CHIP_ERROR ChipDnssdShutdown()
     return MdnsAvahi::GetInstance().Shutdown();
 }
 
-CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdAsyncReturnCallback callback, void * context)
+CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
 {
+    VerifyOrReturnError(service != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(callback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     if (strcmp(service->mHostName, "") != 0)
     {
         ReturnErrorOnFailure(MdnsAvahi::GetInstance().SetHostname(service->mHostName));
     }
-    return MdnsAvahi::GetInstance().PublishService(*service);
+
+    return MdnsAvahi::GetInstance().PublishService(*service, callback, context);
 }
 
 CHIP_ERROR ChipDnssdRemoveServices()
