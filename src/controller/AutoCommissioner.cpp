@@ -317,8 +317,8 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
                  Credentials::AttestationVerificationResult::kDacVendorIdMismatch))
         {
             ChipLogError(Controller,
-                         "Failed device attestation. Device vendor and/or product ID do not match the IDs given in the device "
-                         "attestation certificate");
+                         "Failed device attestation. Device vendor and/or product ID do not match the IDs expected. "
+                         "Verify DAC certificate chain and certification declaration to ensure spec rules followed.");
         }
     }
     else
