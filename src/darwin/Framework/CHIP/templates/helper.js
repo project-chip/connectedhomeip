@@ -194,6 +194,11 @@ function commandHasRequiredField(command)
   return command.arguments.some(arg => !arg.isOptional);
 }
 
+function hasArguments()
+{
+  return !!this.arguments.length
+}
+
 //
 // Module exports
 //
@@ -207,3 +212,4 @@ exports.asObjectiveCType             = asObjectiveCType;
 exports.asStructPropertyName         = asStructPropertyName;
 exports.asGetterName                 = asGetterName;
 exports.commandHasRequiredField      = commandHasRequiredField;
+exports.hasArguments                 = hasArguments;

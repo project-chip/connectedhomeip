@@ -123,23 +123,25 @@ with the target cluster name and the target command name
 <details><summary>All Clusters</summary><p>
 
 {{#chip_client_clusters}}
-{{#if (hasCommands)}}
-<details><summary>{{name}}</summary><p>
+{{#chip_cluster_commands}}
+{{#first}}
+<details><summary>{{parent.name}}</summary><p>
 
 ```bash
 Usage:
-  ./chip-tool-darwin {{asHyphenatedLower name}} command_name [param1 param2 ...]
+  ./chip-tool-darwin {{asType (asSpacedLowercase parent.name)}} command_name [param1 param2 ...]
 
   +-------------------------------------------------------------------------------------+
   | Commands:                                                                           |
   +-------------------------------------------------------------------------------------+
-{{#chip_cluster_commands}}
-{{pad (concat "  | * " (asHyphenatedLower name)) 88 ' '}}|
-{{/chip_cluster_commands}}
+{{/first}}
+{{pad (concat "  | * " (asDelimitedCommand name)) 88 ' '}}|
+{{#last}}
   +-------------------------------------------------------------------------------------+
 ```
 
 </details>
-{{/if}}
+{{/last}}
+{{/chip_cluster_commands}}
 {{/chip_client_clusters}}
 </details>

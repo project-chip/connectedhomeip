@@ -25,16 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIP{{asUpperCamelCase name}} : CHIPCluster
 
 {{#chip_cluster_commands}}
-{{! zcl_command_arguments_count is unreliable when used in a conditional.  As
-    a workaround, just use iteration over the arguments directly to see if we
-    have any. }}
-{{#chip_cluster_command_arguments}}
-{{#first}}
-- (void){{asLowerCamelCase parent.name}}WithParams:(CHIP{{asUpperCamelCase parent.parent.name}}Cluster{{asUpperCamelCase parent.name}}Params * {{#unless (commandHasRequiredField parent)}}_Nullable{{/unless}})params completionHandler:({{>command_completion_type command=parent}})completionHandler;
-{{/first}}
-{{else}}
-- (void){{asLowerCamelCase parent.name}}WithCompletionHandler:({{>command_completion_type command=parent}})completionHandler;
-{{/chip_cluster_command_arguments}}
+- (void){{asLowerCamelCase name}}With{{#if (hasArguments)}}Params:(CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params completionHandler{{else}}CompletionHandler{{/if}}:({{>command_completion_type command=.}})completionHandler;
 {{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}

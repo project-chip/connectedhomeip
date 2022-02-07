@@ -32,15 +32,14 @@ CHIP_ERROR ModelCommand::RunCommand()
     [CurrentCommissioner() getConnectedDevice:mNodeId
                                         queue:callbackQueue
                             completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
+                                CHIP_ERROR err = CHIP_NO_ERROR;
                                 if (error) {
-                                    CHIP_ERROR err = CHIP_NO_ERROR;
                                     err = [CHIPError errorToCHIPErrorCode:error];
-                                    ChipLogError(chipTool, "Error: %s", chip::ErrorStr(err));
-                                    SetCommandExitStatus(err);
-                                    return;
+                                } else {
+                                    err = SendCommand(device, mEndPointId);
                                 }
 
-                                SendCommand(device, mEndPointId);
+                                VerifyOrReturn(CHIP_NO_ERROR == err, SetCommandExitStatus(err));
                             }];
     return CHIP_NO_ERROR;
 }

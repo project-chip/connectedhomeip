@@ -7,8 +7,7 @@
         "../../../src/app/zap-templates/partials/helper.js",
         "../../../src/app/zap-templates/templates/app/helper.js",
         "../../../src/app/zap-templates/templates/chip/helper.js",
-        "../../../src/darwin/Framework/CHIP/templates/helper.js",
-        "helper.js"
+        "../../../src/darwin/Framework/CHIP/templates/helper.js"
     ],
     "override": "../../../src/app/zap-templates/common/override.js",
     "partials": [
@@ -29,7 +28,7 @@
         {
             "path": "commands.zapt",
             "name": "Cluster Commands header",
-            "output": "cluster/CommandsBridge.h"
+            "output": "cluster/Commands.h"
         },
         {
             "path": "README.zapt",

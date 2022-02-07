@@ -19,8 +19,7 @@
 #include "commands/common/Commands.h"
 
 #include "commands/pairing/Commands.h"
-
-#include <zap-generated/cluster/CommandsBridge.h>
+#include <zap-generated/cluster/Commands.h>
 
 int main(int argc, const char * argv[])
 {
