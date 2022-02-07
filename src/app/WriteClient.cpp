@@ -533,7 +533,7 @@ CHIP_ERROR WriteClient::ProcessAttributeStatusIB(AttributeStatusIB::Parser & aAt
     StatusIB::Parser StatusIBParser;
     ConcreteDataAttributePath attributePath;
 
-    err = aAttributeStatusIB.GetPath(&attributePath);
+    err = aAttributeStatusIB.GetPath(&attributePathParser);
     SuccessOrExit(err);
 
     err = attributePathParser.GetCluster(&(attributePath.mClusterId));

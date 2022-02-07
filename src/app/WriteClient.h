@@ -20,6 +20,7 @@
 
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/InteractionModelTimeout.h>
 #include <app/MessageDef/AttributeDataIBs.h>
 #include <app/MessageDef/AttributeStatusIB.h>
 #include <app/MessageDef/StatusIB.h>
@@ -400,6 +401,7 @@ private:
      *     (...)
      *  ],                           <-- 1 byte  "end of AttributeDataIB" (end of container)
      *  moreChunkedMessages = false, <-- 2 bytes "kReservedSizeForMoreChunksFlag"
+     *  InteractionModelRevision = 1,<-- 3 bytes "kReservedSizeForIMRevision"
      * }                             <-- 1 byte  "end of WriteRequestMessage" (end of container)
      */
 
@@ -407,10 +409,13 @@ private:
     static constexpr uint16_t kReservedSizeForMoreChunksFlag = 1 + 1;
     // End Of Container (0x18) uses one byte.
     static constexpr uint16_t kReservedSizeForEndOfContainer = 1;
+    // Reserved size for the uint8_t InteractionModelRevision flag, which takes up 1 byte for the control tag and 1 byte for the
+    // context tag, 1 byte for value
+    static constexpr uint16_t kReservedSizeForIMRevision = 1 + 1 + 1;
     // Reserved buffer for TLV level overhead (the overhead for end of AttributeDataIBs (end of container), more chunks flag, end
     // of WriteRequestMessage (another end of container)).
-    static constexpr uint16_t kReservedSizeForTLVEncodingOverhead =
-        kReservedSizeForMoreChunksFlag + kReservedSizeForEndOfContainer + kReservedSizeForEndOfContainer;
+    static constexpr uint16_t kReservedSizeForTLVEncodingOverhead = kReservedSizeForIMRevision + kReservedSizeForMoreChunksFlag +
+        kReservedSizeForEndOfContainer + kReservedSizeForEndOfContainer;
 };
 
 } // namespace app

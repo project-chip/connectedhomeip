@@ -77,6 +77,8 @@ DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrsOnEndpoint), DECLARE_DY
 
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint, testEndpointClusters);
 
+DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
+
 //clang-format on
 
 class TestWriteCallback : public app::WriteClient::Callback
@@ -161,7 +163,7 @@ void TestWriteChunking::TestListChunking(nlTestSuite * apSuite, void * apContext
     InitDataModelHandler(&ctx.GetExchangeManager());
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, 0, 0);
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, 0, 0, Span<DataVersion>(dataVersionStorage));
 
     // Register our fake attribute access interface.
     registerAttributeAccessOverride(&testServer);
@@ -233,7 +235,7 @@ void TestWriteChunking::TestBadChunking(nlTestSuite * apSuite, void * apContext)
     InitDataModelHandler(&ctx.GetExchangeManager());
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, 0, 0);
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, 0, 0, Span<DataVersion>(dataVersionStorage));
 
     // Register our fake attribute access interface.
     registerAttributeAccessOverride(&testServer);
