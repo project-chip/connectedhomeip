@@ -964,12 +964,10 @@ void BLEManagerImpl::HandleGATTCommEvent(esp_gatts_cb_event_t event, esp_gatt_if
             // possibly not fitting.  There's no way to suppress that warning
             // via explicit cast; we have to disable the warning around the
             // assignment.
-            //
-            // TODO: https://github.com/project-chip/connectedhomeip/issues/2569
-            // tracks making this safe with a check or explaining why no check
-            // is needed.
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
+            // As per the BLE specification, the maximum MTU value can be 517 bytes.
+            // This can be accomodated in 10 bits
             conState->MTU = param->mtu.mtu;
 #pragma GCC diagnostic pop
         }

@@ -83,13 +83,19 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, CHIP_ERRO
     {
         proxy->OnNodeIdResolutionFailed(PeerId(), error);
         proxy->Release();
+        return;
     }
+
+    VerifyOrDie(proxy != nullptr);
 
     if (result == nullptr)
     {
         proxy->OnNodeIdResolutionFailed(PeerId(), CHIP_ERROR_UNKNOWN_RESOURCE_ID);
         proxy->Release();
+        return;
     }
+
+    VerifyOrDie(proxy != nullptr);
 
     PeerId peerId;
     error = ExtractIdFromInstanceName(result->mName, &peerId);
@@ -97,7 +103,10 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, CHIP_ERRO
     {
         proxy->OnNodeIdResolutionFailed(PeerId(), error);
         proxy->Release();
+        return;
     }
+
+    VerifyOrDie(proxy != nullptr);
 
     ResolvedNodeData nodeData;
     Platform::CopyString(nodeData.mHostName, result->mHostName);
@@ -119,6 +128,7 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, CHIP_ERRO
     }
 
     nodeData.LogNodeIdResolved();
+    nodeData.PrioritizeAddresses();
 #if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
     LogErrorOnFailure(sDnssdCache.Insert(nodeData));
 #endif
@@ -235,18 +245,6 @@ CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, const chip::Opti
     VerifyOrReturnError(optional.HasValue(), CHIP_ERROR_WELL_UNINITIALIZED);
 
     auto retryInterval = isIdle ? optional.Value().mIdleRetransTimeout : optional.Value().mActiveRetransTimeout;
-
-    // TODO: Issue #5833 - MRP retry intervals should be updated on the poll period value
-    // change or device type change.
-    // TODO: Is this really the best place to set these? Seems like it should be passed
-    // in with the correct values and set one level up from here.
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    chip::DeviceLayer::ConnectivityManager::SEDPollingConfig sedPollingConfig;
-    ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().GetSEDPollingConfig(sedPollingConfig));
-    // Increment default MRP retry intervals by SED poll period to be on the safe side
-    // and avoid unnecessary retransmissions.
-    retryInterval += isIdle ? sedPollingConfig.SlowPollingIntervalMS : sedPollingConfig.FastPollingIntervalMS;
-#endif
 
     if (retryInterval > kMaxRetryInterval)
     {

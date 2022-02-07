@@ -669,28 +669,6 @@ static constexpr CommandId Id = 0x00000000;
 } // namespace Commands
 } // namespace EthernetNetworkDiagnostics
 
-namespace BridgedDeviceBasic {
-namespace Commands {
-
-namespace StartUp {
-static constexpr CommandId Id = 0x00000000;
-} // namespace StartUp
-
-namespace ShutDown {
-static constexpr CommandId Id = 0x00000001;
-} // namespace ShutDown
-
-namespace Leave {
-static constexpr CommandId Id = 0x00000002;
-} // namespace Leave
-
-namespace ReachableChanged {
-static constexpr CommandId Id = 0x00000003;
-} // namespace ReachableChanged
-
-} // namespace Commands
-} // namespace BridgedDeviceBasic
-
 namespace AdministratorCommissioning {
 namespace Commands {
 
@@ -728,13 +706,13 @@ namespace CertificateChainResponse {
 static constexpr CommandId Id = 0x00000003;
 } // namespace CertificateChainResponse
 
-namespace OpCSRRequest {
+namespace CSRRequest {
 static constexpr CommandId Id = 0x00000004;
-} // namespace OpCSRRequest
+} // namespace CSRRequest
 
-namespace OpCSRResponse {
+namespace CSRResponse {
 static constexpr CommandId Id = 0x00000005;
-} // namespace OpCSRResponse
+} // namespace CSRResponse
 
 namespace AddNOC {
 static constexpr CommandId Id = 0x00000006;

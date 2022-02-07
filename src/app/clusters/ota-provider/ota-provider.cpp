@@ -78,7 +78,9 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(
     EmberAfStatus status           = EMBER_ZCL_STATUS_SUCCESS;
     OTAProviderDelegate * delegate = GetDelegate(endpoint);
 
-    ChipLogDetail(Zcl, "OTA Provider received ApplyUpdateRequest");
+    ChipLogProgress(Zcl, "OTA Provider received ApplyUpdateRequest");
+    ChipLogDetail(Zcl, "  Update Token: %zu", commandData.updateToken.size());
+    ChipLogDetail(Zcl, "  New Version: %" PRIu32, commandData.newVersion);
 
     if (SendStatusIfDelegateNull(endpoint))
     {
@@ -121,7 +123,9 @@ bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(
     EmberAfStatus status           = EMBER_ZCL_STATUS_SUCCESS;
     OTAProviderDelegate * delegate = GetDelegate(endpoint);
 
-    ChipLogDetail(Zcl, "OTA Provider received NotifyUpdateApplied");
+    ChipLogProgress(Zcl, "OTA Provider received NotifyUpdateApplied");
+    ChipLogDetail(Zcl, "  Update Token: %zu", commandData.updateToken.size());
+    ChipLogDetail(Zcl, "  Software Version: %" PRIu32, commandData.softwareVersion);
 
     if (SendStatusIfDelegateNull(endpoint))
     {

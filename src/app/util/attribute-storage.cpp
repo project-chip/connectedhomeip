@@ -94,6 +94,10 @@ constexpr const EmberAfAttributeMinMaxValue minMaxDefaults[] = GENERATED_MIN_MAX
 GENERATED_FUNCTION_ARRAYS
 #endif
 
+#ifdef GENERATED_COMMANDS
+constexpr const chip::CommandId generatedCommands[] = GENERATED_COMMANDS;
+#endif // GENERATED_COMMANDS
+
 constexpr const EmberAfAttributeMetadata generatedAttributes[]      = GENERATED_ATTRIBUTES;
 constexpr const EmberAfCluster generatedClusters[]                  = GENERATED_CLUSTERS;
 constexpr const EmberAfEndpointType generatedEmberAfEndpointTypes[] = GENERATED_ENDPOINT_TYPES;
@@ -106,7 +110,6 @@ DataVersion fixedEndpointDataVersions[ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT];
 #define endpointDeviceVersion(x) fixedDeviceVersions[x]
 // Added 'Macro' to silence MISRA warning about conflict with synonymous vars.
 #define endpointTypeMacro(x) (&(generatedEmberAfEndpointTypes[fixedEmberAfEndpointTypes[x]]))
-#define endpointNetworkIndex(x) fixedNetworks[x]
 #endif
 
 app::AttributeAccessInterface * gAttributeAccessOverrides = nullptr;
@@ -130,7 +133,6 @@ void emberAfEndpointConfigure(void)
     uint16_t fixedDeviceIds[]           = FIXED_DEVICE_IDS;
     uint8_t fixedDeviceVersions[]       = FIXED_DEVICE_VERSIONS;
     uint8_t fixedEmberAfEndpointTypes[] = FIXED_ENDPOINT_TYPES;
-    uint8_t fixedNetworks[]             = FIXED_NETWORKS;
 #endif
 
 #if ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT > 0
@@ -155,7 +157,6 @@ void emberAfEndpointConfigure(void)
         emAfEndpoints[ep].deviceVersion = endpointDeviceVersion(ep);
         emAfEndpoints[ep].endpointType  = endpointTypeMacro(ep);
         emAfEndpoints[ep].dataVersions  = currentDataVersions;
-        emAfEndpoints[ep].networkIndex  = endpointNetworkIndex(ep);
         emAfEndpoints[ep].bitmask       = EMBER_AF_ENDPOINT_ENABLED;
 
         // Increment currentDataVersions by 1 (slot) for every server cluster
@@ -230,7 +231,6 @@ EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, EmberAfEn
     emAfEndpoints[index].deviceVersion = deviceVersion;
     emAfEndpoints[index].endpointType  = ep;
     emAfEndpoints[index].dataVersions  = dataVersionStorage.data();
-    emAfEndpoints[index].networkIndex  = 0;
     // Start the endpoint off as disabled.
     emAfEndpoints[index].bitmask = EMBER_AF_ENDPOINT_DISABLED;
 
@@ -320,9 +320,7 @@ void emberAfClusterDefaultResponseCallback(EndpointId endpoint, ClusterId cluste
         EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_DEFAULT_RESPONSE_FUNCTION);
         if (f != NULL)
         {
-            // emberAfPushEndpointNetworkIndex(endpoint);
             ((EmberAfDefaultResponseFunction) f)(endpoint, commandId, status);
-            // emberAfPopNetworkIndex();
         }
     }
 }
@@ -342,9 +340,7 @@ void emberAfClusterMessageSentCallback(const MessageSendDestination & destinatio
             EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_MESSAGE_SENT_FUNCTION);
             if (f != NULL)
             {
-                // emberAfPushEndpointNetworkIndex(apsFrame->sourceEndpoint);
                 ((EmberAfMessageSentFunction) f)(destination, apsFrame, msgLen, message, status);
-                // emberAfPopNetworkIndex();
             }
         }
     }
@@ -375,11 +371,14 @@ EmberAfStatus emAfClusterPreAttributeChangedCallback(const app::ConcreteAttribut
     }
     else
     {
-        EmberAfStatus status            = EMBER_ZCL_STATUS_SUCCESS;
-        EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION);
+        EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+        // Casting and calling a function pointer on the same line results in ignoring the return
+        // of the call on gcc-arm-none-eabi-9-2019-q4-major
+        EmberAfClusterPreAttributeChangedCallback f = (EmberAfClusterPreAttributeChangedCallback)(
+            emberAfFindClusterFunction(cluster, CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION));
         if (f != NULL)
         {
-            status = ((EmberAfClusterPreAttributeChangedCallback) f)(attributePath, attributeType, size, value);
+            status = f(attributePath, attributeType, size, value);
         }
         return status;
     }
@@ -389,7 +388,6 @@ static void initializeEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
 {
     uint8_t clusterIndex;
     const EmberAfEndpointType * epType = definedEndpoint->endpointType;
-    // emberAfPushEndpointNetworkIndex(definedEndpoint->endpoint);
     for (clusterIndex = 0; clusterIndex < epType->clusterCount; clusterIndex++)
     {
         const EmberAfCluster * cluster = &(epType->cluster[clusterIndex]);
@@ -401,7 +399,6 @@ static void initializeEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
             ((EmberAfInitFunction) f)(definedEndpoint->endpoint);
         }
     }
-    // emberAfPopNetworkIndex();
 }
 
 // Calls the init functions.
@@ -663,6 +660,16 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
         }
     }
     return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE; // Sorry, attribute was not found.
+}
+
+const EmberAfEndpointType * emberAfFindEndpointType(chip::EndpointId endpointId)
+{
+    uint16_t ep = emberAfIndexFromEndpoint(endpointId);
+    if (ep == 0xFFFF)
+    {
+        return nullptr;
+    }
+    return emAfEndpoints[ep].endpointType;
 }
 
 const EmberAfCluster * emberAfFindClusterInType(const EmberAfEndpointType * endpointType, ClusterId clusterId,
@@ -1170,12 +1177,14 @@ void emberAfResetAttributes(EndpointId endpoint)
 void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional<ClusterId> clusterId)
 {
     uint16_t ep;
-    uint8_t clusterI, curNetwork = 0 /* emberGetCurrentNetwork() */;
+    uint8_t clusterI;
     uint16_t attr;
     uint8_t * ptr;
     uint16_t epCount = emberAfEndpointCount();
     uint8_t attrData[ATTRIBUTE_LARGEST];
     auto * attrStorage = ignoreStorage ? nullptr : app::GetAttributePersistenceProvider();
+    // Don't check whether we actually have an attrStorage here, because it's OK
+    // to have one if none of our attributes have NVM storage.
 
     for (ep = 0; ep < epCount; ep++)
     {
@@ -1190,11 +1199,6 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
         }
         de = &(emAfEndpoints[ep]);
 
-        // Ensure that the endpoint is on the current network
-        if (endpoint == EMBER_BROADCAST_ENDPOINT && de->networkIndex != curNetwork)
-        {
-            continue;
-        }
         for (clusterI = 0; clusterI < de->endpointType->clusterCount; clusterI++)
         {
             const EmberAfCluster * cluster = &(de->endpointType->cluster[clusterI]);
@@ -1222,6 +1226,7 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
                 // First check for a persisted value.
                 if (!ignoreStorage && am->IsNonVolatile())
                 {
+                    VerifyOrDie(attrStorage && "Attribute persistence needs a persistence provider");
                     MutableByteSpan bytes(attrData);
                     CHIP_ERROR err = attrStorage->ReadValue(
                         app::ConcreteAttributePath(de->endpoint, cluster->clusterId, am->attributeId), am, bytes);
@@ -1342,8 +1347,15 @@ void emAfSaveAttributeToStorageIfNeeded(uint8_t * data, EndpointId endpoint, Clu
     }
 
     auto * attrStorage = app::GetAttributePersistenceProvider();
-    attrStorage->WriteValue(app::ConcreteAttributePath(endpoint, clusterId, metadata->attributeId), metadata,
-                            ByteSpan(data, dataSize));
+    if (attrStorage)
+    {
+        attrStorage->WriteValue(app::ConcreteAttributePath(endpoint, clusterId, metadata->attributeId), metadata,
+                                ByteSpan(data, dataSize));
+    }
+    else
+    {
+        ChipLogProgress(DataManagement, "Can't store attribute value: no persistence provider");
+    }
 }
 
 // This function returns the actual function point from the array,

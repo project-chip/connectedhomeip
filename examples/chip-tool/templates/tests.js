@@ -15,6 +15,29 @@
  *    limitations under the License.
  */
 
+function getManualTests()
+{
+  const DeviceDiscovery = [
+    'Test_TC_DD_1_5',
+    'Test_TC_DD_1_6',
+    'Test_TC_DD_1_7',
+    'Test_TC_DD_1_8',
+    'Test_TC_DD_1_9',
+  ];
+
+  const Groups = [
+    'TestGroupDemoCommand',
+    'TestGroupDemoConfig',
+  ];
+
+  const tests = [
+    DeviceDiscovery, //
+    Groups, //
+
+  ];
+  return tests.flat(1);
+}
+
 function getTests()
 {
   const BinaryInput = [
@@ -56,14 +79,6 @@ function getTests()
     'Test_TC_CC_9_1',
     'Test_TC_CC_9_2',
     'Test_TC_CC_9_3',
-  ];
-
-  const DeviceDiscovery = [
-    'Test_TC_DD_1_5',
-    'Test_TC_DD_1_6',
-    'Test_TC_DD_1_7',
-    'Test_TC_DD_1_8',
-    'Test_TC_DD_1_9',
   ];
 
   const DeviceManagement = [
@@ -234,6 +249,7 @@ function getTests()
     'TestIdentifyCluster',
     'TestOperationalCredentialsCluster',
     'TestModeSelectCluster',
+    'TestSystemCommands',
   ];
 
   const SoftwareDiagnostics = [
@@ -255,8 +271,6 @@ function getTests()
   const Groups = [
     'TestGroupMessaging',
     'TestGroupsCluster',
-    'TestGroupDemoCommand',
-    'TestGroupDemoConfig',
     'TestGroupKeyManagementCluster',
   ];
 
@@ -265,7 +279,6 @@ function getTests()
     BooleanState, //
     BridgedActions, //
     ColorControl, //
-    DeviceDiscovery, //
     DeviceManagement, //
     ElectricalMeasurement, //
     EthernetNetworkDiagnostics, //
@@ -299,4 +312,5 @@ function getTests()
 //
 // Module exports
 //
-exports.getTests = getTests;
+exports.getTests       = getTests;
+exports.getManualTests = getManualTests;

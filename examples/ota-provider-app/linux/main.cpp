@@ -30,8 +30,8 @@
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
-
 #include <ota-provider-common/BdxOtaSender.h>
+#include <ota-provider-common/DefaultUserConsentProvider.h>
 #include <ota-provider-common/OTAProviderExample.h>
 
 #include <fstream>
@@ -53,13 +53,23 @@ constexpr chip::EndpointId kOtaProviderEndpoint = 0;
 constexpr uint16_t kOptionFilepath             = 'f';
 constexpr uint16_t kOptionOtaImageList         = 'o';
 constexpr uint16_t kOptionQueryImageBehavior   = 'q';
-constexpr uint16_t kOptionDelayedActionTimeSec = 'd';
+constexpr uint16_t kOptionUserConsentState     = 'u';
+constexpr uint16_t kOptionDelayedActionTimeSec = 't';
+constexpr uint16_t kOptionDiscriminator        = 'd';
+constexpr uint16_t kOptionSoftwareVersion      = 's';
+constexpr uint16_t kOptionUserConsentNeeded    = 'c';
+
+static constexpr uint16_t kMaximumDiscriminatorValue = 0xFFF;
 
 // Global variables used for passing the CLI arguments to the OTAProviderExample object
-static OTAProviderExample::QueryImageBehaviorType gQueryImageBehavior = OTAProviderExample::kRespondWithUpdateAvailable;
+static OTAProviderExample::QueryImageBehaviorType gQueryImageBehavior = OTAProviderExample::kRespondWithUnknown;
 static uint32_t gDelayedActionTimeSec                                 = 0;
 static const char * gOtaFilepath                                      = nullptr;
 static const char * gOtaImageListFilepath                             = nullptr;
+static chip::ota::UserConsentState gUserConsentState                  = chip::ota::UserConsentState::kUnknown;
+static bool gUserConsentNeeded                                        = false;
+static chip::Optional<uint16_t> gSetupDiscriminator;
+static chip::Optional<uint32_t> gSoftwareVersion;
 
 // Parses the JSON filepath and extracts DeviceSoftwareVersionModel parameters
 static bool ParseJsonFileAndPopulateCandidates(const char * filepath,
@@ -181,7 +191,47 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         }
         break;
     case kOptionDelayedActionTimeSec:
-        gDelayedActionTimeSec = static_cast<uint32_t>(strtol(aValue, NULL, 0));
+        gDelayedActionTimeSec = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
+        break;
+    case kOptionUserConsentState:
+        if (aValue == NULL)
+        {
+            PrintArgError("%s: ERROR: NULL UserConsent parameter\n", aProgram);
+            retval = false;
+        }
+        else if (strcmp(aValue, "granted") == 0)
+        {
+            gUserConsentState = chip::ota::UserConsentState::kGranted;
+        }
+        else if (strcmp(aValue, "denied") == 0)
+        {
+            gUserConsentState = chip::ota::UserConsentState::kDenied;
+        }
+        else if (strcmp(aValue, "deferred") == 0)
+        {
+            gUserConsentState = chip::ota::UserConsentState::kObtaining;
+        }
+        else
+        {
+            PrintArgError("%s: ERROR: Invalid UserConsent parameter:  %s\n", aProgram, aValue);
+            retval = false;
+        }
+        break;
+    case kOptionDiscriminator: {
+        uint16_t discriminator = static_cast<uint16_t>(strtoul(aValue, NULL, 0));
+        if (discriminator > kMaximumDiscriminatorValue)
+        {
+            PrintArgError("%s: Input ERROR: setupDiscriminator value %s is out of range \n", aProgram, aValue);
+            retval = false;
+        }
+        gSetupDiscriminator.SetValue(discriminator);
+        break;
+    }
+    case kOptionSoftwareVersion:
+        gSoftwareVersion.SetValue(static_cast<uint32_t>(strtoul(aValue, NULL, 0)));
+        break;
+    case kOptionUserConsentNeeded:
+        gUserConsentNeeded = true;
         break;
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
@@ -197,6 +247,10 @@ OptionDef cmdLineOptionsDef[] = {
     { "otaImageList", chip::ArgParser::kArgumentRequired, kOptionOtaImageList },
     { "QueryImageBehavior", chip::ArgParser::kArgumentRequired, kOptionQueryImageBehavior },
     { "DelayedActionTimeSec", chip::ArgParser::kArgumentRequired, kOptionDelayedActionTimeSec },
+    { "UserConsentState", chip::ArgParser::kArgumentRequired, kOptionUserConsentState },
+    { "discriminator", chip::ArgParser::kArgumentRequired, kOptionDiscriminator },
+    { "softwareVersion", chip::ArgParser::kArgumentRequired, kOptionSoftwareVersion },
+    { "UserConsentNeeded", chip::ArgParser::kNoArgument, kOptionUserConsentNeeded },
     {},
 };
 
@@ -207,9 +261,24 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "        Path to a file containing a list of OTA images.\n"
                              "  -q/--QueryImageBehavior <UpdateAvailable | Busy | UpdateNotAvailable>\n"
                              "        Status value in the Query Image Response\n"
-                             "  -d/--DelayedActionTimeSec <time>\n"
+                             "  -t/--DelayedActionTimeSec <time>\n"
                              "        Value in seconds for the DelayedActionTime in the Query Image Response\n"
-                             "        and Apply Update Response\n" };
+                             "        and Apply Update Response\n"
+                             "  -u/--UserConsentState <granted | denied | deferred>\n"
+                             "        granted: Status value in QueryImageResponse is set to UpdateAvailable\n"
+                             "        denied: Status value in QueryImageResponse is set to UpdateNotAvailable\n"
+                             "        deferred: Status value in QueryImageResponse is set to Busy\n"
+                             "        -q/--QueryImageBehavior overrides this option\n"
+                             "  -d/--discriminator <discriminator>\n"
+                             "        A 12-bit value used to discern between multiple commissionable CHIP device\n"
+                             "        advertisements. If none is specified, default value is 3840.\n"
+                             "  -s/--softwareVersion <version>\n"
+                             "        Value of SoftwareVersion in the Query Image Response\n"
+                             "        If ota image list is present along with this option\n"
+                             "        then value from ota image list is used.\n"
+                             "        Otherwise, this value will be used is then value from that will be used\n"
+                             "  -c/--UserConsentNeeded\n"
+                             "        If provided, value of UserConsentNeeded in the Query Image Response is set to true\n" };
 
 HelpOptions helpOptions("ota-provider-app", "Usage: ota-provider-app [options]", "1.0");
 
@@ -219,6 +288,7 @@ int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     OTAProviderExample otaProvider;
+    chip::ota::DefaultUserConsentProvider userConsentProvider;
 
     if (chip::Platform::MemoryInit() != CHIP_NO_ERROR)
     {
@@ -238,6 +308,19 @@ int main(int argc, char * argv[])
     }
 
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
+
+    if (gSetupDiscriminator.HasValue())
+    {
+        // Set discriminator to user specified value
+        ChipLogProgress(SoftwareUpdate, "Setting discriminator to: %" PRIu16, gSetupDiscriminator.Value());
+        err = chip::DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(gSetupDiscriminator.Value());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(SoftwareUpdate, "Setup discriminator setting failed with code: %" CHIP_ERROR_FORMAT, err.Format());
+            return 1;
+        }
+    }
+
     chip::Server::GetInstance().Init();
 
     // Initialize device attestation config
@@ -262,6 +345,21 @@ int main(int argc, char * argv[])
 
     otaProvider.SetQueryImageBehavior(gQueryImageBehavior);
     otaProvider.SetDelayedActionTimeSec(gDelayedActionTimeSec);
+    if (gSoftwareVersion.HasValue())
+    {
+        otaProvider.SetSoftwareVersion(gSoftwareVersion.Value());
+    }
+
+    if (gUserConsentState != chip::ota::UserConsentState::kUnknown)
+    {
+        userConsentProvider.SetGlobalUserConsentState(gUserConsentState);
+        otaProvider.SetUserConsentDelegate(&userConsentProvider);
+    }
+
+    if (gUserConsentNeeded)
+    {
+        otaProvider.SetUserConsentNeeded(true);
+    }
 
     ChipLogDetail(SoftwareUpdate, "Using ImageList file: %s", gOtaImageListFilepath ? gOtaImageListFilepath : "(none)");
 

@@ -37,7 +37,7 @@ tests:
       wait: "AttestationRequest"
 
     - label: "Wait for CSR Request"
-      wait: "OpCSRRequest"
+      wait: "CSRRequest"
 
     - label: "Wait for Add Trusted Root Certificate Request"
       wait: "AddTrustedRootCertificate"

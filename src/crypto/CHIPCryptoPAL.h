@@ -1112,24 +1112,25 @@ protected:
     /**
      * @brief Return the hash.
      *
-     * @param out    Output buffer. The size is implicit and is determined by the hash used.
+     * @param out_span Output buffer. The size available must be >= the hash size. It gets resized
+     *                 to hash size on success.
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR HashFinalize(uint8_t * out) = 0;
+    virtual CHIP_ERROR HashFinalize(MutableByteSpan & out_span) = 0;
 
     /**
      * @brief Generate a message authentication code.
      *
-     * @param key     The MAC key buffer.
-     * @param key_len The size of the MAC key in bytes.
-     * @param in      The input buffer.
-     * @param in_len  The size of the input data to MAC in bytes.
-     * @param out     The output MAC buffer. Size is implicit and is determined by the hash used.
+     * @param key      The MAC key buffer.
+     * @param key_len  The size of the MAC key in bytes.
+     * @param in       The input buffer.
+     * @param in_len   The size of the input data to MAC in bytes.
+     * @param out_span The output MAC buffer span. Size must be >= the hash_size. Output size is updated to fit on success.
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len, uint8_t * out) = 0;
+    virtual CHIP_ERROR Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len, MutableByteSpan & out_span) = 0;
 
     /**
      * @brief Verify a message authentication code.
@@ -1192,7 +1193,7 @@ public:
     ~Spake2p_P256_SHA256_HKDF_HMAC() override { Spake2p_P256_SHA256_HKDF_HMAC::Clear(); }
 
     void Clear() override;
-    CHIP_ERROR Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len, uint8_t * out) override;
+    CHIP_ERROR Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len, MutableByteSpan & out_span) override;
     CHIP_ERROR MacVerify(const uint8_t * key, size_t key_len, const uint8_t * mac, size_t mac_len, const uint8_t * in,
                          size_t in_len) override;
     CHIP_ERROR FELoad(const uint8_t * in, size_t in_len, void * fe) override;
@@ -1212,7 +1213,7 @@ public:
 protected:
     CHIP_ERROR InitImpl() override;
     CHIP_ERROR Hash(const uint8_t * in, size_t in_len) override;
-    CHIP_ERROR HashFinalize(uint8_t * out) override;
+    CHIP_ERROR HashFinalize(MutableByteSpan & out_span) override;
     CHIP_ERROR KDF(const uint8_t * secret, size_t secret_length, const uint8_t * salt, size_t salt_length, const uint8_t * info,
                    size_t info_length, uint8_t * out, size_t out_length) override;
 
@@ -1246,8 +1247,8 @@ CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & root_public_
  *        records from a Node's root public key and Fabric ID.  This is a conveniance
  *        overload that writes to a uint64_t (CompressedFabricId) type.
  *
- * @param[in] root_public_key The root public key associated with the node's fabric
- * @param[in] fabric_id The fabric ID associated with the node's fabric
+ * @param[in] rootPublicKey The root public key associated with the node's fabric
+ * @param[in] fabricId The fabric ID associated with the node's fabric
  * @param[out] compressedFabricId output location for compressed fabric ID
  * @returns a CHIP_ERROR on failure or CHIP_NO_ERROR otherwise.
  */
@@ -1355,7 +1356,7 @@ public:
     virtual ~SymmetricKeyContext() = default;
     /**
      * @brief Perform the message encryption as described in 4.7.2. (Security Processing of Outgoing Messages)
-     * @param[inout] plaintext     Outgoing message payload.
+     * @param[in,out] plaintext     Outgoing message payload.
      * @param[in] aad           Additional data (message header contents)
      * @param[in] nonce         Nonce (Security Flags | Message Counter | Source Node ID)
      * @param[out] out_mic      Outgoing Message Integrity Check
@@ -1365,10 +1366,10 @@ public:
                                       MutableByteSpan & out_mic) const = 0;
     /**
      * @brief Perform the message decryption as described in 4.7.3.(Security Processing of Incoming Messages)
-     * @param ciphertext[inout] Incoming encrypted payload
-     * @param aad[in]   Additional data (message header contents)
-     * @param nonce[in] Nonce (Security Flags | Message Counter | Source Node ID)
-     * @param mic[in]   Incoming Message Integrity Check
+     * @param[in,out] ciphertext Incoming encrypted payload
+     * @param[in] aad   Additional data (message header contents)
+     * @param[in] nonce Nonce (Security Flags | Message Counter | Source Node ID)
+     * @param[in] mic   Incoming Message Integrity Check
      * @return CHIP_ERROR
      */
     virtual CHIP_ERROR DecryptMessage(MutableByteSpan & ciphertext, const ByteSpan & aad, const ByteSpan & nonce,
@@ -1376,10 +1377,10 @@ public:
 
     /**
      * @brief Perform privacy encoding as described in 4.8.2. (Privacy Processing of Outgoing Messages)
-     * @param header[in/out]    Message header to encrypt
-     * @param session_id[in]    Outgoing SessionID
-     * @param payload[in]       Encrypted payload
-     * @param mic[in]       Outgoing Message Integrity Check
+     * @param[in,out] header    Message header to encrypt
+     * @param[in] session_id    Outgoing SessionID
+     * @param[in] payload       Encrypted payload
+     * @param[in] mic       Outgoing Message Integrity Check
      * @return CHIP_ERROR
      */
     virtual CHIP_ERROR EncryptPrivacy(MutableByteSpan & header, uint16_t session_id, const ByteSpan & payload,
@@ -1387,10 +1388,10 @@ public:
 
     /**
      * @brief Perform privacy decoding as described in 4.8.3. (Privacy Processing of Incoming Messages)
-     * @param header[in/out]    Message header to decrypt
-     * @param session_id[in]    Incoming SessionID
-     * @param payload[in]       Encrypted payload
-     * @param mic[in]           Outgoing Message Integrity Check
+     * @param[in,out] header    Message header to decrypt
+     * @param[in] session_id    Incoming SessionID
+     * @param[in] payload       Encrypted payload
+     * @param[in] mic           Outgoing Message Integrity Check
      * @return CHIP_ERROR
      */
     virtual CHIP_ERROR DecryptPrivacy(MutableByteSpan & header, uint16_t session_id, const ByteSpan & payload,

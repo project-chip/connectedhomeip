@@ -31,14 +31,15 @@ using namespace chip::app::Clusters::DoorLock;
 // should wait for door to be locked on lock command and return success) but
 // door lock server should check pin before even calling the lock-door
 // callback.
-bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode)
+bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode, DlOperationError & err)
 {
-    return LockManager::Instance().Lock(endpointId, pinCode);
+    return LockManager::Instance().Lock(endpointId, pinCode, err);
 }
 
-bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode)
+bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode,
+                                              DlOperationError & err)
 {
-    return LockManager::Instance().Unlock(endpointId, pinCode);
+    return LockManager::Instance().Unlock(endpointId, pinCode, err);
 }
 
 bool emberAfPluginDoorLockGetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)

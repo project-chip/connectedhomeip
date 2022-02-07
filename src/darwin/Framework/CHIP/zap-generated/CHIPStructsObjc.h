@@ -126,8 +126,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPGeneralCommissioningClusterBasicCommissioningInfoType : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull failSafeExpiryLengthMs;
+@interface CHIPGeneralCommissioningClusterBasicCommissioningInfo : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull failSafeExpiryLengthSeconds;
 - (instancetype)init;
 @end
 
@@ -256,30 +256,30 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPGroupKeyManagementClusterGroupInfo : NSObject
+@interface CHIPGroupKeyManagementClusterGroupInfoMapStruct : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 @property (strong, nonatomic) NSNumber * _Nonnull groupId;
 @property (strong, nonatomic) NSArray * _Nonnull endpoints;
-@property (strong, nonatomic) NSString * _Nonnull groupName;
+@property (strong, nonatomic) NSString * _Nullable groupName;
 - (instancetype)init;
 @end
 
-@interface CHIPGroupKeyManagementClusterGroupKey : NSObject
+@interface CHIPGroupKeyManagementClusterGroupKeyMapStruct : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 @property (strong, nonatomic) NSNumber * _Nonnull groupId;
 @property (strong, nonatomic) NSNumber * _Nonnull groupKeySetID;
 - (instancetype)init;
 @end
 
-@interface CHIPGroupKeyManagementClusterGroupKeySet : NSObject
+@interface CHIPGroupKeyManagementClusterGroupKeySetStruct : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull groupKeySetID;
-@property (strong, nonatomic) NSNumber * _Nonnull securityPolicy;
-@property (strong, nonatomic) NSData * _Nonnull epochKey0;
-@property (strong, nonatomic) NSNumber * _Nonnull epochStartTime0;
-@property (strong, nonatomic) NSData * _Nonnull epochKey1;
-@property (strong, nonatomic) NSNumber * _Nonnull epochStartTime1;
-@property (strong, nonatomic) NSData * _Nonnull epochKey2;
-@property (strong, nonatomic) NSNumber * _Nonnull epochStartTime2;
+@property (strong, nonatomic) NSNumber * _Nonnull groupKeySecurityPolicy;
+@property (strong, nonatomic) NSData * _Nullable epochKey0;
+@property (strong, nonatomic) NSNumber * _Nullable epochStartTime0;
+@property (strong, nonatomic) NSData * _Nullable epochKey1;
+@property (strong, nonatomic) NSNumber * _Nullable epochStartTime1;
+@property (strong, nonatomic) NSData * _Nullable epochKey2;
+@property (strong, nonatomic) NSNumber * _Nullable epochStartTime2;
 - (instancetype)init;
 @end
 
@@ -406,14 +406,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPApplicationLauncherClusterApplicationLauncherApplication : NSObject
+@interface CHIPApplicationLauncherClusterApplication : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull catalogVendorId;
 @property (strong, nonatomic) NSString * _Nonnull applicationId;
 - (instancetype)init;
 @end
 
 @interface CHIPApplicationLauncherClusterApplicationEP : NSObject
-@property (strong, nonatomic) CHIPApplicationLauncherClusterApplicationLauncherApplication * _Nonnull application;
+@property (strong, nonatomic) CHIPApplicationLauncherClusterApplication * _Nonnull application;
 @property (strong, nonatomic) NSString * _Nonnull endpoint;
 - (instancetype)init;
 @end

@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2020-2021 Project CHIP Authors
+ *   Copyright (c) 2020-2022 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +21,7 @@ import android.bluetooth.BluetoothGatt;
 import android.util.Log;
 import androidx.annotation.Nullable;
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback;
+import chip.devicecontroller.model.ChipAttributePath;
 
 /** Controller to interact with the CHIP device. */
 public class ChipDeviceController {
@@ -174,6 +175,9 @@ public class ChipDeviceController {
   /**
    * Through GetConnectedDeviceCallback, returns a pointer to a connected device or an error.
    *
+   * <p>The native code invoked by this method creates a strong reference to the provided callback,
+   * which is released only when GetConnectedDeviceCallback has returned success or failure.
+   *
    * <p>TODO(#8443): This method could benefit from a ChipDevice abstraction to hide the pointer
    * passing.
    */
@@ -282,7 +286,7 @@ public class ChipDeviceController {
   }
 
   public boolean openPairingWindowWithPIN(
-      long devicePtr, int duration, int iteration, int discriminator, long setupPinCode) {
+      long devicePtr, int duration, long iteration, int discriminator, long setupPinCode) {
     return openPairingWindowWithPIN(
         deviceControllerPtr, devicePtr, duration, iteration, discriminator, setupPinCode);
   }
@@ -296,6 +300,31 @@ public class ChipDeviceController {
     shutdownSubscriptions(deviceControllerPtr, devicePtr);
   }
 
+  /** Subscribe to the given attribute path. */
+  public void subscribeToPath(
+      SubscriptionEstablishedCallback subscriptionEstablishedCallback,
+      ReportCallback reportCallback,
+      long devicePtr,
+      ChipAttributePath attributePath,
+      int minInterval,
+      int maxInterval) {
+    ReportCallbackJni jniCallback =
+        new ReportCallbackJni(subscriptionEstablishedCallback, reportCallback);
+    subscribeToPath(
+        deviceControllerPtr,
+        jniCallback.getCallbackHandle(),
+        devicePtr,
+        attributePath,
+        minInterval,
+        maxInterval);
+  }
+
+  /** Read the given attribute path. */
+  public void readPath(ReportCallback callback, long devicePtr, ChipAttributePath attributePath) {
+    ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback);
+    readPath(deviceControllerPtr, jniCallback.getCallbackHandle(), devicePtr, attributePath);
+  }
+
   /**
    * Generates a new PASE verifier and passcode ID for the given setup PIN code.
    *
@@ -305,12 +334,26 @@ public class ChipDeviceController {
    * @param salt the 16-byte salt
    */
   public PaseVerifierParams computePaseVerifier(
-      long devicePtr, long setupPincode, int iterations, byte[] salt) {
+      long devicePtr, long setupPincode, long iterations, byte[] salt) {
     return computePaseVerifier(deviceControllerPtr, devicePtr, setupPincode, iterations, salt);
   }
 
   private native PaseVerifierParams computePaseVerifier(
-      long deviceControllerPtr, long devicePtr, long setupPincode, int iterations, byte[] salt);
+      long deviceControllerPtr, long devicePtr, long setupPincode, long iterations, byte[] salt);
+
+  private native void subscribeToPath(
+      long deviceControllerPtr,
+      long callbackHandle,
+      long devicePtr,
+      ChipAttributePath attributePath,
+      int minInterval,
+      int maxInterval);
+
+  public native void readPath(
+      long deviceControllerPtr,
+      long callbackHandle,
+      long devicePtr,
+      ChipAttributePath attributePath);
 
   private native long newDeviceController();
 
@@ -368,7 +411,7 @@ public class ChipDeviceController {
       long deviceControllerPtr,
       long devicePtr,
       int duration,
-      int iteration,
+      long iteration,
       int discriminator,
       long setupPinCode);
 

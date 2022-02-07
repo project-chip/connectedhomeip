@@ -288,13 +288,11 @@ CHIP_ERROR PacketHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode
         .Set(Header::MsgFlagValues::kDestinationGroupIdPresent, mDestinationGroupId.HasValue());
 
     uint8_t msgFlags = (kMsgHeaderVersion << kVersionShift) | (messageFlags.Raw() & kMsgFlagsMask);
-    uint8_t secFlags = mSecFlags.Raw();
-    secFlags |= static_cast<uint8_t>(mSessionType);
 
     uint8_t * p = data;
     Write8(p, msgFlags);
     LittleEndian::Write16(p, mSessionId);
-    Write8(p, secFlags);
+    Write8(p, mSecFlags.Raw());
     LittleEndian::Write32(p, mMessageCounter);
     if (mSourceNodeId.HasValue())
     {

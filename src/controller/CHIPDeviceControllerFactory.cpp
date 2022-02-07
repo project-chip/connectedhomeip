@@ -191,7 +191,8 @@ CHIP_ERROR DeviceControllerFactory::SetupCommissioner(SetupParams params, Device
 
     CommissionerInitParams commissionerParams;
     PopulateInitParams(commissionerParams, params);
-    commissionerParams.pairingDelegate = params.pairingDelegate;
+    commissionerParams.pairingDelegate     = params.pairingDelegate;
+    commissionerParams.defaultCommissioner = params.defaultCommissioner;
 
     CHIP_ERROR err = commissioner.Init(commissionerParams);
     return err;
@@ -209,6 +210,11 @@ CHIP_ERROR DeviceControllerFactory::ServiceEvents()
 }
 
 DeviceControllerFactory::~DeviceControllerFactory()
+{
+    Shutdown();
+}
+
+void DeviceControllerFactory::Shutdown()
 {
     if (mSystemState != nullptr)
     {
@@ -282,6 +288,12 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
     {
         chip::Platform::Delete(mSessionMgr);
         mSessionMgr = nullptr;
+    }
+
+    if (mFabrics != nullptr)
+    {
+        chip::Platform::Delete(mFabrics);
+        mFabrics = nullptr;
     }
 
     return CHIP_NO_ERROR;

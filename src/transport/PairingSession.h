@@ -198,7 +198,7 @@ private:
 
     Optional<uint16_t> mPeerSessionId;
 
-    ReliableMessageProtocolConfig mMRPConfig = gDefaultMRPConfig;
+    ReliableMessageProtocolConfig mMRPConfig = GetLocalMRPConfig();
 };
 
 } // namespace chip

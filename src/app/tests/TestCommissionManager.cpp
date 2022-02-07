@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -121,7 +121,7 @@ void CheckCommissioningWindowManagerEnhancedWindowTask(intptr_t context)
     constexpr uint32_t kIterations = chip::kPBKDFMinimumIterations;
     uint8_t salt[chip::kPBKDFMinimumSaltLen];
     chip::ByteSpan saltData(salt);
-    constexpr uint16_t kPasscodeID = 1;
+    constexpr chip::PasscodeId kPasscodeID = 1;
     uint16_t currentDiscriminator;
 
     err = commissionMgr.OpenEnhancedCommissioningWindow(kNoCommissioningTimeout, newDiscriminator, verifier, kIterations, saltData,

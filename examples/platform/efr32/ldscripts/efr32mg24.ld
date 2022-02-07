@@ -197,8 +197,8 @@ SECTIONS
     __nvm3_dummy_chip = .;
     KEEP(*(chipNvm3_section));
     . = ALIGN (8192);
-    . += OPENTHREAD_NVM_SIZE;
-    . = ALIGN (8192);
+    . += DEFINED(SILABS_WIFI) ? 0 : OPENTHREAD_NVM_SIZE;
+    . = DEFINED(SILABS_WIFI) ? . : ALIGN (8192);
   } > FLASH
 
   /* Set NVM to end of FLASH */
