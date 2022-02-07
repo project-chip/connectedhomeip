@@ -102,10 +102,30 @@ static const char ModuleNames[] = "-\0\0" // None
 
 void GetModuleName(char * buf, uint8_t bufSize, uint8_t module)
 {
-    const char * moduleNamePtr = ModuleNames + ((module < ModuleNamesCount) ? module * chip::Logging::kMaxModuleNameLen : 0);
+    if (bufSize == 0)
+    {
+        return; // no space for anything
+    }
 
-    snprintf(buf, bufSize, "%s", moduleNamePtr);
-    buf[chip::Logging::kMaxModuleNameLen] = 0;
+    const char * module_name = ModuleNames;
+    if (module < ModuleNamesCount)
+    {
+        module_name += module * chip::Logging::kMaxModuleNameLen;
+    }
+
+    // module names are NOT generally 0 terminated.
+    // Need to copy exactly kMaxModuleNameLen plus a 0 terminator
+    uint8_t toCopy = chip::Logging::kMaxModuleNameLen + 1; // include 0 terminator
+    if (toCopy > bufSize)
+    {
+        toCopy = bufSize; // at least 1 because of the check at top
+    }
+
+    if (toCopy > 1)
+    {
+        memcpy(buf, module_name, toCopy - 1);
+    }
+    buf[toCopy - 1] = 0; // ensure null termination
 }
 
 void SetLogRedirectCallback(LogRedirectCallback_t callback)
