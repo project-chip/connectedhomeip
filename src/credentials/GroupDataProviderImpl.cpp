@@ -1579,7 +1579,6 @@ void GroupDataProviderImpl::GroupKeyIteratorImpl::Release()
 //
 
 constexpr size_t GroupDataProvider::EpochKey::kLengthBytes;
-constexpr uint8_t kZeroKey[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0 };
 
 CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, const KeySet & in_keyset)
 {
@@ -1607,10 +1606,9 @@ CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, cons
     for (size_t i = 0; i < in_keyset.num_keys_used; ++i)
     {
         ByteSpan epoch_key(in_keyset.epoch_keys[i].key, Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
-        MutableByteSpan key_span(keyset.operational_keys[i].value, sizeof(keyset.operational_keys[i].value));
+        MutableByteSpan key_span(keyset.operational_keys[i].value);
         ReturnErrorOnFailure(Crypto::DeriveGroupOperationalKey(epoch_key, key_span));
         ReturnErrorOnFailure(Crypto::DeriveGroupSessionId(key_span, keyset.operational_keys[i].hash));
-        VerifyOrReturnError(memcmp(kZeroKey, key_span.data(), sizeof(kZeroKey)), CHIP_ERROR_INTERNAL);
     }
     if (found)
     {
