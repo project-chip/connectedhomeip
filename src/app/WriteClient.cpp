@@ -122,7 +122,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR WriteClient::PrepareAttributeIB(const ConcreteDataAttributePath & attributePathParams)
+CHIP_ERROR WriteClient::PrepareAttributeIB(const ConcreteDataAttributePath & aPath)
 {
     AttributeDataIBs::Builder & writeRequests  = mWriteRequestBuilder.GetWriteRequests();
     AttributeDataIB::Builder & attributeDataIB = writeRequests.CreateAttributeDataIBBuilder();
@@ -131,7 +131,28 @@ CHIP_ERROR WriteClient::PrepareAttributeIB(const ConcreteDataAttributePath & att
     attributeDataIB.DataVersion(0);
     ReturnErrorOnFailure(attributeDataIB.GetError());
     AttributePathIB::Builder & path = attributeDataIB.CreatePath();
-    ReturnErrorOnFailure(path.Encode(attributePathParams));
+
+    // We are using kInvalidEndpointId just for group write requests. This is not the correct use of ConcreteDataAttributePath.
+    // TODO: update AttributePathParams or ConcreteDataAttributePath for a class supports both nullable list index and missing
+    // endpoint id.
+    if (aPath.mEndpointId != kInvalidEndpointId)
+    {
+        path.Endpoint(aPath.mEndpointId);
+    }
+    path.Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId);
+    if (aPath.IsListItemOperation())
+    {
+        if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+        {
+            path.ListIndex(DataModel::NullNullable);
+        }
+        else
+        {
+            // We do not support other list operations (i.e. update, delete etc) for now.
+            return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+        }
+    }
+    ReturnErrorOnFailure(path.EndOfAttributePathIB().GetError());
     return CHIP_NO_ERROR;
 }
 

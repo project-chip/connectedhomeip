@@ -142,8 +142,11 @@ public:
     {
         ReturnErrorOnFailure(EnsureMessage());
 
+        // Here, we are using kInvalidEndpointId to for missing endpoint id, which is used when sending group write requests.
         return EncodeSingleAttributeDataIB(
-            ConcreteDataAttributePath(attributePath.mEndpointId, attributePath.mClusterId, attributePath.mAttributeId), value);
+            ConcreteDataAttributePath(attributePath.HasWildcardEndpointId() ? kInvalidEndpointId : attributePath.mEndpointId,
+                                      attributePath.mClusterId, attributePath.mAttributeId),
+            value);
     }
 
     /**
@@ -152,8 +155,10 @@ public:
     template <class T>
     CHIP_ERROR EncodeAttribute(const AttributePathParams & attributePath, const DataModel::List<T> & value)
     {
+        // Here, we are using kInvalidEndpointId to for missing endpoint id, which is used when sending group write requests.
         ConcreteDataAttributePath path =
-            ConcreteDataAttributePath(attributePath.mEndpointId, attributePath.mClusterId, attributePath.mAttributeId);
+            ConcreteDataAttributePath(attributePath.HasWildcardEndpointId() ? kInvalidEndpointId : attributePath.mEndpointId,
+                                      attributePath.mClusterId, attributePath.mAttributeId);
 
         ReturnErrorOnFailure(EnsureMessage());
 
@@ -182,8 +187,11 @@ public:
 
         if (value.IsNull())
         {
+            // Here, we are using kInvalidEndpointId to for missing endpoint id, which is used when sending group write requests.
             return EncodeSingleAttributeDataIB(
-                ConcreteDataAttributePath(attributePath.mEndpointId, attributePath.mClusterId, attributePath.mAttributeId), value);
+                ConcreteDataAttributePath(attributePath.HasWildcardEndpointId() ? kInvalidEndpointId : attributePath.mEndpointId,
+                                          attributePath.mClusterId, attributePath.mAttributeId),
+                value);
         }
         else
         {
@@ -344,7 +352,9 @@ private:
     // and mPendingWriteData is populated.
     CHIP_ERROR SendWriteRequest();
 
-    CHIP_ERROR PrepareAttributeIB(const ConcreteDataAttributePath & attributePathParams);
+    // Encodes the header of an AttributeDataIB, a special case for attributePath is its EndpointId can be kInvalidEndpointId, this
+    // is used when sending group write requests.
+    CHIP_ERROR PrepareAttributeIB(const ConcreteDataAttributePath & attributePath);
     CHIP_ERROR FinishAttributeIB();
     TLV::TLVWriter * GetAttributeDataIBTLVWriter();
 
