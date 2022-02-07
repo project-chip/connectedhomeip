@@ -2,7 +2,7 @@
 
 An example application that uses Matter to send messages to a Matter server.
 
-IMPORTANT: Must have an Apple developer signgin certificate. Information can be
+IMPORTANT: Must have an Apple developer signin certificate. Information can be
 found at [code-signing](https://developer.apple.com/support/code-signing/).
 
 ---
@@ -120,4 +120,4 @@ with the target cluster name and the target command name
 
 ## Command Details
 
-[Cluster Comands](../../zzz_generated/chip-tool-darwin/zap-generated/README_CLUSTER_COMMANDS.md)
+[Cluster Commands](../../zzz_generated/chip-tool-darwin/zap-generated/README_CLUSTER_COMMANDS.md)
