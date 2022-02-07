@@ -93,9 +93,12 @@ class App:
         return runner.RunSubprocess(app_cmd, name='APP ', wait=False)
 
     def __waitForServerReady(self, server_process, outpipe):
+        # The server is considered ready once mdns publishing is effective.
+        readyString = "Mdns service published."
+
         logging.debug('Waiting for server to listen.')
         start_time = time.time()
-        server_is_listening = outpipe.CapturedLogContains("Server Listening")
+        server_is_listening = outpipe.CapturedLogContains(readyString)
         while not server_is_listening:
             if server_process.poll() is not None:
                 died_str = 'Server died during startup, returncode %d' % server_process.returncode
@@ -104,8 +107,7 @@ class App:
             if time.time() - start_time > 10:
                 raise Exception('Timeout for server listening')
             time.sleep(0.1)
-            server_is_listening = outpipe.CapturedLogContains(
-                "Server Listening")
+            server_is_listening = outpipe.CapturedLogContains(readyString)
         logging.debug('Server is listening. Can proceed.')
 
     def __updateSetUpCode(self, outpipe):
