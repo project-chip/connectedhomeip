@@ -24,7 +24,7 @@ app is assigned a PID from the list below:
 | Lock                    | 0x8006 |
 | OTA provider            | 0x8007 |
 | OTA requestor           | 0x8008 |
-| Persistant Storage      | 0x8009 |
+| Persistent Storage      | 0x8009 |
 | Pigweed                 | 0x800B |
 | Pump                    | 0x800A |
 | Pump Controller         | 0x8011 |
