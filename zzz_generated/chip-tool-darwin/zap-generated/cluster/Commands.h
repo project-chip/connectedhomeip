@@ -2605,7 +2605,6 @@ public:
     ApplicationLauncherLaunchAppRequest()
         : ModelCommand("launch-app-request")
     {
-        AddArgument("Data", &mData);
         ModelCommand::AddArguments();
     }
 
@@ -2619,8 +2618,8 @@ public:
                                                                                       queue:callbackQueue];
 
         __auto_type * params = [[CHIPApplicationLauncherClusterLaunchAppRequestParams alloc] init];
-        params.data = [[NSString alloc] initWithBytes:mData.data() length:mData.size() encoding:NSUTF8StringEncoding];
         // application Struct parsing is not supported yet
+        params.data = [[NSData alloc] initWithBytes:mData.data() length:mData.size()];
         [cluster launchAppRequestWithParams:params
                           completionHandler:^(
                               CHIPApplicationLauncherClusterLauncherResponseParams * _Nullable values, NSError * _Nullable error) {
