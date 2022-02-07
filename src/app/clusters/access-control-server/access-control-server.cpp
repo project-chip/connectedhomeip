@@ -448,12 +448,14 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
         size_t newCount;
         size_t maxCount;
 
-        AccessControl::EntryIterator it;
-        AccessControl::Entry entry;
-        ReturnErrorOnFailure(GetAccessControl().Entries(it, &accessingFabricIndex));
-        while (it.Next(entry) == CHIP_NO_ERROR)
         {
-            oldCount++;
+            AccessControl::EntryIterator it;
+            AccessControl::Entry entry;
+            ReturnErrorOnFailure(GetAccessControl().Entries(it, &accessingFabricIndex));
+            while (it.Next(entry) == CHIP_NO_ERROR)
+            {
+                oldCount++;
+            }
         }
 
         ReturnErrorOnFailure(GetAccessControl().GetEntryCount(allCount));
@@ -462,23 +464,33 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
         VerifyOrReturnError(allCount >= oldCount, CHIP_ERROR_INTERNAL);
         VerifyOrReturnError(static_cast<size_t>(allCount - oldCount + newCount) <= maxCount, CHIP_ERROR_INVALID_LIST_LENGTH);
 
-        while (oldCount > 0)
+        auto iterator = list.begin();
+        size_t i      = 0;
+        while (iterator.Next())
+        {
+            if (i < oldCount)
+            {
+                ReturnErrorOnFailure(GetAccessControl().UpdateEntry(i, iterator.GetValue().entry, &accessingFabricIndex));
+                ReturnErrorOnFailure(LogAccessControlEvent(iterator.GetValue().entry, aDecoder.GetSubjectDescriptor(),
+                                                           AccessControlCluster::ChangeTypeEnum::kChanged));
+            }
+            else
+            {
+                ReturnErrorOnFailure(GetAccessControl().CreateEntry(nullptr, iterator.GetValue().entry, &accessingFabricIndex));
+                ReturnErrorOnFailure(LogAccessControlEvent(iterator.GetValue().entry, aDecoder.GetSubjectDescriptor(),
+                                                           AccessControlCluster::ChangeTypeEnum::kAdded));
+            }
+            ++i;
+        }
+        ReturnErrorOnFailure(iterator.GetStatus());
+
+        while (i < oldCount)
         {
             --oldCount;
             ReturnErrorOnFailure(GetAccessControl().DeleteEntry(oldCount, &accessingFabricIndex));
-            ReturnErrorOnFailure(
-                LogAccessControlEvent(entry, aDecoder.GetSubjectDescriptor(), AccessControlCluster::ChangeTypeEnum::kRemoved));
-        }
-
-        auto iterator = list.begin();
-        while (iterator.Next())
-        {
-            ReturnErrorOnFailure(GetAccessControl().CreateEntry(nullptr, iterator.GetValue().entry, &accessingFabricIndex));
             ReturnErrorOnFailure(LogAccessControlEvent(iterator.GetValue().entry, aDecoder.GetSubjectDescriptor(),
-                                                       AccessControlCluster::ChangeTypeEnum::kAdded));
+                                                       AccessControlCluster::ChangeTypeEnum::kRemoved));
         }
-        ReturnErrorOnFailure(iterator.GetStatus());
-        return CHIP_NO_ERROR;
     }
     else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
