@@ -53,7 +53,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (String)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -69,7 +69,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (String)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -85,7 +85,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Boolean)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -103,7 +103,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Boolean)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -119,7 +119,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Boolean)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -143,7 +143,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (String)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -163,7 +163,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -179,7 +179,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -195,7 +195,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -211,7 +211,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -227,7 +227,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -243,7 +243,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -259,7 +259,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -275,7 +275,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -291,7 +291,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -307,7 +307,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -323,7 +323,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -339,7 +339,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -355,7 +355,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -373,7 +373,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Long)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -395,7 +395,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (String)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -411,7 +411,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Long)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -427,7 +427,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -443,7 +443,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -459,7 +459,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Boolean)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -475,7 +475,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Boolean)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -491,7 +491,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -517,7 +517,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Long)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -541,7 +541,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -563,7 +563,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -579,7 +579,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -595,7 +595,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -611,7 +611,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -627,7 +627,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -643,7 +643,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -659,7 +659,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -677,7 +677,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (String)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -701,7 +701,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -719,7 +719,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Boolean)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -743,7 +743,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -759,7 +759,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -775,7 +775,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -793,7 +793,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -819,7 +819,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Long)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -835,7 +835,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Long)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -851,7 +851,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -867,7 +867,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -897,7 +897,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Boolean)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -913,7 +913,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -929,7 +929,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -945,7 +945,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Long)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -961,7 +961,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Long)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -977,7 +977,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -993,7 +993,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1009,7 +1009,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Long)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1025,7 +1025,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Long)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1041,7 +1041,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Long)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1057,7 +1057,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Long)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1073,7 +1073,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Long)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1089,7 +1089,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Long)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1105,7 +1105,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1121,7 +1121,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1137,7 +1137,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Long)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1153,7 +1153,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Long)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1169,7 +1169,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Long)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1185,7 +1185,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Long)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1201,7 +1201,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Long)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1217,7 +1217,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Long)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1233,7 +1233,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1249,7 +1249,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1265,7 +1265,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Float)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1281,7 +1281,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Double)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1297,7 +1297,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (byte[])
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1313,7 +1313,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (byte[])
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1329,7 +1329,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (String)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1345,7 +1345,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (String)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1361,7 +1361,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Long)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1377,7 +1377,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Long)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1393,7 +1393,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1409,7 +1409,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1425,7 +1425,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1441,7 +1441,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1457,7 +1457,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1473,7 +1473,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1505,7 +1505,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Boolean)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1521,7 +1521,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Boolean)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1537,7 +1537,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Boolean)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1553,7 +1553,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Boolean)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1569,7 +1569,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1585,7 +1585,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1601,7 +1601,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Long)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1617,7 +1617,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Long)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1633,7 +1633,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1649,7 +1649,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1665,7 +1665,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Long)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1681,7 +1681,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Long)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1697,7 +1697,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Long)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1713,7 +1713,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Long)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1729,7 +1729,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Long)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1745,7 +1745,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Long)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1761,7 +1761,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1777,7 +1777,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1793,7 +1793,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Long)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1809,7 +1809,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Long)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1825,7 +1825,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Long)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1841,7 +1841,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Long)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1857,7 +1857,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Long)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1873,7 +1873,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Long)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1889,7 +1889,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1905,7 +1905,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1921,7 +1921,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Float)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1937,7 +1937,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Double)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1953,7 +1953,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (byte[])
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1969,7 +1969,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (String)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -1985,7 +1985,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -2001,7 +2001,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -2017,7 +2017,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -2033,7 +2033,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -2049,7 +2049,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -2067,7 +2067,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -2083,7 +2083,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -2099,7 +2099,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -2115,7 +2115,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -2131,7 +2131,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -2147,7 +2147,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -2163,7 +2163,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -2179,7 +2179,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -2195,7 +2195,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -2213,7 +2213,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -2229,7 +2229,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -2245,7 +2245,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -2265,7 +2265,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -2281,7 +2281,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -2299,7 +2299,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -2323,7 +2323,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               (Integer)
               commandArguments.get("value")
-              
+
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
@@ -2334,4 +2334,3 @@ public class ClusterWriteMapping {
     return writeAttributeMap;
   }
 }
-
