@@ -21,47 +21,51 @@
 namespace chip {
 namespace app {
 
-void ChunkedWriteCallback::OnResponse(const app::WriteClient * apWriteClient, const app::ConcreteDataAttributePath & aPath,
-                                      app::StatusIB status)
+void ChunkedWriteCallback::OnResponse(const WriteClient * apWriteClient, const ConcreteDataAttributePath & aPath, StatusIB aStatus)
 {
-    // We may send a chunked list, to make the behavior consistent, we merge the write response here.
+    // We may send a chunked list. To make the behavior consistent whether a list is being chunked or not,
+    // we merge the write responses for a chunked list here and provide our consumer with a single status response.
     if (mLastAttributePath.HasValue())
     {
         // This is not the first write response.
-        if (!IsAppendingToLastItem(aPath))
+        if (IsAppendingToLastItem(aPath))
+        {
+            // This is a response on the same path as what we already have stored. Report the first
+            // failure status we encountered, and ignore subsequent ones.
+            if (mAttributeStatus.IsSuccess())
+            {
+                mAttributeStatus = aStatus;
+            }
+            return;
+        }
+        else
         {
             // This is a response to another attribute write. Report the final result of last attribute write.
             callback->OnResponse(apWriteClient, mLastAttributePath.Value(), mAttributeStatus);
         }
-        else if (mAttributeStatus.mStatus != Protocols::InteractionModel::Status::Success)
-        {
-            // This is a response on the same path as the last stored on. We only latch in the first encountered failure on that
-            // path, and ignore subsequent ones.
-            return;
-        }
-        /**
-         * else The path is the same as the previous one
-         */
     }
-    /**
-     * else: This is the first report message.
-     */
-    mLastAttributePath.SetValue(aPath);
-    mAttributeStatus = status;
 
+    // This is the first report to a new attribute, we assume it will never be list item operations.
+    if (aPath.IsListItemOperation())
+    {
+        aStatus = StatusIB(CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    mLastAttributePath.SetValue(aPath);
+    mAttributeStatus = aStatus;
     // For the last status in the response, we will call the application callback in OnDone()
 }
 
-void ChunkedWriteCallback::OnError(const app::WriteClient * apWriteClient, CHIP_ERROR aError)
+void ChunkedWriteCallback::OnError(const WriteClient * apWriteClient, CHIP_ERROR aError)
 {
     callback->OnError(apWriteClient, aError);
 }
 
-void ChunkedWriteCallback::OnDone(app::WriteClient * apWriteClient)
+void ChunkedWriteCallback::OnDone(WriteClient * apWriteClient)
 {
     if (mLastAttributePath.HasValue())
     {
-        // We have a cached status that has yet to be reported to the application so call it now.
+        // We have a cached status that has yet to be reported to the application so report it now.
         // If we failed to receive the response, or we received a malformed response, OnResponse won't be called,
         // mLastAttributePath will be Missing() in this case.
         callback->OnResponse(apWriteClient, mLastAttributePath.Value(), mAttributeStatus);
@@ -70,18 +74,17 @@ void ChunkedWriteCallback::OnDone(app::WriteClient * apWriteClient)
     callback->OnDone(apWriteClient);
 }
 
-bool ChunkedWriteCallback::IsAppendingToLastItem(const app::ConcreteDataAttributePath & path)
+bool ChunkedWriteCallback::IsAppendingToLastItem(const ConcreteDataAttributePath & path)
 {
     if (!path.IsListItemOperation())
     {
         return false;
     }
-    if (!mLastAttributePath.HasValue() ||
-        !(ConcreteAttributePath(path.mEndpointId, path.mClusterId, path.mAttributeId) == mLastAttributePath.Value()))
+    if (!mLastAttributePath.HasValue() || !(static_cast<ConcreteAttributePath>(path) == mLastAttributePath.Value()))
     {
         return false;
     }
-    return path.mListOp == app::ConcreteDataAttributePath::ListOperation::AppendItem;
+    return path.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem;
 }
 
 } // namespace app

@@ -89,9 +89,6 @@ private:
     OnDoneCallbackType mOnDone       = nullptr;
 
     app::ChunkedWriteCallback mCallback;
-
-    Optional<app::ConcreteAttributePath> mLastAttributePath;
-    app::StatusIB mAttributeStatus;
 };
 
 /**

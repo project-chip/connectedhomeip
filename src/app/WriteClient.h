@@ -50,8 +50,9 @@ class InteractionModelEngine;
  *  Consumer can allocate one write client, then call PrepareAttribute, insert attribute value, followed by FinishAttribute for
  * every attribute it wants to insert in write request, then call SendWriteRequest
  *
- *  Note: When writing lists, you may receive more than one write state for each list entry. You can refer to ChunkedWriteCallback.h
- * for a high level API which will merge status code for chunked write requests.
+ *  Note: When writing lists, you may receive multiple write status responses for a single list.
+ *  Please see ChunkedWriteCallback.h for a high level API which will merge status codes for
+ *  chunked write requests.
  *
  */
 class WriteClient : public Messaging::ExchangeDelegate
@@ -134,10 +135,10 @@ public:
 #endif
 
     /**
-     *  Encode an attribute value that can be directly encoded using DataModel::Encode, will create a new chunk when necessary.
+     *  Encode an attribute value that can be directly encoded using DataModel::Encode. Will create a new chunk when necessary.
      */
     template <class T>
-    CHIP_ERROR EncodeAttribute(const chip::app::AttributePathParams & attributePath, const T & value)
+    CHIP_ERROR EncodeAttribute(const AttributePathParams & attributePath, const T & value)
     {
         ReturnErrorOnFailure(EnsureMessage());
 
@@ -146,10 +147,10 @@ public:
     }
 
     /**
-     *  Encode a list attribute value with chunking feature, will create a new chunk when necessary.
+     *  Encode a possibly-chunked list attribute value.  Will create a new chunk when necessary.
      */
     template <class T>
-    CHIP_ERROR EncodeAttribute(const chip::app::AttributePathParams & attributePath, const DataModel::List<T> & value)
+    CHIP_ERROR EncodeAttribute(const AttributePathParams & attributePath, const DataModel::List<T> & value)
     {
         ConcreteDataAttributePath path =
             ConcreteDataAttributePath(attributePath.mEndpointId, attributePath.mClusterId, attributePath.mAttributeId);
@@ -157,7 +158,7 @@ public:
         ReturnErrorOnFailure(EnsureMessage());
 
         // Encode a list with only one element before all other data. Since we are using a clean chunk for this payload, this call
-        // must success. Note: This is a hack for ACL cluster, since the first element must gurantee itself admin priviledge, we do
+        // must succeed. Note: This is a hack for ACL cluster, since the first element must gurantee itself admin priviledge, we do
         // not encode a real empty list, instead, we encode a list with first element.
         ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, DataModel::List<T>(value.data(), value.size() > 0 ? 1 : 0)));
 
@@ -171,10 +172,11 @@ public:
     }
 
     /**
-     *  Encode an Nullable attribute value.
+     * Encode a Nullable attribute value.  This needs a separate overload so it can dispatch to the right
+     * EncodeAttribute when writing a nullable list.
      */
     template <class T>
-    CHIP_ERROR EncodeAttribute(const chip::app::AttributePathParams & attributePath, const DataModel::Nullable<T> & value)
+    CHIP_ERROR EncodeAttribute(const AttributePathParams & attributePath, const DataModel::Nullable<T> & value)
     {
         ReturnErrorOnFailure(EnsureMessage());
 
@@ -190,14 +192,13 @@ public:
     }
 
     /**
-     *  Encode an attribute value which is already encoded into a TLV. The TLVReader is expected to be initialized and the read head
+     * Encode an attribute value which is already encoded into a TLV. The TLVReader is expected to be initialized and the read head
      * is expected to point to the element to be encoded.
      *
-     *  Note: When encoding lists with this function, you may receive more than one write state for each list entry. You can refer
-     * to ChunkedWriteCallback.h for a high level API which will merge status code for chunked write requests.
+     * Note: When encoding lists with this function, you may receive more than one write status for a single list. You can refer
+     * to ChunkedWriteCallback.h for a high level API which will merge status codes for chunked write requests.
      */
-    CHIP_ERROR PutPreencodedAttributeWritePayload(const chip::app::ConcreteDataAttributePath & attributePath,
-                                                  const TLV::TLVReader & data);
+    CHIP_ERROR PutPreencodedAttribute(const ConcreteDataAttributePath & attributePath, const TLV::TLVReader & data);
 
     /**
      *  Once SendWriteRequest returns successfully, the WriteClient will
@@ -251,7 +252,7 @@ private:
      *  Encode an attribute value that can be directly encoded using DataModel::Encode.
      */
     template <class T>
-    CHIP_ERROR TryEncodeSingleAttributeDataIB(const chip::app::ConcreteDataAttributePath & attributePath, const T & value)
+    CHIP_ERROR TryEncodeSingleAttributeDataIB(const ConcreteDataAttributePath & attributePath, const T & value)
     {
         chip::TLV::TLVWriter * writer = nullptr;
 
@@ -265,11 +266,11 @@ private:
     }
 
     /**
-     *  A wrapper for TryEncodeSingleAttributeDataIB which will start a new chunk when failed with CHIP_ERROR_NO_MEMORY or
-     * CHIP_ERROR_BUFFER_TOO_SMALL/
+     * A wrapper for TryEncodeSingleAttributeDataIB which will start a new chunk when failed with CHIP_ERROR_NO_MEMORY or
+     * CHIP_ERROR_BUFFER_TOO_SMALL.
      */
     template <class T>
-    CHIP_ERROR EncodeSingleAttributeDataIB(const chip::app::ConcreteDataAttributePath & attributePath, const T & value)
+    CHIP_ERROR EncodeSingleAttributeDataIB(const ConcreteDataAttributePath & attributePath, const T & value)
     {
         TLV::TLVWriter backupWriter;
 
@@ -297,20 +298,20 @@ private:
      * Encode a preencoded attribute data, returns TLV encode error if the ramaining space of current chunk is too small for the
      * AttributeDataIB.
      */
-    CHIP_ERROR TryPutSinglePreencodedAttributeWritePayload(const chip::app::ConcreteDataAttributePath & attributePath,
+    CHIP_ERROR TryPutSinglePreencodedAttributeWritePayload(const ConcreteDataAttributePath & attributePath,
                                                            const TLV::TLVReader & data);
 
     /**
      * Encode a preencoded attribute data, will try to create a new chunk when necessary.
      */
-    CHIP_ERROR PutSinglePreencodedAttributeWritePayload(const chip::app::ConcreteDataAttributePath & attributePath,
+    CHIP_ERROR PutSinglePreencodedAttributeWritePayload(const ConcreteDataAttributePath & attributePath,
                                                         const TLV::TLVReader & data);
 
     /**
      * Encode the first AttributeDataIB for list chunking (i.e. a list with first element of the original payload), will try to
      * create a new chunk when necessary
      */
-    CHIP_ERROR TryPutPreencodedAttributeWriteFirstListItem(const chip::app::ConcreteDataAttributePath & attributePath,
+    CHIP_ERROR TryPutPreencodedAttributeWriteFirstListItem(const ConcreteDataAttributePath & attributePath,
                                                            const TLV::TLVReader & data);
 
     CHIP_ERROR EnsureMessage();
@@ -373,10 +374,13 @@ private:
 
     // A list of buffers, one buffer for each chunk.
     System::PacketBufferHandle mChunks;
+
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
     uint16_t mReservedSize = 0;
+#endif
 
     /**
-     * Below we defines several const variables for encoding overheads.
+     * Below we define several const variables for encoding overheads.
      * WriteRequestMessage =
      * {
      *  timedRequest = false,
@@ -387,22 +391,22 @@ private:
      *        DataVersion = 0x0,          |
      *        AttributePathIB =           |
      *        {                           |
-     *           Endpoint = 0x2,          |  "atomically" encodede via
+     *           Endpoint = 0x2,          |  "atomically" encoded via
      *           Cluster = 0x50f,          > EncodeAttribute or
-     *           Attribute = 0x0000_0006, |  PutPreencodedAttributeWritePayload
+     *           Attribute = 0x0000_0006, |  PutPreencodedAttribute
      *           ListIndex = Null,        |
      *        }                           |
      *        Data = ...                  |
      *     },                             /
      *     (...)
      *  ],                           <-- 1 byte  "end of AttributeDataIB" (end of container)
-     *  moreChunkedMessages = false, <-- 2 bytes "kReservedSizeForEndOfContainer"
+     *  moreChunkedMessages = false, <-- 2 bytes "kReservedSizeForMoreChunksFlag"
      * }                             <-- 1 byte  "end of WriteRequestMessage" (end of container)
      */
 
     // Reserved size for the MoreChunks boolean flag, which takes up 1 byte for the control tag and 1 byte for the context tag.
     static constexpr uint16_t kReservedSizeForMoreChunksFlag = 1 + 1;
-    // End Of Container (0x18) coses one byte.
+    // End Of Container (0x18) uses one byte.
     static constexpr uint16_t kReservedSizeForEndOfContainer = 1;
     // Reserved buffer for TLV level overhead (the overhead for end of AttributeDataIBs (end of container), more chunks flag, end
     // of WriteRequestMessage (another end of container)).

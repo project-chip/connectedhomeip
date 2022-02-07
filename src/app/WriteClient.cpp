@@ -186,10 +186,10 @@ CHIP_ERROR WriteClient::StartNewMessage()
         ReturnErrorOnFailure(FinalizeMessage(true));
     }
 
-    // Do not allow timed request with chunks. mChunks will be null
+    // Do not allow timed request with chunks.
     VerifyOrReturnError(!(mTimedWriteTimeoutMs.HasValue() && !mChunks.IsNull()), CHIP_ERROR_NO_MEMORY);
 
-    System::PacketBufferHandle packet = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
+    System::PacketBufferHandle packet = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
     VerifyOrReturnError(!packet.IsNull(), CHIP_ERROR_NO_MEMORY);
 
     // Always limit the size of the packet to fit within kMaxSecureSduLengthBytes regardless of the available buffer capacity.
@@ -199,7 +199,7 @@ CHIP_ERROR WriteClient::StartNewMessage()
     }
 
     // ... and we need to reserve some extra space for the MIC field.
-    reservedSize = static_cast<uint16_t>(reservedSize + chip::Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
+    reservedSize = static_cast<uint16_t>(reservedSize + Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
 
     // ... and the overhead for end of AttributeDataIBs (end of container), more chunks flag, end of WriteRequestMessage (another
     // end of container).
@@ -226,17 +226,17 @@ CHIP_ERROR WriteClient::StartNewMessage()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WriteClient::TryPutSinglePreencodedAttributeWritePayload(const chip::app::ConcreteDataAttributePath & attributePath,
+CHIP_ERROR WriteClient::TryPutSinglePreencodedAttributeWritePayload(const ConcreteDataAttributePath & attributePath,
                                                                     const TLV::TLVReader & data)
 {
     TLV::TLVReader dataToWrite;
     dataToWrite.Init(data);
 
-    chip::TLV::TLVWriter * writer = nullptr;
+    TLV::TLVWriter * writer = nullptr;
 
     ReturnErrorOnFailure(PrepareAttributeIB(attributePath));
     VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(writer->CopyElement(TLV::ContextTag(to_underlying(app::AttributeDataIB::Tag::kData)), dataToWrite));
+    ReturnErrorOnFailure(writer->CopyElement(TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), dataToWrite));
     ReturnErrorOnFailure(FinishAttributeIB());
     return CHIP_NO_ERROR;
 }
@@ -257,12 +257,12 @@ CHIP_ERROR WriteClient::PutSinglePreencodedAttributeWritePayload(const chip::app
         mWriteRequestBuilder.GetWriteRequests().ResetError();
         ReturnErrorOnFailure(StartNewMessage());
         err = TryPutSinglePreencodedAttributeWritePayload(attributePath, data);
-        // Since we have created a new chunk for this element, the encode is expected to success.
+        // Since we have created a new chunk for this element, the encode is expected to succeed.
     }
     return err;
 }
 
-CHIP_ERROR WriteClient::TryPutPreencodedAttributeWriteFirstListItem(const chip::app::ConcreteDataAttributePath & attributePath,
+CHIP_ERROR WriteClient::TryPutPreencodedAttributeWriteFirstListItem(const ConcreteDataAttributePath & attributePath,
                                                                     const TLV::TLVReader & data)
 {
     chip::TLV::TLVWriter * writer = nullptr;
@@ -271,7 +271,7 @@ CHIP_ERROR WriteClient::TryPutPreencodedAttributeWriteFirstListItem(const chip::
 
     ReturnErrorOnFailure(PrepareAttributeIB(attributePath));
     VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(writer->StartContainer(TLV::ContextTag(to_underlying(app::AttributeDataIB::Tag::kData)),
+    ReturnErrorOnFailure(writer->StartContainer(TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)),
                                                 TLV::TLVType::kTLVType_Array, outerType));
     dataReader.Init(data);
     CHIP_ERROR err = dataReader.Next();
@@ -288,8 +288,7 @@ CHIP_ERROR WriteClient::TryPutPreencodedAttributeWriteFirstListItem(const chip::
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WriteClient::PutPreencodedAttributeWritePayload(const chip::app::ConcreteDataAttributePath & attributePath,
-                                                           const TLV::TLVReader & data)
+CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath & attributePath, const TLV::TLVReader & data)
 {
     ReturnErrorOnFailure(EnsureMessage());
 
@@ -440,7 +439,7 @@ CHIP_ERROR WriteClient::SendWriteRequest()
 
     if (!mChunks.IsNull() && mpExchangeCtx->IsGroupExchangeContext())
     {
-        // Reject this request if we have more than one chunks (mChunks is not null after PopHead()), and this is a group
+        // Reject this request if we have more than one chunk (mChunks is not null after PopHead()), and this is a group
         // exchange context.
         return CHIP_ERROR_INCORRECT_STATE;
     }
@@ -482,7 +481,7 @@ CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchang
         SuccessOrExit(err);
         if (!mChunks.IsNull())
         {
-            // We have more than one chunks.
+            // Send the next chunk.
             SuccessOrExit(SendWriteRequest());
         }
     }
@@ -529,21 +528,21 @@ void WriteClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeConte
 CHIP_ERROR WriteClient::ProcessAttributeStatusIB(AttributeStatusIB::Parser & aAttributeStatusIB)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    AttributePathIB::Parser attributePath;
+    AttributePathIB::Parser attributePathParser;
     StatusIB statusIB;
     StatusIB::Parser StatusIBParser;
-    ConcreteDataAttributePath attributePathParams;
+    ConcreteDataAttributePath attributePath;
 
     err = aAttributeStatusIB.GetPath(&attributePath);
     SuccessOrExit(err);
 
-    err = attributePath.GetCluster(&(attributePathParams.mClusterId));
+    err = attributePathParser.GetCluster(&(attributePath.mClusterId));
     SuccessOrExit(err);
-    err = attributePath.GetEndpoint(&(attributePathParams.mEndpointId));
+    err = attributePathParser.GetEndpoint(&(attributePath.mEndpointId));
     SuccessOrExit(err);
-    err = attributePath.GetAttribute(&(attributePathParams.mAttributeId));
+    err = attributePathParser.GetAttribute(&(attributePath.mAttributeId));
     SuccessOrExit(err);
-    err = attributePath.GetListIndex(attributePathParams);
+    err = attributePathParser.GetListIndex(attributePath);
     SuccessOrExit(err);
 
     err = aAttributeStatusIB.GetErrorStatus(&(StatusIBParser));
@@ -553,7 +552,7 @@ CHIP_ERROR WriteClient::ProcessAttributeStatusIB(AttributeStatusIB::Parser & aAt
         SuccessOrExit(err);
         if (mpCallback != nullptr)
         {
-            mpCallback->OnResponse(this, attributePathParams, statusIB);
+            mpCallback->OnResponse(this, attributePath, statusIB);
         }
     }
 

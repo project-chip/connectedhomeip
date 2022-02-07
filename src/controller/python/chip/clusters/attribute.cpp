@@ -302,7 +302,7 @@ chip::ChipError::StorageType pychip_WriteClient_WriteAttributes(void * appContex
             reader.Next();
 
             SuccessOrExit(
-                err = client->PutPreencodedAttributeWritePayload(
+                err = client->PutPreencodedAttribute(
                     chip::app::ConcreteDataAttributePath(pathObj.endpointId, pathObj.clusterId, pathObj.attributeId), reader));
         }
     }

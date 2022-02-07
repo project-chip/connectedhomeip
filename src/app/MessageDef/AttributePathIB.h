@@ -141,13 +141,12 @@ public:
     CHIP_ERROR GetListIndex(DataModel::Nullable<ListIndex> * const apListIndex) const;
 
     /**
-     *  @brief Get the ListIndex, and fill the corresponding field in the ConcreteDataAttributePath field.
+     *  @brief Get the ListIndex, and fill the corresponding field () in the ConcreteDataAttributePath field. It will set ListOp to
+     * NotList when the list index is missing, users should interpret it as ReplaceAll according to the context.
      *
-     *  @param [in] apListIndex    A pointer to apListIndex
+     *  @param [in] aAttributePath    The attribute path object for setting list index and list op.
      *
      *  @return #CHIP_NO_ERROR on success
-     *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types or null
-     *                                     type.
      */
     CHIP_ERROR GetListIndex(ConcreteDataAttributePath & aAttributePath) const;
 };

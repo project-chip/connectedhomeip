@@ -24,30 +24,29 @@ namespace chip {
 namespace app {
 
 /*
- * This is an adapter that intercepts calls that deliver status codes from the WriteClient,
- * selectively "merge"s the status code of the same attribute write for chunked list as follows:
+ * This is an adapter that intercepts calls that deliver status codes from the WriteClient and
+ * selectively "merge"s the status codes for a chunked list write as follows:
  * - If the whole list was successfully written, callback->OnResponse will be called with success.
  * - If any element in the list was not successfully written, callback->OnResponse will be called with the first error received.
  * - callback->OnResponse will always have NotList as mListOp since we have merged the chunked responses.
- * The merge logic is based on the list chunking behavior of WriteClient.
+ * The merge logic assumes all list operations are part of list chunking.
  */
 class ChunkedWriteCallback : public WriteClient::Callback
 {
 public:
     ChunkedWriteCallback(WriteClient::Callback * apCallback) : callback(apCallback) {}
 
-    void OnResponse(const app::WriteClient * apWriteClient, const app::ConcreteDataAttributePath & aPath,
-                    app::StatusIB status) override;
-    void OnError(const app::WriteClient * apWriteClient, CHIP_ERROR aError) override;
-    void OnDone(app::WriteClient * apWriteClient) override;
+    void OnResponse(const WriteClient * apWriteClient, const ConcreteDataAttributePath & aPath, StatusIB status) override;
+    void OnError(const WriteClient * apWriteClient, CHIP_ERROR aError) override;
+    void OnDone(WriteClient * apWriteClient) override;
 
 private:
-    bool IsAppendingToLastItem(const app::ConcreteDataAttributePath & path);
+    bool IsAppendingToLastItem(const ConcreteDataAttributePath & aPath);
 
     // We are using the casts between ConcreteAttributePath and ConcreteDataAttributePath, then all paths passed to upper
     // applications will always have NotList as mListOp.
-    Optional<app::ConcreteAttributePath> mLastAttributePath;
-    app::StatusIB mAttributeStatus;
+    Optional<ConcreteAttributePath> mLastAttributePath;
+    StatusIB mAttributeStatus;
 
     WriteClient::Callback * callback;
 };

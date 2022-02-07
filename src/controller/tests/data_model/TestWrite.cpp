@@ -30,7 +30,9 @@
 using TestContext = chip::Test::AppContext;
 
 using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::TestCluster;
 
 namespace {
 
@@ -69,16 +71,15 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
 CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
                                   TLV::TLVReader & aReader, WriteHandler * aWriteHandler)
 {
-    static chip::ListIndex listStructOctetStringElementCount = 0;
-    if (aPath.mClusterId == TestCluster::Id &&
-        aPath.mAttributeId == TestCluster::Attributes::ListStructOctetString::TypeInfo::GetAttributeId())
+    static ListIndex listStructOctetStringElementCount = 0;
+    if (aPath.mClusterId == TestCluster::Id && aPath.mAttributeId == Attributes::ListStructOctetString::TypeInfo::GetAttributeId())
     {
         if (responseDirective == kSendAttributeSuccess)
         {
             if (!aPath.IsListOperation() || aPath.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
             {
 
-                TestCluster::Attributes::ListStructOctetString::TypeInfo::DecodableType value;
+                Attributes::ListStructOctetString::TypeInfo::DecodableType value;
 
                 ReturnErrorOnFailure(DataModel::Decode(aReader, value));
 
@@ -98,7 +99,7 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
             }
             else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
             {
-                chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType item;
+                Structs::TestListStructOctet::DecodableType item;
                 ReturnErrorOnFailure(DataModel::Decode(aReader, item));
                 VerifyOrReturnError(item.fabricIndex == listStructOctetStringElementCount, CHIP_ERROR_INVALID_ARGUMENT);
                 listStructOctetStringElementCount++;
@@ -159,11 +160,11 @@ void TestWriteInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCont
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&onSuccessCbInvoked](const app::ConcreteAttributePath & attributePath) { onSuccessCbInvoked = true; };
+    auto onSuccessCb = [&onSuccessCbInvoked](const ConcreteAttributePath & attributePath) { onSuccessCbInvoked = true; };
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteAttributePath * attributePath, CHIP_ERROR aError) {
+    auto onFailureCb = [&onFailureCbInvoked](const ConcreteAttributePath * attributePath, CHIP_ERROR aError) {
         onFailureCbInvoked = true;
     };
 
@@ -182,8 +183,8 @@ void TestWriteInteraction::TestAttributeError(nlTestSuite * apSuite, void * apCo
     TestContext & ctx       = *static_cast<TestContext *>(apContext);
     auto sessionHandle      = ctx.GetSessionBobToAlice();
     bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
-    TestCluster::Attributes::ListStructOctetString::TypeInfo::Type value;
-    TestCluster::Structs::TestListStructOctet::Type valueBuf[4];
+    Attributes::ListStructOctetString::TypeInfo::Type value;
+    Structs::TestListStructOctet::Type valueBuf[4];
 
     value = valueBuf;
 
@@ -198,22 +199,22 @@ void TestWriteInteraction::TestAttributeError(nlTestSuite * apSuite, void * apCo
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&onSuccessCbInvoked](const app::ConcreteAttributePath & attributePath) { onSuccessCbInvoked = true; };
+    auto onSuccessCb = [&onSuccessCbInvoked](const ConcreteAttributePath & attributePath) { onSuccessCbInvoked = true; };
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [apSuite, &onFailureCbInvoked](const app::ConcreteAttributePath * attributePath, CHIP_ERROR aError) {
+    auto onFailureCb = [apSuite, &onFailureCbInvoked](const ConcreteAttributePath * attributePath, CHIP_ERROR aError) {
         NL_TEST_ASSERT(apSuite, attributePath != nullptr);
         onFailureCbInvoked = true;
     };
 
-    chip::Controller::WriteAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(sessionHandle, kTestEndpointId,
-                                                                                               value, onSuccessCb, onFailureCb);
+    Controller::WriteAttribute<Attributes::ListStructOctetString::TypeInfo>(sessionHandle, kTestEndpointId, value, onSuccessCb,
+                                                                            onFailureCb);
 
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite, !onSuccessCbInvoked && onFailureCbInvoked);
-    NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers() == 0);
+    NL_TEST_ASSERT(apSuite, InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers() == 0);
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 

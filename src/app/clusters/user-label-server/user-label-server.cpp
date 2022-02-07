@@ -100,7 +100,7 @@ CHIP_ERROR UserLabelAttrAccess::WriteLabelList(const ConcreteDataAttributePath &
     }
     else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
-        chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType entry;
+        Structs::LabelStruct::DecodableType entry;
         DeviceLayer::AttributeList<Structs::LabelStruct::Type, DeviceLayer::kMaxUserLabels> labelList;
         ReturnErrorOnFailure(DeviceLayer::PlatformMgr().GetUserLabelList(endpoint, labelList));
         ReturnErrorOnFailure(aDecoder.Decode(entry));

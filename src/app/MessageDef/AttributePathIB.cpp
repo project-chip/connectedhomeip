@@ -203,24 +203,26 @@ CHIP_ERROR AttributePathIB::Parser::GetListIndex(ConcreteDataAttributePath & aAt
     CHIP_ERROR err = CHIP_NO_ERROR;
     DataModel::Nullable<ListIndex> listIndex;
     err = GetListIndex(&(listIndex));
-    if (CHIP_END_OF_TLV == err)
+    if (err == CHIP_NO_ERROR)
     {
-        // We do not have the context for the actual data type here, we always set the list operation to not list and the users
-        // should inteprete it as ReplaceAll when the attribute type is a list.
+        if (listIndex.IsNull())
+        {
+            aAttributePath.mListOp = ConcreteDataAttributePath::ListOperation::AppendItem;
+        }
+        else
+        {
+            // TODO: Add ListOperation::ReplaceItem support. (Attribute path with valid list index)
+            err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+        }
+    }
+    else if (CHIP_END_OF_TLV == err)
+    {
+        // We do not have the context for the actual data type here. We always set the list operation to not list and the users
+        // should interpret it as ReplaceAll when the attribute type is a list.
         aAttributePath.mListOp = ConcreteDataAttributePath::ListOperation::NotList;
         err                    = CHIP_NO_ERROR;
     }
-    else if (listIndex.IsNull())
-    {
-        aAttributePath.mListOp = ConcreteDataAttributePath::ListOperation::AppendItem;
-    }
-    else
-    {
-        // TODO: Add ListOperation::ReplaceItem support. (Attribute path with valid list index)
-        err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
-    }
-    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 AttributePathIB::Builder & AttributePathIB::Builder::EnableTagCompression(const bool aEnableTagCompression)
@@ -325,23 +327,23 @@ CHIP_ERROR AttributePathIB::Builder::Encode(const AttributePathParams & aAttribu
     return GetError();
 }
 
-CHIP_ERROR AttributePathIB::Builder::Encode(const ConcreteDataAttributePath & aAttributePathParams)
+CHIP_ERROR AttributePathIB::Builder::Encode(const ConcreteDataAttributePath & aAttributePath)
 {
-    Endpoint(aAttributePathParams.mEndpointId);
-    Cluster(aAttributePathParams.mClusterId);
-    Attribute(aAttributePathParams.mAttributeId);
+    Endpoint(aAttributePath.mEndpointId);
+    Cluster(aAttributePath.mClusterId);
+    Attribute(aAttributePath.mAttributeId);
 
-    if (!aAttributePathParams.IsListOperation() ||
-        aAttributePathParams.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
+    if (!aAttributePath.IsListOperation() || aAttributePath.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
     {
         /* noop */
     }
-    else if (aAttributePathParams.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+    else if (aAttributePath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
-        ListIndex(DataModel::Nullable<chip::ListIndex>());
+        ListIndex(DataModel::NullNullable);
     }
     else
     {
+        // TODO: Add ListOperation::ReplaceItem support. (Attribute path with valid list index)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
