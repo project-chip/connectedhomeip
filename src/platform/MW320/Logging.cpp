@@ -150,9 +150,11 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
     (void) module;
     (void) category;
-    
+    char msgbuf[256];
+
     PRINTF("%s: ", module);
-    PRINTF(msg, v);
+    vsprintf(msgbuf, msg, v);
+    PRINTF("%s", msgbuf);
     PRINTF("\r\n");
 
 #if MW320_LOG_ENABLED
