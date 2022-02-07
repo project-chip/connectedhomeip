@@ -274,7 +274,7 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
         break;
     }
 
-    case ArgumentType::Boolean:
+    case ArgumentType::Bool:
     case ArgumentType::Number_uint8: {
         isValidArgument = HandleNullableOptional<uint8_t>(arg, argValue, [&](auto * value) {
             // stringstream treats uint8_t as char, which is not what we want here.

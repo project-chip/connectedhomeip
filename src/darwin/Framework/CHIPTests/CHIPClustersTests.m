@@ -14361,15 +14361,7 @@ NSNumber * _Nonnull currentTarget;
     WaitForCommissionee(expectation, queue);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_1_1_000001_WaitForCommissionee
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
-
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_OO_1_1_000002_ReadAttribute
+- (void)testSendClusterTest_TC_OO_1_1_000001_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"read the global attribute: ClusterRevision"];
 
@@ -14393,7 +14385,7 @@ NSNumber * _Nonnull currentTarget;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_1_1_000003_ReadAttribute
+- (void)testSendClusterTest_TC_OO_1_1_000002_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute constraints: ClusterRevision"];
 
@@ -14412,7 +14404,7 @@ NSNumber * _Nonnull currentTarget;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_1_1_000004_WriteAttribute
+- (void)testSendClusterTest_TC_OO_1_1_000003_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"write the default values to mandatory global attribute: ClusterRevision"];
@@ -14435,7 +14427,7 @@ NSNumber * _Nonnull currentTarget;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_1_1_000005_ReadAttribute
+- (void)testSendClusterTest_TC_OO_1_1_000004_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"reads back global attribute: ClusterRevision"];
 
@@ -14459,7 +14451,7 @@ NSNumber * _Nonnull currentTarget;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_1_1_000006_ReadAttribute
+- (void)testSendClusterTest_TC_OO_1_1_000005_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute: AttributeList"];
 
@@ -14478,7 +14470,7 @@ NSNumber * _Nonnull currentTarget;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_1_1_000007_ReadAttribute
+- (void)testSendClusterTest_TC_OO_1_1_000006_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"read the optional global attribute: FeatureMap"];
 
@@ -14502,7 +14494,7 @@ NSNumber * _Nonnull currentTarget;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_1_1_000008_ReadAttribute
+- (void)testSendClusterTest_TC_OO_1_1_000007_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read the optional global attribute : FeatureMap"];
 
@@ -14521,7 +14513,7 @@ NSNumber * _Nonnull currentTarget;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_1_1_000009_WriteAttribute
+- (void)testSendClusterTest_TC_OO_1_1_000008_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"write the default values to optional global attribute: FeatureMap"];
@@ -14543,7 +14535,7 @@ NSNumber * _Nonnull currentTarget;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_1_1_000010_ReadAttribute
+- (void)testSendClusterTest_TC_OO_1_1_000009_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"reads back optional global attribute: FeatureMap"];
 
@@ -41740,6 +41732,446 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
+- (void)testSendClusterTestGroupKeyManagementCluster_000003_AddGroup
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Add Group 1"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestGroups * cluster = [[CHIPTestGroups alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPGroupsClusterAddGroupParams alloc] init];
+    params.groupId = [NSNumber numberWithUnsignedShort:257U];
+    params.groupName = @"Group #1";
+    [cluster addGroupWithParams:params
+              completionHandler:^(CHIPGroupsClusterAddGroupResponseParams * _Nullable values, NSError * _Nullable err) {
+                  NSLog(@"Add Group 1 Error: %@", err);
+
+                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                  {
+                      id actualValue = values.status;
+                      XCTAssertEqual([actualValue unsignedCharValue], 0);
+                  }
+                  {
+                      id actualValue = values.groupId;
+                      XCTAssertEqual([actualValue unsignedShortValue], 257U);
+                  }
+
+                  [expectation fulfill];
+              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestGroupKeyManagementCluster_000004_AddGroup
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Add Group 2"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestGroups * cluster = [[CHIPTestGroups alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPGroupsClusterAddGroupParams alloc] init];
+    params.groupId = [NSNumber numberWithUnsignedShort:258U];
+    params.groupName = @"Group #2";
+    [cluster addGroupWithParams:params
+              completionHandler:^(CHIPGroupsClusterAddGroupResponseParams * _Nullable values, NSError * _Nullable err) {
+                  NSLog(@"Add Group 2 Error: %@", err);
+
+                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                  {
+                      id actualValue = values.status;
+                      XCTAssertEqual([actualValue unsignedCharValue], 0);
+                  }
+                  {
+                      id actualValue = values.groupId;
+                      XCTAssertEqual([actualValue unsignedShortValue], 258U);
+                  }
+
+                  [expectation fulfill];
+              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestGroupKeyManagementCluster_000005_KeySetWrite
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"KeySet Write 1"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestGroupKeyManagement * cluster = [[CHIPTestGroupKeyManagement alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPGroupKeyManagementClusterKeySetWriteParams alloc] init];
+    params.groupKeySet = [[CHIPGroupKeyManagementClusterGroupKeySetStruct alloc] init];
+    ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).groupKeySetID = [NSNumber numberWithUnsignedShort:417U];
+    ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).groupKeySecurityPolicy =
+        [NSNumber numberWithUnsignedChar:0];
+    ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochKey0 =
+        [[NSData alloc] initWithBytes:"\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf" length:16];
+    ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochStartTime0 =
+        [NSNumber numberWithUnsignedLongLong:1110000ULL];
+    ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochKey1 =
+        [[NSData alloc] initWithBytes:"\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf" length:16];
+    ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochStartTime1 =
+        [NSNumber numberWithUnsignedLongLong:1110001ULL];
+    ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochKey2 =
+        [[NSData alloc] initWithBytes:"\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf" length:16];
+    ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochStartTime2 =
+        [NSNumber numberWithUnsignedLongLong:1110002ULL];
+
+    [cluster keySetWriteWithParams:params
+                 completionHandler:^(NSError * _Nullable err) {
+                     NSLog(@"KeySet Write 1 Error: %@", err);
+
+                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                     [expectation fulfill];
+                 }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestGroupKeyManagementCluster_000006_KeySetWrite
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"KeySet Write 2"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestGroupKeyManagement * cluster = [[CHIPTestGroupKeyManagement alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPGroupKeyManagementClusterKeySetWriteParams alloc] init];
+    params.groupKeySet = [[CHIPGroupKeyManagementClusterGroupKeySetStruct alloc] init];
+    ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).groupKeySetID = [NSNumber numberWithUnsignedShort:418U];
+    ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).groupKeySecurityPolicy =
+        [NSNumber numberWithUnsignedChar:1];
+    ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochKey0 =
+        [[NSData alloc] initWithBytes:"\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf" length:16];
+    ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochStartTime0 =
+        [NSNumber numberWithUnsignedLongLong:2110000ULL];
+    ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochKey1 =
+        [[NSData alloc] initWithBytes:"\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef" length:16];
+    ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochStartTime1 =
+        [NSNumber numberWithUnsignedLongLong:2110001ULL];
+    ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochKey2 =
+        [[NSData alloc] initWithBytes:"\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff" length:16];
+    ((CHIPGroupKeyManagementClusterGroupKeySetStruct *) params.groupKeySet).epochStartTime2 =
+        [NSNumber numberWithUnsignedLongLong:2110002ULL];
+
+    [cluster keySetWriteWithParams:params
+                 completionHandler:^(NSError * _Nullable err) {
+                     NSLog(@"KeySet Write 2 Error: %@", err);
+
+                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                     [expectation fulfill];
+                 }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestGroupKeyManagementCluster_000007_KeySetRead
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"KeySet Read"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestGroupKeyManagement * cluster = [[CHIPTestGroupKeyManagement alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPGroupKeyManagementClusterKeySetReadParams alloc] init];
+    params.groupKeySetID = [NSNumber numberWithUnsignedShort:417U];
+    [cluster
+        keySetReadWithParams:params
+           completionHandler:^(CHIPGroupKeyManagementClusterKeySetReadResponseParams * _Nullable values, NSError * _Nullable err) {
+               NSLog(@"KeySet Read Error: %@", err);
+
+               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+               {
+                   id actualValue = values.groupKeySet;
+                   XCTAssertEqual(
+                       [((CHIPGroupKeyManagementClusterGroupKeySetStruct *) actualValue).groupKeySetID unsignedShortValue], 417U);
+                   XCTAssertEqual(
+                       [((CHIPGroupKeyManagementClusterGroupKeySetStruct *) actualValue).groupKeySecurityPolicy unsignedCharValue],
+                       0);
+                   XCTAssertTrue(((CHIPGroupKeyManagementClusterGroupKeySetStruct *) actualValue).epochKey0 == nil);
+                   XCTAssertFalse(((CHIPGroupKeyManagementClusterGroupKeySetStruct *) actualValue).epochStartTime0 == nil);
+                   XCTAssertEqual(
+                       [((CHIPGroupKeyManagementClusterGroupKeySetStruct *) actualValue).epochStartTime0 unsignedLongLongValue],
+                       1110000ULL);
+                   XCTAssertTrue(((CHIPGroupKeyManagementClusterGroupKeySetStruct *) actualValue).epochKey1 == nil);
+                   XCTAssertFalse(((CHIPGroupKeyManagementClusterGroupKeySetStruct *) actualValue).epochStartTime1 == nil);
+                   XCTAssertEqual(
+                       [((CHIPGroupKeyManagementClusterGroupKeySetStruct *) actualValue).epochStartTime1 unsignedLongLongValue],
+                       1110001ULL);
+                   XCTAssertTrue(((CHIPGroupKeyManagementClusterGroupKeySetStruct *) actualValue).epochKey2 == nil);
+                   XCTAssertFalse(((CHIPGroupKeyManagementClusterGroupKeySetStruct *) actualValue).epochStartTime2 == nil);
+                   XCTAssertEqual(
+                       [((CHIPGroupKeyManagementClusterGroupKeySetStruct *) actualValue).epochStartTime2 unsignedLongLongValue],
+                       1110002ULL);
+               }
+
+               [expectation fulfill];
+           }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestGroupKeyManagementCluster_000008_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write Group Keys"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestGroupKeyManagement * cluster = [[CHIPTestGroupKeyManagement alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id groupKeyMapArgument;
+    {
+        NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
+        temp_0[0] = [[CHIPGroupKeyManagementClusterGroupKeyMapStruct alloc] init];
+        ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:1];
+        ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[0]).groupId = [NSNumber numberWithUnsignedShort:257U];
+        ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[0]).groupKeySetID = [NSNumber numberWithUnsignedShort:417U];
+
+        temp_0[1] = [[CHIPGroupKeyManagementClusterGroupKeyMapStruct alloc] init];
+        ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[1]).fabricIndex = [NSNumber numberWithUnsignedChar:1];
+        ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[1]).groupId = [NSNumber numberWithUnsignedShort:258U];
+        ((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) temp_0[1]).groupKeySetID = [NSNumber numberWithUnsignedShort:418U];
+
+        groupKeyMapArgument = temp_0;
+    }
+    [cluster writeAttributeGroupKeyMapWithValue:groupKeyMapArgument
+                              completionHandler:^(NSError * _Nullable err) {
+                                  NSLog(@"Write Group Keys Error: %@", err);
+
+                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                                  [expectation fulfill];
+                              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestGroupKeyManagementCluster_000009_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read Group Keys"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestGroupKeyManagement * cluster = [[CHIPTestGroupKeyManagement alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeGroupKeyMapWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read Group Keys Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue count], 2);
+            XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[0]).fabricIndex unsignedCharValue], 1);
+            XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[0]).groupId unsignedShortValue], 257U);
+            XCTAssertEqual(
+                [((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[0]).groupKeySetID unsignedShortValue], 417U);
+            XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[1]).fabricIndex unsignedCharValue], 1);
+            XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[1]).groupId unsignedShortValue], 258U);
+            XCTAssertEqual(
+                [((CHIPGroupKeyManagementClusterGroupKeyMapStruct *) actualValue[1]).groupKeySetID unsignedShortValue], 418U);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestGroupKeyManagementCluster_000010_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read GroupTable"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestGroupKeyManagement * cluster = [[CHIPTestGroupKeyManagement alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeGroupTableWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read GroupTable Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue count], 2);
+            XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[0]).fabricIndex unsignedCharValue], 1);
+            XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[0]).groupId unsignedShortValue], 257U);
+            XCTAssertTrue(
+                [((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[0]).groupName isEqualToString:@"Group #1"]);
+            XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[1]).fabricIndex unsignedCharValue], 1);
+            XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[1]).groupId unsignedShortValue], 258U);
+            XCTAssertTrue(
+                [((CHIPGroupKeyManagementClusterGroupInfoMapStruct *) actualValue[1]).groupName isEqualToString:@"Group #2"]);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestGroupKeyManagementCluster_000011_KeySetRemove
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"KeySet Remove 1"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestGroupKeyManagement * cluster = [[CHIPTestGroupKeyManagement alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPGroupKeyManagementClusterKeySetRemoveParams alloc] init];
+    params.groupKeySetID = [NSNumber numberWithUnsignedShort:417U];
+    [cluster keySetRemoveWithParams:params
+                  completionHandler:^(NSError * _Nullable err) {
+                      NSLog(@"KeySet Remove 1 Error: %@", err);
+
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                      [expectation fulfill];
+                  }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestGroupKeyManagementCluster_000012_KeySetRead
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"KeySet Read (removed)"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestGroupKeyManagement * cluster = [[CHIPTestGroupKeyManagement alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPGroupKeyManagementClusterKeySetReadParams alloc] init];
+    params.groupKeySetID = [NSNumber numberWithUnsignedShort:417U];
+    [cluster
+        keySetReadWithParams:params
+           completionHandler:^(CHIPGroupKeyManagementClusterKeySetReadResponseParams * _Nullable values, NSError * _Nullable err) {
+               NSLog(@"KeySet Read (removed) Error: %@", err);
+
+               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_NOT_FOUND);
+               [expectation fulfill];
+           }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestGroupKeyManagementCluster_000013_KeySetRead
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"KeySet Read (not removed)"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestGroupKeyManagement * cluster = [[CHIPTestGroupKeyManagement alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPGroupKeyManagementClusterKeySetReadParams alloc] init];
+    params.groupKeySetID = [NSNumber numberWithUnsignedShort:418U];
+    [cluster
+        keySetReadWithParams:params
+           completionHandler:^(CHIPGroupKeyManagementClusterKeySetReadResponseParams * _Nullable values, NSError * _Nullable err) {
+               NSLog(@"KeySet Read (not removed) Error: %@", err);
+
+               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+               {
+                   id actualValue = values.groupKeySet;
+                   XCTAssertEqual(
+                       [((CHIPGroupKeyManagementClusterGroupKeySetStruct *) actualValue).groupKeySetID unsignedShortValue], 418U);
+                   XCTAssertEqual(
+                       [((CHIPGroupKeyManagementClusterGroupKeySetStruct *) actualValue).groupKeySecurityPolicy unsignedCharValue],
+                       1);
+                   XCTAssertTrue(((CHIPGroupKeyManagementClusterGroupKeySetStruct *) actualValue).epochKey0 == nil);
+                   XCTAssertFalse(((CHIPGroupKeyManagementClusterGroupKeySetStruct *) actualValue).epochStartTime0 == nil);
+                   XCTAssertEqual(
+                       [((CHIPGroupKeyManagementClusterGroupKeySetStruct *) actualValue).epochStartTime0 unsignedLongLongValue],
+                       2110000ULL);
+                   XCTAssertTrue(((CHIPGroupKeyManagementClusterGroupKeySetStruct *) actualValue).epochKey1 == nil);
+                   XCTAssertFalse(((CHIPGroupKeyManagementClusterGroupKeySetStruct *) actualValue).epochStartTime1 == nil);
+                   XCTAssertEqual(
+                       [((CHIPGroupKeyManagementClusterGroupKeySetStruct *) actualValue).epochStartTime1 unsignedLongLongValue],
+                       2110001ULL);
+                   XCTAssertTrue(((CHIPGroupKeyManagementClusterGroupKeySetStruct *) actualValue).epochKey2 == nil);
+                   XCTAssertFalse(((CHIPGroupKeyManagementClusterGroupKeySetStruct *) actualValue).epochStartTime2 == nil);
+                   XCTAssertEqual(
+                       [((CHIPGroupKeyManagementClusterGroupKeySetStruct *) actualValue).epochStartTime2 unsignedLongLongValue],
+                       2110002ULL);
+               }
+
+               [expectation fulfill];
+           }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestGroupKeyManagementCluster_000014_RemoveAllGroups
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Remove All"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestGroups * cluster = [[CHIPTestGroups alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster removeAllGroupsWithCompletionHandler:^(NSError * _Nullable err) {
+        NSLog(@"Remove All Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestGroupKeyManagementCluster_000015_KeySetRemove
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"KeySet Remove 2"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestGroupKeyManagement * cluster = [[CHIPTestGroupKeyManagement alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPGroupKeyManagementClusterKeySetRemoveParams alloc] init];
+    params.groupKeySetID = [NSNumber numberWithUnsignedShort:418U];
+    [cluster keySetRemoveWithParams:params
+                  completionHandler:^(NSError * _Nullable err) {
+                      NSLog(@"KeySet Remove 2 Error: %@", err);
+
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                      [expectation fulfill];
+                  }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestGroupKeyManagementCluster_000016_KeySetRead
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"KeySet Read (also removed)"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestGroupKeyManagement * cluster = [[CHIPTestGroupKeyManagement alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPGroupKeyManagementClusterKeySetReadParams alloc] init];
+    params.groupKeySetID = [NSNumber numberWithUnsignedShort:418U];
+    [cluster
+        keySetReadWithParams:params
+           completionHandler:^(CHIPGroupKeyManagementClusterKeySetReadResponseParams * _Nullable values, NSError * _Nullable err) {
+               NSLog(@"KeySet Read (also removed) Error: %@", err);
+
+               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_NOT_FOUND);
+               [expectation fulfill];
+           }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
 
 - (void)testSendClusterTestIdentifyCluster_000000_WaitForCommissionee
 {
@@ -41886,6 +42318,36 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
 
         [expectation fulfill];
     }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestOperationalCredentialsCluster_000004_RemoveFabric
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Remove nonexistent fabric"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestOperationalCredentials * cluster = [[CHIPTestOperationalCredentials alloc] initWithDevice:device
+                                                                                             endpoint:0
+                                                                                                queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPOperationalCredentialsClusterRemoveFabricParams alloc] init];
+    params.fabricIndex = [NSNumber numberWithUnsignedChar:243];
+    [cluster
+        removeFabricWithParams:params
+             completionHandler:^(CHIPOperationalCredentialsClusterNOCResponseParams * _Nullable values, NSError * _Nullable err) {
+                 NSLog(@"Remove nonexistent fabric Error: %@", err);
+
+                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                 {
+                     id actualValue = values.statusCode;
+                     XCTAssertEqual([actualValue unsignedCharValue], 11);
+                 }
+
+                 [expectation fulfill];
+             }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }

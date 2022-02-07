@@ -28,6 +28,7 @@
 #include "messaging/ExchangeContext.h"
 
 #include <access/AccessControl.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/RequiredPrivilege.h>
 #include <app/util/MatterCallbacks.h>
 #include <credentials/GroupDataProvider.h>
@@ -257,7 +258,7 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
     VerifyOrExit(mpExchangeCtx != nullptr && mpExchangeCtx->HasSessionHandle(), err = CHIP_ERROR_INCORRECT_STATE);
 
     {
-        Access::SubjectDescriptor subjectDescriptor = mpExchangeCtx->GetSessionHandle()->GetSubjectDescriptor();
+        Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
         Access::RequestPath requestPath{ .cluster = concretePath.mClusterId, .endpoint = concretePath.mEndpointId };
         Access::Privilege requestPrivilege = RequiredPrivilege::ForInvokeCommand(concretePath);
         err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
@@ -273,9 +274,16 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
             {
                 return AddStatus(concretePath, Protocols::InteractionModel::Status::Failure);
             }
-            // TODO: when wildcard/group invokes are supported, handle them to discard rather than fail with status
+            // TODO: when wildcard invokes are supported, handle them to discard rather than fail with status
             return AddStatus(concretePath, Protocols::InteractionModel::Status::UnsupportedAccess);
         }
+    }
+
+    if (CommandNeedsTimedInvoke(concretePath.mClusterId, concretePath.mCommandId) && !IsTimedInvoke())
+    {
+        // TODO: when wildcard invokes are supported, discard a
+        // wildcard-expanded path instead of returning a status.
+        return AddStatus(concretePath, Protocols::InteractionModel::Status::NeedsTimedInteraction);
     }
 
     err = aCommandElement.GetData(&commandDataReader);
@@ -359,6 +367,17 @@ CHIP_ERROR CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
     }
     SuccessOrExit(err);
 
+    // Per spec, we do the "is this a timed command?" check for every path, but
+    // since all paths that fail it just get silently discarded we can do it
+    // once up front and discard all the paths at once.  Ordering with respect
+    // to ACL and command presence checks does not matter, because the behavior
+    // is the same for all of them: ignore the path.
+    if (CommandNeedsTimedInvoke(clusterId, commandId))
+    {
+        // Group commands are never timed.
+        ExitNow();
+    }
+
     iterator = groupDataProvider->IterateEndpoints(fabric);
     VerifyOrExit(iterator != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
@@ -384,7 +403,7 @@ CHIP_ERROR CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
         }
 
         {
-            Access::SubjectDescriptor subjectDescriptor = mpExchangeCtx->GetSessionHandle()->GetSubjectDescriptor();
+            Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
             Access::RequestPath requestPath{ .cluster = concretePath.mClusterId, .endpoint = concretePath.mEndpointId };
             Access::Privilege requestPrivilege = RequiredPrivilege::ForInvokeCommand(concretePath);
             err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);

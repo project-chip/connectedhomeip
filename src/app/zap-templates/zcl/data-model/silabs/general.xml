@@ -185,26 +185,26 @@ limitations under the License.
     <globalAttribute side="either" code="0xFFFD" value="3"/>
     <attribute side="server" code="0x0000" define="GROUP_NAME_SUPPORT" type="BITMAP8" min="0x00" max="0x80" writable="false" optional="false">name support</attribute>
     <!-- NAME_SUPPORT -->
-    <command source="client" code="0x00" name="AddGroup" optional="false" cli="zcl groups add">
+    <command source="client" code="0x00" name="AddGroup" response="AddGroupResponse" optional="false" cli="zcl groups add">
       <description>
         Command description for AddGroup
       </description>
       <arg name="groupId" type="INT16U"/>
       <arg name="groupName" type="CHAR_STRING"/>
     </command>
-    <command source="client" code="0x01" name="ViewGroup" optional="false" cli="zcl groups view">
+    <command source="client" code="0x01" name="ViewGroup" response="ViewGroupResponse" optional="false" cli="zcl groups view">
       <description>
         Command description for ViewGroup
       </description>
       <arg name="groupId" type="INT16U"/>
     </command>
-    <command source="client" code="0x02" name="GetGroupMembership" cliFunctionName="zclGroupsGetCommand" optional="false" cli="zcl groups get">
+    <command source="client" code="0x02" name="GetGroupMembership" response="GetGroupMembershipResponse" cliFunctionName="zclGroupsGetCommand" optional="false" cli="zcl groups get">
       <description>
         Command description for GetGroupMembership
       </description>
       <arg name="groupList" type="INT16U" array="true"/>
     </command>
-    <command source="client" code="0x03" name="RemoveGroup" optional="false" cli="zcl groups remove">
+    <command source="client" code="0x03" name="RemoveGroup" response="RemoveGroupResponse" optional="false" cli="zcl groups remove">
       <description>
         Command description for RemoveGroup
       </description>
@@ -268,7 +268,7 @@ limitations under the License.
     <attribute side="server" code="0x0004" define="SCENE_NAME_SUPPORT" type="BITMAP8" min="0x00" max="0x80" writable="false" optional="false">name support</attribute>
     <!-- NAME_SUPPORT -->
     <attribute side="server" code="0x0005" define="LAST_CONFIGURED_BY" type="NODE_ID" writable="false" optional="true">last configured by</attribute>
-    <command source="client" code="0x00" name="AddScene" optional="false" cli="zcl scenes add">
+    <command source="client" code="0x00" name="AddScene" response="AddSceneResponse" optional="false" cli="zcl scenes add">
       <description>
         Add a scene to the scene table. Extension field sets are supported, and are inputed as arrays of the form [[cluster ID] [length] [value0...n] ...]
       </description>
@@ -278,27 +278,27 @@ limitations under the License.
       <arg name="sceneName" type="CHAR_STRING"/>
       <arg name="extensionFieldSets" type="SceneExtensionFieldSet" array="true"/>
     </command>
-    <command source="client" code="0x01" name="ViewScene" optional="false" cli="zcl scenes view">
+    <command source="client" code="0x01" name="ViewScene" response="ViewSceneResponse" optional="false" cli="zcl scenes view">
       <description>
         Command description for ViewScene
       </description>
       <arg name="groupId" type="INT16U"/>
       <arg name="sceneId" type="INT8U"/>
     </command>
-    <command source="client" code="0x02" name="RemoveScene" optional="false" cli="zcl scenes remove">
+    <command source="client" code="0x02" name="RemoveScene" response="RemoveSceneResponse" optional="false" cli="zcl scenes remove">
       <description>
         Command description for RemoveScene
       </description>
       <arg name="groupId" type="INT16U"/>
       <arg name="sceneId" type="INT8U"/>
     </command>
-    <command source="client" code="0x03" name="RemoveAllScenes" optional="false" cli="zcl scenes rmall">
+    <command source="client" code="0x03" name="RemoveAllScenes" response="RemoveAllScenesResponse" optional="false" cli="zcl scenes rmall">
       <description>
         Command description for RemoveAllScenes
       </description>
       <arg name="groupId" type="INT16U"/>
     </command>
-    <command source="client" code="0x04" name="StoreScene" optional="false" cli="zcl scenes store">
+    <command source="client" code="0x04" name="StoreScene" response="StoreSceneResponse" optional="false" cli="zcl scenes store">
       <description>
         Command description for StoreScene
       </description>
@@ -313,7 +313,7 @@ limitations under the License.
       <arg name="sceneId" type="INT8U"/>
       <arg name="transitionTime" type="INT16U" introducedIn="zcl-7.0-07-5123-07" optional="1"/>
     </command>
-    <command source="client" code="0x06" name="GetSceneMembership" optional="false" cli="zcl scenes get">
+    <command source="client" code="0x06" name="GetSceneMembership" response="GetSceneMembershipResponse" optional="false" cli="zcl scenes get">
       <description>
         Command description for GetSceneMembership
       </description>
@@ -491,7 +491,7 @@ limitations under the License.
         Command description for ResetAllAlarms
       </description>
     </command>
-    <command source="client" code="0x02" name="GetAlarm" optional="true">
+    <command source="client" code="0x02" name="GetAlarm" response="GetAlarmResponse" optional="true">
       <description>
         Command description for GetAlarm
       </description>

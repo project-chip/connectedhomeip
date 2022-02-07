@@ -53,6 +53,8 @@ using BoundDeviceChangedHandler = void (*)(const EmberBindingTableEntry * bindin
  */
 class BindingManager
 {
+    friend class PendingNotificationEntry;
+
 public:
     BindingManager() :
         mOnConnectedCallback(HandleDeviceConnected, this), mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
@@ -60,7 +62,7 @@ public:
 
     void RegisterBoundDeviceChangedHandler(BoundDeviceChangedHandler handler) { mBoundDeviceChangedHandler = handler; }
 
-    void SetAppServer(Server * appServer) { mAppServer = appServer; }
+    void SetAppServer(Server * appServer);
 
     /*
      * Notifies the BindingManager that a new unicast binding is created.
@@ -69,10 +71,16 @@ public:
     CHIP_ERROR UnicastBindingCreated(FabricIndex fabric, NodeId node) { return EstablishConnection(fabric, node); }
 
     /*
+     * Notifies the BindingManager that a fabric is removed from the device
+     *
+     */
+    void FabricRemoved(CompressedFabricId compressedId, FabricIndex fabricIndex);
+
+    /*
      * Notfies the BindingManager that the **last** unicast binding to a device has been removed.
      *
      */
-    CHIP_ERROR LastUnicastBindingRemoved(FabricIndex fabric, NodeId node);
+    CHIP_ERROR LastUnicastBindingRemoved(FabricIndex fabricIndex, NodeId node);
 
     /*
      * Notify a cluster change to **all** bound devices associated with the (endpoint, cluster) tuple.
@@ -104,9 +112,26 @@ private:
     class PendingNotificationEntry
     {
     public:
-        PendingNotificationEntry(PeerId peerId) : mPeerId(peerId) {}
+        PendingNotificationEntry(FabricIndex fabricIndex, NodeId node) : mNodeId(node), mFabricIndex(fabricIndex) {}
 
-        PeerId GetPeerId() { return mPeerId; }
+        PeerId GetPeerId()
+        {
+            PeerId peer;
+            if (BindingManager::GetInstance().mAppServer == nullptr)
+            {
+                return peer;
+            }
+            FabricInfo * fabric = BindingManager::GetInstance().mAppServer->GetFabricTable().FindFabricWithIndex(mFabricIndex);
+            if (fabric == nullptr)
+            {
+                return peer;
+            }
+            return fabric->GetPeerIdForNode(mNodeId);
+        }
+
+        NodeId GetNodeId() { return mNodeId; }
+
+        FabricIndex GetFabricIndex() { return mFabricIndex; }
 
         System::Clock::Timestamp GetLastUpdateTime() { return mLastUpdateTime; }
         void Touch() { mLastUpdateTime = System::SystemClock().GetMonotonicTimestamp(); }
@@ -139,13 +164,14 @@ private:
         }
 
     private:
-        PeerId mPeerId;
         System::Clock::Timestamp mLastUpdateTime;
         // TODO: Make the pending notifications list of binding table indecies and list of contexts
         ClusterPath mPendingNotifications[kMaxPendingNotifications];
 
+        NodeId mNodeId;
         uint8_t mNumPendingNotifications = 0;
         uint8_t mNextToOverride          = 0;
+        FabricIndex mFabricIndex;
     };
 
     // The pool for all the pending comands.
@@ -154,9 +180,10 @@ private:
     public:
         PendingNotificationEntry * FindLRUEntry();
 
-        PendingNotificationEntry * FindEntry(PeerId peerId);
+        PendingNotificationEntry * FindEntry(FabricIndex fabricIndex, NodeId node);
 
-        CHIP_ERROR AddPendingNotification(PeerId peer, EndpointId endpoint, ClusterId cluster, void * context);
+        CHIP_ERROR AddPendingNotification(FabricIndex fabricIndex, NodeId node, EndpointId endpoint, ClusterId cluster,
+                                          void * context);
 
         void RemoveEntry(PendingNotificationEntry * entry) { mPendingNotificationMap.ReleaseObject(entry); }
 
@@ -180,9 +207,6 @@ private:
 
     // Called when CASE session is established to a peer device. Will send all the pending commands to the peer.
     void SyncPendingNotificationsToPeer(OperationalDeviceProxy * device, PendingNotificationEntry * pendingClusters);
-
-    // Called when CASE session is not established to a peer device. Will enqueue the command and initialize connection.
-    CHIP_ERROR EnqueueUnicastNotification(FabricIndex fabric, NodeId node, EndpointId endpoint, ClusterId cluster, void * context);
 
     PendingNotificationMap mPendingNotificationMap;
     BoundDeviceChangedHandler mBoundDeviceChangedHandler;

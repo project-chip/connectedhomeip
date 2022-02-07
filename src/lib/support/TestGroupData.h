@@ -30,10 +30,10 @@ static chip::TestPersistentStorageDelegate sDeviceStorage;
 static chip::Credentials::GroupDataProviderImpl sGroupsProvider(sDeviceStorage, kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
 
 static const chip::FabricIndex kFabric1 = 1;
-static const chip::GroupId kGroup1      = 0x1234;
-static const chip::GroupId kGroup2      = 0x0001;
-static const chip::KeysetId kKeySet1    = 0x0101;
-static const chip::KeysetId kKeySet2    = 0x0102;
+static const chip::GroupId kGroup1      = 0x0101;
+static const chip::GroupId kGroup2      = 0x0102;
+static const chip::KeysetId kKeySet1    = 0x01a1;
+static const chip::KeysetId kKeySet2    = 0x01a2;
 
 } // namespace
 

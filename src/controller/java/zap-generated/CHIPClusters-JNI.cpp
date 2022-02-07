@@ -15240,41 +15240,90 @@ JNI_METHOD(void, GroupKeyManagementCluster, keySetWrite)
                                                       groupKeySet_groupKeySetIDItem_0);
     request.groupKeySet.groupKeySetID = static_cast<std::remove_reference_t<decltype(request.groupKeySet.groupKeySetID)>>(
         chip::JniReferences::GetInstance().IntegerToPrimitive(groupKeySet_groupKeySetIDItem_0));
-    jobject groupKeySet_securityPolicyItem_0;
-    chip::JniReferences::GetInstance().GetObjectField(groupKeySet, "securityPolicy", "Ljava/lang/Integer;",
-                                                      groupKeySet_securityPolicyItem_0);
-    request.groupKeySet.securityPolicy = static_cast<std::remove_reference_t<decltype(request.groupKeySet.securityPolicy)>>(
-        chip::JniReferences::GetInstance().IntegerToPrimitive(groupKeySet_securityPolicyItem_0));
+    jobject groupKeySet_groupKeySecurityPolicyItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(groupKeySet, "groupKeySecurityPolicy", "Ljava/lang/Integer;",
+                                                      groupKeySet_groupKeySecurityPolicyItem_0);
+    request.groupKeySet.groupKeySecurityPolicy =
+        static_cast<std::remove_reference_t<decltype(request.groupKeySet.groupKeySecurityPolicy)>>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(groupKeySet_groupKeySecurityPolicyItem_0));
     jobject groupKeySet_epochKey0Item_0;
     chip::JniReferences::GetInstance().GetObjectField(groupKeySet, "epochKey0", "[B", groupKeySet_epochKey0Item_0);
-    cleanupByteArrays.push_back(
-        chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(groupKeySet_epochKey0Item_0)));
-    request.groupKeySet.epochKey0 = cleanupByteArrays.back()->byteSpan();
+    if (groupKeySet_epochKey0Item_0 == nullptr)
+    {
+        request.groupKeySet.epochKey0.SetNull();
+    }
+    else
+    {
+        auto & nonNullValue_1 = request.groupKeySet.epochKey0.SetNonNull();
+        cleanupByteArrays.push_back(
+            chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(groupKeySet_epochKey0Item_0)));
+        nonNullValue_1 = cleanupByteArrays.back()->byteSpan();
+    }
     jobject groupKeySet_epochStartTime0Item_0;
     chip::JniReferences::GetInstance().GetObjectField(groupKeySet, "epochStartTime0", "Ljava/lang/Long;",
                                                       groupKeySet_epochStartTime0Item_0);
-    request.groupKeySet.epochStartTime0 = static_cast<std::remove_reference_t<decltype(request.groupKeySet.epochStartTime0)>>(
-        chip::JniReferences::GetInstance().LongToPrimitive(groupKeySet_epochStartTime0Item_0));
+    if (groupKeySet_epochStartTime0Item_0 == nullptr)
+    {
+        request.groupKeySet.epochStartTime0.SetNull();
+    }
+    else
+    {
+        auto & nonNullValue_1 = request.groupKeySet.epochStartTime0.SetNonNull();
+        nonNullValue_1        = static_cast<std::remove_reference_t<decltype(nonNullValue_1)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(groupKeySet_epochStartTime0Item_0));
+    }
     jobject groupKeySet_epochKey1Item_0;
     chip::JniReferences::GetInstance().GetObjectField(groupKeySet, "epochKey1", "[B", groupKeySet_epochKey1Item_0);
-    cleanupByteArrays.push_back(
-        chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(groupKeySet_epochKey1Item_0)));
-    request.groupKeySet.epochKey1 = cleanupByteArrays.back()->byteSpan();
+    if (groupKeySet_epochKey1Item_0 == nullptr)
+    {
+        request.groupKeySet.epochKey1.SetNull();
+    }
+    else
+    {
+        auto & nonNullValue_1 = request.groupKeySet.epochKey1.SetNonNull();
+        cleanupByteArrays.push_back(
+            chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(groupKeySet_epochKey1Item_0)));
+        nonNullValue_1 = cleanupByteArrays.back()->byteSpan();
+    }
     jobject groupKeySet_epochStartTime1Item_0;
     chip::JniReferences::GetInstance().GetObjectField(groupKeySet, "epochStartTime1", "Ljava/lang/Long;",
                                                       groupKeySet_epochStartTime1Item_0);
-    request.groupKeySet.epochStartTime1 = static_cast<std::remove_reference_t<decltype(request.groupKeySet.epochStartTime1)>>(
-        chip::JniReferences::GetInstance().LongToPrimitive(groupKeySet_epochStartTime1Item_0));
+    if (groupKeySet_epochStartTime1Item_0 == nullptr)
+    {
+        request.groupKeySet.epochStartTime1.SetNull();
+    }
+    else
+    {
+        auto & nonNullValue_1 = request.groupKeySet.epochStartTime1.SetNonNull();
+        nonNullValue_1        = static_cast<std::remove_reference_t<decltype(nonNullValue_1)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(groupKeySet_epochStartTime1Item_0));
+    }
     jobject groupKeySet_epochKey2Item_0;
     chip::JniReferences::GetInstance().GetObjectField(groupKeySet, "epochKey2", "[B", groupKeySet_epochKey2Item_0);
-    cleanupByteArrays.push_back(
-        chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(groupKeySet_epochKey2Item_0)));
-    request.groupKeySet.epochKey2 = cleanupByteArrays.back()->byteSpan();
+    if (groupKeySet_epochKey2Item_0 == nullptr)
+    {
+        request.groupKeySet.epochKey2.SetNull();
+    }
+    else
+    {
+        auto & nonNullValue_1 = request.groupKeySet.epochKey2.SetNonNull();
+        cleanupByteArrays.push_back(
+            chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(groupKeySet_epochKey2Item_0)));
+        nonNullValue_1 = cleanupByteArrays.back()->byteSpan();
+    }
     jobject groupKeySet_epochStartTime2Item_0;
     chip::JniReferences::GetInstance().GetObjectField(groupKeySet, "epochStartTime2", "Ljava/lang/Long;",
                                                       groupKeySet_epochStartTime2Item_0);
-    request.groupKeySet.epochStartTime2 = static_cast<std::remove_reference_t<decltype(request.groupKeySet.epochStartTime2)>>(
-        chip::JniReferences::GetInstance().LongToPrimitive(groupKeySet_epochStartTime2Item_0));
+    if (groupKeySet_epochStartTime2Item_0 == nullptr)
+    {
+        request.groupKeySet.epochStartTime2.SetNull();
+    }
+    else
+    {
+        auto & nonNullValue_1 = request.groupKeySet.epochStartTime2.SetNonNull();
+        nonNullValue_1        = static_cast<std::remove_reference_t<decltype(nonNullValue_1)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(groupKeySet_epochStartTime2Item_0));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -23282,6 +23331,59 @@ JNI_METHOD(void, OperationalCredentialsCluster, attestationRequest)
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, OperationalCredentialsCluster, CSRRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray CSRNonce, jobject timedInvokeTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    OperationalCredentialsCluster * cppCluster;
+
+    ListFreer listFreer;
+    chip::app::Clusters::OperationalCredentials::Commands::CSRRequest::Type request;
+
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+    cleanupByteArrays.push_back(chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(CSRNonce)));
+    request.CSRNonce = cleanupByteArrays.back()->byteSpan();
+
+    std::unique_ptr<CHIPOperationalCredentialsClusterCSRResponseCallback,
+                    void (*)(CHIPOperationalCredentialsClusterCSRResponseCallback *)>
+        onSuccess(Platform::New<CHIPOperationalCredentialsClusterCSRResponseCallback>(callback),
+                  Platform::Delete<CHIPOperationalCredentialsClusterCSRResponseCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+
+    cppCluster = reinterpret_cast<OperationalCredentialsCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn =
+        chip::Callback::Callback<CHIPOperationalCredentialsClusterCSRResponseCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
+                                                                                       CHIP_ERROR_INCORRECT_STATE));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, OperationalCredentialsCluster, certificateChainRequest)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject certificateType, jobject timedInvokeTimeoutMs)
 {
@@ -23318,59 +23420,6 @@ JNI_METHOD(void, OperationalCredentialsCluster, certificateChainRequest)
     auto successFn =
         chip::Callback::Callback<CHIPOperationalCredentialsClusterCertificateChainResponseCallbackType>::FromCancelable(
             onSuccess->Cancel());
-    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-
-    if (timedInvokeTimeoutMs == nullptr)
-    {
-        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
-    }
-    else
-    {
-        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
-                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
-    }
-    VerifyOrReturn(err == CHIP_NO_ERROR,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
-                                                                                       CHIP_ERROR_INCORRECT_STATE));
-
-    onSuccess.release();
-    onFailure.release();
-}
-JNI_METHOD(void, OperationalCredentialsCluster, opCSRRequest)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray CSRNonce, jobject timedInvokeTimeoutMs)
-{
-    chip::DeviceLayer::StackLock lock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    OperationalCredentialsCluster * cppCluster;
-
-    ListFreer listFreer;
-    chip::app::Clusters::OperationalCredentials::Commands::OpCSRRequest::Type request;
-
-    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
-    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
-    cleanupByteArrays.push_back(chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(CSRNonce)));
-    request.CSRNonce = cleanupByteArrays.back()->byteSpan();
-
-    std::unique_ptr<CHIPOperationalCredentialsClusterOpCSRResponseCallback,
-                    void (*)(CHIPOperationalCredentialsClusterOpCSRResponseCallback *)>
-        onSuccess(Platform::New<CHIPOperationalCredentialsClusterOpCSRResponseCallback>(callback),
-                  Platform::Delete<CHIPOperationalCredentialsClusterOpCSRResponseCallback>);
-    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
-        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
-    VerifyOrReturn(onSuccess.get() != nullptr,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
-    VerifyOrReturn(onFailure.get() != nullptr,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
-
-    cppCluster = reinterpret_cast<OperationalCredentialsCluster *>(clusterPtr);
-    VerifyOrReturn(cppCluster != nullptr,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
-
-    auto successFn =
-        chip::Callback::Callback<CHIPOperationalCredentialsClusterOpCSRResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
     if (timedInvokeTimeoutMs == nullptr)

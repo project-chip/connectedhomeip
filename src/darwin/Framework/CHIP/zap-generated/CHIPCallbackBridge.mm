@@ -4510,15 +4510,16 @@ void CHIPGeneralDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge:
 }
 
 void CHIPGroupKeyManagementGroupKeyMapListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> & value)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType> &
+        value)
 {
     NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
         auto & entry_0 = iter_0.GetValue();
-        CHIPGroupKeyManagementClusterGroupKey * newElement_0;
-        newElement_0 = [CHIPGroupKeyManagementClusterGroupKey new];
+        CHIPGroupKeyManagementClusterGroupKeyMapStruct * newElement_0;
+        newElement_0 = [CHIPGroupKeyManagementClusterGroupKeyMapStruct new];
         newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
         newElement_0.groupId = [NSNumber numberWithUnsignedShort:entry_0.groupId];
         newElement_0.groupKeySetID = [NSNumber numberWithUnsignedShort:entry_0.groupKeySetID];
@@ -4552,16 +4553,17 @@ void CHIPGroupKeyManagementGroupKeyMapListAttributeCallbackSubscriptionBridge::O
 }
 
 void CHIPGroupKeyManagementGroupTableListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::DecodableType> & value)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType> &
+        value)
 {
     NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
         auto & entry_0 = iter_0.GetValue();
-        CHIPGroupKeyManagementClusterGroupInfo * newElement_0;
-        newElement_0 = [CHIPGroupKeyManagementClusterGroupInfo new];
-        newElement_0.fabricIndex = [NSNumber numberWithUnsignedShort:entry_0.fabricIndex];
+        CHIPGroupKeyManagementClusterGroupInfoMapStruct * newElement_0;
+        newElement_0 = [CHIPGroupKeyManagementClusterGroupInfoMapStruct new];
+        newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
         newElement_0.groupId = [NSNumber numberWithUnsignedShort:entry_0.groupId];
         auto * array_2 = [NSMutableArray new];
         auto iter_2 = entry_0.endpoints.begin();
@@ -4579,9 +4581,13 @@ void CHIPGroupKeyManagementGroupTableListAttributeCallbackBridge::OnSuccessFn(vo
             }
         }
         newElement_0.endpoints = array_2;
-        newElement_0.groupName = [[NSString alloc] initWithBytes:entry_0.groupName.data()
-                                                          length:entry_0.groupName.size()
-                                                        encoding:NSUTF8StringEncoding];
+        if (entry_0.groupName.HasValue()) {
+            newElement_0.groupName = [[NSString alloc] initWithBytes:entry_0.groupName.Value().data()
+                                                              length:entry_0.groupName.Value().size()
+                                                            encoding:NSUTF8StringEncoding];
+        } else {
+            newElement_0.groupName = nil;
+        }
         [array_0 addObject:newElement_0];
     }
     { // Scope for the error so we will know what it's named
@@ -10078,19 +10084,43 @@ void CHIPGroupKeyManagementClusterKeySetReadResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPGroupKeyManagementClusterKeySetReadResponseParams new];
     {
-        response.groupKeySet = [CHIPGroupKeyManagementClusterGroupKeySet new];
+        response.groupKeySet = [CHIPGroupKeyManagementClusterGroupKeySetStruct new];
         response.groupKeySet.groupKeySetID = [NSNumber numberWithUnsignedShort:data.groupKeySet.groupKeySetID];
-        response.groupKeySet.securityPolicy =
-            [NSNumber numberWithUnsignedChar:chip::to_underlying(data.groupKeySet.securityPolicy)];
-        response.groupKeySet.epochKey0 = [NSData dataWithBytes:data.groupKeySet.epochKey0.data()
-                                                        length:data.groupKeySet.epochKey0.size()];
-        response.groupKeySet.epochStartTime0 = [NSNumber numberWithUnsignedLongLong:data.groupKeySet.epochStartTime0];
-        response.groupKeySet.epochKey1 = [NSData dataWithBytes:data.groupKeySet.epochKey1.data()
-                                                        length:data.groupKeySet.epochKey1.size()];
-        response.groupKeySet.epochStartTime1 = [NSNumber numberWithUnsignedLongLong:data.groupKeySet.epochStartTime1];
-        response.groupKeySet.epochKey2 = [NSData dataWithBytes:data.groupKeySet.epochKey2.data()
-                                                        length:data.groupKeySet.epochKey2.size()];
-        response.groupKeySet.epochStartTime2 = [NSNumber numberWithUnsignedLongLong:data.groupKeySet.epochStartTime2];
+        response.groupKeySet.groupKeySecurityPolicy =
+            [NSNumber numberWithUnsignedChar:chip::to_underlying(data.groupKeySet.groupKeySecurityPolicy)];
+        if (data.groupKeySet.epochKey0.IsNull()) {
+            response.groupKeySet.epochKey0 = nil;
+        } else {
+            response.groupKeySet.epochKey0 = [NSData dataWithBytes:data.groupKeySet.epochKey0.Value().data()
+                                                            length:data.groupKeySet.epochKey0.Value().size()];
+        }
+        if (data.groupKeySet.epochStartTime0.IsNull()) {
+            response.groupKeySet.epochStartTime0 = nil;
+        } else {
+            response.groupKeySet.epochStartTime0 = [NSNumber numberWithUnsignedLongLong:data.groupKeySet.epochStartTime0.Value()];
+        }
+        if (data.groupKeySet.epochKey1.IsNull()) {
+            response.groupKeySet.epochKey1 = nil;
+        } else {
+            response.groupKeySet.epochKey1 = [NSData dataWithBytes:data.groupKeySet.epochKey1.Value().data()
+                                                            length:data.groupKeySet.epochKey1.Value().size()];
+        }
+        if (data.groupKeySet.epochStartTime1.IsNull()) {
+            response.groupKeySet.epochStartTime1 = nil;
+        } else {
+            response.groupKeySet.epochStartTime1 = [NSNumber numberWithUnsignedLongLong:data.groupKeySet.epochStartTime1.Value()];
+        }
+        if (data.groupKeySet.epochKey2.IsNull()) {
+            response.groupKeySet.epochKey2 = nil;
+        } else {
+            response.groupKeySet.epochKey2 = [NSData dataWithBytes:data.groupKeySet.epochKey2.Value().data()
+                                                            length:data.groupKeySet.epochKey2.Value().size()];
+        }
+        if (data.groupKeySet.epochStartTime2.IsNull()) {
+            response.groupKeySet.epochStartTime2 = nil;
+        } else {
+            response.groupKeySet.epochStartTime2 = [NSNumber numberWithUnsignedLongLong:data.groupKeySet.epochStartTime2.Value()];
+        }
     }
     DispatchSuccess(context, response);
 };
@@ -10396,6 +10426,20 @@ void CHIPOperationalCredentialsClusterAttestationResponseCallbackBridge::OnSucce
     DispatchSuccess(context, response);
 };
 
+void CHIPOperationalCredentialsClusterCSRResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType & data)
+{
+    auto * response = [CHIPOperationalCredentialsClusterCSRResponseParams new];
+    {
+        response.nocsrElements = [NSData dataWithBytes:data.NOCSRElements.data() length:data.NOCSRElements.size()];
+    }
+    {
+        response.attestationSignature = [NSData dataWithBytes:data.attestationSignature.data()
+                                                       length:data.attestationSignature.size()];
+    }
+    DispatchSuccess(context, response);
+};
+
 void CHIPOperationalCredentialsClusterCertificateChainResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType & data)
 {
@@ -10411,29 +10455,23 @@ void CHIPOperationalCredentialsClusterNOCResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPOperationalCredentialsClusterNOCResponseParams new];
     {
-        response.statusCode = [NSNumber numberWithUnsignedChar:data.statusCode];
+        response.statusCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.statusCode)];
     }
     {
-        response.fabricIndex = [NSNumber numberWithUnsignedChar:data.fabricIndex];
+        if (data.fabricIndex.HasValue()) {
+            response.fabricIndex = [NSNumber numberWithUnsignedChar:data.fabricIndex.Value()];
+        } else {
+            response.fabricIndex = nil;
+        }
     }
     {
-        response.debugText = [[NSString alloc] initWithBytes:data.debugText.data()
-                                                      length:data.debugText.size()
-                                                    encoding:NSUTF8StringEncoding];
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPOperationalCredentialsClusterOpCSRResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::OperationalCredentials::Commands::OpCSRResponse::DecodableType & data)
-{
-    auto * response = [CHIPOperationalCredentialsClusterOpCSRResponseParams new];
-    {
-        response.nocsrElements = [NSData dataWithBytes:data.NOCSRElements.data() length:data.NOCSRElements.size()];
-    }
-    {
-        response.attestationSignature = [NSData dataWithBytes:data.attestationSignature.data()
-                                                       length:data.attestationSignature.size()];
+        if (data.debugText.HasValue()) {
+            response.debugText = [[NSString alloc] initWithBytes:data.debugText.Value().data()
+                                                          length:data.debugText.Value().size()
+                                                        encoding:NSUTF8StringEncoding];
+        } else {
+            response.debugText = nil;
+        }
     }
     DispatchSuccess(context, response);
 };
@@ -13830,19 +13868,18 @@ void CHIPNullableAdministratorCommissioningClusterStatusCodeAttributeCallbackSub
     }
 }
 
-void CHIPOperationalCredentialsClusterNodeOperationalCertStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OperationalCredentials::NodeOperationalCertStatus value)
+void CHIPOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::OperationalCredentials::OperationalCertStatus value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPOperationalCredentialsClusterNodeOperationalCertStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+void CHIPOperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
-    auto * self
-        = static_cast<CHIPOperationalCredentialsClusterNodeOperationalCertStatusAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPOperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -13856,8 +13893,8 @@ void CHIPOperationalCredentialsClusterNodeOperationalCertStatusAttributeCallback
     }
 }
 
-void CHIPNullableOperationalCredentialsClusterNodeOperationalCertStatusAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalCredentials::NodeOperationalCertStatus> & value)
+void CHIPNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalCredentials::OperationalCertStatus> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -13868,12 +13905,11 @@ void CHIPNullableOperationalCredentialsClusterNodeOperationalCertStatusAttribute
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPNullableOperationalCredentialsClusterNodeOperationalCertStatusAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished(void * context)
+void CHIPNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
 {
     auto * self
-        = static_cast<CHIPNullableOperationalCredentialsClusterNodeOperationalCertStatusAttributeCallbackSubscriptionBridge *>(
-            context);
+        = static_cast<CHIPNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }

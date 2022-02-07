@@ -2595,7 +2595,7 @@ class ChipClusters:
                     "commandName": "KeySetWrite",
                     "args": {
                         "groupKeySetID": "int",
-                        "securityPolicy": "int",
+                        "groupKeySecurityPolicy": "int",
                         "epochKey0": "bytes",
                         "epochStartTime0": "int",
                         "epochKey1": "bytes",
@@ -3932,18 +3932,18 @@ class ChipClusters:
                         "attestationNonce": "bytes",
                     },
                 },
+            0x00000004: {
+                    "commandId": 0x00000004,
+                    "commandName": "CSRRequest",
+                    "args": {
+                        "CSRNonce": "bytes",
+                    },
+                },
             0x00000002: {
                     "commandId": 0x00000002,
                     "commandName": "CertificateChainRequest",
                     "args": {
                         "certificateType": "int",
-                    },
-                },
-            0x00000004: {
-                    "commandId": 0x00000004,
-                    "commandName": "OpCSRRequest",
-                    "args": {
-                        "CSRNonce": "bytes",
                     },
                 },
             0x0000000A: {

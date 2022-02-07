@@ -439,6 +439,21 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPOperationalCredentialsClusterCSRResponseCallback
+    : public Callback::Callback<CHIPOperationalCredentialsClusterCSRResponseCallbackType>
+{
+public:
+    CHIPOperationalCredentialsClusterCSRResponseCallback(jobject javaCallback);
+
+    ~CHIPOperationalCredentialsClusterCSRResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPOperationalCredentialsClusterCertificateChainResponseCallback
     : public Callback::Callback<CHIPOperationalCredentialsClusterCertificateChainResponseCallbackType>
 {
@@ -465,21 +480,6 @@ public:
 
     static void CallbackFn(void * context,
                            const chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPOperationalCredentialsClusterOpCSRResponseCallback
-    : public Callback::Callback<CHIPOperationalCredentialsClusterOpCSRResponseCallbackType>
-{
-public:
-    CHIPOperationalCredentialsClusterOpCSRResponseCallback(jobject javaCallback);
-
-    ~CHIPOperationalCredentialsClusterOpCSRResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::OperationalCredentials::Commands::OpCSRResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;

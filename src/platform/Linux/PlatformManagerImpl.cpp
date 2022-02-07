@@ -37,6 +37,7 @@
 
 #include <arpa/inet.h>
 #include <dirent.h>
+#include <errno.h>
 #include <linux/netlink.h>
 #include <linux/rtnetlink.h>
 #include <net/if.h>
@@ -170,13 +171,19 @@ void PlatformManagerImpl::WiFIIPChangeListener()
                     if (routeInfo->rta_type == IFA_LOCAL)
                     {
                         char name[IFNAMSIZ];
-                        ChipDeviceEvent event;
-                        if_indextoname(addressMessage->ifa_index, name);
+                        if (if_indextoname(addressMessage->ifa_index, name) == NULL)
+                        {
+                            ChipLogError(DeviceLayer, "Error %d when getting the interface name at index: %d", errno,
+                                         addressMessage->ifa_index);
+                            continue;
+                        }
+
                         if (strcmp(name, ConnectivityManagerImpl::GetWiFiIfName()) != 0)
                         {
                             continue;
                         }
 
+                        ChipDeviceEvent event;
                         event.Type                            = DeviceEventType::kInternetConnectivityChange;
                         event.InternetConnectivityChange.IPv4 = kConnectivity_Established;
                         event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
@@ -240,22 +247,13 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 
     mStartTime = System::SystemClock().GetMonotonicTimestamp();
 
-    ScheduleWork(HandleDeviceRebooted, 0);
-
 exit:
     return err;
 }
 
 CHIP_ERROR PlatformManagerImpl::_Shutdown()
 {
-    PlatformManagerDelegate * platformManagerDelegate = PlatformMgr().GetDelegate();
-    uint64_t upTime                                   = 0;
-
-    // The ShutDown event SHOULD be emitted by a Node prior to any orderly shutdown sequence.
-    if (platformManagerDelegate != nullptr)
-    {
-        platformManagerDelegate->OnShutDown();
-    }
+    uint64_t upTime = 0;
 
     if (GetDiagnosticDataProvider().GetUpTime(upTime) == CHIP_NO_ERROR)
     {
@@ -380,26 +378,6 @@ PlatformManagerImpl::_GetSupportedCalendarTypes(
     supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kTaiwanese);
 
     return CHIP_NO_ERROR;
-}
-
-void PlatformManagerImpl::HandleDeviceRebooted(intptr_t arg)
-{
-    PlatformManagerDelegate * platformManagerDelegate       = PlatformMgr().GetDelegate();
-    GeneralDiagnosticsDelegate * generalDiagnosticsDelegate = GetDiagnosticDataProvider().GetGeneralDiagnosticsDelegate();
-
-    if (generalDiagnosticsDelegate != nullptr)
-    {
-        generalDiagnosticsDelegate->OnDeviceRebooted();
-    }
-
-    // The StartUp event SHALL be emitted by a Node after completing a boot or reboot process
-    if (platformManagerDelegate != nullptr)
-    {
-        uint32_t softwareVersion;
-
-        ReturnOnFailure(ConfigurationMgr().GetSoftwareVersion(softwareVersion));
-        platformManagerDelegate->OnStartUp(softwareVersion);
-    }
 }
 
 void PlatformManagerImpl::HandleGeneralFault(uint32_t EventId)

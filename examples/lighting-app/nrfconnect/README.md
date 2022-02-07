@@ -220,6 +220,11 @@ following states are possible:
 
 -   _Off_ &mdash; The light bulb is off.
 
+**LED 3** can be used to identify the device. The LED starts blinking evenly
+(500 ms on/500 ms off) when the Identify command of the Identify cluster is
+received. The command's argument can be used to specify the duration of the
+effect.
+
 **Button 1** can be used for the following purposes:
 
 -   _Pressed for 6 s_ &mdash; Initiates the factory reset of the device.

@@ -10806,14 +10806,45 @@ using namespace chip::app::Clusters;
     ListFreer listFreer;
     GroupKeyManagement::Commands::KeySetWrite::Type request;
     request.groupKeySet.groupKeySetID = params.groupKeySet.groupKeySetID.unsignedShortValue;
-    request.groupKeySet.securityPolicy = static_cast<std::remove_reference_t<decltype(request.groupKeySet.securityPolicy)>>(
-        params.groupKeySet.securityPolicy.unsignedCharValue);
-    request.groupKeySet.epochKey0 = [self asByteSpan:params.groupKeySet.epochKey0];
-    request.groupKeySet.epochStartTime0 = params.groupKeySet.epochStartTime0.unsignedLongLongValue;
-    request.groupKeySet.epochKey1 = [self asByteSpan:params.groupKeySet.epochKey1];
-    request.groupKeySet.epochStartTime1 = params.groupKeySet.epochStartTime1.unsignedLongLongValue;
-    request.groupKeySet.epochKey2 = [self asByteSpan:params.groupKeySet.epochKey2];
-    request.groupKeySet.epochStartTime2 = params.groupKeySet.epochStartTime2.unsignedLongLongValue;
+    request.groupKeySet.groupKeySecurityPolicy
+        = static_cast<std::remove_reference_t<decltype(request.groupKeySet.groupKeySecurityPolicy)>>(
+            params.groupKeySet.groupKeySecurityPolicy.unsignedCharValue);
+    if (params.groupKeySet.epochKey0 == nil) {
+        request.groupKeySet.epochKey0.SetNull();
+    } else {
+        auto & nonNullValue_1 = request.groupKeySet.epochKey0.SetNonNull();
+        nonNullValue_1 = [self asByteSpan:params.groupKeySet.epochKey0];
+    }
+    if (params.groupKeySet.epochStartTime0 == nil) {
+        request.groupKeySet.epochStartTime0.SetNull();
+    } else {
+        auto & nonNullValue_1 = request.groupKeySet.epochStartTime0.SetNonNull();
+        nonNullValue_1 = params.groupKeySet.epochStartTime0.unsignedLongLongValue;
+    }
+    if (params.groupKeySet.epochKey1 == nil) {
+        request.groupKeySet.epochKey1.SetNull();
+    } else {
+        auto & nonNullValue_1 = request.groupKeySet.epochKey1.SetNonNull();
+        nonNullValue_1 = [self asByteSpan:params.groupKeySet.epochKey1];
+    }
+    if (params.groupKeySet.epochStartTime1 == nil) {
+        request.groupKeySet.epochStartTime1.SetNull();
+    } else {
+        auto & nonNullValue_1 = request.groupKeySet.epochStartTime1.SetNonNull();
+        nonNullValue_1 = params.groupKeySet.epochStartTime1.unsignedLongLongValue;
+    }
+    if (params.groupKeySet.epochKey2 == nil) {
+        request.groupKeySet.epochKey2.SetNull();
+    } else {
+        auto & nonNullValue_1 = request.groupKeySet.epochKey2.SetNonNull();
+        nonNullValue_1 = [self asByteSpan:params.groupKeySet.epochKey2];
+    }
+    if (params.groupKeySet.epochStartTime2 == nil) {
+        request.groupKeySet.epochStartTime2.SetNull();
+    } else {
+        auto & nonNullValue_1 = request.groupKeySet.epochStartTime2.SetNonNull();
+        nonNullValue_1 = params.groupKeySet.epochStartTime2.unsignedLongLongValue;
+    }
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
@@ -10860,11 +10891,11 @@ using namespace chip::app::Clusters;
                     }
                     listFreer.add(listHolder_0);
                     for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[CHIPGroupKeyManagementClusterGroupKey class]]) {
+                        if (![value[i_0] isKindOfClass:[CHIPGroupKeyManagementClusterGroupKeyMapStruct class]]) {
                             // Wrong kind of value.
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_0 = (CHIPGroupKeyManagementClusterGroupKey *) value[i_0];
+                        auto element_0 = (CHIPGroupKeyManagementClusterGroupKeyMapStruct *) value[i_0];
                         listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
                         listHolder_0->mList[i_0].groupId = element_0.groupId.unsignedShortValue;
                         listHolder_0->mList[i_0].groupKeySetID = element_0.groupKeySetID.unsignedShortValue;
@@ -16218,6 +16249,22 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)CSRRequestWithParams:(CHIPOperationalCredentialsClusterCSRRequestParams *)params
+           completionHandler:(void (^)(CHIPOperationalCredentialsClusterCSRResponseParams * _Nullable data,
+                                 NSError * _Nullable error))completionHandler
+{
+    ListFreer listFreer;
+    OperationalCredentials::Commands::CSRRequest::Type request;
+    request.CSRNonce = [self asByteSpan:params.csrNonce];
+
+    new CHIPOperationalCredentialsClusterCSRResponseCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            auto successFn = Callback<CHIPOperationalCredentialsClusterCSRResponseCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)certificateChainRequestWithParams:(CHIPOperationalCredentialsClusterCertificateChainRequestParams *)params
                         completionHandler:
                             (void (^)(CHIPOperationalCredentialsClusterCertificateChainResponseParams * _Nullable data,
@@ -16231,22 +16278,6 @@ using namespace chip::app::Clusters;
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             auto successFn
                 = Callback<CHIPOperationalCredentialsClusterCertificateChainResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)opCSRRequestWithParams:(CHIPOperationalCredentialsClusterOpCSRRequestParams *)params
-             completionHandler:(void (^)(CHIPOperationalCredentialsClusterOpCSRResponseParams * _Nullable data,
-                                   NSError * _Nullable error))completionHandler
-{
-    ListFreer listFreer;
-    OperationalCredentials::Commands::OpCSRRequest::Type request;
-    request.CSRNonce = [self asByteSpan:params.csrNonce];
-
-    new CHIPOperationalCredentialsClusterOpCSRResponseCallbackBridge(
-        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPOperationalCredentialsClusterOpCSRResponseCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
