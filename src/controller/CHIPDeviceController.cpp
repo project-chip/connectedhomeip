@@ -1657,7 +1657,7 @@ void DeviceCommissioner::OnDone()
     mReadClient     = nullptr;
     CommissioningDelegate::CommissioningReport report;
     report.Set<ReadCommissioningInfo>(info);
-    CommissioningStageComplete(err, report);
+    CommissioningStageComplete(return_err, report);
 }
 void DeviceCommissioner::OnArmFailSafe(void * context,
                                        const GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data)
@@ -1736,18 +1736,22 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
         app::ReadPrepareParams readParams(proxy->GetSecureSession().Value());
 
-        app::AttributePathParams readPaths[3];
+        app::AttributePathParams readPaths[5];
         // Read all the feature maps for all the networking clusters on any endpoint to determine what is supported
         readPaths[0] = app::AttributePathParams(app::Clusters::NetworkCommissioning::Id,
                                                 app::Clusters::NetworkCommissioning::Attributes::FeatureMap::Id);
         // Get the basic commissioning info from the general commissioning cluster on this endpoint (recommended failsafe time)
         readPaths[1] = app::AttributePathParams(endpoint, app::Clusters::GeneralCommissioning::Id,
                                                 app::Clusters::GeneralCommissioning::Attributes::BasicCommissioningInfo::Id);
-        // Read all the attributes from the basic info cluster (includes vendor id / product id / software version)
-        readPaths[2] = app::AttributePathParams(endpoint, app::Clusters::Basic::Id);
+        // Read attributes from the basic info cluster (vendor id / product id / software version)
+        readPaths[2] = app::AttributePathParams(endpoint, app::Clusters::Basic::Id, app::Clusters::Basic::Attributes::VendorID::Id);
+        readPaths[3] =
+            app::AttributePathParams(endpoint, app::Clusters::Basic::Id, app::Clusters::Basic::Attributes::ProductID::Id);
+        readPaths[4] =
+            app::AttributePathParams(endpoint, app::Clusters::Basic::Id, app::Clusters::Basic::Attributes::SoftwareVersion::Id);
 
         readParams.mpAttributePathParamsList    = readPaths;
-        readParams.mAttributePathParamsListSize = 3;
+        readParams.mAttributePathParamsListSize = 5;
         if (timeout.HasValue())
         {
             readParams.mTimeout = timeout.Value();
