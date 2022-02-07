@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 PASSCODE=${1:-20202021}
-ID=${2:-42}
-DISCRIMINATOR=${3:-5560}
+DISCRIMINATOR=${2:-42}
+UDP_PORT=${3:-5560}
 
 pkill chip-ota-provider-app
 pkill chip-ota-requestor-app
@@ -24,7 +24,7 @@ if [ ! -f "/tmp/ota/provider-log.txt" ]; then
     exit 1
 fi
 
-echo "Commissioning Provider "
+echo "Commissioning Provider"
 
 ./out/chip-tool pairing onnetwork 1 "$PASSCODE" | tee /tmp/ota/chip-tool-commission-provider.txt
 if grep "Device commissioning completed with success" /tmp/ota/chip-tool-commission-provider.txt; then
@@ -34,14 +34,15 @@ else
     exit 1
 fi
 
+# TODO: This should be removed once chip_kvs is fixed
 rm /tmp/chip_kvs
 
-stdbuf -o0 ./out/ota_requestor_debug/chip-ota-requestor-app -u "$DISCRIMINATOR" -d "$ID" | tee /tmp/ota/requestor-log.txt &
+stdbuf -o0 ./out/ota_requestor_debug/chip-ota-requestor-app -u "$UDP_PORT" -d "$DISCRIMINATOR" | tee /tmp/ota/requestor-log.txt &
 requestor_pid=$!
 
-echo "Commissioning Requestor "
+echo "Commissioning Requestor"
 
-./out/chip-tool pairing onnetwork-long 2 "$PASSCODE" "$ID" | tee /tmp/ota/chip-tool-commission-requestor.txt
+./out/chip-tool pairing onnetwork-long 2 "$PASSCODE" "$DISCRIMINATOR" | tee /tmp/ota/chip-tool-commission-requestor.txt
 
 if grep "Device commissioning completed with success" /tmp/ota/chip-tool-commission-requestor.txt; then
     echo Requestor Commissioned
@@ -50,7 +51,7 @@ else
     exit 1
 fi
 
-echo "Sending announce-ota-provider "
+echo "Sending announce-ota-provider"
 
 ./out/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0 | tee /tmp/ota/chip-tool-announce-ota.txt
 

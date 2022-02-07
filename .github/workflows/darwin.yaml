@@ -110,6 +110,13 @@ jobs:
               timeout-minutes: 20
               run: |
                   scripts/examples/ota_test.sh
+            - name: Uploading OTA logs
+              if: always()
+              uses: actions/upload-artifact@v2
+              with:
+                  name: OTA,darwin,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
+                  path: |
+                      /tmp/ota/
             - name: Delete Defaults
               run: defaults delete com.apple.dt.xctest.tool
               continue-on-error: true
