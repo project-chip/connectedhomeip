@@ -331,10 +331,10 @@ EmberAfStatus emAfClusterPreAttributeChangedCallback(const app::ConcreteAttribut
     else
     {
         EmberAfStatus status            = EMBER_ZCL_STATUS_SUCCESS;
-        EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION);
+        EmberAfClusterPreAttributeChangedCallback f = (EmberAfClusterPreAttributeChangedCallback )(emberAfFindClusterFunction(cluster, CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION));
         if (f != NULL)
         {
-            status = ((EmberAfClusterPreAttributeChangedCallback) f)(attributePath, attributeType, size, value);
+            status = f(attributePath, attributeType, size, value);
         }
         return status;
     }
