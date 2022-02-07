@@ -108,7 +108,6 @@ function asReadType(type)
 // List of all cluster with generated functions
 var endpointClusterWithInit = [
   'Basic',
-  'Bridged Device Basic',
   'Color Control',
   'Groups',
   'IAS Zone',
