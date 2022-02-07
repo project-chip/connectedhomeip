@@ -5504,7 +5504,7 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)writeAttributePHYRateWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributePHYRateWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -5515,14 +5515,19 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = EthernetNetworkDiagnostics::Attributes::PHYRate::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedCharValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(value.unsignedCharValue);
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)writeAttributeFullDuplexWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeFullDuplexWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -5533,7 +5538,12 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = EthernetNetworkDiagnostics::Attributes::FullDuplex::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.boolValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.boolValue;
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -5630,7 +5640,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeCarrierDetectWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeCarrierDetectWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -5641,7 +5651,12 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = EthernetNetworkDiagnostics::Attributes::CarrierDetect::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.boolValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.boolValue;
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);

@@ -12652,14 +12652,14 @@ class EthernetNetworkDiagnostics(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
-                ClusterObjectFieldDescriptor(Label="PHYRate", Tag=0x00000000, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="fullDuplex", Tag=0x00000001, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="PHYRate", Tag=0x00000000, Type=typing.Union[None, Nullable, EthernetNetworkDiagnostics.Enums.PHYRateType]),
+                ClusterObjectFieldDescriptor(Label="fullDuplex", Tag=0x00000001, Type=typing.Union[None, Nullable, bool]),
                 ClusterObjectFieldDescriptor(Label="packetRxCount", Tag=0x00000002, Type=uint),
                 ClusterObjectFieldDescriptor(Label="packetTxCount", Tag=0x00000003, Type=uint),
                 ClusterObjectFieldDescriptor(Label="txErrCount", Tag=0x00000004, Type=uint),
                 ClusterObjectFieldDescriptor(Label="collisionCount", Tag=0x00000005, Type=uint),
                 ClusterObjectFieldDescriptor(Label="overrunCount", Tag=0x00000006, Type=uint),
-                ClusterObjectFieldDescriptor(Label="carrierDetect", Tag=0x00000007, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="carrierDetect", Tag=0x00000007, Type=typing.Union[None, Nullable, bool]),
                 ClusterObjectFieldDescriptor(Label="timeSinceReset", Tag=0x00000008, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="serverGeneratedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="clientGeneratedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
@@ -12668,14 +12668,14 @@ class EthernetNetworkDiagnostics(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    PHYRate: 'typing.Optional[uint]' = None
-    fullDuplex: 'typing.Optional[bool]' = None
+    PHYRate: 'typing.Union[None, Nullable, EthernetNetworkDiagnostics.Enums.PHYRateType]' = None
+    fullDuplex: 'typing.Union[None, Nullable, bool]' = None
     packetRxCount: 'uint' = None
     packetTxCount: 'uint' = None
     txErrCount: 'uint' = None
     collisionCount: 'uint' = None
     overrunCount: 'uint' = None
-    carrierDetect: 'typing.Optional[bool]' = None
+    carrierDetect: 'typing.Union[None, Nullable, bool]' = None
     timeSinceReset: 'typing.Optional[uint]' = None
     serverGeneratedCommandList: 'typing.List[uint]' = None
     clientGeneratedCommandList: 'typing.List[uint]' = None
@@ -12726,9 +12726,9 @@ class EthernetNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, EthernetNetworkDiagnostics.Enums.PHYRateType])
 
-            value: 'typing.Optional[uint]' = None
+            value: 'typing.Union[None, Nullable, EthernetNetworkDiagnostics.Enums.PHYRateType]' = None
 
         @dataclass
         class FullDuplex(ClusterAttributeDescriptor):
@@ -12742,9 +12742,9 @@ class EthernetNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, bool])
 
-            value: 'typing.Optional[bool]' = None
+            value: 'typing.Union[None, Nullable, bool]' = None
 
         @dataclass
         class PacketRxCount(ClusterAttributeDescriptor):
@@ -12838,9 +12838,9 @@ class EthernetNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, bool])
 
-            value: 'typing.Optional[bool]' = None
+            value: 'typing.Union[None, Nullable, bool]' = None
 
         @dataclass
         class TimeSinceReset(ClusterAttributeDescriptor):

@@ -447,14 +447,14 @@ server cluster EthernetNetworkDiagnostics = 55 {
     k400g = 9;
   }
 
-  readonly attribute enum8 PHYRate = 0;
-  readonly attribute boolean fullDuplex = 1;
+  readonly attribute nullable PHYRateType PHYRate = 0;
+  readonly attribute nullable boolean fullDuplex = 1;
   readonly attribute int64u packetRxCount = 2;
   readonly attribute int64u packetTxCount = 3;
   readonly attribute int64u txErrCount = 4;
   readonly attribute int64u collisionCount = 5;
   readonly attribute int64u overrunCount = 6;
-  readonly attribute boolean carrierDetect = 7;
+  readonly attribute nullable boolean carrierDetect = 7;
   readonly attribute int64u timeSinceReset = 8;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;

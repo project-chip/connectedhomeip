@@ -14425,9 +14425,9 @@ namespace Attributes {
 namespace PHYRate {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PHYRate::Id; }
@@ -14437,9 +14437,9 @@ struct TypeInfo
 namespace FullDuplex {
 struct TypeInfo
 {
-    using Type             = bool;
-    using DecodableType    = bool;
-    using DecodableArgType = bool;
+    using Type             = chip::app::DataModel::Nullable<bool>;
+    using DecodableType    = chip::app::DataModel::Nullable<bool>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<bool> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FullDuplex::Id; }
@@ -14509,9 +14509,9 @@ struct TypeInfo
 namespace CarrierDetect {
 struct TypeInfo
 {
-    using Type             = bool;
-    using DecodableType    = bool;
-    using DecodableArgType = bool;
+    using Type             = chip::app::DataModel::Nullable<bool>;
+    using DecodableType    = chip::app::DataModel::Nullable<bool>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<bool> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CarrierDetect::Id; }
@@ -14599,14 +14599,14 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::PHYRate::TypeInfo::DecodableType PHYRate               = static_cast<uint8_t>(0);
-        Attributes::FullDuplex::TypeInfo::DecodableType fullDuplex         = static_cast<bool>(0);
+        Attributes::PHYRate::TypeInfo::DecodableType PHYRate;
+        Attributes::FullDuplex::TypeInfo::DecodableType fullDuplex;
         Attributes::PacketRxCount::TypeInfo::DecodableType packetRxCount   = static_cast<uint64_t>(0);
         Attributes::PacketTxCount::TypeInfo::DecodableType packetTxCount   = static_cast<uint64_t>(0);
         Attributes::TxErrCount::TypeInfo::DecodableType txErrCount         = static_cast<uint64_t>(0);
         Attributes::CollisionCount::TypeInfo::DecodableType collisionCount = static_cast<uint64_t>(0);
         Attributes::OverrunCount::TypeInfo::DecodableType overrunCount     = static_cast<uint64_t>(0);
-        Attributes::CarrierDetect::TypeInfo::DecodableType carrierDetect   = static_cast<bool>(0);
+        Attributes::CarrierDetect::TypeInfo::DecodableType carrierDetect;
         Attributes::TimeSinceReset::TypeInfo::DecodableType timeSinceReset = static_cast<uint64_t>(0);
         Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
         Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;

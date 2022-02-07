@@ -7162,6 +7162,30 @@ public class ChipClusters {
         DefaultClusterCallback Callback,
         @Nullable Integer timedInvokeTimeoutMs);
 
+    public interface PHYRateAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface FullDuplexAttributeCallback {
+      void onSuccess(@Nullable Boolean value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface CarrierDetectAttributeCallback {
+      void onSuccess(@Nullable Boolean value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
     public interface ServerGeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
@@ -7186,21 +7210,21 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public void readPHYRateAttribute(IntegerAttributeCallback callback) {
+    public void readPHYRateAttribute(PHYRateAttributeCallback callback) {
       readPHYRateAttribute(chipClusterPtr, callback);
     }
 
     public void subscribePHYRateAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        PHYRateAttributeCallback callback, int minInterval, int maxInterval) {
       subscribePHYRateAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readFullDuplexAttribute(BooleanAttributeCallback callback) {
+    public void readFullDuplexAttribute(FullDuplexAttributeCallback callback) {
       readFullDuplexAttribute(chipClusterPtr, callback);
     }
 
     public void subscribeFullDuplexAttribute(
-        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+        FullDuplexAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeFullDuplexAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -7249,12 +7273,12 @@ public class ChipClusters {
       subscribeOverrunCountAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readCarrierDetectAttribute(BooleanAttributeCallback callback) {
+    public void readCarrierDetectAttribute(CarrierDetectAttributeCallback callback) {
       readCarrierDetectAttribute(chipClusterPtr, callback);
     }
 
     public void subscribeCarrierDetectAttribute(
-        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+        CarrierDetectAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeCarrierDetectAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -7317,16 +7341,19 @@ public class ChipClusters {
     }
 
     private native void readPHYRateAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, PHYRateAttributeCallback callback);
 
     private native void subscribePHYRateAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr, PHYRateAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readFullDuplexAttribute(
-        long chipClusterPtr, BooleanAttributeCallback callback);
+        long chipClusterPtr, FullDuplexAttributeCallback callback);
 
     private native void subscribeFullDuplexAttribute(
-        long chipClusterPtr, BooleanAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr,
+        FullDuplexAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
     private native void readPacketRxCountAttribute(
         long chipClusterPtr, LongAttributeCallback callback);
@@ -7359,10 +7386,13 @@ public class ChipClusters {
         long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readCarrierDetectAttribute(
-        long chipClusterPtr, BooleanAttributeCallback callback);
+        long chipClusterPtr, CarrierDetectAttributeCallback callback);
 
     private native void subscribeCarrierDetectAttribute(
-        long chipClusterPtr, BooleanAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr,
+        CarrierDetectAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
     private native void readTimeSinceResetAttribute(
         long chipClusterPtr, LongAttributeCallback callback);

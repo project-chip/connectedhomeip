@@ -3968,8 +3968,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value())];
+            }
             return value;
         }
         case Attributes::FullDuplex::Id: {
@@ -3979,8 +3983,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithBool:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithBool:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::PacketRxCount::Id: {
@@ -4045,8 +4053,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithBool:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithBool:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::TimeSinceReset::Id: {
