@@ -59,8 +59,8 @@ public:
                                                                       *   Cleared during factory reset. */
     static constexpr uint8_t kFileId_ChipCounter = CATEGORY_BASE + 2; /**< Category containing dynamic counter values set at
                                                                        * runtime. Retained during factory reset. */
-    static constexpr uint8_t kFileId_KVS = CATEGORY_BASE + 3; /**< Category containing KVS set at runtime.
-                                                         *   Cleared during factory reset. */
+    static constexpr uint8_t kFileId_KVS = CATEGORY_BASE + 3;         /**< Category containing KVS set at runtime.
+                                                                       *   Cleared during factory reset. */
 
     using Key = uint32_t;
 
@@ -82,13 +82,13 @@ public:
     static constexpr Key kConfigKey_FabricSecret                = ConfigKey(kFileId_ChipConfig, 0x04);
     static constexpr Key kConfigKey_LastUsedEpochKeyId          = ConfigKey(kFileId_ChipConfig, 0x05);
     static constexpr Key kConfigKey_FailSafeArmed               = ConfigKey(kFileId_ChipConfig, 0x06);
-    static constexpr Key kConfigKey_OperationalDeviceId               = ConfigKey(kFileId_ChipConfig, 0x07);
-    static constexpr Key kConfigKey_OperationalDeviceCert             = ConfigKey(kFileId_ChipConfig, 0x08);
-    static constexpr Key kConfigKey_OperationalDeviceICACerts         = ConfigKey(kFileId_ChipConfig, 0x09);
-    static constexpr Key kConfigKey_OperationalDevicePrivateKey       = ConfigKey(kFileId_ChipConfig, 0x0A);
-    static constexpr Key kConfigKey_RegulatoryLocation   = ConfigKey(kFileId_ChipConfig, 0x0B);
-    static constexpr Key kConfigKey_CountryCode          = ConfigKey(kFileId_ChipConfig, 0x0C);
-    static constexpr Key kConfigKey_Breadcrumb           = ConfigKey(kFileId_ChipConfig, 0x0D);
+    static constexpr Key kConfigKey_OperationalDeviceId         = ConfigKey(kFileId_ChipConfig, 0x07);
+    static constexpr Key kConfigKey_OperationalDeviceCert       = ConfigKey(kFileId_ChipConfig, 0x08);
+    static constexpr Key kConfigKey_OperationalDeviceICACerts   = ConfigKey(kFileId_ChipConfig, 0x09);
+    static constexpr Key kConfigKey_OperationalDevicePrivateKey = ConfigKey(kFileId_ChipConfig, 0x0A);
+    static constexpr Key kConfigKey_RegulatoryLocation          = ConfigKey(kFileId_ChipConfig, 0x0B);
+    static constexpr Key kConfigKey_CountryCode                 = ConfigKey(kFileId_ChipConfig, 0x0C);
+    static constexpr Key kConfigKey_Breadcrumb                  = ConfigKey(kFileId_ChipConfig, 0x0D);
 
     static constexpr Key kConfigKey_GroupKey   = ConfigKey(kFileId_ChipConfig, 0x0E);
     static constexpr Key kConfigKey_GroupKey0  = ConfigKey(kFileId_ChipConfig, 0x0F);
@@ -149,11 +149,9 @@ protected:
     using ForEachRecordFunct = std::function<CHIP_ERROR(const Key & key, const size_t & length)>;
     static CHIP_ERROR ForEachRecord(Key firstKey, Key lastKey, bool addNewRecord, ForEachRecordFunct funct);
 
-
 private:
     static CHIP_ERROR FactoryResetConfigInternal(Key firstKey, Key lastKey);
 };
-
 
 } // namespace Internal
 } // namespace DeviceLayer

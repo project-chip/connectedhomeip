@@ -29,7 +29,6 @@
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.cpp>
 
-
 #include <lwip/tcpip.h>
 
 namespace chip {
@@ -52,7 +51,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     SuccessOrExit(err);
 
     // Initialize LwIP.
-    //tcpip_init(NULL, NULL);
+    // tcpip_init(NULL, NULL);
 
     err = chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16);
     SuccessOrExit(err);
