@@ -262,6 +262,22 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
 
     TestContext & ctx = *static_cast<TestContext *>(apContext);
 
+    //
+    // We have to enable async dispatch here to ensure that the exchange
+    // gets correctly closed out in the test below. Otherwise, the following happens:
+    //
+    // 1. WriteHandler generates a response upon OnWriteRequest being called.
+    // 2. Since there is no matching active client-side exchange for that request, the IM engine
+    //    handles it incorrectly and treats it like an unsolicited message.
+    // 3. It is invalid to receive a WriteResponse as an unsolicited message so it correctly sends back
+    //    a StatusResponse containing an error to that message.
+    // 4. Without unwinding the existing call stack, a response is received on the same exchange that the handler
+    //    generated a WriteResponse on. This exchange should have been closed in a normal execution model, but in
+    //    a synchronous model, the exchange is still open, and the status response is sent to the WriteHandler.
+    // 5. WriteHandler::OnMessageReceived is invoked, and it correctly asserts.
+    //
+    ctx.EnableAsyncDispatch();
+
     constexpr bool allBooleans[] = { true, false };
     for (auto messageIsTimed : allBooleans)
     {
@@ -279,8 +295,6 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
             TestExchangeDelegate delegate;
             Messaging::ExchangeContext * exchange = ctx.NewExchangeToBob(&delegate);
 
-            writeHandler.EnableResponseGeneration(false);
-
             Status status = writeHandler.OnWriteRequest(exchange, std::move(buf), transactionIsTimed);
             if (messageIsTimed == transactionIsTimed)
             {
@@ -288,27 +302,27 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
             }
             else
             {
+                //
+                // In a normal execution flow, the exchange manager would have closed out the exchange after the
+                // message dispatch call path had unwinded. In this test however, we've manually allocated the exchange
+                // ourselves (as opposed to the exchange manager), so we need to take ownership of closing out the exchange.
+                //
+                // Note that this doesn't happen in the success case above, since that results in a call to send a message through
+                // the exchange context, which results in the exchange manager correctly closing it.
+                //
+                exchange->Close();
                 NL_TEST_ASSERT(apSuite, status == Status::UnsupportedAccess);
             }
 
-            //
-            // In both failure and success cases, we've disabled generation of responses in WriteHandler.
-            // This is needed since we don't have a matching ReadClient instance that generated the original
-            // request. This means that the InteractionModelEngine is going to handle that response, causing it to
-            // incorrectly send back a further failure to that response. Ordinarily, this would have been discarded
-            // by the exchange layer since the exchange on the handler-side would have been closed already, but given
-            // we're not in a representative async work loop model in this test, every call is synchronous. This results
-            // in the erroneous response being processed while the exchange is still open, and we end up processing the message
-            // and triggering a fault.
-            //
-            // Since we're not generating responses, close the exchange in all cases.
-            //
-            exchange->Close();
+            ctx.DrainAndServiceIO();
+            ctx.DrainAndServiceIO();
 
             Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
             NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
         }
     }
+
+    ctx.DisableAsyncDispatch();
 }
 
 CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,

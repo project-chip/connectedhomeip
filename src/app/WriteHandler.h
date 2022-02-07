@@ -94,10 +94,6 @@ public:
 
     FabricIndex GetAccessingFabricIndex() const;
 
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
-    void EnableResponseGeneration(bool aEnableResponse) { mEnableResponse = aEnableResponse; }
-#endif
-
     /**
      * Check whether the WriteRequest we are handling is a timed write.
      */
@@ -129,10 +125,6 @@ private: // ExchangeDelegate
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
 
 private:
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
-    bool mEnableResponse = true;
-#endif
-
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     WriteResponseMessage::Builder mWriteResponseBuilder;
     System::PacketBufferTLVWriter mMessageWriter;

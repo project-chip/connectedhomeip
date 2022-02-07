@@ -114,12 +114,6 @@ Status WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeConte
     // Do not send response on Group Write
     if (status == Status::Success && !apExchangeContext->IsGroupExchangeContext())
     {
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
-        if (!mEnableResponse)
-        {
-            return status;
-        }
-#endif
         CHIP_ERROR err = SendWriteResponse();
         if (err != CHIP_NO_ERROR)
         {

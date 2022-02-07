@@ -235,6 +235,20 @@ public:
     }
 
     /*
+     * Reset the dispatch back to a model that synchronously dispatches received messages up the stack.
+     *
+     * NOTE: This results in highly atypical/complex call stacks that are not representative of what happens on real
+     * devices and can cause subtle and complex bugs to either appear or get masked in the system. Where possible, please
+     * use this sparingly!
+     *
+     */
+    void DisableAsyncDispatch()
+    {
+        auto & impl = GetLoopback();
+        impl.DisableAsyncDispatch();
+    }
+
+    /*
      * This drives the servicing of events using the embedded IOContext while there are pending
      * messages in the loopback transport's pending message queue. This should run to completion
      * in well-behaved logic (i.e there isn't an indefinite ping-pong of messages transmitted back
