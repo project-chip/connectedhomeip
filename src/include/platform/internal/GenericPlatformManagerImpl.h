@@ -24,9 +24,6 @@
 
 #pragma once
 
-#include <cstddef>
-#include <cstdint>
-
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -71,21 +68,6 @@ protected:
     CHIP_ERROR _GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales);
     CHIP_ERROR _GetSupportedCalendarTypes(
         AttributeList<app::Clusters::TimeFormatLocalization::CalendarType, kMaxCalendarTypes> & supportedCalendarTypes);
-    CHIP_ERROR _GetBridgedVendorName(EndpointId endpoint, char * buf, size_t bufSize);
-    CHIP_ERROR _GetBridgedVendorId(EndpointId endpoint, uint16_t & vendorId);
-    CHIP_ERROR _GetBridgedProductName(EndpointId endpoint, char * buf, size_t bufSize);
-    CHIP_ERROR _GetBridgedNodeLabel(EndpointId endpoint, char * buf, size_t bufSize);
-    CHIP_ERROR _GetBridgedHardwareVersion(EndpointId endpoint, uint16_t & hardwareVer);
-    CHIP_ERROR _GetBridgedHardwareVersionString(EndpointId endpoint, char * buf, size_t bufSize);
-    CHIP_ERROR _GetBridgedSoftwareVersion(EndpointId endpoint, uint32_t & softwareVer);
-    CHIP_ERROR _GetBridgedSoftwareVersionString(EndpointId endpoint, char * buf, size_t bufSize);
-    CHIP_ERROR _GetBridgedManufacturingDate(EndpointId endpoint, uint16_t & year, uint8_t & month, uint8_t & dayOfMonth);
-    CHIP_ERROR _GetBridgedPartNumber(EndpointId endpoint, char * buf, size_t bufSize);
-    CHIP_ERROR _GetBridgedProductURL(EndpointId endpoint, char * buf, size_t bufSize);
-    CHIP_ERROR _GetBridgedProductLabel(EndpointId endpoint, char * buf, size_t bufSize);
-    CHIP_ERROR _GetBridgedSerialNumber(EndpointId endpoint, char * buf, size_t bufSize);
-    CHIP_ERROR _GetBridgedReachable(EndpointId endpoint, bool & reachable);
-    CHIP_ERROR _GetBridgedUniqueId(EndpointId endpoint, char * buf, size_t bufSize);
 
     // ===== Support methods that can be overridden by the implementation subclass.
 
@@ -133,99 +115,6 @@ GenericPlatformManagerImpl<ImplClass>::_GetSupportedLocales(AttributeList<chip::
 template <class ImplClass>
 inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetSupportedCalendarTypes(
     AttributeList<app::Clusters::TimeFormatLocalization::CalendarType, kMaxCalendarTypes> & supportedCalendarTypes)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetBridgedVendorName(EndpointId endpoint, char * buf, size_t bufSize)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetBridgedVendorId(EndpointId endpoint, uint16_t & vendorId)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetBridgedProductName(EndpointId endpoint, char * buf, size_t bufSize)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetBridgedNodeLabel(EndpointId endpoint, char * buf, size_t bufSize)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetBridgedHardwareVersion(EndpointId endpoint, uint16_t & hardwareVer)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetBridgedHardwareVersionString(
-    EndpointId endpoint, char * buf, size_t bufSize)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetBridgedSoftwareVersion(EndpointId endpoint, uint32_t & softwareVer)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetBridgedSoftwareVersionString(
-    EndpointId endpoint, char * buf, size_t bufSize)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetBridgedManufacturingDate(
-    EndpointId endpoint, uint16_t & year, uint8_t & month, uint8_t & dayOfMonth)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetBridgedPartNumber(EndpointId endpoint, char * buf, size_t bufSize)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetBridgedProductURL(EndpointId endpoint, char * buf, size_t bufSize)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetBridgedProductLabel(EndpointId endpoint, char * buf, size_t bufSize)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetBridgedSerialNumber(EndpointId endpoint, char * buf, size_t bufSize)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetBridgedReachable(EndpointId endpoint, bool & reachable)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetBridgedUniqueId(EndpointId endpoint, char * buf, size_t bufSize)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
