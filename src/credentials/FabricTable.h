@@ -43,7 +43,7 @@
 namespace chip {
 
 static constexpr FabricIndex kMinValidFabricIndex     = 1;
-static constexpr FabricIndex kMaxValidFabricIndex     = std::min<FabricIndex>(UINT8_MAX - 1, CHIP_CONFIG_MAX_DEVICE_ADMINS);
+static constexpr FabricIndex kMaxValidFabricIndex     = std::min<FabricIndex>(UINT8_MAX - 1, CHIP_CONFIG_MAX_FABRICS);
 static constexpr uint8_t kFabricLabelMaxLengthInBytes = 32;
 
 // KVS store is sensitive to length of key strings, based on the underlying
@@ -441,16 +441,16 @@ public:
 
     uint8_t FabricCount() const { return mFabricCount; }
 
-    ConstFabricIterator cbegin() const { return ConstFabricIterator(mStates, 0, CHIP_CONFIG_MAX_DEVICE_ADMINS); }
+    ConstFabricIterator cbegin() const { return ConstFabricIterator(mStates, 0, CHIP_CONFIG_MAX_FABRICS); }
     ConstFabricIterator cend() const
     {
-        return ConstFabricIterator(mStates, CHIP_CONFIG_MAX_DEVICE_ADMINS, CHIP_CONFIG_MAX_DEVICE_ADMINS);
+        return ConstFabricIterator(mStates, CHIP_CONFIG_MAX_FABRICS, CHIP_CONFIG_MAX_FABRICS);
     }
     ConstFabricIterator begin() const { return cbegin(); }
     ConstFabricIterator end() const { return cend(); }
 
 private:
-    FabricInfo mStates[CHIP_CONFIG_MAX_DEVICE_ADMINS];
+    FabricInfo mStates[CHIP_CONFIG_MAX_FABRICS];
     FabricStorage * mStorage = nullptr;
 
     FabricTableDelegate * mDelegate = nullptr;
