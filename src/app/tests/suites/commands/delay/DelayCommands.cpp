@@ -18,6 +18,14 @@
 
 #include "DelayCommands.h"
 
+namespace {
+const char basePath[] = "./src/app/tests/suites/commands/delay/scripts/";
+const char * getScriptsFolder()
+{
+    return basePath;
+}
+} // namespace
+
 CHIP_ERROR DelayCommands::WaitForMs(uint16_t ms)
 {
     const auto duration = chip::System::Clock::Milliseconds32(ms);
@@ -28,4 +36,30 @@ void DelayCommands::OnWaitForMsFn(chip::System::Layer * systemLayer, void * cont
 {
     auto * command = static_cast<DelayCommands *>(context);
     command->OnWaitForMs();
+}
+
+CHIP_ERROR DelayCommands::WaitForCommissionableAdvertisement()
+{
+    const char * scriptDir            = getScriptsFolder();
+    constexpr const char * scriptName = "WaitForCommissionableAdvertisement.py";
+
+    char command[128];
+    VerifyOrReturnError(snprintf(command, sizeof(command), "%s%s", scriptDir, scriptName) >= 0, CHIP_ERROR_INTERNAL);
+    return RunInternal(command);
+}
+
+CHIP_ERROR DelayCommands::WaitForOperationalAdvertisement()
+{
+    const char * scriptDir            = getScriptsFolder();
+    constexpr const char * scriptName = "WaitForOperationalAdvertisement.py";
+
+    char command[128];
+    VerifyOrReturnError(snprintf(command, sizeof(command), "%s%s", scriptDir, scriptName) >= 0, CHIP_ERROR_INTERNAL);
+    return RunInternal(command);
+}
+
+CHIP_ERROR DelayCommands::RunInternal(const char * command)
+{
+    VerifyOrReturnError(system(command) == 0, CHIP_ERROR_INTERNAL);
+    return ContinueOnChipMainThread();
 }
