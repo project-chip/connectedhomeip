@@ -126,12 +126,12 @@ with the target cluster name and the target command name
 
 ```bash
 Usage:
-  ./chip-tool-darwin account login command_name [param1 param2 ...]
+  ./chip-tool-darwin accountlogin command_name [param1 param2 ...]
 
   +-------------------------------------------------------------------------------------+
   | Commands:                                                                           |
   +-------------------------------------------------------------------------------------+
-  | * get-setup-p-i-n-request                                                           |
+  | * get-setup-pinrequest                                                              |
   | * login-request                                                                     |
   | * logout-request                                                                    |
   +-------------------------------------------------------------------------------------+
@@ -158,7 +158,7 @@ Usage:
 
 ```bash
 Usage:
-  ./chip-tool-darwin application launcher command_name [param1 param2 ...]
+  ./chip-tool-darwin applicationlauncher command_name [param1 param2 ...]
 
   +-------------------------------------------------------------------------------------+
   | Commands:                                                                           |
@@ -174,7 +174,7 @@ Usage:
 
 ```bash
 Usage:
-  ./chip-tool-darwin audio output command_name [param1 param2 ...]
+  ./chip-tool-darwin audiooutput command_name [param1 param2 ...]
 
   +-------------------------------------------------------------------------------------+
   | Commands:                                                                           |
@@ -189,7 +189,7 @@ Usage:
 
 ```bash
 Usage:
-  ./chip-tool-darwin barrier control command_name [param1 param2 ...]
+  ./chip-tool-darwin barriercontrol command_name [param1 param2 ...]
 
   +-------------------------------------------------------------------------------------+
   | Commands:                                                                           |
@@ -219,7 +219,7 @@ Usage:
 
 ```bash
 Usage:
-  ./chip-tool-darwin bridged actions command_name [param1 param2 ...]
+  ./chip-tool-darwin bridgedactions command_name [param1 param2 ...]
 
   +-------------------------------------------------------------------------------------+
   | Commands:                                                                           |
@@ -260,7 +260,7 @@ Usage:
 
 ```bash
 Usage:
-  ./chip-tool-darwin color control command_name [param1 param2 ...]
+  ./chip-tool-darwin colorcontrol command_name [param1 param2 ...]
 
   +-------------------------------------------------------------------------------------+
   | Commands:                                                                           |
@@ -292,13 +292,13 @@ Usage:
 
 ```bash
 Usage:
-  ./chip-tool-darwin content launcher command_name [param1 param2 ...]
+  ./chip-tool-darwin contentlauncher command_name [param1 param2 ...]
 
   +-------------------------------------------------------------------------------------+
   | Commands:                                                                           |
   +-------------------------------------------------------------------------------------+
   | * launch-content-request                                                            |
-  | * launch-u-r-l-request                                                              |
+  | * launch-urlrequest                                                                 |
   +-------------------------------------------------------------------------------------+
 ```
 
@@ -307,7 +307,7 @@ Usage:
 
 ```bash
 Usage:
-  ./chip-tool-darwin diagnostic logs command_name [param1 param2 ...]
+  ./chip-tool-darwin diagnosticlogs command_name [param1 param2 ...]
 
   +-------------------------------------------------------------------------------------+
   | Commands:                                                                           |
@@ -321,7 +321,7 @@ Usage:
 
 ```bash
 Usage:
-  ./chip-tool-darwin door lock command_name [param1 param2 ...]
+  ./chip-tool-darwin doorlock command_name [param1 param2 ...]
 
   +-------------------------------------------------------------------------------------+
   | Commands:                                                                           |
@@ -349,7 +349,7 @@ Usage:
 
 ```bash
 Usage:
-  ./chip-tool-darwin ethernet network diagnostics command_name [param1 param2 ...]
+  ./chip-tool-darwin ethernetnetworkdiagnostics command_name [param1 param2 ...]
 
   +-------------------------------------------------------------------------------------+
   | Commands:                                                                           |
@@ -363,7 +363,7 @@ Usage:
 
 ```bash
 Usage:
-  ./chip-tool-darwin general commissioning command_name [param1 param2 ...]
+  ./chip-tool-darwin generalcommissioning command_name [param1 param2 ...]
 
   +-------------------------------------------------------------------------------------+
   | Commands:                                                                           |
@@ -379,7 +379,7 @@ Usage:
 
 ```bash
 Usage:
-  ./chip-tool-darwin group key management command_name [param1 param2 ...]
+  ./chip-tool-darwin groupkeymanagement command_name [param1 param2 ...]
 
   +-------------------------------------------------------------------------------------+
   | Commands:                                                                           |
@@ -431,7 +431,7 @@ Usage:
 
 ```bash
 Usage:
-  ./chip-tool-darwin keypad input command_name [param1 param2 ...]
+  ./chip-tool-darwin keypadinput command_name [param1 param2 ...]
 
   +-------------------------------------------------------------------------------------+
   | Commands:                                                                           |
@@ -445,7 +445,7 @@ Usage:
 
 ```bash
 Usage:
-  ./chip-tool-darwin level control command_name [param1 param2 ...]
+  ./chip-tool-darwin levelcontrol command_name [param1 param2 ...]
 
   +-------------------------------------------------------------------------------------+
   | Commands:                                                                           |
@@ -466,7 +466,7 @@ Usage:
 
 ```bash
 Usage:
-  ./chip-tool-darwin low power command_name [param1 param2 ...]
+  ./chip-tool-darwin lowpower command_name [param1 param2 ...]
 
   +-------------------------------------------------------------------------------------+
   | Commands:                                                                           |
@@ -480,7 +480,7 @@ Usage:
 
 ```bash
 Usage:
-  ./chip-tool-darwin media input command_name [param1 param2 ...]
+  ./chip-tool-darwin mediainput command_name [param1 param2 ...]
 
   +-------------------------------------------------------------------------------------+
   | Commands:                                                                           |
@@ -497,7 +497,7 @@ Usage:
 
 ```bash
 Usage:
-  ./chip-tool-darwin media playback command_name [param1 param2 ...]
+  ./chip-tool-darwin mediaplayback command_name [param1 param2 ...]
 
   +-------------------------------------------------------------------------------------+
   | Commands:                                                                           |
@@ -521,7 +521,7 @@ Usage:
 
 ```bash
 Usage:
-  ./chip-tool-darwin mode select command_name [param1 param2 ...]
+  ./chip-tool-darwin modeselect command_name [param1 param2 ...]
 
   +-------------------------------------------------------------------------------------+
   | Commands:                                                                           |
@@ -535,7 +535,7 @@ Usage:
 
 ```bash
 Usage:
-  ./chip-tool-darwin network commissioning command_name [param1 param2 ...]
+  ./chip-tool-darwin networkcommissioning command_name [param1 param2 ...]
 
   +-------------------------------------------------------------------------------------+
   | Commands:                                                                           |
@@ -554,7 +554,7 @@ Usage:
 
 ```bash
 Usage:
-  ./chip-tool-darwin ota software update provider command_name [param1 param2 ...]
+  ./chip-tool-darwin otasoftwareupdateprovider command_name [param1 param2 ...]
 
   +-------------------------------------------------------------------------------------+
   | Commands:                                                                           |
@@ -570,7 +570,7 @@ Usage:
 
 ```bash
 Usage:
-  ./chip-tool-darwin ota software update requestor command_name [param1 param2 ...]
+  ./chip-tool-darwin otasoftwareupdaterequestor command_name [param1 param2 ...]
 
   +-------------------------------------------------------------------------------------+
   | Commands:                                                                           |
@@ -603,20 +603,20 @@ Usage:
 
 ```bash
 Usage:
-  ./chip-tool-darwin operational credentials command_name [param1 param2 ...]
+  ./chip-tool-darwin operationalcredentials command_name [param1 param2 ...]
 
   +-------------------------------------------------------------------------------------+
   | Commands:                                                                           |
   +-------------------------------------------------------------------------------------+
-  | * add-n-o-c                                                                         |
+  | * add-noc                                                                           |
   | * add-trusted-root-certificate                                                      |
   | * attestation-request                                                               |
-  | * c-s-r-request                                                                     |
+  | * csrrequest                                                                        |
   | * certificate-chain-request                                                         |
   | * remove-fabric                                                                     |
   | * remove-trusted-root-certificate                                                   |
   | * update-fabric-label                                                               |
-  | * update-n-o-c                                                                      |
+  | * update-noc                                                                        |
   +-------------------------------------------------------------------------------------+
 ```
 
@@ -645,7 +645,7 @@ Usage:
 
 ```bash
 Usage:
-  ./chip-tool-darwin software diagnostics command_name [param1 param2 ...]
+  ./chip-tool-darwin softwarediagnostics command_name [param1 param2 ...]
 
   +-------------------------------------------------------------------------------------+
   | Commands:                                                                           |
@@ -659,7 +659,7 @@ Usage:
 
 ```bash
 Usage:
-  ./chip-tool-darwin target navigator command_name [param1 param2 ...]
+  ./chip-tool-darwin targetnavigator command_name [param1 param2 ...]
 
   +-------------------------------------------------------------------------------------+
   | Commands:                                                                           |
@@ -673,7 +673,7 @@ Usage:
 
 ```bash
 Usage:
-  ./chip-tool-darwin test cluster command_name [param1 param2 ...]
+  ./chip-tool-darwin testcluster command_name [param1 param2 ...]
 
   +-------------------------------------------------------------------------------------+
   | Commands:                                                                           |
@@ -683,8 +683,8 @@ Usage:
   | * test-add-arguments                                                                |
   | * test-emit-test-event-request                                                      |
   | * test-enums-request                                                                |
-  | * test-list-int8-u-argument-request                                                 |
-  | * test-list-int8-u-reverse-request                                                  |
+  | * test-list-int8uargument-request                                                   |
+  | * test-list-int8ureverse-request                                                    |
   | * test-list-nested-struct-list-argument-request                                     |
   | * test-list-struct-argument-request                                                 |
   | * test-nested-struct-argument-request                                               |
@@ -722,7 +722,7 @@ Usage:
 
 ```bash
 Usage:
-  ./chip-tool-darwin thread network diagnostics command_name [param1 param2 ...]
+  ./chip-tool-darwin threadnetworkdiagnostics command_name [param1 param2 ...]
 
   +-------------------------------------------------------------------------------------+
   | Commands:                                                                           |
@@ -736,7 +736,7 @@ Usage:
 
 ```bash
 Usage:
-  ./chip-tool-darwin wifi network diagnostics command_name [param1 param2 ...]
+  ./chip-tool-darwin wifinetworkdiagnostics command_name [param1 param2 ...]
 
   +-------------------------------------------------------------------------------------+
   | Commands:                                                                           |
@@ -750,7 +750,7 @@ Usage:
 
 ```bash
 Usage:
-  ./chip-tool-darwin window covering command_name [param1 param2 ...]
+  ./chip-tool-darwin windowcovering command_name [param1 param2 ...]
 
   +-------------------------------------------------------------------------------------+
   | Commands:                                                                           |
