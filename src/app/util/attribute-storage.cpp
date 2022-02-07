@@ -662,6 +662,16 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
     return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE; // Sorry, attribute was not found.
 }
 
+const EmberAfEndpointType * emberAfFindEndpointType(chip::EndpointId endpointId)
+{
+    uint16_t ep = emberAfIndexFromEndpoint(endpointId);
+    if (ep == 0xFFFF)
+    {
+        return nullptr;
+    }
+    return emAfEndpoints[ep].endpointType;
+}
+
 const EmberAfCluster * emberAfFindClusterInType(const EmberAfEndpointType * endpointType, ClusterId clusterId,
                                                 EmberAfClusterMask mask, uint8_t * index)
 {
