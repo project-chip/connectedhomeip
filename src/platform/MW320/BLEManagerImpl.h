@@ -24,6 +24,3 @@
  */
 
 #pragma once
-
-
-

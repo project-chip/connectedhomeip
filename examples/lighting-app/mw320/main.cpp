@@ -119,7 +119,7 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
     {
         return;
     }
-    
+
     if (*value)
     {
         test_led_on(0, NULL);
@@ -372,12 +372,12 @@ int wlan_event_callback(enum wlan_event_reason reason, void *data)
     struct wlan_ip_config addr;
     char ip[16];
     static int auth_fail = 0;
-    
+
     PRINTF("[%s] WLAN: received event %d\r\n", __FUNCTION__, reason);
     switch (reason)
     {
         case WLAN_REASON_INITIALIZED:
-            PRINTF("app_cb: WLAN initialized\r\n");           
+            PRINTF("app_cb: WLAN initialized\r\n");
             ret = dhcpd_cli_init();
             if (ret != WM_SUCCESS)
             {
@@ -476,7 +476,7 @@ int wlan_event_callback(enum wlan_event_reason reason, void *data)
                 PRINTF("Failed to get Soft AP network\r\n");
                 return 0;
             }
-            
+
             PRINTF("Soft AP \"%s\" started successfully\r\n", uap_network.ssid);
             if (dhcp_server_start(net_get_uap_handle()))
                 PRINTF("Error in starting dhcp server\r\n");
@@ -520,7 +520,7 @@ char network_netmask[15] = "255.255.255.0";
 const uint8_t kOptionalDefaultStringTag1       = 1;
 const uint8_t kOptionalDefaultStringTag2       = 2;
 const uint8_t kOptionalDefaultStringTag3       = 3;
-    
+
 std::string createSetupPayload()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -529,7 +529,7 @@ std::string createSetupPayload()
     std::string kOptionalDefaultStringValue2 = "SSID:";
     std::string kOptionalDefaultStringValue3 = "Key:";
     uint16_t discriminator;
-    
+
     kOptionalDefaultStringValue1.append( network_ip, sizeof(network_ip) );
     kOptionalDefaultStringValue2.append( ssid, sizeof(ssid) );
     kOptionalDefaultStringValue3.append( psk, sizeof(psk) );
@@ -539,7 +539,7 @@ std::string createSetupPayload()
         PRINTF("[%s]: Couldn't get discriminator: %s\r\n", __FUNCTION__, ErrorStr(err));
         return result;
     }
-    
+
     uint32_t setupPINCode;
     err = ConfigurationMgr().GetSetupPinCode(setupPINCode);
     if (err != CHIP_NO_ERROR)
@@ -547,7 +547,7 @@ std::string createSetupPayload()
         PRINTF("[%s]: Couldn't get setupPINCode: %s\r\n", __FUNCTION__, ErrorStr(err));
         return result;
     }
-    
+
     uint16_t vendorId;
     err = ConfigurationMgr().GetVendorId(vendorId);
     if (err != CHIP_NO_ERROR)
@@ -570,7 +570,7 @@ std::string createSetupPayload()
     payload.rendezvousInformation = RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE);
     payload.vendorID              = vendorId;
     payload.productID             = productId;
-    
+
     err = payload.addOptionalVendorData(kOptionalDefaultStringTag1, kOptionalDefaultStringValue1);
     if (err != CHIP_NO_ERROR)
     {
@@ -586,7 +586,7 @@ std::string createSetupPayload()
     {
         PRINTF("[%s]: Couldn't add payload Vnedor string %d \r\n", __FUNCTION__, kOptionalDefaultStringTag3);
     }
-    
+
     QRCodeSetupPayloadGenerator generator(payload);
     size_t tlvDataLen = sizeof(kOptionalDefaultStringValue1)+sizeof(kOptionalDefaultStringValue2)+sizeof(kOptionalDefaultStringValue3);
     uint8_t tlvDataStart[tlvDataLen];
@@ -603,7 +603,7 @@ void uAP_init(void)
 {
 	struct wlan_network network;
     int ret = 0;
-    
+
 	// add uAP profile
     memset(&network, 0, sizeof(struct wlan_network));
     memcpy(network.name, profile, strlen(profile));
@@ -617,7 +617,7 @@ void uAP_init(void)
 	network.ip.ipv4.addr_type = ADDR_TYPE_STATIC;
 
 	network.security.psk_len = strlen(psk);
-    strcpy(network.security.psk, psk);			
+    strcpy(network.security.psk, psk);
 	network.security.type = WLAN_SECURITY_WPA2;
 
 	network.role = WLAN_BSS_ROLE_UAP;
@@ -650,7 +650,7 @@ void uAP_init(void)
         PRINTF("Error: unable to start network\r\n");
 	else
 		PRINTF("start uAP ssid: %s\r\n", network.ssid);
-	
+
 }
 
 void gpio_init(void)
@@ -688,7 +688,7 @@ void ShellCLIMain(void * pvParameter)
     }
 
     ChipLogDetail(Shell, "Initializing CHIP shell commands: %d", rc);
-    
+
     chip::Platform::MemoryInit();
     chip::DeviceLayer::PlatformMgr().InitChipStack();
     ConfigurationMgr().LogDeviceConfig();
@@ -704,7 +704,7 @@ void ShellCLIMain(void * pvParameter)
     //cmd_send_init();
 
     ChipLogDetail(Shell, "Run CHIP shell Task: %d", rc);
-    
+
     mcuInitPower();
     boot_init();
     mflash_drv_init();
@@ -748,7 +748,7 @@ void ShellCLIMain(void * pvParameter)
 
     std::string qrCodeText = createSetupPayload();
     PRINTF("SetupQRCode: [%s]\r\n", qrCodeText.c_str());
-    
+
     // Init ZCL Data Model and CHIP App Server
     chip::Server::GetInstance().Init();
 
@@ -767,7 +767,7 @@ int StartShellTask(void)
     {
         ret = -1;
     }
-    
+
     return ret;
 }
 
@@ -775,30 +775,30 @@ int main(void)
 {
     char ch;
     unsigned int bp;
-    
+
     /* Initialize platform */
     //BOARD_ConfigMPU();
     BOARD_InitPins();
     BOARD_BootClockRUN();
-    
+
     BOARD_InitDebugConsole();
     PRINTF("\nMW320 uAP SSID=%s key=%s ip=%s \r\n", ssid, psk, network_ip);
-    
+
     CLOCK_EnableXtal32K(kCLOCK_Osc32k_External);
     CLOCK_AttachClk(kXTAL32K_to_RTC);
-    
+
     aesLock = xSemaphoreCreateRecursiveMutex();
     assert(aesLock != NULL);
-    
+
     AES_Init(APP_AES);
     AES_SetLockFunc(APP_AES_Lock, APP_AES_Unlock);
 	gpio_init();
-    
+
     StartShellTask();
 
     /* Start FreeRTOS */
     vTaskStartScheduler();
-    
+
     return 0;
 }
 

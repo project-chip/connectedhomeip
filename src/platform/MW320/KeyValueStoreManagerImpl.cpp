@@ -43,7 +43,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
                                           size_t offset_bytes)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    
+
 
     return err;
 }
@@ -51,7 +51,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
 CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-   
+
 
 
     return err;
@@ -60,7 +60,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
 CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    
+
 
 
     return err;
