@@ -92,7 +92,7 @@ static void TestDACProvidersExample_Providers(nlTestSuite * inSuite, void * inCo
     NL_TEST_ASSERT(inSuite, 0 == memcmp(pai_public_key.ConstBytes(), kExpectedPaiPublicKey.data(), kExpectedPaiPublicKey.size()));
 
     // Check for CD presence
-    uint8_t other_data_buf[541];
+    uint8_t other_data_buf[kMaxCMSSignedCDMessage];
     MutableByteSpan other_data_span(other_data_buf);
     memset(other_data_span.data(), 0, other_data_span.size());
 
