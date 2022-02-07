@@ -398,6 +398,18 @@ CHIP_ERROR DiscoveryImplPlatform::GetCommissionableInstanceName(char * instanceN
                                                      instanceName, maxLength);
 }
 
+void DiscoveryImplPlatform::HandleDnssdPublish(void * context, const char * type, CHIP_ERROR error)
+{
+    if (CHIP_NO_ERROR == error)
+    {
+        ChipLogProgress(Discovery, "mDNS service published: %s", type);
+    }
+    else
+    {
+        ChipLogProgress(Discovery, "mDNS service published error: %s", chip::ErrorStr(error));
+    }
+}
+
 CHIP_ERROR DiscoveryImplPlatform::PublishService(const char * serviceType, TextEntry * textEntries, size_t textEntrySize,
                                                  const char ** subTypes, size_t subTypeSize,
                                                  const OperationalAdvertisingParameters & params)
@@ -435,7 +447,7 @@ CHIP_ERROR DiscoveryImplPlatform::PublishService(const char * serviceType, TextE
     service.mSubTypes      = subTypes;
     service.mSubTypeSize   = subTypeSize;
 
-    ReturnErrorOnFailure(ChipDnssdPublishService(&service));
+    ReturnErrorOnFailure(ChipDnssdPublishService(&service, HandleDnssdPublish, this));
 
 #ifdef DETAIL_LOGGING
     printf("printEntries port=%u, mTextEntrySize=%zu, mSubTypeSize=%zu\n", port, textEntrySize, subTypeSize);
