@@ -591,8 +591,8 @@ public:
      * @param[in] attestationNonce    Attestation nonce
      * @param[in] pai                 PAI certificate
      * @param[in] dac                 DAC certificates
-     * @param[in] remoteVendorId      vendor ID read from the device
-     * @param[in] remoteProductId     product ID read from the device
+     * @param[in] remoteVendorId      vendor ID read from the device Basic Information cluster
+     * @param[in] remoteProductId     product ID read from the device Basic Information cluster
      * @param[in] proxy               device proxy that is being attested.
      */
     CHIP_ERROR ValidateAttestationInfo(const ByteSpan & attestationElements, const ByteSpan & signature,
