@@ -4081,6 +4081,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("application launcher list", 1, value);
         }
+        case ApplicationLauncher::Attributes::ApplicationLauncherApp::Id: {
+            chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("application launcher app", 1, value);
+        }
         case ApplicationLauncher::Attributes::ServerGeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -4550,6 +4555,16 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("channel list", 1, value);
+        }
+        case Channel::Attributes::ChannelLineup::Id: {
+            chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("channel lineup", 1, value);
+        }
+        case Channel::Attributes::CurrentChannel::Id: {
+            chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("current channel", 1, value);
         }
         case Channel::Attributes::ServerGeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -5845,6 +5860,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             uint64_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("duration", 1, value);
+        }
+        case MediaPlayback::Attributes::Position::Id: {
+            chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("position", 1, value);
         }
         case MediaPlayback::Attributes::PlaybackSpeed::Id: {
             float value;
