@@ -56,7 +56,7 @@
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
  *
- * 0x8005: example lighitng app
+ * 0x8005: example lighting app
  */
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8005
 
