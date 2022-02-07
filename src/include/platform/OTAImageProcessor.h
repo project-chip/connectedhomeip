@@ -33,21 +33,6 @@ struct OTAImageProcessorParams
     uint64_t totalFileBytes  = 0;
 };
 
-// TODO: Parse the header when the image is received
-struct OTAImageProcessorHeader
-{
-    uint16_t vendorId;
-    uint16_t productId;
-    uint32_t softwareVersion;
-    CharSpan softwareVersionString;
-    uint64_t payloadSize;
-    uint16_t minApplicableSoftwareVersion;
-    uint16_t maxApplicableSoftwareVersion;
-    CharSpan releaseNotesUrl;
-    uint8_t imageDigestType;
-    ByteSpan imageDigest;
-};
-
 /**
  * @class OTAImageProcessorInterface
  *
@@ -99,16 +84,11 @@ public:
     /**
      * Called to check the current download status of the OTA image download.
      */
-    virtual void GetPercentComplete(app::DataModel::Nullable<uint8_t> & percent)
+    virtual app::DataModel::Nullable<uint8_t> GetPercentComplete()
     {
-        if (mParams.totalFileBytes == 0)
-        {
-            percent.SetNull();
-        }
-        else
-        {
-            percent.SetNonNull(static_cast<uint8_t>((mParams.downloadedBytes * 100) / mParams.totalFileBytes));
-        }
+        return mParams.totalFileBytes > 0
+            ? app::DataModel::Nullable<uint8_t>(static_cast<uint8_t>((mParams.downloadedBytes * 100) / mParams.totalFileBytes))
+            : app::DataModel::Nullable<uint8_t>{};
     }
 
     /**
@@ -118,7 +98,6 @@ public:
 
 protected:
     OTAImageProcessorParams mParams;
-    OTAImageProcessorHeader mHeader;
 };
 
 } // namespace chip

@@ -47,4 +47,5 @@ config CHIP_OTA_REQUESTOR_BUFFER_SIZE
 # See config/zephyr/Kconfig for full definition
 config CHIP_OTA_IMAGE_BUILD
 	bool
+	default y if CHIP_OTA_REQUESTOR
 	depends on SIGN_IMAGES

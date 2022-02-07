@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <lib/core/OTAImageHeader.h>
 #include <lib/support/Span.h>
 #include <platform/OTAImageProcessor.h>
 
@@ -41,8 +42,10 @@ public:
 
 private:
     CHIP_ERROR PrepareDownloadImpl();
+    CHIP_ERROR ProcessHeader(ByteSpan & block);
 
     OTADownloader * mDownloader = nullptr;
+    OTAImageHeaderParser mHeaderParser;
     uint8_t mBuffer[kBufferSize];
 };
 
