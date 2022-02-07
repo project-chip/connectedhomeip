@@ -273,7 +273,7 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
                 {
                     continue;
                 }
-                // TODO(#14431): device type target not yet supported
+                // TODO(#14431): device type target not yet supported (add lookup/match when supported)
                 targetMatched = true;
                 break;
             }
@@ -293,6 +293,8 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
 
 bool AccessControl::IsValid(const Entry & entry)
 {
+    const char * msg = "unexpected error";
+
     AuthMode authMode;
     FabricIndex fabricIndex;
     Privilege privilege;
@@ -305,24 +307,17 @@ bool AccessControl::IsValid(const Entry & entry)
     SuccessOrExit(entry.GetSubjectCount(subjectCount));
     SuccessOrExit(entry.GetTargetCount(targetCount));
 
-    if (fabricIndex == kUndefinedFabricIndex)
-    {
-        ChipLogError(DataManagement, "AccessControl: invalid fabric index");
-        return false;
-    }
+    // Fabric index must be defined.
+    VerifyOrExit(fabricIndex != kUndefinedFabricIndex, msg = "invalid fabric index");
+
+    // Privilege must not be administer if auth mode is not CASE.
+    VerifyOrExit(authMode == AuthMode::kCase || privilege != Privilege::kAdminister, msg = "invalid privilege");
 
     // Operational PASE not supported for v1.0.
-    if (authMode != AuthMode::kCase && authMode != AuthMode::kGroup)
-    {
-        ChipLogError(DataManagement, "AccessControl: invalid auth mode");
-        return false;
-    }
+    VerifyOrExit(authMode == AuthMode::kCase || authMode == AuthMode::kGroup, msg = "invalid auth mode");
 
-    if (privilege == Privilege::kAdminister && authMode != AuthMode::kCase)
-    {
-        ChipLogError(DataManagement, "AccessControl: invalid privilege");
-        return false;
-    }
+    // Subject must be present if auth mode is not CASE.
+    VerifyOrExit(authMode == AuthMode::kCase || subjectCount > 0, msg = "invalid subject count");
 
     for (size_t i = 0; i < subjectCount; ++i)
     {
@@ -330,11 +325,7 @@ bool AccessControl::IsValid(const Entry & entry)
         SuccessOrExit(entry.GetSubject(i, subject));
         const bool kIsCase  = authMode == AuthMode::kCase;
         const bool kIsGroup = authMode == AuthMode::kGroup;
-        if ((kIsCase && !IsValidCaseNodeId(subject)) || (kIsGroup && !IsValidGroupNodeId(subject)))
-        {
-            ChipLogError(DataManagement, "AccessControl: invalid subject");
-            return false;
-        }
+        VerifyOrExit((kIsCase && IsValidCaseNodeId(subject)) || (kIsGroup && IsValidGroupNodeId(subject)), msg = "invalid subject");
     }
 
     for (size_t i = 0; i < targetCount; ++i)
@@ -344,25 +335,19 @@ bool AccessControl::IsValid(const Entry & entry)
         const bool kHasCluster    = target.flags & Entry::Target::kCluster;
         const bool kHasEndpoint   = target.flags & Entry::Target::kEndpoint;
         const bool kHasDeviceType = target.flags & Entry::Target::kDeviceType;
-        if ((!kHasCluster && !kHasEndpoint && !kHasDeviceType) || (kHasEndpoint && kHasDeviceType) ||
-            (kHasCluster && !IsValidClusterId(target.cluster)) || (kHasEndpoint && !IsValidEndpointId(target.endpoint)) ||
-            (kHasDeviceType && !IsValidDeviceTypeId(target.deviceType)))
-        {
-            ChipLogError(DataManagement, "AccessControl: invalid target");
-            return false;
-        }
-        // TODO(#14431): device type target not yet supported
-        if (kHasDeviceType)
-        {
-            ChipLogError(DataManagement, "AccessControl: device type target not yet supported");
-            return false;
-        }
+        VerifyOrExit((kHasCluster || kHasEndpoint || kHasDeviceType) && !(kHasEndpoint && kHasDeviceType) &&
+                         (!kHasCluster || IsValidClusterId(target.cluster)) &&
+                         (!kHasEndpoint || IsValidEndpointId(target.endpoint)) &&
+                         (!kHasDeviceType || IsValidDeviceTypeId(target.deviceType)),
+                     msg = "invalid target");
+        // TODO(#14431): device type target not yet supported (remove check when supported)
+        VerifyOrExit(!kHasDeviceType, msg = "device type target not yet supported");
     }
 
     return true;
 
 exit:
-    ChipLogError(DataManagement, "AccessControl: unexpected error");
+    ChipLogError(DataManagement, "AccessControl: %s", msg);
     return false;
 }
 
