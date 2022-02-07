@@ -44,6 +44,7 @@ void JniReferences::SetJavaVm(JavaVM * jvm, const char * clsType)
     mFindClassMethod = env->GetMethodID(classLoaderClass, "findClass", "(Ljava/lang/String;)Ljava/lang/Class;");
 
     chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", mArrayListClass);
+    chip::JniReferences::GetInstance().GetClassRef(env, "java/util/HashMap", mHashMapClass);
 }
 
 JNIEnv * JniReferences::GetEnvForCurrentThread()
@@ -315,6 +316,32 @@ CHIP_ERROR JniReferences::AddToArrayList(jobject list, jobject objectToAdd)
     VerifyOrReturnError(addMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
     env->CallBooleanMethod(list, addMethod, objectToAdd);
+    VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
+    return err;
+}
+
+CHIP_ERROR JniReferences::CreateHashMap(jobject & outMap)
+{
+    JNIEnv * env   = GetEnvForCurrentThread();
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    jmethodID hashMapCtor = env->GetMethodID(mHashMapClass, "<init>", "()V");
+    VerifyOrReturnError(hashMapCtor != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
+    outMap = env->NewObject(mHashMapClass, hashMapCtor);
+    VerifyOrReturnError(outMap != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
+
+    return err;
+}
+
+CHIP_ERROR JniReferences::PutInMap(jobject map, jobject key, jobject value)
+{
+    JNIEnv * env   = GetEnvForCurrentThread();
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    jmethodID putMethod = env->GetMethodID(mHashMapClass, "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
+    VerifyOrReturnError(putMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
+
+    env->CallObjectMethod(map, putMethod, key, value);
     VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
     return err;
 }

@@ -880,9 +880,6 @@ CHIP_ERROR BLEEndPoint::HandleFragmentConfirmationReceived()
     // Ensure we're in correct state to receive confirmation of non-handshake GATT send.
     VerifyOrExit(IsConnected(mState), err = CHIP_ERROR_INCORRECT_STATE);
 
-    // TODO Packet buffer high water mark optimization: if ack pending, but fragmenter state == complete, free fragmenter's
-    // tx buf before sending ack.
-
     if (mConnStateFlags.Has(ConnectionStateFlag::kStandAloneAckInFlight))
     {
         // If confirmation was received for stand-alone ack, free its tx buffer.

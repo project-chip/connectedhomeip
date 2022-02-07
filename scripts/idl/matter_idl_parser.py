@@ -56,12 +56,16 @@ class MatterIdlTransformer(Transformer):
             raise Error("Unexpected size for data type")
 
     @v_args(inline=True)
-    def enum_entry(self, id, number):
-        return EnumEntry(name=id, code=number)
+    def constant_entry(self, id, number):
+        return ConstantEntry(name=id, code=number)
 
     @v_args(inline=True)
     def enum(self, id, type, *entries):
         return Enum(name=id, base_type=type, entries=list(entries))
+
+    @v_args(inline=True)
+    def bitmap(self, id, type, *entries):
+        return Bitmap(name=id, base_type=type, entries=list(entries))
 
     def field(self, args):
         data_type, name = args[0], args[1]
@@ -183,6 +187,8 @@ class MatterIdlTransformer(Transformer):
         for item in content:
             if type(item) == Enum:
                 result.enums.append(item)
+            elif type(item) == Bitmap:
+                result.bitmaps.append(item)
             elif type(item) == Event:
                 result.events.append(item)
             elif type(item) == Attribute:
@@ -192,7 +198,7 @@ class MatterIdlTransformer(Transformer):
             elif type(item) == Command:
                 result.commands.append(item)
             else:
-                raise Error("UNKNOWN cluster content item: %r" % item)
+                raise Exception("UNKNOWN cluster content item: %r" % item)
 
         return result
 
@@ -209,7 +215,7 @@ class MatterIdlTransformer(Transformer):
             elif type(item) == Endpoint:
                 idl.endpoints.append(item)
             else:
-                raise Error("UNKNOWN idl content item: %r" % item)
+                raise Exception("UNKNOWN idl content item: %r" % item)
 
         return idl
 

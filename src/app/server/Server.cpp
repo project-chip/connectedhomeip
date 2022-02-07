@@ -17,6 +17,8 @@
 
 #include <app/server/Server.h>
 
+#include <access/examples/ExampleAccessControlDelegate.h>
+
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
 #include <app/server/Dnssd.h>
@@ -87,13 +89,12 @@ Server::Server() :
             .idAllocator    = &mSessionIDAllocator,
             .fabricTable    = &mFabrics,
             .clientPool     = &mCASEClientPool,
-            .imDelegate     = nullptr,
         },
         .dnsCache          = nullptr,
         .devicePool        = &mDevicePool,
         .dnsResolver       = nullptr,
     }), mCommissioningWindowManager(this), mGroupsProvider(mDeviceStorage),
-    mAttributePersister(mDeviceStorage)
+    mAttributePersister(mDeviceStorage), mAccessControl(Access::Examples::GetAccessControlDelegate(&mDeviceStorage))
 {}
 
 CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint16_t unsecureServicePort)
@@ -128,6 +129,11 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     err = mGroupsProvider.Init();
     SuccessOrExit(err);
     SetGroupDataProvider(&mGroupsProvider);
+
+    // Access control must be initialized after mDeviceStorage.
+    err = mAccessControl.Init();
+    SuccessOrExit(err);
+    Access::SetAccessControl(mAccessControl);
 
     // Init transport before operations with secure session mgr.
     err = mTransports.Init(UdpListenParameters(DeviceLayer::UDPEndPointManager())

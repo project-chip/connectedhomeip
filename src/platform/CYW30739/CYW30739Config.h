@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019-2020 Google LLC.
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
@@ -42,14 +42,17 @@ public:
 
     // Key definitions for well-known keys.
     // Factory config keys
-    static constexpr Key kConfigKey_SerialNum           = 0;
-    static constexpr Key kConfigKey_MfrDeviceId         = 1;
-    static constexpr Key kConfigKey_MfrDeviceCert       = 2;
-    static constexpr Key kConfigKey_MfrDevicePrivateKey = 3;
-    static constexpr Key kConfigKey_ManufacturingDate   = 4;
-    static constexpr Key kConfigKey_SetupPinCode        = 5;
-    static constexpr Key kConfigKey_MfrDeviceICACerts   = 6;
-    static constexpr Key kConfigKey_SetupDiscriminator  = 7;
+    static constexpr Key kConfigKey_SerialNum             = 0;
+    static constexpr Key kConfigKey_MfrDeviceId           = 1;
+    static constexpr Key kConfigKey_MfrDeviceCert         = 2;
+    static constexpr Key kConfigKey_MfrDevicePrivateKey   = 3;
+    static constexpr Key kConfigKey_ManufacturingDate     = 4;
+    static constexpr Key kConfigKey_SetupPinCode          = 5;
+    static constexpr Key kConfigKey_MfrDeviceICACerts     = 6;
+    static constexpr Key kConfigKey_SetupDiscriminator    = 7;
+    static constexpr Key kConfigKey_Spake2pIterationCount = 8;
+    static constexpr Key kConfigKey_Spake2pSalt           = 9;
+    static constexpr Key kConfigKey_Spake2pVerifier       = 10;
     // CHIP Config Keys
     static constexpr Key kConfigKey_FabricId           = 8;
     static constexpr Key kConfigKey_ServiceConfig      = 9;

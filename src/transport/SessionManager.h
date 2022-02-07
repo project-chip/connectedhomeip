@@ -251,7 +251,7 @@ private:
 
     SessionMessageDelegate * mCB = nullptr;
 
-    BitMapObjectPool<std::reference_wrapper<SessionRecoveryDelegate>, CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES>
+    ObjectPool<std::reference_wrapper<SessionRecoveryDelegate>, CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES>
         mSessionRecoveryDelegates;
 
     TransportMgrBase * mTransportMgr                                   = nullptr;

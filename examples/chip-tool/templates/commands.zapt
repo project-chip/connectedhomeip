@@ -24,7 +24,7 @@
 class {{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}: public ClusterCommand
 {
 public:
-    {{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}(): ClusterCommand("{{asDelimitedCommand name}}"){{#chip_cluster_command_arguments}}{{#if isComplex}}, mComplex_{{asUpperCamelCase label}}(&mRequest.{{asLowerCamelCase label}}){{/if}}{{/chip_cluster_command_arguments}}
+    {{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}(CredentialIssuerCommands * credsIssuerConfig): ClusterCommand("{{asDelimitedCommand name}}", credsIssuerConfig){{#chip_cluster_command_arguments}}{{#if isComplex}}, mComplex_{{asUpperCamelCase label}}(&mRequest.{{asLowerCamelCase label}}){{/if}}{{/chip_cluster_command_arguments}}
     {
         {{#chip_cluster_command_arguments}}
         {{~#*inline "field"}}mRequest.{{asLowerCamelCase label}}{{/inline~}}
@@ -33,15 +33,7 @@ public:
         {{else if (isString type)}}
         AddArgument("{{asUpperCamelCase label}}", &{{>field}});
         {{else}}
-        AddArgument("{{asUpperCamelCase label}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}},
-          {{~#if isNullable}}&{{>field}}
-          {{else}}
-            {{~#if ./isEnum}}reinterpret_cast<std::underlying_type_t<decltype({{>field}})> *>(&{{>field}})
-            {{else ./isBitmap}}reinterpret_cast<std::underlying_type_t<chip::app::Clusters::{{asUpperCamelCase parent.clusterName}}::{{asUpperCamelCase type}}> *>(&{{>field}})
-            {{else}}&{{>field}}
-            {{/if~}}
-          {{/if~}}
-        );
+        AddArgument("{{asUpperCamelCase label}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &{{>field}});
         {{/if}}
         {{/chip_cluster_command_arguments}}
         ClusterCommand::AddArguments();
@@ -66,13 +58,11 @@ private:
 {{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
-{{! TODO: Various types (floats, structs) not supported here. }}
-{{#unless (isStrEqual chipCallback.name "Unsupported")}}
 {{#if isWritableAttribute}}
 class Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public WriteAttribute
 {
 public:
-    Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): WriteAttribute("{{asUpperCamelCase name}}"){{#if isComplex}}, mComplex(&mValue){{/if}}
+    Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(CredentialIssuerCommands * credsIssuerConfig): WriteAttribute("{{asUpperCamelCase name}}", credsIssuerConfig){{#if isComplex}}, mComplex(&mValue){{/if}}
     {
         AddArgument("attr-name", "{{asDelimitedCommand (asUpperCamelCase name)}}");
         {{#if isComplex}}
@@ -100,7 +90,6 @@ private:
 };
 
 {{/if}}
-{{/unless}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
 
@@ -108,7 +97,7 @@ private:
 | Register all Clusters commands                                               |
 \*----------------------------------------------------------------------------*/
 {{#chip_client_clusters}}
-void registerCluster{{asUpperCamelCase name}}(Commands & commands)
+void registerCluster{{asUpperCamelCase name}}(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::{{asUpperCamelCase name}};
 
@@ -118,42 +107,39 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
         {{#chip_cluster_commands}}
-        make_unique<{{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}>(), //
+        make_unique<{{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}>(credsIssuerConfig), //
         {{/chip_cluster_commands}}
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id), //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig), //
         {{#chip_server_cluster_attributes}}
-        make_unique<ReadAttribute>(Id, "{{asDelimitedCommand (asUpperCamelCase name)}}", Attributes::{{asUpperCamelCase name}}::Id), //
+        make_unique<ReadAttribute>(Id, "{{asDelimitedCommand (asUpperCamelCase name)}}", Attributes::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
         {{/chip_server_cluster_attributes}}
-        make_unique<WriteAttribute>(Id), //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig), //
         {{#chip_server_cluster_attributes}}
-        {{! TODO: Various types (floats, structs) not supported here. }}
-        {{#unless (isStrEqual chipCallback.name "Unsupported")}}
         {{#if isWritableAttribute}}
-        make_unique<Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
+        make_unique<Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(credsIssuerConfig), //
         {{/if}}
-        {{/unless}}
         {{/chip_server_cluster_attributes}}
-        make_unique<SubscribeAttribute>(Id), //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig), //
         {{#chip_server_cluster_attributes}}
         {{#if isReportableAttribute}}
-        make_unique<SubscribeAttribute>(Id, "{{asDelimitedCommand (asUpperCamelCase name)}}", Attributes::{{asUpperCamelCase name}}::Id), //
+        make_unique<SubscribeAttribute>(Id, "{{asDelimitedCommand (asUpperCamelCase name)}}", Attributes::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
         {{/if}}
         {{/chip_server_cluster_attributes}}
         //
         // Events
         //
-        make_unique<ReadEvent>(Id), //
+        make_unique<ReadEvent>(Id, credsIssuerConfig), //
         {{#chip_server_cluster_events}}
-        make_unique<ReadEvent>(Id, "{{asDelimitedCommand (asUpperCamelCase name)}}", Events::{{asUpperCamelCase name}}::Id), //
+        make_unique<ReadEvent>(Id, "{{asDelimitedCommand (asUpperCamelCase name)}}", Events::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
         {{/chip_server_cluster_events}}
-        make_unique<SubscribeEvent>(Id), //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
         {{#chip_server_cluster_events}}
-        make_unique<SubscribeEvent>(Id, "{{asDelimitedCommand (asUpperCamelCase name)}}", Events::{{asUpperCamelCase name}}::Id), //
+        make_unique<SubscribeEvent>(Id, "{{asDelimitedCommand (asUpperCamelCase name)}}", Events::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
         {{/chip_server_cluster_events}}
     };
 
@@ -161,26 +147,26 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
 }
 {{/chip_client_clusters}}
 
-void registerClusterAny(Commands & commands)
+void registerClusterAny(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     const char * clusterName = "Any";
 
     commands_list clusterCommands = {
-        make_unique<ClusterCommand>(),  //
-        make_unique<ReadAttribute>(),   //
-        make_unique<WriteAttribute>(),  //
-        make_unique<SubscribeAttribute>(), //
-        make_unique<ReadEvent>(),       //
-        make_unique<SubscribeEvent>(),     //
+        make_unique<ClusterCommand>(credsIssuerConfig),  //
+        make_unique<ReadAttribute>(credsIssuerConfig),   //
+        make_unique<WriteAttribute>(credsIssuerConfig),  //
+        make_unique<SubscribeAttribute>(credsIssuerConfig), //
+        make_unique<ReadEvent>(credsIssuerConfig),       //
+        make_unique<SubscribeEvent>(credsIssuerConfig),     //
     };
 
     commands.Register(clusterName, clusterCommands);
 }
 
-void registerClusters(Commands & commands)
+void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    registerClusterAny(commands);
+    registerClusterAny(commands, credsIssuerConfig);
 {{#chip_client_clusters}}
-    registerCluster{{asUpperCamelCase name}}(commands);
+    registerCluster{{asUpperCamelCase name}}(commands, credsIssuerConfig);
 {{/chip_client_clusters}}
 }

@@ -117,6 +117,6 @@ struct ReliableMessageProtocolConfig
     System::Clock::Milliseconds32 mActiveRetransTimeout;
 };
 
-extern const ReliableMessageProtocolConfig gDefaultMRPConfig;
+ReliableMessageProtocolConfig GetLocalMRPConfig();
 
 } // namespace chip

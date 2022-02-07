@@ -25,6 +25,7 @@
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/core/CHIPTLVUtilities.hpp>
 #include <lib/support/ErrorStr.h>
+#include <lib/support/TestGroupData.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <messaging/ExchangeContext.h>
@@ -270,7 +271,6 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
 
             app::WriteHandler writeHandler;
 
-            chip::app::InteractionModelDelegate IMdelegate;
             System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
             err                            = writeHandler.Init();
 
@@ -418,12 +418,6 @@ void TestWriteInteraction::TestWriteRoundtrip(nlTestSuite * apSuite, void * apCo
 
 namespace {
 
-constexpr uint16_t kMaxGroupsPerFabric    = 5;
-constexpr uint16_t kMaxGroupKeysPerFabric = 8;
-
-static chip::TestPersistentStorageDelegate sDelegate;
-static chip::Credentials::GroupDataProviderImpl sProvider(sDelegate, kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
-
 /**
  *   Test Suite. It lists all the test functions.
  */
@@ -447,12 +441,11 @@ const nlTest sTests[] =
  */
 int Test_Setup(void * inContext)
 {
-    SetGroupDataProvider(&sProvider);
     VerifyOrReturnError(CHIP_NO_ERROR == chip::Platform::MemoryInit(), FAILURE);
-    VerifyOrReturnError(CHIP_NO_ERROR == sProvider.Init(), FAILURE);
-
 
     VerifyOrReturnError(TestContext::Initialize(inContext) == SUCCESS, FAILURE);
+
+    VerifyOrReturnError(CHIP_NO_ERROR == chip::GroupTesting::InitGroupData(), FAILURE);
 
     return SUCCESS;
 }

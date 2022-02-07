@@ -153,6 +153,12 @@ public:
     /// Set whether there is a message hasn't been acknowledged.
     void SetMessageNotAcked(bool messageNotAcked);
 
+    /// Set if this exchange is requesting Sleepy End Device fast-polling mode
+    void SetRequestingFastPollingMode(bool fastPollingMode);
+
+    /// Determine whether this exchange is requesting Sleepy End Device fast-polling mode
+    bool IsRequestingFastPollingMode() const;
+
     /**
      * Get the reliable message manager that corresponds to this reliable
      * message context.
@@ -194,8 +200,12 @@ protected:
 
         /// When set, signifies that we are currently in the middle of HandleMessage.
         kFlagHandlingMessage = (1u << 9),
+
         /// When set, we have had Close() or Abort() called on us already.
         kFlagClosed = (1u << 10),
+
+        /// When set, signifies that the exchange is requesting Sleepy End Device fast-polling mode.
+        kFlagFastPollingMode = (1u << 11),
     };
 
     BitFlags<Flags> mFlags; // Internal state flags
@@ -258,6 +268,11 @@ inline bool ReliableMessageContext::HasPiggybackAckPending() const
     return mFlags.Has(Flags::kFlagAckMessageCounterIsValid);
 }
 
+inline bool ReliableMessageContext::IsRequestingFastPollingMode() const
+{
+    return mFlags.Has(Flags::kFlagFastPollingMode);
+}
+
 inline void ReliableMessageContext::SetAutoRequestAck(bool autoReqAck)
 {
     mFlags.Set(Flags::kFlagAutoRequestAck, autoReqAck);
@@ -281,6 +296,11 @@ inline void ReliableMessageContext::SetDropAckDebug(bool inDropAckDebug)
 inline void ReliableMessageContext::SetMessageNotAcked(bool messageNotAcked)
 {
     mFlags.Set(Flags::kFlagMesageNotAcked, messageNotAcked);
+}
+
+inline void ReliableMessageContext::SetRequestingFastPollingMode(bool fastPollingMode)
+{
+    mFlags.Set(Flags::kFlagFastPollingMode, fastPollingMode);
 }
 
 } // namespace Messaging

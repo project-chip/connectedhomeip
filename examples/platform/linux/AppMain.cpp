@@ -33,8 +33,6 @@
 #include <credentials/examples/DefaultDeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
-#include <access/examples/ExampleAccessControlDelegate.h>
-
 #include <lib/support/CHIPMem.h>
 #include <lib/support/ScopedBuffer.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
@@ -66,27 +64,6 @@ using namespace chip::DeviceLayer;
 using namespace chip::Inet;
 using namespace chip::Transport;
 
-class GeneralStorageDelegate : public PersistentStorageDelegate
-{
-    CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
-    {
-        ChipLogProgress(NotSpecified, "Retrieved value from general storage.");
-        return PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size);
-    }
-
-    CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
-    {
-        ChipLogProgress(NotSpecified, "Stored value in general storage");
-        return PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
-    }
-
-    CHIP_ERROR SyncDeleteKeyValue(const char * key) override
-    {
-        ChipLogProgress(NotSpecified, "Delete value in general storage");
-        return PersistedStorage::KeyValueStoreMgr().Delete(key);
-    }
-};
-
 #if defined(ENABLE_CHIP_SHELL)
 using chip::Shell::Engine;
 #endif
@@ -111,8 +88,6 @@ void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
         ChipLogProgress(DeviceLayer, "Receive kCHIPoBLEConnectionEstablished");
     }
 }
-
-GeneralStorageDelegate gAclStorageDelegate;
 } // namespace
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -160,8 +135,6 @@ int ChipLinuxAppInit(int argc, char ** argv)
     ConfigurationMgr().LogDeviceConfig();
 
     PrintOnboardingCodes(LinuxDeviceOptions::GetInstance().payload);
-
-    Access::Examples::SetAccessControlDelegateStorage(&gAclStorageDelegate);
 
 #if defined(PW_RPC_ENABLED)
     rpc::Init();
@@ -323,7 +296,7 @@ CHIP_ERROR ShutdownCommissioner()
 class PairingCommand : public Controller::DevicePairingDelegate, public Controller::DeviceAddressUpdateDelegate
 {
 public:
-    PairingCommand() : mSuccessCallback(OnSuccessResponse, this), mFailureCallback(OnFailureResponse, this){};
+    PairingCommand(){};
 
     /////////// DevicePairingDelegate Interface /////////
     void OnStatusUpdate(Controller::DevicePairingDelegate::Status status) override;
@@ -337,12 +310,9 @@ public:
     CHIP_ERROR UpdateNetworkAddress();
 
     /* Callback when command results in success */
-    static void OnSuccessResponse(void * context);
+    static void OnSuccessResponse(void * context, const chip::app::DataModel::NullObjectType &);
     /* Callback when command results in failure */
-    static void OnFailureResponse(void * context, uint8_t status);
-
-    Callback::Callback<DefaultSuccessCallback> mSuccessCallback;
-    Callback::Callback<DefaultFailureCallback> mFailureCallback;
+    static void OnFailureResponse(void * context, CHIP_ERROR error);
 };
 
 PairingCommand gPairingCommand;
@@ -401,12 +371,12 @@ void PairingCommand::OnPairingDeleted(CHIP_ERROR err)
     }
 }
 
-void PairingCommand::OnSuccessResponse(void * context)
+void PairingCommand::OnSuccessResponse(void * context, const chip::app::DataModel::NullObjectType &)
 {
     ChipLogProgress(Controller, "OnSuccessResponse");
 }
 
-void PairingCommand::OnFailureResponse(void * context, uint8_t status)
+void PairingCommand::OnFailureResponse(void * context, CHIP_ERROR error)
 {
     ChipLogProgress(Controller, "OnFailureResponse");
 }
@@ -423,15 +393,12 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
         // - the cluster(s) chosen should come from the App Platform
         constexpr EndpointId kBindingClusterEndpoint = 0;
 
-        Callback::Cancelable * successCallback = mSuccessCallback.Cancel();
-        Callback::Cancelable * failureCallback = mFailureCallback.Cancel();
-
         GroupId groupId       = kUndefinedGroupId;
         EndpointId endpointId = 1;
         ClusterId clusterId   = kInvalidClusterId;
 
         gCommissioner.CreateBindingWithCallback(nodeId, kBindingClusterEndpoint, gLocalId, groupId, endpointId, clusterId,
-                                                successCallback, failureCallback);
+                                                OnSuccessResponse, OnFailureResponse);
     }
     else
     {

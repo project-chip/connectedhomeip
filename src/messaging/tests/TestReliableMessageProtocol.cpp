@@ -330,7 +330,6 @@ void CheckFailedMessageRetainOnSend(nlTestSuite * inSuite, void * inContext)
     });
 
     mockSender.mMessageDispatch.mRetainMessageOnSend = false;
-
     // Let's drop the initial message
     gLoopback.mSentMessageCount    = 0;
     gLoopback.mNumMessagesToDrop   = 1;
@@ -1347,8 +1346,8 @@ void CheckLostStandaloneAck(nlTestSuite * inSuite, void * inContext)
 int InitializeTestCase(void * inContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(inContext);
-    ctx.GetSessionAliceToBob()->AsSecureSession()->SetMRPConfig(gDefaultMRPConfig);
-    ctx.GetSessionBobToAlice()->AsSecureSession()->SetMRPConfig(gDefaultMRPConfig);
+    ctx.GetSessionAliceToBob()->AsSecureSession()->SetMRPConfig(GetLocalMRPConfig());
+    ctx.GetSessionBobToAlice()->AsSecureSession()->SetMRPConfig(GetLocalMRPConfig());
     return SUCCESS;
 }
 
