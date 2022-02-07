@@ -121,7 +121,7 @@ var endpointClusterWithInit = [
   'Time Format Localization',
   'Thermostat',
 ];
-var endpointClusterWithAttributeChanged = [ 'Identify', 'Door Lock', 'Pump Configuration and Control' ];
+var endpointClusterWithAttributeChanged = [ 'Bridged Device Basic', 'Door Lock', 'Identify', 'Pump Configuration and Control' ];
 var endpointClusterWithPreAttribute     = [
   'IAS Zone', 'Door Lock', 'Thermostat User Interface Configuration', 'Time Format Localization', 'Localization Configuration'
 ];
