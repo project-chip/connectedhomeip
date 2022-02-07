@@ -224,7 +224,7 @@ CHIP_ERROR MessageCounterManager::SendMsgCounterSyncResp(Messaging::ExchangeCont
     System::PacketBufferHandle msgBuf;
     VerifyOrDie(exchangeContext->HasSessionHandle());
 
-    VerifyOrReturnError(exchangeContext->GetSessionHandle()->GetSessionType() == Transport::Session::SessionType::kGroupSession,
+    VerifyOrReturnError(exchangeContext->GetSessionHandle()->GetSessionType() == Transport::Session::SessionType::kGroup,
                         CHIP_ERROR_INVALID_ARGUMENT);
 
     // NOTE: not currently implemented. When implementing, the following should be done:
