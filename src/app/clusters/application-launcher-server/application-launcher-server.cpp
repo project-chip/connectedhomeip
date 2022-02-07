@@ -234,7 +234,7 @@ bool emberAfApplicationLauncherClusterLaunchAppRequestCallback(app::CommandHandl
         if (delegate->HasFeature(ApplicationLauncherFeature::kApplicationPlatform))
         {
             ChipLogError(Zcl, "ApplicationLauncher has content platform feature");
-            ContentApp * app = ContentAppPlatform::GetInstance().LoadContentApp(vendorApp);
+            ContentApp * app = ContentAppPlatform::GetInstance().LoadContentApp(&vendorApp);
             if (app == nullptr)
             {
                 ChipLogError(Zcl, "ApplicationLauncher target app not found");
@@ -265,7 +265,7 @@ bool emberAfApplicationLauncherClusterLaunchAppRequestCallback(app::CommandHandl
         }
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-        ContentApp * app = ContentAppPlatform::GetInstance().LoadContentApp(vendorApp);
+        ContentApp * app = ContentAppPlatform::GetInstance().LoadContentApp(&vendorApp);
         if (app != nullptr)
         {
             ContentAppPlatform::GetInstance().SetCurrentApp(app);
@@ -314,7 +314,7 @@ bool emberAfApplicationLauncherClusterStopAppRequestCallback(app::CommandHandler
         if (delegate->HasFeature(ApplicationLauncherFeature::kApplicationPlatform))
         {
             ChipLogError(Zcl, "ApplicationLauncher has content platform feature");
-            ContentApp * app = ContentAppPlatform::GetInstance().LoadContentApp(vendorApp);
+            ContentApp * app = ContentAppPlatform::GetInstance().LoadContentApp(&vendorApp);
             if (app == nullptr)
             {
                 ChipLogError(Zcl, "ApplicationLauncher target app not loaded");
@@ -342,7 +342,7 @@ bool emberAfApplicationLauncherClusterStopAppRequestCallback(app::CommandHandler
         ChipLogError(Zcl, "ApplicationLauncher no content platform feature");
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-        ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(vendorApp);
+        ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(&vendorApp);
         if (app != nullptr)
         {
             ContentAppPlatform::GetInstance().UnsetIfCurrentApp(app);
@@ -397,7 +397,7 @@ bool emberAfApplicationLauncherClusterHideAppRequestCallback(app::CommandHandler
         if (delegate->HasFeature(ApplicationLauncherFeature::kApplicationPlatform))
         {
             ChipLogError(Zcl, "ApplicationLauncher has content platform feature");
-            ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(vendorApp);
+            ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(&vendorApp);
             if (app == nullptr)
             {
                 ChipLogError(Zcl, "ApplicationLauncher target app not loaded");
@@ -422,7 +422,7 @@ bool emberAfApplicationLauncherClusterHideAppRequestCallback(app::CommandHandler
         ChipLogError(Zcl, "ApplicationLauncher no content platform feature");
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-        ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(vendorApp);
+        ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(&vendorApp);
         if (app != nullptr)
         {
             ContentAppPlatform::GetInstance().UnsetIfCurrentApp(app);
