@@ -38,6 +38,8 @@ CHIP_ERROR WriteHandler::Init()
 
     MoveToState(State::Initialized);
 
+    mACLCheckCache.ClearValue();
+
     return CHIP_NO_ERROR;
 }
 

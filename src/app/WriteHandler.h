@@ -17,6 +17,7 @@
  */
 
 #pragma once
+#include <app/AttributeAccessToken.h>
 #include <app/AttributePathParams.h>
 #include <app/MessageDef/WriteResponseMessage.h>
 #include <lib/core/CHIPCore.h>
@@ -104,6 +105,13 @@ public:
         return !IsFree() && mpExchangeCtx == apExchangeContext;
     }
 
+    void CacheACLCheckResult(const AttributeAccessToken & aToken) { mACLCheckCache.SetValue(aToken); }
+
+    bool ACLCheckCacheHit(const AttributeAccessToken & aToken)
+    {
+        return mACLCheckCache.HasValue() && mACLCheckCache.Value() == aToken;
+    }
+
 private:
     enum class State
     {
@@ -136,9 +144,10 @@ private:
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     WriteResponseMessage::Builder mWriteResponseBuilder;
     System::PacketBufferTLVWriter mMessageWriter;
-    State mState         = State::Uninitialized;
-    bool mIsTimedRequest = false;
-    bool mHasMoreChunks  = false;
+    State mState                                  = State::Uninitialized;
+    bool mIsTimedRequest                          = false;
+    bool mHasMoreChunks                           = false;
+    Optional<AttributeAccessToken> mACLCheckCache = NullOptional;
 };
 } // namespace app
 } // namespace chip

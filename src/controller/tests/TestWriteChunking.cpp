@@ -204,7 +204,8 @@ void TestWriteChunking::TestListChunking(nlTestSuite * apSuite, void * apContext
             ctx.DrainAndServiceIO();
         }
 
-        NL_TEST_ASSERT(apSuite, writeCallback.mSuccessCount == kTestListLength);
+        NL_TEST_ASSERT(apSuite,
+                       writeCallback.mSuccessCount == kTestListLength + 1 /* an extra item for the empty list at the beginning */);
         NL_TEST_ASSERT(apSuite, writeCallback.mErrorCount == 0);
         NL_TEST_ASSERT(apSuite, writeCallback.mOnDoneCount == 1);
 
@@ -283,7 +284,8 @@ void TestWriteChunking::TestBadChunking(nlTestSuite * apSuite, void * apContext)
             ctx.DrainAndServiceIO();
         }
 
-        NL_TEST_ASSERT(apSuite, writeCallback.mSuccessCount == kTestListLength);
+        NL_TEST_ASSERT(apSuite,
+                       writeCallback.mSuccessCount == kTestListLength + 1 /* an extra item for the empty list at the beginning */);
         NL_TEST_ASSERT(apSuite, writeCallback.mErrorCount == 0);
         NL_TEST_ASSERT(apSuite, writeCallback.mOnDoneCount == 1);
 

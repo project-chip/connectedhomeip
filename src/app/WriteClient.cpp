@@ -283,32 +283,6 @@ CHIP_ERROR WriteClient::PutSinglePreencodedAttributeWritePayload(const chip::app
     return err;
 }
 
-CHIP_ERROR WriteClient::TryPutPreencodedAttributeWriteFirstListItem(const ConcreteDataAttributePath & attributePath,
-                                                                    const TLV::TLVReader & data)
-{
-    chip::TLV::TLVWriter * writer = nullptr;
-    TLV::TLVReader dataReader;
-    TLV::TLVType outerType;
-
-    ReturnErrorOnFailure(PrepareAttributeIB(attributePath));
-    VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(writer->StartContainer(TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)),
-                                                TLV::TLVType::kTLVType_Array, outerType));
-    dataReader.Init(data);
-    CHIP_ERROR err = dataReader.Next();
-    if (err == CHIP_NO_ERROR)
-    {
-        ReturnErrorOnFailure(writer->CopyElement(dataReader));
-    }
-    else if (err != CHIP_END_OF_TLV)
-    {
-        ReturnErrorOnFailure(err);
-    }
-    ReturnErrorOnFailure(writer->EndContainer(outerType));
-    ReturnErrorOnFailure(FinishAttributeIB());
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath & attributePath, const TLV::TLVReader & data)
 {
     ReturnErrorOnFailure(EnsureMessage());
@@ -316,7 +290,6 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
     // ListIndex is missing and the data is an array -- we are writing a whole list.
     if (!attributePath.IsListOperation() && data.GetType() == TLV::TLVType::kTLVType_Array)
     {
-        TLV::TLVWriter backupWriter;
         TLV::TLVReader dataReader;
         TLV::TLVReader valueReader;
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -326,22 +299,8 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
         dataReader.Init(data);
         dataReader.OpenContainer(valueReader);
 
-        // Encode a list with only one element before all other data, and create a new message when possible.
-        // Note: This is a hack for ACL cluster, since the first element must gurantee itself admin priviledge, we do
-        // not encode a real empty list, instead, we encode a list with first element.
-        mWriteRequestBuilder.GetWriteRequests().Checkpoint(backupWriter);
-        err = TryPutPreencodedAttributeWriteFirstListItem(path, data);
-        if (err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL)
-        {
-            // If it failed with no memory, then we create a new chunk for it.
-            mWriteRequestBuilder.GetWriteRequests().Rollback(backupWriter);
-            mWriteRequestBuilder.GetWriteRequests().ResetError();
-            ReturnErrorOnFailure(StartNewMessage());
-            ReturnErrorOnFailure(TryPutPreencodedAttributeWriteFirstListItem(path, data));
-        }
-
-        // Skip the first element.
-        err = valueReader.Next();
+        // Encode an empty list for the chunking protocol.
+        ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, DataModel::List<uint8_t>(nullptr, 0)));
 
         if (err == CHIP_NO_ERROR)
         {

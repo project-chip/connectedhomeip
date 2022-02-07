@@ -162,13 +162,11 @@ public:
 
         ReturnErrorOnFailure(EnsureMessage());
 
-        // Encode a list with only one element before all other data. Since we are using a clean chunk for this payload, this call
-        // must succeed. Note: This is a hack for ACL cluster, since the first element must gurantee itself admin priviledge, we do
-        // not encode a real empty list, instead, we encode a list with first element.
-        ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, DataModel::List<T>(value.data(), value.size() > 0 ? 1 : 0)));
+        // Encode an empty list for the chunking protocol.
+        ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, DataModel::List<uint8_t>(nullptr, 0)));
 
         path.mListOp = ConcreteDataAttributePath::ListOperation::AppendItem;
-        for (ListIndex i = 1; i < value.size(); i++)
+        for (ListIndex i = 0; i < value.size(); i++)
         {
             ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, value.data()[i]));
         }
@@ -314,13 +312,6 @@ private:
      */
     CHIP_ERROR PutSinglePreencodedAttributeWritePayload(const ConcreteDataAttributePath & attributePath,
                                                         const TLV::TLVReader & data);
-
-    /**
-     * Encode the first AttributeDataIB for list chunking (i.e. a list with first element of the original payload), will try to
-     * create a new chunk when necessary
-     */
-    CHIP_ERROR TryPutPreencodedAttributeWriteFirstListItem(const ConcreteDataAttributePath & attributePath,
-                                                           const TLV::TLVReader & data);
 
     CHIP_ERROR EnsureMessage();
 

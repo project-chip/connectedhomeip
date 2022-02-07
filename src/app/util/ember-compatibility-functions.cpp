@@ -923,7 +923,11 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
     {
         Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
         Access::Privilege requestPrivilege = RequiredPrivilege::ForWriteAttribute(aPath);
-        CHIP_ERROR err                     = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requestPrivilege);
+        CHIP_ERROR err                     = CHIP_NO_ERROR;
+        if (!apWriteHandler->ACLCheckCacheHit({ aPath, requestPrivilege }))
+        {
+            err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requestPrivilege);
+        }
         if (err != CHIP_NO_ERROR)
         {
             // Grace period until ACLs are in place
@@ -936,6 +940,7 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
             // TODO: when wildcard/group writes are supported, handle them to discard rather than fail with status
             return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::UnsupportedAccess);
         }
+        apWriteHandler->CacheACLCheckResult({ static_cast<ConcreteAttributePath>(aPath), requestPrivilege });
     }
 
     if (attributeMetadata->MustUseTimedWrite() && !apWriteHandler->IsTimedWrite())
