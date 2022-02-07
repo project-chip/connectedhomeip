@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -513,15 +513,13 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowInternal()
         ReturnErrorOnFailure(PASESession::GeneratePASEVerifier(verifier, mCommissioningWindowIteration, salt, randomSetupPIN,
                                                                mSetupPayload.setUpPINCode));
 
-        uint8_t serializedVerifier[2 * kSpake2p_WS_Length];
-        VerifyOrReturnError(sizeof(serializedVerifier) == sizeof(verifier), CHIP_ERROR_INTERNAL);
-
-        memcpy(serializedVerifier, verifier.mW0, kSpake2p_WS_Length);
-        memcpy(&serializedVerifier[kSpake2p_WS_Length], verifier.mL, kSpake2p_WS_Length);
+        chip::PASEVerifierSerialized serializedVerifier;
+        MutableByteSpan serializedVerifierSpan(serializedVerifier);
+        ReturnErrorOnFailure(verifier.Serialize(serializedVerifierSpan));
 
         AdministratorCommissioning::Commands::OpenCommissioningWindow::Type request;
         request.commissioningTimeout = mCommissioningWindowTimeout;
-        request.PAKEVerifier         = ByteSpan(serializedVerifier);
+        request.PAKEVerifier         = serializedVerifierSpan;
         request.discriminator        = mSetupPayload.discriminator;
         request.iterations           = mCommissioningWindowIteration;
         request.salt                 = salt;

@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2020-2021 Project CHIP Authors
+ *   Copyright (c) 2020-2022 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -594,6 +594,8 @@ JNI_METHOD(jobject, computePaseVerifier)
     jbyteArray verifierBytes;
     uint32_t passcodeId;
     PASEVerifier verifier;
+    PASEVerifierSerialized serializedVerifier;
+    MutableByteSpan serializedVerifierSpan(serializedVerifier);
     JniByteArray jniSalt(env, salt);
 
     ChipLogProgress(Controller, "computePaseVerifier() called");
@@ -602,11 +604,10 @@ JNI_METHOD(jobject, computePaseVerifier)
     err = wrapper->Controller()->ComputePASEVerifier(iterations, setupPincode, jniSalt.byteSpan(), verifier, passcodeId);
     SuccessOrExit(err);
 
-    uint8_t serializedVerifier[sizeof(verifier.mW0) + sizeof(verifier.mL)];
-    memcpy(serializedVerifier, verifier.mW0, kSpake2p_WS_Length);
-    memcpy(&serializedVerifier[sizeof(verifier.mW0)], verifier.mL, sizeof(verifier.mL));
+    err = verifier.Serialize(serializedVerifierSpan);
+    SuccessOrExit(err);
 
-    err = JniReferences::GetInstance().N2J_ByteArray(env, serializedVerifier, sizeof(serializedVerifier), verifierBytes);
+    err = JniReferences::GetInstance().N2J_ByteArray(env, serializedVerifier, kSpake2pSerializedVerifierSize, verifierBytes);
     SuccessOrExit(err);
 
     err = N2J_PaseVerifierParams(env, setupPincode, static_cast<jlong>(passcodeId), verifierBytes, params);
