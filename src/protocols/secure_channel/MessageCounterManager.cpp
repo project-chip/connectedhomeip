@@ -225,6 +225,9 @@ CHIP_ERROR MessageCounterManager::SendMsgCounterSyncResp(Messaging::ExchangeCont
 
     VerifyOrDie(exchangeContext->HasSessionHandle());
 
+    VerifyOrReturnError(exchangeContext->GetSessionHandle()->GetSessionType() == Session::SessionType::kSecure,
+                        CHIP_ERROR_INVALID_ARGUMENT);
+
     // Allocate new buffer.
     msgBuf = MessagePacketBuffer::New(kSyncRespMsgSize);
     VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_NO_MEMORY);
