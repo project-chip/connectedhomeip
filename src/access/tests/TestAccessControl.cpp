@@ -883,6 +883,90 @@ void MetaTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, CompareAccessControl(accessControl, entryData1, entryData1Count) != CHIP_NO_ERROR);
 }
 
+void TestAclValidateAuthMode(nlTestSuite * inSuite, void * inContext)
+{
+    // TODO
+}
+
+void TestAclValidateFabricIndex(nlTestSuite * inSuite, void * inContext)
+{
+    Entry entry;
+
+    // Use prepared entry for valid cases
+    NL_TEST_ASSERT(inSuite, accessControl.PrepareEntry(entry) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.SetFabricIndex(1) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.SetPrivilege(Privilege::kView) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kCase) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.AddSubject(nullptr, kOperationalNodeId0) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.AddTarget(nullptr, { .flags = Target::kCluster, .cluster = kOnOffCluster }) == CHIP_NO_ERROR);
+
+    // Each case tries to update the first entry, then add a second entry, then unconditionally delete it
+    NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
+
+    for (auto fabricIndex : fabricIndexes)
+    {
+        NL_TEST_ASSERT(inSuite, entry.SetFabricIndex(fabricIndex) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+
+    // Use test entry for invalid cases (to ensure it can hold invalid combinations)
+    TestEntryDelegate delegate;
+    entry.SetDelegate(delegate);
+
+    for (auto fabricIndex : invalidFabricIndexes)
+    {
+        delegate.mFabricIndex = fabricIndex;
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+}
+
+void TestAclValidatePrivilege(nlTestSuite * inSuite, void * inContext)
+{
+    Entry entry;
+
+    // Use prepared entry for valid cases
+    NL_TEST_ASSERT(inSuite, accessControl.PrepareEntry(entry) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.SetFabricIndex(1) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.SetPrivilege(Privilege::kView) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kCase) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.AddSubject(nullptr, kOperationalNodeId0) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, entry.AddTarget(nullptr, { .flags = Target::kCluster, .cluster = kOnOffCluster }) == CHIP_NO_ERROR);
+
+    // Each case tries to update the first entry, then add a second entry, then unconditionally delete it
+    NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
+
+    for (auto privilege : privileges)
+    {
+        NL_TEST_ASSERT(inSuite, entry.SetPrivilege(privilege) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+
+    // Use test entry for invalid cases (to ensure it can hold invalid combinations)
+    TestEntryDelegate delegate;
+    entry.SetDelegate(delegate);
+
+    // Cannot grant administer privilege to group auth mode
+    {
+        delegate.mPrivilege = Privilege::kAdminister;
+        delegate.mAuthMode  = AuthMode::kGroup;
+        delegate.mSubject   = kGroup4;
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        accessControl.DeleteEntry(1);
+    }
+}
+
+void TestAclValidateSubject(nlTestSuite * inSuite, void * inContext)
+{
+    // TODO
+}
+
 void TestAclValidateTarget(nlTestSuite * inSuite, void * inContext)
 {
     Entry entry;
@@ -1688,11 +1772,15 @@ int TestAccessControl()
     // clang-format off
     constexpr nlTest tests[] = {
         NL_TEST_DEF("MetaTest", MetaTest),
-        NL_TEST_DEF("TestAclValidateTarget", TestAclValidateTarget),
         NL_TEST_DEF("TestPrepareEntry", TestPrepareEntry),
         NL_TEST_DEF("TestCreateReadEntry", TestCreateReadEntry),
         NL_TEST_DEF("TestUpdateEntry", TestUpdateEntry),
         NL_TEST_DEF("TestDeleteEntry", TestDeleteEntry),
+        NL_TEST_DEF("TestAclValidateFabricIndex", TestAclValidateFabricIndex),
+        NL_TEST_DEF("TestAclValidatePrivilege", TestAclValidatePrivilege),
+        NL_TEST_DEF("TestAclValidateAuthMode", TestAclValidateAuthMode),
+        NL_TEST_DEF("TestAclValidateSubject", TestAclValidateSubject),
+        NL_TEST_DEF("TestAclValidateTarget", TestAclValidateTarget),
         NL_TEST_DEF("TestSubjectsTargets", TestSubjectsTargets),
         NL_TEST_DEF("TestIterator", TestIterator),
         NL_TEST_DEF("TestFabricFilteredReadEntry", TestFabricFilteredReadEntry),
