@@ -15,7 +15,6 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/mw320_sdk.gni")
 
-
 chip_device_platform = "mw320"
 
 lwip_platform = "mw320"
@@ -24,9 +23,9 @@ lwip_ipv4 = true
 lwip_api = true
 lwip_ethernet = true
 
-chip_enable_openthread=false
-chip_enable_ble=false
-chip_config_network_layer_ble=false
+chip_enable_openthread = false
+chip_enable_ble = false
+chip_config_network_layer_ble = false
 
 chip_inet_config_enable_ipv4 = true
 chip_inet_config_enable_dns_resolver = false
