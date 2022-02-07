@@ -45,7 +45,6 @@
 {{else}}
   {{#if_is_struct type}}
   {{#>CHIPCallbackBridge ns=parent.name                              }}{{asUpperCamelCase ../../name}}{{asUpperCamelCase ../name}}StructAttributeCallback{{/CHIPCallbackBridge}}
-{{else}}
   {{/if_is_struct}}
 {{/if}}
 {{/chip_server_cluster_attributes}}
