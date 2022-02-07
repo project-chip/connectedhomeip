@@ -78,9 +78,10 @@
 
 #define DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(clusterListName) EmberAfCluster clusterListName[] = {
 
-#define DECLARE_DYNAMIC_CLUSTER(clusterId, clusterAttrs)                                                                           \
+#define DECLARE_DYNAMIC_CLUSTER(clusterId, clusterAttrs, incomingCommands, outgoingCommands)                                       \
     {                                                                                                                              \
-        clusterId, clusterAttrs, sizeof(clusterAttrs) / sizeof(EmberAfAttributeMetadata), 0, ZAP_CLUSTER_MASK(SERVER), NULL        \
+        clusterId, clusterAttrs, sizeof(clusterAttrs) / sizeof(EmberAfAttributeMetadata), 0, ZAP_CLUSTER_MASK(SERVER), NULL,       \
+            incomingCommands, outgoingCommands                                                                                     \
     }
 
 #define DECLARE_DYNAMIC_CLUSTER_LIST_END }
@@ -127,6 +128,10 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
 bool emAfMatchCluster(const EmberAfCluster * cluster, EmberAfAttributeSearchRecord * attRecord);
 bool emAfMatchAttribute(const EmberAfCluster * cluster, const EmberAfAttributeMetadata * am,
                         EmberAfAttributeSearchRecord * attRecord);
+
+// Returns endpoint type for the given endpoint id if there is an enabled
+// endpoint with that endpoint id.  Otherwise returns null.
+const EmberAfEndpointType * emberAfFindEndpointType(chip::EndpointId endpointId);
 
 // Check if a cluster is implemented or not. If yes, the cluster is returned.
 //

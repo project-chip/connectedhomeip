@@ -2715,6 +2715,98 @@ private:
     bool keepAlive;
 };
 
+class CHIPEthernetNetworkDiagnosticsPHYRateAttributeCallback
+    : public chip::Callback::Callback<CHIPEthernetNetworkDiagnosticsClusterPHYRateAttributeCallbackType>
+{
+public:
+    CHIPEthernetNetworkDiagnosticsPHYRateAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPEthernetNetworkDiagnosticsPHYRateAttributeCallback();
+
+    static void maybeDestroy(CHIPEthernetNetworkDiagnosticsPHYRateAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPEthernetNetworkDiagnosticsPHYRateAttributeCallback>(callback);
+        }
+    }
+
+    static void
+    CallbackFn(void * context,
+               const chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPEthernetNetworkDiagnosticsPHYRateAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPEthernetNetworkDiagnosticsFullDuplexAttributeCallback
+    : public chip::Callback::Callback<CHIPEthernetNetworkDiagnosticsClusterFullDuplexAttributeCallbackType>
+{
+public:
+    CHIPEthernetNetworkDiagnosticsFullDuplexAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPEthernetNetworkDiagnosticsFullDuplexAttributeCallback();
+
+    static void maybeDestroy(CHIPEthernetNetworkDiagnosticsFullDuplexAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPEthernetNetworkDiagnosticsFullDuplexAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<bool> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPEthernetNetworkDiagnosticsFullDuplexAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPEthernetNetworkDiagnosticsCarrierDetectAttributeCallback
+    : public chip::Callback::Callback<CHIPEthernetNetworkDiagnosticsClusterCarrierDetectAttributeCallbackType>
+{
+public:
+    CHIPEthernetNetworkDiagnosticsCarrierDetectAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPEthernetNetworkDiagnosticsCarrierDetectAttributeCallback();
+
+    static void maybeDestroy(CHIPEthernetNetworkDiagnosticsCarrierDetectAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPEthernetNetworkDiagnosticsCarrierDetectAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<bool> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPEthernetNetworkDiagnosticsCarrierDetectAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPEthernetNetworkDiagnosticsServerGeneratedCommandListAttributeCallback
     : public chip::Callback::Callback<CHIPEthernetNetworkDiagnosticsClusterServerGeneratedCommandListAttributeCallbackType>
 {

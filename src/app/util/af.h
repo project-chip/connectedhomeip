@@ -286,12 +286,14 @@ extern EmberAfDefinedEndpoint emAfEndpoints[];
 chip::EndpointId emberAfEndpointFromIndex(uint16_t index);
 
 /**
- * Returns the index of a given endpoint
+ * Returns the index of a given endpoint.  Will return 0xFFFF if this is not a
+ * valid endpoint id or if the endpoint is disabled.
  */
 uint16_t emberAfIndexFromEndpoint(chip::EndpointId endpoint);
 
 /**
- * Returns the index of a given endpoint; Does not ignore disabled endpoints
+ * Returns the index of a given endpoint; Does not ignore disabled endpoints.
+ * Will return 0xFFFF if this is not a valid endpoint id.
  */
 uint16_t emberAfIndexFromEndpointIncludingDisabledEndpoints(chip::EndpointId endpoint);
 

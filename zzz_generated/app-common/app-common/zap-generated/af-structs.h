@@ -132,17 +132,17 @@ typedef struct _BrandingInformation
     StyleInformation waterMark;
 } BrandingInformation;
 
-// Struct for ApplicationLauncherApplication
-typedef struct _ApplicationLauncherApplication
+// Struct for Application
+typedef struct _Application
 {
     uint16_t catalogVendorId;
     chip::CharSpan applicationId;
-} ApplicationLauncherApplication;
+} Application;
 
 // Struct for ApplicationEP
 typedef struct _ApplicationEP
 {
-    ApplicationLauncherApplication application;
+    Application application;
     chip::CharSpan endpoint;
 } ApplicationEP;
 

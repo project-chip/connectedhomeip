@@ -55,7 +55,7 @@ private:
     CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours) override;
     CHIP_ERROR GetBootReason(uint32_t & bootReason) override;
     CHIP_ERROR StoreBootReason(uint32_t bootReason) override;
-
+    CHIP_ERROR GetUniqueId(char * buf, size_t bufSize) override;
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
 
     // ===== Members that implement the GenericConfigurationManagerImpl protected interface.

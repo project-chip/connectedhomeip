@@ -23,14 +23,13 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ContentLauncher::Structs::AdditionalInfo::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::ApplicationLauncher::Structs::Application::DecodableType & value);
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
          const chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType & value);
-static CHIP_ERROR
-LogValue(const char * label, size_t indent,
-         const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfo::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,

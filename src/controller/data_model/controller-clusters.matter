@@ -176,7 +176,7 @@ client cluster ApplicationLauncher = 1292 {
     kLineupInfo = 0x2;
   }
 
-  struct ApplicationLauncherApplication {
+  struct Application {
     INT16U catalogVendorId = 0;
     CHAR_STRING applicationId = 1;
   }
@@ -188,21 +188,21 @@ client cluster ApplicationLauncher = 1292 {
   readonly global attribute int16u clusterRevision = 65533;
 
   request struct HideAppRequestRequest {
-    ApplicationLauncherApplication application = 0;
+    Application application = 0;
   }
 
   request struct LaunchAppRequestRequest {
-    CHAR_STRING data = 0;
-    ApplicationLauncherApplication application = 1;
+    Application application = 0;
+    OCTET_STRING data = 1;
   }
 
   request struct StopAppRequestRequest {
-    ApplicationLauncherApplication application = 0;
+    Application application = 0;
   }
 
   response struct LauncherResponse {
     StatusEnum status = 0;
-    CHAR_STRING data = 1;
+    OCTET_STRING data = 1;
   }
 
   command HideAppRequest(HideAppRequestRequest): LauncherResponse = 2;
@@ -1619,14 +1619,14 @@ client cluster EthernetNetworkDiagnostics = 55 {
     k400g = 9;
   }
 
-  readonly attribute enum8 PHYRate = 0;
-  readonly attribute boolean fullDuplex = 1;
+  readonly attribute nullable PHYRateType PHYRate = 0;
+  readonly attribute nullable boolean fullDuplex = 1;
   readonly attribute int64u packetRxCount = 2;
   readonly attribute int64u packetTxCount = 3;
   readonly attribute int64u txErrCount = 4;
   readonly attribute int64u collisionCount = 5;
   readonly attribute int64u overrunCount = 6;
-  readonly attribute boolean carrierDetect = 7;
+  readonly attribute nullable boolean carrierDetect = 7;
   readonly attribute int64u timeSinceReset = 8;
   readonly global attribute command_id serverGeneratedCommandList[] = 65528;
   readonly global attribute command_id clientGeneratedCommandList[] = 65529;
@@ -3196,8 +3196,8 @@ client cluster Switch = 59 {
 client cluster TargetNavigator = 1285 {
   enum StatusEnum : ENUM8 {
     kSuccess = 0;
-    kAppNotAvailable = 1;
-    kSystemBusy = 2;
+    kTargetNotFound = 1;
+    kNotAllowed = 2;
   }
 
   struct TargetInfo {

@@ -442,7 +442,7 @@ CHIP_ERROR DeviceController::ComputePASEVerifier(uint32_t iterations, uint32_t s
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceController::OpenCommissioningWindowWithCallback(NodeId deviceId, uint16_t timeout, uint16_t iteration,
+CHIP_ERROR DeviceController::OpenCommissioningWindowWithCallback(NodeId deviceId, uint16_t timeout, uint32_t iteration,
                                                                  uint16_t discriminator, uint8_t option,
                                                                  chip::Callback::Callback<OnOpenCommissioningWindow> * callback,
                                                                  bool readVIDPIDAttributes)

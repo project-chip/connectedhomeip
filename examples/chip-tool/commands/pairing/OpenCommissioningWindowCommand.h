@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2021 Project CHIP Authors
+ *   Copyright (c) 2021-2022 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,7 +31,7 @@ public:
         AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
         AddArgument("option", 0, UINT8_MAX, &mCommissioningWindowOption);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-        AddArgument("iteration", 0, UINT16_MAX, &mIteration);
+        AddArgument("iteration", chip::kPBKDFMinimumIterations, chip::kPBKDFMaximumIterations, &mIteration);
         AddArgument("discriminator", 0, 4096, &mDiscriminator);
     }
 
@@ -43,7 +43,7 @@ private:
     NodeId mNodeId;
     uint8_t mCommissioningWindowOption;
     uint16_t mTimeout;
-    uint16_t mIteration;
+    uint32_t mIteration;
     uint16_t mDiscriminator;
 
     CHIP_ERROR OpenCommissioningWindow();

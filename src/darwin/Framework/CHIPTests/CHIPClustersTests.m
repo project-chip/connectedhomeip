@@ -23207,53 +23207,15 @@ NSNumber * _Nonnull currentTarget;
 }
 - (void)testSendClusterTest_TC_WIFIDIAG_1_1_000001_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads CurrentMaxRate attribute from DUT"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads NetworkInterface structure attribute from DUT"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWiFiNetworkDiagnostics * cluster = [[CHIPTestWiFiNetworkDiagnostics alloc] initWithDevice:device
-                                                                                             endpoint:1
-                                                                                                queue:queue];
+    CHIPTestGeneralDiagnostics * cluster = [[CHIPTestGeneralDiagnostics alloc] initWithDevice:device endpoint:0 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeCurrentMaxRateWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Reads CurrentMaxRate attribute from DUT Error: %@", err);
-
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
-            [expectation fulfill];
-            return;
-        }
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedLongLongValue], 0ULL);
-        }
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WIFIDIAG_1_1_000002_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads CurrentMaxRate attribute constraints"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestWiFiNetworkDiagnostics * cluster = [[CHIPTestWiFiNetworkDiagnostics alloc] initWithDevice:device
-                                                                                             endpoint:1
-                                                                                                queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeCurrentMaxRateWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Reads CurrentMaxRate attribute constraints Error: %@", err);
-
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
-            [expectation fulfill];
-            return;
-        }
+    [cluster readAttributeNetworkInterfacesWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Reads NetworkInterface structure attribute from DUT Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -28764,7 +28726,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster testWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send Test Command to unsupported endpoint Error: %@", err);
 
-        XCTAssertNotEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT);
         [expectation fulfill];
     }];
 
@@ -28782,7 +28744,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster testWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send Test Command to unsupported cluster Error: %@", err);
 
-        XCTAssertNotEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER);
         [expectation fulfill];
     }];
 
@@ -34622,7 +34584,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeListInt8uWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute from nonexistent endpoint. Error: %@", err);
 
-        XCTAssertNotEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT);
         [expectation fulfill];
     }];
 
@@ -34640,7 +34602,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeListInt8uWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute from nonexistent cluster. Error: %@", err);
 
-        XCTAssertNotEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER);
         [expectation fulfill];
     }];
 
@@ -42568,11 +42530,31 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
 - (void)testSendClusterTest_TC_SWDIAG_1_1_000001_ReadAttribute
 {
     XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Reads a list of ThreadMetrics struct non-global attribute from DUT."];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestSoftwareDiagnostics * cluster = [[CHIPTestSoftwareDiagnostics alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeThreadMetricsWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Reads a list of ThreadMetrics struct non-global attribute from DUT. Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_SWDIAG_1_1_000002_ReadAttribute
+{
+    XCTestExpectation * expectation =
         [self expectationWithDescription:@"Reads CurrentHeapFree non-global attribute value from DUT"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestSoftwareDiagnostics * cluster = [[CHIPTestSoftwareDiagnostics alloc] initWithDevice:device endpoint:1 queue:queue];
+    CHIPTestSoftwareDiagnostics * cluster = [[CHIPTestSoftwareDiagnostics alloc] initWithDevice:device endpoint:0 queue:queue];
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeCurrentHeapFreeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
@@ -42590,14 +42572,14 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_SWDIAG_1_1_000002_ReadAttribute
+- (void)testSendClusterTest_TC_SWDIAG_1_1_000003_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Reads CurrentHeapUsed non-global attribute value from DUT"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestSoftwareDiagnostics * cluster = [[CHIPTestSoftwareDiagnostics alloc] initWithDevice:device endpoint:1 queue:queue];
+    CHIPTestSoftwareDiagnostics * cluster = [[CHIPTestSoftwareDiagnostics alloc] initWithDevice:device endpoint:0 queue:queue];
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeCurrentHeapUsedWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
@@ -42615,14 +42597,14 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_SWDIAG_1_1_000003_ReadAttribute
+- (void)testSendClusterTest_TC_SWDIAG_1_1_000004_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Reads CurrentHeapHighWaterMark non-global attribute value from DUT"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestSoftwareDiagnostics * cluster = [[CHIPTestSoftwareDiagnostics alloc] initWithDevice:device endpoint:1 queue:queue];
+    CHIPTestSoftwareDiagnostics * cluster = [[CHIPTestSoftwareDiagnostics alloc] initWithDevice:device endpoint:0 queue:queue];
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeCurrentHeapHighWatermarkWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
@@ -42649,13 +42631,32 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     WaitForCommissionee(expectation, queue);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_SWDIAG_3_1_000001_ReadAttribute
+- (void)testSendClusterTest_TC_SWDIAG_3_1_000001_ResetWatermarks
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Sends ResetWatermarks to DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestSoftwareDiagnostics * cluster = [[CHIPTestSoftwareDiagnostics alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster resetWatermarksWithCompletionHandler:^(NSError * _Nullable err) {
+        NSLog(@"Sends ResetWatermarks to DUT Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_SWDIAG_3_1_000002_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Reads CurrentHeapUsed attribute value from DUT"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestSoftwareDiagnostics * cluster = [[CHIPTestSoftwareDiagnostics alloc] initWithDevice:device endpoint:1 queue:queue];
+    CHIPTestSoftwareDiagnostics * cluster = [[CHIPTestSoftwareDiagnostics alloc] initWithDevice:device endpoint:0 queue:queue];
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeCurrentHeapUsedWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
@@ -42678,13 +42679,13 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_SWDIAG_3_1_000002_ReadAttribute
+- (void)testSendClusterTest_TC_SWDIAG_3_1_000003_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Reads CurrentHeapHighWaterMark attribute value from DUT"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestSoftwareDiagnostics * cluster = [[CHIPTestSoftwareDiagnostics alloc] initWithDevice:device endpoint:1 queue:queue];
+    CHIPTestSoftwareDiagnostics * cluster = [[CHIPTestSoftwareDiagnostics alloc] initWithDevice:device endpoint:0 queue:queue];
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeCurrentHeapHighWatermarkWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {

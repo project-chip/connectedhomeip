@@ -17,7 +17,7 @@ name:
 
 config:
     cluster: "WiFi Network Diagnostics"
-    endpoint: 1
+    endpoint: 0
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -25,6 +25,8 @@ tests:
       command: "WaitForCommissionee"
 
     #Below steps disabled due to issue #13645
+    # Also, ResetCounts may not work on some platforms yet?
+    # And on Linux since we don't have actual Wi-Fi these error out.
     - label: "TH sends ResetCounts command to DUT"
       disabled: true
       command: "ResetCounts"

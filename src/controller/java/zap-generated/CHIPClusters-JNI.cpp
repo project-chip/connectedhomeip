@@ -1514,7 +1514,7 @@ JNI_METHOD(void, ApplicationLauncherCluster, hideAppRequest)
     onFailure.release();
 }
 JNI_METHOD(void, ApplicationLauncherCluster, launchAppRequest)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring data, jobject application, jobject timedInvokeTimeoutMs)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject application, jbyteArray data, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1525,8 +1525,6 @@ JNI_METHOD(void, ApplicationLauncherCluster, launchAppRequest)
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
-    cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(data)));
-    request.data = cleanupStrings.back()->charSpan();
     jobject application_catalogVendorIdItem_0;
     chip::JniReferences::GetInstance().GetObjectField(application, "catalogVendorId", "Ljava/lang/Integer;",
                                                       application_catalogVendorIdItem_0);
@@ -1538,6 +1536,8 @@ JNI_METHOD(void, ApplicationLauncherCluster, launchAppRequest)
     cleanupStrings.push_back(
         chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(application_applicationIdItem_0)));
     request.application.applicationId = cleanupStrings.back()->charSpan();
+    cleanupByteArrays.push_back(chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(data)));
+    request.data = cleanupByteArrays.back()->byteSpan();
 
     std::unique_ptr<CHIPApplicationLauncherClusterLauncherResponseCallback,
                     void (*)(CHIPApplicationLauncherClusterLauncherResponseCallback *)>
@@ -13065,8 +13065,10 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, subscribePHYRateAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
     chip::DeviceLayer::StackLock lock;
-    std::unique_ptr<CHIPInt8uAttributeCallback, void (*)(CHIPInt8uAttributeCallback *)> onSuccess(
-        Platform::New<CHIPInt8uAttributeCallback>(callback, true), chip::Platform::Delete<CHIPInt8uAttributeCallback>);
+    std::unique_ptr<CHIPEthernetNetworkDiagnosticsPHYRateAttributeCallback,
+                    void (*)(CHIPEthernetNetworkDiagnosticsPHYRateAttributeCallback *)>
+        onSuccess(Platform::New<CHIPEthernetNetworkDiagnosticsPHYRateAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPEthernetNetworkDiagnosticsPHYRateAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -13088,9 +13090,9 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, subscribePHYRateAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
-                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-                                                   CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval), CHIPEthernetNetworkDiagnosticsPHYRateAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -13102,8 +13104,10 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, subscribeFullDuplexAttribute
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
     chip::DeviceLayer::StackLock lock;
-    std::unique_ptr<CHIPBooleanAttributeCallback, void (*)(CHIPBooleanAttributeCallback *)> onSuccess(
-        Platform::New<CHIPBooleanAttributeCallback>(callback, true), chip::Platform::Delete<CHIPBooleanAttributeCallback>);
+    std::unique_ptr<CHIPEthernetNetworkDiagnosticsFullDuplexAttributeCallback,
+                    void (*)(CHIPEthernetNetworkDiagnosticsFullDuplexAttributeCallback *)>
+        onSuccess(Platform::New<CHIPEthernetNetworkDiagnosticsFullDuplexAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPEthernetNetworkDiagnosticsFullDuplexAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -13125,9 +13129,9 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, subscribeFullDuplexAttribute
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
-                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-                                                   CHIPBooleanAttributeCallback::OnSubscriptionEstablished);
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval), CHIPEthernetNetworkDiagnosticsFullDuplexAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -13328,8 +13332,10 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, subscribeCarrierDetectAttrib
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
     chip::DeviceLayer::StackLock lock;
-    std::unique_ptr<CHIPBooleanAttributeCallback, void (*)(CHIPBooleanAttributeCallback *)> onSuccess(
-        Platform::New<CHIPBooleanAttributeCallback>(callback, true), chip::Platform::Delete<CHIPBooleanAttributeCallback>);
+    std::unique_ptr<CHIPEthernetNetworkDiagnosticsCarrierDetectAttributeCallback,
+                    void (*)(CHIPEthernetNetworkDiagnosticsCarrierDetectAttributeCallback *)>
+        onSuccess(Platform::New<CHIPEthernetNetworkDiagnosticsCarrierDetectAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPEthernetNetworkDiagnosticsCarrierDetectAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -13352,9 +13358,10 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, subscribeCarrierDetectAttrib
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
-                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-                                                   CHIPBooleanAttributeCallback::OnSubscriptionEstablished);
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval),
+        CHIPEthernetNetworkDiagnosticsCarrierDetectAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));

@@ -128,6 +128,31 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::ContentLauncher::Struc
     ComplexArgumentParser::Finalize(request.value);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::ApplicationLauncher::Structs::Application::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("Application.catalogVendorId", value.isMember("catalogVendorId")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("Application.applicationId", value.isMember("applicationId")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "catalogVendorId");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.catalogVendorId, value["catalogVendorId"]));
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "applicationId");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.applicationId, value["applicationId"]));
+
+    return CHIP_NO_ERROR;
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.catalogVendorId);
+    ComplexArgumentParser::Finalize(request.applicationId);
+}
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type & request,
                                         Json::Value & value)
 {
@@ -176,34 +201,6 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::ApplicationLauncher::S
 {
     ComplexArgumentParser::Finalize(request.application);
     ComplexArgumentParser::Finalize(request.endpoint);
-}
-CHIP_ERROR
-ComplexArgumentParser::Setup(const char * label,
-                             chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & request,
-                             Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ApplicationLauncherApplication.catalogVendorId",
-                                                                  value.isMember("catalogVendorId")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("ApplicationLauncherApplication.applicationId", value.isMember("applicationId")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "catalogVendorId");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.catalogVendorId, value["catalogVendorId"]));
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "applicationId");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.applicationId, value["applicationId"]));
-
-    return CHIP_NO_ERROR;
-}
-
-void ComplexArgumentParser::Finalize(
-    chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.catalogVendorId);
-    ComplexArgumentParser::Finalize(request.applicationId);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfo::Type & request,

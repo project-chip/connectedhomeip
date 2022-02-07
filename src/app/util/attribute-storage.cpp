@@ -371,11 +371,14 @@ EmberAfStatus emAfClusterPreAttributeChangedCallback(const app::ConcreteAttribut
     }
     else
     {
-        EmberAfStatus status            = EMBER_ZCL_STATUS_SUCCESS;
-        EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION);
+        EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+        // Casting and calling a function pointer on the same line results in ignoring the return
+        // of the call on gcc-arm-none-eabi-9-2019-q4-major
+        EmberAfClusterPreAttributeChangedCallback f = (EmberAfClusterPreAttributeChangedCallback)(
+            emberAfFindClusterFunction(cluster, CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION));
         if (f != NULL)
         {
-            status = ((EmberAfClusterPreAttributeChangedCallback) f)(attributePath, attributeType, size, value);
+            status = f(attributePath, attributeType, size, value);
         }
         return status;
     }
@@ -657,6 +660,16 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
         }
     }
     return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE; // Sorry, attribute was not found.
+}
+
+const EmberAfEndpointType * emberAfFindEndpointType(chip::EndpointId endpointId)
+{
+    uint16_t ep = emberAfIndexFromEndpoint(endpointId);
+    if (ep == 0xFFFF)
+    {
+        return nullptr;
+    }
+    return emAfEndpoints[ep].endpointType;
 }
 
 const EmberAfCluster * emberAfFindClusterInType(const EmberAfEndpointType * endpointType, ClusterId clusterId,

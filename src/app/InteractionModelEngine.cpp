@@ -596,7 +596,7 @@ void InteractionModelEngine::DispatchCommand(CommandHandler & apCommandObj, cons
     DispatchSingleClusterCommand(aCommandPath, apPayload, &apCommandObj);
 }
 
-bool InteractionModelEngine::CommandExists(const ConcreteCommandPath & aCommandPath)
+Protocols::InteractionModel::Status InteractionModelEngine::CommandExists(const ConcreteCommandPath & aCommandPath)
 {
     return ServerClusterCommandExists(aCommandPath);
 }

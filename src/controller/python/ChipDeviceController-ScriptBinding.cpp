@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019-2020 Google LLC.
  *    Copyright (c) 2013-2018 Nest Labs, Inc.
  *    All rights reserved.
@@ -145,7 +145,7 @@ pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled(chip::Co
 ChipError::StorageType pychip_DeviceController_PostTaskOnChipThread(ChipThreadTaskRunnerFunct callback, void * pythonContext);
 
 ChipError::StorageType pychip_DeviceController_OpenCommissioningWindow(chip::Controller::DeviceCommissioner * devCtrl,
-                                                                       chip::NodeId nodeid, uint16_t timeout, uint16_t iteration,
+                                                                       chip::NodeId nodeid, uint16_t timeout, uint32_t iteration,
                                                                        uint16_t discriminator, uint8_t option);
 
 void pychip_DeviceController_PrintDiscoveredDevices(chip::Controller::DeviceCommissioner * devCtrl);
@@ -434,7 +434,7 @@ pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled(chip::Co
 }
 
 ChipError::StorageType pychip_DeviceController_OpenCommissioningWindow(chip::Controller::DeviceCommissioner * devCtrl,
-                                                                       chip::NodeId nodeid, uint16_t timeout, uint16_t iteration,
+                                                                       chip::NodeId nodeid, uint16_t timeout, uint32_t iteration,
                                                                        uint16_t discriminator, uint8_t option)
 {
     SetupPayload payload;
