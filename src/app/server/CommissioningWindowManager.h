@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ public:
 
     CHIP_ERROR OpenEnhancedCommissioningWindow(uint16_t commissioningTimeoutSeconds, uint16_t discriminator,
                                                PASEVerifier & verifier, uint32_t iterations, chip::ByteSpan salt,
-                                               uint16_t passcodeID);
+                                               PasscodeId passcodeID);
 
     void CloseCommissioningWindow();
 
@@ -108,7 +108,7 @@ private:
     bool mUseECM = false;
     PASEVerifier mECMPASEVerifier;
     uint16_t mECMDiscriminator = 0;
-    uint16_t mECMPasscodeID    = 0;
+    PasscodeId mECMPasscodeID  = kDefaultCommissioningPasscodeId;
     uint32_t mECMIterations    = 0;
     uint32_t mECMSaltLength    = 0;
     uint8_t mECMSalt[kPBKDFMaximumSaltLen];
