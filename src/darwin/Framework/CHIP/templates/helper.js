@@ -153,11 +153,11 @@ function commandHasRequiredField(command)
 //
 // Module exports
 //
-exports.asObjectiveCBasicType        = asObjectiveCBasicType;
-exports.asObjectiveCNumberType       = asObjectiveCNumberType;
-exports.asTestIndex                  = asTestIndex;
-exports.asObjectiveCClass            = asObjectiveCClass;
-exports.asObjectiveCType             = asObjectiveCType;
-exports.asStructPropertyName         = asStructPropertyName;
-exports.asGetterName                 = asGetterName;
-exports.commandHasRequiredField      = commandHasRequiredField;
+exports.asObjectiveCBasicType   = asObjectiveCBasicType;
+exports.asObjectiveCNumberType  = asObjectiveCNumberType;
+exports.asTestIndex             = asTestIndex;
+exports.asObjectiveCClass       = asObjectiveCClass;
+exports.asObjectiveCType        = asObjectiveCType;
+exports.asStructPropertyName    = asStructPropertyName;
+exports.asGetterName            = asGetterName;
+exports.commandHasRequiredField = commandHasRequiredField;
