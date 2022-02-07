@@ -133,12 +133,12 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
         // operational network because the provisioning of certificates will trigger the device to start operational advertising.
         if (mNeedsNetworkSetup)
         {
-            if (mParams.GetWiFiCredentials().HasValue() && mDeviceCommissioingInfo.network.wifi != kInvalidEndpointId)
+            if (mParams.GetWiFiCredentials().HasValue() && mDeviceCommissioningInfo.network.wifi != kInvalidEndpointId)
             {
                 return CommissioningStage::kWiFiNetworkSetup;
             }
             else if (mParams.GetThreadOperationalDataset().HasValue() &&
-                     mDeviceCommissioingInfo.network.thread != kInvalidEndpointId)
+                     mDeviceCommissioningInfo.network.thread != kInvalidEndpointId)
             {
                 return CommissioningStage::kThreadNetworkSetup;
             }
@@ -149,8 +149,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
                              mParams.GetWiFiCredentials().HasValue() ? "yes" : "no",
                              mParams.GetThreadOperationalDataset().HasValue() ? "yes" : "no");
                 ChipLogError(Controller, "Device supports: wifi (%s) thread(%s)",
-                             mDeviceCommissioingInfo.network.wifi == kInvalidEndpointId ? "no" : "yes",
-                             mDeviceCommissioingInfo.network.thread == kInvalidEndpointId ? "no" : "yes");
+                             mDeviceCommissioningInfo.network.wifi == kInvalidEndpointId ? "no" : "yes",
+                             mDeviceCommissioningInfo.network.thread == kInvalidEndpointId ? "no" : "yes");
                 lastErr = CHIP_ERROR_INVALID_ARGUMENT;
                 return CommissioningStage::kCleanup;
             }
@@ -165,7 +165,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
 #endif
         }
     case CommissioningStage::kWiFiNetworkSetup:
-        if (mParams.GetThreadOperationalDataset().HasValue() && mDeviceCommissioingInfo.network.thread != kInvalidEndpointId)
+        if (mParams.GetThreadOperationalDataset().HasValue() && mDeviceCommissioningInfo.network.thread != kInvalidEndpointId)
         {
             return CommissioningStage::kThreadNetworkSetup;
         }
@@ -174,7 +174,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
             return CommissioningStage::kWiFiNetworkEnable;
         }
     case CommissioningStage::kThreadNetworkSetup:
-        if (mParams.GetWiFiCredentials().HasValue() && mDeviceCommissioingInfo.network.wifi != kInvalidEndpointId)
+        if (mParams.GetWiFiCredentials().HasValue() && mDeviceCommissioningInfo.network.wifi != kInvalidEndpointId)
         {
             return CommissioningStage::kWiFiNetworkEnable;
         }
@@ -184,7 +184,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
         }
 
     case CommissioningStage::kWiFiNetworkEnable:
-        if (mParams.GetThreadOperationalDataset().HasValue() && mDeviceCommissioingInfo.network.thread != kInvalidEndpointId)
+        if (mParams.GetThreadOperationalDataset().HasValue() && mDeviceCommissioningInfo.network.thread != kInvalidEndpointId)
         {
             return CommissioningStage::kThreadNetworkEnable;
         }
@@ -221,10 +221,10 @@ EndpointId AutoCommissioner::GetEndpoint(const CommissioningStage & stage)
     {
     case CommissioningStage::kWiFiNetworkSetup:
     case CommissioningStage::kWiFiNetworkEnable:
-        return mDeviceCommissioingInfo.network.wifi;
+        return mDeviceCommissioningInfo.network.wifi;
     case CommissioningStage::kThreadNetworkSetup:
     case CommissioningStage::kThreadNetworkEnable:
-        return mDeviceCommissioingInfo.network.thread;
+        return mDeviceCommissioningInfo.network.thread;
     default:
         return kRootEndpointId;
     }
@@ -308,10 +308,10 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
         switch (report.stageCompleted)
         {
         case CommissioningStage::kReadCommissioningInfo:
-            mDeviceCommissioingInfo = report.Get<ReadCommissioningInfo>();
-            if (!mParams.GetFailsafeTimerSeconds().HasValue() && mDeviceCommissioingInfo.general.recommendedFailsafe > 0)
+            mDeviceCommissioningInfo = report.Get<ReadCommissioningInfo>();
+            if (!mParams.GetFailsafeTimerSeconds().HasValue() && mDeviceCommissioningInfo.general.recommendedFailsafe > 0)
             {
-                mParams.SetFailsafeTimerSeconds(mDeviceCommissioingInfo.general.recommendedFailsafe);
+                mParams.SetFailsafeTimerSeconds(mDeviceCommissioningInfo.general.recommendedFailsafe);
             }
             break;
         case CommissioningStage::kSendPAICertificateRequest:
@@ -354,7 +354,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             mCommissioneeDeviceProxy = nullptr;
             mOperationalDeviceProxy  = nullptr;
             mParams                  = CommissioningParameters();
-            mDeviceCommissioingInfo  = ReadCommissioningInfo();
+            mDeviceCommissioningInfo = ReadCommissioningInfo();
             return CHIP_NO_ERROR;
         default:
             break;

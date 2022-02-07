@@ -1571,7 +1571,9 @@ void DeviceCommissioner::OnDone()
                 return CHIP_NO_ERROR;
             }
             app::Clusters::GeneralCommissioning::Attributes::BasicCommissioningInfo::TypeInfo::DecodableType basicInfo;
-            ReturnErrorOnFailure(this->mAttributeCache->Get(path, basicInfo));
+            ReturnErrorOnFailure(
+                this->mAttributeCache->Get<app::Clusters::GeneralCommissioning::Attributes::BasicCommissioningInfo::TypeInfo>(
+                    path, basicInfo));
             info.general.recommendedFailsafe = basicInfo.failSafeExpiryLengthSeconds;
             return CHIP_NO_ERROR;
         });
@@ -1580,7 +1582,6 @@ void DeviceCommissioner::OnDone()
     return_err = err == CHIP_NO_ERROR ? return_err : err;
 
     err = mAttributeCache->ForEachAttribute(app::Clusters::Basic::Id, [this, &info](const app::ConcreteAttributePath & path) {
-        TLV::TLVReader reader;
         if (path.mAttributeId != app::Clusters::Basic::Attributes::VendorID::Id &&
             path.mAttributeId != app::Clusters::Basic::Attributes::ProductID::Id &&
             path.mAttributeId != app::Clusters::Basic::Attributes::SoftwareVersion::Id)
@@ -1589,15 +1590,15 @@ void DeviceCommissioner::OnDone()
             return CHIP_NO_ERROR;
         }
 
-        ReturnErrorOnFailure(this->mAttributeCache->Get(path, reader));
         switch (path.mAttributeId)
         {
         case app::Clusters::Basic::Attributes::VendorID::Id:
-            return this->mAttributeCache->Get(path, info.basic.vendorId);
+            return this->mAttributeCache->Get<app::Clusters::Basic::Attributes::VendorID::TypeInfo>(path, info.basic.vendorId);
         case app::Clusters::Basic::Attributes::ProductID::Id:
-            return app::DataModel::Decode(reader, info.basic.productId);
+            return this->mAttributeCache->Get<app::Clusters::Basic::Attributes::ProductID::TypeInfo>(path, info.basic.productId);
         case app::Clusters::Basic::Attributes::SoftwareVersion::Id:
-            return app::DataModel::Decode(reader, info.basic.softwareVersion);
+            return this->mAttributeCache->Get<app::Clusters::Basic::Attributes::SoftwareVersion::TypeInfo>(
+                path, info.basic.softwareVersion);
         default:
             return CHIP_NO_ERROR;
         }
