@@ -918,41 +918,41 @@ public class ChipClusters {
 
     public void hideAppRequest(
         LauncherResponseCallback callback,
-        ChipStructs.ApplicationLauncherClusterApplicationLauncherApplication application) {
+        ChipStructs.ApplicationLauncherClusterApplication application) {
       hideAppRequest(chipClusterPtr, callback, application, null);
     }
 
     public void hideAppRequest(
         LauncherResponseCallback callback,
-        ChipStructs.ApplicationLauncherClusterApplicationLauncherApplication application,
+        ChipStructs.ApplicationLauncherClusterApplication application,
         int timedInvokeTimeoutMs) {
       hideAppRequest(chipClusterPtr, callback, application, timedInvokeTimeoutMs);
     }
 
     public void launchAppRequest(
         LauncherResponseCallback callback,
-        String data,
-        ChipStructs.ApplicationLauncherClusterApplicationLauncherApplication application) {
-      launchAppRequest(chipClusterPtr, callback, data, application, null);
+        ChipStructs.ApplicationLauncherClusterApplication application,
+        byte[] data) {
+      launchAppRequest(chipClusterPtr, callback, application, data, null);
     }
 
     public void launchAppRequest(
         LauncherResponseCallback callback,
-        String data,
-        ChipStructs.ApplicationLauncherClusterApplicationLauncherApplication application,
+        ChipStructs.ApplicationLauncherClusterApplication application,
+        byte[] data,
         int timedInvokeTimeoutMs) {
-      launchAppRequest(chipClusterPtr, callback, data, application, timedInvokeTimeoutMs);
+      launchAppRequest(chipClusterPtr, callback, application, data, timedInvokeTimeoutMs);
     }
 
     public void stopAppRequest(
         LauncherResponseCallback callback,
-        ChipStructs.ApplicationLauncherClusterApplicationLauncherApplication application) {
+        ChipStructs.ApplicationLauncherClusterApplication application) {
       stopAppRequest(chipClusterPtr, callback, application, null);
     }
 
     public void stopAppRequest(
         LauncherResponseCallback callback,
-        ChipStructs.ApplicationLauncherClusterApplicationLauncherApplication application,
+        ChipStructs.ApplicationLauncherClusterApplication application,
         int timedInvokeTimeoutMs) {
       stopAppRequest(chipClusterPtr, callback, application, timedInvokeTimeoutMs);
     }
@@ -960,24 +960,24 @@ public class ChipClusters {
     private native void hideAppRequest(
         long chipClusterPtr,
         LauncherResponseCallback Callback,
-        ChipStructs.ApplicationLauncherClusterApplicationLauncherApplication application,
+        ChipStructs.ApplicationLauncherClusterApplication application,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void launchAppRequest(
         long chipClusterPtr,
         LauncherResponseCallback Callback,
-        String data,
-        ChipStructs.ApplicationLauncherClusterApplicationLauncherApplication application,
+        ChipStructs.ApplicationLauncherClusterApplication application,
+        byte[] data,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void stopAppRequest(
         long chipClusterPtr,
         LauncherResponseCallback Callback,
-        ChipStructs.ApplicationLauncherClusterApplicationLauncherApplication application,
+        ChipStructs.ApplicationLauncherClusterApplication application,
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface LauncherResponseCallback {
-      void onSuccess(Integer status, String data);
+      void onSuccess(Integer status, byte[] data);
 
       void onError(Exception error);
     }

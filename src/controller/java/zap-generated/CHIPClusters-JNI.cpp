@@ -1514,7 +1514,7 @@ JNI_METHOD(void, ApplicationLauncherCluster, hideAppRequest)
     onFailure.release();
 }
 JNI_METHOD(void, ApplicationLauncherCluster, launchAppRequest)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring data, jobject application, jobject timedInvokeTimeoutMs)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject application, jbyteArray data, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1525,8 +1525,6 @@ JNI_METHOD(void, ApplicationLauncherCluster, launchAppRequest)
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
-    cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(data)));
-    request.data = cleanupStrings.back()->charSpan();
     jobject application_catalogVendorIdItem_0;
     chip::JniReferences::GetInstance().GetObjectField(application, "catalogVendorId", "Ljava/lang/Integer;",
                                                       application_catalogVendorIdItem_0);
@@ -1538,6 +1536,8 @@ JNI_METHOD(void, ApplicationLauncherCluster, launchAppRequest)
     cleanupStrings.push_back(
         chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(application_applicationIdItem_0)));
     request.application.applicationId = cleanupStrings.back()->charSpan();
+    cleanupByteArrays.push_back(chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(data)));
+    request.data = cleanupByteArrays.back()->byteSpan();
 
     std::unique_ptr<CHIPApplicationLauncherClusterLauncherResponseCallback,
                     void (*)(CHIPApplicationLauncherClusterLauncherResponseCallback *)>

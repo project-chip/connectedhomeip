@@ -33732,9 +33732,9 @@ namespace TargetNavigator {
 // Enum for StatusEnum
 enum class StatusEnum : uint8_t
 {
-    kSuccess         = 0x00,
-    kAppNotAvailable = 0x01,
-    kSystemBusy      = 0x02,
+    kSuccess        = 0x00,
+    kTargetNotFound = 0x01,
+    kNotAllowed     = 0x02,
 };
 
 namespace Structs {
@@ -36007,7 +36007,7 @@ enum class ChannelFeature : uint32_t
 };
 
 namespace Structs {
-namespace ApplicationLauncherApplication {
+namespace Application {
 enum class Fields
 {
     kCatalogVendorId = 0,
@@ -36028,7 +36028,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace ApplicationLauncherApplication
+} // namespace Application
 namespace ApplicationEP {
 enum class Fields
 {
@@ -36039,7 +36039,7 @@ enum class Fields
 struct Type
 {
 public:
-    Structs::ApplicationLauncherApplication::Type application;
+    Structs::Application::Type application;
     chip::CharSpan endpoint;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -36082,8 +36082,8 @@ namespace Commands {
 namespace LaunchAppRequest {
 enum class Fields
 {
-    kData        = 0,
-    kApplication = 1,
+    kApplication = 0,
+    kData        = 1,
 };
 
 struct Type
@@ -36093,8 +36093,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    chip::CharSpan data;
-    Structs::ApplicationLauncherApplication::Type application;
+    Structs::Application::Type application;
+    chip::ByteSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -36109,8 +36109,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    chip::CharSpan data;
-    Structs::ApplicationLauncherApplication::DecodableType application;
+    Structs::Application::DecodableType application;
+    chip::ByteSpan data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LaunchAppRequest
@@ -36127,7 +36127,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StopAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::ApplicationLauncherApplication::Type application;
+    Structs::Application::Type application;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -36142,7 +36142,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StopAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::ApplicationLauncherApplication::DecodableType application;
+    Structs::Application::DecodableType application;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace StopAppRequest
@@ -36159,7 +36159,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::HideAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::ApplicationLauncherApplication::Type application;
+    Structs::Application::Type application;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -36174,7 +36174,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::HideAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::ApplicationLauncherApplication::DecodableType application;
+    Structs::Application::DecodableType application;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace HideAppRequest
@@ -36193,7 +36193,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
     StatusEnum status = static_cast<StatusEnum>(0);
-    chip::CharSpan data;
+    chip::ByteSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -36209,7 +36209,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
     StatusEnum status = static_cast<StatusEnum>(0);
-    chip::CharSpan data;
+    chip::ByteSpan data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LauncherResponse

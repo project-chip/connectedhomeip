@@ -42,6 +42,7 @@ using namespace chip::app::Clusters::ApplicationLauncher;
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 using namespace chip::AppPlatform;
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+using namespace chip::Uint8;
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -217,7 +218,7 @@ bool emberAfApplicationLauncherClusterLaunchAppRequestCallback(app::CommandHandl
         // chip-tool can't send structs from command line so treat data value as appid if appid is blank
         // TODO: fix this once chip-tool support sending structs from command line
         ChipLogError(Zcl, "ApplicationLauncher blank content id, taking data as appid");
-        appId = std::string(data.data(), data.size());
+        appId = std::string((char *) data.data(), data.size());
     }
     CatalogVendorApp vendorApp(application.catalogVendorId, appId.c_str());
 
@@ -239,8 +240,9 @@ bool emberAfApplicationLauncherClusterLaunchAppRequestCallback(app::CommandHandl
             {
                 ChipLogError(Zcl, "ApplicationLauncher target app not found");
                 LauncherResponseType response;
-                response.data   = CharSpan("data", strlen("data"));
-                response.status = StatusEnum::kAppNotAvailable;
+                const char * buf = "data";
+                response.data    = ByteSpan(from_const_char(buf), strlen(buf));
+                response.status  = StatusEnum::kAppNotAvailable;
                 responder.Success(response);
                 return true;
             }
@@ -319,8 +321,9 @@ bool emberAfApplicationLauncherClusterStopAppRequestCallback(app::CommandHandler
             {
                 ChipLogError(Zcl, "ApplicationLauncher target app not loaded");
                 LauncherResponseType response;
-                response.data   = CharSpan("data", strlen("data"));
-                response.status = StatusEnum::kAppNotAvailable;
+                const char * buf = "data";
+                response.data    = ByteSpan(from_const_char(buf), strlen(buf));
+                response.status  = StatusEnum::kAppNotAvailable;
                 responder.Success(response);
                 return true;
             }
@@ -402,8 +405,9 @@ bool emberAfApplicationLauncherClusterHideAppRequestCallback(app::CommandHandler
             {
                 ChipLogError(Zcl, "ApplicationLauncher target app not loaded");
                 LauncherResponseType response;
-                response.data   = CharSpan("data", strlen("data"));
-                response.status = StatusEnum::kAppNotAvailable;
+                const char * buf = "data";
+                response.data    = ByteSpan(from_const_char(buf), strlen(buf));
+                response.status  = StatusEnum::kAppNotAvailable;
                 responder.Success(response);
                 return true;
             }

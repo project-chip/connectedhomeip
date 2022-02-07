@@ -154,7 +154,7 @@ client cluster ApplicationLauncher = 1292 {
     kLineupInfo = 0x2;
   }
 
-  struct ApplicationLauncherApplication {
+  struct Application {
     INT16U catalogVendorId = 0;
     CHAR_STRING applicationId = 1;
   }
@@ -163,16 +163,16 @@ client cluster ApplicationLauncher = 1292 {
   readonly global attribute int16u clusterRevision = 65533;
 
   request struct HideAppRequestRequest {
-    ApplicationLauncherApplication application = 0;
+    Application application = 0;
   }
 
   request struct LaunchAppRequestRequest {
-    CHAR_STRING data = 0;
-    ApplicationLauncherApplication application = 1;
+    Application application = 0;
+    OCTET_STRING data = 1;
   }
 
   request struct StopAppRequestRequest {
-    ApplicationLauncherApplication application = 0;
+    Application application = 0;
   }
 
   command HideAppRequest(HideAppRequestRequest): LauncherResponse = 2;
@@ -2409,8 +2409,8 @@ server cluster Switch = 59 {
 client cluster TargetNavigator = 1285 {
   enum StatusEnum : ENUM8 {
     kSuccess = 0;
-    kAppNotAvailable = 1;
-    kSystemBusy = 2;
+    kTargetNotFound = 1;
+    kNotAllowed = 2;
   }
 
   struct TargetInfo {

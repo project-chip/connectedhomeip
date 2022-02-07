@@ -833,7 +833,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPApplicationLauncherClusterApplicationLauncherApplication
+@implementation CHIPApplicationLauncherClusterApplication
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -851,7 +851,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _application = [CHIPApplicationLauncherClusterApplicationLauncherApplication new];
+        _application = [CHIPApplicationLauncherClusterApplication new];
 
         _endpoint = @"";
     }
