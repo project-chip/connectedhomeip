@@ -210,7 +210,7 @@ limitations under the License.
       </description>
     </command>
 
-    <command source="client" code="0x02" name="TestSpecific" optional="false">
+    <command source="client" code="0x02" name="TestSpecific" response="TestSpecificResponse" optional="false">
       <description>
         Simple command without any parameters and with a specific response
       </description>
@@ -222,7 +222,7 @@ limitations under the License.
       </description>
     </command>
 
-    <command source="client" code="0x04" name="TestAddArguments" optional="false">
+    <command source="client" code="0x04" name="TestAddArguments" response="TestAddArgumentsResponse" optional="false">
       <description>
         Command that takes two arguments and returns their sum.
       </description>
@@ -230,14 +230,14 @@ limitations under the License.
       <arg name="arg2" type="INT8U"/>
     </command>
 
-    <command source="client" code="0x05" name="TestSimpleArgumentRequest" optional="false">
+    <command source="client" code="0x05" name="TestSimpleArgumentRequest" response="TestSimpleArgumentResponse" optional="false">
       <description>
         Command that takes an argument which is bool
       </description>
       <arg name="arg1" type="BOOLEAN"/>
     </command>
 
-    <command source="client" code="0x06" name="TestStructArrayArgumentRequest" optional="false">
+    <command source="client" code="0x06" name="TestStructArrayArgumentRequest" response="TestStructArrayArgumentResponse" optional="false">
       <description>
         Command that takes various arguments that are arrays, including an array of structs which have a list member.
       </description>
@@ -305,7 +305,7 @@ limitations under the License.
       <arg name="arg1" type="NestedStructList" array="true"/>
     </command>
 
-    <command source="client" code="0x0D" name="TestListInt8UReverseRequest" optional="false">
+    <command source="client" code="0x0D" name="TestListInt8UReverseRequest" response="TestListInt8UReverseResponse" optional="false">
       <description>
         Command that takes an argument which is a list of INT8U and expects a
         response that reverses the list.
@@ -313,7 +313,7 @@ limitations under the License.
       <arg name="arg1" type="INT8U" array="true"/>
     </command>
 
-    <command source="client" code="0x0E" name="TestEnumsRequest" optional="false">
+    <command source="client" code="0x0E" name="TestEnumsRequest" response="TestEnumsResponse" optional="false">
       <description>
         Command that sends a vendor id and an enum.  The server is expected to
         echo them back.

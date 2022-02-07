@@ -34,8 +34,7 @@ CHIP_ERROR SystemCommands::Start(uint16_t discriminator)
     char command[128];
     VerifyOrReturnError(snprintf(command, sizeof(command), "%s%s %u", scriptDir, scriptName, discriminator) >= 0,
                         CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(system(command) == 0, CHIP_ERROR_INTERNAL);
-    return ContinueOnChipMainThread();
+    return RunInternal(command);
 }
 
 CHIP_ERROR SystemCommands::Stop()
@@ -45,9 +44,7 @@ CHIP_ERROR SystemCommands::Stop()
 
     char command[128];
     VerifyOrReturnError(snprintf(command, sizeof(command), "%s%s", scriptDir, scriptName) >= 0, CHIP_ERROR_INTERNAL);
-
-    VerifyOrReturnError(system(command) == 0, CHIP_ERROR_INTERNAL);
-    return ContinueOnChipMainThread();
+    return RunInternal(command);
 }
 
 CHIP_ERROR SystemCommands::Reboot(uint16_t discriminator)
@@ -58,7 +55,21 @@ CHIP_ERROR SystemCommands::Reboot(uint16_t discriminator)
     char command[128];
     VerifyOrReturnError(snprintf(command, sizeof(command), "%s%s %u", scriptDir, scriptName, discriminator) >= 0,
                         CHIP_ERROR_INTERNAL);
+    return RunInternal(command);
+}
 
+CHIP_ERROR SystemCommands::FactoryReset()
+{
+    const char * scriptDir            = getScriptsFolder();
+    constexpr const char * scriptName = "FactoryReset.py";
+
+    char command[128];
+    VerifyOrReturnError(snprintf(command, sizeof(command), "%s%s", scriptDir, scriptName) >= 0, CHIP_ERROR_INTERNAL);
+    return RunInternal(command);
+}
+
+CHIP_ERROR SystemCommands::RunInternal(const char * command)
+{
     VerifyOrReturnError(system(command) == 0, CHIP_ERROR_INTERNAL);
     return ContinueOnChipMainThread();
 }

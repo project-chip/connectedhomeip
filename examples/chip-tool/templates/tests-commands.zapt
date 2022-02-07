@@ -21,7 +21,20 @@ public:
     }
 };
 
-{{>test_cluster tests=(getTests)}}
+class ManualTestList : public Command
+{
+public:
+    ManualTestList() : Command("list-manual") {};
+    CHIP_ERROR Run() override
+    {
+        {{#chip_tests (getManualTests)}}printf("{{filename}}\n");{{/chip_tests}}
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+{{>test_cluster tests=(getTests) credsIssuerConfigArg=true}}
+{{>test_cluster tests=(getManualTests) credsIssuerConfigArg=true}}
 
 void registerCommandsTests(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
@@ -29,7 +42,11 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
 
     commands_list clusterCommands = {
         make_unique<TestList>(),
+        make_unique<ManualTestList>(),
       {{#chip_tests (getTests)}}
+        make_unique<{{filename}}>(credsIssuerConfig),
+      {{/chip_tests}}
+      {{#chip_tests (getManualTests)}}
         make_unique<{{filename}}>(credsIssuerConfig),
       {{/chip_tests}}
     };

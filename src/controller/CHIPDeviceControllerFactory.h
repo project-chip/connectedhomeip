@@ -61,6 +61,7 @@ struct SetupParams
     DevicePairingDelegate * pairingDelegate = nullptr;
 
     Credentials::DeviceAttestationVerifier * deviceAttestationVerifier = nullptr;
+    CommissioningDelegate * defaultCommissioner                        = nullptr;
 };
 
 // TODO everything other than the fabric storage here should be removed.
@@ -90,6 +91,7 @@ public:
     }
 
     CHIP_ERROR Init(FactoryInitParams params);
+    void Shutdown();
     CHIP_ERROR SetupController(SetupParams params, DeviceController & controller);
     CHIP_ERROR SetupCommissioner(SetupParams params, DeviceCommissioner & commissioner);
 

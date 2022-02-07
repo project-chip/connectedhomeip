@@ -126,8 +126,7 @@ void HandleSubscribeReportComplete()
            static_cast<double>(transitTime.count()) / 1000);
 }
 
-class MockInteractionModelApp : public chip::app::InteractionModelDelegate,
-                                public ::chip::app::CommandSender::Callback,
+class MockInteractionModelApp : public ::chip::app::CommandSender::Callback,
                                 public ::chip::app::WriteClient::Callback,
                                 public ::chip::app::ReadClient::Callback
 {
@@ -146,8 +145,8 @@ public:
             }
         }
     }
-    void OnAttributeData(const chip::app::ConcreteDataAttributePath & aPath, chip::TLV::TLVReader * aData,
-                         const chip::app::StatusIB & status) override
+    void OnAttributeData(const chip::app::ConcreteDataAttributePath & aPath, chip::DataVersion aVersion,
+                         chip::TLV::TLVReader * aData, const chip::app::StatusIB & status) override
     {}
 
     void OnError(CHIP_ERROR aError) override { printf("ReadError with err %" CHIP_ERROR_FORMAT, aError.Format()); }

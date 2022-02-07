@@ -50,6 +50,7 @@
 #include <app/DeviceProxy.h>
 #include <app/InteractionModelEngine.h>
 #include <app/server/Dnssd.h>
+#include <controller/AutoCommissioner.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/CommissioningDelegate.h>
@@ -88,6 +89,7 @@ chip::Platform::ScopedMemoryBuffer<uint8_t> sSsidBuf;
 chip::Platform::ScopedMemoryBuffer<uint8_t> sCredsBuf;
 chip::Platform::ScopedMemoryBuffer<uint8_t> sThreadBuf;
 chip::Controller::CommissioningParameters sCommissioningParameters;
+
 } // namespace
 
 chip::Controller::ScriptDevicePairingDelegate sPairingDelegate;
@@ -104,7 +106,7 @@ extern "C" {
 ChipError::StorageType pychip_DeviceController_StackInit();
 
 ChipError::StorageType pychip_DeviceController_NewDeviceController(chip::Controller::DeviceCommissioner ** outDevCtrl,
-                                                                   chip::NodeId localDeviceId);
+                                                                   chip::NodeId localDeviceId, bool useTestCommissioner);
 ChipError::StorageType pychip_DeviceController_DeleteDeviceController(chip::Controller::DeviceCommissioner * devCtrl);
 ChipError::StorageType pychip_DeviceController_GetAddressAndPort(chip::Controller::DeviceCommissioner * devCtrl,
                                                                  chip::NodeId nodeId, char * outAddress, uint64_t maxAddressLen,
@@ -481,7 +483,7 @@ void pychip_DeviceController_PrintDiscoveredDevices(chip::Controller::DeviceComm
             ChipLogProgress(Discovery, "\tMrp Interval active\tNot present");
         }
         ChipLogProgress(Discovery, "\tSupports TCP\t\t%d", dnsSdInfo->supportsTcp);
-        for (int j = 0; j < dnsSdInfo->numIPs; ++j)
+        for (unsigned j = 0; j < dnsSdInfo->numIPs; ++j)
         {
             char buf[chip::Inet::IPAddress::kMaxStringLength];
             dnsSdInfo->ipAddress[j].ToString(buf);

@@ -245,16 +245,23 @@ private:
     void MessageHandled();
 
     /**
-     * Updates Sleepy End Device polling interval in the following way:
+     * Updates Sleepy End Device polling mode in the following way:
      * - does nothing for exchanges over Bluetooth LE
-     * - set IDLE polling mode if all conditions are met:
-     *   - device doesn't expect getting response nor sending message
-     *   - there is no other active exchange than the current one
-     * - set ACTIVE polling mode if any of the conditions is met:
-     *   - device expects getting response or sending message
-     *   - there is another active exchange
+     * - requests fast-polling (active) mode if there are more messages,
+     *   including MRP acknowledgements, expected to be sent or received on
+     *   this exchange.
+     * - withdraws the request for fast-polling (active) mode, otherwise.
      */
     void UpdateSEDPollingMode();
+
+    /**
+     * Requests or withdraws the request for Sleepy End Device fast-polling mode
+     * based on the argument value.
+     *
+     * Note that the device switches to the slow-polling (idle) mode if no
+     * exchange nor other component requests the fast-polling mode.
+     */
+    void UpdateSEDPollingMode(bool fastPollingMode);
 };
 
 } // namespace Messaging

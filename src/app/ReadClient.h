@@ -27,8 +27,8 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/EventHeader.h>
 #include <app/EventPathParams.h>
-#include <app/InteractionModelDelegate.h>
 #include <app/MessageDef/ReadRequestMessage.h>
+#include <app/MessageDef/StatusIB.h>
 #include <app/MessageDef/StatusResponseMessage.h>
 #include <app/MessageDef/SubscribeRequestMessage.h>
 #include <app/MessageDef/SubscribeResponseMessage.h>
@@ -110,11 +110,14 @@ public:
          * receives an OnDone call to destroy the object.
          *
          * @param[in] aPath        The attribute path field in report response.
+         * @param[in] aVersion     The data version for cluster in report response.
          * @param[in] apData       The attribute data of the given path, will be a nullptr if status is not Success.
          * @param[in] aStatus      Attribute-specific status, containing an InteractionModel::Status code as well as an
          *                         optional cluster-specific status code.
          */
-        virtual void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) {}
+        virtual void OnAttributeData(const ConcreteDataAttributePath & aPath, DataVersion aVersion, TLV::TLVReader * apData,
+                                     const StatusIB & aStatus)
+        {}
 
         /**
          * OnSubscriptionEstablished will be called when a subscription is established for the given subscription transaction.
@@ -184,7 +187,7 @@ public:
      *
      *  @param[in]    apImEngine       A valid pointer to the IM engine.
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
-     *  @param[in]    apCallback       InteractionModelDelegate set by application.
+     *  @param[in]    apCallback       Callback set by application.
      *  @param[in]    aInteractionType Type of interaction (read or subscribe)
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE incorrect state if it is already initialized

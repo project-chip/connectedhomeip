@@ -207,6 +207,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChainAfterValidation(N
     noc_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipNodeId, nodeId);
     ChipDN rcac_dn;
     rcac_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipRootId, mIssuerId);
+    rcac_dn.AddAttribute(chip::ASN1::kOID_AttributeType_ChipFabricId, fabricId);
 
     X509CertRequestParams noc_request = { 1, validityStart, validityEnd, noc_dn, rcac_dn };
     ReturnErrorOnFailure(NewNodeOperationalX509Cert(noc_request, pubkey, *mIssuerKey, noc));

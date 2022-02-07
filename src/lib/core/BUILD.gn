@@ -103,6 +103,8 @@ static_library("core") {
     "DataModelTypes.h",
     "GroupId.h",
     "NodeId.h",
+    "OTAImageHeader.cpp",
+    "OTAImageHeader.h",
     "PasscodeId.h",
     "PeerId.h",
   ]

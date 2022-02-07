@@ -413,6 +413,15 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
     CHIP_ERROR err                             = CHIP_NO_ERROR;
     Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::Failure;
 
+    // Group Message can only be an InvokeCommandRequest or WriteRequest
+    if (apExchangeContext->IsGroupExchangeContext() &&
+        !aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandRequest) &&
+        !aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteRequest))
+    {
+        ChipLogProgress(InteractionModel, "Msg type %d not supported for group message", aPayloadHeader.GetMessageType());
+        return err;
+    }
+
     if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandRequest))
     {
         SuccessOrExit(
@@ -580,9 +589,6 @@ void InteractionModelEngine::DispatchCommand(CommandHandler & apCommandObj, cons
 
     if (handler)
     {
-        // TODO: Figure out who is responsible for handling checking
-        // apCommandObj->IsTimedInvoke() for commands that require a timed
-        // invoke and have a CommandHandlerInterface handling them.
         CommandHandlerInterface::HandlerContext context(apCommandObj, aCommandPath, apPayload);
         handler->InvokeCommand(context);
 

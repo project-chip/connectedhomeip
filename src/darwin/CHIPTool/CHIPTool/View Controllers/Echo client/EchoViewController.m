@@ -111,25 +111,7 @@
         msg = [self.messageTextField placeholder];
     }
 
-    if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
-            if (chipDevice) {
-                CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:chipDevice endpoint:0 queue:dispatch_get_main_queue()];
-                [self updateResult:@"MfgSpecificPing command sent..."];
-
-                [cluster mfgSpecificPingWithCompletionHandler:^(NSError * _Nullable error) {
-                    NSString * resultString = (error == nil)
-                        ? @"MfgSpecificPing command: success!"
-                        : [NSString stringWithFormat:@"An error occurred: 0x%02lx", error.code];
-                    [self updateResult:resultString];
-                }];
-            } else {
-                [self updateResult:@"Failed to establish a connection with the device"];
-            }
-        })) {
-        [self updateResult:@"Waiting for connection with the device"];
-    } else {
-        [self updateResult:@"Failed to trigger the connection with the device"];
-    }
+    [self updateResult:@"Not Supported"];
 }
 
 @end

@@ -20,7 +20,6 @@
 
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/InteractionModelDelegate.h>
 #include <app/MessageDef/AttributeDataIBs.h>
 #include <app/MessageDef/AttributeStatusIB.h>
 #include <app/MessageDef/StatusIB.h>
@@ -117,7 +116,7 @@ public:
      *  of this instance.
      *
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
-     *  @param[in]    apDelegate       InteractionModelDelegate set by application.
+     *  @param[in]    apCallback       Callback set by application.
      *  @param[in]    aTimedWriteTimeoutMs If provided, do a timed write using this timeout.
      */
     WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback,

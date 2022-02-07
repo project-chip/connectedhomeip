@@ -120,6 +120,10 @@ public:
 
     CHIP_ERROR GetArrayListItem(jobject list, jint index, jobject & outItem);
 
+    CHIP_ERROR CreateHashMap(jobject & outMap);
+
+    CHIP_ERROR PutInMap(jobject map, jobject key, jobject value);
+
     CHIP_ERROR GetObjectField(jobject objectToRead, const char * name, const char * signature, jobject & outObject);
 
     /**
@@ -163,6 +167,7 @@ private:
     jobject mClassLoader       = nullptr;
     jmethodID mFindClassMethod = nullptr;
 
+    jclass mHashMapClass   = nullptr;
     jclass mArrayListClass = nullptr;
 };
 } // namespace chip

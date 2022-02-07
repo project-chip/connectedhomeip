@@ -16,7 +16,6 @@
  */
 
 #include <access/AccessControl.h>
-#include <access/examples/ExampleAccessControlDelegate.h>
 
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -282,6 +281,8 @@ struct AccessControlEntryCodec
         return fabricIndex;
     }
 
+    void SetFabricIndex(FabricIndex fabricIndex) { entry.SetFabricIndex(fabricIndex); }
+
     AccessControl::Entry entry;
 };
 
@@ -450,7 +451,7 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
         AccessControl::EntryIterator it;
         AccessControl::Entry entry;
         ReturnErrorOnFailure(GetAccessControl().Entries(it, &accessingFabricIndex));
-        if (it.Next(entry) == CHIP_NO_ERROR)
+        while (it.Next(entry) == CHIP_NO_ERROR)
         {
             oldCount++;
         }
@@ -459,7 +460,7 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
         ReturnErrorOnFailure(list.ComputeSize(&newCount));
         ReturnErrorOnFailure(GetAccessControl().GetMaxEntryCount(maxCount));
         VerifyOrReturnError(allCount >= oldCount, CHIP_ERROR_INTERNAL);
-        VerifyOrReturnError(static_cast<size_t>(allCount - oldCount + newCount) > maxCount, CHIP_ERROR_INVALID_LIST_LENGTH);
+        VerifyOrReturnError(static_cast<size_t>(allCount - oldCount + newCount) <= maxCount, CHIP_ERROR_INVALID_LIST_LENGTH);
 
         while (oldCount > 0)
         {
@@ -505,16 +506,9 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(AttributeValueDecoder & aDecod
 
 AccessControlAttribute gAttribute;
 
-AccessControl gAccessControl(Examples::GetAccessControlDelegate());
-
 } // namespace
 
 void MatterAccessControlPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttribute);
-
-    // TODO: move access control setup to lower level
-    //       (it's OK and convenient here during development)
-    gAccessControl.Init();
-    SetAccessControl(gAccessControl);
 }

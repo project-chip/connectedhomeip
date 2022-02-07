@@ -117,7 +117,6 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
 } // namespace chip
 
 namespace {
-bool testSyncReport = false;
 chip::TransportMgr<chip::Transport::UDP> gTransportManager;
 chip::SecurePairingUsingTestSecret gTestPairing;
 LivenessEventGenerator gLivenessGenerator;
@@ -139,45 +138,11 @@ void InitializeEventLogging(chip::Messaging::ExchangeManager * apMgr)
                                                       gCircularEventBuffer, logStorageResources, nullptr, 0, nullptr);
 }
 
-void MutateClusterHandler(chip::System::Layer * systemLayer, void * appState)
-{
-    chip::app::ClusterInfo dirtyPath;
-    dirtyPath.mClusterId  = kTestClusterId;
-    dirtyPath.mEndpointId = kTestEndpointId;
-    printf("MutateClusterHandler is triggered...");
-    // send dirty change
-    if (!testSyncReport)
-    {
-        dirtyPath.mAttributeId = 1;
-        chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(dirtyPath);
-        chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
-        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(1), MutateClusterHandler, NULL);
-        testSyncReport = true;
-    }
-    else
-    {
-        dirtyPath.mAttributeId = 10; // unknown field
-        chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(dirtyPath);
-        // send sync message(empty report)
-        chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
-    }
-}
-
-class MockInteractionModelApp : public chip::app::InteractionModelDelegate
-{
-public:
-    virtual CHIP_ERROR SubscriptionEstablished(const chip::app::ReadHandler * apReadHandler)
-    {
-        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(1), MutateClusterHandler, NULL);
-        return CHIP_NO_ERROR;
-    }
-};
 } // namespace
 
 int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    MockInteractionModelApp mockDelegate;
     chip::Optional<chip::Transport::PeerAddress> peer(chip::Transport::Type::kUndefined);
     const chip::FabricIndex gFabricIndex = 0;
 

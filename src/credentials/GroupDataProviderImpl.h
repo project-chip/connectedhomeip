@@ -217,12 +217,12 @@ protected:
 
     chip::PersistentStorageDelegate & mStorage;
     bool mInitialized = false;
-    BitMapObjectPool<GroupInfoIteratorImpl, kIteratorsMax> mGroupInfoIterators;
-    BitMapObjectPool<GroupKeyIteratorImpl, kIteratorsMax> mGroupKeyIterators;
-    BitMapObjectPool<EndpointIteratorImpl, kIteratorsMax> mEndpointIterators;
-    BitMapObjectPool<KeySetIteratorImpl, kIteratorsMax> mKeySetIterators;
-    BitMapObjectPool<GroupSessionIteratorImpl, kIteratorsMax> mGroupSessionsIterator;
-    BitMapObjectPool<GroupKeyContext, kIteratorsMax> mKeyContexPool;
+    ObjectPool<GroupInfoIteratorImpl, kIteratorsMax> mGroupInfoIterators;
+    ObjectPool<GroupKeyIteratorImpl, kIteratorsMax> mGroupKeyIterators;
+    ObjectPool<EndpointIteratorImpl, kIteratorsMax> mEndpointIterators;
+    ObjectPool<KeySetIteratorImpl, kIteratorsMax> mKeySetIterators;
+    ObjectPool<GroupSessionIteratorImpl, kIteratorsMax> mGroupSessionsIterator;
+    ObjectPool<GroupKeyContext, kIteratorsMax> mKeyContexPool;
 };
 
 } // namespace Credentials

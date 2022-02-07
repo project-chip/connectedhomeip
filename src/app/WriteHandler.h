@@ -18,7 +18,6 @@
 
 #pragma once
 #include <app/AttributePathParams.h>
-#include <app/InteractionModelDelegate.h>
 #include <app/MessageDef/WriteResponseMessage.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
@@ -45,8 +44,6 @@ public:
      *  of this instance, this method is invoked once after object
      *  construction until a call to Shutdown is made to terminate the
      *  instance.
-     *
-     *  @param[in]    apDelegate       InteractionModelDelegate set by application.
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE If the state is not equal to
      *          kState_NotInitialized.
