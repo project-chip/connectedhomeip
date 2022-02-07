@@ -66,9 +66,6 @@ class App:
 
     def factoryReset(self):
         storage = '/tmp/chip_kvs'
-        if platform.system() == 'Darwin':
-            storage = str(Path.home()) + '/Documents/chip.store'
-
         if os.path.exists(storage):
             os.unlink(storage)
 

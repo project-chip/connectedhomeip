@@ -113,13 +113,6 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     // handler.
     SetAttributePersistenceProvider(&mAttributePersister);
 
-#if CHIP_DEVICE_LAYER_TARGET_DARWIN
-    err = DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init("chip.store");
-    SuccessOrExit(err);
-#elif CHIP_DEVICE_LAYER_TARGET_LINUX
-    DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
-#endif
-
     InitDataModelHandler(&mExchangeMgr);
 
     err = mFabrics.Init(&mDeviceStorage);
