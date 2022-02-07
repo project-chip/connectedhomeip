@@ -24,11 +24,9 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include "lib/support/CHIPMem.h"
-#include <platform/MW320/MW320Config.h>
 #include <platform/KeyValueStoreManager.h>
+#include <platform/MW320/MW320Config.h>
 #include <string>
-
-
 
 namespace chip {
 namespace DeviceLayer {
@@ -44,7 +42,6 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-
     return err;
 }
 
@@ -52,16 +49,12 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-
-
     return err;
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
-
 
     return err;
 }

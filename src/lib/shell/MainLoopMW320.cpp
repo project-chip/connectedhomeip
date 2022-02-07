@@ -20,10 +20,9 @@
 #include <platform/CHIPDeviceLayer.h>
 
 #include <ctype.h>
-#include <string.h>
-#include <stdlib.h>
 #include <stdio.h>
-
+#include <stdlib.h>
+#include <string.h>
 
 using chip::FormatCHIPError;
 using chip::Shell::Engine;
@@ -33,7 +32,7 @@ namespace {
 
 intptr_t ReadLine(char * buffer, size_t max)
 {
-     ssize_t read = 0;
+    ssize_t read = 0;
     bool done    = false;
     char * inptr = buffer;
 
@@ -142,8 +141,6 @@ int TokenizeLine(char * buffer, char ** tokens, int max_tokens)
 exit:
     return cursor;
 }
-
-
 
 } // namespace
 

@@ -35,9 +35,6 @@
 
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD 0
 
-
-
-
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 0
 
 #define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_CRIT_EIDC_KEY 2
@@ -49,8 +46,6 @@
 
 // These are configuration options that are unique to the MW320 platform.
 // These can be overridden by the application as needed.
-
-
 
 // ========== Platform-specific Configuration Overrides =========
 #ifndef CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE

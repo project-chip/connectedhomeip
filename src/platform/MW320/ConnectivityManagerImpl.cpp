@@ -19,9 +19,9 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/ConnectivityManager.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/ConnectivityManager.h>
 
 #include <lwip/dns.h>
 #include <lwip/ip_addr.h>
@@ -30,10 +30,9 @@
 
 extern "C" {
 #include "wlan.h"
-void test_wlan_scan(int argc, char **argv);
-void test_wlan_add(int argc, char **argv);
+void test_wlan_scan(int argc, char ** argv);
+void test_wlan_add(int argc, char ** argv);
 }
-
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.cpp>
@@ -59,7 +58,6 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 
     // Initialize the generic base classes that require it.
 
-
     SuccessOrExit(err);
 
 exit:
@@ -69,7 +67,6 @@ exit:
 void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 {
     // Forward the event to the generic base classes as needed.
-
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -78,7 +75,8 @@ ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMod
 {
     if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
     {
-        mWiFiStationMode = kWiFiStationMode_Enabled; //(mWpaSupplicant.iface != nullptr) ? kWiFiStationMode_Enabled : kWiFiStationMode_Disabled;
+        mWiFiStationMode =
+            kWiFiStationMode_Enabled; //(mWpaSupplicant.iface != nullptr) ? kWiFiStationMode_Enabled : kWiFiStationMode_Disabled;
     }
 
     return mWiFiStationMode;
@@ -125,7 +123,7 @@ bool ConnectivityManagerImpl::_IsWiFiStationEnabled()
 
 bool ConnectivityManagerImpl::_IsWiFiStationConnected()
 {
-    bool ret            = false;
+    bool ret = false;
 
     return ret;
 }
@@ -135,16 +133,13 @@ bool ConnectivityManagerImpl::_IsWiFiStationApplicationControlled()
     return mWiFiStationMode == ConnectivityManager::kWiFiStationMode_ApplicationControlled;
 }
 
-void ConnectivityManagerImpl::StartWiFiManagement()
-{
-
-}
+void ConnectivityManagerImpl::StartWiFiManagement() {}
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
 CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, const char * key)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    CHIP_ERROR ret  = CHIP_NO_ERROR;
+    CHIP_ERROR ret = CHIP_NO_ERROR;
     int ret_mcuXpresso;
     char arg0[] = "wlan-add";
     char arg1[32];
@@ -152,12 +147,12 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, cons
     char arg3[32];
     char arg4[] = "wpa2";
     char arg5[64];
-    char* argv[] = { &arg0[0], &arg1[0], &arg2[0], &arg3[0], &arg4[0], &arg5[0], NULL };
-    int   argc   = (int)(sizeof(argv) / sizeof(argv[0])) - 1;
+    char * argv[] = { &arg0[0], &arg1[0], &arg2[0], &arg3[0], &arg4[0], &arg5[0], NULL };
+    int argc      = (int) (sizeof(argv) / sizeof(argv[0])) - 1;
 
-    sprintf( (char *) arg1, "%s", ssid);
-    sprintf( (char *) arg3, "%s", ssid);
-    sprintf( (char *) arg5, "%s", key);
+    sprintf((char *) arg1, "%s", ssid);
+    sprintf((char *) arg3, "%s", ssid);
+    sprintf((char *) arg5, "%s", key);
     test_wlan_add(argc, &argv[0]);
     ret_mcuXpresso = wlan_connect(argv[1]);
     if (ret_mcuXpresso == WLAN_ERROR_STATE)
@@ -172,8 +167,9 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, cons
     }
     else
     {
-        ChipLogProgress(DeviceLayer, "Connecting to network...\r\nUse 'wlan-stat' for "
-        "current connection status.");
+        ChipLogProgress(DeviceLayer,
+                        "Connecting to network...\r\nUse 'wlan-stat' for "
+                        "current connection status.");
     }
     return ret;
 #else

@@ -18,9 +18,9 @@
 #include <platform/logging/LogV.h>
 
 #include <lib/core/CHIPConfig.h>
+#include <lib/support/logging/Constants.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <src/lib/support/CodeUtils.h>
-#include <lib/support/logging/Constants.h>
 
 #include <cstring>
 
@@ -35,7 +35,6 @@
 
 static bool isLogInitialized;
 extern uint8_t gOtLogUartInstance;
-
 
 namespace chip {
 namespace Logging {
@@ -91,7 +90,7 @@ void FillPrefix(char * buf, uint8_t bufLen, uint8_t chipCategory, uint8_t otLeve
     /* add the error string */
     chip::Logging::Platform::GetMessageString(buf, chipCategory, otLevelLog);
 }
- // unnamed namespace
+// unnamed namespace
 
 namespace chip {
 namespace DeviceLayer {
@@ -117,9 +116,9 @@ void GenericLog(const char * format, va_list arg)
 
     if (!isLogInitialized)
     {
-        isLogInitialized   = true;
-        //gOtLogUartInstance = 0;
-        //otPlatUartEnable();
+        isLogInitialized = true;
+        // gOtLogUartInstance = 0;
+        // otPlatUartEnable();
     }
 
     /* Prefix is composed of [Debug String][MOdule Name String] */
@@ -131,7 +130,6 @@ void GenericLog(const char * format, va_list arg)
     writtenLen = vsnprintf(formattedMsg + prefixLen, CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE - prefixLen - EOL_CHARS_LEN, format, arg);
     VerifyOrDie(writtenLen > 0);
     memcpy(formattedMsg + prefixLen + writtenLen, EOL_CHARS, EOL_CHARS_LEN);
-
 
     // Let the application know that a log message has been emitted.
     chip::DeviceLayer::OnLogOutput();

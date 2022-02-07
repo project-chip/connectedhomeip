@@ -59,7 +59,7 @@ private:
 
     friend PlatformManager & PlatformMgr(void);
     friend PlatformManagerImpl & PlatformMgrImpl(void);
-    //friend class Internal::BLEManagerImpl;
+    // friend class Internal::BLEManagerImpl;
 
     static PlatformManagerImpl sInstance;
 
