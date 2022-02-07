@@ -86,6 +86,7 @@ public:
     bool SetOneTouchLocking(chip::EndpointId endpointId, bool isEnabled);
     bool SetPrivacyModeButton(chip::EndpointId endpointId, bool isEnabled);
 
+    bool GetAutoRelockTime(chip::EndpointId endpointId, uint32_t & autoRelockTime);
     bool GetNumberOfUserSupported(chip::EndpointId endpointId, uint16_t & numberOfUsersSupported);
     bool GetNumberOfPINCredentialsSupported(chip::EndpointId endpointId, uint16_t & numberOfPINCredentials);
     bool GetNumberOfRFIDCredentialsSupported(chip::EndpointId endpointId, uint16_t & numberOfRFIDCredentials);
@@ -294,6 +295,14 @@ private:
                                 bool opSuccess = true);
 
     /**
+     * @brief Schedule auto relocking with a given timeout
+     *
+     * @param endpointId    endpoint where DoorLockServer is running
+     * @param timeoutSec    timeout in seconds
+     */
+    void ScheduleAutoRelock(chip::EndpointId endpointId, uint32_t timeoutSec);
+
+    /**
      * @brief Send generic event
      *
      * @tparam T            Any event type supported by Matter
@@ -345,6 +354,10 @@ private:
     friend bool emberAfDoorLockClusterUnlockWithTimeoutCallback(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::DoorLock::Commands::UnlockWithTimeout::DecodableType & commandData);
+
+    friend void emberAfPluginDoorLockOnAutoRelock(chip::EndpointId endpointId);
+
+    EmberEventControl AutolockEvent; /**< for automatic relock scheduling */
 
     static DoorLockServer instance;
 };

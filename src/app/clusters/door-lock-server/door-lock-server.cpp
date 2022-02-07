@@ -45,7 +45,14 @@ using namespace chip::app::Clusters::DoorLock;
 static constexpr uint8_t DOOR_LOCK_SCHEDULE_MAX_HOUR   = 23;
 static constexpr uint8_t DOOR_LOCK_SCHEDULE_MAX_MINUTE = 59;
 
+// emberEventControlSetDelayMS() uses uint32_t for timeout in milliseconds but doesn't accept
+// values more than MAX(UINT32) / 2. This is internal value. Thus, lets limit our relock timeout
+// in seconds with the appropriate maximum to ensure that delay setting won't fail.
+static constexpr uint32_t DOOR_LOCK_MAX_LOCK_TIMEOUT_SEC = MAX_INT32U_VALUE / (2 * MILLISECOND_TICKS_PER_SECOND);
+
 DoorLockServer DoorLockServer::instance;
+
+void emberAfPluginDoorLockOnAutoRelock(chip::EndpointId endpointId);
 
 /**********************************************************
  * DoorLockServer public methods
@@ -90,10 +97,14 @@ bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLo
     // Schedule auto-relocking
     if (success && DlLockOperationType::kUnlock == opType)
     {
-        uint32_t autoRelockTime;
+        // appclusters.pdf 5.3.3.25:
+        // The number of seconds to wait after unlocking a lock before it automatically locks again. 0=disabled. If set, unlock
+        // operations from any source will be timed. For one time unlock with timeout use the specific command.
+        uint32_t autoRelockTime = 0;
 
-        success = GetAttribute(endpointId, Attributes::AutoRelockTime::Id, Attributes::AutoRelockTime::Get, autoRelockTime);
-        // TODO: Handle AutoRelockTime here
+        VerifyOrReturnError(GetAutoRelockTime(endpointId, autoRelockTime), false);
+        VerifyOrReturnError(0 != autoRelockTime, true);
+        ScheduleAutoRelock(endpointId, autoRelockTime);
     }
 
     return success;
@@ -140,6 +151,11 @@ bool DoorLockServer::SetOneTouchLocking(chip::EndpointId endpointId, bool isEnab
 bool DoorLockServer::SetPrivacyModeButton(chip::EndpointId endpointId, bool isEnabled)
 {
     return SetAttribute(endpointId, Attributes::EnablePrivacyModeButton::Id, Attributes::EnablePrivacyModeButton::Set, isEnabled);
+}
+
+bool DoorLockServer::GetAutoRelockTime(chip::EndpointId endpointId, uint32_t & autoRelockTime)
+{
+    return GetAttribute(endpointId, Attributes::AutoRelockTime::Id, Attributes::AutoRelockTime::Get, autoRelockTime);
 }
 
 bool DoorLockServer::GetNumberOfUserSupported(chip::EndpointId endpointId, uint16_t & numberOfUsersSupported)
@@ -2672,6 +2688,23 @@ void DoorLockServer::SendLockOperationEvent(chip::EndpointId endpointId, DlLockO
     }
 }
 
+void DoorLockServer::ScheduleAutoRelock(chip::EndpointId endpointId, uint32_t timeoutSec)
+{
+    emberEventControlSetInactive(&AutolockEvent);
+
+    AutolockEvent.endpoint = endpointId;
+    AutolockEvent.callback = emberAfPluginDoorLockOnAutoRelock;
+
+    uint32_t timeoutMs =
+        (DOOR_LOCK_MAX_LOCK_TIMEOUT_SEC >= timeoutSec) ? timeoutSec * MILLISECOND_TICKS_PER_SECOND : DOOR_LOCK_MAX_LOCK_TIMEOUT_SEC;
+    auto err = emberEventControlSetDelayMS(&AutolockEvent, timeoutMs);
+
+    if (EMBER_SUCCESS != err)
+    {
+        ChipLogError(Zcl, "Failed to schedule autorelock: timeout=%" PRIu32 ", status=0x%" PRIx8, timeoutSec, err);
+    }
+}
+
 template <typename T>
 void DoorLockServer::SendEvent(chip::EndpointId endpointId, T & event)
 {
@@ -2737,7 +2770,14 @@ bool emberAfDoorLockClusterUnlockDoorCallback(
     if (DoorLockServer::Instance().HandleRemoteLockOperation(commandObj, commandPath, DlLockOperationType::kUnlock,
                                                              emberAfPluginDoorLockOnDoorUnlockCommand, commandData.pinCode))
     {
-        // TODO: if AutoRelockTime is set, schedule automatic door locking
+        // appclusters.pdf 5.3.3.25:
+        // The number of seconds to wait after unlocking a lock before it automatically locks again. 0=disabled. If set, unlock
+        // operations from any source will be timed. For one time unlock with timeout use the specific command.
+        uint32_t autoRelockTime = 0;
+
+        VerifyOrReturnError(DoorLockServer::Instance().GetAutoRelockTime(commandPath.mEndpointId, autoRelockTime), true);
+        VerifyOrReturnError(0 != autoRelockTime, true);
+        DoorLockServer::Instance().ScheduleAutoRelock(commandPath.mEndpointId, autoRelockTime);
     }
 
     return true;
@@ -2752,7 +2792,14 @@ bool emberAfDoorLockClusterUnlockWithTimeoutCallback(
     if (DoorLockServer::Instance().HandleRemoteLockOperation(commandObj, commandPath, DlLockOperationType::kUnlock,
                                                              emberAfPluginDoorLockOnDoorUnlockCommand, commandData.pinCode))
     {
-        // TODO: Implement door locking with given timeout
+        // appclusters.pdf 5.3.4.3:
+        // This command causes the lock device to unlock the door with a timeout parameter. After the time in seconds specified in
+        // the timeout field, the lock device will relock itself automatically.
+        // field: Timeout, type: uint16_t
+        uint32_t timeout = static_cast<uint32_t>(commandData.timeout);
+
+        VerifyOrReturnError(0 != timeout, true);
+        DoorLockServer::Instance().ScheduleAutoRelock(commandPath.mEndpointId, timeout);
     }
 
     return true;
@@ -3143,4 +3190,14 @@ emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t yearDayInd
                                  uint32_t localStartTime, uint32_t localEndTime)
 {
     return DlStatus::kFailure;
+}
+
+// =============================================================================
+// Timer callbacks
+// =============================================================================
+
+void emberAfPluginDoorLockOnAutoRelock(chip::EndpointId endpointId)
+{
+    emberEventControlSetInactive(&DoorLockServer::Instance().AutolockEvent);
+    DoorLockServer::Instance().SetLockState(endpointId, DlLockState::kLocked, DlOperationSource::kAuto);
 }
