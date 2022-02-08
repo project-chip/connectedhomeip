@@ -31,6 +31,7 @@
 
 #include <ble/CHIPBleServiceData.h>
 #include <platform/internal/BLEManager.h>
+#include <setup_payload/AdditionalDataPayloadGenerator.h>
 
 #include "FreeRTOS.h"
 #include <queue.h>
@@ -90,7 +91,11 @@ QueueHandle_t BLEManagerImpl::sEventHandlerMsgQueueID;
 
 chipOBleProfileCBs_t BLEManagerImpl::CHIPoBLEProfile_CBs = {
     // Provisioning GATT Characteristic value change callback
-    CHIPoBLEProfile_charValueChangeCB
+    CHIPoBLEProfile_charValueChangeCB,
+
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    CHIPoBLEProfile_c3ValueReadCB,
+#endif
 };
 
 // GAP Bond Manager Callbacks
@@ -1806,6 +1811,55 @@ void BLEManagerImpl::CHIPoBLEProfile_charValueChangeCB(uint8_t paramId, uint16_t
         }
     }
 }
+
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+/*********************************************************************
+ * @fn      CHIPoBLEProfile_c3ValueReadCB
+ *
+ * @brief   Callback from CHIPoBLE Profile indicating a commissioner
+ *          reading an additionald commissioning-related data (C3) from
+ *          commissionee.
+ *          Calling context (BLE Stack Task)
+ *
+ * @param   destBuf - buffer to copy data to
+ *          maxLen - maximum length of destBuf
+ *
+ * @return  None.
+ */
+void BLEManagerImpl::CHIPoBLEProfile_c3ValueReadCB(uint16_t connHandle, uint8_t *destBuf, uint16_t maxLen)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    System::PacketBufferHandle packetBuf;
+    uint16_t len;
+
+    char serialNumber[ConfigurationManager::kMaxSerialNumberLength + 1];
+    uint16_t lifetimeCounter = 0;
+    BitFlags<AdditionalDataFields> additionalDataFields;
+
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
+    err = ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber));
+    SuccessOrExit(err);
+    err = ConfigurationMgr().GetLifetimeCounter(lifetimeCounter);
+    SuccessOrExit(err);
+
+    additionalDataFields.Set(AdditionalDataFields::RotatingDeviceId);
+#endif /* CHIP_ENABLE_ROTATING_DEVICE_ID */
+
+    err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(lifetimeCounter, serialNumber, strlen(serialNumber),
+                                                                         packetBuf, additionalDataFields);
+    SuccessOrExit(err);
+
+    len = (maxLen < packetBuf->DataLength()) ? maxLen : packetBuf->DataLength();
+    memcpy(destBuf, packetBuf->Start(), len);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to read C3 data (%s), error: %lX", __func__, err.AsInteger());
+    }
+    return;
+}
+#endif
 
 /*********************************************************************
  * @fn      RemoteDisplay_passcodeCb

@@ -69,6 +69,12 @@ extern "C" {
 #define CHIPOBLEPROFILE_CHAR_LEN (244)
 #define CHIPOBLEPROFILE_MAX_DESCRIPTION_LEN (20)
 
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+// following example of CHIPOBLEPROFILE_CHAR_LEN = C1 Character max length - 3
+// spec: Table 30. BTP GATT service
+#define CHIPOBLEPROFILE_C3_MAX_LEN (509)
+#endif
+
 /*********************************************************************
  * TYPEDEFS
  */
@@ -76,9 +82,17 @@ extern "C" {
 /* Callback when a characteristic value has changed */
 typedef void (*chipOBleProfileChange_t)(uint8 paramID, uint16 len, uint16_t connHandle);
 
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+/* Called when commissioner requests (optional) additional commissioning-related data from this device (commissionee) */
+typedef void (*chipOBLEProfileC3Read_t)(uint8_t *destBuf, uint16_t maxLen, uint16_t connHandle);
+#endif
+
 typedef struct
 {
     chipOBleProfileChange_t pfnchipOBleProfileChange; // Called when characteristic value changes
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    chipOBLEProfileC3Read_t pfnchipOBleC3Read;        // Called when commissioner requests (optional) additional commissioning-related data from this device (commissionee)
+#endif
 } chipOBleProfileCBs_t;
 
 /*********************************************************************

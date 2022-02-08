@@ -330,6 +330,9 @@ private:
     static void ClockHandler(uintptr_t arg);
     static void AdvTimeoutHandler(uintptr_t arg);
     static void CHIPoBLEProfile_charValueChangeCB(uint8_t paramId, uint16_t len, uint16_t connHandle);
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    static void CHIPoBLEProfile_c3ValueReadCB(uint8_t *destBuf, uint16_t maxLen,uint16_t connHandle);
+#endif
     static void PasscodeCb(uint8_t * pDeviceAddr, uint16_t connHandle, uint8_t uiInputs, uint8_t uiOutputs, uint32_t numComparison);
     static void PairStateCb(uint16_t connHandle, uint8_t state, uint8_t status);
     static void AssertHandler(uint8 assertCause, uint8 assertSubcause);

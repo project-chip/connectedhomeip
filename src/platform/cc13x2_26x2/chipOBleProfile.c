@@ -56,7 +56,7 @@ const uint8 chipOBleProfileRxCharUUID[ATT_UUID_SIZE] = {
 };
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-// CHIPoBLE Rx characteristic UUID
+// CHIPoBLE C3 characteristic UUID
 const uint8 chipOBleProfileC3CharUUID[ATT_UUID_SIZE] = {
     // 0x04, 0x8F, 0x21, 0x83, 0x8A, 0x74, 0x7D, 0xB8, 0xF2, 0x45, 0x72, 0x87, 0x38, 0x02, 0x63, 0x64
     CHIPOBLEPROFILE_C3_CHAR_UUID128
@@ -341,13 +341,36 @@ static bStatus_t CHIPoBLEProfile_ReadAttrCB(uint16_t connHandle, gattAttribute_t
                                             uint16_t offset, uint16_t maxLen, uint8_t method)
 {
     bStatus_t status = SUCCESS;
-    uint8 len        = maxLen;
+    uint16 len        = maxLen;
 
     if (offset + maxLen > CHIPOBLEPROFILE_CHAR_LEN)
         len = CHIPOBLEPROFILE_CHAR_LEN - offset;
 
+    // toby: original
+    /*
     *pLen = len;
     VOID osal_memcpy(pValue, (pAttr->pValue) + offset, len);
+    */
+    // end original
+
+    // toby add?
+
+    *pLen = len;
+
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    if (pAttr->type->len == ATT_UUID_SIZE &&
+        !memcmp(pAttr->type->uuid, chipOBleProfileC3CharUUID, sizeof(chipOBleProfileC3CharUUID)) &&
+        chipOBleProfile_AppCBs->pfnchipOBleC3Read)
+    {
+        len = CHIPOBLEPROFILE_C3_MAX_LEN;
+        chipOBleProfile_AppCBs->pfnchipOBleC3Read(pValue, len, connHandle);
+    }
+    else
+#endif
+    {
+        VOID osal_memcpy(pValue, (pAttr->pValue) + offset, len);
+    }
+    // end add
 
     return status;
 }
