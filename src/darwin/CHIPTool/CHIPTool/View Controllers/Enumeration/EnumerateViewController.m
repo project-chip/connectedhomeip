@@ -65,7 +65,7 @@
     _sendButton = [UIButton new];
     [_sendButton setTitle:@"Start" forState:UIControlStateNormal];
     [_sendButton addTarget:self action:@selector(sendMessage:) forControlEvents:UIControlEventTouchUpInside];
-    UIView * startView = [CHIPUIViewUtils stackViewWithButtons:@[_sendButton]];
+    UIView * startView = [CHIPUIViewUtils stackViewWithButtons:@[ _sendButton ]];
     [_stackView addArrangedSubview:startView];
     startView.translatesAutoresizingMaskIntoConstraints = false;
     [startView.trailingAnchor constraintEqualToAnchor:_stackView.trailingAnchor].active = YES;
@@ -99,7 +99,6 @@
     [self enumerate];
 }
 
-
 // MARK: Enumeration Implementation
 
 // This API just walks over the accessory and tries to display its information.
@@ -111,54 +110,59 @@
 {
     CHIPGetConnectedDevice(^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
         if (error) {
-            NSString *resultLog = [[NSString alloc] initWithFormat:@"Unable to get connected device: Error: %@", error];
+            NSString * resultLog = [[NSString alloc] initWithFormat:@"Unable to get connected device: Error: %@", error];
             [self updateResult:resultLog];
             return;
         }
 
-        CHIPDescriptor *descriptorCluster = [[CHIPDescriptor alloc] initWithDevice:device endpoint:0 queue:dispatch_get_main_queue()];
+        CHIPDescriptor * descriptorCluster = [[CHIPDescriptor alloc] initWithDevice:device
+                                                                           endpoint:0
+                                                                              queue:dispatch_get_main_queue()];
         NSLog(@"Reading parts list to get list of endpoints in use...");
-        [descriptorCluster readAttributePartsListWithCompletionHandler:^(NSArray<NSNumber *> * _Nullable endpointsInUse, NSError * _Nullable error) {
-            if (error)
-            {
-                NSString *resultLog = [[NSString alloc] initWithFormat:@"Unable to read parts list: Error: %@", error];
+        [descriptorCluster readAttributePartsListWithCompletionHandler:^(
+            NSArray<NSNumber *> * _Nullable endpointsInUse, NSError * _Nullable error) {
+            if (error) {
+                NSString * resultLog = [[NSString alloc] initWithFormat:@"Unable to read parts list: Error: %@", error];
                 [self updateResult:resultLog];
                 return;
             }
 
-            NSString *resultLog = [[NSString alloc] initWithFormat:@"Got list of endpoints in Use: %@", endpointsInUse];
+            NSString * resultLog = [[NSString alloc] initWithFormat:@"Got list of endpoints in Use: %@", endpointsInUse];
             [self updateResult:resultLog];
 
-            for (NSNumber *endpoint in endpointsInUse)
-            {
-                CHIPDescriptor *descriptorCluster = [[CHIPDescriptor alloc] initWithDevice:device endpoint:[endpoint unsignedShortValue] queue:dispatch_get_main_queue()];
-                [descriptorCluster readAttributeDeviceListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                    if (error)
-                    {
-                        NSString *resultLog = [[NSString alloc] initWithFormat:@"Unable to read device list for Endpoint:%@ Error: %@", endpoint, error];
+            for (NSNumber * endpoint in endpointsInUse) {
+                CHIPDescriptor * descriptorCluster = [[CHIPDescriptor alloc] initWithDevice:device
+                                                                                   endpoint:[endpoint unsignedShortValue]
+                                                                                      queue:dispatch_get_main_queue()];
+                [descriptorCluster readAttributeDeviceListWithCompletionHandler:^(
+                    NSArray * _Nullable value, NSError * _Nullable error) {
+                    if (error) {
+                        NSString * resultLog = [[NSString alloc]
+                            initWithFormat:@"Unable to read device list for Endpoint:%@ Error: %@", endpoint, error];
                         [self updateResult:resultLog];
                         return;
                     }
 
-                    NSString *resultLog = [[NSString alloc] initWithFormat:@"Got device list for endpoint:%@ %@", endpoint, value];
+                    NSString * resultLog = [[NSString alloc] initWithFormat:@"Got device list for endpoint:%@ %@", endpoint, value];
                     [self updateResult:resultLog];
 
-                    [descriptorCluster readAttributeServerListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                        if (error)
-                        {
-                            NSString *resultLog = [[NSString alloc] initWithFormat:@"Unable to read server list for Endpoint:%@ Error: %@", endpoint, error];
-                            [self updateResult:resultLog];
-                            return;
-                        }
+                    [descriptorCluster
+                        readAttributeServerListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                            if (error) {
+                                NSString * resultLog = [[NSString alloc]
+                                    initWithFormat:@"Unable to read server list for Endpoint:%@ Error: %@", endpoint, error];
+                                [self updateResult:resultLog];
+                                return;
+                            }
 
-                        NSString *resultLog = [[NSString alloc] initWithFormat:@"Got server list for endpoint:%@ %@", endpoint, value];
-                        [self updateResult:resultLog];
-                    }];
+                            NSString * resultLog =
+                                [[NSString alloc] initWithFormat:@"Got server list for endpoint:%@ %@", endpoint, value];
+                            [self updateResult:resultLog];
+                        }];
                 }];
             }
         }];
     });
 }
-
 
 @end
