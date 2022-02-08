@@ -59,7 +59,7 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
     serializedKey.SetLength(keySize);
 
     if (err != CHIP_NO_ERROR)
-    {   
+    {
         ChipLogProgress(Controller, "Couldn't get %s from storage: %s", kOperationalCredentialsIssuerKeypairStorage, ErrorStr(err));
         // Storage doesn't have an existing keypair. Let's create one and add it to the storage.
         ReturnErrorOnFailure(mIssuer.Initialize());
