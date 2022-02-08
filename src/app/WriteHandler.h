@@ -113,6 +113,9 @@ private:
         Sending,           // The handler has sent out the write response
     };
     Protocols::InteractionModel::Status ProcessWriteRequest(System::PacketBufferHandle && aPayload, bool aIsTimedWrite);
+    Protocols::InteractionModel::Status HandleWriteRequestMessage(Messaging::ExchangeContext * apExchangeContext,
+                                                                  System::PacketBufferHandle && aPayload, bool aIsTimedWrite);
+
     CHIP_ERROR FinalizeMessage(System::PacketBufferHandle & packet);
     CHIP_ERROR SendWriteResponse();
 

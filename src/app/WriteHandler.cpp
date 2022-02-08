@@ -58,13 +58,6 @@ void WriteHandler::Close()
 
 void WriteHandler::Abort()
 {
-#if 0
-    // TODO: When chunking gets added, we should add this back.
-    //
-    // If the exchange context hasn't already been gracefully closed
-    // (signaled by setting it to null), then we need to forcibly
-    // tear it down.
-    //
     if (mpExchangeCtx != nullptr)
     {
         // We might be a delegate for this exchange, and we don't want the
@@ -80,27 +73,11 @@ void WriteHandler::Abort()
     }
 
     ClearState();
-#else
-    //
-    // The WriteHandler should get synchronously allocated and destroyed in the same execution
-    // context given that it's just a 2 message exchange (request + response). Consequently, we should
-    // never arrive at a situation where we have active handlers at any time Abort() is called.
-    //
-    VerifyOrDie(mState == State::Uninitialized);
-#endif
 }
 
-Status WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload,
-                                    bool aIsTimedWrite)
+Status WriteHandler::HandleWriteRequestMessage(Messaging::ExchangeContext * apExchangeContext,
+                                               System::PacketBufferHandle && aPayload, bool aIsTimedWrite)
 {
-    mpExchangeCtx = apExchangeContext;
-
-    //
-    // Let's take over further message processing on this exchange from the IM.
-    // This is only relevant during chunked requests.
-    //
-    mpExchangeCtx->SetDelegate(this);
-
     System::PacketBufferHandle packet = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
     VerifyOrReturnError(!packet.IsNull(), Status::Failure);
 
@@ -123,38 +100,62 @@ Status WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeConte
         }
     }
 
+    return status;
+}
+
+Status WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload,
+                                    bool aIsTimedWrite)
+{
+    mpExchangeCtx = apExchangeContext;
+
+    //
+    // Let's take over further message processing on this exchange from the IM.
+    // This is only relevant during chunked requests.
+    //
+    mpExchangeCtx->SetDelegate(this);
+
+    Status status = HandleWriteRequestMessage(apExchangeContext, std::move(aPayload), aIsTimedWrite);
+
+    // The write transaction will be alive only when the message was handled successfully and there are more chunks.
     if (!(status == Status::Success && mHasMoreChunks))
     {
         Close();
     }
+
     return status;
 }
 
 CHIP_ERROR WriteHandler::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                            System::PacketBufferHandle && aPayload)
 {
-    //
-    // As part of write handling, the exchange should get closed sychronously given there is always
-    // just a single response to a Write Request message before the exchange gets closed. There-after,
-    // even if we get any more messages on that exchange from a non-compliant client, our exchange layer
-    // should correctly discard those. If there is a bug there, this function here may get invoked.
-    //
-    // NOTE: Once chunking gets implemented, this will no longer be true.
-    //
-    VerifyOrDieWithMsg(false, DataManagement, "This function should never get invoked");
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrDieWithMsg(apExchangeContext == mpExchangeCtx, DataManagement,
+                       "Incoming exchange context should be same as the initial request.");
+    VerifyOrDieWithMsg(!apExchangeContext->IsGroupExchangeContext(), DataManagement,
+                       "OnMessageReceived should not be called on GroupExchangeContext");
+
+    Status status =
+        HandleWriteRequestMessage(apExchangeContext, std::move(aPayload), false /* chunked write should not be timed write */);
+    if (status == Status::Success)
+    {
+        // We have no more chunks, the write response has been sent in HandleWriteRequestMessage, so close directly.
+        if (!mHasMoreChunks)
+        {
+            Close();
+        }
+    }
+    else if (status != Protocols::InteractionModel::Status::Success)
+    {
+        err = StatusResponse::Send(status, apExchangeContext, false /*aExpectResponse*/);
+        Close();
+    }
+    return CHIP_NO_ERROR;
 }
 
 void WriteHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
 {
-    //
-    // As part of write handling, the exchange should get closed sychronously given there is always
-    // just a single response to a Write Request message before the exchange gets closed. That response
-    // does not solicit any further responses back. Consequently, we never expect to get notified
-    // of any response timeouts.
-    //
-    // NOTE: Once chunking gets implemented, this will no longer be true.
-    //
-    VerifyOrDieWithMsg(false, DataManagement, "This function should never get invoked");
+    Abort();
 }
 
 CHIP_ERROR WriteHandler::FinalizeMessage(System::PacketBufferHandle & packet)
@@ -399,6 +400,13 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
         err = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
+
+    if (mHasMoreChunks && (mpExchangeCtx->IsGroupExchangeContext() || mIsTimedRequest))
+    {
+        // Sanity check: group exchange context should only have one chunk.
+        // Also, timed requests should not have more than one chunk.
+        ExitNow(err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
+    }
 
     err = writeRequestParser.GetWriteRequests(&AttributeDataIBsParser);
     SuccessOrExit(err);
