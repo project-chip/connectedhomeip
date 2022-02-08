@@ -47,7 +47,7 @@ void OperationalDeviceProxy::MoveToState(State aTargetState)
     if (mState != aTargetState)
     {
         ChipLogDetail(Controller,
-                      "OperationalDeviceProxy[CF" ChipLogFormatX64 ":" ChipLogFormatX64 "]: Moving from state %d --> %d",
+                      "OperationalDeviceProxy[CF" ChipLogFormatX64 "-" ChipLogFormatX64 "]: Moving from state %d --> %d",
                       ChipLogValueX64(mPeerId.GetCompressedFabricId()), ChipLogValueX64(mPeerId.GetNodeId()), (uint32_t) mState,
                       (uint32_t) aTargetState);
         mState = aTargetState;
