@@ -1457,8 +1457,8 @@ server cluster GeneralDiagnostics = 51 {
   struct NetworkInterfaceType {
     CHAR_STRING<32> name = 0;
     BOOLEAN fabricConnected = 1;
-    BOOLEAN offPremiseServicesReachableIPv4 = 2;
-    BOOLEAN offPremiseServicesReachableIPv6 = 3;
+    nullable BOOLEAN offPremiseServicesReachableIPv4 = 2;
+    nullable BOOLEAN offPremiseServicesReachableIPv6 = 3;
     OCTET_STRING<8> hardwareAddress = 4;
     InterfaceType type = 5;
   }

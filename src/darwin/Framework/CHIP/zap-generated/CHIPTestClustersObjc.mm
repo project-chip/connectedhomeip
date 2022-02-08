@@ -6514,10 +6514,18 @@ using namespace chip::app::Clusters;
                         auto element_0 = (CHIPGeneralDiagnosticsClusterNetworkInterfaceType *) value[i_0];
                         listHolder_0->mList[i_0].name = [self asCharSpan:element_0.name];
                         listHolder_0->mList[i_0].fabricConnected = element_0.fabricConnected.boolValue;
-                        listHolder_0->mList[i_0].offPremiseServicesReachableIPv4
-                            = element_0.offPremiseServicesReachableIPv4.boolValue;
-                        listHolder_0->mList[i_0].offPremiseServicesReachableIPv6
-                            = element_0.offPremiseServicesReachableIPv6.boolValue;
+                        if (element_0.offPremiseServicesReachableIPv4 == nil) {
+                            listHolder_0->mList[i_0].offPremiseServicesReachableIPv4.SetNull();
+                        } else {
+                            auto & nonNullValue_2 = listHolder_0->mList[i_0].offPremiseServicesReachableIPv4.SetNonNull();
+                            nonNullValue_2 = element_0.offPremiseServicesReachableIPv4.boolValue;
+                        }
+                        if (element_0.offPremiseServicesReachableIPv6 == nil) {
+                            listHolder_0->mList[i_0].offPremiseServicesReachableIPv6.SetNull();
+                        } else {
+                            auto & nonNullValue_2 = listHolder_0->mList[i_0].offPremiseServicesReachableIPv6.SetNonNull();
+                            nonNullValue_2 = element_0.offPremiseServicesReachableIPv6.boolValue;
+                        }
                         listHolder_0->mList[i_0].hardwareAddress = [self asByteSpan:element_0.hardwareAddress];
                         listHolder_0->mList[i_0].type
                             = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].type)>>(

@@ -668,16 +668,16 @@ public class ChipStructs {
   public static class GeneralDiagnosticsClusterNetworkInterfaceType {
     public String name;
     public Boolean fabricConnected;
-    public Boolean offPremiseServicesReachableIPv4;
-    public Boolean offPremiseServicesReachableIPv6;
+    public @Nullable Boolean offPremiseServicesReachableIPv4;
+    public @Nullable Boolean offPremiseServicesReachableIPv6;
     public byte[] hardwareAddress;
     public Integer type;
 
     public GeneralDiagnosticsClusterNetworkInterfaceType(
         String name,
         Boolean fabricConnected,
-        Boolean offPremiseServicesReachableIPv4,
-        Boolean offPremiseServicesReachableIPv6,
+        @Nullable Boolean offPremiseServicesReachableIPv4,
+        @Nullable Boolean offPremiseServicesReachableIPv6,
         byte[] hardwareAddress,
         Integer type) {
       this.name = name;

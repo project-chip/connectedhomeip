@@ -37,6 +37,7 @@
 
 #include "lwip/opt.h"
 #include <cy_lwip.h>
+#include <platform/P6/NetworkCommissioningDriver.h>
 #include <type_traits>
 
 #if !CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
@@ -240,6 +241,7 @@ void ConnectivityManagerImpl::wlan_event_cb(cy_wcm_event_t event, cy_wcm_event_d
     case CY_WCM_EVENT_CONNECTED:
         ChipLogProgress(DeviceLayer, "CY_WCM_EVENT_CONNECTED");
         ConnectivityMgrImpl().ChangeWiFiStationState(kWiFiStationState_Connecting_Succeeded);
+        NetworkCommissioning::P6WiFiDriver::GetInstance().OnConnectWiFiNetwork();
         ConnectivityMgrImpl().DriveStationState();
         break;
     case CY_WCM_EVENT_CONNECT_FAILED:
@@ -250,6 +252,7 @@ void ConnectivityManagerImpl::wlan_event_cb(cy_wcm_event_t event, cy_wcm_event_d
     case CY_WCM_EVENT_RECONNECTED:
         ChipLogProgress(DeviceLayer, "CY_WCM_EVENT_RECONNECTED");
         ConnectivityMgrImpl().ChangeWiFiStationState(kWiFiStationState_Connecting_Succeeded);
+        NetworkCommissioning::P6WiFiDriver::GetInstance().OnConnectWiFiNetwork();
         ConnectivityMgrImpl().DriveStationState();
         break;
     case CY_WCM_EVENT_DISCONNECTED:

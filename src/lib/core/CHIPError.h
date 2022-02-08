@@ -400,9 +400,13 @@ using CHIP_ERROR = ::chip::ChipError;
 
 #define CHIP_CORE_ERROR(e) CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kCore, (e))
 
-#define CHIP_IM_GLOBAL_STATUS(e) CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kIMGlobalStatus, to_underlying(e))
+#define CHIP_IM_GLOBAL_STATUS(type)                                                                                                \
+    CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kIMGlobalStatus, to_underlying(Protocols::InteractionModel::Status::type))
 
-#define CHIP_IM_CLUSTER_STATUS(e) CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kIMClusterStatus, e)
+//
+// type must be a compile-time constant as mandated by CHIP_SDK_ERROR.
+//
+#define CHIP_IM_CLUSTER_STATUS(type) CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kIMClusterStatus, type)
 
 // clang-format off
 
