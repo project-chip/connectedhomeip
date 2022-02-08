@@ -318,9 +318,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _fabricConnected = @(0);
 
-        _offPremiseServicesReachableIPv4 = @(0);
+        _offPremiseServicesReachableIPv4 = nil;
 
-        _offPremiseServicesReachableIPv6 = @(0);
+        _offPremiseServicesReachableIPv6 = nil;
 
         _hardwareAddress = [NSData data];
 

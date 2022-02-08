@@ -10234,16 +10234,16 @@ class GeneralDiagnostics(Cluster):
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="name", Tag=0, Type=str),
                             ClusterObjectFieldDescriptor(Label="fabricConnected", Tag=1, Type=bool),
-                            ClusterObjectFieldDescriptor(Label="offPremiseServicesReachableIPv4", Tag=2, Type=bool),
-                            ClusterObjectFieldDescriptor(Label="offPremiseServicesReachableIPv6", Tag=3, Type=bool),
+                            ClusterObjectFieldDescriptor(Label="offPremiseServicesReachableIPv4", Tag=2, Type=typing.Union[Nullable, bool]),
+                            ClusterObjectFieldDescriptor(Label="offPremiseServicesReachableIPv6", Tag=3, Type=typing.Union[Nullable, bool]),
                             ClusterObjectFieldDescriptor(Label="hardwareAddress", Tag=4, Type=bytes),
                             ClusterObjectFieldDescriptor(Label="type", Tag=5, Type=GeneralDiagnostics.Enums.InterfaceType),
                     ])
 
             name: 'str' = ""
             fabricConnected: 'bool' = False
-            offPremiseServicesReachableIPv4: 'bool' = False
-            offPremiseServicesReachableIPv6: 'bool' = False
+            offPremiseServicesReachableIPv4: 'typing.Union[Nullable, bool]' = NullValue
+            offPremiseServicesReachableIPv6: 'typing.Union[Nullable, bool]' = NullValue
             hardwareAddress: 'bytes' = b""
             type: 'GeneralDiagnostics.Enums.InterfaceType' = 0
 

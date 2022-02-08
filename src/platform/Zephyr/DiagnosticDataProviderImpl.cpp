@@ -199,8 +199,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             ChipLogError(DeviceLayer, "Failed to get interface type");
         }
 
-        ifp->offPremiseServicesReachableIPv4 = false;
-        ifp->offPremiseServicesReachableIPv6 = false;
+        ifp->offPremiseServicesReachableIPv4.SetNonNull(false);
+        ifp->offPremiseServicesReachableIPv6.SetNonNull(false);
 
         uint8_t addressSize;
         if (interfaceIterator.GetHardwareAddress(ifp->MacAddress, addressSize, sizeof(ifp->MacAddress)) != CHIP_NO_ERROR)
