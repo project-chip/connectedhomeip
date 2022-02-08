@@ -64,6 +64,7 @@ argv
 armeabi
 ARMmbed
 armv
+ASAN
 asdk
 AssertionError
 ASYNC
@@ -143,6 +144,7 @@ capacitive
 CatalogVendorId
 CBB
 cbd
+ccf
 CCMP
 CCS
 CCSTUDIO
@@ -302,6 +304,7 @@ DevKitC
 DevKitM
 df
 dfu
+DgDxsfHx
 dhclient
 DHCP
 DHCPC
@@ -413,6 +416,7 @@ ffeebaefa
 FFF
 fffe
 fffff
+fHtcwcAAAAAAAAAwQAAAAAAXPMlAAAAAAA
 Fi
 filepath
 fini
@@ -429,6 +433,7 @@ fstab
 fsync
 ftd
 fullclean
+fuzzer
 gbl
 gcloud
 GDB
@@ -571,6 +576,7 @@ libdbus
 LIBDIR
 libegl
 libffi
+libfuzzer
 libgirepository
 libglib
 libical
@@ -1134,7 +1140,9 @@ WSTK
 xa
 xab
 xaver
+xb
 xbef
+xc
 xcd
 Xcode
 xcodeproj
@@ -1143,6 +1151,7 @@ xd
 xdeadbeefcafe
 xds
 xdsdfu
+xed
 xef
 xF
 xFFFF
