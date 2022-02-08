@@ -675,11 +675,11 @@ NS_ASSUME_NONNULL_BEGIN
 
         _minorNumber = @(0);
 
-        _name = @"";
+        _name = nil;
 
-        _callSign = @"";
+        _callSign = nil;
 
-        _affiliateCallSign = @"";
+        _affiliateCallSign = nil;
     }
     return self;
 }
@@ -692,9 +692,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _operatorName = @"";
 
-        _lineupName = @"";
+        _lineupName = nil;
 
-        _postalCode = @"";
+        _postalCode = nil;
 
         _lineupInfoType = @(0);
     }
@@ -722,7 +722,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _updatedAt = @(0);
 
-        _position = @(0);
+        _position = nil;
     }
     return self;
 }
@@ -782,7 +782,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _value = @"";
 
-        _externalIDList = [NSArray array];
+        _externalIDList = nil;
     }
     return self;
 }
@@ -804,11 +804,11 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _imageUrl = @"";
+        _imageUrl = nil;
 
-        _color = @"";
+        _color = nil;
 
-        _size = [CHIPContentLauncherClusterDimension new];
+        _size = nil;
     }
     return self;
 }
@@ -821,15 +821,15 @@ NS_ASSUME_NONNULL_BEGIN
 
         _providerName = @"";
 
-        _background = [CHIPContentLauncherClusterStyleInformation new];
+        _background = nil;
 
-        _logo = [CHIPContentLauncherClusterStyleInformation new];
+        _logo = nil;
 
-        _progressBar = [CHIPContentLauncherClusterStyleInformation new];
+        _progressBar = nil;
 
-        _splash = [CHIPContentLauncherClusterStyleInformation new];
+        _splash = nil;
 
-        _waterMark = [CHIPContentLauncherClusterStyleInformation new];
+        _waterMark = nil;
     }
     return self;
 }
@@ -870,7 +870,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _application = [CHIPApplicationLauncherClusterApplication new];
 
-        _endpoint = @"";
+        _endpoint = nil;
     }
     return self;
 }

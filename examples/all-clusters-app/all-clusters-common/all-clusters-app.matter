@@ -380,9 +380,9 @@ server cluster Channel = 1284 {
   struct ChannelInfo {
     INT16U majorNumber = 0;
     INT16U minorNumber = 1;
-    CHAR_STRING<32> name = 2;
-    CHAR_STRING<32> callSign = 3;
-    CHAR_STRING<32> affiliateCallSign = 4;
+    optional CHAR_STRING<32> name = 2;
+    optional CHAR_STRING<32> callSign = 3;
+    optional CHAR_STRING<32> affiliateCallSign = 4;
   }
 
   readonly attribute ChannelInfo channelList[] = 0;
@@ -719,7 +719,7 @@ server cluster ContentLauncher = 1290 {
   struct Parameter {
     ParameterEnum type = 0;
     CHAR_STRING value = 1;
-    AdditionalInfo externalIDList[] = 2;
+    optional AdditionalInfo externalIDList[] = 2;
   }
 
   struct AdditionalInfo {
@@ -729,17 +729,17 @@ server cluster ContentLauncher = 1290 {
 
   struct BrandingInformation {
     CHAR_STRING providerName = 0;
-    StyleInformation background = 1;
-    StyleInformation logo = 2;
-    StyleInformation progressBar = 3;
-    StyleInformation splash = 4;
-    StyleInformation waterMark = 5;
+    optional StyleInformation background = 1;
+    optional StyleInformation logo = 2;
+    optional StyleInformation progressBar = 3;
+    optional StyleInformation splash = 4;
+    optional StyleInformation waterMark = 5;
   }
 
   struct StyleInformation {
-    CHAR_STRING imageUrl = 0;
-    CHAR_STRING color = 1;
-    Dimension size = 2;
+    optional CHAR_STRING imageUrl = 0;
+    optional CHAR_STRING color = 1;
+    optional Dimension size = 2;
   }
 
   struct Dimension {
@@ -1985,11 +1985,11 @@ server cluster MediaPlayback = 1286 {
   }
 
   readonly attribute PlaybackStateEnum playbackState = 0;
-  readonly attribute epoch_us startTime = 1;
-  readonly attribute int64u duration = 2;
+  readonly attribute nullable epoch_us startTime = 1;
+  readonly attribute nullable int64u duration = 2;
   readonly attribute single playbackSpeed = 4;
-  readonly attribute int64u seekRangeEnd = 5;
-  readonly attribute int64u seekRangeStart = 6;
+  readonly attribute nullable int64u seekRangeEnd = 5;
+  readonly attribute nullable int64u seekRangeStart = 6;
   readonly global attribute int16u clusterRevision = 65533;
 }
 

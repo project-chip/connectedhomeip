@@ -33348,9 +33348,9 @@ struct Type
 public:
     uint16_t majorNumber = static_cast<uint16_t>(0);
     uint16_t minorNumber = static_cast<uint16_t>(0);
-    chip::CharSpan name;
-    chip::CharSpan callSign;
-    chip::CharSpan affiliateCallSign;
+    Optional<chip::CharSpan> name;
+    Optional<chip::CharSpan> callSign;
+    Optional<chip::CharSpan> affiliateCallSign;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -33374,8 +33374,8 @@ struct Type
 {
 public:
     chip::CharSpan operatorName;
-    chip::CharSpan lineupName;
-    chip::CharSpan postalCode;
+    Optional<chip::CharSpan> lineupName;
+    Optional<chip::CharSpan> postalCode;
     LineupInfoTypeEnum lineupInfoType = static_cast<LineupInfoTypeEnum>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -33569,9 +33569,10 @@ struct TypeInfo
 namespace ChannelLineup {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::Channel::Structs::LineupInfo::Type;
-    using DecodableType    = chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType;
-    using DecodableArgType = const chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType &;
+    using Type          = chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfo::Type>;
+    using DecodableType = chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ChannelLineup::Id; }
@@ -33581,9 +33582,10 @@ struct TypeInfo
 namespace CurrentChannel {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::Channel::Structs::ChannelInfo::Type;
-    using DecodableType    = chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType;
-    using DecodableArgType = const chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType &;
+    using Type          = chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfo::Type>;
+    using DecodableType = chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentChannel::Id; }
@@ -33736,7 +33738,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
 
     uint8_t target = static_cast<uint8_t>(0);
-    chip::CharSpan data;
+    Optional<chip::CharSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -33752,7 +33754,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
 
     uint8_t target = static_cast<uint8_t>(0);
-    chip::CharSpan data;
+    Optional<chip::CharSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace NavigateTargetRequest
@@ -33771,7 +33773,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
 
     StatusEnum status = static_cast<StatusEnum>(0);
-    chip::CharSpan data;
+    Optional<chip::CharSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -33787,7 +33789,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
 
     StatusEnum status = static_cast<StatusEnum>(0);
-    chip::CharSpan data;
+    Optional<chip::CharSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace NavigateTargetResponse
@@ -33933,7 +33935,7 @@ struct Type
 {
 public:
     uint64_t updatedAt = static_cast<uint64_t>(0);
-    uint64_t position  = static_cast<uint64_t>(0);
+    DataModel::Nullable<uint64_t> position;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -34383,9 +34385,9 @@ struct TypeInfo
 namespace StartTime {
 struct TypeInfo
 {
-    using Type             = uint64_t;
-    using DecodableType    = uint64_t;
-    using DecodableArgType = uint64_t;
+    using Type             = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint64_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StartTime::Id; }
@@ -34395,9 +34397,9 @@ struct TypeInfo
 namespace Duration {
 struct TypeInfo
 {
-    using Type             = uint64_t;
-    using DecodableType    = uint64_t;
-    using DecodableArgType = uint64_t;
+    using Type             = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint64_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Duration::Id; }
@@ -34431,9 +34433,9 @@ struct TypeInfo
 namespace SeekRangeEnd {
 struct TypeInfo
 {
-    using Type             = uint64_t;
-    using DecodableType    = uint64_t;
-    using DecodableArgType = uint64_t;
+    using Type             = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint64_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SeekRangeEnd::Id; }
@@ -34443,9 +34445,9 @@ struct TypeInfo
 namespace SeekRangeStart {
 struct TypeInfo
 {
-    using Type             = uint64_t;
-    using DecodableType    = uint64_t;
-    using DecodableArgType = uint64_t;
+    using Type             = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint64_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SeekRangeStart::Id; }
@@ -34523,12 +34525,12 @@ struct TypeInfo
 
         Attributes::PlaybackState::TypeInfo::DecodableType playbackState =
             static_cast<chip::app::Clusters::MediaPlayback::PlaybackStateEnum>(0);
-        Attributes::StartTime::TypeInfo::DecodableType startTime = static_cast<uint64_t>(0);
-        Attributes::Duration::TypeInfo::DecodableType duration   = static_cast<uint64_t>(0);
+        Attributes::StartTime::TypeInfo::DecodableType startTime;
+        Attributes::Duration::TypeInfo::DecodableType duration;
         Attributes::Position::TypeInfo::DecodableType position;
-        Attributes::PlaybackSpeed::TypeInfo::DecodableType playbackSpeed   = static_cast<float>(0);
-        Attributes::SeekRangeEnd::TypeInfo::DecodableType seekRangeEnd     = static_cast<uint64_t>(0);
-        Attributes::SeekRangeStart::TypeInfo::DecodableType seekRangeStart = static_cast<uint64_t>(0);
+        Attributes::PlaybackSpeed::TypeInfo::DecodableType playbackSpeed = static_cast<float>(0);
+        Attributes::SeekRangeEnd::TypeInfo::DecodableType seekRangeEnd;
+        Attributes::SeekRangeStart::TypeInfo::DecodableType seekRangeStart;
         Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
         Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
@@ -35347,7 +35349,7 @@ struct Type
 public:
     ParameterEnum type = static_cast<ParameterEnum>(0);
     chip::CharSpan value;
-    DataModel::List<const Structs::AdditionalInfo::Type> externalIDList;
+    Optional<DataModel::List<const Structs::AdditionalInfo::Type>> externalIDList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -35359,7 +35361,7 @@ struct DecodableType
 public:
     ParameterEnum type = static_cast<ParameterEnum>(0);
     chip::CharSpan value;
-    DataModel::DecodableList<Structs::AdditionalInfo::DecodableType> externalIDList;
+    Optional<DataModel::DecodableList<Structs::AdditionalInfo::DecodableType>> externalIDList;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -35405,9 +35407,9 @@ enum class Fields
 struct Type
 {
 public:
-    chip::CharSpan imageUrl;
-    chip::CharSpan color;
-    Structs::Dimension::Type size;
+    Optional<chip::CharSpan> imageUrl;
+    Optional<chip::CharSpan> color;
+    Optional<Structs::Dimension::Type> size;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -35433,11 +35435,11 @@ struct Type
 {
 public:
     chip::CharSpan providerName;
-    Structs::StyleInformation::Type background;
-    Structs::StyleInformation::Type logo;
-    Structs::StyleInformation::Type progressBar;
-    Structs::StyleInformation::Type splash;
-    Structs::StyleInformation::Type waterMark;
+    Optional<Structs::StyleInformation::Type> background;
+    Optional<Structs::StyleInformation::Type> logo;
+    Optional<Structs::StyleInformation::Type> progressBar;
+    Optional<Structs::StyleInformation::Type> splash;
+    Optional<Structs::StyleInformation::Type> waterMark;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -35474,9 +35476,9 @@ namespace Commands {
 namespace LaunchContentRequest {
 enum class Fields
 {
-    kAutoPlay = 0,
-    kData     = 1,
-    kSearch   = 2,
+    kSearch   = 0,
+    kAutoPlay = 1,
+    kData     = 2,
 };
 
 struct Type
@@ -35486,9 +35488,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchContentRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
-    bool autoPlay = static_cast<bool>(0);
-    chip::CharSpan data;
     DataModel::List<const Structs::ContentSearch::Type> search;
+    bool autoPlay = static_cast<bool>(0);
+    Optional<chip::CharSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -35503,9 +35505,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchContentRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
-    bool autoPlay = static_cast<bool>(0);
-    chip::CharSpan data;
     DataModel::DecodableList<Structs::ContentSearch::DecodableType> search;
+    bool autoPlay = static_cast<bool>(0);
+    Optional<chip::CharSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LaunchContentRequest
@@ -35525,8 +35527,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
     chip::CharSpan contentURL;
-    chip::CharSpan displayString;
-    Structs::BrandingInformation::Type brandingInformation;
+    Optional<chip::CharSpan> displayString;
+    Optional<Structs::BrandingInformation::Type> brandingInformation;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -35542,8 +35544,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
     chip::CharSpan contentURL;
-    chip::CharSpan displayString;
-    Structs::BrandingInformation::DecodableType brandingInformation;
+    Optional<chip::CharSpan> displayString;
+    Optional<Structs::BrandingInformation::DecodableType> brandingInformation;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LaunchURLRequest
@@ -35562,7 +35564,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
     StatusEnum status = static_cast<StatusEnum>(0);
-    chip::CharSpan data;
+    Optional<chip::CharSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -35578,7 +35580,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
     StatusEnum status = static_cast<StatusEnum>(0);
-    chip::CharSpan data;
+    Optional<chip::CharSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LaunchResponse
@@ -35983,7 +35985,7 @@ struct Type
 {
 public:
     Structs::Application::Type application;
-    chip::CharSpan endpoint;
+    Optional<chip::EndpointId> endpoint;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -36037,7 +36039,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
     Structs::Application::Type application;
-    chip::ByteSpan data;
+    Optional<chip::ByteSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -36053,7 +36055,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
     Structs::Application::DecodableType application;
-    chip::ByteSpan data;
+    Optional<chip::ByteSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LaunchAppRequest
@@ -36175,9 +36177,11 @@ struct TypeInfo
 namespace ApplicationLauncherApp {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type;
-    using DecodableType    = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType;
-    using DecodableArgType = const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType &;
+    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type>;
+    using DecodableType =
+        chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationLauncherApp::Id; }
