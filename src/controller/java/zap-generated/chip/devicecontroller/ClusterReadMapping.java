@@ -3254,7 +3254,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.EthernetNetworkDiagnosticsCluster) cluster)
-                  .readPHYRateAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readPHYRateAttribute(
+                      (ChipClusters.EthernetNetworkDiagnosticsCluster.PHYRateAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readEthernetNetworkDiagnosticsPHYRateCommandParams);
@@ -3266,7 +3268,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.EthernetNetworkDiagnosticsCluster) cluster)
-                  .readFullDuplexAttribute((ChipClusters.BooleanAttributeCallback) callback);
+                  .readFullDuplexAttribute(
+                      (ChipClusters.EthernetNetworkDiagnosticsCluster.FullDuplexAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
             readEthernetNetworkDiagnosticsFullDuplexCommandParams);
@@ -3344,7 +3348,10 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.EthernetNetworkDiagnosticsCluster) cluster)
-                  .readCarrierDetectAttribute((ChipClusters.BooleanAttributeCallback) callback);
+                  .readCarrierDetectAttribute(
+                      (ChipClusters.EthernetNetworkDiagnosticsCluster
+                              .CarrierDetectAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
             readEthernetNetworkDiagnosticsCarrierDetectCommandParams);

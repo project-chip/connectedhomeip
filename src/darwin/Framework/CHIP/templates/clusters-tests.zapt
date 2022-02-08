@@ -219,8 +219,8 @@ CHIPDevice * GetConnectedDevice(void)
 {{#unless (isStrEqual "Thermostat" name)}}
 {{#unless (isStrEqual "OTA Software Update Provider" name)}}
 {{#unless (isStrEqual "Network Commissioning" name)}} {{! "Networks" is broken }}
+{{#unless (isStrEqual "Application Basic" name)}} {{! "Application App" is broken }}
 {{#chip_server_cluster_attributes}}
-{{#unless (isStrEqual chipCallback.name "Unsupported")}}
 - (void)testSendCluster{{asUpperCamelCase parent.name}}ReadAttribute{{asUpperCamelCase name}}WithCompletionHandler
 {
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -259,7 +259,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     XCTestExpectation * expectation = [self expectationWithDescription:@"{{asUpperCamelCase parent.name}}WriteAttribute{{asUpperCamelCase name}}WithValue"];
 
-    {{asObjectiveCType type parent.name}} value = {{asTestValue}};
+    {{asObjectiveCType type parent.name}} value = {{asTestValue parent.name}};
     [cluster writeAttribute{{asUpperCamelCase name}}WithValue:value completionHandler:^(NSError * _Nullable err) {
         NSLog(@"{{asUpperCamelCase parent.name}} {{asUpperCamelCase name}} Error: %@", err);
         XCTAssertEqual(err.code, 0);
@@ -269,8 +269,8 @@ CHIPDevice * GetConnectedDevice(void)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 {{/if}}
-{{/unless}}
 {{/chip_server_cluster_attributes}}
+{{/unless}}
 {{/unless}}
 {{/unless}}
 {{/unless}}

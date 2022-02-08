@@ -833,7 +833,6 @@ void CHIPAccessControlAclAttributeCallback::CallbackFn(
                     ChipLogError(Zcl, "Could not find class ChipStructs$AccessControlClusterTarget");
                     return;
                 }
-                chip::JniClass structJniClass(targetStructClass);
                 jmethodID targetStructCtor =
                     env->GetMethodID(targetStructClass, "<init>", "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Long;)V");
                 if (targetStructCtor == nullptr)
@@ -856,7 +855,6 @@ void CHIPAccessControlAclAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$AccessControlClusterAccessControlEntry");
             return;
         }
-        chip::JniClass structJniClass(accessControlEntryStructClass);
         jmethodID accessControlEntryStructCtor = env->GetMethodID(
             accessControlEntryStructClass, "<init>",
             "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/ArrayList;Ljava/util/ArrayList;)V");
@@ -954,7 +952,6 @@ void CHIPAccessControlExtensionAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$AccessControlClusterExtensionEntry");
             return;
         }
-        chip::JniClass structJniClass(extensionEntryStructClass);
         jmethodID extensionEntryStructCtor = env->GetMethodID(extensionEntryStructClass, "<init>", "(Ljava/lang/Integer;[B)V");
         if (extensionEntryStructCtor == nullptr)
         {
@@ -2326,7 +2323,6 @@ void CHIPAudioOutputAudioOutputListAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$AudioOutputClusterOutputInfo");
             return;
         }
-        chip::JniClass structJniClass(outputInfoStructClass);
         jmethodID outputInfoStructCtor =
             env->GetMethodID(outputInfoStructClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;)V");
         if (outputInfoStructCtor == nullptr)
@@ -3773,7 +3769,6 @@ void CHIPBridgedActionsActionListAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$BridgedActionsClusterActionStruct");
             return;
         }
-        chip::JniClass structJniClass(actionStructStructClass);
         jmethodID actionStructStructCtor = env->GetMethodID(
             actionStructStructClass, "<init>",
             "(Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V");
@@ -3892,7 +3887,6 @@ void CHIPBridgedActionsEndpointListAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$BridgedActionsClusterEndpointListStruct");
             return;
         }
-        chip::JniClass structJniClass(endpointListStructStructClass);
         jmethodID endpointListStructStructCtor =
             env->GetMethodID(endpointListStructStructClass, "<init>",
                              "(Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/Integer;Ljava/util/ArrayList;)V");
@@ -4426,7 +4420,6 @@ void CHIPChannelChannelListAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$ChannelClusterChannelInfo");
             return;
         }
-        chip::JniClass structJniClass(channelInfoStructClass);
         jmethodID channelInfoStructCtor =
             env->GetMethodID(channelInfoStructClass, "<init>",
                              "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
@@ -5230,7 +5223,6 @@ void CHIPDescriptorDeviceListAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$DescriptorClusterDeviceType");
             return;
         }
-        chip::JniClass structJniClass(deviceTypeStructClass);
         jmethodID deviceTypeStructCtor =
             env->GetMethodID(deviceTypeStructClass, "<init>", "(Ljava/lang/Long;Ljava/lang/Integer;)V");
         if (deviceTypeStructCtor == nullptr)
@@ -6434,6 +6426,207 @@ void CHIPElectricalMeasurementAttributeListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
+CHIPEthernetNetworkDiagnosticsPHYRateAttributeCallback::CHIPEthernetNetworkDiagnosticsPHYRateAttributeCallback(jobject javaCallback,
+                                                                                                               bool keepAlive) :
+    chip::Callback::Callback<CHIPEthernetNetworkDiagnosticsClusterPHYRateAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPEthernetNetworkDiagnosticsPHYRateAttributeCallback::~CHIPEthernetNetworkDiagnosticsPHYRateAttributeCallback()
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+}
+
+void CHIPEthernetNetworkDiagnosticsPHYRateAttributeCallback::CallbackFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType> & value)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+    std::unique_ptr<CHIPEthernetNetworkDiagnosticsPHYRateAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPEthernetNetworkDiagnosticsPHYRateAttributeCallback *>(context), maybeDestroy);
+
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    VerifyOrReturn(javaCallbackRef != nullptr,
+                   ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+    jmethodID javaMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+    jobject javaValue;
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Integer";
+        std::string javaValueCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                      static_cast<uint8_t>(value.Value()), javaValue);
+    }
+
+    env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
+}
+
+CHIPEthernetNetworkDiagnosticsFullDuplexAttributeCallback::CHIPEthernetNetworkDiagnosticsFullDuplexAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPEthernetNetworkDiagnosticsClusterFullDuplexAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPEthernetNetworkDiagnosticsFullDuplexAttributeCallback::~CHIPEthernetNetworkDiagnosticsFullDuplexAttributeCallback()
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+}
+
+void CHIPEthernetNetworkDiagnosticsFullDuplexAttributeCallback::CallbackFn(void * context,
+                                                                           const chip::app::DataModel::Nullable<bool> & value)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+    std::unique_ptr<CHIPEthernetNetworkDiagnosticsFullDuplexAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPEthernetNetworkDiagnosticsFullDuplexAttributeCallback *>(context), maybeDestroy);
+
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    VerifyOrReturn(javaCallbackRef != nullptr,
+                   ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+    jmethodID javaMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Boolean;)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+    jobject javaValue;
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Boolean";
+        std::string javaValueCtorSignature = "(Z)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<bool>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                   value.Value(), javaValue);
+    }
+
+    env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
+}
+
+CHIPEthernetNetworkDiagnosticsCarrierDetectAttributeCallback::CHIPEthernetNetworkDiagnosticsCarrierDetectAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPEthernetNetworkDiagnosticsClusterCarrierDetectAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPEthernetNetworkDiagnosticsCarrierDetectAttributeCallback::~CHIPEthernetNetworkDiagnosticsCarrierDetectAttributeCallback()
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+}
+
+void CHIPEthernetNetworkDiagnosticsCarrierDetectAttributeCallback::CallbackFn(void * context,
+                                                                              const chip::app::DataModel::Nullable<bool> & value)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+    std::unique_ptr<CHIPEthernetNetworkDiagnosticsCarrierDetectAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPEthernetNetworkDiagnosticsCarrierDetectAttributeCallback *>(context), maybeDestroy);
+
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    VerifyOrReturn(javaCallbackRef != nullptr,
+                   ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+    jmethodID javaMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Boolean;)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+    jobject javaValue;
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Boolean";
+        std::string javaValueCtorSignature = "(Z)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<bool>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                   value.Value(), javaValue);
+    }
+
+    env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
+}
+
 CHIPEthernetNetworkDiagnosticsServerGeneratedCommandListAttributeCallback::
     CHIPEthernetNetworkDiagnosticsServerGeneratedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIPEthernetNetworkDiagnosticsClusterServerGeneratedCommandListAttributeCallbackType>(CallbackFn,
@@ -6723,7 +6916,6 @@ void CHIPFixedLabelLabelListAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$FixedLabelClusterLabelStruct");
             return;
         }
-        chip::JniClass structJniClass(labelStructStructClass);
         jmethodID labelStructStructCtor =
             env->GetMethodID(labelStructStructClass, "<init>", "(Ljava/lang/String;Ljava/lang/String;)V");
         if (labelStructStructCtor == nullptr)
@@ -7450,19 +7642,33 @@ void CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback::CallbackFn(
                                                                    newElement_0_fabricConnectedCtorSignature.c_str(),
                                                                    entry_0.fabricConnected, newElement_0_fabricConnected);
         jobject newElement_0_offPremiseServicesReachableIPv4;
-        std::string newElement_0_offPremiseServicesReachableIPv4ClassName     = "java/lang/Boolean";
-        std::string newElement_0_offPremiseServicesReachableIPv4CtorSignature = "(Z)V";
-        chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
-            newElement_0_offPremiseServicesReachableIPv4ClassName.c_str(),
-            newElement_0_offPremiseServicesReachableIPv4CtorSignature.c_str(), entry_0.offPremiseServicesReachableIPv4,
-            newElement_0_offPremiseServicesReachableIPv4);
+        if (entry_0.offPremiseServicesReachableIPv4.IsNull())
+        {
+            newElement_0_offPremiseServicesReachableIPv4 = nullptr;
+        }
+        else
+        {
+            std::string newElement_0_offPremiseServicesReachableIPv4ClassName     = "java/lang/Boolean";
+            std::string newElement_0_offPremiseServicesReachableIPv4CtorSignature = "(Z)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
+                newElement_0_offPremiseServicesReachableIPv4ClassName.c_str(),
+                newElement_0_offPremiseServicesReachableIPv4CtorSignature.c_str(), entry_0.offPremiseServicesReachableIPv4.Value(),
+                newElement_0_offPremiseServicesReachableIPv4);
+        }
         jobject newElement_0_offPremiseServicesReachableIPv6;
-        std::string newElement_0_offPremiseServicesReachableIPv6ClassName     = "java/lang/Boolean";
-        std::string newElement_0_offPremiseServicesReachableIPv6CtorSignature = "(Z)V";
-        chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
-            newElement_0_offPremiseServicesReachableIPv6ClassName.c_str(),
-            newElement_0_offPremiseServicesReachableIPv6CtorSignature.c_str(), entry_0.offPremiseServicesReachableIPv6,
-            newElement_0_offPremiseServicesReachableIPv6);
+        if (entry_0.offPremiseServicesReachableIPv6.IsNull())
+        {
+            newElement_0_offPremiseServicesReachableIPv6 = nullptr;
+        }
+        else
+        {
+            std::string newElement_0_offPremiseServicesReachableIPv6ClassName     = "java/lang/Boolean";
+            std::string newElement_0_offPremiseServicesReachableIPv6CtorSignature = "(Z)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
+                newElement_0_offPremiseServicesReachableIPv6ClassName.c_str(),
+                newElement_0_offPremiseServicesReachableIPv6CtorSignature.c_str(), entry_0.offPremiseServicesReachableIPv6.Value(),
+                newElement_0_offPremiseServicesReachableIPv6);
+        }
         jobject newElement_0_hardwareAddress;
         jbyteArray newElement_0_hardwareAddressByteArray = env->NewByteArray(static_cast<jsize>(entry_0.hardwareAddress.size()));
         env->SetByteArrayRegion(newElement_0_hardwareAddressByteArray, 0, static_cast<jsize>(entry_0.hardwareAddress.size()),
@@ -7484,7 +7690,6 @@ void CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$GeneralDiagnosticsClusterNetworkInterfaceType");
             return;
         }
-        chip::JniClass structJniClass(networkInterfaceTypeStructClass);
         jmethodID networkInterfaceTypeStructCtor =
             env->GetMethodID(networkInterfaceTypeStructClass, "<init>",
                              "(Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;[BLjava/lang/Integer;)V");
@@ -8022,7 +8227,6 @@ void CHIPGroupKeyManagementGroupKeyMapAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$GroupKeyManagementClusterGroupKeyMapStruct");
             return;
         }
-        chip::JniClass structJniClass(groupKeyMapStructStructClass);
         jmethodID groupKeyMapStructStructCtor = env->GetMethodID(groupKeyMapStructStructClass, "<init>",
                                                                  "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V");
         if (groupKeyMapStructStructCtor == nullptr)
@@ -8147,7 +8351,6 @@ void CHIPGroupKeyManagementGroupTableAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$GroupKeyManagementClusterGroupInfoMapStruct");
             return;
         }
-        chip::JniClass structJniClass(groupInfoMapStructStructClass);
         jmethodID groupInfoMapStructStructCtor =
             env->GetMethodID(groupInfoMapStructStructClass, "<init>",
                              "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/ArrayList;Ljava/util/Optional;)V");
@@ -10548,7 +10751,6 @@ void CHIPMediaInputMediaInputListAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$MediaInputClusterInputInfo");
             return;
         }
-        chip::JniClass structJniClass(inputInfoStructClass);
         jmethodID inputInfoStructCtor = env->GetMethodID(
             inputInfoStructClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;)V");
         if (inputInfoStructCtor == nullptr)
@@ -11071,7 +11273,6 @@ void CHIPModeSelectSupportedModesAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$ModeSelectClusterModeOptionStruct");
             return;
         }
-        chip::JniClass structJniClass(modeOptionStructStructClass);
         jmethodID modeOptionStructStructCtor =
             env->GetMethodID(modeOptionStructStructClass, "<init>", "(Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Long;)V");
         if (modeOptionStructStructCtor == nullptr)
@@ -11382,7 +11583,6 @@ void CHIPNetworkCommissioningNetworksAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$NetworkCommissioningClusterNetworkInfo");
             return;
         }
-        chip::JniClass structJniClass(networkInfoStructClass);
         jmethodID networkInfoStructCtor = env->GetMethodID(networkInfoStructClass, "<init>", "([BLjava/lang/Boolean;)V");
         if (networkInfoStructCtor == nullptr)
         {
@@ -11705,7 +11905,6 @@ void CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback::Callbac
             ChipLogError(Zcl, "Could not find class ChipStructs$OtaSoftwareUpdateRequestorClusterProviderLocation");
             return;
         }
-        chip::JniClass structJniClass(providerLocationStructClass);
         jmethodID providerLocationStructCtor =
             env->GetMethodID(providerLocationStructClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;)V");
         if (providerLocationStructCtor == nullptr)
@@ -12595,7 +12794,6 @@ void CHIPOperationalCredentialsNOCsAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$OperationalCredentialsClusterNOCStruct");
             return;
         }
-        chip::JniClass structJniClass(NOCStructStructClass);
         jmethodID NOCStructStructCtor = env->GetMethodID(NOCStructStructClass, "<init>", "(Ljava/lang/Integer;[B[B)V");
         if (NOCStructStructCtor == nullptr)
         {
@@ -12713,7 +12911,6 @@ void CHIPOperationalCredentialsFabricsListAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$OperationalCredentialsClusterFabricDescriptor");
             return;
         }
-        chip::JniClass structJniClass(fabricDescriptorStructClass);
         jmethodID fabricDescriptorStructCtor =
             env->GetMethodID(fabricDescriptorStructClass, "<init>",
                              "(Ljava/lang/Integer;[BLjava/lang/Integer;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/String;)V");
@@ -14599,7 +14796,6 @@ void CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$SoftwareDiagnosticsClusterThreadMetrics");
             return;
         }
-        chip::JniClass structJniClass(threadMetricsStructClass);
         jmethodID threadMetricsStructCtor =
             env->GetMethodID(threadMetricsStructClass, "<init>",
                              "(Ljava/lang/Long;Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;)V");
@@ -15122,7 +15318,6 @@ void CHIPTargetNavigatorTargetNavigatorListAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$TargetNavigatorClusterTargetInfo");
             return;
         }
-        chip::JniClass structJniClass(targetInfoStructClass);
         jmethodID targetInfoStructCtor =
             env->GetMethodID(targetInfoStructClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;)V");
         if (targetInfoStructCtor == nullptr)
@@ -15644,7 +15839,6 @@ void CHIPTestClusterListStructOctetStringAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterClusterTestListStructOctet");
             return;
         }
-        chip::JniClass structJniClass(testListStructOctetStructClass);
         jmethodID testListStructOctetStructCtor =
             env->GetMethodID(testListStructOctetStructClass, "<init>", "(Ljava/lang/Long;[B)V");
         if (testListStructOctetStructCtor == nullptr)
@@ -15928,7 +16122,6 @@ void CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback::CallbackFn
                 ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterClusterSimpleStruct");
                 return;
             }
-            chip::JniClass structJniClass(simpleStructStructClass);
             jmethodID simpleStructStructCtor =
                 env->GetMethodID(simpleStructStructClass, "<init>",
                                  "(Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/Integer;[BLjava/lang/String;Ljava/lang/"
@@ -16006,7 +16199,6 @@ void CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback::CallbackFn
                 ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterClusterSimpleStruct");
                 return;
             }
-            chip::JniClass structJniClass(simpleStructStructClass);
             jmethodID simpleStructStructCtor =
                 env->GetMethodID(simpleStructStructClass, "<init>",
                                  "(Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/Integer;[BLjava/lang/String;Ljava/lang/"
@@ -16098,7 +16290,6 @@ void CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback::CallbackFn
                     ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterClusterSimpleStruct");
                     return;
                 }
-                chip::JniClass structJniClass(simpleStructStructClass);
                 jmethodID simpleStructStructCtor =
                     env->GetMethodID(simpleStructStructClass, "<init>",
                                      "(Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/Integer;[BLjava/lang/String;Ljava/lang/"
@@ -16200,7 +16391,6 @@ void CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback::CallbackFn
             ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterClusterNullablesAndOptionalsStruct");
             return;
         }
-        chip::JniClass structJniClass(nullablesAndOptionalsStructStructClass);
         jmethodID nullablesAndOptionalsStructStructCtor =
             env->GetMethodID(nullablesAndOptionalsStructStructClass, "<init>",
                              "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/lang/String;Ljava/util/"
@@ -19082,7 +19272,6 @@ void CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$ThreadNetworkDiagnosticsClusterNeighborTable");
             return;
         }
-        chip::JniClass structJniClass(neighborTableStructClass);
         jmethodID neighborTableStructCtor =
             env->GetMethodID(neighborTableStructClass, "<init>",
                              "(Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/"
@@ -19233,7 +19422,6 @@ void CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$ThreadNetworkDiagnosticsClusterRouteTable");
             return;
         }
-        chip::JniClass structJniClass(routeTableStructClass);
         jmethodID routeTableStructCtor =
             env->GetMethodID(routeTableStructClass, "<init>",
                              "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/"
@@ -19336,7 +19524,6 @@ void CHIPThreadNetworkDiagnosticsSecurityPolicyAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$ThreadNetworkDiagnosticsClusterSecurityPolicy");
             return;
         }
-        chip::JniClass structJniClass(securityPolicyStructClass);
         jmethodID securityPolicyStructCtor =
             env->GetMethodID(securityPolicyStructClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;)V");
         if (securityPolicyStructCtor == nullptr)
@@ -19500,7 +19687,6 @@ void CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsAttributeCallback::
             ChipLogError(Zcl, "Could not find class ChipStructs$ThreadNetworkDiagnosticsClusterOperationalDatasetComponents");
             return;
         }
-        chip::JniClass structJniClass(operationalDatasetComponentsStructClass);
         jmethodID operationalDatasetComponentsStructCtor =
             env->GetMethodID(operationalDatasetComponentsStructClass, "<init>",
                              "(Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/"
@@ -20171,7 +20357,6 @@ void CHIPUserLabelLabelListAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$UserLabelClusterLabelStruct");
             return;
         }
-        chip::JniClass structJniClass(labelStructStructClass);
         jmethodID labelStructStructCtor =
             env->GetMethodID(labelStructStructClass, "<init>", "(Ljava/lang/String;Ljava/lang/String;)V");
         if (labelStructStructCtor == nullptr)

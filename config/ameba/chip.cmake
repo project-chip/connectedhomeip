@@ -118,6 +118,11 @@ if (matter_enable_ota_requestor)
 string(APPEND CHIP_GN_ARGS "chip_enable_ota_requestor = true\n")
 endif (matter_enable_ota_requestor)
 
+if (CONFIG_ENABLE_ROTATING_DEVICE_ID)
+    string(APPEND CHIP_GN_ARGS "chip_enable_additional_data_advertising"   "true")
+    string(APPEND CHIP_GN_ARGS "chip_enable_rotating_device_id"            "true")
+endif()
+
 file(GENERATE OUTPUT ${CHIP_OUTPUT}/args.gn CONTENT ${CHIP_GN_ARGS})
 
 ExternalProject_Add(

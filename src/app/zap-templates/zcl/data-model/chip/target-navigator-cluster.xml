@@ -44,8 +44,8 @@ limitations under the License.
   <enum name="StatusEnum" type="ENUM8">
     <cluster code="0x0505"/>
     <item name="Success" value="0x00"/>
-    <item name="AppNotAvailable" value="0x01"/>
-    <item name="SystemBusy" value="0x02"/>
+    <item name="TargetNotFound" value="0x01"/>
+    <item name="NotAllowed" value="0x02"/>
   </enum>
 
   <struct name="TargetInfo">

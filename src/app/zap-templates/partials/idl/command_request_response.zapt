@@ -11,8 +11,8 @@
         {{asUpperCamelCase parent.commandName}}Request
     {{~/first~}}
 {{~/zcl_command_arguments~}}
-): {{#if responseRef~}}
-    {{getResponseCommandName responseRef}}
+): {{#if responseName~}}
+    {{responseName}}
 {{~else~}}
     DefaultSuccess
 {{~/if~}}

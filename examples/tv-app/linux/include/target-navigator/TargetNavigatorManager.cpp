@@ -55,9 +55,8 @@ void TargetNavigatorManager::HandleNavigateTarget(CommandResponseHelper<Navigate
     NavigateTargetResponseType response;
     if (target == kNoCurrentTarget || target > mTargets.size())
     {
-        response.data = CharSpan::fromCharString("error");
-        // TODO: should be TARGET_NOT_FOUND
-        response.status = StatusEnum::kAppNotAvailable;
+        response.data   = CharSpan::fromCharString("error");
+        response.status = StatusEnum::kTargetNotFound;
         helper.Success(response);
         return;
     }

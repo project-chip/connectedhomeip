@@ -147,12 +147,11 @@ public class ChipStructs {
     }
   }
 
-  public static class ApplicationLauncherClusterApplicationLauncherApplication {
+  public static class ApplicationLauncherClusterApplication {
     public Integer catalogVendorId;
     public String applicationId;
 
-    public ApplicationLauncherClusterApplicationLauncherApplication(
-        Integer catalogVendorId, String applicationId) {
+    public ApplicationLauncherClusterApplication(Integer catalogVendorId, String applicationId) {
       this.catalogVendorId = catalogVendorId;
       this.applicationId = applicationId;
     }
@@ -160,7 +159,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("ApplicationLauncherClusterApplicationLauncherApplication {\n");
+      output.append("ApplicationLauncherClusterApplication {\n");
       output.append("\tcatalogVendorId: ");
       output.append(catalogVendorId);
       output.append("\n");
@@ -173,12 +172,11 @@ public class ChipStructs {
   }
 
   public static class ApplicationLauncherClusterApplicationEP {
-    public ChipStructs.ApplicationLauncherClusterApplicationLauncherApplication application;
+    public ChipStructs.ApplicationLauncherClusterApplication application;
     public String endpoint;
 
     public ApplicationLauncherClusterApplicationEP(
-        ChipStructs.ApplicationLauncherClusterApplicationLauncherApplication application,
-        String endpoint) {
+        ChipStructs.ApplicationLauncherClusterApplication application, String endpoint) {
       this.application = application;
       this.endpoint = endpoint;
     }
@@ -670,16 +668,16 @@ public class ChipStructs {
   public static class GeneralDiagnosticsClusterNetworkInterfaceType {
     public String name;
     public Boolean fabricConnected;
-    public Boolean offPremiseServicesReachableIPv4;
-    public Boolean offPremiseServicesReachableIPv6;
+    public @Nullable Boolean offPremiseServicesReachableIPv4;
+    public @Nullable Boolean offPremiseServicesReachableIPv6;
     public byte[] hardwareAddress;
     public Integer type;
 
     public GeneralDiagnosticsClusterNetworkInterfaceType(
         String name,
         Boolean fabricConnected,
-        Boolean offPremiseServicesReachableIPv4,
-        Boolean offPremiseServicesReachableIPv6,
+        @Nullable Boolean offPremiseServicesReachableIPv4,
+        @Nullable Boolean offPremiseServicesReachableIPv6,
         byte[] hardwareAddress,
         Integer type) {
       this.name = name;

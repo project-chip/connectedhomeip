@@ -229,7 +229,7 @@ CHIP_ERROR CommissioningWindowManager::OpenBasicCommissioningWindow(uint16_t com
 
 CHIP_ERROR CommissioningWindowManager::OpenEnhancedCommissioningWindow(uint16_t commissioningTimeoutSeconds, uint16_t discriminator,
                                                                        PASEVerifier & verifier, uint32_t iterations, ByteSpan salt,
-                                                                       uint16_t passcodeID)
+                                                                       PasscodeId passcodeID)
 {
     // Once a device is operational, it shall be commissioned into subsequent fabrics using
     // the operational network only.

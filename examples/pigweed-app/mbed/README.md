@@ -55,9 +55,21 @@ using the following command:
     $ git submodule update --init
 
 Building the example application requires the use of **ARM Mbed-OS** sources and
-the **arm-none-gnu-eabi** toolchain. The OpenOCD package is used for flashing
-purpose. <br> Some additional packages may be needed, depending on selected
-build target and its requirements.
+the **arm-none-gnu-eabi** toolchain.
+
+The Cypress OpenOCD package is required for flashing purpose. Install the
+Cypress OpenOCD and set env var `OPENOCD_PATH` before calling the flashing
+script.
+
+```
+cd ~
+wget https://github.com/Infineon/openocd/releases/download/release-v4.3.0/openocd-4.3.0.1746-linux.tar.gz
+tar xzvf openocd-4.3.0.1746-linux.tar.gz
+export OPENOCD_PATH=$HOME/openocd
+```
+
+Some additional packages may be needed, depending on selected build target and
+its requirements.
 
 > **The VSCode devcontainer has these components pre-installed. Using the VSCode
 > devcontainer is the recommended way to interact with Arm Mbed-OS port of the

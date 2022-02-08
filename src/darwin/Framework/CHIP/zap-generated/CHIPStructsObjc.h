@@ -162,8 +162,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPGeneralDiagnosticsClusterNetworkInterfaceType : NSObject
 @property (strong, nonatomic) NSString * _Nonnull name;
 @property (strong, nonatomic) NSNumber * _Nonnull fabricConnected;
-@property (strong, nonatomic) NSNumber * _Nonnull offPremiseServicesReachableIPv4;
-@property (strong, nonatomic) NSNumber * _Nonnull offPremiseServicesReachableIPv6;
+@property (strong, nonatomic) NSNumber * _Nullable offPremiseServicesReachableIPv4;
+@property (strong, nonatomic) NSNumber * _Nullable offPremiseServicesReachableIPv6;
 @property (strong, nonatomic) NSData * _Nonnull hardwareAddress;
 @property (strong, nonatomic) NSNumber * _Nonnull type;
 - (instancetype)init;
@@ -406,14 +406,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPApplicationLauncherClusterApplicationLauncherApplication : NSObject
+@interface CHIPApplicationLauncherClusterApplication : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull catalogVendorId;
 @property (strong, nonatomic) NSString * _Nonnull applicationId;
 - (instancetype)init;
 @end
 
 @interface CHIPApplicationLauncherClusterApplicationEP : NSObject
-@property (strong, nonatomic) CHIPApplicationLauncherClusterApplicationLauncherApplication * _Nonnull application;
+@property (strong, nonatomic) CHIPApplicationLauncherClusterApplication * _Nonnull application;
 @property (strong, nonatomic) NSString * _Nonnull endpoint;
 - (instancetype)init;
 @end

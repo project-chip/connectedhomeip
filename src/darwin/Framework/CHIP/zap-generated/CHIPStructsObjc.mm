@@ -318,9 +318,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _fabricConnected = @(0);
 
-        _offPremiseServicesReachableIPv4 = @(0);
+        _offPremiseServicesReachableIPv4 = nil;
 
-        _offPremiseServicesReachableIPv6 = @(0);
+        _offPremiseServicesReachableIPv6 = nil;
 
         _hardwareAddress = [NSData data];
 
@@ -833,7 +833,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPApplicationLauncherClusterApplicationLauncherApplication
+@implementation CHIPApplicationLauncherClusterApplication
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -851,7 +851,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _application = [CHIPApplicationLauncherClusterApplicationLauncherApplication new];
+        _application = [CHIPApplicationLauncherClusterApplication new];
 
         _endpoint = @"";
     }

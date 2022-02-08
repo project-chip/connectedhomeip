@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -434,7 +434,7 @@ void DeviceController::OnOpenPairingWindowFailureResponse(void * context, CHIP_E
 }
 
 CHIP_ERROR DeviceController::ComputePASEVerifier(uint32_t iterations, uint32_t setupPincode, const ByteSpan & salt,
-                                                 PASEVerifier & outVerifier, uint32_t & outPasscodeId)
+                                                 PASEVerifier & outVerifier, PasscodeId & outPasscodeId)
 {
     ReturnErrorOnFailure(PASESession::GeneratePASEVerifier(outVerifier, iterations, salt, /* useRandomPIN= */ false, setupPincode));
 
@@ -442,7 +442,7 @@ CHIP_ERROR DeviceController::ComputePASEVerifier(uint32_t iterations, uint32_t s
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceController::OpenCommissioningWindowWithCallback(NodeId deviceId, uint16_t timeout, uint16_t iteration,
+CHIP_ERROR DeviceController::OpenCommissioningWindowWithCallback(NodeId deviceId, uint16_t timeout, uint32_t iteration,
                                                                  uint16_t discriminator, uint8_t option,
                                                                  chip::Callback::Callback<OnOpenCommissioningWindow> * callback,
                                                                  bool readVIDPIDAttributes)
@@ -513,15 +513,13 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowInternal()
         ReturnErrorOnFailure(PASESession::GeneratePASEVerifier(verifier, mCommissioningWindowIteration, salt, randomSetupPIN,
                                                                mSetupPayload.setUpPINCode));
 
-        uint8_t serializedVerifier[2 * kSpake2p_WS_Length];
-        VerifyOrReturnError(sizeof(serializedVerifier) == sizeof(verifier), CHIP_ERROR_INTERNAL);
-
-        memcpy(serializedVerifier, verifier.mW0, kSpake2p_WS_Length);
-        memcpy(&serializedVerifier[kSpake2p_WS_Length], verifier.mL, kSpake2p_WS_Length);
+        chip::PASEVerifierSerialized serializedVerifier;
+        MutableByteSpan serializedVerifierSpan(serializedVerifier);
+        ReturnErrorOnFailure(verifier.Serialize(serializedVerifierSpan));
 
         AdministratorCommissioning::Commands::OpenCommissioningWindow::Type request;
         request.commissioningTimeout = mCommissioningWindowTimeout;
-        request.PAKEVerifier         = ByteSpan(serializedVerifier);
+        request.PAKEVerifier         = serializedVerifierSpan;
         request.discriminator        = mSetupPayload.discriminator;
         request.iterations           = mCommissioningWindowIteration;
         request.salt                 = salt;
@@ -552,37 +550,6 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowInternal()
                                                    OnOpenPairingWindowFailureResponse, MakeOptional(timedInvokeTimeoutMs)));
     }
 
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DeviceController::CreateBindingWithCallback(chip::NodeId deviceId, chip::EndpointId deviceEndpointId,
-                                                       chip::NodeId bindingNodeId, chip::GroupId bindingGroupId,
-                                                       chip::EndpointId bindingEndpointId, chip::ClusterId bindingClusterId,
-                                                       CommandResponseSuccessCallback<app::DataModel::NullObjectType> successCb,
-                                                       CommandResponseFailureCallback failureCb)
-{
-    PeerId peerId;
-    peerId.SetNodeId(deviceId);
-    peerId.SetCompressedFabricId(GetCompressedFabricId());
-
-    OperationalDeviceProxy * device = mCASESessionManager->FindExistingSession(peerId);
-    if (device == nullptr)
-    {
-        ChipLogProgress(AppServer, "No OperationalDeviceProxy returned from device commissioner");
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    chip::Controller::BindingCluster cluster;
-    cluster.Associate(device, deviceEndpointId);
-
-    Binding::Commands::Bind::Type request;
-    request.nodeId     = bindingNodeId;
-    request.groupId    = bindingGroupId;
-    request.endpointId = bindingEndpointId;
-    request.clusterId  = bindingClusterId;
-    ReturnErrorOnFailure(cluster.InvokeCommand(request, this, successCb, failureCb));
-
-    ChipLogDetail(Controller, "Sent Bind command request, waiting for response");
     return CHIP_NO_ERROR;
 }
 
