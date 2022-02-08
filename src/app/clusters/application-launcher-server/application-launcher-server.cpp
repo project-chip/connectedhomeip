@@ -215,7 +215,6 @@ bool emberAfApplicationLauncherClusterLaunchAppRequestCallback(app::CommandHandl
 
     std::string appId(application.applicationId.data(), application.applicationId.size());
 
-
     if (appId.length() == 0 && data.HasValue())
     {
         // chip-tool can't send structs from command line so treat data value as appid if appid is blank
@@ -253,7 +252,8 @@ bool emberAfApplicationLauncherClusterLaunchAppRequestCallback(app::CommandHandl
             ContentAppPlatform::GetInstance().SetCurrentApp(app);
 
             ChipLogError(Zcl, "ApplicationLauncher handling launch on ContentApp");
-            app->GetApplicationLauncherDelegate()->HandleLaunchApp(responder, data.HasValue() ? data.Value() : ByteSpan(), application);
+            app->GetApplicationLauncherDelegate()->HandleLaunchApp(responder, data.HasValue() ? data.Value() : ByteSpan(),
+                                                                   application);
             return true;
         }
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED

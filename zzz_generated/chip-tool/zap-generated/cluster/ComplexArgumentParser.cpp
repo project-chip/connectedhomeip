@@ -191,7 +191,8 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ApplicationEP.application", value.isMember("application")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("ApplicationEP.application", "application", value.isMember("application")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "application");
@@ -328,8 +329,6 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("BrandingInformation.providerName", "providerName",
                                                                   value.isMember("providerName")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("BrandingInformation.providerName", value.isMember("providerName")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "providerName");
@@ -382,8 +381,10 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ChannelInfo.majorNumber", value.isMember("majorNumber")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ChannelInfo.minorNumber", value.isMember("minorNumber")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("ChannelInfo.majorNumber", "majorNumber", value.isMember("majorNumber")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("ChannelInfo.minorNumber", "minorNumber", value.isMember("minorNumber")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "majorNumber");
@@ -868,8 +869,10 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("LineupInfo.operatorName", value.isMember("operatorName")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("LineupInfo.lineupInfoType", value.isMember("lineupInfoType")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("LineupInfo.operatorName", "operatorName", value.isMember("operatorName")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("LineupInfo.lineupInfoType", "lineupInfoType", value.isMember("lineupInfoType")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "operatorName");
@@ -1436,8 +1439,8 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("Parameter.type", value.isMember("type")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("Parameter.value", value.isMember("value")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("Parameter.type", "type", value.isMember("type")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("Parameter.value", "value", value.isMember("value")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "type");
