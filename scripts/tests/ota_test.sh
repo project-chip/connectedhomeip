@@ -7,7 +7,7 @@ UDP_PORT=${3:-5560}
 pkill chip-ota-provider-app
 pkill chip-ota-requestor-app
 
-# scripts/examples/gn_build_example.sh examples/chip-tool out/
+scripts/examples/gn_build_example.sh examples/chip-tool out/
 
 touch my-firmware.bin
 
