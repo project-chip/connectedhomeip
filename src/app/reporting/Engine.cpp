@@ -53,7 +53,7 @@ bool Engine::IsClusterDataVersionMatch(ClusterInfo * aDataVersionFilterList, con
     {
         if (aPath.mEndpointId == filter->mEndpointId && aPath.mClusterId == filter->mClusterId && filter->mDataVersion.HasValue())
         {
-            if(IsClusterDataVersionEqual(filter->mEndpointId, filter->mClusterId, filter->mDataVersion.Value()))
+            if (IsClusterDataVersionEqual(filter->mEndpointId, filter->mClusterId, filter->mDataVersion.Value()))
             {
                 return true;
             }

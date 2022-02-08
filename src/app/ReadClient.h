@@ -114,9 +114,7 @@ public:
          * @param[in] aStatus      Attribute-specific status, containing an InteractionModel::Status code as well as an
          *                         optional cluster-specific status code.
          */
-        virtual void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
-                                     const StatusIB & aStatus)
-        {}
+        virtual void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) {}
 
         /**
          * OnSubscriptionEstablished will be called when a subscription is established for the given subscription transaction.
@@ -293,8 +291,7 @@ private:
     CHIP_ERROR GenerateAttributePathList(AttributePathIBs::Builder & aAttributePathIBsBuilder,
                                          AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize);
     CHIP_ERROR GenerateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
-                                             DataVersionFilter * apDataVersionFilterList,
-                                             size_t aDataVersionFilterListSize);
+                                             DataVersionFilter * apDataVersionFilterList, size_t aDataVersionFilterListSize);
     CHIP_ERROR ProcessAttributeReportIBs(TLV::TLVReader & aAttributeDataIBsReader);
     CHIP_ERROR ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsReader);
 

@@ -86,8 +86,7 @@ public:
 
     app::BufferedReadCallback * GetBufferedReadCallback() { return &mBufferedReadCallback; }
 
-    void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
-                         const StatusIB & aStatus) override
+    void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override
     {
         //
         // We shouldn't be getting list item operations in the provided path since that should be handled by the buffered read
@@ -312,9 +311,9 @@ chip::ChipError::StorageType pychip_WriteClient_WriteAttributes(void * appContex
 
             Optional<chip::DataVersion> dataVersion;
             dataVersion.SetValue(pathObj.dataVersion);
-            SuccessOrExit(err = client->PrepareAttribute(
-                              chip::app::AttributePathParams(pathObj.endpointId, pathObj.clusterId, pathObj.attributeId),
-                              dataVersion));
+            SuccessOrExit(
+                err = client->PrepareAttribute(
+                    chip::app::AttributePathParams(pathObj.endpointId, pathObj.clusterId, pathObj.attributeId), dataVersion));
             VerifyOrExit((writer = client->GetAttributeDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
             reader.Init(tlvBuffer, static_cast<uint32_t>(length));

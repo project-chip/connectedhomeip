@@ -143,7 +143,8 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
 }
 
 CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
-                                  TLV::TLVReader & aReader, WriteHandler * aWriteHandler, Optional<DataVersion> &aRequiredDataVersion)
+                                  TLV::TLVReader & aReader, WriteHandler * aWriteHandler,
+                                  Optional<DataVersion> & aRequiredDataVersion)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

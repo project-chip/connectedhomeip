@@ -50,8 +50,8 @@ class TypedReadAttributeCallback final : public app::ReadClient::Callback
 public:
     using OnSuccessCallbackType =
         std::function<void(const app::ConcreteDataAttributePath & aPath, const DecodableAttributeType & aData)>;
-    using OnErrorCallbackType                   = std::function<void(const app::ConcreteDataAttributePath * aPath, CHIP_ERROR aError)>;
-    using OnDoneCallbackType                    = std::function<void(TypedReadAttributeCallback * callback)>;
+    using OnErrorCallbackType = std::function<void(const app::ConcreteDataAttributePath * aPath, CHIP_ERROR aError)>;
+    using OnDoneCallbackType  = std::function<void(TypedReadAttributeCallback * callback)>;
     using OnSubscriptionEstablishedCallbackType = std::function<void()>;
 
     TypedReadAttributeCallback(ClusterId aClusterId, AttributeId aAttributeId, OnSuccessCallbackType aOnSuccess,

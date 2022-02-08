@@ -93,9 +93,9 @@ private:
  */
 template <typename AttrType>
 CHIP_ERROR WriteAttribute(const SessionHandle & sessionHandle, chip::EndpointId endpointId, ClusterId clusterId,
-                          AttributeId attributeId, const AttrType & requestData, const Optional<DataVersion> & aDataVersion, WriteCallback::OnSuccessCallbackType onSuccessCb,
-                          WriteCallback::OnErrorCallbackType onErrorCb, const Optional<uint16_t> & aTimedWriteTimeoutMs,
-                          WriteCallback::OnDoneCallbackType onDoneCb = nullptr)
+                          AttributeId attributeId, const AttrType & requestData, const Optional<DataVersion> & aDataVersion,
+                          WriteCallback::OnSuccessCallbackType onSuccessCb, WriteCallback::OnErrorCallbackType onErrorCb,
+                          const Optional<uint16_t> & aTimedWriteTimeoutMs, WriteCallback::OnDoneCallbackType onDoneCb = nullptr)
 {
     auto callback = Platform::MakeUnique<WriteCallback>(onSuccessCb, onErrorCb, onDoneCb);
     auto client   = Platform::MakeUnique<app::WriteClient>(app::InteractionModelEngine::GetInstance()->GetExchangeManager(),
@@ -127,19 +127,19 @@ CHIP_ERROR WriteAttribute(const SessionHandle & sessionHandle, chip::EndpointId 
 
 template <typename AttributeInfo>
 CHIP_ERROR WriteAttribute(const SessionHandle & sessionHandle, chip::EndpointId endpointId,
-                          const typename AttributeInfo::Type & requestData, const Optional<DataVersion> & aDataVersion, WriteCallback::OnSuccessCallbackType onSuccessCb,
-                          WriteCallback::OnErrorCallbackType onErrorCb, const Optional<uint16_t> & aTimedWriteTimeoutMs,
-                          WriteCallback::OnDoneCallbackType onDoneCb = nullptr)
+                          const typename AttributeInfo::Type & requestData, const Optional<DataVersion> & aDataVersion,
+                          WriteCallback::OnSuccessCallbackType onSuccessCb, WriteCallback::OnErrorCallbackType onErrorCb,
+                          const Optional<uint16_t> & aTimedWriteTimeoutMs, WriteCallback::OnDoneCallbackType onDoneCb = nullptr)
 {
-    return WriteAttribute(sessionHandle, endpointId, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), requestData, aDataVersion,
-                          onSuccessCb, onErrorCb, aTimedWriteTimeoutMs, onDoneCb);
+    return WriteAttribute(sessionHandle, endpointId, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), requestData,
+                          aDataVersion, onSuccessCb, onErrorCb, aTimedWriteTimeoutMs, onDoneCb);
 }
 
 template <typename AttributeInfo>
 CHIP_ERROR WriteAttribute(const SessionHandle & sessionHandle, chip::EndpointId endpointId,
-                          const typename AttributeInfo::Type & requestData, const Optional<DataVersion> & aDataVersion, WriteCallback::OnSuccessCallbackType onSuccessCb,
-                          WriteCallback::OnErrorCallbackType onErrorCb, uint16_t aTimedWriteTimeoutMs,
-                          WriteCallback::OnDoneCallbackType onDoneCb = nullptr)
+                          const typename AttributeInfo::Type & requestData, const Optional<DataVersion> & aDataVersion,
+                          WriteCallback::OnSuccessCallbackType onSuccessCb, WriteCallback::OnErrorCallbackType onErrorCb,
+                          uint16_t aTimedWriteTimeoutMs, WriteCallback::OnDoneCallbackType onDoneCb = nullptr)
 {
     return WriteAttribute<AttributeInfo>(sessionHandle, endpointId, requestData, aDataVersion, onSuccessCb, onErrorCb, onDoneCb,
                                          MakeOptional(aTimedWriteTimeoutMs), onDoneCb);
@@ -147,10 +147,12 @@ CHIP_ERROR WriteAttribute(const SessionHandle & sessionHandle, chip::EndpointId 
 
 template <typename AttributeInfo, typename std::enable_if_t<!AttributeInfo::MustUseTimedWrite(), int> = 0>
 CHIP_ERROR WriteAttribute(const SessionHandle & sessionHandle, chip::EndpointId endpointId,
-                          const typename AttributeInfo::Type & requestData, const Optional<DataVersion> & aDataVersion, WriteCallback::OnSuccessCallbackType onSuccessCb,
-                          WriteCallback::OnErrorCallbackType onErrorCb, WriteCallback::OnDoneCallbackType onDoneCb = nullptr)
+                          const typename AttributeInfo::Type & requestData, const Optional<DataVersion> & aDataVersion,
+                          WriteCallback::OnSuccessCallbackType onSuccessCb, WriteCallback::OnErrorCallbackType onErrorCb,
+                          WriteCallback::OnDoneCallbackType onDoneCb = nullptr)
 {
-    return WriteAttribute<AttributeInfo>(sessionHandle, endpointId, requestData, aDataVersion, onSuccessCb, onErrorCb, NullOptional, onDoneCb);
+    return WriteAttribute<AttributeInfo>(sessionHandle, endpointId, requestData, aDataVersion, onSuccessCb, onErrorCb, NullOptional,
+                                         onDoneCb);
 }
 
 } // namespace Controller

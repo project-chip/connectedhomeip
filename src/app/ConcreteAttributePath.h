@@ -123,8 +123,8 @@ struct ConcreteDataAttributePath : public ConcreteAttributePath
     // This index is only valid if `mListOp` is set to a list item operation, i.e
     // ReplaceItem, DeleteItem or AppendItem. Otherwise, it is to be ignored.
     //
-    uint16_t mListIndex   = 0;
-    ListOperation mListOp = ListOperation::NotList;
+    uint16_t mListIndex      = 0;
+    ListOperation mListOp    = ListOperation::NotList;
     DataVersion mDataVersion = 0;
 };
 

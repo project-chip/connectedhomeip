@@ -34,7 +34,7 @@ using namespace chip::app::Clusters;
 namespace {
 
 constexpr EndpointId kTestEndpointId = 1;
-constexpr DataVersion kDataVersion = 5;
+constexpr DataVersion kDataVersion   = 5;
 
 enum ResponseDirective
 {
@@ -131,7 +131,8 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
 }
 
 CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
-                                  TLV::TLVReader & aReader, WriteHandler * aWriteHandler, Optional<DataVersion> &aRequiredDataVersion)
+                                  TLV::TLVReader & aReader, WriteHandler * aWriteHandler,
+                                  Optional<DataVersion> & aRequiredDataVersion)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
@@ -182,7 +183,8 @@ void TestReadInteraction::TestReadAttributeResponse(nlTestSuite * apSuite, void 
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [apSuite, &onSuccessCbInvoked](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+    auto onSuccessCb = [apSuite, &onSuccessCbInvoked](const app::ConcreteDataAttributePath & attributePath,
+                                                      const auto & dataResponse) {
         uint8_t i = 0;
         NL_TEST_ASSERT(apSuite, attributePath.mDataVersion == kDataVersion);
         auto iter = dataResponse.begin();
@@ -227,7 +229,8 @@ void TestReadInteraction::TestReadDataVersionFilter(nlTestSuite * apSuite, void 
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [apSuite, &onSuccessCbInvoked](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+    auto onSuccessCb = [apSuite, &onSuccessCbInvoked](const app::ConcreteDataAttributePath & attributePath,
+                                                      const auto & dataResponse) {
         uint8_t i = 0;
         auto iter = dataResponse.begin();
         while (iter.Next())
@@ -464,7 +467,8 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptionsWithDataVersionFi
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [apSuite, &numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+    auto onSuccessCb = [apSuite, &numSuccessCalls](const app::ConcreteDataAttributePath & attributePath,
+                                                   const auto & dataResponse) {
         NL_TEST_ASSERT(apSuite, attributePath.mDataVersion == kDataVersion);
         numSuccessCalls++;
     };
@@ -615,7 +619,8 @@ void TestReadInteraction::TestReadHandlerResourceExhaustion_MultipleReads(nlTest
 
     NL_TEST_ASSERT(apSuite,
                    chip::Controller::ReadAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
-                       &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, dataVersion, onSuccessCb, onFailureCb) == CHIP_NO_ERROR);
+                       &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, dataVersion, onSuccessCb, onFailureCb) ==
+                       CHIP_NO_ERROR);
 
     //
     // It may take a couple of service calls since we may hit the limit of CHIP_IM_MAX_REPORTS_IN_FLIGHT
@@ -660,7 +665,8 @@ void TestReadInteraction::TestReadFabricScopedWithoutFabricFilter(nlTestSuite * 
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [apSuite, &onSuccessCbInvoked](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+    auto onSuccessCb = [apSuite, &onSuccessCbInvoked](const app::ConcreteDataAttributePath & attributePath,
+                                                      const auto & dataResponse) {
         size_t len = 0;
 
         NL_TEST_ASSERT(apSuite, dataResponse.ComputeSize(&len) == CHIP_NO_ERROR);
@@ -677,8 +683,8 @@ void TestReadInteraction::TestReadFabricScopedWithoutFabricFilter(nlTestSuite * 
 
     chip::Optional<chip::DataVersion> dataVersion;
     chip::Controller::ReadAttribute<TestCluster::Attributes::ListFabricScoped::TypeInfo>(&ctx.GetExchangeManager(), sessionHandle,
-                                                                                         kTestEndpointId, dataVersion, onSuccessCb, onFailureCb,
-                                                                                         false /* fabric filtered */);
+                                                                                         kTestEndpointId, dataVersion, onSuccessCb,
+                                                                                         onFailureCb, false /* fabric filtered */);
 
     ctx.DrainAndServiceIO();
     chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
@@ -710,7 +716,8 @@ void TestReadInteraction::TestReadFabricScopedWithFabricFilter(nlTestSuite * apS
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [apSuite, &onSuccessCbInvoked](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+    auto onSuccessCb = [apSuite, &onSuccessCbInvoked](const app::ConcreteDataAttributePath & attributePath,
+                                                      const auto & dataResponse) {
         size_t len = 0;
 
         NL_TEST_ASSERT(apSuite, dataResponse.ComputeSize(&len) == CHIP_NO_ERROR);
@@ -736,8 +743,8 @@ void TestReadInteraction::TestReadFabricScopedWithFabricFilter(nlTestSuite * apS
 
     Optional<chip::DataVersion> dataVersion;
     chip::Controller::ReadAttribute<TestCluster::Attributes::ListFabricScoped::TypeInfo>(&ctx.GetExchangeManager(), sessionHandle,
-                                                                                         kTestEndpointId, dataVersion, onSuccessCb, onFailureCb,
-                                                                                         true /* fabric filtered */);
+                                                                                         kTestEndpointId, dataVersion, onSuccessCb,
+                                                                                         onFailureCb, true /* fabric filtered */);
 
     ctx.DrainAndServiceIO();
     chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();

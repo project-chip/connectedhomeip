@@ -303,7 +303,8 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
 }
 
 CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
-                                  TLV::TLVReader & aReader, WriteHandler * aWriteHandler, Optional<DataVersion> &aRequiredDataVersion)
+                                  TLV::TLVReader & aReader, WriteHandler * aWriteHandler,
+                                  Optional<DataVersion> & aRequiredDataVersion)
 {
     TLV::TLVWriter writer;
     writer.Init(attributeDataTLV);

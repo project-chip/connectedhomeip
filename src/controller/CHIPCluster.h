@@ -113,9 +113,10 @@ public:
      * type).
      */
     template <typename AttrType>
-    CHIP_ERROR WriteAttribute(const AttrType & requestData, void * context, ClusterId clusterId, AttributeId attributeId, const Optional<DataVersion> & aDataVersion,
-                              WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb,
-                              const Optional<uint16_t> & aTimedWriteTimeoutMs, WriteResponseDoneCallback doneCb = nullptr)
+    CHIP_ERROR WriteAttribute(const AttrType & requestData, void * context, ClusterId clusterId, AttributeId attributeId,
+                              const Optional<DataVersion> & aDataVersion, WriteResponseSuccessCallback successCb,
+                              WriteResponseFailureCallback failureCb, const Optional<uint16_t> & aTimedWriteTimeoutMs,
+                              WriteResponseDoneCallback doneCb = nullptr)
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
         VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -144,40 +145,44 @@ public:
         if (mGroupSession)
         {
             err =
-                chip::Controller::WriteAttribute<AttrType>(mGroupSession.Get(), mEndpoint, clusterId, attributeId, requestData, aDataVersion,
-                                                           onSuccessCb, onFailureCb, aTimedWriteTimeoutMs, onDoneCb);
+                chip::Controller::WriteAttribute<AttrType>(mGroupSession.Get(), mEndpoint, clusterId, attributeId, requestData,
+                                                           aDataVersion, onSuccessCb, onFailureCb, aTimedWriteTimeoutMs, onDoneCb);
             mDevice->GetExchangeManager()->GetSessionManager()->RemoveGroupSession(mGroupSession->AsGroupSession());
         }
         else
         {
             err = chip::Controller::WriteAttribute<AttrType>(mDevice->GetSecureSession().Value(), mEndpoint, clusterId, attributeId,
-                                                             requestData, aDataVersion, onSuccessCb, onFailureCb, aTimedWriteTimeoutMs, onDoneCb);
+                                                             requestData, aDataVersion, onSuccessCb, onFailureCb,
+                                                             aTimedWriteTimeoutMs, onDoneCb);
         }
 
         return err;
     }
 
     template <typename AttributeInfo>
-    CHIP_ERROR WriteAttribute(const typename AttributeInfo::Type & requestData, void * context, const Optional<DataVersion> & aDataVersion,
-                              WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb,
-                              const Optional<uint16_t> & aTimedWriteTimeoutMs, WriteResponseDoneCallback doneCb = nullptr)
+    CHIP_ERROR WriteAttribute(const typename AttributeInfo::Type & requestData, void * context,
+                              const Optional<DataVersion> & aDataVersion, WriteResponseSuccessCallback successCb,
+                              WriteResponseFailureCallback failureCb, const Optional<uint16_t> & aTimedWriteTimeoutMs,
+                              WriteResponseDoneCallback doneCb = nullptr)
     {
-        return WriteAttribute(requestData, context, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), aDataVersion, successCb,
-                              failureCb, aTimedWriteTimeoutMs, doneCb);
+        return WriteAttribute(requestData, context, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), aDataVersion,
+                              successCb, failureCb, aTimedWriteTimeoutMs, doneCb);
     }
 
     template <typename AttributeInfo>
-    CHIP_ERROR WriteAttribute(const typename AttributeInfo::Type & requestData, void * context, const chip::Optional<chip::DataVersion> & aDataVersion,
-                              WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb,
-                              uint16_t aTimedWriteTimeoutMs, WriteResponseDoneCallback doneCb = nullptr)
+    CHIP_ERROR WriteAttribute(const typename AttributeInfo::Type & requestData, void * context,
+                              const chip::Optional<chip::DataVersion> & aDataVersion, WriteResponseSuccessCallback successCb,
+                              WriteResponseFailureCallback failureCb, uint16_t aTimedWriteTimeoutMs,
+                              WriteResponseDoneCallback doneCb = nullptr)
     {
-        return WriteAttribute<AttributeInfo>(requestData, context, aDataVersion, successCb, failureCb, MakeOptional(aTimedWriteTimeoutMs), doneCb);
+        return WriteAttribute<AttributeInfo>(requestData, context, aDataVersion, successCb, failureCb,
+                                             MakeOptional(aTimedWriteTimeoutMs), doneCb);
     }
 
     template <typename AttributeInfo, typename std::enable_if_t<!AttributeInfo::MustUseTimedWrite(), int> = 0>
-    CHIP_ERROR WriteAttribute(const typename AttributeInfo::Type & requestData, void * context, const Optional<DataVersion> & aDataVersion,
-                              WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb,
-                              WriteResponseDoneCallback doneCb = nullptr)
+    CHIP_ERROR WriteAttribute(const typename AttributeInfo::Type & requestData, void * context,
+                              const Optional<DataVersion> & aDataVersion, WriteResponseSuccessCallback successCb,
+                              WriteResponseFailureCallback failureCb, WriteResponseDoneCallback doneCb = nullptr)
     {
         return WriteAttribute<AttributeInfo>(requestData, context, aDataVersion, successCb, failureCb, NullOptional, doneCb);
     }
@@ -186,7 +191,8 @@ public:
      * Read an attribute and get a type-safe callback with the attribute value.
      */
     template <typename AttributeInfo>
-    CHIP_ERROR ReadAttribute(void * context, const Optional<DataVersion> & aDataVersion, ReadResponseSuccessCallback<typename AttributeInfo::DecodableArgType> successCb,
+    CHIP_ERROR ReadAttribute(void * context, const Optional<DataVersion> & aDataVersion,
+                             ReadResponseSuccessCallback<typename AttributeInfo::DecodableArgType> successCb,
                              ReadResponseFailureCallback failureCb)
     {
         return ReadAttribute<typename AttributeInfo::DecodableType, typename AttributeInfo::DecodableArgType>(
@@ -194,8 +200,9 @@ public:
     }
 
     template <typename DecodableType, typename DecodableArgType>
-    CHIP_ERROR ReadAttribute(void * context, ClusterId clusterId, AttributeId attributeId, const Optional<DataVersion> & aDataVersion,
-                             ReadResponseSuccessCallback<DecodableArgType> successCb, ReadResponseFailureCallback failureCb)
+    CHIP_ERROR ReadAttribute(void * context, ClusterId clusterId, AttributeId attributeId,
+                             const Optional<DataVersion> & aDataVersion, ReadResponseSuccessCallback<DecodableArgType> successCb,
+                             ReadResponseFailureCallback failureCb)
     {
         VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -222,18 +229,20 @@ public:
      * value when it changes.
      */
     template <typename AttributeInfo>
-    CHIP_ERROR SubscribeAttribute(void * context, const Optional<DataVersion> & aDataVersion, ReadResponseSuccessCallback<typename AttributeInfo::DecodableArgType> reportCb,
+    CHIP_ERROR SubscribeAttribute(void * context, const Optional<DataVersion> & aDataVersion,
+                                  ReadResponseSuccessCallback<typename AttributeInfo::DecodableArgType> reportCb,
                                   ReadResponseFailureCallback failureCb, uint16_t minIntervalFloorSeconds,
                                   uint16_t maxIntervalCeilingSeconds,
                                   SubscriptionEstablishedCallback subscriptionEstablishedCb = nullptr)
     {
         return SubscribeAttribute<typename AttributeInfo::DecodableType, typename AttributeInfo::DecodableArgType>(
-            context, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), aDataVersion, reportCb, failureCb, minIntervalFloorSeconds,
-            maxIntervalCeilingSeconds, subscriptionEstablishedCb);
+            context, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), aDataVersion, reportCb, failureCb,
+            minIntervalFloorSeconds, maxIntervalCeilingSeconds, subscriptionEstablishedCb);
     }
 
     template <typename DecodableType, typename DecodableArgType>
-    CHIP_ERROR SubscribeAttribute(void * context, ClusterId clusterId, AttributeId attributeId, const Optional<DataVersion> & aDataVersion,
+    CHIP_ERROR SubscribeAttribute(void * context, ClusterId clusterId, AttributeId attributeId,
+                                  const Optional<DataVersion> & aDataVersion,
                                   ReadResponseSuccessCallback<DecodableArgType> reportCb, ReadResponseFailureCallback failureCb,
                                   uint16_t minIntervalFloorSeconds, uint16_t maxIntervalCeilingSeconds,
                                   SubscriptionEstablishedCallback subscriptionEstablishedCb = nullptr)
@@ -262,8 +271,8 @@ public:
         };
 
         return Controller::SubscribeAttribute<DecodableType>(
-            mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint, clusterId, attributeId, aDataVersion, onReportCb,
-            onFailureCb, minIntervalFloorSeconds, maxIntervalCeilingSeconds, onSubscriptionEstablishedCb);
+            mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint, clusterId, attributeId, aDataVersion,
+            onReportCb, onFailureCb, minIntervalFloorSeconds, maxIntervalCeilingSeconds, onSubscriptionEstablishedCb);
     }
 
     /**

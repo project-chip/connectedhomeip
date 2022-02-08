@@ -121,7 +121,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         AttributeDataIB::Parser element;
         AttributePathIB::Parser attributePath;
         ClusterInfo clusterInfo;
-        TLV::TLVReader reader       = aAttributeDataIBsReader;
+        TLV::TLVReader reader = aAttributeDataIBsReader;
 
         err = element.Init(reader);
         SuccessOrExit(err);

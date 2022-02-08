@@ -863,7 +863,8 @@ CHIP_ERROR prepareWriteData(const EmberAfAttributeMetadata * attributeMetadata, 
 // TODO: Refactor WriteSingleClusterData and all dependent functions to take ConcreteAttributePath instead of ClusterInfo
 // as the input argument.
 CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
-                                  TLV::TLVReader & aReader, WriteHandler * apWriteHandler, Optional<DataVersion> &aRequiredDataVersion)
+                                  TLV::TLVReader & aReader, WriteHandler * apWriteHandler,
+                                  Optional<DataVersion> & aRequiredDataVersion)
 {
     // Named aPath for now to reduce the amount of code change that needs to
     // happen when the above TODO is resolved.
@@ -899,7 +900,8 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
         }
     }
 
-    if (aRequiredDataVersion.HasValue() && !IsClusterDataVersionEqual(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aRequiredDataVersion.Value()))
+    if (aRequiredDataVersion.HasValue() &&
+        !IsClusterDataVersionEqual(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aRequiredDataVersion.Value()))
     {
         return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::DataVersionMismatch);
     }

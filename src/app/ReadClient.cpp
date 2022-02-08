@@ -306,13 +306,11 @@ CHIP_ERROR ReadClient::GenerateAttributePathList(AttributePathIBs::Builder & aAt
 }
 
 CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
-                                                     DataVersionFilter * apDataVersionFilterList,
-                                                     size_t aDataVersionFilterListSize)
+                                                     DataVersionFilter * apDataVersionFilterList, size_t aDataVersionFilterListSize)
 {
     for (size_t index = 0; index < aDataVersionFilterListSize; index++)
     {
-        VerifyOrReturnError(apDataVersionFilterList[index].IsValidDataVersionFilter(),
-                            CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(apDataVersionFilterList[index].IsValidDataVersionFilter(), CHIP_ERROR_INVALID_ARGUMENT);
         DataVersionFilterIB::Builder & filter = aDataVersionFilterIBsBuilder.CreateDataVersionFilter();
         ReturnErrorOnFailure(aDataVersionFilterIBsBuilder.GetError());
         ClusterPathIB::Builder & path = filter.CreatePath();
@@ -322,7 +320,8 @@ CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Build
                                  .EndOfClusterPathIB()
                                  .GetError());
         VerifyOrReturnError(apDataVersionFilterList[index].mDataVersion.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
-        ReturnErrorOnFailure(filter.DataVersion(apDataVersionFilterList[index].mDataVersion.Value()).EndOfDataVersionFilterIB().GetError());
+        ReturnErrorOnFailure(
+            filter.DataVersion(apDataVersionFilterList[index].mDataVersion.Value()).EndOfDataVersionFilterIB().GetError());
     }
 
     return aDataVersionFilterIBsBuilder.EndOfDataVersionFilterIBs().GetError();
@@ -601,7 +600,7 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
         TLV::TLVReader reader = aAttributeReportIBsReader;
         ReturnErrorOnFailure(report.Init(reader));
 
-        err                 = report.GetAttributeStatus(&status);
+        err = report.GetAttributeStatus(&status);
         if (CHIP_NO_ERROR == err)
         {
             StatusIB::Parser errorStatus;

@@ -342,7 +342,7 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
  * TODO: Document.
  */
 CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
-                                  TLV::TLVReader & aReader, WriteHandler * apWriteHandler, Optional<DataVersion> &aDataVersion);
+                                  TLV::TLVReader & aReader, WriteHandler * apWriteHandler, Optional<DataVersion> & aDataVersion);
 
 /**
  * Check if the input version is same as the related one stored in server

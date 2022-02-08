@@ -55,7 +55,8 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
 }
 
 CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
-                                  TLV::TLVReader & aReader, WriteHandler * aWriteHandler, Optional<DataVersion> &aRequiredDataVersion)
+                                  TLV::TLVReader & aReader, WriteHandler * aWriteHandler,
+                                  Optional<DataVersion> & aRequiredDataVersion)
 {
     if (aClusterInfo.mClusterId == TestCluster::Id &&
         aClusterInfo.mAttributeId == TestCluster::Attributes::ListStructOctetString::TypeInfo::GetAttributeId())
@@ -144,8 +145,8 @@ void TestWriteInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCont
     };
 
     chip::Optional<chip::DataVersion> dataVersion;
-    chip::Controller::WriteAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(sessionHandle, kTestEndpointId,
-                                                                                               value, dataVersion, onSuccessCb, onFailureCb);
+    chip::Controller::WriteAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+        sessionHandle, kTestEndpointId, value, dataVersion, onSuccessCb, onFailureCb);
 
     ctx.DrainAndServiceIO();
 
@@ -185,8 +186,8 @@ void TestWriteInteraction::TestAttributeError(nlTestSuite * apSuite, void * apCo
     };
 
     chip::Optional<chip::DataVersion> dataVersion;
-    chip::Controller::WriteAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(sessionHandle, kTestEndpointId,
-                                                                                               value, dataVersion, onSuccessCb, onFailureCb);
+    chip::Controller::WriteAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+        sessionHandle, kTestEndpointId, value, dataVersion, onSuccessCb, onFailureCb);
 
     ctx.DrainAndServiceIO();
 

@@ -1765,8 +1765,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         BasicCluster basic;
         SetupCluster(basic, proxy, endpoint, timeout);
         Optional<DataVersion> dataVersion;
-        basic.ReadAttribute<chip::app::Clusters::Basic::Attributes::SoftwareVersion::TypeInfo>(this, dataVersion, BasicSoftwareCallback,
-                                                                                               AttributeReadFailure);
+        basic.ReadAttribute<chip::app::Clusters::Basic::Attributes::SoftwareVersion::TypeInfo>(
+            this, dataVersion, BasicSoftwareCallback, AttributeReadFailure);
     }
     break;
     case CommissioningStage::kArmFailsafe: {

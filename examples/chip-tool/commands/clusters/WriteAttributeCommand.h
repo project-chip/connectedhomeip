@@ -54,7 +54,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        //TODO: Extend dataVersion to chip-tool for write
+        // TODO: Extend dataVersion to chip-tool for write
         chip::Optional<chip::DataVersion> dataVersion;
         return WriteAttribute::SendCommand(device, endpointId, mClusterId, mAttributeId, mAttributeValue, dataVersion);
     }
@@ -86,8 +86,7 @@ public:
 
     template <class T>
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId, chip::ClusterId clusterId,
-                           chip::AttributeId attributeId, const T & value,
-                           const chip::Optional<chip::DataVersion> & aDataVersion)
+                           chip::AttributeId attributeId, const T & value, const chip::Optional<chip::DataVersion> & aDataVersion)
     {
         ChipLogProgress(chipTool, "Sending WriteAttribute to cluster " ChipLogFormatMEI " on endpoint %" PRIu16,
                         ChipLogValueMEI(clusterId), endpointId);

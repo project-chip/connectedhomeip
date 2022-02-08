@@ -96,8 +96,7 @@ private:
 
     void OnReportEnd() override;
 
-    void OnAttributeData(
-        const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
+    void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
 
     void OnError(CHIP_ERROR aError) override;
 

@@ -203,7 +203,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending ReadAttribute to cluster " ChipLogFormatMEI " on endpoint %" PRIu16,
                         ChipLogValueMEI(mClusterId), endpointId);
-        //TODO: Extend data version to Chip-tool for read
+        // TODO: Extend data version to Chip-tool for read
         chip::Optional<chip::DataVersion> dataVersion;
         return ReportCommand::ReportAttribute(device, endpointId, mClusterId, mAttributeId,
                                               chip::app::ReadClient::InteractionType::Read, dataVersion);
@@ -255,10 +255,11 @@ public:
     {
         ChipLogProgress(chipTool, "Sending SubscribeAttribute to cluster " ChipLogFormatMEI " on endpoint %" PRIu16,
                         ChipLogValueMEI(mClusterId), endpointId);
-        //TODO: Extend data version to Chip-tool for subscribe
+        // TODO: Extend data version to Chip-tool for subscribe
         chip::Optional<chip::DataVersion> dataVersion;
         return ReportCommand::ReportAttribute(device, endpointId, mClusterId, mAttributeId,
-                                              chip::app::ReadClient::InteractionType::Subscribe, dataVersion, mMinInterval, mMaxInterval);
+                                              chip::app::ReadClient::InteractionType::Subscribe, dataVersion, mMinInterval,
+                                              mMaxInterval);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override

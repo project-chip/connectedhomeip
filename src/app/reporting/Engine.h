@@ -118,7 +118,7 @@ private:
                                    const ConcreteReadAttributePath & aClusterInfo,
                                    AttributeValueEncoder::AttributeEncodeState * apEncoderState);
 
-    //if version match, it means don't send, if version mismatch, it means send.
+    // if version match, it means don't send, if version mismatch, it means send.
     bool IsClusterDataVersionMatch(ClusterInfo * aDataVersionFilterList, const ConcreteReadAttributePath & aPath);
     /**
      * Check all active subscription, if the subscription has no paths that intersect with global dirty set,

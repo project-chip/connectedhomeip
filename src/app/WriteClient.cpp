@@ -144,7 +144,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR WriteClient::PrepareAttribute(const AttributePathParams & aAttributePathParams, const Optional<DataVersion> & aDataVersion)
+CHIP_ERROR WriteClient::PrepareAttribute(const AttributePathParams & aAttributePathParams,
+                                         const Optional<DataVersion> & aDataVersion)
 {
     if (mState == State::Uninitialized)
     {

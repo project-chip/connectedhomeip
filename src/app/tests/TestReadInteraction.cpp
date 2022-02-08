@@ -143,8 +143,8 @@ public:
         mGotEventResponse = true;
     }
 
-    void OnAttributeData(const chip::app::ConcreteDataAttributePath & aPath,
-                         chip::TLV::TLVReader * apData, const chip::app::StatusIB & status) override
+    void OnAttributeData(const chip::app::ConcreteDataAttributePath & aPath, chip::TLV::TLVReader * apData,
+                         const chip::app::StatusIB & status) override
     {
         if (status.mStatus == chip::Protocols::InteractionModel::Status::Success)
         {
