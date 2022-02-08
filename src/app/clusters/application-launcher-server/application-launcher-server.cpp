@@ -44,6 +44,13 @@ using namespace chip::AppPlatform;
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 using namespace chip::Uint8;
 
+#ifdef CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
+#define APPLICATION_LAUNCHER_DELEGATE_TABLE_SIZE   \
+(EMBER_AF_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
+#else
+#define APPLICATION_LAUNCHER_DELEGATE_TABLE_SIZE EMBER_AF_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT
+#endif
+
 // -----------------------------------------------------------------------------
 // Delegate Implementation
 
@@ -53,7 +60,7 @@ using ApplicationStatusEnum = app::Clusters::ApplicationBasic::ApplicationStatus
 
 namespace {
 
-Delegate * gDelegateTable[EMBER_AF_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT] = { nullptr };
+Delegate * gDelegateTable[APPLICATION_LAUNCHER_DELEGATE_TABLE_SIZE] = { nullptr };
 
 Delegate * GetDelegate(EndpointId endpoint)
 {

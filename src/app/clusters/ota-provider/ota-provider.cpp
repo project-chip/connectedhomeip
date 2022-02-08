@@ -32,13 +32,20 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider;
 using chip::app::Clusters::OTAProviderDelegate;
 
+#ifdef CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
+#define OTA_PROVIDER_DELEGATE_TABLE_SIZE   \
+(EMBER_AF_OTA_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
+#else
+#define OTA_PROVIDER_DELEGATE_TABLE_SIZE EMBER_AF_OTA_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT
+#endif
+
 namespace {
 constexpr size_t kLocationLen          = 2;   // The expected length of the location parameter in QueryImage
 constexpr size_t kMaxMetadataLen       = 512; // The maximum length of Metadata in any OTA Provider command
 constexpr size_t kUpdateTokenMaxLength = 32;  // The expected length of the Update Token parameter used in multiple commands
 constexpr size_t kUpdateTokenMinLength = 8;   // The expected length of the Update Token parameter used in multiple commands
 
-OTAProviderDelegate * gDelegateTable[EMBER_AF_OTA_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT] = { nullptr };
+OTAProviderDelegate * gDelegateTable[OTA_PROVIDER_DELEGATE_TABLE_SIZE] = { nullptr };
 
 OTAProviderDelegate * GetDelegate(EndpointId endpoint)
 {

@@ -64,6 +64,13 @@
 
 using namespace chip;
 
+#ifdef CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
+#define IDENTIFY_STATE_TABLE_SIZE   \
+(EMBER_AF_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
+#else
+#define IDENTIFY_STATE_TABLE_SIZE EMBER_AF_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT
+#endif
+
 typedef struct
 {
     bool active;
@@ -84,7 +91,7 @@ void emAfPluginZllIdentifyServerChannelChangeEffect(uint8_t endpoint);
 
 extern EmberEventControl emberAfPluginZllIdentifyServerTriggerEffectEndpointEventControls[];
 
-static EmAfZllIdentifyState stateTable[EMBER_AF_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT];
+static EmAfZllIdentifyState stateTable[IDENTIFY_STATE_TABLE_SIZE];
 
 static EmAfZllIdentifyState * getZllIdentifyState(uint8_t endpoint);
 
