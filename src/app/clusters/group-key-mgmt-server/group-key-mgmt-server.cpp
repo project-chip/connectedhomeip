@@ -33,6 +33,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::Credentials;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::GroupKeyManagement;
 
 //
 // Attributes
@@ -139,7 +140,7 @@ public:
 
         if (GroupKeyManagement::Attributes::GroupKeyMap::Id == aPath.mAttributeId)
         {
-            return WriteGroupKeyMap(aPath.mEndpointId, aDecoder);
+            return WriteGroupKeyMap(aPath, aDecoder);
         }
         return CHIP_ERROR_WRITE_FAILED;
     }
@@ -175,31 +176,53 @@ private:
         return err;
     }
 
-    CHIP_ERROR WriteGroupKeyMap(EndpointId endpoint, AttributeValueDecoder & aDecoder)
+    CHIP_ERROR WriteGroupKeyMap(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
     {
         auto fabric_index = aDecoder.AccessingFabricIndex();
         auto provider     = GetGroupDataProvider();
-        GroupKeyManagement::Attributes::GroupKeyMap::TypeInfo::DecodableType list;
-        size_t new_count;
 
-        VerifyOrReturnError(nullptr != provider, CHIP_ERROR_INTERNAL);
-        ReturnErrorOnFailure(aDecoder.Decode(list));
-        ReturnErrorOnFailure(list.ComputeSize(&new_count));
-
-        // Remove existing keys, ignore errors
-        provider->RemoveGroupKeys(fabric_index);
-
-        // Add the new keys
-        auto iter = list.begin();
-        size_t i  = 0;
-        while (iter.Next())
+        if (!aPath.IsListItemOperation())
         {
-            const auto & value = iter.GetValue();
-            VerifyOrReturnError(fabric_index == value.fabricIndex, CHIP_ERROR_INVALID_FABRIC_ID);
-            ReturnErrorOnFailure(
-                provider->SetGroupKeyAt(value.fabricIndex, i++, GroupDataProvider::GroupKey(value.groupId, value.groupKeySetID)));
+            Attributes::GroupKeyMap::TypeInfo::DecodableType list;
+            size_t new_count;
+
+            VerifyOrReturnError(nullptr != provider, CHIP_ERROR_INTERNAL);
+            ReturnErrorOnFailure(aDecoder.Decode(list));
+            ReturnErrorOnFailure(list.ComputeSize(&new_count));
+
+            // Remove existing keys, ignore errors
+            provider->RemoveGroupKeys(fabric_index);
+
+            // Add the new keys
+            auto iter = list.begin();
+            size_t i  = 0;
+            while (iter.Next())
+            {
+                const auto & value = iter.GetValue();
+                VerifyOrReturnError(fabric_index == value.fabricIndex, CHIP_ERROR_INVALID_FABRIC_ID);
+                ReturnErrorOnFailure(provider->SetGroupKeyAt(value.fabricIndex, i++,
+                                                             GroupDataProvider::GroupKey(value.groupId, value.groupKeySetID)));
+            }
+            ReturnErrorOnFailure(iter.GetStatus());
         }
-        ReturnErrorOnFailure(iter.GetStatus());
+        else
+        {
+            Structs::GroupKeyMapStruct::DecodableType value;
+            size_t current_count = 0;
+            VerifyOrReturnError(nullptr != provider, CHIP_ERROR_INTERNAL);
+            ReturnErrorOnFailure(aDecoder.Decode(value));
+            VerifyOrReturnError(fabric_index == value.fabricIndex, CHIP_ERROR_INVALID_FABRIC_ID);
+
+            {
+                auto iter     = provider->IterateGroupKeys(fabric_index);
+                current_count = iter->Count();
+                iter->Release();
+            }
+
+            ReturnErrorOnFailure(provider->SetGroupKeyAt(value.fabricIndex, current_count,
+                                                         GroupDataProvider::GroupKey(value.groupId, value.groupKeySetID)));
+        }
+
         return CHIP_NO_ERROR;
     }
 
