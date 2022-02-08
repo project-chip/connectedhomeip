@@ -242,7 +242,8 @@ bool emberAfContentLauncherClusterLaunchURLRequestCallback(
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
     {
-        delegate->HandleLaunchUrl(responder, contentUrl, displayString.HasValue() ? displayString.Value() : CharSpan(), brandingInformationList);
+        delegate->HandleLaunchUrl(responder, contentUrl, displayString.HasValue() ? displayString.Value() : CharSpan(),
+                                  brandingInformationList);
     }
 
 exit:
