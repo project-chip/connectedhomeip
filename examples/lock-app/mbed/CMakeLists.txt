@@ -27,7 +27,7 @@ if(APP_TYPE STREQUAL "boot" OR APP_TYPE STREQUAL "upgrade")
 endif()
 
 include(${MBED_PATH}/tools/cmake/app.cmake)
-if(MBED_TARGET STREQUAL "CY8CPROTO_062_4343W" AND BOOT_ENABLED)   
+if(MBED_TARGET STREQUAL "CY8CPROTO_062_4343W" AND BOOT_ENABLED)
     list(REMOVE_ITEM MBED_TARGET_LABELS CM0P_SLEEP)
     list(REMOVE_ITEM MBED_TARGET_DEFINITIONS COMPONENT_CM0P_SLEEP=1)
 endif()
@@ -49,7 +49,7 @@ target_include_directories(${APP_TARGET} PRIVATE
                            ${MBED_COMMON}/util/include
                            ${GEN_DIR}/app-common
                            ${GEN_DIR}/lock-app
-                           ${NLIO_ROOT}                                    
+                           ${NLIO_ROOT}
 )
 
 target_sources(${APP_TARGET} PRIVATE
@@ -58,7 +58,6 @@ target_sources(${APP_TARGET} PRIVATE
                main/main.cpp
                main/ZclCallbacks.cpp
                ${GEN_DIR}/lock-app/zap-generated/callback-stub.cpp
-               ${GEN_DIR}/lock-app/zap-generated/CHIPClusters.cpp
                ${GEN_DIR}/lock-app/zap-generated/IMClusterCommandHandler.cpp
                ${MBED_COMMON}/util/LEDWidget.cpp
                ${MBED_COMMON}/util/DFUManager.cpp

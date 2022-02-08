@@ -47,13 +47,18 @@ FILE_DATA_TEMPLATE = """{
 }
 """
 
+
 def CreateOtaListFile(config, imagePath):
     data = json.loads(FILE_DATA_TEMPLATE)
 
-    data["deviceSoftwareVersionModel"][0]["vendorId"] = int(config["config"]["vendor-id"]["value"])
-    data["deviceSoftwareVersionModel"][0]["productId"] = int(config["config"]["product-id"]["value"])
-    data["deviceSoftwareVersionModel"][0]["softwareVersion"] = int(config["config"]["version-number"]["value"])
-    data["deviceSoftwareVersionModel"][0]["softwareVersionString"] = config["config"]["version-number-str"]["value"].strip('"\\')
+    data["deviceSoftwareVersionModel"][0]["vendorId"] = int(
+        config["config"]["vendor-id"]["value"])
+    data["deviceSoftwareVersionModel"][0]["productId"] = int(
+        config["config"]["product-id"]["value"])
+    data["deviceSoftwareVersionModel"][0]["softwareVersion"] = int(
+        config["config"]["version-number"]["value"])
+    data["deviceSoftwareVersionModel"][0]["softwareVersionString"] = config[
+        "config"]["version-number-str"]["value"].strip('"\\')
     data["deviceSoftwareVersionModel"][0]["otaURL"] = str(imagePath)
 
     output_path = os.path.join(os.path.dirname(imagePath), FILE_NAME)
@@ -61,9 +66,11 @@ def CreateOtaListFile(config, imagePath):
     with open(output_path, 'w') as jsonFile:
         json.dump(data, jsonFile)
 
+
 def main():
     if len(sys.argv) != 3:
-        print('Usage: ' + sys.argv[0] + ' <mbed_config_json_file_path> <image_path>')
+        print('Usage: ' + sys.argv[0] +
+              ' <mbed_config_json_file_path> <image_path>')
         exit(1)
 
     config_json_path = sys.argv[1]
