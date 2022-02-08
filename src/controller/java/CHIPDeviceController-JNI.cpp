@@ -588,10 +588,11 @@ JNI_METHOD(jbyteArray, getAttestationChallenge)
     }
 
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
-    err = wrapper->Controller()->GetAttestationChallenge(attestationChallenge);
+    err                                      = wrapper->Controller()->GetAttestationChallenge(attestationChallenge);
     SuccessOrExit(err);
 
-    err = JniReferences::GetInstance().N2J_ByteArray(env, attestationChallenge.data(), sizeof(attestationChallenge.data()), attestationChallengeJbytes);
+    err = JniReferences::GetInstance().N2J_ByteArray(env, attestationChallenge.data(), sizeof(attestationChallenge.data()),
+                                                     attestationChallengeJbytes);
     SuccessOrExit(err);
 
 exit:
