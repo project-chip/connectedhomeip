@@ -48,6 +48,8 @@ static_library("P6") {
     "LwIPCoreLock.cpp",
     "MTBKeyValueStore.cpp",
     "MTBKeyValueStore.h",
+    "NetworkCommissioningDriver.h",
+    "NetworkCommissioningWiFiDriver.cpp",
     "P6Config.cpp",
     "P6Config.h",
     "P6Utils.cpp",

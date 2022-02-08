@@ -90,7 +90,7 @@ public:
         AttributeAccessInterface(Optional<EndpointId>::Missing(), Clusters::OperationalCredentials::Id)
     {}
 
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(FabricIndex fabricIndex, const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
     CHIP_ERROR ReadNOCs(EndpointId endpoint, AttributeValueEncoder & aEncoder);
@@ -136,7 +136,7 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadNOCs(EndpointId endpoint, Attri
 
 CHIP_ERROR OperationalCredentialsAttrAccess::ReadSupportedFabrics(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    uint8_t fabricCount = CHIP_CONFIG_MAX_DEVICE_ADMINS;
+    uint8_t fabricCount = CHIP_CONFIG_MAX_FABRICS;
 
     return aEncoder.Encode(fabricCount);
 }
@@ -194,7 +194,8 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadRootCertificates(EndpointId end
 
 OperationalCredentialsAttrAccess gAttrAccess;
 
-CHIP_ERROR OperationalCredentialsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR OperationalCredentialsAttrAccess::Read(FabricIndex fabricIndex, const ConcreteReadAttributePath & aPath,
+                                                  AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == Clusters::OperationalCredentials::Id);
 

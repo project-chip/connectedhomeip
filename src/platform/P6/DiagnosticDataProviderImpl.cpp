@@ -158,12 +158,12 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     if (net_interface)
     {
         /* Update Network Interface list */
-        ifp->name                            = CharSpan::fromCharString(net_interface->name);
-        ifp->fabricConnected                 = net_interface->flags & NETIF_FLAG_LINK_UP;
-        ifp->type                            = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
-        ifp->offPremiseServicesReachableIPv4 = mipv4_offpremise;
-        ifp->offPremiseServicesReachableIPv6 = mipv6_offpremise;
-        ifp->hardwareAddress                 = ByteSpan(net_interface->hwaddr, net_interface->hwaddr_len);
+        ifp->name            = CharSpan::fromCharString(net_interface->name);
+        ifp->fabricConnected = net_interface->flags & NETIF_FLAG_LINK_UP;
+        ifp->type            = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
+        ifp->offPremiseServicesReachableIPv4.SetNonNull(mipv4_offpremise);
+        ifp->offPremiseServicesReachableIPv6.SetNonNull(mipv6_offpremise);
+        ifp->hardwareAddress = ByteSpan(net_interface->hwaddr, net_interface->hwaddr_len);
     }
     *netifpp = ifp;
 

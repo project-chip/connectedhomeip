@@ -130,10 +130,6 @@
 #define ZCL_OVERLOAD_PAUSE_COMMAND_ID (0x04)
 #define ZCL_OVERLOAD_WARNING_COMMAND_ID (0x05)
 
-// Commands for cluster: Binding
-#define ZCL_BIND_COMMAND_ID (0x00)
-#define ZCL_UNBIND_COMMAND_ID (0x01)
-
 // Commands for cluster: Poll Control
 #define ZCL_CHECK_IN_COMMAND_ID (0x00)
 #define ZCL_CHECK_IN_RESPONSE_COMMAND_ID (0x00)

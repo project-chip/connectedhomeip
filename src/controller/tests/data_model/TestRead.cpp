@@ -432,7 +432,7 @@ void TestReadInteraction::TestReadHandlerResourceExhaustion_MultipleSubscription
     auto onFailureCb = [&apSuite, &numFailureCalls](const app::ConcreteAttributePath * attributePath, CHIP_ERROR aError) {
         numFailureCalls++;
 
-        NL_TEST_ASSERT(apSuite, aError == CHIP_IM_GLOBAL_STATUS(Protocols::InteractionModel::Status::ResourceExhausted));
+        NL_TEST_ASSERT(apSuite, aError == CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
         NL_TEST_ASSERT(apSuite, attributePath == nullptr);
     };
 
@@ -499,7 +499,7 @@ void TestReadInteraction::TestReadHandlerResourceExhaustion_MultipleReads(nlTest
     auto onFailureCb = [&apSuite, &numFailureCalls](const app::ConcreteAttributePath * attributePath, CHIP_ERROR aError) {
         numFailureCalls++;
 
-        NL_TEST_ASSERT(apSuite, aError == CHIP_IM_GLOBAL_STATUS(Protocols::InteractionModel::Status::ResourceExhausted));
+        NL_TEST_ASSERT(apSuite, aError == CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
         NL_TEST_ASSERT(apSuite, attributePath == nullptr);
     };
 

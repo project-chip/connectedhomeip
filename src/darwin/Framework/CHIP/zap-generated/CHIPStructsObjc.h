@@ -61,6 +61,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+@interface CHIPBindingClusterBindingEntry : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull nodeId;
+@property (strong, nonatomic) NSNumber * _Nonnull groupId;
+@property (strong, nonatomic) NSNumber * _Nonnull endpointId;
+@property (strong, nonatomic) NSNumber * _Nonnull clusterId;
+- (instancetype)init;
+@end
+
 @interface CHIPAccessControlClusterTarget : NSObject
 @property (strong, nonatomic) NSNumber * _Nullable cluster;
 @property (strong, nonatomic) NSNumber * _Nullable endpoint;
@@ -162,8 +170,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPGeneralDiagnosticsClusterNetworkInterfaceType : NSObject
 @property (strong, nonatomic) NSString * _Nonnull name;
 @property (strong, nonatomic) NSNumber * _Nonnull fabricConnected;
-@property (strong, nonatomic) NSNumber * _Nonnull offPremiseServicesReachableIPv4;
-@property (strong, nonatomic) NSNumber * _Nonnull offPremiseServicesReachableIPv6;
+@property (strong, nonatomic) NSNumber * _Nullable offPremiseServicesReachableIPv4;
+@property (strong, nonatomic) NSNumber * _Nullable offPremiseServicesReachableIPv6;
 @property (strong, nonatomic) NSData * _Nonnull hardwareAddress;
 @property (strong, nonatomic) NSNumber * _Nonnull type;
 - (instancetype)init;

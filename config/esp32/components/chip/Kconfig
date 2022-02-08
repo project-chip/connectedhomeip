@@ -287,7 +287,7 @@ menu "CHIP Device Layer"
 
         config DEVICE_SOFTWARE_VERSION
             string "Device Software Version String"
-            default ""
+            default "v1.0"
             help
                 A string identifying the software version running on the device.
 
@@ -765,6 +765,22 @@ menu "CHIP Device Layer"
 
                 When size is set to 0, the debug event buffer and all support
                 for the debug level events are disabled.
+
+    endmenu
+
+    menu "Matter OTA Image"
+
+        config CHIP_OTA_IMAGE_BUILD
+            bool "Generate Matter OTA image"
+            help
+              Enable building OTA (Over-the-air update) image which includes Matter OTA header.
+
+        config CHIP_OTA_IMAGE_EXTRA_ARGS
+            string "OTA image creator extra arguments"
+            depends on CHIP_OTA_IMAGE_BUILD
+            help
+              This option allows one to pass optional arguments to the ota_image_tool.py script,
+              used for building OTA image with Matter OTA header.
 
     endmenu
 

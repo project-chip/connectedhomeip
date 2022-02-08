@@ -150,7 +150,7 @@ client cluster ApplicationBasic = 1293 {
   readonly attribute int16u vendorId = 1;
   readonly attribute char_string<32> applicationName = 2;
   readonly attribute int16u productId = 3;
-  attribute ApplicationBasicApplication applicationApp = 4;
+  readonly attribute ApplicationBasicApplication applicationApp = 4;
   readonly attribute ApplicationStatusEnum applicationStatus = 5;
   readonly attribute char_string<32> applicationVersion = 6;
   readonly attribute vendor_id allowedVendorList[] = 7;
@@ -176,12 +176,18 @@ client cluster ApplicationLauncher = 1292 {
     kLineupInfo = 0x2;
   }
 
+  struct ApplicationEP {
+    Application application = 0;
+    CHAR_STRING endpoint = 1;
+  }
+
   struct Application {
     INT16U catalogVendorId = 0;
     CHAR_STRING applicationId = 1;
   }
 
   readonly attribute INT16U applicationLauncherList[] = 0;
+  attribute ApplicationEP applicationLauncherApp = 1;
   readonly global attribute command_id serverGeneratedCommandList[] = 65528;
   readonly global attribute command_id clientGeneratedCommandList[] = 65529;
   readonly global attribute attrib_id attributeList[] = 65531;
@@ -319,27 +325,18 @@ client cluster BinaryInputBasic = 15 {
 }
 
 client cluster Binding = 30 {
+  struct BindingEntry {
+    NODE_ID nodeId = 0;
+    GROUP_ID groupId = 1;
+    ENDPOINT_NO endpointId = 2;
+    CLUSTER_ID clusterId = 3;
+  }
+
+  attribute BindingEntry bindingList[] = 0;
   readonly global attribute command_id serverGeneratedCommandList[] = 65528;
   readonly global attribute command_id clientGeneratedCommandList[] = 65529;
   readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute int16u clusterRevision = 65533;
-
-  request struct BindRequest {
-    NODE_ID nodeId = 0;
-    GROUP_ID groupId = 1;
-    ENDPOINT_NO endpointId = 2;
-    CLUSTER_ID clusterId = 3;
-  }
-
-  request struct UnbindRequest {
-    NODE_ID nodeId = 0;
-    GROUP_ID groupId = 1;
-    ENDPOINT_NO endpointId = 2;
-    CLUSTER_ID clusterId = 3;
-  }
-
-  command Bind(BindRequest): DefaultSuccess = 0;
-  command Unbind(UnbindRequest): DefaultSuccess = 1;
 }
 
 client cluster BooleanState = 69 {
@@ -567,7 +564,16 @@ client cluster Channel = 1284 {
     CHAR_STRING<32> affiliateCallSign = 4;
   }
 
+  struct LineupInfo {
+    CHAR_STRING operatorName = 0;
+    CHAR_STRING lineupName = 1;
+    CHAR_STRING postalCode = 2;
+    LineupInfoTypeEnum lineupInfoType = 3;
+  }
+
   readonly attribute ChannelInfo channelList[] = 0;
+  attribute LineupInfo channelLineup = 1;
+  attribute ChannelInfo currentChannel = 2;
   readonly global attribute command_id serverGeneratedCommandList[] = 65528;
   readonly global attribute command_id clientGeneratedCommandList[] = 65529;
   readonly global attribute attrib_id attributeList[] = 65531;
@@ -1769,8 +1775,8 @@ client cluster GeneralDiagnostics = 51 {
   struct NetworkInterfaceType {
     CHAR_STRING<32> name = 0;
     BOOLEAN fabricConnected = 1;
-    BOOLEAN offPremiseServicesReachableIPv4 = 2;
-    BOOLEAN offPremiseServicesReachableIPv6 = 3;
+    nullable BOOLEAN offPremiseServicesReachableIPv4 = 2;
+    nullable BOOLEAN offPremiseServicesReachableIPv6 = 3;
     OCTET_STRING<8> hardwareAddress = 4;
     InterfaceType type = 5;
   }
@@ -2291,9 +2297,15 @@ client cluster MediaPlayback = 1286 {
     kSeekOutOfRange = 5;
   }
 
+  struct PlaybackPosition {
+    INT64U updatedAt = 0;
+    INT64U position = 1;
+  }
+
   readonly attribute PlaybackStateEnum playbackState = 0;
   readonly attribute epoch_us startTime = 1;
   readonly attribute int64u duration = 2;
+  attribute PlaybackPosition position = 3;
   readonly attribute single playbackSpeed = 4;
   readonly attribute int64u seekRangeEnd = 5;
   readonly attribute int64u seekRangeStart = 6;
