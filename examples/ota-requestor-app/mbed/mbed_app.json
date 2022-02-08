@@ -71,6 +71,12 @@
             "help": "Name used for BLE advertising.",
             "value": "\"MBED-ota-req\""
         },
+        "vendor-id": {
+            "value": "9050"
+        },
+        "product-id": {
+            "value": "5"
+        },
         "version-number": {
             "value": "0"
         },

@@ -18,7 +18,6 @@
 
 cd "$(dirname "$0")"/../..
 CHIP_ROOT=$PWD
-cd "$CHIP_ROOT"/examples
 
 SUPPORTED_TOOLCHAIN=(GCC_ARM ARM)
 SUPPORTED_TARGET_BOARD=(CY8CPROTO_062_4343W)
@@ -110,8 +109,11 @@ set -e # Exit immediately if a command exits with a non-zero status.
 # Activate Matter environment
 source "$CHIP_ROOT"/scripts/activate.sh
 
+# Application directory setup
+APP_DIRECTORY="$CHIP_ROOT"/examples/"$APP"/mbed
+
 # Build directory setup
-BUILD_DIRECTORY="$APP"/mbed/build-"$TARGET_BOARD"/"$PROFILE"/
+BUILD_DIRECTORY="$APP_DIRECTORY"/build-"$TARGET_BOARD"/"$PROFILE"
 
 # Set bootloader root directory
 BOOTLOADER_ROOT_DIRECTORY="$CHIP_ROOT"/examples/platform/mbed/bootloader
@@ -179,23 +181,23 @@ if [[ "$COMMAND" == *"build"* ]]; then
     MBED_OS_POSIX_SOCKET_PATH="$CHIP_ROOT"/third_party/mbed-os-posix-socket/repo
 
     if [[ "$TYPE" == "boot" || "$TYPE" == "upgrade" ]]; then
-        ln -sfTr "$MBED_MCU_BOOT_PATH"/boot/mbed "$APP"/mbed/mcuboot
+        ln -sfTr "$MBED_MCU_BOOT_PATH"/boot/mbed "$APP_DIRECTORY"/mcuboot
     fi
 
     # Generate config file for selected target, toolchain and hardware
-    mbed-tools configure -t "$TOOLCHAIN" -m "$TARGET_BOARD" -p "$APP"/mbed/ -o "$BUILD_DIRECTORY" --mbed-os-path "$MBED_OS_PATH"
+    mbed-tools configure -t "$TOOLCHAIN" -m "$TARGET_BOARD" -p "$APP_DIRECTORY" -o "$BUILD_DIRECTORY" --mbed-os-path "$MBED_OS_PATH"
 
     # Remove old artifacts to force linking
     rm -rf "$BUILD_DIRECTORY/chip-"*
 
     # Build application
-    cmake -S "$APP/mbed" -B "$BUILD_DIRECTORY" -GNinja -DCMAKE_BUILD_TYPE="$PROFILE" -DMBED_OS_PATH="$MBED_OS_PATH" -DMBED_OS_POSIX_SOCKET_PATH="$MBED_OS_POSIX_SOCKET_PATH" -DMBED_MCU_BOOT_PATH="$MBED_MCU_BOOT_PATH" -DMBED_APP_TYPE="$TYPE"
+    cmake -S "$APP_DIRECTORY" -B "$BUILD_DIRECTORY" -GNinja -DCMAKE_BUILD_TYPE="$PROFILE" -DMBED_OS_PATH="$MBED_OS_PATH" -DMBED_OS_POSIX_SOCKET_PATH="$MBED_OS_POSIX_SOCKET_PATH" -DMBED_MCU_BOOT_PATH="$MBED_MCU_BOOT_PATH" -DMBED_APP_TYPE="$TYPE"
     cmake --build "$BUILD_DIRECTORY"
 
     if [[ "$TYPE" == "boot" || "$TYPE" == "upgrade" ]]; then
-        APP_VERSION=$(jq '.config."version-number-str".value' "$APP"/mbed/mbed_app.json | tr -d '\\"')
-        HEADER_SIZE=$(jq '.target_overrides.'\""$TARGET_BOARD"\"'."mcuboot.header-size"' "$APP"/mbed/mbed_app.json | tr -d \")
-        SLOT_SIZE=$(jq '.target_overrides.'\""$TARGET_BOARD"\"'."mcuboot.slot-size"' "$APP"/mbed/mbed_app.json | tr -d \")
+        APP_VERSION=$(jq '.config."version-number-str".value' "$APP_DIRECTORY"/mbed_app.json | tr -d '\\"')
+        HEADER_SIZE=$(jq '.target_overrides.'\""$TARGET_BOARD"\"'."mcuboot.header-size"' "$APP_DIRECTORY"/mbed_app.json | tr -d \")
+        SLOT_SIZE=$(jq '.target_overrides.'\""$TARGET_BOARD"\"'."mcuboot.slot-size"' "$APP_DIRECTORY"/mbed_app.json | tr -d \")
 
         if [[ "$TYPE" == "boot" ]]; then
             # Signed the primary application
@@ -211,6 +213,7 @@ if [[ "$COMMAND" == *"build"* ]]; then
                 "$BUILD_DIRECTORY"/chip-mbed-"$APP"-example.hex "$BUILD_DIRECTORY"/chip-mbed-"$APP"-example-signed.hex
             # Convert hex image to raw binary file
             arm-none-eabi-objcopy -I ihex -O binary "$BUILD_DIRECTORY"/chip-mbed-"$APP"-example-signed.hex "$BUILD_DIRECTORY"/chip-mbed-"$APP"-example.bin
+            python "$CHIP_ROOT"/examples/platform/mbed/ota/generate_ota_list_image.py "$APP_DIRECTORY"/mbed_app.json "$BUILD_DIRECTORY"/chip-mbed-"$APP"-example.bin
         fi
     fi
 fi

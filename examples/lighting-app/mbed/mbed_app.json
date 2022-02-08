@@ -77,6 +77,12 @@
         },
         "version-number-str": {
             "value": "\"0.1.0\""
+        },
+        "vendor-id": {
+            "value": "9050"
+        },
+        "product-id": {
+            "value": "1"
         }
     }
 }
