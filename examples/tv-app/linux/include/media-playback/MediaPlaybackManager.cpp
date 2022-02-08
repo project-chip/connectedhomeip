@@ -18,6 +18,7 @@
 #include "MediaPlaybackManager.h"
 
 using namespace std;
+using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::MediaPlayback;
 
 PlaybackStateEnum MediaPlaybackManager::HandleGetCurrentState()
@@ -39,7 +40,7 @@ CHIP_ERROR MediaPlaybackManager::HandleGetSampledPosition(AttributeValueEncoder 
 {
     Structs::PlaybackPosition::Type sampledPosition;
     sampledPosition.updatedAt = 0;
-    sampledPosition.position  = 0;
+    sampledPosition.position  = Nullable<uint64_t>(0);
 
     return aEncoder.Encode(sampledPosition);
 }
