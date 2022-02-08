@@ -57,6 +57,7 @@ constexpr uint16_t kOptionUserConsentState     = 'u';
 constexpr uint16_t kOptionDelayedActionTimeSec = 't';
 constexpr uint16_t kOptionDiscriminator        = 'd';
 constexpr uint16_t kOptionSoftwareVersion      = 's';
+constexpr uint16_t kOptionSoftwareVersionStr   = 'S';
 constexpr uint16_t kOptionUserConsentNeeded    = 'c';
 
 static constexpr uint16_t kMaximumDiscriminatorValue = 0xFFF;
@@ -70,6 +71,7 @@ static chip::ota::UserConsentState gUserConsentState                  = chip::ot
 static bool gUserConsentNeeded                                        = false;
 static chip::Optional<uint16_t> gSetupDiscriminator;
 static chip::Optional<uint32_t> gSoftwareVersion;
+static const char * gSoftwareVersionString = nullptr;
 
 // Parses the JSON filepath and extracts DeviceSoftwareVersionModel parameters
 static bool ParseJsonFileAndPopulateCandidates(const char * filepath,
@@ -233,6 +235,22 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
     case kOptionUserConsentNeeded:
         gUserConsentNeeded = true;
         break;
+    case kOptionSoftwareVersionStr:
+        if (aValue == NULL)
+        {
+            PrintArgError("%s: ERROR: NULL SoftwareVersionStr parameter\n", aProgram);
+            retval = false;
+        }
+        else if ((strlen(aValue) < 1 || strlen(aValue) > 64))
+        {
+            PrintArgError("%s: ERROR: SoftwareVersionStr parameter length is out of range \n", aProgram);
+            retval = false;
+        }
+        else
+        {
+            gSoftwareVersionString = aValue;
+        }
+        break;
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
         retval = false;
@@ -250,6 +268,7 @@ OptionDef cmdLineOptionsDef[] = {
     { "UserConsentState", chip::ArgParser::kArgumentRequired, kOptionUserConsentState },
     { "discriminator", chip::ArgParser::kArgumentRequired, kOptionDiscriminator },
     { "softwareVersion", chip::ArgParser::kArgumentRequired, kOptionSoftwareVersion },
+    { "softwareVersionStr", chip::ArgParser::kArgumentRequired, kOptionSoftwareVersionStr },
     { "UserConsentNeeded", chip::ArgParser::kNoArgument, kOptionUserConsentNeeded },
     {},
 };
@@ -274,6 +293,11 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "        advertisements. If none is specified, default value is 3840.\n"
                              "  -s/--softwareVersion <version>\n"
                              "        Value of SoftwareVersion in the Query Image Response\n"
+                             "        If ota image list is present along with this option\n"
+                             "        then value from ota image list is used.\n"
+                             "        Otherwise, this value will be used is then value from that will be used\n"
+                             "  -S/--softwareVersionStr <version string>\n"
+                             "        Value of SoftwareVersionString in the Query Image Response\n"
                              "        If ota image list is present along with this option\n"
                              "        then value from ota image list is used.\n"
                              "        Otherwise, this value will be used is then value from that will be used\n"
@@ -348,6 +372,10 @@ int main(int argc, char * argv[])
     if (gSoftwareVersion.HasValue())
     {
         otaProvider.SetSoftwareVersion(gSoftwareVersion.Value());
+    }
+    if (gSoftwareVersionString)
+    {
+        otaProvider.SetSoftwareVersionString(gSoftwareVersionString);
     }
 
     if (gUserConsentState != chip::ota::UserConsentState::kUnknown)
