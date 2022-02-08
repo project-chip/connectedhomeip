@@ -47,6 +47,7 @@ IGNORE: Set[str] = {
     '/platform/Linux/',
     '/platform/nxp/',
     '/platform/Tizen/',
+    '/platform/P6/',
     r'POSIX\.h$',
 }
 
