@@ -60,6 +60,13 @@ using namespace chip::app::Clusters::ContentLauncher;
 using namespace chip::AppPlatform;
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
+#ifdef CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
+#define CONTENT_LAUNCH_DELEGATE_TABLE_SIZE   \
+(EMBER_AF_CONTENT_LAUNCH_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
+#else
+#define CONTENT_LAUNCH_DELEGATE_TABLE_SIZE EMBER_AF_CONTENT_LAUNCH_CLUSTER_SERVER_ENDPOINT_COUNT
+#endif
+
 // -----------------------------------------------------------------------------
 // Delegate Implementation
 
