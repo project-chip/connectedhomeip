@@ -63,7 +63,7 @@ void AndroidDeviceControllerWrapper::CallJavaMethod(const char * methodName, jin
 AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     JavaVM * vm, jobject deviceControllerObj, chip::NodeId nodeId, chip::System::Layer * systemLayer,
     chip::Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager,
-    chip::Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager, 
+    chip::Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager,
     AndroidOperationalCredentialsIssuerPtr opCredsIssuerPtr,
     CHIP_ERROR * errInfoOnFailure)
 {
