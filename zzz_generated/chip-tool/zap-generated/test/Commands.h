@@ -46679,7 +46679,8 @@ private:
 
         RequestType request;
         request.target = 1;
-        request.data   = chip::Span<const char>("1garbage: not in length on purpose", 1);
+        request.data.Emplace();
+        request.data.Value() = chip::Span<const char>("1garbage: not in length on purpose", 1);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_TargetNavigatorCluster *>(context))->OnSuccessResponse_3(data.status, data.data);
@@ -46699,11 +46700,12 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3(chip::app::Clusters::TargetNavigator::StatusEnum status, chip::CharSpan data)
+    void OnSuccessResponse_3(chip::app::Clusters::TargetNavigator::StatusEnum status, const chip::Optional<chip::CharSpan> & data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
-        VerifyOrReturn(CheckValueAsString("data", data, chip::CharSpan("data response", 13)));
+        VerifyOrReturn(CheckValuePresent("data", data));
+        VerifyOrReturn(CheckValueAsString("data.Value()", data.Value(), chip::CharSpan("data response", 13)));
 
         NextTest();
     }
@@ -47092,7 +47094,8 @@ private:
         request.application.catalogVendorId = 123U;
         request.application.applicationId   = chip::Span<const char>("applicationIdgarbage: not in length on purpose", 13);
 
-        request.data = chip::ByteSpan(chip::Uint8::from_const_char("datagarbage: not in length on purpose"), 4);
+        request.data.Emplace();
+        request.data.Value() = chip::ByteSpan(chip::Uint8::from_const_char("datagarbage: not in length on purpose"), 4);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_2(data.status, data.data);
@@ -48055,7 +48058,7 @@ private:
         (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_2(error);
     }
 
-    static void OnSuccessCallback_2(void * context, uint64_t startTime)
+    static void OnSuccessCallback_2(void * context, const chip::app::DataModel::Nullable<uint64_t> & startTime)
     {
         (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_2(startTime);
     }
@@ -48065,7 +48068,7 @@ private:
         (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_3(error);
     }
 
-    static void OnSuccessCallback_3(void * context, uint64_t duration)
+    static void OnSuccessCallback_3(void * context, const chip::app::DataModel::Nullable<uint64_t> & duration)
     {
         (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_3(duration);
     }
@@ -48085,7 +48088,7 @@ private:
         (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_5(error);
     }
 
-    static void OnSuccessCallback_5(void * context, uint64_t seekRangeEnd)
+    static void OnSuccessCallback_5(void * context, const chip::app::DataModel::Nullable<uint64_t> & seekRangeEnd)
     {
         (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_5(seekRangeEnd);
     }
@@ -48095,7 +48098,7 @@ private:
         (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_6(error);
     }
 
-    static void OnSuccessCallback_6(void * context, uint64_t seekRangeStart)
+    static void OnSuccessCallback_6(void * context, const chip::app::DataModel::Nullable<uint64_t> & seekRangeStart)
     {
         (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_6(seekRangeStart);
     }
@@ -48151,9 +48154,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_2(uint64_t startTime)
+    void OnSuccessResponse_2(const chip::app::DataModel::Nullable<uint64_t> & startTime)
     {
-        VerifyOrReturn(CheckValue("startTime", startTime, 0ULL));
+        VerifyOrReturn(CheckValueNonNull("startTime", startTime));
+        VerifyOrReturn(CheckValue("startTime.Value()", startTime.Value(), 0ULL));
 
         NextTest();
     }
@@ -48175,9 +48179,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3(uint64_t duration)
+    void OnSuccessResponse_3(const chip::app::DataModel::Nullable<uint64_t> & duration)
     {
-        VerifyOrReturn(CheckValue("duration", duration, 0ULL));
+        VerifyOrReturn(CheckValueNonNull("duration", duration));
+        VerifyOrReturn(CheckValue("duration.Value()", duration.Value(), 0ULL));
 
         NextTest();
     }
@@ -48223,9 +48228,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_5(uint64_t seekRangeEnd)
+    void OnSuccessResponse_5(const chip::app::DataModel::Nullable<uint64_t> & seekRangeEnd)
     {
-        VerifyOrReturn(CheckValue("seekRangeEnd", seekRangeEnd, 0ULL));
+        VerifyOrReturn(CheckValueNonNull("seekRangeEnd", seekRangeEnd));
+        VerifyOrReturn(CheckValue("seekRangeEnd.Value()", seekRangeEnd.Value(), 0ULL));
 
         NextTest();
     }
@@ -48247,9 +48253,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_6(uint64_t seekRangeStart)
+    void OnSuccessResponse_6(const chip::app::DataModel::Nullable<uint64_t> & seekRangeStart)
     {
-        VerifyOrReturn(CheckValue("seekRangeStart", seekRangeStart, 0ULL));
+        VerifyOrReturn(CheckValueNonNull("seekRangeStart", seekRangeStart));
+        VerifyOrReturn(CheckValue("seekRangeStart.Value()", seekRangeStart.Value(), 0ULL));
 
         NextTest();
     }
@@ -48738,19 +48745,27 @@ private:
             VerifyOrReturn(CheckNextListItemDecodes<decltype(channelList)>("channelList", iter_0, 0));
             VerifyOrReturn(CheckValue("channelList[0].majorNumber", iter_0.GetValue().majorNumber, 1U));
             VerifyOrReturn(CheckValue("channelList[0].minorNumber", iter_0.GetValue().minorNumber, 2U));
-            VerifyOrReturn(CheckValueAsString("channelList[0].name", iter_0.GetValue().name, chip::CharSpan("exampleName", 11)));
-            VerifyOrReturn(
-                CheckValueAsString("channelList[0].callSign", iter_0.GetValue().callSign, chip::CharSpan("exampleCSign", 12)));
-            VerifyOrReturn(CheckValueAsString("channelList[0].affiliateCallSign", iter_0.GetValue().affiliateCallSign,
-                                              chip::CharSpan("exampleASign", 12)));
+            VerifyOrReturn(CheckValuePresent("channelList[0].name", iter_0.GetValue().name));
+            VerifyOrReturn(CheckValueAsString("channelList[0].name.Value()", iter_0.GetValue().name.Value(),
+                                              chip::CharSpan("exampleName", 11)));
+            VerifyOrReturn(CheckValuePresent("channelList[0].callSign", iter_0.GetValue().callSign));
+            VerifyOrReturn(CheckValueAsString("channelList[0].callSign.Value()", iter_0.GetValue().callSign.Value(),
+                                              chip::CharSpan("exampleCSign", 12)));
+            VerifyOrReturn(CheckValuePresent("channelList[0].affiliateCallSign", iter_0.GetValue().affiliateCallSign));
+            VerifyOrReturn(CheckValueAsString("channelList[0].affiliateCallSign.Value()",
+                                              iter_0.GetValue().affiliateCallSign.Value(), chip::CharSpan("exampleASign", 12)));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(channelList)>("channelList", iter_0, 1));
             VerifyOrReturn(CheckValue("channelList[1].majorNumber", iter_0.GetValue().majorNumber, 2U));
             VerifyOrReturn(CheckValue("channelList[1].minorNumber", iter_0.GetValue().minorNumber, 3U));
-            VerifyOrReturn(CheckValueAsString("channelList[1].name", iter_0.GetValue().name, chip::CharSpan("exampleName", 11)));
-            VerifyOrReturn(
-                CheckValueAsString("channelList[1].callSign", iter_0.GetValue().callSign, chip::CharSpan("exampleCSign", 12)));
-            VerifyOrReturn(CheckValueAsString("channelList[1].affiliateCallSign", iter_0.GetValue().affiliateCallSign,
-                                              chip::CharSpan("exampleASign", 12)));
+            VerifyOrReturn(CheckValuePresent("channelList[1].name", iter_0.GetValue().name));
+            VerifyOrReturn(CheckValueAsString("channelList[1].name.Value()", iter_0.GetValue().name.Value(),
+                                              chip::CharSpan("exampleName", 11)));
+            VerifyOrReturn(CheckValuePresent("channelList[1].callSign", iter_0.GetValue().callSign));
+            VerifyOrReturn(CheckValueAsString("channelList[1].callSign.Value()", iter_0.GetValue().callSign.Value(),
+                                              chip::CharSpan("exampleCSign", 12)));
+            VerifyOrReturn(CheckValuePresent("channelList[1].affiliateCallSign", iter_0.GetValue().affiliateCallSign));
+            VerifyOrReturn(CheckValueAsString("channelList[1].affiliateCallSign.Value()",
+                                              iter_0.GetValue().affiliateCallSign.Value(), chip::CharSpan("exampleASign", 12)));
             VerifyOrReturn(CheckNoMoreListItems<decltype(channelList)>("channelList", iter_0, 2));
         }
 
@@ -48788,9 +48803,13 @@ private:
     {
         VerifyOrReturn(CheckValue("channelMatch.majorNumber", channelMatch.majorNumber, 1U));
         VerifyOrReturn(CheckValue("channelMatch.minorNumber", channelMatch.minorNumber, 0U));
-        VerifyOrReturn(CheckValueAsString("channelMatch.name", channelMatch.name, chip::CharSpan("name", 4)));
-        VerifyOrReturn(CheckValueAsString("channelMatch.callSign", channelMatch.callSign, chip::CharSpan("callSign", 8)));
-        VerifyOrReturn(CheckValueAsString("channelMatch.affiliateCallSign", channelMatch.affiliateCallSign,
+        VerifyOrReturn(CheckValuePresent("channelMatch.name", channelMatch.name));
+        VerifyOrReturn(CheckValueAsString("channelMatch.name.Value()", channelMatch.name.Value(), chip::CharSpan("name", 4)));
+        VerifyOrReturn(CheckValuePresent("channelMatch.callSign", channelMatch.callSign));
+        VerifyOrReturn(
+            CheckValueAsString("channelMatch.callSign.Value()", channelMatch.callSign.Value(), chip::CharSpan("callSign", 8)));
+        VerifyOrReturn(CheckValuePresent("channelMatch.affiliateCallSign", channelMatch.affiliateCallSign));
+        VerifyOrReturn(CheckValueAsString("channelMatch.affiliateCallSign.Value()", channelMatch.affiliateCallSign.Value(),
                                           chip::CharSpan("affiliateCallSign", 17)));
 
         VerifyOrReturn(CheckValue("errorType", errorType, 0));
@@ -49136,10 +49155,11 @@ private:
         using RequestType               = chip::app::Clusters::ContentLauncher::Commands::LaunchContentRequest::Type;
 
         RequestType request;
-        request.autoPlay = true;
-        request.data     = chip::Span<const char>("exampleDatagarbage: not in length on purpose", 11);
 
-        request.search = chip::app::DataModel::List<chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type>();
+        request.search   = chip::app::DataModel::List<chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type>();
+        request.autoPlay = true;
+        request.data.Emplace();
+        request.data.Value() = chip::Span<const char>("exampleDatagarbage: not in length on purpose", 11);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_ContentLauncherCluster *>(context))->OnSuccessResponse_3(data.status, data.data);
@@ -49159,11 +49179,12 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3(chip::app::Clusters::ContentLauncher::StatusEnum status, chip::CharSpan data)
+    void OnSuccessResponse_3(chip::app::Clusters::ContentLauncher::StatusEnum status, const chip::Optional<chip::CharSpan> & data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
-        VerifyOrReturn(CheckValueAsString("data", data, chip::CharSpan("exampleData", 11)));
+        VerifyOrReturn(CheckValuePresent("data", data));
+        VerifyOrReturn(CheckValueAsString("data.Value()", data.Value(), chip::CharSpan("exampleData", 11)));
 
         NextTest();
     }
@@ -49174,46 +49195,87 @@ private:
         using RequestType               = chip::app::Clusters::ContentLauncher::Commands::LaunchURLRequest::Type;
 
         RequestType request;
-        request.contentURL    = chip::Span<const char>("exampleUrlgarbage: not in length on purpose", 10);
-        request.displayString = chip::Span<const char>("exampleDisplayStringgarbage: not in length on purpose", 20);
+        request.contentURL = chip::Span<const char>("exampleUrlgarbage: not in length on purpose", 10);
+        request.displayString.Emplace();
+        request.displayString.Value() = chip::Span<const char>("exampleDisplayStringgarbage: not in length on purpose", 20);
+        request.brandingInformation.Emplace();
 
-        request.brandingInformation.providerName = chip::Span<const char>("exampleNamegarbage: not in length on purpose", 11);
+        request.brandingInformation.Value().providerName =
+            chip::Span<const char>("exampleNamegarbage: not in length on purpose", 11);
+        request.brandingInformation.Value().background.Emplace();
 
-        request.brandingInformation.background.imageUrl = chip::Span<const char>("exampleUrlgarbage: not in length on purpose", 10);
-        request.brandingInformation.background.color = chip::Span<const char>("exampleColorgarbage: not in length on purpose", 12);
-
-        request.brandingInformation.background.size.width  = 0;
-        request.brandingInformation.background.size.height = 0;
-        request.brandingInformation.background.size.metric = static_cast<chip::app::Clusters::ContentLauncher::MetricTypeEnum>(0);
-
-        request.brandingInformation.logo.imageUrl = chip::Span<const char>("exampleUrlgarbage: not in length on purpose", 10);
-        request.brandingInformation.logo.color    = chip::Span<const char>("exampleColorgarbage: not in length on purpose", 12);
-
-        request.brandingInformation.logo.size.width  = 0;
-        request.brandingInformation.logo.size.height = 0;
-        request.brandingInformation.logo.size.metric = static_cast<chip::app::Clusters::ContentLauncher::MetricTypeEnum>(0);
-
-        request.brandingInformation.progressBar.imageUrl =
+        request.brandingInformation.Value().background.Value().imageUrl.Emplace();
+        request.brandingInformation.Value().background.Value().imageUrl.Value() =
             chip::Span<const char>("exampleUrlgarbage: not in length on purpose", 10);
-        request.brandingInformation.progressBar.color = chip::Span<const char>("exampleColorgarbage: not in length on purpose", 12);
+        request.brandingInformation.Value().background.Value().color.Emplace();
+        request.brandingInformation.Value().background.Value().color.Value() =
+            chip::Span<const char>("exampleColorgarbage: not in length on purpose", 12);
+        request.brandingInformation.Value().background.Value().size.Emplace();
 
-        request.brandingInformation.progressBar.size.width  = 0;
-        request.brandingInformation.progressBar.size.height = 0;
-        request.brandingInformation.progressBar.size.metric = static_cast<chip::app::Clusters::ContentLauncher::MetricTypeEnum>(0);
+        request.brandingInformation.Value().background.Value().size.Value().width  = 0;
+        request.brandingInformation.Value().background.Value().size.Value().height = 0;
+        request.brandingInformation.Value().background.Value().size.Value().metric =
+            static_cast<chip::app::Clusters::ContentLauncher::MetricTypeEnum>(0);
 
-        request.brandingInformation.splash.imageUrl = chip::Span<const char>("exampleUrlgarbage: not in length on purpose", 10);
-        request.brandingInformation.splash.color    = chip::Span<const char>("exampleColorgarbage: not in length on purpose", 12);
+        request.brandingInformation.Value().logo.Emplace();
 
-        request.brandingInformation.splash.size.width  = 0;
-        request.brandingInformation.splash.size.height = 0;
-        request.brandingInformation.splash.size.metric = static_cast<chip::app::Clusters::ContentLauncher::MetricTypeEnum>(0);
+        request.brandingInformation.Value().logo.Value().imageUrl.Emplace();
+        request.brandingInformation.Value().logo.Value().imageUrl.Value() =
+            chip::Span<const char>("exampleUrlgarbage: not in length on purpose", 10);
+        request.brandingInformation.Value().logo.Value().color.Emplace();
+        request.brandingInformation.Value().logo.Value().color.Value() =
+            chip::Span<const char>("exampleColorgarbage: not in length on purpose", 12);
+        request.brandingInformation.Value().logo.Value().size.Emplace();
 
-        request.brandingInformation.waterMark.imageUrl = chip::Span<const char>("exampleUrlgarbage: not in length on purpose", 10);
-        request.brandingInformation.waterMark.color = chip::Span<const char>("exampleColorgarbage: not in length on purpose", 12);
+        request.brandingInformation.Value().logo.Value().size.Value().width  = 0;
+        request.brandingInformation.Value().logo.Value().size.Value().height = 0;
+        request.brandingInformation.Value().logo.Value().size.Value().metric =
+            static_cast<chip::app::Clusters::ContentLauncher::MetricTypeEnum>(0);
 
-        request.brandingInformation.waterMark.size.width  = 0;
-        request.brandingInformation.waterMark.size.height = 0;
-        request.brandingInformation.waterMark.size.metric = static_cast<chip::app::Clusters::ContentLauncher::MetricTypeEnum>(0);
+        request.brandingInformation.Value().progressBar.Emplace();
+
+        request.brandingInformation.Value().progressBar.Value().imageUrl.Emplace();
+        request.brandingInformation.Value().progressBar.Value().imageUrl.Value() =
+            chip::Span<const char>("exampleUrlgarbage: not in length on purpose", 10);
+        request.brandingInformation.Value().progressBar.Value().color.Emplace();
+        request.brandingInformation.Value().progressBar.Value().color.Value() =
+            chip::Span<const char>("exampleColorgarbage: not in length on purpose", 12);
+        request.brandingInformation.Value().progressBar.Value().size.Emplace();
+
+        request.brandingInformation.Value().progressBar.Value().size.Value().width  = 0;
+        request.brandingInformation.Value().progressBar.Value().size.Value().height = 0;
+        request.brandingInformation.Value().progressBar.Value().size.Value().metric =
+            static_cast<chip::app::Clusters::ContentLauncher::MetricTypeEnum>(0);
+
+        request.brandingInformation.Value().splash.Emplace();
+
+        request.brandingInformation.Value().splash.Value().imageUrl.Emplace();
+        request.brandingInformation.Value().splash.Value().imageUrl.Value() =
+            chip::Span<const char>("exampleUrlgarbage: not in length on purpose", 10);
+        request.brandingInformation.Value().splash.Value().color.Emplace();
+        request.brandingInformation.Value().splash.Value().color.Value() =
+            chip::Span<const char>("exampleColorgarbage: not in length on purpose", 12);
+        request.brandingInformation.Value().splash.Value().size.Emplace();
+
+        request.brandingInformation.Value().splash.Value().size.Value().width  = 0;
+        request.brandingInformation.Value().splash.Value().size.Value().height = 0;
+        request.brandingInformation.Value().splash.Value().size.Value().metric =
+            static_cast<chip::app::Clusters::ContentLauncher::MetricTypeEnum>(0);
+
+        request.brandingInformation.Value().waterMark.Emplace();
+
+        request.brandingInformation.Value().waterMark.Value().imageUrl.Emplace();
+        request.brandingInformation.Value().waterMark.Value().imageUrl.Value() =
+            chip::Span<const char>("exampleUrlgarbage: not in length on purpose", 10);
+        request.brandingInformation.Value().waterMark.Value().color.Emplace();
+        request.brandingInformation.Value().waterMark.Value().color.Value() =
+            chip::Span<const char>("exampleColorgarbage: not in length on purpose", 12);
+        request.brandingInformation.Value().waterMark.Value().size.Emplace();
+
+        request.brandingInformation.Value().waterMark.Value().size.Value().width  = 0;
+        request.brandingInformation.Value().waterMark.Value().size.Value().height = 0;
+        request.brandingInformation.Value().waterMark.Value().size.Value().metric =
+            static_cast<chip::app::Clusters::ContentLauncher::MetricTypeEnum>(0);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_ContentLauncherCluster *>(context))->OnSuccessResponse_4(data.status, data.data);
@@ -49233,11 +49295,12 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4(chip::app::Clusters::ContentLauncher::StatusEnum status, chip::CharSpan data)
+    void OnSuccessResponse_4(chip::app::Clusters::ContentLauncher::StatusEnum status, const chip::Optional<chip::CharSpan> & data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
-        VerifyOrReturn(CheckValueAsString("data", data, chip::CharSpan("exampleData", 11)));
+        VerifyOrReturn(CheckValuePresent("data", data));
+        VerifyOrReturn(CheckValueAsString("data.Value()", data.Value(), chip::CharSpan("exampleData", 11)));
 
         NextTest();
     }

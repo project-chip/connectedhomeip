@@ -482,8 +482,9 @@ public:
     }
 
 private:
-    chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type mValue;
-    TypedComplexArgument<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type> mComplex;
+    chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type> mValue;
+    TypedComplexArgument<chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type>>
+        mComplex;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -1309,52 +1310,6 @@ public:
 
 private:
     chip::app::Clusters::Channel::Commands::SkipChannelRequest::Type mRequest;
-};
-
-class WriteChannelChannelLineup : public WriteAttribute
-{
-public:
-    WriteChannelChannelLineup(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("ChannelLineup", credsIssuerConfig), mComplex(&mValue)
-    {
-        AddArgument("attr-name", "channel-lineup");
-        AddArgument("attr-value", &mComplex);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteChannelChannelLineup() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
-    {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000504, 0x00000001, mValue);
-    }
-
-private:
-    chip::app::Clusters::Channel::Structs::LineupInfo::Type mValue;
-    TypedComplexArgument<chip::app::Clusters::Channel::Structs::LineupInfo::Type> mComplex;
-};
-
-class WriteChannelCurrentChannel : public WriteAttribute
-{
-public:
-    WriteChannelCurrentChannel(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("CurrentChannel", credsIssuerConfig), mComplex(&mValue)
-    {
-        AddArgument("attr-name", "current-channel");
-        AddArgument("attr-value", &mComplex);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteChannelCurrentChannel() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
-    {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000504, 0x00000002, mValue);
-    }
-
-private:
-    chip::app::Clusters::Channel::Structs::ChannelInfo::Type mValue;
-    TypedComplexArgument<chip::app::Clusters::Channel::Structs::ChannelInfo::Type> mComplex;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -2265,9 +2220,9 @@ public:
     ContentLauncherLaunchContentRequest(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("launch-content-request", credsIssuerConfig), mComplex_Search(&mRequest.search)
     {
+        AddArgument("Search", &mComplex_Search);
         AddArgument("AutoPlay", 0, 1, &mRequest.autoPlay);
         AddArgument("Data", &mRequest.data);
-        AddArgument("Search", &mComplex_Search);
         ClusterCommand::AddArguments();
     }
 
@@ -2308,7 +2263,8 @@ public:
 
 private:
     chip::app::Clusters::ContentLauncher::Commands::LaunchURLRequest::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type> mComplex_BrandingInformation;
+    TypedComplexArgument<chip::Optional<chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type>>
+        mComplex_BrandingInformation;
 };
 
 class WriteContentLauncherSupportedStreamingProtocols : public WriteAttribute
@@ -4561,29 +4517,6 @@ public:
 
 private:
     chip::app::Clusters::MediaPlayback::Commands::StopRequest::Type mRequest;
-};
-
-class WriteMediaPlaybackPosition : public WriteAttribute
-{
-public:
-    WriteMediaPlaybackPosition(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("Position", credsIssuerConfig), mComplex(&mValue)
-    {
-        AddArgument("attr-name", "position");
-        AddArgument("attr-value", &mComplex);
-        WriteAttribute::AddArguments();
-    }
-
-    ~WriteMediaPlaybackPosition() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
-    {
-        return WriteAttribute::SendCommand(device, endpointId, 0x00000506, 0x00000003, mValue);
-    }
-
-private:
-    chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::Type mValue;
-    TypedComplexArgument<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::Type> mComplex;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -10044,8 +9977,6 @@ void registerClusterChannel(Commands & commands, CredentialIssuerCommands * cred
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),        //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),    //
         make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                        //
-        make_unique<WriteChannelChannelLineup>(credsIssuerConfig),                                                 //
-        make_unique<WriteChannelCurrentChannel>(credsIssuerConfig),                                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                    //
         make_unique<SubscribeAttribute>(Id, "channel-list", Attributes::ChannelList::Id, credsIssuerConfig),       //
         make_unique<SubscribeAttribute>(Id, "channel-lineup", Attributes::ChannelLineup::Id, credsIssuerConfig),   //
@@ -11300,7 +11231,6 @@ void registerClusterMediaPlayback(Commands & commands, CredentialIssuerCommands 
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),         //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),     //
         make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                         //
-        make_unique<WriteMediaPlaybackPosition>(credsIssuerConfig),                                                 //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                     //
         make_unique<SubscribeAttribute>(Id, "playback-state", Attributes::PlaybackState::Id, credsIssuerConfig),    //
         make_unique<SubscribeAttribute>(Id, "start-time", Attributes::StartTime::Id, credsIssuerConfig),            //
