@@ -48,8 +48,18 @@ step. To install these components manually, follow these steps:
           $ cd ${HOME}/tools
           $ git clone https://github.com/espressif/esp-idf.git
           $ cd esp-idf
-          $ git checkout v4.4
+          $ git checkout release/v4.4
           $ git submodule update --init
+          $ ./install.sh
+
+    To update an existing esp-idf toolchain to v4.4:
+
+          $ cd ~/tools/esp-idf
+          $ git fetch origin
+          $ git checkout release/v4.4
+          $ git reset --hard origin/release/v4.4
+          $ git submodule update --init
+          $ git clean -fdx
           $ ./install.sh
 
 -   Install ninja-build
