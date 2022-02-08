@@ -213,9 +213,6 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
         // We are using the feature that the parser won't touch the value if the field does not exist, since all fields in the
         // cluster info will be invalid / wildcard, it is safe to ignore CHIP_END_OF_TLV.
 
-        err = attributePath.GetEndpoint(&(dataAttributePath.mEndpointId));
-        SuccessOrExit(err);
-
         err = attributePath.GetCluster(&(dataAttributePath.mClusterId));
         SuccessOrExit(err);
 
