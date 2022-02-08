@@ -95,7 +95,9 @@ static uint8_t chipOBleProfileRxdDataUserDesp[CHIPOBLEPROFILE_MAX_DESCRIPTION_LE
 static uint8_t chipOBleProfileC3CharProps = GATT_PROP_READ;
 
 // CHIPoBLE C3 Characteristic Value
-static uint8_t chipOBleProfileC3CharVal[CHIPOBLEPROFILE_CHAR_LEN] = { 0x00 };
+// currently this is not used, but it could be for debugging what the value actually is.
+// at the moment, this device's GATT server's read response would be populated dynamically (see pfnchipOBleC3Read).
+static uint8_t chipOBleProfileC3CharVal[CHIPOBLEPROFILE_C3_MAX_LEN] = { 0x00 };
 
 // CHIPoBLE C3 Characteristic User Description
 static uint8_t chipOBleProfileC3dDataUserDesp[CHIPOBLEPROFILE_MAX_DESCRIPTION_LEN] = "ChipOBLE C3 Char";
@@ -346,20 +348,11 @@ static bStatus_t CHIPoBLEProfile_ReadAttrCB(uint16_t connHandle, gattAttribute_t
     if (offset + maxLen > CHIPOBLEPROFILE_CHAR_LEN)
         len = CHIPOBLEPROFILE_CHAR_LEN - offset;
 
-    // toby: original
-    /*
-    *pLen = len;
-    VOID osal_memcpy(pValue, (pAttr->pValue) + offset, len);
-    */
-    // end original
-
-    // toby add?
-
     *pLen = len;
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-    if (pAttr->type->len == ATT_UUID_SIZE &&
-        !memcmp(pAttr->type->uuid, chipOBleProfileC3CharUUID, sizeof(chipOBleProfileC3CharUUID)) &&
+    if (pAttr->type.len == ATT_UUID_SIZE &&
+        !memcmp(pAttr->type.uuid, chipOBleProfileC3CharUUID, sizeof(chipOBleProfileC3CharUUID)) &&
         chipOBleProfile_AppCBs->pfnchipOBleC3Read)
     {
         len = CHIPOBLEPROFILE_C3_MAX_LEN;
@@ -370,7 +363,6 @@ static bStatus_t CHIPoBLEProfile_ReadAttrCB(uint16_t connHandle, gattAttribute_t
     {
         VOID osal_memcpy(pValue, (pAttr->pValue) + offset, len);
     }
-    // end add
 
     return status;
 }
