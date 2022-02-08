@@ -101,35 +101,86 @@ constexpr FabricIndex invalidFabricIndexes[] = { kUndefinedFabricIndex };
 
 // clang-format off
 constexpr NodeId validCaseSubjects[] = {
-    0x0123456789ABCDEF,
-    NodeIdFromCASEAuthTag(kCASEAuthTag0),
-    // TODO more nodes in range, CATs, version/id, range prefixes
+    0x0000'0000'0000'0001, // min operational
+    0x0000'0000'0000'0002,
+    0x0123'4567'89AB'CDEF,
+    0xFFFF'FFEF'FFFF'FFFE,
+    0xFFFF'FFEF'FFFF'FFFF, // max operational
+
+    // TODO: is CAT 0x0000'0001 valid? can't tell from spec
+
+    NodeIdFromCASEAuthTag(0x0001'0001),
+    NodeIdFromCASEAuthTag(0x0001'0002),
+    NodeIdFromCASEAuthTag(0x0001'FFFE),
+    NodeIdFromCASEAuthTag(0x0001'FFFF),
+
+    NodeIdFromCASEAuthTag(0xFFFE'0001),
+    NodeIdFromCASEAuthTag(0xFFFE'0002),
+    NodeIdFromCASEAuthTag(0xFFFE'FFFE),
+    NodeIdFromCASEAuthTag(0xFFFE'FFFF),
+
+    NodeIdFromCASEAuthTag(0xFFFF'0001),
+    NodeIdFromCASEAuthTag(0xFFFF'0002),
+    NodeIdFromCASEAuthTag(0xFFFF'FFFE),
+    NodeIdFromCASEAuthTag(0xFFFF'FFFF),
 };
 // clang-format on
 
 // clang-format off
 constexpr NodeId validGroupSubjects[] = {
-    //NodeIdFromGroupId(0x0000),
-    NodeIdFromGroupId(0x0001),
-    //NodeIdFromGroupId(0xFFFE),
-    //NodeIdFromGroupId(0xFFFF),
-    // TODO test more prefixes in range
+    NodeIdFromGroupId(0x0001), // start of fabric-scoped
+    NodeIdFromGroupId(0x0002),
+    NodeIdFromGroupId(0x7FFE),
+    NodeIdFromGroupId(0x7FFF), // end of fabric-scoped
+    NodeIdFromGroupId(0x8000), // start of universal
+    NodeIdFromGroupId(0x8001),
+    NodeIdFromGroupId(0xFFFB),
+    NodeIdFromGroupId(0xFFFC), // end of universal
+    NodeIdFromGroupId(0xFFFD), // all proxies
+    NodeIdFromGroupId(0xFFFE), // all non sleepy
+    NodeIdFromGroupId(0xFFFF), // all nodes
 };
 // clang-format on
 
 // clang-format off
 constexpr NodeId validPaseSubjects[] = {
-    NodeIdFromPAKEKeyId(0x0000),
+    NodeIdFromPAKEKeyId(0x0000), // start
     NodeIdFromPAKEKeyId(0x0001),
-    //NodeIdFromPAKEKeyId(0xFFFE),
-    //NodeIdFromPAKEKeyId(0xFFFF),
-    // TODO test more prefixes in range
+    NodeIdFromPAKEKeyId(0xFFFE),
+    NodeIdFromPAKEKeyId(0xFFFF), // end
+
+    // Debatable whether these are valid or not,
+    // since they have bits in the unused part
+    // of the range set. Code currently treats
+    // them as valid (ignoring the unused bits).
+
+    0xFFFF'FFFB'0001'0000,
+    0xFFFF'FFFB'0001'0001,
+    0xFFFF'FFFB'0001'FFFE,
+    0xFFFF'FFFB'0001'FFFF,
+
+    0xFFFF'FFFB'FFFE'0000,
+    0xFFFF'FFFB'FFFE'0001,
+    0xFFFF'FFFB'FFFE'FFFE,
+    0xFFFF'FFFB'FFFE'FFFF,
+
+    0xFFFF'FFFB'FFFF'0000,
+    0xFFFF'FFFB'FFFF'0001,
+    0xFFFF'FFFB'FFFF'FFFE,
+    0xFFFF'FFFB'FFFF'FFFF,
 };
 // clang-format on
 
 // clang-format off
 constexpr NodeId invalidSubjects[] = {
-    // TODO add all the bad cases
+    0x0000'0000'0000'0000,
+
+    // TODO: not passing yet, probably needs code change
+    //0xFFFF'FFFD'0001'0000, // CAT with version 0
+    //0xFFFF'FFFD'FFFE'0000, // CAT with version 0
+    //0xFFFF'FFFD'FFFF'0000, // CAT with version 0
+
+    0xFFFF'FFFF'FFFF'0000, // group 0
 };
 // clang-format on
 
@@ -1089,7 +1140,7 @@ void TestAclValidateAuthModeSubject(nlTestSuite * inSuite, void * inContext)
         accessControl.DeleteEntry(1);
     }
 
-    // Pase must have subject
+    // PASE must have subject
     {
         NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kGroup) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
