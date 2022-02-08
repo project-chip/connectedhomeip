@@ -339,6 +339,17 @@ NS_ASSUME_NONNULL_BEGIN
                                                    reportHandler:(void (^)(NSArray * _Nullable value,
                                                                      NSError * _Nullable error))reportHandler;
 
+- (void)readAttributeApplicationLauncherAppWithCompletionHandler:
+    (void (^)(CHIPApplicationLauncherClusterApplicationEP * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeApplicationLauncherAppWithValue:(CHIPApplicationLauncherClusterApplicationEP * _Nonnull)value
+                                    completionHandler:(StatusCompletion)completionHandler;
+- (void)
+    subscribeAttributeApplicationLauncherAppWithMinInterval:(uint16_t)minInterval
+                                                maxInterval:(uint16_t)maxInterval
+                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                              reportHandler:(void (^)(CHIPApplicationLauncherClusterApplicationEP * _Nullable value,
+                                                                NSError * _Nullable error))reportHandler;
+
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(uint16_t)minInterval
@@ -1127,6 +1138,26 @@ NS_ASSUME_NONNULL_BEGIN
                                          maxInterval:(uint16_t)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeChannelLineupWithCompletionHandler:(void (^)(CHIPChannelClusterLineupInfo * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
+- (void)writeAttributeChannelLineupWithValue:(CHIPChannelClusterLineupInfo * _Nonnull)value
+                           completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeChannelLineupWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                         reportHandler:(void (^)(CHIPChannelClusterLineupInfo * _Nullable value,
+                                                           NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeCurrentChannelWithCompletionHandler:(void (^)(CHIPChannelClusterChannelInfo * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
+- (void)writeAttributeCurrentChannelWithValue:(CHIPChannelClusterChannelInfo * _Nonnull)value
+                            completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeCurrentChannelWithMinInterval:(uint16_t)minInterval
+                                            maxInterval:(uint16_t)maxInterval
+                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                          reportHandler:(void (^)(CHIPChannelClusterChannelInfo * _Nullable value,
+                                                            NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
@@ -3393,6 +3424,16 @@ NS_ASSUME_NONNULL_BEGIN
                                       maxInterval:(uint16_t)maxInterval
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributePositionWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackPosition * _Nullable value,
+                                                       NSError * _Nullable error))completionHandler;
+- (void)writeAttributePositionWithValue:(CHIPMediaPlaybackClusterPlaybackPosition * _Nonnull)value
+                      completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributePositionWithMinInterval:(uint16_t)minInterval
+                                      maxInterval:(uint16_t)maxInterval
+                          subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                    reportHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackPosition * _Nullable value,
+                                                      NSError * _Nullable error))reportHandler;
 
 - (void)readAttributePlaybackSpeedWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;

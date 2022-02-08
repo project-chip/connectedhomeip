@@ -545,8 +545,16 @@ typedef void (*NullableApplianceEventsAndAlertClusterEventIdentificationAttribut
 
 typedef void (*ApplicationBasicApplicationAppStructAttributeCallback)(
     void *, const chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::DecodableType &);
+typedef void (*ApplicationLauncherApplicationLauncherAppStructAttributeCallback)(
+    void *, const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType &);
+typedef void (*ChannelChannelLineupStructAttributeCallback)(
+    void *, const chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType &);
+typedef void (*ChannelCurrentChannelStructAttributeCallback)(
+    void *, const chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType &);
 typedef void (*GeneralCommissioningBasicCommissioningInfoStructAttributeCallback)(
     void *, const chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfo::DecodableType &);
+typedef void (*MediaPlaybackPositionStructAttributeCallback)(
+    void *, const chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType &);
 typedef void (*TestClusterStructAttrStructAttributeCallback)(
     void *, const chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType &);
 typedef void (*TestClusterNullableStructStructAttributeCallback)(
@@ -1770,6 +1778,36 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
+class CHIPApplicationLauncherApplicationLauncherAppStructAttributeCallbackBridge
+    : public CHIPCallbackBridge<ApplicationLauncherApplicationLauncherAppStructAttributeCallback>
+{
+public:
+    CHIPApplicationLauncherApplicationLauncherAppStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ApplicationLauncherApplicationLauncherAppStructAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                             keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType & value);
+};
+
+class CHIPApplicationLauncherApplicationLauncherAppStructAttributeCallbackSubscriptionBridge
+    : public CHIPApplicationLauncherApplicationLauncherAppStructAttributeCallbackBridge
+{
+public:
+    CHIPApplicationLauncherApplicationLauncherAppStructAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPApplicationLauncherApplicationLauncherAppStructAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
 class CHIPApplicationLauncherServerGeneratedCommandListListAttributeCallbackBridge
     : public CHIPCallbackBridge<ApplicationLauncherServerGeneratedCommandListListAttributeCallback>
 {
@@ -2649,6 +2687,61 @@ public:
                                                                   CHIPActionBlock action,
                                                                   SubscriptionEstablishedHandler establishedHandler) :
         CHIPChannelChannelListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPChannelChannelLineupStructAttributeCallbackBridge : public CHIPCallbackBridge<ChannelChannelLineupStructAttributeCallback>
+{
+public:
+    CHIPChannelChannelLineupStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                          bool keepAlive = false) :
+        CHIPCallbackBridge<ChannelChannelLineupStructAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType & value);
+};
+
+class CHIPChannelChannelLineupStructAttributeCallbackSubscriptionBridge
+    : public CHIPChannelChannelLineupStructAttributeCallbackBridge
+{
+public:
+    CHIPChannelChannelLineupStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      CHIPActionBlock action,
+                                                                      SubscriptionEstablishedHandler establishedHandler) :
+        CHIPChannelChannelLineupStructAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPChannelCurrentChannelStructAttributeCallbackBridge
+    : public CHIPCallbackBridge<ChannelCurrentChannelStructAttributeCallback>
+{
+public:
+    CHIPChannelCurrentChannelStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                           bool keepAlive = false) :
+        CHIPCallbackBridge<ChannelCurrentChannelStructAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType & value);
+};
+
+class CHIPChannelCurrentChannelStructAttributeCallbackSubscriptionBridge
+    : public CHIPChannelCurrentChannelStructAttributeCallbackBridge
+{
+public:
+    CHIPChannelCurrentChannelStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       CHIPActionBlock action,
+                                                                       SubscriptionEstablishedHandler establishedHandler) :
+        CHIPChannelCurrentChannelStructAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -4859,6 +4952,35 @@ public:
                                                                        CHIPActionBlock action,
                                                                        SubscriptionEstablishedHandler establishedHandler) :
         CHIPMediaInputAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPMediaPlaybackPositionStructAttributeCallbackBridge
+    : public CHIPCallbackBridge<MediaPlaybackPositionStructAttributeCallback>
+{
+public:
+    CHIPMediaPlaybackPositionStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                           bool keepAlive = false) :
+        CHIPCallbackBridge<MediaPlaybackPositionStructAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType & value);
+};
+
+class CHIPMediaPlaybackPositionStructAttributeCallbackSubscriptionBridge
+    : public CHIPMediaPlaybackPositionStructAttributeCallbackBridge
+{
+public:
+    CHIPMediaPlaybackPositionStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       CHIPActionBlock action,
+                                                                       SubscriptionEstablishedHandler establishedHandler) :
+        CHIPMediaPlaybackPositionStructAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 

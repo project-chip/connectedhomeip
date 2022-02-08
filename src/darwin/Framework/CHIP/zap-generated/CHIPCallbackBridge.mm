@@ -1453,6 +1453,39 @@ void CHIPApplicationLauncherApplicationLauncherListListAttributeCallbackSubscrip
     }
 }
 
+void CHIPApplicationLauncherApplicationLauncherAppStructAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType & value)
+{
+    CHIPApplicationLauncherClusterApplicationEP * _Nonnull objCValue;
+    objCValue = [CHIPApplicationLauncherClusterApplicationEP new];
+    objCValue.application = [CHIPApplicationLauncherClusterApplication new];
+    objCValue.application.catalogVendorId = [NSNumber numberWithUnsignedShort:value.application.catalogVendorId];
+    objCValue.application.applicationId = [[NSString alloc] initWithBytes:value.application.applicationId.data()
+                                                                   length:value.application.applicationId.size()
+                                                                 encoding:NSUTF8StringEncoding];
+    objCValue.endpoint = [[NSString alloc] initWithBytes:value.endpoint.data()
+                                                  length:value.endpoint.size()
+                                                encoding:NSUTF8StringEncoding];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPApplicationLauncherApplicationLauncherAppStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPApplicationLauncherApplicationLauncherAppStructAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
 void CHIPApplicationLauncherServerGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -2701,6 +2734,73 @@ void CHIPChannelChannelListListAttributeCallbackBridge::OnSuccessFn(void * conte
 void CHIPChannelChannelListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
     auto * self = static_cast<CHIPChannelChannelListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPChannelChannelLineupStructAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType & value)
+{
+    CHIPChannelClusterLineupInfo * _Nonnull objCValue;
+    objCValue = [CHIPChannelClusterLineupInfo new];
+    objCValue.operatorName = [[NSString alloc] initWithBytes:value.operatorName.data()
+                                                      length:value.operatorName.size()
+                                                    encoding:NSUTF8StringEncoding];
+    objCValue.lineupName = [[NSString alloc] initWithBytes:value.lineupName.data()
+                                                    length:value.lineupName.size()
+                                                  encoding:NSUTF8StringEncoding];
+    objCValue.postalCode = [[NSString alloc] initWithBytes:value.postalCode.data()
+                                                    length:value.postalCode.size()
+                                                  encoding:NSUTF8StringEncoding];
+    objCValue.lineupInfoType = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.lineupInfoType)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPChannelChannelLineupStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPChannelChannelLineupStructAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPChannelCurrentChannelStructAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType & value)
+{
+    CHIPChannelClusterChannelInfo * _Nonnull objCValue;
+    objCValue = [CHIPChannelClusterChannelInfo new];
+    objCValue.majorNumber = [NSNumber numberWithUnsignedShort:value.majorNumber];
+    objCValue.minorNumber = [NSNumber numberWithUnsignedShort:value.minorNumber];
+    objCValue.name = [[NSString alloc] initWithBytes:value.name.data() length:value.name.size() encoding:NSUTF8StringEncoding];
+    objCValue.callSign = [[NSString alloc] initWithBytes:value.callSign.data()
+                                                  length:value.callSign.size()
+                                                encoding:NSUTF8StringEncoding];
+    objCValue.affiliateCallSign = [[NSString alloc] initWithBytes:value.affiliateCallSign.data()
+                                                           length:value.affiliateCallSign.size()
+                                                         encoding:NSUTF8StringEncoding];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPChannelCurrentChannelStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPChannelCurrentChannelStructAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -5768,6 +5868,32 @@ void CHIPMediaInputAttributeListListAttributeCallbackBridge::OnSuccessFn(
 void CHIPMediaInputAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
     auto * self = static_cast<CHIPMediaInputAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPMediaPlaybackPositionStructAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType & value)
+{
+    CHIPMediaPlaybackClusterPlaybackPosition * _Nonnull objCValue;
+    objCValue = [CHIPMediaPlaybackClusterPlaybackPosition new];
+    objCValue.updatedAt = [NSNumber numberWithUnsignedLongLong:value.updatedAt];
+    objCValue.position = [NSNumber numberWithUnsignedLongLong:value.position];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPMediaPlaybackPositionStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPMediaPlaybackPositionStructAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
