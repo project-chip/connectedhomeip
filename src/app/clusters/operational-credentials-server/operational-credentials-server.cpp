@@ -352,7 +352,7 @@ public:
     void OnResponseTimeout(chip::Messaging::ExchangeContext * ec) override {}
     void OnExchangeClosing(chip::Messaging::ExchangeContext * ec) override
     {
-        FabricIndex currentFabricIndex = ec->GetSessionHandle()->AsSecureSession()->GetFabricIndex();
+        FabricIndex currentFabricIndex = ec->GetSessionHandle()->GetFabricIndex();
         ec->GetExchangeMgr()->GetSessionManager()->ExpireAllPairingsForFabric(currentFabricIndex);
     }
 };

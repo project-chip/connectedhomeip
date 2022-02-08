@@ -573,7 +573,7 @@ FabricIndex CommandHandler::GetAccessingFabricIndex() const
     }
     else
     {
-        fabric = mpExchangeCtx->GetSessionHandle()->AsSecureSession()->GetFabricIndex();
+        fabric = mpExchangeCtx->GetSessionHandle()->GetFabricIndex();
     }
 
     return fabric;
