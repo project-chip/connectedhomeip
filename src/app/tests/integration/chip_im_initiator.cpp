@@ -621,10 +621,10 @@ exit:
 
 namespace chip {
 namespace app {
-bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
+Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
 {
-    // Always return true in test.
-    return true;
+    // Always return success in test.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip::TLV::TLVReader & aReader,

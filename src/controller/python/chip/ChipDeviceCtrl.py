@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2020-2021 Project CHIP Authors
+#    Copyright (c) 2020-2022 Project CHIP Authors
 #    Copyright (c) 2019-2020 Google, LLC.
 #    Copyright (c) 2013-2018 Nest Labs, Inc.
 #    All rights reserved.
@@ -921,7 +921,7 @@ class ChipDeviceController():
             self._dmLib.pychip_DeviceController_GetCompressedFabricId.restype = c_uint32
 
             self._dmLib.pychip_DeviceController_OpenCommissioningWindow.argtypes = [
-                c_void_p, c_uint64, c_uint16, c_uint16, c_uint16, c_uint8]
+                c_void_p, c_uint64, c_uint16, c_uint32, c_uint16, c_uint8]
             self._dmLib.pychip_DeviceController_OpenCommissioningWindow.restype = c_uint32
             self._dmLib.pychip_TestCommissionerUsed.argtypes = []
             self._dmLib.pychip_TestCommissionerUsed.restype = c_bool

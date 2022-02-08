@@ -81,6 +81,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeVendorIdWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeApplicationNameWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeProductIdWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeApplicationAppWithValue:(CHIPApplicationBasicClusterApplicationBasicApplication * _Nonnull)value
+                            completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeApplicationStatusWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeApplicationVersionWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeAllowedVendorListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -465,14 +467,14 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPTestEthernetNetworkDiagnostics : CHIPEthernetNetworkDiagnostics
 
-- (void)writeAttributePHYRateWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeFullDuplexWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributePHYRateWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeFullDuplexWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributePacketRxCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributePacketTxCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeTxErrCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeCollisionCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeOverrunCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeCarrierDetectWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeCarrierDetectWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeTimeSinceResetWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
                                         completionHandler:(StatusCompletion)completionHandler;

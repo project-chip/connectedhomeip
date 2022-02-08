@@ -183,10 +183,11 @@ CHIP_ERROR CryptoContext::Encrypt(const uint8_t * input, size_t input_length, ui
 
     if (mKeyContext)
     {
-        MutableByteSpan plaintext(output, input_length); // WARNING: ASSUMES IN-PLACE ENCRYPTION
+        ByteSpan plaintext(input, input_length);
+        MutableByteSpan ciphertext(output, input_length);
         MutableByteSpan mic(tag, taglen);
 
-        ReturnErrorOnFailure(mKeyContext->EncryptMessage(plaintext, ByteSpan(AAD, aadLen), ByteSpan(IV), mic));
+        ReturnErrorOnFailure(mKeyContext->EncryptMessage(plaintext, ByteSpan(AAD, aadLen), ByteSpan(IV), mic, ciphertext));
     }
     else
     {
@@ -228,10 +229,11 @@ CHIP_ERROR CryptoContext::Decrypt(const uint8_t * input, size_t input_length, ui
 
     if (nullptr != mKeyContext)
     {
-        MutableByteSpan ciphertext(output, input_length); // WARNING: ASSUMES input == output
+        ByteSpan ciphertext(input, input_length);
+        MutableByteSpan plaintext(output, input_length);
         ByteSpan mic(tag, taglen);
 
-        CHIP_ERROR err = mKeyContext->DecryptMessage(ciphertext, ByteSpan(AAD, aadLen), ByteSpan(IV), mic);
+        CHIP_ERROR err = mKeyContext->DecryptMessage(ciphertext, ByteSpan(AAD, aadLen), ByteSpan(IV), mic, plaintext);
         ReturnErrorOnFailure(err);
     }
     else

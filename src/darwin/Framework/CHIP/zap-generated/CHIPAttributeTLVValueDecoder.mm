@@ -707,6 +707,25 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = array_0;
             return value;
         }
+        case Attributes::ApplicationLauncherApp::Id: {
+            using TypeInfo = Attributes::ApplicationLauncherApp::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            CHIPApplicationLauncherClusterApplicationEP * _Nonnull value;
+            value = [CHIPApplicationLauncherClusterApplicationEP new];
+            value.application = [CHIPApplicationLauncherClusterApplication new];
+            value.application.catalogVendorId = [NSNumber numberWithUnsignedShort:cppValue.application.catalogVendorId];
+            value.application.applicationId = [[NSString alloc] initWithBytes:cppValue.application.applicationId.data()
+                                                                       length:cppValue.application.applicationId.size()
+                                                                     encoding:NSUTF8StringEncoding];
+            value.endpoint = [[NSString alloc] initWithBytes:cppValue.endpoint.data()
+                                                      length:cppValue.endpoint.size()
+                                                    encoding:NSUTF8StringEncoding];
+            return value;
+        }
         case Attributes::ServerGeneratedCommandList::Id: {
             using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -2209,6 +2228,49 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 }
             }
             value = array_0;
+            return value;
+        }
+        case Attributes::ChannelLineup::Id: {
+            using TypeInfo = Attributes::ChannelLineup::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            CHIPChannelClusterLineupInfo * _Nonnull value;
+            value = [CHIPChannelClusterLineupInfo new];
+            value.operatorName = [[NSString alloc] initWithBytes:cppValue.operatorName.data()
+                                                          length:cppValue.operatorName.size()
+                                                        encoding:NSUTF8StringEncoding];
+            value.lineupName = [[NSString alloc] initWithBytes:cppValue.lineupName.data()
+                                                        length:cppValue.lineupName.size()
+                                                      encoding:NSUTF8StringEncoding];
+            value.postalCode = [[NSString alloc] initWithBytes:cppValue.postalCode.data()
+                                                        length:cppValue.postalCode.size()
+                                                      encoding:NSUTF8StringEncoding];
+            value.lineupInfoType = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.lineupInfoType)];
+            return value;
+        }
+        case Attributes::CurrentChannel::Id: {
+            using TypeInfo = Attributes::CurrentChannel::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            CHIPChannelClusterChannelInfo * _Nonnull value;
+            value = [CHIPChannelClusterChannelInfo new];
+            value.majorNumber = [NSNumber numberWithUnsignedShort:cppValue.majorNumber];
+            value.minorNumber = [NSNumber numberWithUnsignedShort:cppValue.minorNumber];
+            value.name = [[NSString alloc] initWithBytes:cppValue.name.data()
+                                                  length:cppValue.name.size()
+                                                encoding:NSUTF8StringEncoding];
+            value.callSign = [[NSString alloc] initWithBytes:cppValue.callSign.data()
+                                                      length:cppValue.callSign.size()
+                                                    encoding:NSUTF8StringEncoding];
+            value.affiliateCallSign = [[NSString alloc] initWithBytes:cppValue.affiliateCallSign.data()
+                                                               length:cppValue.affiliateCallSign.size()
+                                                             encoding:NSUTF8StringEncoding];
             return value;
         }
         case Attributes::ServerGeneratedCommandList::Id: {
@@ -3968,8 +4030,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value())];
+            }
             return value;
         }
         case Attributes::FullDuplex::Id: {
@@ -3979,8 +4045,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithBool:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithBool:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::PacketRxCount::Id: {
@@ -4045,8 +4115,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithBool:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithBool:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::TimeSinceReset::Id: {
@@ -6199,6 +6273,19 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             NSNumber * _Nonnull value;
             value = [NSNumber numberWithUnsignedLongLong:cppValue];
+            return value;
+        }
+        case Attributes::Position::Id: {
+            using TypeInfo = Attributes::Position::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            CHIPMediaPlaybackClusterPlaybackPosition * _Nonnull value;
+            value = [CHIPMediaPlaybackClusterPlaybackPosition new];
+            value.updatedAt = [NSNumber numberWithUnsignedLongLong:cppValue.updatedAt];
+            value.position = [NSNumber numberWithUnsignedLongLong:cppValue.position];
             return value;
         }
         case Attributes::PlaybackSpeed::Id: {

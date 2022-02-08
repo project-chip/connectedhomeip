@@ -238,7 +238,6 @@ class ChipClusters:
                     "attributeId": 0x00000004,
                     "type": "",
                     "reportable": True,
-                    "writable": True,
                 },
                 0x00000005: {
                     "attributeName": "ApplicationStatus",
@@ -300,9 +299,9 @@ class ChipClusters:
                     "commandId": 0x00000000,
                     "commandName": "LaunchAppRequest",
                     "args": {
-                        "data": "str",
                         "catalogVendorId": "int",
                         "applicationId": "str",
+                        "data": "bytes",
                     },
                 },
             0x00000001: {
@@ -320,6 +319,13 @@ class ChipClusters:
                     "attributeId": 0x00000000,
                     "type": "int",
                     "reportable": True,
+                },
+                0x00000001: {
+                    "attributeName": "ApplicationLauncherApp",
+                    "attributeId": 0x00000001,
+                    "type": "",
+                    "reportable": True,
+                    "writable": True,
                 },
                 0x0000FFF8: {
                     "attributeName": "ServerGeneratedCommandList",
@@ -1067,6 +1073,20 @@ class ChipClusters:
                     "attributeId": 0x00000000,
                     "type": "",
                     "reportable": True,
+                },
+                0x00000001: {
+                    "attributeName": "ChannelLineup",
+                    "attributeId": 0x00000001,
+                    "type": "",
+                    "reportable": True,
+                    "writable": True,
+                },
+                0x00000002: {
+                    "attributeName": "CurrentChannel",
+                    "attributeId": 0x00000002,
+                    "type": "",
+                    "reportable": True,
+                    "writable": True,
                 },
                 0x0000FFF8: {
                     "attributeName": "ServerGeneratedCommandList",
@@ -3344,6 +3364,13 @@ class ChipClusters:
                     "attributeId": 0x00000002,
                     "type": "int",
                     "reportable": True,
+                },
+                0x00000003: {
+                    "attributeName": "Position",
+                    "attributeId": 0x00000003,
+                    "type": "",
+                    "reportable": True,
+                    "writable": True,
                 },
                 0x00000004: {
                     "attributeName": "PlaybackSpeed",

@@ -406,14 +406,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPApplicationLauncherClusterApplicationLauncherApplication : NSObject
+@interface CHIPApplicationLauncherClusterApplication : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull catalogVendorId;
 @property (strong, nonatomic) NSString * _Nonnull applicationId;
 - (instancetype)init;
 @end
 
 @interface CHIPApplicationLauncherClusterApplicationEP : NSObject
-@property (strong, nonatomic) CHIPApplicationLauncherClusterApplicationLauncherApplication * _Nonnull application;
+@property (strong, nonatomic) CHIPApplicationLauncherClusterApplication * _Nonnull application;
 @property (strong, nonatomic) NSString * _Nonnull endpoint;
 - (instancetype)init;
 @end

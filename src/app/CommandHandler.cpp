@@ -254,7 +254,18 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
     err = commandPath.GetEndpointId(&concretePath.mEndpointId);
     SuccessOrExit(err);
 
-    VerifyOrExit(mpCallback->CommandExists(concretePath), err = CHIP_ERROR_INVALID_PROFILE_ID);
+    using Protocols::InteractionModel::Status;
+    {
+        Status commandExists = mpCallback->CommandExists(concretePath);
+        if (commandExists != Status::Success)
+        {
+            ChipLogDetail(DataManagement, "No command " ChipLogFormatMEI " in Cluster " ChipLogFormatMEI " on Endpoint 0x%" PRIx16,
+                          ChipLogValueMEI(concretePath.mCommandId), ChipLogValueMEI(concretePath.mClusterId),
+                          concretePath.mEndpointId);
+            return AddStatus(concretePath, commandExists);
+        }
+    }
+
     VerifyOrExit(mpExchangeCtx != nullptr && mpExchangeCtx->HasSessionHandle(), err = CHIP_ERROR_INCORRECT_STATE);
 
     {
@@ -272,10 +283,10 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
         {
             if (err != CHIP_ERROR_ACCESS_DENIED)
             {
-                return AddStatus(concretePath, Protocols::InteractionModel::Status::Failure);
+                return AddStatus(concretePath, Status::Failure);
             }
             // TODO: when wildcard invokes are supported, handle them to discard rather than fail with status
-            return AddStatus(concretePath, Protocols::InteractionModel::Status::UnsupportedAccess);
+            return AddStatus(concretePath, Status::UnsupportedAccess);
         }
     }
 
@@ -308,18 +319,7 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        // The Path is the path in the request if there are any error occurred before we dispatch the command to clusters.
-        // Currently, it could be failed to decode Path or failed to find cluster / command on desired endpoint.
-        // TODO: The behavior when receiving a malformed message is not clear in the Spec. (Spec#3259)
-        // TODO: The error code should be updated after #7072 added error codes required by IM.
-        if (err == CHIP_ERROR_INVALID_PROFILE_ID)
-        {
-            ChipLogDetail(DataManagement, "No Cluster " ChipLogFormatMEI " on Endpoint 0x%" PRIx16,
-                          ChipLogValueMEI(concretePath.mClusterId), concretePath.mEndpointId);
-        }
-
-        // TODO:in particular different reasons for ServerClusterCommandExists to test false should result in different errors here
-        AddStatus(concretePath, Protocols::InteractionModel::Status::InvalidCommand);
+        return AddStatus(concretePath, Status::InvalidCommand);
     }
 
     // We have handled the error status above and put the error status in response, now return success status so we can process
@@ -394,10 +394,10 @@ CHIP_ERROR CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
 
         const ConcreteCommandPath concretePath(mapping.endpoint_id, clusterId, commandId);
 
-        if (!mpCallback->CommandExists(concretePath))
+        if (mpCallback->CommandExists(concretePath) != Protocols::InteractionModel::Status::Success)
         {
-            ChipLogError(DataManagement, "No Cluster " ChipLogFormatMEI " on Endpoint 0x%" PRIx16, ChipLogValueMEI(clusterId),
-                         mapping.endpoint_id);
+            ChipLogDetail(DataManagement, "No command " ChipLogFormatMEI " in Cluster " ChipLogFormatMEI " on Endpoint 0x%" PRIx16,
+                          ChipLogValueMEI(mapping.endpoint_id), ChipLogValueMEI(clusterId), mapping.endpoint_id);
 
             continue;
         }

@@ -171,8 +171,15 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
         if (strlen(mOTAFilePath) > 0) // If OTA file is directly provided
         {
             // TODO: Following details shall be read from the OTA file
-            newSoftwareVersion = commandData.softwareVersion + 1; // This implementation will always indicate that an update is
-                                                                  // available (if the user provides a file).
+
+            // If software version is provided using command line then use it.
+            // Otherwise, bump the software version received in QueryImage by 1.
+            newSoftwareVersion = commandData.softwareVersion + 1;
+            if (mSoftwareVersion.HasValue())
+            {
+                newSoftwareVersion = mSoftwareVersion.Value();
+            }
+
             newSoftwareVersionString = "Example-Image-V0.1";
             otaFilePath              = mOTAFilePath;
             queryStatus              = OTAQueryStatus::kUpdateAvailable;
@@ -270,8 +277,14 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
 
     response.status = queryStatus;
     response.delayedActionTime.Emplace(delayedActionTimeSec);
-    response.userConsentNeeded.Emplace(requestorCanConsent);
-
+    if (mUserConsentNeeded)
+    {
+        response.userConsentNeeded.Emplace(mUserConsentNeeded);
+    }
+    else
+    {
+        response.userConsentNeeded.Emplace(requestorCanConsent);
+    }
     // For test coverage, sending empty metadata when (requestorNodeId % 2) == 0 and not sending otherwise.
     if (commandObj->GetSubjectDescriptor().subject % 2 == 0)
     {

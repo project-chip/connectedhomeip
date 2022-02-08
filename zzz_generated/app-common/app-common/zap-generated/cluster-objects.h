@@ -14425,9 +14425,9 @@ namespace Attributes {
 namespace PHYRate {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PHYRate::Id; }
@@ -14437,9 +14437,9 @@ struct TypeInfo
 namespace FullDuplex {
 struct TypeInfo
 {
-    using Type             = bool;
-    using DecodableType    = bool;
-    using DecodableArgType = bool;
+    using Type             = chip::app::DataModel::Nullable<bool>;
+    using DecodableType    = chip::app::DataModel::Nullable<bool>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<bool> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FullDuplex::Id; }
@@ -14509,9 +14509,9 @@ struct TypeInfo
 namespace CarrierDetect {
 struct TypeInfo
 {
-    using Type             = bool;
-    using DecodableType    = bool;
-    using DecodableArgType = bool;
+    using Type             = chip::app::DataModel::Nullable<bool>;
+    using DecodableType    = chip::app::DataModel::Nullable<bool>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<bool> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CarrierDetect::Id; }
@@ -14599,14 +14599,14 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::PHYRate::TypeInfo::DecodableType PHYRate               = static_cast<uint8_t>(0);
-        Attributes::FullDuplex::TypeInfo::DecodableType fullDuplex         = static_cast<bool>(0);
+        Attributes::PHYRate::TypeInfo::DecodableType PHYRate;
+        Attributes::FullDuplex::TypeInfo::DecodableType fullDuplex;
         Attributes::PacketRxCount::TypeInfo::DecodableType packetRxCount   = static_cast<uint64_t>(0);
         Attributes::PacketTxCount::TypeInfo::DecodableType packetTxCount   = static_cast<uint64_t>(0);
         Attributes::TxErrCount::TypeInfo::DecodableType txErrCount         = static_cast<uint64_t>(0);
         Attributes::CollisionCount::TypeInfo::DecodableType collisionCount = static_cast<uint64_t>(0);
         Attributes::OverrunCount::TypeInfo::DecodableType overrunCount     = static_cast<uint64_t>(0);
-        Attributes::CarrierDetect::TypeInfo::DecodableType carrierDetect   = static_cast<bool>(0);
+        Attributes::CarrierDetect::TypeInfo::DecodableType carrierDetect;
         Attributes::TimeSinceReset::TypeInfo::DecodableType timeSinceReset = static_cast<uint64_t>(0);
         Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
         Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
@@ -33732,9 +33732,9 @@ namespace TargetNavigator {
 // Enum for StatusEnum
 enum class StatusEnum : uint8_t
 {
-    kSuccess         = 0x00,
-    kAppNotAvailable = 0x01,
-    kSystemBusy      = 0x02,
+    kSuccess        = 0x00,
+    kTargetNotFound = 0x01,
+    kNotAllowed     = 0x02,
 };
 
 namespace Structs {
@@ -36007,7 +36007,7 @@ enum class ChannelFeature : uint32_t
 };
 
 namespace Structs {
-namespace ApplicationLauncherApplication {
+namespace Application {
 enum class Fields
 {
     kCatalogVendorId = 0,
@@ -36028,7 +36028,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace ApplicationLauncherApplication
+} // namespace Application
 namespace ApplicationEP {
 enum class Fields
 {
@@ -36039,7 +36039,7 @@ enum class Fields
 struct Type
 {
 public:
-    Structs::ApplicationLauncherApplication::Type application;
+    Structs::Application::Type application;
     chip::CharSpan endpoint;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -36082,8 +36082,8 @@ namespace Commands {
 namespace LaunchAppRequest {
 enum class Fields
 {
-    kData        = 0,
-    kApplication = 1,
+    kApplication = 0,
+    kData        = 1,
 };
 
 struct Type
@@ -36093,8 +36093,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    chip::CharSpan data;
-    Structs::ApplicationLauncherApplication::Type application;
+    Structs::Application::Type application;
+    chip::ByteSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -36109,8 +36109,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    chip::CharSpan data;
-    Structs::ApplicationLauncherApplication::DecodableType application;
+    Structs::Application::DecodableType application;
+    chip::ByteSpan data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LaunchAppRequest
@@ -36127,7 +36127,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StopAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::ApplicationLauncherApplication::Type application;
+    Structs::Application::Type application;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -36142,7 +36142,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StopAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::ApplicationLauncherApplication::DecodableType application;
+    Structs::Application::DecodableType application;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace StopAppRequest
@@ -36159,7 +36159,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::HideAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::ApplicationLauncherApplication::Type application;
+    Structs::Application::Type application;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -36174,7 +36174,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::HideAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::ApplicationLauncherApplication::DecodableType application;
+    Structs::Application::DecodableType application;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace HideAppRequest
@@ -36193,7 +36193,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
     StatusEnum status = static_cast<StatusEnum>(0);
-    chip::CharSpan data;
+    chip::ByteSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -36209,7 +36209,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
     StatusEnum status = static_cast<StatusEnum>(0);
-    chip::CharSpan data;
+    chip::ByteSpan data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LauncherResponse

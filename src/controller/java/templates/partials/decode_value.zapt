@@ -35,7 +35,6 @@ if ({{source}}.IsNull()) {
       ChipLogError(Zcl, "Could not find class ChipStructs${{cluster}}Cluster{{asUpperCamelCase type}}");
       return {{earlyReturn}};
     }
-    chip::JniClass structJniClass({{asLowerCamelCase type}}StructClass);
     jmethodID {{asLowerCamelCase type}}StructCtor = env->GetMethodID({{asLowerCamelCase type}}StructClass, "<init>"
         , "({{#zcl_struct_items_by_struct_name type}}{{asJniSignature type null ../cluster true}}{{/zcl_struct_items_by_struct_name}})V");
     if ({{asLowerCamelCase type}}StructCtor == nullptr) {

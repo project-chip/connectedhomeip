@@ -8015,7 +8015,7 @@
           ],
           "attributes": [
             {
-              "name": "groupKeyMap",
+              "name": "GroupKeyMap",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -8030,7 +8030,7 @@
               "reportableChange": 0
             },
             {
-              "name": "groupTable",
+              "name": "GroupTable",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -8045,7 +8045,7 @@
               "reportableChange": 0
             },
             {
-              "name": "maxGroupsPerFabric",
+              "name": "MaxGroupsPerFabric",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -8060,7 +8060,7 @@
               "reportableChange": 0
             },
             {
-              "name": "maxGroupKeysPerFabric",
+              "name": "MaxGroupKeysPerFabric",
               "code": 3,
               "mfgCode": null,
               "side": "server",
@@ -14085,7 +14085,7 @@
               "code": 1,
               "mfgCode": null,
               "side": "server",
-              "included": 0,
+              "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -14100,7 +14100,7 @@
               "code": 2,
               "mfgCode": null,
               "side": "server",
-              "included": 0,
+              "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -14560,7 +14560,7 @@
               "code": 3,
               "mfgCode": null,
               "side": "server",
-              "included": 0,
+              "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -15624,7 +15624,7 @@
               "code": 1,
               "mfgCode": null,
               "side": "server",
-              "included": 0,
+              "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -17946,5 +17946,6 @@
       "endpointVersion": 1,
       "deviceIdentifier": 22
     }
-  ]
+  ],
+  "log": []
 }
