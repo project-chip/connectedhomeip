@@ -18,11 +18,16 @@
 function getManualTests()
 {
   const DeviceDiscovery = [
+    'Test_TC_DD_1_1',
+    'Test_TC_DD_1_2',
+    'Test_TC_DD_1_3',
+    'Test_TC_DD_1_4',
     'Test_TC_DD_1_5',
     'Test_TC_DD_1_6',
     'Test_TC_DD_1_7',
     'Test_TC_DD_1_8',
     'Test_TC_DD_1_9',
+    'Test_TC_DD_1_10',
   ];
 
   const Groups = [

@@ -1,0 +1,39 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 7.1.1. [TC-DD-1.1] QR Code Onboarding Payload Verification
+config:
+    cluster: "Basic"
+    endpoint: 0
+tests:
+    - label: "Scan the DUTs QR code using a QR code reader"
+      disabled: true
+    - label: "Verify the QR code payload version"
+      disabled: true
+    - label: "Verify 8-bit Rendezvous Capabilities bit mask"
+      disabled: true
+    - label: "Verify the 12-bit discriminator bit mask"
+      disabled: true
+    - label: "Verify the onboarding payload contains a 27-bit Passcode"
+      disabled: true
+    - label: "Verify passcode is valid"
+      disabled: true
+    - label: "Verify QR code prefix"
+      disabled: true
+    - label: "Verify Vendor ID and Product ID"
+      disabled: true
+    - label: "Verify the packed binary data structure"
+      disabled: true
+    - label: "Verify Custom payload support"
+      disabled: true
