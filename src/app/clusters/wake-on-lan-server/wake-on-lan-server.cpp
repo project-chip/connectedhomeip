@@ -93,8 +93,7 @@ class WakeOnLanAttrAccess : public app::AttributeAccessInterface
 public:
     WakeOnLanAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), chip::app::Clusters::WakeOnLan::Id) {}
 
-    CHIP_ERROR Read(FabricIndex fabricIndex, const app::ConcreteReadAttributePath & aPath,
-                    app::AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
 
 private:
     CHIP_ERROR ReadMacAddressAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
@@ -102,8 +101,7 @@ private:
 
 WakeOnLanAttrAccess gWakeOnLanAttrAccess;
 
-CHIP_ERROR WakeOnLanAttrAccess::Read(FabricIndex fabricIndex, const app::ConcreteReadAttributePath & aPath,
-                                     app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR WakeOnLanAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder)
 {
     EndpointId endpoint = aPath.mEndpointId;
     Delegate * delegate = GetDelegate(endpoint);
