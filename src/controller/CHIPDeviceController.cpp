@@ -932,6 +932,21 @@ CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId, CommissioningPa
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DeviceCommissioner::GetAttestationChallenge(ByteSpan & attestationChallenge)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    Optional<SessionHandle> secureSessionHandle;
+
+    VerifyOrExit(mDeviceBeingCommissioned != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    secureSessionHandle = mDeviceBeingCommissioned->GetSecureSession();
+    VerifyOrExit(secureSessionHandle.HasValue(), err = CHIP_ERROR_INCORRECT_STATE);
+
+    attestationChallenge = secureSessionHandle.Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
+exit:
+    return err;
+}
+
 CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
 {
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
