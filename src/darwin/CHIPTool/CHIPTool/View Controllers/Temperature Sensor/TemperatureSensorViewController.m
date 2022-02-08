@@ -201,16 +201,18 @@
             if (chipDevice) {
                 CHIPTemperatureMeasurement * cluster =
                     [[CHIPTemperatureMeasurement alloc] initWithDevice:chipDevice endpoint:1 queue:dispatch_get_main_queue()];
-                [cluster subscribeAttributeMeasuredValueWithMinInterval:minIntervalSeconds maxInterval:maxIntervalSeconds subscriptionEstablished:^{
+                [cluster subscribeAttributeMeasuredValueWithMinInterval:minIntervalSeconds
+                    maxInterval:maxIntervalSeconds
+                    subscriptionEstablished:^{
 
-                } reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
-                    if (error) {
-                        NSLog(@"Status: update reportAttributeMeasuredValue completed with error %@",
-                              [error description]);
-                        return;
                     }
-                    [self updateTempInUI:value.shortValue];
-                }];
+                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                        if (error) {
+                            NSLog(@"Status: update reportAttributeMeasuredValue completed with error %@", [error description]);
+                            return;
+                        }
+                        [self updateTempInUI:value.shortValue];
+                    }];
             } else {
                 NSLog(@"Status: Failed to establish a connection with the device");
             }
