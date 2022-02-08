@@ -94,6 +94,9 @@ endif()
 
 if (CONFIG_CHIP_PW_RPC)
 
+# Make all targets created below depend on zephyr_interface to inherit MCU-related compilation flags
+link_libraries($<BUILD_INTERFACE:zephyr_interface>)
+
 set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
 include(${PIGWEED_ROOT}/pw_build/pigweed.cmake)
 include(${PIGWEED_ROOT}/pw_protobuf_compiler/proto.cmake)
@@ -239,7 +242,5 @@ target_link_options(app
   PUBLIC
     "-T${PIGWEED_ROOT}/pw_tokenizer/pw_tokenizer_linker_sections.ld"
 )
-
-target_link_libraries(pw_build INTERFACE zephyr_interface)
 
 endif(CONFIG_CHIP_PW_RPC)
