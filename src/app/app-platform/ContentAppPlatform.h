@@ -23,15 +23,15 @@
 #pragma once
 
 #include <app-common/zap-generated/enums.h>
+#include <app/OperationalDeviceProxy.h>
 #include <app/app-platform/ContentApp.h>
 #include <app/util/attribute-storage.h>
-#include <functional>
-#include <lib/support/Span.h>
+#include <controller/CHIPCluster.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <stdbool.h>
-#include <stdint.h>
 
 using chip::app::Clusters::ApplicationBasic::CatalogVendorApp;
+using chip::Controller::CommandResponseFailureCallback;
+using chip::Controller::CommandResponseSuccessCallback;
 
 namespace chip {
 namespace AppPlatform {
@@ -47,14 +47,14 @@ public:
     virtual CHIP_ERROR LookupCatalogVendorApp(uint16_t vendorId, uint16_t productId, CatalogVendorApp * destinationApp) = 0;
 
     // Lookup ContentApp for this catalog id / app id and load it
-    virtual ContentApp * LoadContentApp(CatalogVendorApp vendorApp) = 0;
+    virtual ContentApp * LoadContentApp(const CatalogVendorApp & vendorApp) = 0;
 
     // Gets the catalog vendor ID used by this platform
     virtual uint16_t GetPlatformCatalogVendorId() = 0;
 
     // Converts application (any catalog) into the platform's catalog Vendor
     // and then writes it to destinationApp
-    virtual CHIP_ERROR ConvertToPlatformCatalogVendorApp(CatalogVendorApp sourceApp, CatalogVendorApp * destinationApp) = 0;
+    virtual CHIP_ERROR ConvertToPlatformCatalogVendorApp(const CatalogVendorApp & sourceApp, CatalogVendorApp * destinationApp) = 0;
 };
 
 class DLL_EXPORT ContentAppPlatform
@@ -90,13 +90,13 @@ public:
     ContentApp * LoadContentAppByClient(uint16_t vendorId, uint16_t productId);
 
     // Lookup ContentApp described by this application and load it
-    ContentApp * LoadContentApp(CatalogVendorApp application);
+    ContentApp * LoadContentApp(const CatalogVendorApp & application);
 
     // helpful method to get a Content App by endpoint in order to perform attribute or command ops
     ContentApp * GetContentApp(EndpointId id);
 
     // helpful method to get a Content App by application, does not load if not found
-    ContentApp * GetContentApp(CatalogVendorApp application);
+    ContentApp * GetContentApp(const CatalogVendorApp & application);
 
     // sets the current app for this platform
     void SetCurrentApp(ContentApp * app);
@@ -117,10 +117,31 @@ public:
     // Returns 0 if pin cannot be obtained.
     uint32_t GetPincodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId);
 
+    /**
+     * @brief
+     *   Add a binding.
+     *
+     * @param[in] device             OperationalDeviceProxy for the target device.
+     * @param[in] deviceEndpointId   The endpoint on the device containing the binding cluster.
+     * @param[in] bindingNodeId      The NodeId for the binding that will be created.
+     * @param[in] bindingGroupId     The GroupId for the binding that will be created.
+     * @param[in] bindingEndpointId  The EndpointId for the binding that will be created.
+     * @param[in] bindingClusterId   The ClusterId for the binding that will be created.
+     * @param[in] successCb          The function to be called on success of adding the binding.
+     * @param[in] failureCb          The function to be called on failure of adding the binding.
+     *
+     * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
+     */
+    CHIP_ERROR CreateBindingWithCallback(OperationalDeviceProxy * device, chip::EndpointId deviceEndpointId,
+                                         chip::NodeId bindingNodeId, chip::GroupId bindingGroupId,
+                                         chip::EndpointId bindingEndpointId, chip::ClusterId bindingClusterId,
+                                         Controller::WriteResponseSuccessCallback successCb,
+                                         Controller::WriteResponseFailureCallback failureCb);
+
 protected:
     // requires vendorApp to be in the catalog of the platform
-    ContentApp * LoadContentAppInternal(CatalogVendorApp vendorApp);
-    ContentApp * GetContentAppInternal(CatalogVendorApp vendorApp);
+    ContentApp * LoadContentAppInternal(const CatalogVendorApp & vendorApp);
+    ContentApp * GetContentAppInternal(const CatalogVendorApp & vendorApp);
 
     static const int kNoCurrentEndpointId = 0;
     EndpointId mCurrentAppEndpointId      = kNoCurrentEndpointId;

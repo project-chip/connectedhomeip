@@ -111,7 +111,7 @@ bool Delegate::Matches(ApplicationBasicApplication match)
 {
     std::string appId(match.applicationId.data(), match.applicationId.size());
     CatalogVendorApp matchApp(match.catalogVendorId, appId.c_str());
-    return mCatalogVendorApp.Matches(matchApp);
+    return mCatalogVendorApp.Matches(&matchApp);
 }
 
 } // namespace ApplicationBasic
@@ -129,7 +129,8 @@ class ApplicationBasicAttrAccess : public app::AttributeAccessInterface
 public:
     ApplicationBasicAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), ApplicationBasic::Id) {}
 
-    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(FabricIndex fabricIndex, const app::ConcreteReadAttributePath & aPath,
+                    app::AttributeValueEncoder & aEncoder) override;
 
 private:
     CHIP_ERROR ReadVendorNameAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
@@ -144,7 +145,8 @@ private:
 
 ApplicationBasicAttrAccess gApplicationBasicAttrAccess;
 
-CHIP_ERROR ApplicationBasicAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR ApplicationBasicAttrAccess::Read(FabricIndex fabricIndex, const app::ConcreteReadAttributePath & aPath,
+                                            app::AttributeValueEncoder & aEncoder)
 {
     EndpointId endpoint = aPath.mEndpointId;
     Delegate * delegate = GetDelegate(endpoint);

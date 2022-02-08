@@ -226,8 +226,7 @@ static void TestDACVerifierExample_AttestationInfoVerification(nlTestSuite * inS
 
     default_verifier->VerifyAttestationInformation(
         ByteSpan(attestationElementsTestVector), ByteSpan(attestationChallengeTestVector), ByteSpan(attestationSignatureTestVector),
-        pai_span, dac_span, ByteSpan(attestationNonceTestVector), static_cast<VendorId>(0xFFF1), 0x8000,
-        &attestationInformationVerificationCallback);
+        pai_span, dac_span, ByteSpan(attestationNonceTestVector), &attestationInformationVerificationCallback);
     NL_TEST_ASSERT(inSuite, attestationResult == AttestationVerificationResult::kSuccess);
 }
 

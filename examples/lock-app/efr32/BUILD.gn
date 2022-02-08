@@ -261,6 +261,12 @@ efr32_executable("lock_app") {
       "-fstack-usage",
     ]
   }
+  if (use_rs911x || use_wf200) {
+    ldflags += [
+      "-Wl,--defsym",
+      "-Wl,SILABS_WIFI=1",
+    ]
+  }
 
   output_dir = root_out_dir
 }

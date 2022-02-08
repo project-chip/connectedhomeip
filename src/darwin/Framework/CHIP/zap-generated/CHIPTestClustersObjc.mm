@@ -620,6 +620,26 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)writeAttributeApplicationAppWithValue:(CHIPApplicationBasicClusterApplicationBasicApplication * _Nonnull)value
+                            completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = ApplicationBasic::Attributes::ApplicationApp::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue.catalogVendorId = value.catalogVendorId.unsignedShortValue;
+            cppValue.applicationId = [self asCharSpan:value.applicationId];
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)writeAttributeApplicationStatusWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -5504,7 +5524,7 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)writeAttributePHYRateWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributePHYRateWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -5515,14 +5535,19 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = EthernetNetworkDiagnostics::Attributes::PHYRate::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedCharValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(value.unsignedCharValue);
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)writeAttributeFullDuplexWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeFullDuplexWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -5533,7 +5558,12 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = EthernetNetworkDiagnostics::Attributes::FullDuplex::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.boolValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.boolValue;
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -5630,7 +5660,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeCarrierDetectWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeCarrierDetectWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -5641,7 +5671,12 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = EthernetNetworkDiagnostics::Attributes::CarrierDetect::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.boolValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.boolValue;
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -6479,10 +6514,18 @@ using namespace chip::app::Clusters;
                         auto element_0 = (CHIPGeneralDiagnosticsClusterNetworkInterfaceType *) value[i_0];
                         listHolder_0->mList[i_0].name = [self asCharSpan:element_0.name];
                         listHolder_0->mList[i_0].fabricConnected = element_0.fabricConnected.boolValue;
-                        listHolder_0->mList[i_0].offPremiseServicesReachableIPv4
-                            = element_0.offPremiseServicesReachableIPv4.boolValue;
-                        listHolder_0->mList[i_0].offPremiseServicesReachableIPv6
-                            = element_0.offPremiseServicesReachableIPv6.boolValue;
+                        if (element_0.offPremiseServicesReachableIPv4 == nil) {
+                            listHolder_0->mList[i_0].offPremiseServicesReachableIPv4.SetNull();
+                        } else {
+                            auto & nonNullValue_2 = listHolder_0->mList[i_0].offPremiseServicesReachableIPv4.SetNonNull();
+                            nonNullValue_2 = element_0.offPremiseServicesReachableIPv4.boolValue;
+                        }
+                        if (element_0.offPremiseServicesReachableIPv6 == nil) {
+                            listHolder_0->mList[i_0].offPremiseServicesReachableIPv6.SetNull();
+                        } else {
+                            auto & nonNullValue_2 = listHolder_0->mList[i_0].offPremiseServicesReachableIPv6.SetNonNull();
+                            nonNullValue_2 = element_0.offPremiseServicesReachableIPv6.boolValue;
+                        }
                         listHolder_0->mList[i_0].hardwareAddress = [self asByteSpan:element_0.hardwareAddress];
                         listHolder_0->mList[i_0].type
                             = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].type)>>(
@@ -6860,12 +6903,12 @@ using namespace chip::app::Clusters;
                     }
                     listFreer.add(listHolder_0);
                     for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[CHIPGroupKeyManagementClusterGroupInfo class]]) {
+                        if (![value[i_0] isKindOfClass:[CHIPGroupKeyManagementClusterGroupInfoMapStruct class]]) {
                             // Wrong kind of value.
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_0 = (CHIPGroupKeyManagementClusterGroupInfo *) value[i_0];
-                        listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedShortValue;
+                        auto element_0 = (CHIPGroupKeyManagementClusterGroupInfoMapStruct *) value[i_0];
+                        listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
                         listHolder_0->mList[i_0].groupId = element_0.groupId.unsignedShortValue;
                         {
                             using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].endpoints)>;
@@ -6889,7 +6932,10 @@ using namespace chip::app::Clusters;
                                 listHolder_0->mList[i_0].endpoints = ListType_2();
                             }
                         }
-                        listHolder_0->mList[i_0].groupName = [self asCharSpan:element_0.groupName];
+                        if (element_0.groupName != nil) {
+                            auto & definedValue_2 = listHolder_0->mList[i_0].groupName.Emplace();
+                            definedValue_2 = [self asCharSpan:element_0.groupName];
+                        }
                     }
                     cppValue = ListType_0(listHolder_0->mList, value.count);
                 } else {

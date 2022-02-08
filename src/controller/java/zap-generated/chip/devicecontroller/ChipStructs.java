@@ -147,12 +147,11 @@ public class ChipStructs {
     }
   }
 
-  public static class ApplicationLauncherClusterApplicationLauncherApplication {
+  public static class ApplicationLauncherClusterApplication {
     public Integer catalogVendorId;
     public String applicationId;
 
-    public ApplicationLauncherClusterApplicationLauncherApplication(
-        Integer catalogVendorId, String applicationId) {
+    public ApplicationLauncherClusterApplication(Integer catalogVendorId, String applicationId) {
       this.catalogVendorId = catalogVendorId;
       this.applicationId = applicationId;
     }
@@ -160,7 +159,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("ApplicationLauncherClusterApplicationLauncherApplication {\n");
+      output.append("ApplicationLauncherClusterApplication {\n");
       output.append("\tcatalogVendorId: ");
       output.append(catalogVendorId);
       output.append("\n");
@@ -173,12 +172,11 @@ public class ChipStructs {
   }
 
   public static class ApplicationLauncherClusterApplicationEP {
-    public ChipStructs.ApplicationLauncherClusterApplicationLauncherApplication application;
+    public ChipStructs.ApplicationLauncherClusterApplication application;
     public String endpoint;
 
     public ApplicationLauncherClusterApplicationEP(
-        ChipStructs.ApplicationLauncherClusterApplicationLauncherApplication application,
-        String endpoint) {
+        ChipStructs.ApplicationLauncherClusterApplication application, String endpoint) {
       this.application = application;
       this.endpoint = endpoint;
     }
@@ -221,6 +219,41 @@ public class ChipStructs {
       output.append("\n");
       output.append("\tname: ");
       output.append(name);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class BindingClusterBindingEntry {
+    public Long nodeId;
+    public Integer groupId;
+    public Integer endpointId;
+    public Long clusterId;
+
+    public BindingClusterBindingEntry(
+        Long nodeId, Integer groupId, Integer endpointId, Long clusterId) {
+      this.nodeId = nodeId;
+      this.groupId = groupId;
+      this.endpointId = endpointId;
+      this.clusterId = clusterId;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("BindingClusterBindingEntry {\n");
+      output.append("\tnodeId: ");
+      output.append(nodeId);
+      output.append("\n");
+      output.append("\tgroupId: ");
+      output.append(groupId);
+      output.append("\n");
+      output.append("\tendpointId: ");
+      output.append(endpointId);
+      output.append("\n");
+      output.append("\tclusterId: ");
+      output.append(clusterId);
       output.append("\n");
       output.append("}\n");
       return output.toString();
@@ -670,16 +703,16 @@ public class ChipStructs {
   public static class GeneralDiagnosticsClusterNetworkInterfaceType {
     public String name;
     public Boolean fabricConnected;
-    public Boolean offPremiseServicesReachableIPv4;
-    public Boolean offPremiseServicesReachableIPv6;
+    public @Nullable Boolean offPremiseServicesReachableIPv4;
+    public @Nullable Boolean offPremiseServicesReachableIPv6;
     public byte[] hardwareAddress;
     public Integer type;
 
     public GeneralDiagnosticsClusterNetworkInterfaceType(
         String name,
         Boolean fabricConnected,
-        Boolean offPremiseServicesReachableIPv4,
-        Boolean offPremiseServicesReachableIPv6,
+        @Nullable Boolean offPremiseServicesReachableIPv4,
+        @Nullable Boolean offPremiseServicesReachableIPv6,
         byte[] hardwareAddress,
         Integer type) {
       this.name = name;
@@ -717,14 +750,17 @@ public class ChipStructs {
     }
   }
 
-  public static class GroupKeyManagementClusterGroupInfo {
+  public static class GroupKeyManagementClusterGroupInfoMapStruct {
     public Integer fabricIndex;
     public Integer groupId;
     public ArrayList<Object> endpoints;
-    public String groupName;
+    public Optional<String> groupName;
 
-    public GroupKeyManagementClusterGroupInfo(
-        Integer fabricIndex, Integer groupId, ArrayList<Object> endpoints, String groupName) {
+    public GroupKeyManagementClusterGroupInfoMapStruct(
+        Integer fabricIndex,
+        Integer groupId,
+        ArrayList<Object> endpoints,
+        Optional<String> groupName) {
       this.fabricIndex = fabricIndex;
       this.groupId = groupId;
       this.endpoints = endpoints;
@@ -734,7 +770,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("GroupKeyManagementClusterGroupInfo {\n");
+      output.append("GroupKeyManagementClusterGroupInfoMapStruct {\n");
       output.append("\tfabricIndex: ");
       output.append(fabricIndex);
       output.append("\n");
@@ -752,12 +788,12 @@ public class ChipStructs {
     }
   }
 
-  public static class GroupKeyManagementClusterGroupKey {
+  public static class GroupKeyManagementClusterGroupKeyMapStruct {
     public Integer fabricIndex;
     public Integer groupId;
     public Integer groupKeySetID;
 
-    public GroupKeyManagementClusterGroupKey(
+    public GroupKeyManagementClusterGroupKeyMapStruct(
         Integer fabricIndex, Integer groupId, Integer groupKeySetID) {
       this.fabricIndex = fabricIndex;
       this.groupId = groupId;
@@ -767,7 +803,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("GroupKeyManagementClusterGroupKey {\n");
+      output.append("GroupKeyManagementClusterGroupKeyMapStruct {\n");
       output.append("\tfabricIndex: ");
       output.append(fabricIndex);
       output.append("\n");
@@ -782,27 +818,27 @@ public class ChipStructs {
     }
   }
 
-  public static class GroupKeyManagementClusterGroupKeySet {
+  public static class GroupKeyManagementClusterGroupKeySetStruct {
     public Integer groupKeySetID;
-    public Integer securityPolicy;
-    public byte[] epochKey0;
-    public Long epochStartTime0;
-    public byte[] epochKey1;
-    public Long epochStartTime1;
-    public byte[] epochKey2;
-    public Long epochStartTime2;
+    public Integer groupKeySecurityPolicy;
+    public @Nullable byte[] epochKey0;
+    public @Nullable Long epochStartTime0;
+    public @Nullable byte[] epochKey1;
+    public @Nullable Long epochStartTime1;
+    public @Nullable byte[] epochKey2;
+    public @Nullable Long epochStartTime2;
 
-    public GroupKeyManagementClusterGroupKeySet(
+    public GroupKeyManagementClusterGroupKeySetStruct(
         Integer groupKeySetID,
-        Integer securityPolicy,
-        byte[] epochKey0,
-        Long epochStartTime0,
-        byte[] epochKey1,
-        Long epochStartTime1,
-        byte[] epochKey2,
-        Long epochStartTime2) {
+        Integer groupKeySecurityPolicy,
+        @Nullable byte[] epochKey0,
+        @Nullable Long epochStartTime0,
+        @Nullable byte[] epochKey1,
+        @Nullable Long epochStartTime1,
+        @Nullable byte[] epochKey2,
+        @Nullable Long epochStartTime2) {
       this.groupKeySetID = groupKeySetID;
-      this.securityPolicy = securityPolicy;
+      this.groupKeySecurityPolicy = groupKeySecurityPolicy;
       this.epochKey0 = epochKey0;
       this.epochStartTime0 = epochStartTime0;
       this.epochKey1 = epochKey1;
@@ -814,12 +850,12 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("GroupKeyManagementClusterGroupKeySet {\n");
+      output.append("GroupKeyManagementClusterGroupKeySetStruct {\n");
       output.append("\tgroupKeySetID: ");
       output.append(groupKeySetID);
       output.append("\n");
-      output.append("\tsecurityPolicy: ");
-      output.append(securityPolicy);
+      output.append("\tgroupKeySecurityPolicy: ");
+      output.append(groupKeySecurityPolicy);
       output.append("\n");
       output.append("\tepochKey0: ");
       output.append(Arrays.toString(epochKey0));

@@ -1414,6 +1414,7 @@ static void TestSPAKE2P_spake2p_Mac(nlTestSuite * inSuite, void * inContext)
 {
     HeapChecker heapChecker(inSuite);
     uint8_t mac[kMAX_Hash_Length];
+    MutableByteSpan mac_span{ mac };
 
     int numOfTestVectors = ArraySize(hmac_tvs);
     int numOfTestsRan    = 0;
@@ -1426,10 +1427,10 @@ static void TestSPAKE2P_spake2p_Mac(nlTestSuite * inSuite, void * inContext)
         CHIP_ERROR err = spake2p.Init(nullptr, 0);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        err = spake2p.Mac(vector->key, vector->key_len, vector->input, vector->input_len, mac);
+        err = spake2p.Mac(vector->key, vector->key_len, vector->input, vector->input_len, mac_span);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        NL_TEST_ASSERT(inSuite, memcmp(mac, vector->output, vector->output_len) == 0);
+        NL_TEST_ASSERT(inSuite, memcmp(mac_span.data(), vector->output, vector->output_len) == 0);
 
         err = spake2p.MacVerify(vector->key, vector->key_len, vector->output, vector->output_len, vector->input, vector->input_len);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);

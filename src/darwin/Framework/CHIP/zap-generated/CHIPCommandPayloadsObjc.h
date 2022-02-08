@@ -470,22 +470,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPBindingClusterBindParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull nodeId;
-@property (strong, nonatomic) NSNumber * _Nonnull groupId;
-@property (strong, nonatomic) NSNumber * _Nonnull endpointId;
-@property (strong, nonatomic) NSNumber * _Nonnull clusterId;
-- (instancetype)init;
-@end
-
-@interface CHIPBindingClusterUnbindParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull nodeId;
-@property (strong, nonatomic) NSNumber * _Nonnull groupId;
-@property (strong, nonatomic) NSNumber * _Nonnull endpointId;
-@property (strong, nonatomic) NSNumber * _Nonnull clusterId;
-- (instancetype)init;
-@end
-
 @interface CHIPPollControlClusterCheckInResponseParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull startFastPolling;
 @property (strong, nonatomic) NSNumber * _Nonnull fastPollTimeout;
@@ -773,12 +757,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPOperationalCredentialsClusterOpCSRRequestParams : NSObject
+@interface CHIPOperationalCredentialsClusterCSRRequestParams : NSObject
 @property (strong, nonatomic) NSData * _Nonnull csrNonce;
 - (instancetype)init;
 @end
 
-@interface CHIPOperationalCredentialsClusterOpCSRResponseParams : NSObject
+@interface CHIPOperationalCredentialsClusterCSRResponseParams : NSObject
 @property (strong, nonatomic) NSData * _Nonnull nocsrElements;
 @property (strong, nonatomic) NSData * _Nonnull attestationSignature;
 - (instancetype)init;
@@ -827,7 +811,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CHIPGroupKeyManagementClusterKeySetWriteParams : NSObject
-@property (strong, nonatomic) CHIPGroupKeyManagementClusterGroupKeySet * _Nonnull groupKeySet;
+@property (strong, nonatomic) CHIPGroupKeyManagementClusterGroupKeySetStruct * _Nonnull groupKeySet;
 - (instancetype)init;
 @end
 
@@ -837,7 +821,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CHIPGroupKeyManagementClusterKeySetReadResponseParams : NSObject
-@property (strong, nonatomic) CHIPGroupKeyManagementClusterGroupKeySet * _Nonnull groupKeySet;
+@property (strong, nonatomic) CHIPGroupKeyManagementClusterGroupKeySetStruct * _Nonnull groupKeySet;
 - (instancetype)init;
 @end
 
@@ -1642,24 +1626,24 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CHIPApplicationLauncherClusterLaunchAppRequestParams : NSObject
-@property (strong, nonatomic) NSString * _Nonnull data;
-@property (strong, nonatomic) CHIPApplicationLauncherClusterApplicationLauncherApplication * _Nonnull application;
+@property (strong, nonatomic) CHIPApplicationLauncherClusterApplication * _Nonnull application;
+@property (strong, nonatomic) NSData * _Nonnull data;
 - (instancetype)init;
 @end
 
 @interface CHIPApplicationLauncherClusterStopAppRequestParams : NSObject
-@property (strong, nonatomic) CHIPApplicationLauncherClusterApplicationLauncherApplication * _Nonnull application;
+@property (strong, nonatomic) CHIPApplicationLauncherClusterApplication * _Nonnull application;
 - (instancetype)init;
 @end
 
 @interface CHIPApplicationLauncherClusterHideAppRequestParams : NSObject
-@property (strong, nonatomic) CHIPApplicationLauncherClusterApplicationLauncherApplication * _Nonnull application;
+@property (strong, nonatomic) CHIPApplicationLauncherClusterApplication * _Nonnull application;
 - (instancetype)init;
 @end
 
 @interface CHIPApplicationLauncherClusterLauncherResponseParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull status;
-@property (strong, nonatomic) NSString * _Nonnull data;
+@property (strong, nonatomic) NSData * _Nonnull data;
 - (instancetype)init;
 @end
 

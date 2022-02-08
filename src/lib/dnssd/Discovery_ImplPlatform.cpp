@@ -83,13 +83,19 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, CHIP_ERRO
     {
         proxy->OnNodeIdResolutionFailed(PeerId(), error);
         proxy->Release();
+        return;
     }
+
+    VerifyOrDie(proxy != nullptr);
 
     if (result == nullptr)
     {
         proxy->OnNodeIdResolutionFailed(PeerId(), CHIP_ERROR_UNKNOWN_RESOURCE_ID);
         proxy->Release();
+        return;
     }
+
+    VerifyOrDie(proxy != nullptr);
 
     PeerId peerId;
     error = ExtractIdFromInstanceName(result->mName, &peerId);
@@ -97,7 +103,10 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, CHIP_ERRO
     {
         proxy->OnNodeIdResolutionFailed(PeerId(), error);
         proxy->Release();
+        return;
     }
+
+    VerifyOrDie(proxy != nullptr);
 
     ResolvedNodeData nodeData;
     Platform::CopyString(nodeData.mHostName, result->mHostName);
@@ -119,6 +128,7 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, CHIP_ERRO
     }
 
     nodeData.LogNodeIdResolved();
+    nodeData.PrioritizeAddresses();
 #if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
     LogErrorOnFailure(sDnssdCache.Insert(nodeData));
 #endif

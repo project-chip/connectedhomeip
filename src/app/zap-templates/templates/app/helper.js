@@ -725,14 +725,6 @@ function getPythonFieldDefault(type, options)
   return _getPythonFieldDefault.call(this, type, options)
 }
 
-async function getResponseCommandName(responseRef, options)
-{
-  let pkgId = await templateUtil.ensureZclPackageId(this);
-
-  const { db, sessionId } = this.global;
-  return queryCommand.selectCommandById(db, responseRef, pkgId).then(response => asUpperCamelCase(response.name));
-}
-
 // Allow-list of enums that we generate as enums, not enum classes.  The goal is
 // to drive this down to 0.
 function isWeaklyTypedEnum(label)
@@ -822,6 +814,16 @@ async function zcl_events_fields_by_event_name(name, options)
   return templateUtil.templatePromise(this.global, promise)
 }
 
+// Must be used inside zcl_clusters
+async function zcl_commands_that_need_timed_invoke(options)
+{
+  const { db }  = this.global;
+  let packageId = await templateUtil.ensureZclPackageId(this);
+  let commands  = await queryCommand.selectCommandsByClusterId(db, this.id, packageId);
+  commands      = commands.filter(cmd => cmd.mustUseTimedInvoke);
+  return templateUtil.collectBlocks(commands, options, this);
+}
+
 //
 // Module exports
 //
@@ -840,8 +842,8 @@ exports.asMEI                                 = asMEI;
 exports.zapTypeToEncodableClusterObjectType   = zapTypeToEncodableClusterObjectType;
 exports.zapTypeToDecodableClusterObjectType   = zapTypeToDecodableClusterObjectType;
 exports.zapTypeToPythonClusterObjectType      = zapTypeToPythonClusterObjectType;
-exports.getResponseCommandName                = getResponseCommandName;
 exports.isWeaklyTypedEnum                     = isWeaklyTypedEnum;
 exports.getPythonFieldDefault                 = getPythonFieldDefault;
 exports.incrementDepth                        = incrementDepth;
 exports.zcl_events_fields_by_event_name       = zcl_events_fields_by_event_name;
+exports.zcl_commands_that_need_timed_invoke   = zcl_commands_that_need_timed_invoke;

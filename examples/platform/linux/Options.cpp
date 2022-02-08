@@ -47,7 +47,8 @@ enum
     kDeviceOption_SecuredCommissionerPort   = 0x100b,
     kDeviceOption_UnsecuredCommissionerPort = 0x100c,
     kDeviceOption_Command                   = 0x100d,
-    kDeviceOption_PICS                      = 0x100e
+    kDeviceOption_PICS                      = 0x100e,
+    kDeviceOption_KVS                       = 0x100f
 };
 
 constexpr unsigned kAppUsageLength = 64;
@@ -74,6 +75,7 @@ OptionDef sDeviceOptionDefs[] = {
     { "unsecured-commissioner-port", kArgumentRequired, kDeviceOption_UnsecuredCommissionerPort },
     { "command", kArgumentRequired, kDeviceOption_Command },
     { "PICS", kArgumentRequired, kDeviceOption_PICS },
+    { "KVS", kArgumentRequired, kDeviceOption_KVS },
     {}
 };
 
@@ -129,6 +131,9 @@ const char * sDeviceOptionHelp =
     "\n"
     "  --PICS <filepath>\n"
     "       A file containing PICS items.\n"
+    "\n"
+    "  --KVS <filepath>\n"
+    "       A file to store Key Value Store items.\n"
     "\n";
 
 bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
@@ -211,6 +216,10 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 
     case kDeviceOption_PICS:
         LinuxDeviceOptions::GetInstance().PICS = aValue;
+        break;
+
+    case kDeviceOption_KVS:
+        LinuxDeviceOptions::GetInstance().KVS = aValue;
         break;
 
     default:

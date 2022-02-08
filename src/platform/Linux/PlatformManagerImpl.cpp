@@ -247,22 +247,13 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 
     mStartTime = System::SystemClock().GetMonotonicTimestamp();
 
-    ScheduleWork(HandleDeviceRebooted, 0);
-
 exit:
     return err;
 }
 
 CHIP_ERROR PlatformManagerImpl::_Shutdown()
 {
-    PlatformManagerDelegate * platformManagerDelegate = PlatformMgr().GetDelegate();
-    uint64_t upTime                                   = 0;
-
-    // The ShutDown event SHOULD be emitted by a Node prior to any orderly shutdown sequence.
-    if (platformManagerDelegate != nullptr)
-    {
-        platformManagerDelegate->OnShutDown();
-    }
+    uint64_t upTime = 0;
 
     if (GetDiagnosticDataProvider().GetUpTime(upTime) == CHIP_NO_ERROR)
     {
@@ -387,26 +378,6 @@ PlatformManagerImpl::_GetSupportedCalendarTypes(
     supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kTaiwanese);
 
     return CHIP_NO_ERROR;
-}
-
-void PlatformManagerImpl::HandleDeviceRebooted(intptr_t arg)
-{
-    PlatformManagerDelegate * platformManagerDelegate       = PlatformMgr().GetDelegate();
-    GeneralDiagnosticsDelegate * generalDiagnosticsDelegate = GetDiagnosticDataProvider().GetGeneralDiagnosticsDelegate();
-
-    if (generalDiagnosticsDelegate != nullptr)
-    {
-        generalDiagnosticsDelegate->OnDeviceRebooted();
-    }
-
-    // The StartUp event SHALL be emitted by a Node after completing a boot or reboot process
-    if (platformManagerDelegate != nullptr)
-    {
-        uint32_t softwareVersion;
-
-        ReturnOnFailure(ConfigurationMgr().GetSoftwareVersion(softwareVersion));
-        platformManagerDelegate->OnStartUp(softwareVersion);
-    }
 }
 
 void PlatformManagerImpl::HandleGeneralFault(uint32_t EventId)

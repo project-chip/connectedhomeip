@@ -24,8 +24,6 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/app-platform/ContentAppPlatform.h>
-#include <cstdio>
-#include <inttypes.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CHIPArgParser.hpp>
@@ -33,6 +31,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ZclString.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <zap-generated/CHIPClusters.h>
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
@@ -196,7 +195,7 @@ void ContentAppPlatform::SetupAppPlatform()
     // emberAfEndpointEnableDisable(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1)), false);
 }
 
-ContentApp * ContentAppPlatform::GetContentAppInternal(CatalogVendorApp vendorApp)
+ContentApp * ContentAppPlatform::GetContentAppInternal(const CatalogVendorApp & vendorApp)
 {
     if (vendorApp.catalogVendorId != mContentAppFactory->GetPlatformCatalogVendorId())
     {
@@ -215,7 +214,7 @@ ContentApp * ContentAppPlatform::GetContentAppInternal(CatalogVendorApp vendorAp
     return nullptr;
 }
 
-ContentApp * ContentAppPlatform::LoadContentAppInternal(CatalogVendorApp vendorApp)
+ContentApp * ContentAppPlatform::LoadContentAppInternal(const CatalogVendorApp & vendorApp)
 {
     ContentApp * app = GetContentAppInternal(vendorApp);
     if (app != nullptr)
@@ -241,10 +240,10 @@ ContentApp * ContentAppPlatform::LoadContentAppByClient(uint16_t vendorId, uint1
                         vendorId, productId);
         return nullptr;
     }
-    return LoadContentAppInternal(vendorApp);
+    return LoadContentAppInternal(&vendorApp);
 }
 
-ContentApp * ContentAppPlatform::LoadContentApp(CatalogVendorApp vendorApp)
+ContentApp * ContentAppPlatform::LoadContentApp(const CatalogVendorApp & vendorApp)
 {
     if (vendorApp.catalogVendorId == mContentAppFactory->GetPlatformCatalogVendorId())
     {
@@ -258,10 +257,10 @@ ContentApp * ContentAppPlatform::LoadContentApp(CatalogVendorApp vendorApp)
                         vendorApp.catalogVendorId, vendorApp.applicationId);
         return nullptr;
     }
-    return LoadContentAppInternal(destinationApp);
+    return LoadContentAppInternal(&destinationApp);
 }
 
-ContentApp * ContentAppPlatform::GetContentApp(CatalogVendorApp vendorApp)
+ContentApp * ContentAppPlatform::GetContentApp(const CatalogVendorApp & vendorApp)
 {
     if (vendorApp.catalogVendorId == mContentAppFactory->GetPlatformCatalogVendorId())
     {
@@ -275,7 +274,7 @@ ContentApp * ContentAppPlatform::GetContentApp(CatalogVendorApp vendorApp)
                         vendorApp.catalogVendorId, vendorApp.applicationId);
         return nullptr;
     }
-    return GetContentAppInternal(destinationApp);
+    return GetContentAppInternal(&destinationApp);
 }
 
 ContentApp * ContentAppPlatform::GetContentApp(EndpointId id)
@@ -386,6 +385,23 @@ uint32_t ContentAppPlatform::GetPincodeFromContentApp(uint16_t vendorId, uint16_
 
     char * eptr;
     return (uint32_t) strtol(pinString.c_str(), &eptr, 10);
+}
+
+CHIP_ERROR ContentAppPlatform::CreateBindingWithCallback(OperationalDeviceProxy * device, chip::EndpointId deviceEndpointId,
+                                                         chip::NodeId bindingNodeId, chip::GroupId bindingGroupId,
+                                                         chip::EndpointId bindingEndpointId, chip::ClusterId bindingClusterId,
+                                                         Controller::WriteResponseSuccessCallback successCb,
+                                                         Controller::WriteResponseFailureCallback failureCb)
+{
+    chip::Controller::BindingCluster cluster;
+    cluster.Associate(device, deviceEndpointId);
+
+    Binding::Structs::BindingEntry::Type entries[1] = { { bindingNodeId, bindingGroupId, bindingEndpointId, bindingClusterId } };
+    Binding::Attributes::BindingList::TypeInfo::Type bindingList(entries);
+    cluster.WriteAttribute(bindingList, nullptr, Binding::Id, Binding::Attributes::BindingList::Id, successCb, failureCb,
+                           NullOptional);
+    ChipLogDetail(Controller, "CreateBindingWithCallback: Sent Bind write request, waiting for response");
+    return CHIP_NO_ERROR;
 }
 
 } // namespace AppPlatform

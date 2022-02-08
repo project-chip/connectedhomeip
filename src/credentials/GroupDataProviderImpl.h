@@ -158,10 +158,10 @@ protected:
 
         uint16_t GetKeyHash() override { return mKeyHash; }
 
-        CHIP_ERROR EncryptMessage(MutableByteSpan & plaintext, const ByteSpan & aad, const ByteSpan & nonce,
-                                  MutableByteSpan & out_mic) const override;
-        CHIP_ERROR DecryptMessage(MutableByteSpan & ciphertext, const ByteSpan & aad, const ByteSpan & nonce,
-                                  const ByteSpan & mic) const override;
+        CHIP_ERROR EncryptMessage(const ByteSpan & plaintext, const ByteSpan & aad, const ByteSpan & nonce, MutableByteSpan & mic,
+                                  MutableByteSpan & ciphertext) const override;
+        CHIP_ERROR DecryptMessage(const ByteSpan & ciphertext, const ByteSpan & aad, const ByteSpan & nonce, const ByteSpan & mic,
+                                  MutableByteSpan & plaintext) const override;
         CHIP_ERROR EncryptPrivacy(MutableByteSpan & header, uint16_t session_id, const ByteSpan & payload,
                                   const ByteSpan & mic) const override;
         CHIP_ERROR DecryptPrivacy(MutableByteSpan & header, uint16_t session_id, const ByteSpan & payload,

@@ -1,6 +1,7 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,30 +19,10 @@
 #pragma once
 
 namespace chip {
-namespace Shell {
+namespace rpc {
 
-class OnOffCommands
-{
-public:
-    // delete the copy constructor
-    OnOffCommands(const OnOffCommands &) = delete;
-    // delete the move constructor
-    OnOffCommands(OnOffCommands &&) = delete;
-    // delete the assignment operator
-    OnOffCommands & operator=(const OnOffCommands &) = delete;
+bool Init(void);
+void RunRpcService(void *);
 
-    static OnOffCommands & GetInstance()
-    {
-        static OnOffCommands instance;
-        return instance;
-    }
-
-    // Register the OTA provider commands
-    void Register();
-
-private:
-    OnOffCommands() {}
-};
-
-} // namespace Shell
+} // namespace rpc
 } // namespace chip

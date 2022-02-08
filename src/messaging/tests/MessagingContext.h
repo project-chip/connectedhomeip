@@ -151,7 +151,7 @@ private:
     NodeId mAliceNodeId     = 111222333;
     uint16_t mBobKeyId      = 1;
     uint16_t mAliceKeyId    = 2;
-    GroupId mFriendsGroupId = 0x1234;
+    GroupId mFriendsGroupId = 0x0101;
     Transport::PeerAddress mAliceAddress;
     Transport::PeerAddress mBobAddress;
     SecurePairingUsingTestSecret mPairingAliceToBob;
@@ -232,6 +232,20 @@ public:
     {
         auto & impl = GetLoopback();
         impl.EnableAsyncDispatch(&mIOContext.GetSystemLayer());
+    }
+
+    /*
+     * Reset the dispatch back to a model that synchronously dispatches received messages up the stack.
+     *
+     * NOTE: This results in highly atypical/complex call stacks that are not representative of what happens on real
+     * devices and can cause subtle and complex bugs to either appear or get masked in the system. Where possible, please
+     * use this sparingly!
+     *
+     */
+    void DisableAsyncDispatch()
+    {
+        auto & impl = GetLoopback();
+        impl.DisableAsyncDispatch();
     }
 
     /*

@@ -132,17 +132,94 @@ DECLARE_DYNAMIC_ATTRIBUTE(ZCL_CHANNEL_LIST_ATTRIBUTE_ID, ARRAY, kDescriptorAttri
     DECLARE_DYNAMIC_ATTRIBUTE(ZCL_CHANNEL_CURRENT_CHANNEL_ATTRIBUTE_ID, STRUCT, 1, 0),             /* current channel */
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
+constexpr CommandId keypadInputIncomingCommands[] = {
+    app::Clusters::KeypadInput::Commands::SendKeyRequest::Id,
+    kInvalidCommandId,
+};
+constexpr CommandId keypadInputOutgoingCommands[] = {
+    app::Clusters::KeypadInput::Commands::SendKeyResponse::Id,
+    kInvalidCommandId,
+};
+constexpr CommandId applicationLauncherIncomingCommands[] = {
+    app::Clusters::ApplicationLauncher::Commands::LaunchAppRequest::Id,
+    app::Clusters::ApplicationLauncher::Commands::StopAppRequest::Id,
+    app::Clusters::ApplicationLauncher::Commands::HideAppRequest::Id,
+    kInvalidCommandId,
+};
+constexpr CommandId applicationLauncherOutgoingCommands[] = {
+    app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Id,
+    kInvalidCommandId,
+};
+constexpr CommandId accountLoginIncomingCommands[] = {
+    app::Clusters::AccountLogin::Commands::GetSetupPINRequest::Id,
+    app::Clusters::AccountLogin::Commands::LoginRequest::Id,
+    app::Clusters::AccountLogin::Commands::LogoutRequest::Id,
+    kInvalidCommandId,
+};
+constexpr CommandId accountLoginOutgoingCommands[] = {
+    app::Clusters::AccountLogin::Commands::GetSetupPINResponse::Id,
+    kInvalidCommandId,
+};
+// TODO: Sort out when the optional commands here should be listed.
+constexpr CommandId contentLauncherIncomingCommands[] = {
+    app::Clusters::ContentLauncher::Commands::LaunchContentRequest::Id,
+    app::Clusters::ContentLauncher::Commands::LaunchURLRequest::Id,
+    kInvalidCommandId,
+};
+constexpr CommandId contentLauncherOutgoingCommands[] = {
+    app::Clusters::ContentLauncher::Commands::LaunchResponse::Id,
+    kInvalidCommandId,
+};
+// TODO: Sort out when the optional commands here should be listed.
+constexpr CommandId mediaPlaybackIncomingCommands[] = {
+    app::Clusters::MediaPlayback::Commands::PlayRequest::Id,        app::Clusters::MediaPlayback::Commands::PauseRequest::Id,
+    app::Clusters::MediaPlayback::Commands::StopRequest::Id,        app::Clusters::MediaPlayback::Commands::StartOverRequest::Id,
+    app::Clusters::MediaPlayback::Commands::PreviousRequest::Id,    app::Clusters::MediaPlayback::Commands::NextRequest::Id,
+    app::Clusters::MediaPlayback::Commands::RewindRequest::Id,      app::Clusters::MediaPlayback::Commands::FastForwardRequest::Id,
+    app::Clusters::MediaPlayback::Commands::SkipForwardRequest::Id, app::Clusters::MediaPlayback::Commands::SkipBackwardRequest::Id,
+    app::Clusters::MediaPlayback::Commands::SeekRequest::Id,        kInvalidCommandId,
+};
+constexpr CommandId mediaPlaybackOutgoingCommands[] = {
+    app::Clusters::MediaPlayback::Commands::PlaybackResponse::Id,
+    kInvalidCommandId,
+};
+constexpr CommandId targetNavigatorIncomingCommands[] = {
+    app::Clusters::TargetNavigator::Commands::NavigateTargetRequest::Id,
+    kInvalidCommandId,
+};
+constexpr CommandId targetNavigatorOutgoingCommands[] = {
+    app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Id,
+    kInvalidCommandId,
+};
+// TODO: Sort out when the optional commands here should be listed.
+constexpr CommandId channelIncomingCommands[] = {
+    app::Clusters::Channel::Commands::ChangeChannelRequest::Id,
+    app::Clusters::Channel::Commands::ChangeChannelByNumberRequest::Id,
+    app::Clusters::Channel::Commands::SkipChannelRequest::Id,
+    kInvalidCommandId,
+};
+constexpr CommandId channelOutgoingCommands[] = {
+    app::Clusters::Channel::Commands::ChangeChannelResponse::Id,
+    kInvalidCommandId,
+};
 // Declare Cluster List for Content App endpoint
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(contentAppClusters)
-DECLARE_DYNAMIC_CLUSTER(ZCL_DESCRIPTOR_CLUSTER_ID, descriptorAttrs),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_APPLICATION_BASIC_CLUSTER_ID, applicationBasicAttrs),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_KEYPAD_INPUT_CLUSTER_ID, keypadInputAttrs),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_APPLICATION_LAUNCHER_CLUSTER_ID, applicationLauncherAttrs),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_ACCOUNT_LOGIN_CLUSTER_ID, accountLoginAttrs),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_CONTENT_LAUNCH_CLUSTER_ID, contentLauncherAttrs),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_MEDIA_PLAYBACK_CLUSTER_ID, mediaPlaybackAttrs),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_TARGET_NAVIGATOR_CLUSTER_ID, targetNavigatorAttrs),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_CHANNEL_CLUSTER_ID, channelAttrs) DECLARE_DYNAMIC_CLUSTER_LIST_END;
+DECLARE_DYNAMIC_CLUSTER(ZCL_DESCRIPTOR_CLUSTER_ID, descriptorAttrs, nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(ZCL_APPLICATION_BASIC_CLUSTER_ID, applicationBasicAttrs, nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(ZCL_KEYPAD_INPUT_CLUSTER_ID, keypadInputAttrs, keypadInputIncomingCommands,
+                            keypadInputOutgoingCommands),
+    DECLARE_DYNAMIC_CLUSTER(ZCL_APPLICATION_LAUNCHER_CLUSTER_ID, applicationLauncherAttrs, applicationLauncherIncomingCommands,
+                            applicationLauncherOutgoingCommands),
+    DECLARE_DYNAMIC_CLUSTER(ZCL_ACCOUNT_LOGIN_CLUSTER_ID, accountLoginAttrs, accountLoginIncomingCommands,
+                            accountLoginOutgoingCommands),
+    DECLARE_DYNAMIC_CLUSTER(ZCL_CONTENT_LAUNCH_CLUSTER_ID, contentLauncherAttrs, contentLauncherIncomingCommands,
+                            contentLauncherOutgoingCommands),
+    DECLARE_DYNAMIC_CLUSTER(ZCL_MEDIA_PLAYBACK_CLUSTER_ID, mediaPlaybackAttrs, mediaPlaybackIncomingCommands,
+                            mediaPlaybackOutgoingCommands),
+    DECLARE_DYNAMIC_CLUSTER(ZCL_TARGET_NAVIGATOR_CLUSTER_ID, targetNavigatorAttrs, targetNavigatorIncomingCommands,
+                            targetNavigatorOutgoingCommands),
+    DECLARE_DYNAMIC_CLUSTER(ZCL_CHANNEL_CLUSTER_ID, channelAttrs, channelIncomingCommands, channelOutgoingCommands),
+    DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 // Declare Content App endpoint
 DECLARE_DYNAMIC_ENDPOINT(contentAppEndpoint, contentAppClusters);
@@ -168,7 +245,8 @@ CHIP_ERROR ContentAppFactoryImpl::LookupCatalogVendorApp(uint16_t vendorId, uint
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ContentAppFactoryImpl::ConvertToPlatformCatalogVendorApp(CatalogVendorApp sourceApp, CatalogVendorApp * destinationApp)
+CHIP_ERROR ContentAppFactoryImpl::ConvertToPlatformCatalogVendorApp(const CatalogVendorApp & sourceApp,
+                                                                    CatalogVendorApp * destinationApp)
 {
     destinationApp->catalogVendorId = GetPlatformCatalogVendorId();
     std::string appId(sourceApp.applicationId);
@@ -185,7 +263,7 @@ CHIP_ERROR ContentAppFactoryImpl::ConvertToPlatformCatalogVendorApp(CatalogVendo
     return CHIP_NO_ERROR;
 }
 
-ContentApp * ContentAppFactoryImpl::LoadContentApp(CatalogVendorApp vendorApp)
+ContentApp * ContentAppFactoryImpl::LoadContentApp(const CatalogVendorApp & vendorApp)
 {
     ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl: LoadContentAppByAppId catalogVendorId=%d applicationId=%s ",
                     vendorApp.catalogVendorId, vendorApp.applicationId);

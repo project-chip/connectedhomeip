@@ -247,11 +247,31 @@ CHIP_ERROR attributeBufferToNumericTlvData(TLV::TLVWriter & writer, bool isNulla
 
 } // anonymous namespace
 
-bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
+Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
 {
-    // TODO: Currently, we are using cluster catalog from the ember library, this should be modified or replaced after several
-    // updates to Commands.
-    return emberAfContainsServer(aCommandPath.mEndpointId, aCommandPath.mClusterId);
+    using Protocols::InteractionModel::Status;
+
+    const EmberAfEndpointType * type = emberAfFindEndpointType(aCommandPath.mEndpointId);
+    if (type == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+
+    const EmberAfCluster * cluster = emberAfFindClusterInType(type, aCommandPath.mClusterId, CLUSTER_MASK_SERVER);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedCluster;
+    }
+
+    for (const CommandId * cmd = cluster->clientGeneratedCommandList; cmd != nullptr; cmd++)
+    {
+        if (*cmd == aCommandPath.mCommandId)
+        {
+            return Status::Success;
+        }
+    }
+
+    return Status::UnsupportedCommand;
 }
 
 namespace {
@@ -320,10 +340,11 @@ class GlobalAttributeReader : public MandatoryGlobalAttributeReader
 public:
     GlobalAttributeReader(const EmberAfCluster * aCluster) : MandatoryGlobalAttributeReader(aCluster) {}
 
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(FabricIndex fabricIndex, const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 };
 
-CHIP_ERROR GlobalAttributeReader::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR GlobalAttributeReader::Read(FabricIndex fabricIndex, const ConcreteReadAttributePath & aPath,
+                                       AttributeValueEncoder & aEncoder)
 {
     using namespace Clusters::Globals::Attributes;
     // The id of the attributes below is not in the attribute metadata.
@@ -386,7 +407,7 @@ CHIP_ERROR ReadViaAccessInterface(FabricIndex aAccessingFabricIndex, bool aIsFab
     DataVersion version = kUndefinedDataVersion;
     ReturnErrorOnFailure(ReadClusterDataVersion(aPath.mEndpointId, aPath.mClusterId, version));
     AttributeValueEncoder valueEncoder(aAttributeReports, aAccessingFabricIndex, aPath, version, aIsFabricFiltered, state);
-    CHIP_ERROR err = aAccessInterface->Read(aPath, valueEncoder);
+    CHIP_ERROR err = aAccessInterface->Read(aAccessingFabricIndex, aPath, valueEncoder);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -401,6 +422,30 @@ CHIP_ERROR ReadViaAccessInterface(FabricIndex aAccessingFabricIndex, bool aIsFab
 
     *aTriedEncode = valueEncoder.TriedEncode();
     return CHIP_NO_ERROR;
+}
+
+// Determine the appropriate status response for an unsupported attribute for
+// the given path.  Must be called when the attribute is known to be unsupported
+// (i.e. we found no attribute metadata for it).
+Protocols::InteractionModel::Status UnsupportedAttributeStatus(const ConcreteAttributePath & aPath)
+{
+    using Protocols::InteractionModel::Status;
+
+    const EmberAfEndpointType * type = emberAfFindEndpointType(aPath.mEndpointId);
+    if (type == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+
+    const EmberAfCluster * cluster = emberAfFindClusterInType(type, aPath.mClusterId, CLUSTER_MASK_SERVER);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedCluster;
+    }
+
+    // Since we know the attribute is unsupported and the endpoint/cluster are
+    // OK, this is the only option left.
+    return Status::UnsupportedAttribute;
 }
 
 } // anonymous namespace
@@ -436,7 +481,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
 
     if (attributeCluster == nullptr && attributeMetadata == nullptr)
     {
-        return SendFailureStatus(aPath, aAttributeReports, Protocols::InteractionModel::Status::UnsupportedAttribute, nullptr);
+        return SendFailureStatus(aPath, aAttributeReports, UnsupportedAttributeStatus(aPath), nullptr);
     }
 
     // Check access control. A failed check will disallow the operation, and may or may not generate an attribute report
@@ -873,7 +918,7 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
 
     if (attributeMetadata == nullptr)
     {
-        return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::UnsupportedAttribute);
+        return apWriteHandler->AddStatus(aPath, UnsupportedAttributeStatus(aPath));
     }
 
     if (attributeMetadata->IsReadOnly())
@@ -907,7 +952,7 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
     if (auto * attrOverride = findAttributeAccessOverride(aClusterInfo.mEndpointId, aClusterInfo.mClusterId))
     {
         AttributeValueDecoder valueDecoder(aReader, aSubjectDescriptor);
-        ReturnErrorOnFailure(attrOverride->Write(aPath, valueDecoder));
+        ReturnErrorOnFailure(attrOverride->Write(aSubjectDescriptor.fabricIndex, aPath, valueDecoder));
 
         if (valueDecoder.TriedDecode())
         {

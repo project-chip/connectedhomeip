@@ -829,11 +829,7 @@ void TestKeySetIterator(nlTestSuite * apSuite, void * apContext)
         while (it->Next(keyset) && count < expected_f1.size())
         {
             NL_TEST_ASSERT(apSuite, expected_f1.count(keyset.keyset_id) > 0);
-            NL_TEST_ASSERT(apSuite, keyset.keyset_id == expected_f1[keyset.keyset_id].keyset_id);
-            NL_TEST_ASSERT(apSuite, keyset.policy == expected_f1[keyset.keyset_id].policy);
-            NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKey, keyset.epoch_keys[0].key, sizeof(kZeroKey)));
-            NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKey, keyset.epoch_keys[1].key, sizeof(kZeroKey)));
-            NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKey, keyset.epoch_keys[2].key, sizeof(kZeroKey)));
+            NL_TEST_ASSERT(apSuite, CompareKeySets(keyset, expected_f1[keyset.keyset_id]));
             count++;
         }
         NL_TEST_ASSERT(apSuite, count == expected_f1.size());
@@ -854,11 +850,7 @@ void TestKeySetIterator(nlTestSuite * apSuite, void * apContext)
         while (it->Next(keyset) && count < expected_f2.size())
         {
             NL_TEST_ASSERT(apSuite, expected_f2.count(keyset.keyset_id) > 0);
-            NL_TEST_ASSERT(apSuite, keyset.keyset_id == expected_f2[keyset.keyset_id].keyset_id);
-            NL_TEST_ASSERT(apSuite, keyset.policy == expected_f2[keyset.keyset_id].policy);
-            NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKey, keyset.epoch_keys[0].key, sizeof(kZeroKey)));
-            NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKey, keyset.epoch_keys[1].key, sizeof(kZeroKey)));
-            NL_TEST_ASSERT(apSuite, 0 == memcmp(kZeroKey, keyset.epoch_keys[2].key, sizeof(kZeroKey)));
+            NL_TEST_ASSERT(apSuite, CompareKeySets(keyset, expected_f2[keyset.keyset_id]));
             count++;
         }
         NL_TEST_ASSERT(apSuite, count == expected_f2.size());
@@ -1058,7 +1050,7 @@ void TestGroupDecryption(nlTestSuite * apSuite, void * apContext)
     //
 
     // Load the plaintext to encrypt
-    memcpy(ciphertext_buffer, kMessage, sizeof(kMessage));
+    memcpy(plaintext_buffer, kMessage, sizeof(kMessage));
 
     // Get the key context
     Crypto::SymmetricKeyContext * key_context = provider->GetKeyContext(kFabric2, kGroup2);
@@ -1066,9 +1058,10 @@ void TestGroupDecryption(nlTestSuite * apSuite, void * apContext)
     uint16_t session_id = key_context->GetKeyHash();
 
     // Encrypt the message
-    NL_TEST_ASSERT(apSuite,
-                   CHIP_NO_ERROR ==
-                       key_context->EncryptMessage(ciphertext, ByteSpan(aad, sizeof(aad)), ByteSpan(nonce, sizeof(nonce)), tag));
+    NL_TEST_ASSERT(
+        apSuite,
+        CHIP_NO_ERROR ==
+            key_context->EncryptMessage(plaintext, ByteSpan(aad, sizeof(aad)), ByteSpan(nonce, sizeof(nonce)), tag, ciphertext));
 
     // The ciphertext must be different to the original message
     NL_TEST_ASSERT(apSuite, memcmp(ciphertext.data(), kMessage, sizeof(kMessage)));
@@ -1096,14 +1089,11 @@ void TestGroupDecryption(nlTestSuite * apSuite, void * apContext)
             NL_TEST_ASSERT(apSuite, expected.count(found) > 0);
             NL_TEST_ASSERT(apSuite, session.key != nullptr);
 
-            // Load ciphertext to decrypt
-            memcpy(plaintext_buffer, ciphertext_buffer, sizeof(plaintext_buffer));
-
             // Decrypt de ciphertext
-            NL_TEST_ASSERT(
-                apSuite,
-                CHIP_NO_ERROR ==
-                    session.key->DecryptMessage(plaintext, ByteSpan(aad, sizeof(aad)), ByteSpan(nonce, sizeof(nonce)), tag));
+            NL_TEST_ASSERT(apSuite,
+                           CHIP_NO_ERROR ==
+                               session.key->DecryptMessage(ciphertext, ByteSpan(aad, sizeof(aad)), ByteSpan(nonce, sizeof(nonce)),
+                                                           tag, plaintext));
 
             // The new plaintext must match the original message
             NL_TEST_ASSERT(apSuite, 0 == memcmp(plaintext.data(), kMessage, sizeof(kMessage)));

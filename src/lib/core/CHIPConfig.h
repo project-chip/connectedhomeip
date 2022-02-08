@@ -1259,16 +1259,16 @@
 #endif // CHIP_CONFIG_MAX_BINDINGS
 
 /**
- *  @def CHIP_CONFIG_MAX_DEVICE_ADMINS
+ *  @def CHIP_CONFIG_MAX_FABRICS
  *
  *  @brief
- *    Maximum number of administrators that can provision the device. Each admin
- *    can provision the device with their unique operational credentials and manage
- *    their access control lists.
+ *    Maximum number of fabrics the device can participate in.  Each fabric can
+ *    provision the device with its unique operational credentials and manage
+ *    its own access control lists.
  */
-#ifndef CHIP_CONFIG_MAX_DEVICE_ADMINS
-#define CHIP_CONFIG_MAX_DEVICE_ADMINS 16
-#endif // CHIP_CONFIG_MAX_DEVICE_ADMINS
+#ifndef CHIP_CONFIG_MAX_FABRICS
+#define CHIP_CONFIG_MAX_FABRICS 16
+#endif // CHIP_CONFIG_MAX_FABRICS
 
 /**
  * @def CHIP_NON_PRODUCTION_MARKER
@@ -1752,6 +1752,23 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_RESUBSCRIBE_WAIT_TIME_MULTIPLIER_MS
 #define CHIP_RESUBSCRIBE_WAIT_TIME_MULTIPLIER_MS 10000
 #endif
+
+/*
+ * @def CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE
+ *
+ * @brief Safety limit to ensure that we don't end up with a
+ * larger-than-expected buffer for temporary attribute storage (on the stack or
+ * in .bss).  The SDK will fail to compile if this value is set below the value
+ * it thinks it needs for a buffer size that can store any simple (not list or
+ * struct) attribute value.
+ */
+#ifndef CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE
+// I can't figure out how to get all-clusters-app to sanely use a different
+// value here, and that app includes TestCluster, which has very large string
+// attributes (1000 octets, leading to a 1003 octet buffer).
+#define CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE 1003
+#endif // CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE
+
 /**
  * @}
  */

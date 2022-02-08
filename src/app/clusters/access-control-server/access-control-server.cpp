@@ -16,7 +16,6 @@
  */
 
 #include <access/AccessControl.h>
-#include <access/examples/ExampleAccessControlDelegate.h>
 
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -292,8 +291,8 @@ class AccessControlAttribute : public chip::app::AttributeAccessInterface
 public:
     AccessControlAttribute() : AttributeAccessInterface(Optional<EndpointId>(0), AccessControlCluster::Id) {}
 
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
+    CHIP_ERROR Read(FabricIndex fabricIndex, const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Write(FabricIndex fabricIndex, const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
     static constexpr uint16_t ClusterRevision = 1;
 
@@ -384,7 +383,8 @@ CHIP_ERROR LogAccessControlEvent(const AccessControl::Entry & entry, const Acces
     return err;
 }
 
-CHIP_ERROR AccessControlAttribute::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR AccessControlAttribute::Read(FabricIndex fabricIndex, const ConcreteReadAttributePath & aPath,
+                                        AttributeValueEncoder & aEncoder)
 {
     switch (aPath.mAttributeId)
     {
@@ -422,7 +422,8 @@ CHIP_ERROR AccessControlAttribute::ReadExtension(AttributeValueEncoder & aEncode
     return aEncoder.EncodeEmptyList();
 }
 
-CHIP_ERROR AccessControlAttribute::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+CHIP_ERROR AccessControlAttribute::Write(FabricIndex fabricIndex, const ConcreteDataAttributePath & aPath,
+                                         AttributeValueDecoder & aDecoder)
 {
     switch (aPath.mAttributeId)
     {
@@ -503,16 +504,9 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(AttributeValueDecoder & aDecod
 
 AccessControlAttribute gAttribute;
 
-AccessControl gAccessControl(Examples::GetAccessControlDelegate());
-
 } // namespace
 
 void MatterAccessControlPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttribute);
-
-    // TODO: move access control setup to lower level
-    //       (it's OK and convenient here during development)
-    gAccessControl.Init();
-    SetAccessControl(gAccessControl);
 }

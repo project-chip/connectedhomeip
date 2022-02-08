@@ -403,20 +403,6 @@ static constexpr CommandId Id = 0x00000005;
 } // namespace Commands
 } // namespace ApplianceControl
 
-namespace Binding {
-namespace Commands {
-
-namespace Bind {
-static constexpr CommandId Id = 0x00000000;
-} // namespace Bind
-
-namespace Unbind {
-static constexpr CommandId Id = 0x00000001;
-} // namespace Unbind
-
-} // namespace Commands
-} // namespace Binding
-
 namespace PollControl {
 namespace Commands {
 
@@ -706,13 +692,13 @@ namespace CertificateChainResponse {
 static constexpr CommandId Id = 0x00000003;
 } // namespace CertificateChainResponse
 
-namespace OpCSRRequest {
+namespace CSRRequest {
 static constexpr CommandId Id = 0x00000004;
-} // namespace OpCSRRequest
+} // namespace CSRRequest
 
-namespace OpCSRResponse {
+namespace CSRResponse {
 static constexpr CommandId Id = 0x00000005;
-} // namespace OpCSRResponse
+} // namespace CSRResponse
 
 namespace AddNOC {
 static constexpr CommandId Id = 0x00000006;

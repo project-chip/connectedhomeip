@@ -132,17 +132,17 @@ typedef struct _BrandingInformation
     StyleInformation waterMark;
 } BrandingInformation;
 
-// Struct for ApplicationLauncherApplication
-typedef struct _ApplicationLauncherApplication
+// Struct for Application
+typedef struct _Application
 {
     uint16_t catalogVendorId;
     chip::CharSpan applicationId;
-} ApplicationLauncherApplication;
+} Application;
 
 // Struct for ApplicationEP
 typedef struct _ApplicationEP
 {
-    ApplicationLauncherApplication application;
+    Application application;
     chip::CharSpan endpoint;
 } ApplicationEP;
 
@@ -202,6 +202,15 @@ typedef struct _BatFaultChangeType
     /* TYPE WARNING: array array defaults to */ uint8_t * previous;
 } BatFaultChangeType;
 
+// Struct for BindingEntry
+typedef struct _BindingEntry
+{
+    chip::NodeId nodeId;
+    chip::GroupId groupId;
+    chip::EndpointId endpointId;
+    chip::ClusterId clusterId;
+} BindingEntry;
+
 // Struct for ChannelInfo
 typedef struct _ChannelInfo
 {
@@ -253,35 +262,35 @@ typedef struct _FabricDescriptor
     chip::CharSpan Label;
 } FabricDescriptor;
 
-// Struct for GroupInfo
-typedef struct _GroupInfo
+// Struct for GroupInfoMapStruct
+typedef struct _GroupInfoMapStruct
 {
-    uint16_t fabricIndex;
-    uint16_t groupId;
-    /* TYPE WARNING: array array defaults to */ uint8_t * endpoints;
-    chip::CharSpan groupName;
-} GroupInfo;
+    chip::FabricIndex FabricIndex;
+    chip::GroupId GroupId;
+    /* TYPE WARNING: array array defaults to */ uint8_t * Endpoints;
+    chip::CharSpan GroupName;
+} GroupInfoMapStruct;
 
-// Struct for GroupKey
-typedef struct _GroupKey
+// Struct for GroupKeyMapStruct
+typedef struct _GroupKeyMapStruct
 {
-    chip::FabricIndex fabricIndex;
-    uint16_t groupId;
-    uint16_t groupKeySetID;
-} GroupKey;
+    chip::FabricIndex FabricIndex;
+    chip::GroupId GroupId;
+    uint16_t GroupKeySetID;
+} GroupKeyMapStruct;
 
-// Struct for GroupKeySet
-typedef struct _GroupKeySet
+// Struct for GroupKeySetStruct
+typedef struct _GroupKeySetStruct
 {
-    uint16_t groupKeySetID;
-    uint8_t securityPolicy;
-    chip::ByteSpan epochKey0;
-    uint64_t epochStartTime0;
-    chip::ByteSpan epochKey1;
-    uint64_t epochStartTime1;
-    chip::ByteSpan epochKey2;
-    uint64_t epochStartTime2;
-} GroupKeySet;
+    uint16_t GroupKeySetID;
+    uint8_t GroupKeySecurityPolicy;
+    chip::ByteSpan EpochKey0;
+    uint64_t EpochStartTime0;
+    chip::ByteSpan EpochKey1;
+    uint64_t EpochStartTime1;
+    chip::ByteSpan EpochKey2;
+    uint64_t EpochStartTime2;
+} GroupKeySetStruct;
 
 // Struct for IasAceZoneStatusResult
 typedef struct _IasAceZoneStatusResult

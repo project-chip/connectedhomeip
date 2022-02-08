@@ -91,6 +91,7 @@ public:
     }
 
     CHIP_ERROR Init(FactoryInitParams params);
+    void Shutdown();
     CHIP_ERROR SetupController(SetupParams params, DeviceController & controller);
     CHIP_ERROR SetupCommissioner(SetupParams params, DeviceCommissioner & commissioner);
 

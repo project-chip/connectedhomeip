@@ -125,20 +125,8 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     k_timer_start(&sOperationalHoursSavingTimer, K_HOURS(CONFIG_CHIP_OPERATIONAL_TIME_SAVE_INTERVAL),
                   K_HOURS(CONFIG_CHIP_OPERATIONAL_TIME_SAVE_INTERVAL));
 
-    ScheduleWork(OnDeviceBoot, 0);
-
 exit:
     return err;
-}
-
-void PlatformManagerImpl::OnDeviceBoot(intptr_t arg)
-{
-    GeneralDiagnosticsDelegate * generalDiagnosticsDelegate = GetDiagnosticDataProvider().GetGeneralDiagnosticsDelegate();
-
-    if (generalDiagnosticsDelegate)
-    {
-        generalDiagnosticsDelegate->OnDeviceRebooted();
-    }
 }
 
 } // namespace DeviceLayer

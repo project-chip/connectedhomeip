@@ -978,40 +978,6 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPBindingClusterBindParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _nodeId = @(0);
-
-        _groupId = @(0);
-
-        _endpointId = @(0);
-
-        _clusterId = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPBindingClusterUnbindParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _nodeId = @(0);
-
-        _groupId = @(0);
-
-        _endpointId = @(0);
-
-        _clusterId = @(0);
-    }
-    return self;
-}
-@end
-
 @implementation CHIPPollControlClusterCheckInResponseParams
 - (instancetype)init
 {
@@ -1629,7 +1595,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPOperationalCredentialsClusterOpCSRRequestParams
+@implementation CHIPOperationalCredentialsClusterCSRRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1640,7 +1606,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPOperationalCredentialsClusterOpCSRResponseParams
+@implementation CHIPOperationalCredentialsClusterCSRResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1749,7 +1715,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _groupKeySet = [CHIPGroupKeyManagementClusterGroupKeySet new];
+        _groupKeySet = [CHIPGroupKeyManagementClusterGroupKeySetStruct new];
     }
     return self;
 }
@@ -1771,7 +1737,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _groupKeySet = [CHIPGroupKeyManagementClusterGroupKeySet new];
+        _groupKeySet = [CHIPGroupKeyManagementClusterGroupKeySetStruct new];
     }
     return self;
 }
@@ -3495,9 +3461,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _data = @"";
+        _application = [CHIPApplicationLauncherClusterApplication new];
 
-        _application = [CHIPApplicationLauncherClusterApplicationLauncherApplication new];
+        _data = [NSData data];
     }
     return self;
 }
@@ -3508,7 +3474,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _application = [CHIPApplicationLauncherClusterApplicationLauncherApplication new];
+        _application = [CHIPApplicationLauncherClusterApplication new];
     }
     return self;
 }
@@ -3519,7 +3485,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _application = [CHIPApplicationLauncherClusterApplicationLauncherApplication new];
+        _application = [CHIPApplicationLauncherClusterApplication new];
     }
     return self;
 }
@@ -3532,7 +3498,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _data = @"";
+        _data = [NSData data];
     }
     return self;
 }

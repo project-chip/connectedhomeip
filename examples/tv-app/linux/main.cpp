@@ -26,8 +26,6 @@
 #include <app/app-platform/ContentAppPlatform.h>
 #include <app/util/af.h>
 
-#include <iostream>
-
 #include "include/account-login/AccountLoginManager.h"
 #include "include/application-basic/ApplicationBasicManager.h"
 #include "include/application-launcher/ApplicationLauncherManager.h"
@@ -81,17 +79,26 @@ void ApplicationInit() {}
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 class MyUserPrompter : public UserPrompter
 {
-    // TODO: tv should override this with a dialog prompt
+    // tv should override this with a dialog prompt
     inline void PromptForCommissionOKPermission(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override
     {
         return;
     }
 
-    // TODO: tv should override this with a dialog prompt
+    // tv should override this with a dialog prompt
     inline void PromptForCommissionPincode(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override
     {
         return;
     }
+
+    // tv should override this with a dialog prompt
+    inline void PromptCommissioningSucceeded(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override
+    {
+        return;
+    }
+
+    // tv should override this with a dialog prompt
+    inline void PromptCommissioningFailed(const char * commissioneeName, CHIP_ERROR error) override { return; }
 };
 
 MyUserPrompter gMyUserPrompter;
@@ -106,6 +113,52 @@ class MyPincodeService : public PincodeService
     }
 };
 MyPincodeService gMyPincodeService;
+
+class MyPostCommissioningListener : public PostCommissioningListener
+{
+    void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId, OperationalDeviceProxy * device) override
+    {
+
+        // TODO:
+        // - the endpointId chosen should come from the App Platform (determined based upon vid/pid of node)
+        // - the cluster(s) chosen should come from the App Platform
+        constexpr EndpointId kBindingClusterEndpoint = 0;
+
+        GroupId groupId       = kUndefinedGroupId;
+        EndpointId endpointId = 1;
+        ClusterId clusterId   = kInvalidClusterId;
+
+        ChipLogProgress(Controller, "Attempting to create Binding");
+
+        ContentAppPlatform::GetInstance().CreateBindingWithCallback(device, kBindingClusterEndpoint, nodeId, groupId, endpointId,
+                                                                    clusterId, OnSuccessResponse, OnFailureResponse);
+    }
+
+    /* Callback when command results in success */
+    static void OnSuccessResponse(void * context)
+    {
+        ChipLogProgress(Controller, "OnSuccessResponse - Binding Add Successfully");
+        CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
+        if (cdc != nullptr)
+        {
+            cdc->PostCommissioningSucceeded();
+        }
+    }
+
+    /* Callback when command results in failure */
+    static void OnFailureResponse(void * context, CHIP_ERROR error)
+    {
+        ChipLogProgress(Controller, "OnFailureResponse - Binding Add Failed");
+        CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
+        if (cdc != nullptr)
+        {
+            cdc->PostCommissioningFailed(error);
+        }
+    }
+};
+
+MyPostCommissioningListener gMyPostCommissioningListener;
+
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
 int main(int argc, char * argv[])
@@ -126,6 +179,7 @@ int main(int argc, char * argv[])
     {
         cdc->SetPincodeService(&gMyPincodeService);
         cdc->SetUserPrompter(&gMyUserPrompter);
+        cdc->SetPostCommissioningListener(&gMyPostCommissioningListener);
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED

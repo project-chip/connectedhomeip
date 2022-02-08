@@ -49,9 +49,36 @@ BindingFabricTableDelegate gFabricTableDelegate;
 
 } // namespace
 
+namespace {
+
+chip::PeerId PeerIdForNode(chip::FabricTable & fabricTable, chip::FabricIndex fabric, chip::NodeId node)
+{
+    chip::FabricInfo * fabricInfo = fabricTable.FindFabricWithIndex(fabric);
+    if (fabricInfo == nullptr)
+    {
+        return chip::PeerId();
+    }
+    return fabricInfo->GetPeerIdForNode(node);
+}
+
+} // namespace
+
 namespace chip {
 
 BindingManager BindingManager::sBindingManager;
+
+CHIP_ERROR BindingManager::UnicastBindingCreated(const EmberBindingTableEntry & bindingEntry)
+{
+    return EstablishConnection(bindingEntry.fabricIndex, bindingEntry.nodeId);
+}
+
+CHIP_ERROR BindingManager::UnicastBindingRemoved(uint8_t bindingEntryId)
+{
+    EmberBindingTableEntry entry{};
+    emberGetBinding(bindingEntryId, &entry);
+    mPendingNotificationMap.RemoveEntry(bindingEntryId);
+    return CHIP_NO_ERROR;
+}
 
 void BindingManager::SetAppServer(Server * appServer)
 {
@@ -63,9 +90,8 @@ CHIP_ERROR BindingManager::EstablishConnection(FabricIndex fabric, NodeId node)
 {
     VerifyOrReturnError(mAppServer != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    FabricInfo * fabricInfo = mAppServer->GetFabricTable().FindFabricWithIndex(fabric);
-    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_NOT_FOUND);
-    PeerId peer = fabricInfo->GetPeerIdForNode(node);
+    PeerId peer = PeerIdForNode(mAppServer->GetFabricTable(), fabric, node);
+    VerifyOrReturnError(peer.GetNodeId() != kUndefinedNodeId, CHIP_ERROR_NOT_FOUND);
     CHIP_ERROR error =
         mAppServer->GetCASESessionManager()->FindOrEstablishSession(peer, &mOnConnectedCallback, &mOnConnectionFailureCallback);
     if (error == CHIP_ERROR_NO_MEMORY)
@@ -73,11 +99,13 @@ CHIP_ERROR BindingManager::EstablishConnection(FabricIndex fabric, NodeId node)
         // Release the least recently used entry
         // TODO: Some reference counting mechanism shall be added the CASESessionManager
         // so that other session clients don't get accidentally closed.
-        PendingNotificationEntry * entry = mPendingNotificationMap.FindLRUEntry();
-        if (entry != nullptr)
+        FabricIndex fabricToRemove;
+        NodeId nodeToRemove;
+        if (mPendingNotificationMap.FindLRUConnectPeer(&fabricToRemove, &nodeToRemove) == CHIP_NO_ERROR)
         {
-            mAppServer->GetCASESessionManager()->ReleaseSession(entry->GetPeerId());
-            mPendingNotificationMap.RemoveEntry(entry);
+            mPendingNotificationMap.RemoveAllEntriesForNode(fabricToRemove, nodeToRemove);
+            PeerId lruPeer = PeerIdForNode(mAppServer->GetFabricTable(), fabricToRemove, nodeToRemove);
+            mAppServer->GetCASESessionManager()->ReleaseSession(lruPeer);
             // Now retry
             error = mAppServer->GetCASESessionManager()->FindOrEstablishSession(peer, &mOnConnectedCallback,
                                                                                 &mOnConnectionFailureCallback);
@@ -94,33 +122,25 @@ void BindingManager::HandleDeviceConnected(void * context, OperationalDeviceProx
 
 void BindingManager::HandleDeviceConnected(OperationalDeviceProxy * device)
 {
-    mPendingNotificationMap.ForEachActiveObject([&](PendingNotificationEntry * entry) -> Loop {
-        if (entry->GetPeerId() == device->GetPeerId())
-        {
-            SyncPendingNotificationsToPeer(device, entry);
-        }
+    FabricIndex fabricToRemove = kUndefinedFabricIndex;
+    NodeId nodeToRemove        = kUndefinedNodeId;
 
-        return Loop::Continue;
-    });
-}
-
-void BindingManager::SyncPendingNotificationsToPeer(OperationalDeviceProxy * device, PendingNotificationEntry * pendingClusters)
-{
-    for (const ClusterPath & path : *pendingClusters)
+    // Note: not using a const ref here, because the mPendingNotificationMap
+    // iterator returns things by value anyway.
+    for (PendingNotificationEntry pendingNotification : mPendingNotificationMap)
     {
-        ClusterId cluster   = path.cluster;
-        EndpointId endpoint = path.endpoint;
-        for (uint8_t j = 0; j < EMBER_BINDING_TABLE_SIZE; j++)
+        EmberBindingTableEntry entry;
+        emberGetBinding(pendingNotification.mBindingEntryId, &entry);
+
+        PeerId peer = PeerIdForNode(mAppServer->GetFabricTable(), entry.fabricIndex, entry.nodeId);
+        if (device->GetPeerId() == peer)
         {
-            EmberBindingTableEntry entry;
-            if (emberGetBinding(j, &entry) == EMBER_SUCCESS && entry.type == EMBER_UNICAST_BINDING && entry.clusterId == cluster &&
-                entry.local == endpoint && mBoundDeviceChangedHandler)
-            {
-                mBoundDeviceChangedHandler(&entry, device, path.context);
-            }
+            fabricToRemove = entry.fabricIndex;
+            nodeToRemove   = entry.nodeId;
+            mBoundDeviceChangedHandler(&entry, device, pendingNotification.mContext);
         }
     }
-    mPendingNotificationMap.RemoveEntry(pendingClusters);
+    mPendingNotificationMap.RemoveAllEntriesForNode(fabricToRemove, nodeToRemove);
 }
 
 void BindingManager::HandleDeviceConnectionFailure(void * context, PeerId peerId, CHIP_ERROR error)
@@ -138,32 +158,8 @@ void BindingManager::HandleDeviceConnectionFailure(PeerId peerId, CHIP_ERROR err
 
 void BindingManager::FabricRemoved(CompressedFabricId compressedFabricId, FabricIndex fabricIndex)
 {
-    mPendingNotificationMap.ForEachActiveObject([&](PendingNotificationEntry * entry) {
-        if (entry->GetFabricIndex() == fabricIndex)
-        {
-            mPendingNotificationMap.RemoveEntry(entry);
-            return Loop::Break;
-        }
-        return Loop::Continue;
-    });
+    mPendingNotificationMap.RemoveAllEntriesForFabric(fabricIndex);
     mAppServer->GetCASESessionManager()->ReleaseSessionForFabric(compressedFabricId);
-}
-
-CHIP_ERROR BindingManager::LastUnicastBindingRemoved(FabricIndex fabricIndex, NodeId node)
-{
-    VerifyOrReturnError(mAppServer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    FabricInfo * fabricInfo = mAppServer->GetFabricTable().FindFabricWithIndex(fabricIndex);
-    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_NOT_FOUND);
-    PeerId peer                      = fabricInfo->GetPeerIdForNode(node);
-    PendingNotificationEntry * entry = mPendingNotificationMap.FindEntry(fabricIndex, node);
-    if (entry)
-    {
-        mPendingNotificationMap.RemoveEntry(entry);
-    }
-
-    mAppServer->GetCASESessionManager()->ReleaseSession(peer);
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, void * context)
@@ -183,17 +179,18 @@ CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, Cluste
                 VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_NOT_FOUND);
                 PeerId peer                         = fabricInfo->GetPeerIdForNode(entry.nodeId);
                 OperationalDeviceProxy * peerDevice = mAppServer->GetCASESessionManager()->FindExistingSession(peer);
-                if (peerDevice != nullptr && mBoundDeviceChangedHandler)
+                if (peerDevice != nullptr && peerDevice->IsConnected() && mBoundDeviceChangedHandler)
                 {
                     // We already have an active connection
                     mBoundDeviceChangedHandler(&entry, peerDevice, context);
                 }
                 else
                 {
-                    // Enqueue pending cluster and establish connection
-                    ReturnErrorOnFailure(mPendingNotificationMap.AddPendingNotification(entry.fabricIndex, entry.nodeId, endpoint,
-                                                                                        cluster, context));
-                    ReturnErrorOnFailure(EstablishConnection(entry.fabricIndex, entry.nodeId));
+                    mPendingNotificationMap.AddPendingNotification(i, context);
+                    if (!peerDevice->IsConnecting())
+                    {
+                        ReturnErrorOnFailure(EstablishConnection(entry.fabricIndex, entry.nodeId));
+                    }
                 }
             }
             else if (entry.type == EMBER_MULTICAST_BINDING)
@@ -202,48 +199,6 @@ CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, Cluste
             }
         }
     }
-    return CHIP_NO_ERROR;
-}
-
-BindingManager::PendingNotificationEntry * BindingManager::PendingNotificationMap::FindLRUEntry()
-{
-    PendingNotificationEntry * lruEntry = nullptr;
-    mPendingNotificationMap.ForEachActiveObject([&](PendingNotificationEntry * entry) {
-        if (lruEntry == nullptr || lruEntry->GetLastUpdateTime() > entry->GetLastUpdateTime())
-        {
-            lruEntry = entry;
-        }
-        return Loop::Continue;
-    });
-    return lruEntry;
-}
-
-BindingManager::PendingNotificationEntry * BindingManager::PendingNotificationMap::FindEntry(FabricIndex fabricIndex, NodeId node)
-{
-    PendingNotificationEntry * foundEntry = nullptr;
-    mPendingNotificationMap.ForEachActiveObject([&](PendingNotificationEntry * entry) {
-        if (entry->GetFabricIndex() == fabricIndex && entry->GetNodeId() == node)
-        {
-            foundEntry = entry;
-            return Loop::Break;
-        }
-        return Loop::Continue;
-    });
-    return foundEntry;
-}
-
-CHIP_ERROR BindingManager::PendingNotificationMap::AddPendingNotification(FabricIndex fabric, NodeId node, EndpointId endpoint,
-                                                                          ClusterId cluster, void * context)
-{
-    PendingNotificationEntry * entry = FindEntry(fabric, node);
-
-    if (entry == nullptr)
-    {
-        entry = mPendingNotificationMap.CreateObject(fabric, node);
-        VerifyOrReturnError(entry != nullptr, CHIP_ERROR_NO_MEMORY);
-    }
-    entry->AddPendingNotification(endpoint, cluster, context);
-    entry->Touch();
     return CHIP_NO_ERROR;
 }
 

@@ -25,11 +25,13 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/tests/MessagingContext.h>
 #include <nlunit-test.h>
+#include <protocols/interaction_model/Constants.h>
 
 using TestContext = chip::Test::AppContext;
 
 using namespace chip;
 using namespace chip::app::Clusters;
+using namespace chip::Protocols;
 
 namespace {
 
@@ -52,10 +54,22 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
                                   CommandHandler * apCommandObj)
 {}
 
-bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
+InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
 {
-    // Mock cluster catalog, only support one command on one cluster on one endpoint.
-    return (aCommandPath.mEndpointId == kTestEndpointId && aCommandPath.mClusterId == TestCluster::Id);
+    // Mock cluster catalog, only support commands on one cluster on one endpoint.
+    using InteractionModel::Status;
+
+    if (aCommandPath.mEndpointId != kTestEndpointId)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+
+    if (aCommandPath.mClusterId != TestCluster::Id)
+    {
+        return Status::UnsupportedCluster;
+    }
+
+    return Status::Success;
 }
 
 CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
@@ -418,7 +432,7 @@ void TestReadInteraction::TestReadHandlerResourceExhaustion_MultipleSubscription
     auto onFailureCb = [&apSuite, &numFailureCalls](const app::ConcreteAttributePath * attributePath, CHIP_ERROR aError) {
         numFailureCalls++;
 
-        NL_TEST_ASSERT(apSuite, aError == CHIP_IM_GLOBAL_STATUS(Protocols::InteractionModel::Status::ResourceExhausted));
+        NL_TEST_ASSERT(apSuite, aError == CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
         NL_TEST_ASSERT(apSuite, attributePath == nullptr);
     };
 
@@ -485,7 +499,7 @@ void TestReadInteraction::TestReadHandlerResourceExhaustion_MultipleReads(nlTest
     auto onFailureCb = [&apSuite, &numFailureCalls](const app::ConcreteAttributePath * attributePath, CHIP_ERROR aError) {
         numFailureCalls++;
 
-        NL_TEST_ASSERT(apSuite, aError == CHIP_IM_GLOBAL_STATUS(Protocols::InteractionModel::Status::ResourceExhausted));
+        NL_TEST_ASSERT(apSuite, aError == CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
         NL_TEST_ASSERT(apSuite, attributePath == nullptr);
     };
 
