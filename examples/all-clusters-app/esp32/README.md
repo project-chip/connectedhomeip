@@ -123,10 +123,10 @@ that are currently supported include `ESP32-DevKitC` (default),
     device via USB. Then run the following command to flash the demo application
     onto the device and then monitor its output. If necessary, replace
     `/dev/tty.SLAB_USBtoUART` with the correct USB device name for your system
-    (like `/dev/ttyUSB0` on Linux or `/dev/tty.usbserial-01CDEEDC` on Mac).
-    Note that sometimes you might have to
-    press and hold the `boot` button on the device while it's trying to connect
-    before flashing. For ESP32-DevKitC devices this is labeled in the
+    (like `/dev/ttyUSB0` on Linux or `/dev/tty.usbserial-01CDEEDC` on Mac). Note
+    that sometimes you might have to press and hold the `boot` button on the
+    device while it's trying to connect before flashing. For ESP32-DevKitC
+    devices this is labeled in the
     [functional description diagram](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/hw-reference/esp32/get-started-devkitc.html#functional-description).
 
           $ idf.py -p /dev/tty.SLAB_USBtoUART flash monitor
