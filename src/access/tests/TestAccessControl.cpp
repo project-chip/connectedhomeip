@@ -40,12 +40,9 @@ constexpr ClusterId kLevelControlCluster  = 0x0000'0008;
 constexpr ClusterId kAccessControlCluster = 0x0000'001F;
 constexpr ClusterId kColorControlCluster  = 0x0000'0300;
 
-constexpr DeviceTypeId kColorLightDeviceType = 0x0000'0102;
-
 constexpr NodeId kPaseVerifier0 = NodeIdFromPAKEKeyId(0x0000);
 constexpr NodeId kPaseVerifier1 = NodeIdFromPAKEKeyId(0x0001);
 constexpr NodeId kPaseVerifier3 = NodeIdFromPAKEKeyId(0x0003);
-constexpr NodeId kPaseVerifier5 = NodeIdFromPAKEKeyId(0x0005);
 
 constexpr NodeId kOperationalNodeId0 = 0x0123456789ABCDEF;
 constexpr NodeId kOperationalNodeId1 = 0x1234567812345678;
@@ -94,8 +91,6 @@ constexpr Target targets[] = {
     { .flags = Target::kEndpoint, .endpoint = 3 },
     { .flags = Target::kCluster | Target::kEndpoint, .cluster = kLevelControlCluster, .endpoint = 5 },
 };
-
-constexpr AuthMode invalidAuthModes[] = { AuthMode::kNone, AuthMode::kPase };
 
 constexpr FabricIndex invalidFabricIndexes[] = { kUndefinedFabricIndex };
 
@@ -1221,7 +1216,7 @@ void TestAclValidateAuthModeSubject(nlTestSuite * inSuite, void * inContext)
         accessControl.DeleteEntry(1);
     }
 
-    // None is not a real auth mode
+    // None is not a real auth mode but also shouldn't work with no subject
     {
         NL_TEST_ASSERT(inSuite, entry.SetAuthMode(AuthMode::kNone) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
