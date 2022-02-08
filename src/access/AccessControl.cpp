@@ -61,6 +61,16 @@ bool CheckRequestPrivilegeAgainstEntryPrivilege(Privilege requestPrivilege, Priv
     return false;
 }
 
+constexpr bool IsValidCaseNodeId(NodeId aNodeId)
+{
+    return chip::IsOperationalNodeId(aNodeId) || (chip::IsCASEAuthTag(aNodeId) && ((aNodeId & chip::kTagVersionMask) != 0));
+}
+
+constexpr bool IsValidGroupNodeId(NodeId aNodeId)
+{
+    return chip::IsGroupId(aNodeId) && chip::IsValidGroupId(chip::GroupIdFromNodeId(aNodeId));
+}
+
 #if CHIP_DETAIL_LOGGING
 
 char GetAuthModeStringForLogging(AuthMode authMode)
@@ -310,14 +320,17 @@ bool AccessControl::IsValid(const Entry & entry)
     // Fabric index must be defined.
     VerifyOrExit(fabricIndex != kUndefinedFabricIndex, msg = "invalid fabric index");
 
-    // Privilege must not be administer if auth mode is not CASE.
-    VerifyOrExit(authMode == AuthMode::kCase || privilege != Privilege::kAdminister, msg = "invalid privilege");
+    if (authMode != AuthMode::kCase)
+    {
+        // Operational PASE not supported for v1.0 (so must be group).
+        VerifyOrExit(authMode == AuthMode::kGroup, msg = "invalid auth mode");
 
-    // Operational PASE not supported for v1.0.
-    VerifyOrExit(authMode == AuthMode::kCase || authMode == AuthMode::kGroup, msg = "invalid auth mode");
+        // Privilege must not be administer.
+        VerifyOrExit(privilege != Privilege::kAdminister, msg = "invalid privilege");
 
-    // Subject must be present if auth mode is not CASE.
-    VerifyOrExit(authMode == AuthMode::kCase || subjectCount > 0, msg = "invalid subject count");
+        // Subject must be present.
+        VerifyOrExit(subjectCount > 0, msg = "invalid subject count");
+    }
 
     for (size_t i = 0; i < subjectCount; ++i)
     {

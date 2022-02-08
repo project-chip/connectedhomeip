@@ -107,7 +107,10 @@ constexpr NodeId validCaseSubjects[] = {
     0xFFFF'FFEF'FFFF'FFFE,
     0xFFFF'FFEF'FFFF'FFFF, // max operational
 
-    // TODO: is CAT 0x0000'0001 valid? can't tell from spec
+    NodeIdFromCASEAuthTag(0x0000'0001),
+    NodeIdFromCASEAuthTag(0x0000'0002),
+    NodeIdFromCASEAuthTag(0x0000'FFFE),
+    NodeIdFromCASEAuthTag(0x0000'FFFF),
 
     NodeIdFromCASEAuthTag(0x0001'0001),
     NodeIdFromCASEAuthTag(0x0001'0002),
@@ -153,32 +156,102 @@ constexpr NodeId validPaseSubjects[] = {
     // since they have bits in the unused part
     // of the range set. Code currently treats
     // them as valid (ignoring the unused bits).
-
-    0xFFFF'FFFB'0001'0000,
-    0xFFFF'FFFB'0001'0001,
-    0xFFFF'FFFB'0001'FFFE,
-    0xFFFF'FFFB'0001'FFFF,
-
-    0xFFFF'FFFB'FFFE'0000,
-    0xFFFF'FFFB'FFFE'0001,
-    0xFFFF'FFFB'FFFE'FFFE,
-    0xFFFF'FFFB'FFFE'FFFF,
-
-    0xFFFF'FFFB'FFFF'0000,
-    0xFFFF'FFFB'FFFF'0001,
-    0xFFFF'FFFB'FFFF'FFFE,
-    0xFFFF'FFFB'FFFF'FFFF,
 };
 // clang-format on
 
 // clang-format off
 constexpr NodeId invalidSubjects[] = {
-    0x0000'0000'0000'0000,
+    0x0000'0000'0000'0000, // unspecified
 
-    // TODO: not passing yet, probably needs code change
-    //0xFFFF'FFFD'0001'0000, // CAT with version 0
-    //0xFFFF'FFFD'FFFE'0000, // CAT with version 0
-    //0xFFFF'FFFD'FFFF'0000, // CAT with version 0
+    0xFFFF'FFF0'0000'0000, // start reserved
+    0xFFFF'FFF0'0000'0001,
+    0xFFFF'FFF0'FFFF'FFFE,
+    0xFFFF'FFF0'FFFF'FFFF, // end reserved
+
+    0xFFFF'FFF1'0000'0000, // start reserved
+    0xFFFF'FFF1'0000'0001,
+    0xFFFF'FFF1'FFFF'FFFE,
+    0xFFFF'FFF1'FFFF'FFFF, // end reserved
+
+    0xFFFF'FFF2'0000'0000, // start reserved
+    0xFFFF'FFF2'0000'0001,
+    0xFFFF'FFF2'FFFF'FFFE,
+    0xFFFF'FFF2'FFFF'FFFF, // end reserved
+
+    0xFFFF'FFF3'0000'0000, // start reserved
+    0xFFFF'FFF3'0000'0001,
+    0xFFFF'FFF3'FFFF'FFFE,
+    0xFFFF'FFF3'FFFF'FFFF, // end reserved
+
+    0xFFFF'FFF4'0000'0000, // start reserved
+    0xFFFF'FFF4'0000'0001,
+    0xFFFF'FFF4'FFFF'FFFE,
+    0xFFFF'FFF4'FFFF'FFFF, // end reserved
+
+    0xFFFF'FFF5'0000'0000, // start reserved
+    0xFFFF'FFF5'0000'0001,
+    0xFFFF'FFF5'FFFF'FFFE,
+    0xFFFF'FFF5'FFFF'FFFF, // end reserved
+
+    0xFFFF'FFF6'0000'0000, // start reserved
+    0xFFFF'FFF6'0000'0001,
+    0xFFFF'FFF6'FFFF'FFFE,
+    0xFFFF'FFF6'FFFF'FFFF, // end reserved
+
+    0xFFFF'FFF7'0000'0000, // start reserved
+    0xFFFF'FFF7'0000'0001,
+    0xFFFF'FFF7'FFFF'FFFE,
+    0xFFFF'FFF7'FFFF'FFFF, // end reserved
+
+    0xFFFF'FFF8'0000'0000, // start reserved
+    0xFFFF'FFF8'0000'0001,
+    0xFFFF'FFF8'FFFF'FFFE,
+    0xFFFF'FFF8'FFFF'FFFF, // end reserved
+
+    0xFFFF'FFF9'0000'0000, // start reserved
+    0xFFFF'FFF9'0000'0001,
+    0xFFFF'FFF9'FFFF'FFFE,
+    0xFFFF'FFF9'FFFF'FFFF, // end reserved
+
+    0xFFFF'FFFA'0000'0000, // start reserved
+    0xFFFF'FFFA'0000'0001,
+    0xFFFF'FFFA'FFFF'FFFE,
+    0xFFFF'FFFA'FFFF'FFFF, // end reserved
+
+    0xFFFF'FFFB'0001'0000, // PASE with unused bits used
+    0xFFFF'FFFB'0001'0001, // PASE with unused bits used
+    0xFFFF'FFFB'0001'FFFE, // PASE with unused bits used
+    0xFFFF'FFFB'0001'FFFF, // PASE with unused bits used
+
+    0xFFFF'FFFB'FFFE'0000, // PASE with unused bits used
+    0xFFFF'FFFB'FFFE'0001, // PASE with unused bits used
+    0xFFFF'FFFB'FFFE'FFFE, // PASE with unused bits used
+    0xFFFF'FFFB'FFFE'FFFF, // PASE with unused bits used
+
+    0xFFFF'FFFB'FFFF'0000, // PASE with unused bits used
+    0xFFFF'FFFB'FFFF'0001, // PASE with unused bits used
+    0xFFFF'FFFB'FFFF'FFFE, // PASE with unused bits used
+    0xFFFF'FFFB'FFFF'FFFF, // PASE with unused bits used
+
+    0xFFFF'FFFC'0000'0000, // start reserved
+    0xFFFF'FFFC'0000'0001,
+    0xFFFF'FFFC'FFFF'FFFE,
+    0xFFFF'FFFC'FFFF'FFFF, // end reserved
+
+    0xFFFF'FFFD'0000'0000, // CAT with version 0
+    0xFFFF'FFFD'0001'0000, // CAT with version 0
+    0xFFFF'FFFD'FFFE'0000, // CAT with version 0
+    0xFFFF'FFFD'FFFF'0000, // CAT with version 0
+
+    0xFFFF'FFFE'0000'0000, // start temporary local
+    0xFFFF'FFFE'0000'0001,
+    0xFFFF'FFFE'FFFF'FFFE,
+    0xFFFF'FFFE'FFFF'FFFF, // end temporary local (used for placeholder)
+
+    0xFFFF'FFFF'0000'0000, // start reserved
+    0xFFFF'FFFF'0000'0001,
+    0xFFFF'FFFF'FFFE'FFFE,
+    0xFFFF'FFFF'FFFE'FFFF, // end reserved
 
     0xFFFF'FFFF'FFFF'0000, // group 0
 };

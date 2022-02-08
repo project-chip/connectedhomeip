@@ -97,25 +97,4 @@ constexpr uint16_t PAKEKeyIdFromNodeId(NodeId aNodeId)
     return aNodeId & kMaskPAKEKeyId;
 }
 
-constexpr bool IsValidCaseNodeId(NodeId aNodeId)
-{
-    return IsOperationalNodeId(aNodeId) || IsCASEAuthTag(aNodeId);
-}
-
-constexpr bool IsValidGroupNodeId(NodeId aNodeId)
-{
-    return IsGroupId(aNodeId) && IsValidGroupId(GroupIdFromNodeId(aNodeId));
-}
-
-constexpr bool IsValidPaseNodeId(NodeId aNodeId)
-{
-    // NOTE: reserved range is 32-bit but valid values are 16-bit
-    return IsPAKEKeyId(aNodeId) && ((kMaskUnusedPAKEKeyId & aNodeId) == 0);
-}
-
-constexpr bool IsValidNodeId(NodeId aNodeId)
-{
-    return IsValidCaseNodeId(aNodeId) || IsValidGroupNodeId(aNodeId) || IsValidPaseNodeId(aNodeId);
-}
-
 } // namespace chip
