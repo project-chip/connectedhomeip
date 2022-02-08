@@ -1053,6 +1053,7 @@ void MetaTest(nlTestSuite * inSuite, void * inContext)
 
 void TestAclValidateAuthModeSubject(nlTestSuite * inSuite, void * inContext)
 {
+    TestEntryDelegate delegate; // outlive entry
     Entry entry;
 
     // Use prepared entry for valid cases
@@ -1085,7 +1086,6 @@ void TestAclValidateAuthModeSubject(nlTestSuite * inSuite, void * inContext)
     }
 
     // Use test entry for invalid cases (to ensure it can hold invalid data)
-    TestEntryDelegate delegate;
     entry.SetDelegate(delegate);
 
     // Operational PASE not supported
@@ -1227,6 +1227,7 @@ void TestAclValidateAuthModeSubject(nlTestSuite * inSuite, void * inContext)
 
 void TestAclValidateFabricIndex(nlTestSuite * inSuite, void * inContext)
 {
+    TestEntryDelegate delegate; // outlive entry
     Entry entry;
 
     // Use prepared entry for valid cases
@@ -1249,7 +1250,6 @@ void TestAclValidateFabricIndex(nlTestSuite * inSuite, void * inContext)
     }
 
     // Use test entry for invalid cases (to ensure it can hold invalid data)
-    TestEntryDelegate delegate;
     entry.SetDelegate(delegate);
 
     for (auto fabricIndex : invalidFabricIndexes)
@@ -1263,6 +1263,7 @@ void TestAclValidateFabricIndex(nlTestSuite * inSuite, void * inContext)
 
 void TestAclValidatePrivilege(nlTestSuite * inSuite, void * inContext)
 {
+    TestEntryDelegate delegate; // outlive entry
     Entry entry;
 
     // Use prepared entry for valid cases
@@ -1285,7 +1286,6 @@ void TestAclValidatePrivilege(nlTestSuite * inSuite, void * inContext)
     }
 
     // Use test entry for invalid cases (to ensure it can hold invalid data)
-    TestEntryDelegate delegate;
     entry.SetDelegate(delegate);
 
     // Cannot grant administer privilege to group auth mode
@@ -1301,6 +1301,7 @@ void TestAclValidatePrivilege(nlTestSuite * inSuite, void * inContext)
 
 void TestAclValidateTarget(nlTestSuite * inSuite, void * inContext)
 {
+    TestEntryDelegate delegate; // outlive entry
     Entry entry;
 
     // Use prepared entry for valid cases
@@ -1370,7 +1371,6 @@ void TestAclValidateTarget(nlTestSuite * inSuite, void * inContext)
     }
 
     // Use test entry for invalid cases (to ensure it can hold invalid data)
-    TestEntryDelegate delegate;
     entry.SetDelegate(delegate);
 
     // Cannot target endpoint and device type
