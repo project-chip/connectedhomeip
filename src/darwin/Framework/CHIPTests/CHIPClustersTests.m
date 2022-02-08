@@ -5264,7 +5264,39 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_3_1_000003_MoveToHue
+- (void)testSendClusterTest_TC_CC_3_1_000003_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads CurrentHue attribute from DUT."];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Reads CurrentHue attribute from DUT. Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertGreaterThanOrEqual([actualValue unsignedCharValue], 0);
+            }
+        }
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertLessThanOrEqual([actualValue unsignedCharValue], 254);
+            }
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_3_1_000004_MoveToHue
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Move to hue shortest distance command"];
 
@@ -5276,7 +5308,7 @@ CHIPDevice * GetConnectedDevice(void)
     __auto_type * params = [[CHIPColorControlClusterMoveToHueParams alloc] init];
     params.hue = [NSNumber numberWithUnsignedChar:150];
     params.direction = [NSNumber numberWithUnsignedChar:0];
-    params.transitionTime = [NSNumber numberWithUnsignedShort:100U];
+    params.transitionTime = [NSNumber numberWithUnsignedShort:300U];
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveToHueWithParams:params
@@ -5290,7 +5322,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_3_1_000004_MoveToHue
+- (void)testSendClusterTest_TC_CC_3_1_000005_MoveToHue
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Move to hue longest distance command"];
 
@@ -5302,7 +5334,7 @@ CHIPDevice * GetConnectedDevice(void)
     __auto_type * params = [[CHIPColorControlClusterMoveToHueParams alloc] init];
     params.hue = [NSNumber numberWithUnsignedChar:200];
     params.direction = [NSNumber numberWithUnsignedChar:1];
-    params.transitionTime = [NSNumber numberWithUnsignedShort:100U];
+    params.transitionTime = [NSNumber numberWithUnsignedShort:300U];
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveToHueWithParams:params
@@ -5316,7 +5348,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_3_1_000005_MoveToHue
+- (void)testSendClusterTest_TC_CC_3_1_000006_MoveToHue
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Move to hue up command"];
 
@@ -5328,7 +5360,7 @@ CHIPDevice * GetConnectedDevice(void)
     __auto_type * params = [[CHIPColorControlClusterMoveToHueParams alloc] init];
     params.hue = [NSNumber numberWithUnsignedChar:250];
     params.direction = [NSNumber numberWithUnsignedChar:2];
-    params.transitionTime = [NSNumber numberWithUnsignedShort:100U];
+    params.transitionTime = [NSNumber numberWithUnsignedShort:300U];
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveToHueWithParams:params
@@ -5342,7 +5374,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_3_1_000006_MoveToHue
+- (void)testSendClusterTest_TC_CC_3_1_000007_MoveToHue
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Move to hue down command"];
 
@@ -5354,7 +5386,7 @@ CHIPDevice * GetConnectedDevice(void)
     __auto_type * params = [[CHIPColorControlClusterMoveToHueParams alloc] init];
     params.hue = [NSNumber numberWithUnsignedChar:225];
     params.direction = [NSNumber numberWithUnsignedChar:3];
-    params.transitionTime = [NSNumber numberWithUnsignedShort:100U];
+    params.transitionTime = [NSNumber numberWithUnsignedShort:300U];
     params.optionsMask = [NSNumber numberWithUnsignedChar:0];
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster moveToHueWithParams:params
@@ -5368,7 +5400,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_3_1_000007_Off
+- (void)testSendClusterTest_TC_CC_3_1_000008_Off
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Turn off light that we turned on"];
 
@@ -5387,7 +5419,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_3_1_000008_ReadAttribute
+- (void)testSendClusterTest_TC_CC_3_1_000009_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Check on/off attribute value is false after off command"];
 
@@ -6943,7 +6975,39 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_6_2_000003_MoveColorTemperature
+- (void)testSendClusterTest_TC_CC_6_2_000003_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read current color temprature"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorTemperatureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read current color temprature Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 0U);
+            }
+        }
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 65279U);
+            }
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_6_2_000004_MoveColorTemperature
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Move up color temperature command"];
 
@@ -6962,33 +7026,6 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster moveColorTemperatureWithParams:params
                           completionHandler:^(NSError * _Nullable err) {
                               NSLog(@"Move up color temperature command Error: %@", err);
-
-                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-                              [expectation fulfill];
-                          }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_6_2_000004_MoveColorTemperature
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Stop Color Temperature command"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    __auto_type * params = [[CHIPColorControlClusterMoveColorTemperatureParams alloc] init];
-    params.moveMode = [NSNumber numberWithUnsignedChar:0];
-    params.rate = [NSNumber numberWithUnsignedShort:10U];
-    params.colorTemperatureMinimum = [NSNumber numberWithUnsignedShort:1U];
-    params.colorTemperatureMaximum = [NSNumber numberWithUnsignedShort:255U];
-    params.optionsMask = [NSNumber numberWithUnsignedChar:0];
-    params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
-    [cluster moveColorTemperatureWithParams:params
-                          completionHandler:^(NSError * _Nullable err) {
-                              NSLog(@"Stop Color Temperature command Error: %@", err);
 
                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -7024,7 +7061,115 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_6_2_000006_Off
+- (void)testSendClusterTest_TC_CC_6_2_000006_MoveColorTemperature
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Move up color temperature command"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPColorControlClusterMoveColorTemperatureParams alloc] init];
+    params.moveMode = [NSNumber numberWithUnsignedChar:1];
+    params.rate = [NSNumber numberWithUnsignedShort:10U];
+    params.colorTemperatureMinimum = [NSNumber numberWithUnsignedShort:1U];
+    params.colorTemperatureMaximum = [NSNumber numberWithUnsignedShort:255U];
+    params.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveColorTemperatureWithParams:params
+                          completionHandler:^(NSError * _Nullable err) {
+                              NSLog(@"Move up color temperature command Error: %@", err);
+
+                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                              [expectation fulfill];
+                          }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_6_2_000007_MoveColorTemperature
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Stop Color Temperature command"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPColorControlClusterMoveColorTemperatureParams alloc] init];
+    params.moveMode = [NSNumber numberWithUnsignedChar:0];
+    params.rate = [NSNumber numberWithUnsignedShort:10U];
+    params.colorTemperatureMinimum = [NSNumber numberWithUnsignedShort:1U];
+    params.colorTemperatureMaximum = [NSNumber numberWithUnsignedShort:255U];
+    params.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveColorTemperatureWithParams:params
+                          completionHandler:^(NSError * _Nullable err) {
+                              NSLog(@"Stop Color Temperature command Error: %@", err);
+
+                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                              [expectation fulfill];
+                          }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_6_2_000008_MoveColorTemperature
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Move down color temperature command"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPColorControlClusterMoveColorTemperatureParams alloc] init];
+    params.moveMode = [NSNumber numberWithUnsignedChar:3];
+    params.rate = [NSNumber numberWithUnsignedShort:20U];
+    params.colorTemperatureMinimum = [NSNumber numberWithUnsignedShort:1U];
+    params.colorTemperatureMaximum = [NSNumber numberWithUnsignedShort:255U];
+    params.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveColorTemperatureWithParams:params
+                          completionHandler:^(NSError * _Nullable err) {
+                              NSLog(@"Move down color temperature command Error: %@", err);
+
+                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                              [expectation fulfill];
+                          }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_6_2_000009_MoveColorTemperature
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Stop Color Temperature command"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPColorControlClusterMoveColorTemperatureParams alloc] init];
+    params.moveMode = [NSNumber numberWithUnsignedChar:0];
+    params.rate = [NSNumber numberWithUnsignedShort:10U];
+    params.colorTemperatureMinimum = [NSNumber numberWithUnsignedShort:1U];
+    params.colorTemperatureMaximum = [NSNumber numberWithUnsignedShort:255U];
+    params.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveColorTemperatureWithParams:params
+                          completionHandler:^(NSError * _Nullable err) {
+                              NSLog(@"Stop Color Temperature command Error: %@", err);
+
+                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                              [expectation fulfill];
+                          }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_6_2_000010_Off
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Turn off light that we turned on"];
 
@@ -7043,7 +7188,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_6_2_000007_ReadAttribute
+- (void)testSendClusterTest_TC_CC_6_2_000011_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Check on/off attribute value is false after off command"];
 
@@ -7296,32 +7441,111 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_7_1_000004_ReadAttribute
+- (void)testSendClusterTest_TC_CC_7_1_000004_EnhancedMoveToHue
 {
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Check Remaining time attribute value matched the value sent by the last command"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Enhanced Move To Hue command"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeRemainingTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Check Remaining time attribute value matched the value sent by the last command Error: %@", err);
+    __auto_type * params = [[CHIPColorControlClusterEnhancedMoveToHueParams alloc] init];
+    params.enhancedHue = [NSNumber numberWithUnsignedShort:1100U];
+    params.direction = [NSNumber numberWithUnsignedChar:0];
+    params.transitionTime = [NSNumber numberWithUnsignedShort:300U];
+    params.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster enhancedMoveToHueWithParams:params
+                       completionHandler:^(NSError * _Nullable err) {
+                           NSLog(@"Enhanced Move To Hue command Error: %@", err);
 
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedShortValue], 1U);
-        }
-
-        [expectation fulfill];
-    }];
+                           [expectation fulfill];
+                       }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_7_1_000005_Off
+- (void)testSendClusterTest_TC_CC_7_1_000005_EnhancedMoveToHue
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Enhanced Move To Hue command"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPColorControlClusterEnhancedMoveToHueParams alloc] init];
+    params.enhancedHue = [NSNumber numberWithUnsignedShort:1150U];
+    params.direction = [NSNumber numberWithUnsignedChar:1];
+    params.transitionTime = [NSNumber numberWithUnsignedShort:300U];
+    params.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster enhancedMoveToHueWithParams:params
+                       completionHandler:^(NSError * _Nullable err) {
+                           NSLog(@"Enhanced Move To Hue command Error: %@", err);
+
+                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                           [expectation fulfill];
+                       }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_7_1_000006_EnhancedMoveToHue
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Enhanced Move To Hue command"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPColorControlClusterEnhancedMoveToHueParams alloc] init];
+    params.enhancedHue = [NSNumber numberWithUnsignedShort:1200U];
+    params.direction = [NSNumber numberWithUnsignedChar:2];
+    params.transitionTime = [NSNumber numberWithUnsignedShort:300U];
+    params.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster enhancedMoveToHueWithParams:params
+                       completionHandler:^(NSError * _Nullable err) {
+                           NSLog(@"Enhanced Move To Hue command Error: %@", err);
+
+                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                           [expectation fulfill];
+                       }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_7_1_000007_EnhancedMoveToHue
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Enhanced Move To Hue command"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPColorControlClusterEnhancedMoveToHueParams alloc] init];
+    params.enhancedHue = [NSNumber numberWithUnsignedShort:1300U];
+    params.direction = [NSNumber numberWithUnsignedChar:3];
+    params.transitionTime = [NSNumber numberWithUnsignedShort:300U];
+    params.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster enhancedMoveToHueWithParams:params
+                       completionHandler:^(NSError * _Nullable err) {
+                           NSLog(@"Enhanced Move To Hue command Error: %@", err);
+
+                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                           [expectation fulfill];
+                       }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_7_1_000008_Off
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Turn off light that we turned on"];
 
@@ -7340,7 +7564,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_7_1_000006_ReadAttribute
+- (void)testSendClusterTest_TC_CC_7_1_000009_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Check on/off attribute value is false after off command"];
 
@@ -7416,57 +7640,39 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_7_2_000003_EnhancedMoveHue
+- (void)testSendClusterTest_TC_CC_7_2_000003_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Enhanced Move Hue Down command "];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Check EnhancedCurrentHue attribute from DUT"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    __auto_type * params = [[CHIPColorControlClusterEnhancedMoveHueParams alloc] init];
-    params.moveMode = [NSNumber numberWithUnsignedChar:3];
-    params.rate = [NSNumber numberWithUnsignedShort:5U];
-    params.optionsMask = [NSNumber numberWithUnsignedChar:0];
-    params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
-    [cluster enhancedMoveHueWithParams:params
-                     completionHandler:^(NSError * _Nullable err) {
-                         NSLog(@"Enhanced Move Hue Down command  Error: %@", err);
+    [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Check EnhancedCurrentHue attribute from DUT Error: %@", err);
 
-                         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
-                         [expectation fulfill];
-                     }];
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertGreaterThanOrEqual([actualValue unsignedShortValue], 0U);
+            }
+        }
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertLessThanOrEqual([actualValue unsignedShortValue], 65535U);
+            }
+        }
+
+        [expectation fulfill];
+    }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_7_2_000004_EnhancedMoveHue
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Enhanced Move Hue Stop command"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    __auto_type * params = [[CHIPColorControlClusterEnhancedMoveHueParams alloc] init];
-    params.moveMode = [NSNumber numberWithUnsignedChar:0];
-    params.rate = [NSNumber numberWithUnsignedShort:0U];
-    params.optionsMask = [NSNumber numberWithUnsignedChar:0];
-    params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
-    [cluster enhancedMoveHueWithParams:params
-                     completionHandler:^(NSError * _Nullable err) {
-                         NSLog(@"Enhanced Move Hue Stop command Error: %@", err);
-
-                         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-                         [expectation fulfill];
-                     }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_7_2_000005_EnhancedMoveHue
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Enhanced Move Hue Up command"];
 
@@ -7491,7 +7697,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_7_2_000006_EnhancedMoveHue
+- (void)testSendClusterTest_TC_CC_7_2_000005_EnhancedMoveHue
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Enhanced Move Hue Stop command"];
 
@@ -7516,7 +7722,57 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_7_2_000007_Off
+- (void)testSendClusterTest_TC_CC_7_2_000006_EnhancedMoveHue
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Enhanced Move Hue Down command "];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPColorControlClusterEnhancedMoveHueParams alloc] init];
+    params.moveMode = [NSNumber numberWithUnsignedChar:3];
+    params.rate = [NSNumber numberWithUnsignedShort:5U];
+    params.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster enhancedMoveHueWithParams:params
+                     completionHandler:^(NSError * _Nullable err) {
+                         NSLog(@"Enhanced Move Hue Down command  Error: %@", err);
+
+                         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                         [expectation fulfill];
+                     }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_7_2_000007_EnhancedMoveHue
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Enhanced Move Hue Stop command"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPColorControlClusterEnhancedMoveHueParams alloc] init];
+    params.moveMode = [NSNumber numberWithUnsignedChar:0];
+    params.rate = [NSNumber numberWithUnsignedShort:0U];
+    params.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster enhancedMoveHueWithParams:params
+                     completionHandler:^(NSError * _Nullable err) {
+                         NSLog(@"Enhanced Move Hue Stop command Error: %@", err);
+
+                         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                         [expectation fulfill];
+                     }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_7_2_000008_Off
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Turn off light that we turned on"];
 
@@ -7535,7 +7791,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_7_2_000008_ReadAttribute
+- (void)testSendClusterTest_TC_CC_7_2_000009_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Check on/off attribute value is false after off command"];
 
@@ -8539,7 +8795,56 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_1_000013_ColorLoopSet
+NSNumber * _Nonnull EnhancedCurrentHueValue1;
+- (void)testSendClusterTest_TC_CC_9_1_000013_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read EnhancedCurrentHue attribute from DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read EnhancedCurrentHue attribute from DUT Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            EnhancedCurrentHueValue1 = actualValue;
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_9_1_000014_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopStoredEnhancedHue attribute from DUT."];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorLoopStoredEnhancedHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read ColorLoopStoredEnhancedHue attribute from DUT. Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqualObjects(actualValue, EnhancedCurrentHueValue1);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_9_1_000015_ColorLoopSet
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Sends ColorLoopSet Command - Set all Attributes"];
 
@@ -8567,7 +8872,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_1_000014_ReadAttribute
+- (void)testSendClusterTest_TC_CC_9_1_000016_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopActive attribute from DUT"];
 
@@ -8591,7 +8896,56 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_1_000015_ColorLoopSet
+NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue1;
+- (void)testSendClusterTest_TC_CC_9_1_000017_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopStoredEnhancedHue attribute from DUT."];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorLoopStoredEnhancedHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read ColorLoopStoredEnhancedHue attribute from DUT. Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            ColorLoopStoredEnhancedHueValue1 = actualValue;
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_9_1_000018_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read EnhancedCurrentHue attribute from DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read EnhancedCurrentHue attribute from DUT Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqualObjects(actualValue, ColorLoopStoredEnhancedHueValue1);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_9_1_000019_ColorLoopSet
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Sends ColorLoopSet Command - Set all Attributes"];
 
@@ -8619,7 +8973,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_1_000016_ReadAttribute
+- (void)testSendClusterTest_TC_CC_9_1_000020_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopDirection attribute from DUT"];
 
@@ -8643,7 +8997,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_1_000017_ColorLoopSet
+- (void)testSendClusterTest_TC_CC_9_1_000021_ColorLoopSet
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Sends ColorLoopSet Command - Set all Attributes"];
 
@@ -8671,7 +9025,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_1_000018_ReadAttribute
+- (void)testSendClusterTest_TC_CC_9_1_000022_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopActive attribute from DUT"];
 
@@ -8695,7 +9049,56 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_1_000019_ColorLoopSet
+NSNumber * _Nonnull EnhancedCurrentHueValue2;
+- (void)testSendClusterTest_TC_CC_9_1_000023_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read EnhancedCurrentHue attribute from DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read EnhancedCurrentHue attribute from DUT Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            EnhancedCurrentHueValue2 = actualValue;
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_9_1_000024_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopStoredEnhancedHue attribute from DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorLoopStoredEnhancedHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read ColorLoopStoredEnhancedHue attribute from DUT Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqualObjects(actualValue, EnhancedCurrentHueValue2);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_9_1_000025_ColorLoopSet
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Sends ColorLoopSet Command - Set all Attributes"];
 
@@ -8723,7 +9126,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_1_000020_ReadAttribute
+- (void)testSendClusterTest_TC_CC_9_1_000026_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopActive attribute from DUT"];
 
@@ -8747,9 +9150,58 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_1_000021_EnhancedMoveToHue
+NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue2;
+- (void)testSendClusterTest_TC_CC_9_1_000027_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Enhanced Move To Hue command 10"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopStoredEnhancedHue attribute from DUT."];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorLoopStoredEnhancedHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read ColorLoopStoredEnhancedHue attribute from DUT. Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            ColorLoopStoredEnhancedHueValue2 = actualValue;
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_9_1_000028_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read EnhancedCurrentHue attribute from DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read EnhancedCurrentHue attribute from DUT Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqualObjects(actualValue, ColorLoopStoredEnhancedHueValue2);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_9_1_000029_EnhancedMoveToHue
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Enhanced Move To Hue command"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -8764,7 +9216,7 @@ CHIPDevice * GetConnectedDevice(void)
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster enhancedMoveToHueWithParams:params
                        completionHandler:^(NSError * _Nullable err) {
-                           NSLog(@"Enhanced Move To Hue command 10 Error: %@", err);
+                           NSLog(@"Enhanced Move To Hue command Error: %@", err);
 
                            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -8773,7 +9225,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_1_000022_WaitForMs
+- (void)testSendClusterTest_TC_CC_9_1_000030_WaitForMs
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 2000ms"];
 
@@ -8781,7 +9233,7 @@ CHIPDevice * GetConnectedDevice(void)
     WaitForMs(expectation, queue, 2000);
     [self waitForExpectationsWithTimeout:(2000 / 1000) + kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_1_000023_ReadAttribute
+- (void)testSendClusterTest_TC_CC_9_1_000031_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read EnhancedCurrentHue attribute from DUT"];
 
@@ -8805,214 +9257,6 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_1_000024_ColorLoopSet
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Sends ColorLoopSet Command - Set all Attributes"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    __auto_type * params = [[CHIPColorControlClusterColorLoopSetParams alloc] init];
-    params.updateFlags = [NSNumber numberWithUnsignedChar:2];
-    params.action = [NSNumber numberWithUnsignedChar:0];
-    params.direction = [NSNumber numberWithUnsignedChar:0];
-    params.time = [NSNumber numberWithUnsignedShort:0U];
-    params.startHue = [NSNumber numberWithUnsignedShort:0U];
-    params.optionsMask = [NSNumber numberWithUnsignedChar:0];
-    params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
-    [cluster colorLoopSetWithParams:params
-                  completionHandler:^(NSError * _Nullable err) {
-                      NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
-
-                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-                      [expectation fulfill];
-                  }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_9_1_000025_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopDirection attribute from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeColorLoopDirectionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Read ColorLoopDirection attribute from DUT Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], 0);
-        }
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_9_1_000026_ColorLoopSet
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Sends ColorLoopSet Command - Set all Attributes"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    __auto_type * params = [[CHIPColorControlClusterColorLoopSetParams alloc] init];
-    params.updateFlags = [NSNumber numberWithUnsignedChar:1];
-    params.action = [NSNumber numberWithUnsignedChar:2];
-    params.direction = [NSNumber numberWithUnsignedChar:0];
-    params.time = [NSNumber numberWithUnsignedShort:0U];
-    params.startHue = [NSNumber numberWithUnsignedShort:0U];
-    params.optionsMask = [NSNumber numberWithUnsignedChar:0];
-    params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
-    [cluster colorLoopSetWithParams:params
-                  completionHandler:^(NSError * _Nullable err) {
-                      NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
-
-                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-                      [expectation fulfill];
-                  }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_9_1_000027_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopActive attribute from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeColorLoopActiveWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Read ColorLoopActive attribute from DUT Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], 1);
-        }
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_9_1_000028_ColorLoopSet
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Sends ColorLoopSet Command - Set all Attributes"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    __auto_type * params = [[CHIPColorControlClusterColorLoopSetParams alloc] init];
-    params.updateFlags = [NSNumber numberWithUnsignedChar:1];
-    params.action = [NSNumber numberWithUnsignedChar:0];
-    params.direction = [NSNumber numberWithUnsignedChar:0];
-    params.time = [NSNumber numberWithUnsignedShort:0U];
-    params.startHue = [NSNumber numberWithUnsignedShort:0U];
-    params.optionsMask = [NSNumber numberWithUnsignedChar:0];
-    params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
-    [cluster colorLoopSetWithParams:params
-                  completionHandler:^(NSError * _Nullable err) {
-                      NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
-
-                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-                      [expectation fulfill];
-                  }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_9_1_000029_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopActive attribute from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeColorLoopActiveWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Read ColorLoopActive attribute from DUT Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], 0);
-        }
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_9_1_000030_ColorLoopSet
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Sends ColorLoopSet Command - Set all Attributes"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    __auto_type * params = [[CHIPColorControlClusterColorLoopSetParams alloc] init];
-    params.updateFlags = [NSNumber numberWithUnsignedChar:2];
-    params.action = [NSNumber numberWithUnsignedChar:0];
-    params.direction = [NSNumber numberWithUnsignedChar:1];
-    params.time = [NSNumber numberWithUnsignedShort:0U];
-    params.startHue = [NSNumber numberWithUnsignedShort:0U];
-    params.optionsMask = [NSNumber numberWithUnsignedChar:0];
-    params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
-    [cluster colorLoopSetWithParams:params
-                  completionHandler:^(NSError * _Nullable err) {
-                      NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
-
-                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-                      [expectation fulfill];
-                  }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_9_1_000031_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopDirection attribute from DUT"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeColorLoopDirectionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Read ColorLoopDirection attribute from DUT Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], 1);
-        }
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
 - (void)testSendClusterTest_TC_CC_9_1_000032_ColorLoopSet
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Sends ColorLoopSet Command - Set all Attributes"];
@@ -9023,8 +9267,8 @@ CHIPDevice * GetConnectedDevice(void)
     XCTAssertNotNil(cluster);
 
     __auto_type * params = [[CHIPColorControlClusterColorLoopSetParams alloc] init];
-    params.updateFlags = [NSNumber numberWithUnsignedChar:1];
-    params.action = [NSNumber numberWithUnsignedChar:2];
+    params.updateFlags = [NSNumber numberWithUnsignedChar:2];
+    params.action = [NSNumber numberWithUnsignedChar:0];
     params.direction = [NSNumber numberWithUnsignedChar:0];
     params.time = [NSNumber numberWithUnsignedShort:0U];
     params.startHue = [NSNumber numberWithUnsignedShort:0U];
@@ -9043,21 +9287,21 @@ CHIPDevice * GetConnectedDevice(void)
 }
 - (void)testSendClusterTest_TC_CC_9_1_000033_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopActive attribute from DUT"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopDirection attribute from DUT"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
     CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeColorLoopActiveWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Read ColorLoopActive attribute from DUT Error: %@", err);
+    [cluster readAttributeColorLoopDirectionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read ColorLoopDirection attribute from DUT Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], 1);
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
         }
 
         [expectation fulfill];
@@ -9076,7 +9320,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     __auto_type * params = [[CHIPColorControlClusterColorLoopSetParams alloc] init];
     params.updateFlags = [NSNumber numberWithUnsignedChar:1];
-    params.action = [NSNumber numberWithUnsignedChar:0];
+    params.action = [NSNumber numberWithUnsignedChar:2];
     params.direction = [NSNumber numberWithUnsignedChar:0];
     params.time = [NSNumber numberWithUnsignedShort:0U];
     params.startHue = [NSNumber numberWithUnsignedShort:0U];
@@ -9109,6 +9353,107 @@ CHIPDevice * GetConnectedDevice(void)
 
         {
             id actualValue = value;
+            XCTAssertEqual([actualValue unsignedCharValue], 1);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+NSNumber * _Nonnull EnhancedCurrentHueValue3;
+- (void)testSendClusterTest_TC_CC_9_1_000036_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read EnhancedCurrentHue attribute from DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read EnhancedCurrentHue attribute from DUT Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            EnhancedCurrentHueValue3 = actualValue;
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_9_1_000037_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopStoredEnhancedHue attribute from DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorLoopStoredEnhancedHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read ColorLoopStoredEnhancedHue attribute from DUT Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqualObjects(actualValue, EnhancedCurrentHueValue3);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_9_1_000038_ColorLoopSet
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Sends ColorLoopSet Command - Set all Attributes"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPColorControlClusterColorLoopSetParams alloc] init];
+    params.updateFlags = [NSNumber numberWithUnsignedChar:1];
+    params.action = [NSNumber numberWithUnsignedChar:0];
+    params.direction = [NSNumber numberWithUnsignedChar:0];
+    params.time = [NSNumber numberWithUnsignedShort:0U];
+    params.startHue = [NSNumber numberWithUnsignedShort:0U];
+    params.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSetWithParams:params
+                  completionHandler:^(NSError * _Nullable err) {
+                      NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
+
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                      [expectation fulfill];
+                  }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_9_1_000039_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopActive attribute from DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorLoopActiveWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read ColorLoopActive attribute from DUT Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
             XCTAssertEqual([actualValue unsignedCharValue], 0);
         }
 
@@ -9117,7 +9462,310 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_1_000036_Off
+NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue3;
+- (void)testSendClusterTest_TC_CC_9_1_000040_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopStoredEnhancedHue attribute from DUT."];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorLoopStoredEnhancedHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read ColorLoopStoredEnhancedHue attribute from DUT. Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            ColorLoopStoredEnhancedHueValue3 = actualValue;
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_9_1_000041_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read EnhancedCurrentHue attribute from DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read EnhancedCurrentHue attribute from DUT Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqualObjects(actualValue, ColorLoopStoredEnhancedHueValue3);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_9_1_000042_ColorLoopSet
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Sends ColorLoopSet Command - Set all Attributes"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPColorControlClusterColorLoopSetParams alloc] init];
+    params.updateFlags = [NSNumber numberWithUnsignedChar:2];
+    params.action = [NSNumber numberWithUnsignedChar:0];
+    params.direction = [NSNumber numberWithUnsignedChar:1];
+    params.time = [NSNumber numberWithUnsignedShort:0U];
+    params.startHue = [NSNumber numberWithUnsignedShort:0U];
+    params.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSetWithParams:params
+                  completionHandler:^(NSError * _Nullable err) {
+                      NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
+
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                      [expectation fulfill];
+                  }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_9_1_000043_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopDirection attribute from DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorLoopDirectionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read ColorLoopDirection attribute from DUT Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue unsignedCharValue], 1);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_9_1_000044_ColorLoopSet
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Sends ColorLoopSet Command - Set all Attributes"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPColorControlClusterColorLoopSetParams alloc] init];
+    params.updateFlags = [NSNumber numberWithUnsignedChar:1];
+    params.action = [NSNumber numberWithUnsignedChar:2];
+    params.direction = [NSNumber numberWithUnsignedChar:0];
+    params.time = [NSNumber numberWithUnsignedShort:0U];
+    params.startHue = [NSNumber numberWithUnsignedShort:0U];
+    params.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSetWithParams:params
+                  completionHandler:^(NSError * _Nullable err) {
+                      NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
+
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                      [expectation fulfill];
+                  }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_9_1_000045_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopActive attribute from DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorLoopActiveWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read ColorLoopActive attribute from DUT Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue unsignedCharValue], 1);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+NSNumber * _Nonnull EnhancedCurrentHueValue4;
+- (void)testSendClusterTest_TC_CC_9_1_000046_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read EnhancedCurrentHue attribute from DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read EnhancedCurrentHue attribute from DUT Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            EnhancedCurrentHueValue4 = actualValue;
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_9_1_000047_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopStoredEnhancedHue attribute from DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorLoopStoredEnhancedHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read ColorLoopStoredEnhancedHue attribute from DUT Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqualObjects(actualValue, EnhancedCurrentHueValue4);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_9_1_000048_ColorLoopSet
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Sends ColorLoopSet Command - Set all Attributes"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPColorControlClusterColorLoopSetParams alloc] init];
+    params.updateFlags = [NSNumber numberWithUnsignedChar:1];
+    params.action = [NSNumber numberWithUnsignedChar:0];
+    params.direction = [NSNumber numberWithUnsignedChar:0];
+    params.time = [NSNumber numberWithUnsignedShort:0U];
+    params.startHue = [NSNumber numberWithUnsignedShort:0U];
+    params.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster colorLoopSetWithParams:params
+                  completionHandler:^(NSError * _Nullable err) {
+                      NSLog(@"Sends ColorLoopSet Command - Set all Attributes Error: %@", err);
+
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                      [expectation fulfill];
+                  }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_9_1_000049_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopActive attribute from DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorLoopActiveWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read ColorLoopActive attribute from DUT Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue unsignedCharValue], 0);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+NSNumber * _Nonnull ColorLoopStoredEnhancedHue4;
+- (void)testSendClusterTest_TC_CC_9_1_000050_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopStoredEnhancedHue attribute from DUT."];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorLoopStoredEnhancedHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read ColorLoopStoredEnhancedHue attribute from DUT. Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            ColorLoopStoredEnhancedHue4 = actualValue;
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_9_1_000051_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read EnhancedCurrentHue attribute from DUT"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read EnhancedCurrentHue attribute from DUT Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqualObjects(actualValue, ColorLoopStoredEnhancedHue4);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_9_1_000052_Off
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Turn Off light for color control tests"];
 
@@ -9130,6 +9778,30 @@ CHIPDevice * GetConnectedDevice(void)
         NSLog(@"Turn Off light for color control tests Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_9_1_000053_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Check on/off attribute value is false after off command"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -9365,7 +10037,56 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_2_000010_ColorLoopSet
+NSNumber * _Nonnull EnhancedCurrentHueValue;
+- (void)testSendClusterTest_TC_CC_9_2_000010_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read EnhancedCurrentHue attribute from DUT."];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read EnhancedCurrentHue attribute from DUT. Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            EnhancedCurrentHueValue = actualValue;
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_9_2_000011_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopStoredEnhancedHue attribute from DUT."];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorLoopStoredEnhancedHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read ColorLoopStoredEnhancedHue attribute from DUT. Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqualObjects(actualValue, EnhancedCurrentHueValue);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_9_2_000012_ColorLoopSet
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Color Loop Set Command - Start Color Loop"];
 
@@ -9393,7 +10114,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_2_000011_ReadAttribute
+- (void)testSendClusterTest_TC_CC_9_2_000013_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopDirection attribute from DUT."];
 
@@ -9417,7 +10138,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_2_000012_ColorLoopSet
+- (void)testSendClusterTest_TC_CC_9_2_000014_ColorLoopSet
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Color Loop Set Command - Start Color Loop"];
 
@@ -9445,7 +10166,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_2_000013_ReadAttribute
+- (void)testSendClusterTest_TC_CC_9_2_000015_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopActive attribute from DUT"];
 
@@ -9469,7 +10190,56 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_2_000014_Off
+NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
+- (void)testSendClusterTest_TC_CC_9_2_000016_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopStoredEnhancedHue attribute from DUT."];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorLoopStoredEnhancedHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read ColorLoopStoredEnhancedHue attribute from DUT. Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            ColorLoopStoredEnhancedHueValue = actualValue;
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_9_2_000017_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read EnhancedCurrentHue attribute from DUT."];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read EnhancedCurrentHue attribute from DUT. Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqualObjects(actualValue, ColorLoopStoredEnhancedHueValue);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_9_2_000018_Off
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Turn off light for color control tests"];
 
@@ -9482,6 +10252,30 @@ CHIPDevice * GetConnectedDevice(void)
         NSLog(@"Turn off light for color control tests Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_9_2_000019_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Check on/off attribute value is false after off command"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
@@ -9717,7 +10511,56 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_3_000010_ColorLoopSet
+NSNumber * _Nonnull EnhancedCurrentHueValue;
+- (void)testSendClusterTest_TC_CC_9_3_000010_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read EnhancedCurrentHue attribute from DUT."];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read EnhancedCurrentHue attribute from DUT. Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            EnhancedCurrentHueValue = actualValue;
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_9_3_000011_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopStoredEnhancedHue attribute from DUT."];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorLoopStoredEnhancedHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read ColorLoopStoredEnhancedHue attribute from DUT. Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqualObjects(actualValue, EnhancedCurrentHueValue);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_9_3_000012_ColorLoopSet
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Color Loop Set Command - Start Color Loop"];
 
@@ -9745,7 +10588,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_3_000011_ReadAttribute
+- (void)testSendClusterTest_TC_CC_9_3_000013_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopTime attribute from DUT."];
 
@@ -9769,7 +10612,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_3_000012_ColorLoopSet
+- (void)testSendClusterTest_TC_CC_9_3_000014_ColorLoopSet
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Color Loop Set Command - Start Color Loop"];
 
@@ -9797,7 +10640,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_3_000013_ReadAttribute
+- (void)testSendClusterTest_TC_CC_9_3_000015_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopActive attribute from DUT"];
 
@@ -9821,7 +10664,56 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_3_000014_Off
+NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
+- (void)testSendClusterTest_TC_CC_9_3_000016_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopStoredEnhancedHue attribute from DUT."];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorLoopStoredEnhancedHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read ColorLoopStoredEnhancedHue attribute from DUT. Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            ColorLoopStoredEnhancedHueValue = actualValue;
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_9_3_000017_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read EnhancedCurrentHue attribute from DUT."];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read EnhancedCurrentHue attribute from DUT. Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqualObjects(actualValue, ColorLoopStoredEnhancedHueValue);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_9_3_000018_Off
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Turn off light for color control tests"];
 
@@ -9834,6 +10726,30 @@ CHIPDevice * GetConnectedDevice(void)
         NSLog(@"Turn off light for color control tests Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_9_3_000019_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Check on/off attribute value is false after off command"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue boolValue], 0);
+        }
 
         [expectation fulfill];
     }];
