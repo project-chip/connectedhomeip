@@ -5542,6 +5542,7 @@ class Binding(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
+                ClusterObjectFieldDescriptor(Label="bindingList", Tag=0x00000000, Type=typing.List[Binding.Structs.BindingEntry]),
                 ClusterObjectFieldDescriptor(Label="serverGeneratedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="clientGeneratedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -5549,6 +5550,7 @@ class Binding(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
+    bindingList: 'typing.List[Binding.Structs.BindingEntry]' = None
     serverGeneratedCommandList: 'typing.List[uint]' = None
     clientGeneratedCommandList: 'typing.List[uint]' = None
     attributeList: 'typing.List[uint]' = None
@@ -5556,14 +5558,9 @@ class Binding(Cluster):
     clusterRevision: 'uint' = None
 
 
-
-    class Commands:
+    class Structs:
         @dataclass
-        class Bind(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x001E
-            command_id: typing.ClassVar[int] = 0x0000
-            is_client: typing.ClassVar[bool] = True
-
+        class BindingEntry(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
@@ -5579,29 +5576,26 @@ class Binding(Cluster):
             endpointId: 'uint' = 0
             clusterId: 'uint' = 0
 
-        @dataclass
-        class Unbind(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x001E
-            command_id: typing.ClassVar[int] = 0x0001
-            is_client: typing.ClassVar[bool] = True
 
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                            ClusterObjectFieldDescriptor(Label="nodeId", Tag=0, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="groupId", Tag=1, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="endpointId", Tag=2, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="clusterId", Tag=3, Type=uint),
-                    ])
-
-            nodeId: 'uint' = 0
-            groupId: 'uint' = 0
-            endpointId: 'uint' = 0
-            clusterId: 'uint' = 0
 
 
     class Attributes:
+        @dataclass
+        class BindingList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x001E
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[Binding.Structs.BindingEntry])
+
+            value: 'typing.List[Binding.Structs.BindingEntry]' = field(default_factory=lambda: [])
+
         @dataclass
         class ServerGeneratedCommandList(ClusterAttributeDescriptor):
             @ChipUtility.classproperty

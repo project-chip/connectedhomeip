@@ -147,7 +147,8 @@ class ApplicationLauncherAttrAccess : public app::AttributeAccessInterface
 public:
     ApplicationLauncherAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), ApplicationLauncher::Id) {}
 
-    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(FabricIndex fabricIndex, const app::ConcreteReadAttributePath & aPath,
+                    app::AttributeValueEncoder & aEncoder) override;
 
 private:
     CHIP_ERROR ReadCatalogListAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
@@ -156,7 +157,8 @@ private:
 
 ApplicationLauncherAttrAccess gApplicationLauncherAttrAccess;
 
-CHIP_ERROR ApplicationLauncherAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR ApplicationLauncherAttrAccess::Read(FabricIndex fabricIndex, const app::ConcreteReadAttributePath & aPath,
+                                               app::AttributeValueEncoder & aEncoder)
 {
     EndpointId endpoint = aPath.mEndpointId;
     Delegate * delegate = GetDelegate(endpoint);

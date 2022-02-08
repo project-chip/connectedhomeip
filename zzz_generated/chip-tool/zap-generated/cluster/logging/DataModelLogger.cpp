@@ -288,6 +288,46 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::Binding::Structs::BindingEntry::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("NodeId", indent + 1, value.nodeId);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'NodeId'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("GroupId", indent + 1, value.groupId);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'GroupId'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("EndpointId", indent + 1, value.endpointId);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EndpointId'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ClusterId", indent + 1, value.clusterId);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ClusterId'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::DecodableType & value)
@@ -4356,6 +4396,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case Binding::Id: {
         switch (path.mAttributeId)
         {
+        case Binding::Attributes::BindingList::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::BindingEntry::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("binding list", 1, value);
+        }
         case Binding::Attributes::ServerGeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));

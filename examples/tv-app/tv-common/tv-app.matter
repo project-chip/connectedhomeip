@@ -277,45 +277,27 @@ server cluster Basic = 40 {
 }
 
 client cluster Binding = 30 {
+  struct BindingEntry {
+    NODE_ID nodeId = 0;
+    GROUP_ID groupId = 1;
+    ENDPOINT_NO endpointId = 2;
+    CLUSTER_ID clusterId = 3;
+  }
+
+  attribute BindingEntry bindingList[] = 0;
   readonly global attribute int16u clusterRevision = 65533;
-
-  request struct BindRequest {
-    NODE_ID nodeId = 0;
-    GROUP_ID groupId = 1;
-    ENDPOINT_NO endpointId = 2;
-    CLUSTER_ID clusterId = 3;
-  }
-
-  request struct UnbindRequest {
-    NODE_ID nodeId = 0;
-    GROUP_ID groupId = 1;
-    ENDPOINT_NO endpointId = 2;
-    CLUSTER_ID clusterId = 3;
-  }
-
-  command Bind(BindRequest): DefaultSuccess = 0;
-  command Unbind(UnbindRequest): DefaultSuccess = 1;
 }
 
 server cluster Binding = 30 {
+  struct BindingEntry {
+    NODE_ID nodeId = 0;
+    GROUP_ID groupId = 1;
+    ENDPOINT_NO endpointId = 2;
+    CLUSTER_ID clusterId = 3;
+  }
+
+  attribute BindingEntry bindingList[] = 0;
   readonly global attribute int16u clusterRevision = 65533;
-
-  request struct BindRequest {
-    NODE_ID nodeId = 0;
-    GROUP_ID groupId = 1;
-    ENDPOINT_NO endpointId = 2;
-    CLUSTER_ID clusterId = 3;
-  }
-
-  request struct UnbindRequest {
-    NODE_ID nodeId = 0;
-    GROUP_ID groupId = 1;
-    ENDPOINT_NO endpointId = 2;
-    CLUSTER_ID clusterId = 3;
-  }
-
-  command Bind(BindRequest): DefaultSuccess = 0;
-  command Unbind(UnbindRequest): DefaultSuccess = 1;
 }
 
 server cluster Channel = 1284 {
