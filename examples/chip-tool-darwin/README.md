@@ -2,7 +2,7 @@
 
 An example application that uses Matter to send messages to a Matter server.
 
-IMPORTANT: Must have an Apple developer signin certificate. Information can be
+IMPORTANT: Must have an Apple developer signed certificate. Information can be
 found at [code-signing](https://developer.apple.com/support/code-signing/).
 
 ---
