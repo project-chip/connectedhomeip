@@ -37,7 +37,6 @@
 #endif
 
 #include <platform/NetworkCommissioning.h>
-#include <vector>
 
 namespace chip {
 namespace Inet {

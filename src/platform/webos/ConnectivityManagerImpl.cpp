@@ -24,9 +24,7 @@
 
 #include <cstdlib>
 #include <new>
-#include <string>
 #include <utility>
-#include <vector>
 
 #include <ifaddrs.h>
 #include <stdio.h>
