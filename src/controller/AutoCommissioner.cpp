@@ -17,7 +17,6 @@
  */
 
 #include <controller/AutoCommissioner.h>
-
 #include <controller/CHIPDeviceController.h>
 #include <credentials/CHIPCert.h>
 #include <lib/support/SafeInt.h>
@@ -143,23 +142,33 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
     case CommissioningStage::kSendNOC:
         // TODO(cecille): device attestation casues operational cert provisioinging to happen, This should be a separate stage.
         // For thread and wifi, this should go to network setup then enable. For on-network we can skip right to finding the
-        // operational network because the provisioning of certificates will trigger the device to start operational advertising.
+        // operational network because the provisioning of certificates will trigger the device to start operational
+        // advertising.
         if (mNeedsNetworkSetup)
         {
-            if (mParams.GetWiFiCredentials().HasValue() && mNetworkEndpoints.wifi != kInvalidEndpointId)
+            if (mNetworkEndpoints.wifi != kInvalidEndpointId)
             {
-                return CommissioningStage::kWiFiNetworkSetup;
+                if (mParams.GetWiFiCredentials().HasValue())
+                {
+                    ChipLogProgress(Controller, "Proceeding with wifi configuration");
+                    return CommissioningStage::kWiFiNetworkSetup;
+                }
+                ChipLogProgress(Controller, "Device supports WiFi Network, however no parameters were provided");
             }
-            else if (mParams.GetThreadOperationalDataset().HasValue() && mNetworkEndpoints.thread != kInvalidEndpointId)
+
+            if (mNetworkEndpoints.thread != kInvalidEndpointId)
             {
-                return CommissioningStage::kThreadNetworkSetup;
+                if (mParams.GetThreadOperationalDataset().HasValue())
+                {
+                    ChipLogProgress(Controller, "Proceeding with Thread configuration");
+                    return CommissioningStage::kThreadNetworkSetup;
+                }
+                ChipLogProgress(Controller, "Device supports Thread Network, however no parameters were provided");
             }
-            else
-            {
-                ChipLogError(Controller, "Required network information not provided in commissioning parameters");
-                lastErr = CHIP_ERROR_INVALID_ARGUMENT;
-                return CommissioningStage::kCleanup;
-            }
+
+            ChipLogError(Controller, "Required network information not provided in commissioning parameters");
+            lastErr = CHIP_ERROR_INVALID_ARGUMENT;
+            return CommissioningStage::kCleanup;
         }
         else
         {
@@ -267,8 +276,8 @@ CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissione
 Optional<System::Clock::Timeout> AutoCommissioner::GetCommandTimeout(CommissioningStage stage)
 {
     // Per spec, all commands that are sent with the arm failsafe held need at least a 30s timeout. Using 30s everywhere for
-    // simplicity. 30s appears to be sufficient for long-running network commands (enable wifi and enable thread), but we may wish
-    // to increase the timeout for those commissioning stages at a later time.
+    // simplicity. 30s appears to be sufficient for long-running network commands (enable wifi and enable thread), but we may
+    // wish to increase the timeout for those commissioning stages at a later time.
     return MakeOptional(System::Clock::Timeout(System::Clock::Seconds16(30)));
 }
 
