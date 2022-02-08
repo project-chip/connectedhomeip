@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <algorithm>
 #include "AndroidOperationalCredentialsIssuer.h"
+#include <algorithm>
 #include <credentials/CHIPCert.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/CHIPMem.h>
@@ -68,7 +68,7 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::Initialize(PersistentStorageDele
         ReturnErrorOnFailure(mIssuer.Deserialize(serializedKey));
     }
 
-    mStorage     = &storage;
+    mStorage       = &storage;
     mJavaObjectRef = javaObjectRef;
 
     mInitialized = true;
@@ -184,7 +184,6 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan 
     JniReferences::GetInstance().GetEnvForCurrentThread()->CallVoidMethod(mJavaObjectRef, method, javaCsr);
     return CHIP_NO_ERROR;
 }
-
 
 } // namespace Controller
 } // namespace chip

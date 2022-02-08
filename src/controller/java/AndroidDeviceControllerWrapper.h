@@ -102,7 +102,9 @@ private:
     jbyteArray operationalDatasetBytes = nullptr;
     jbyte * operationalDataset         = nullptr;
 
-    AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller, AndroidOperationalCredentialsIssuerPtr opCredsIssuer) : mController(std::move(controller)), mOpCredsIssuer(std::move(opCredsIssuer)) { }
+    AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller, AndroidOperationalCredentialsIssuerPtr opCredsIssuer) :
+        mController(std::move(controller)), mOpCredsIssuer(std::move(opCredsIssuer))
+    {}
 };
 
 inline jlong AndroidDeviceControllerWrapper::ToJNIHandle()

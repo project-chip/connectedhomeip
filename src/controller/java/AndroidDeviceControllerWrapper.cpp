@@ -60,12 +60,12 @@ void AndroidDeviceControllerWrapper::CallJavaMethod(const char * methodName, jin
                                              argument);
 }
 
-AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
-    JavaVM * vm, jobject deviceControllerObj, chip::NodeId nodeId, chip::System::Layer * systemLayer,
-    chip::Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager,
-    chip::Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager,
-    AndroidOperationalCredentialsIssuerPtr opCredsIssuerPtr,
-    CHIP_ERROR * errInfoOnFailure)
+AndroidDeviceControllerWrapper *
+AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControllerObj, chip::NodeId nodeId,
+                                            chip::System::Layer * systemLayer,
+                                            chip::Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager,
+                                            chip::Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager,
+                                            AndroidOperationalCredentialsIssuerPtr opCredsIssuerPtr, CHIP_ERROR * errInfoOnFailure)
 {
     if (errInfoOnFailure == nullptr)
     {
@@ -100,11 +100,12 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
         *errInfoOnFailure = CHIP_ERROR_NO_MEMORY;
         return nullptr;
     }
-    std::unique_ptr<AndroidDeviceControllerWrapper> wrapper(new AndroidDeviceControllerWrapper(std::move(controller), std::move(opCredsIssuerPtr)));
+    std::unique_ptr<AndroidDeviceControllerWrapper> wrapper(
+        new AndroidDeviceControllerWrapper(std::move(controller), std::move(opCredsIssuerPtr)));
 
     wrapper->SetJavaObjectRef(vm, deviceControllerObj);
 
-    chip::Controller::AndroidOperationalCredentialsIssuer* opCredsIssuer = wrapper->mOpCredsIssuer.get();
+    chip::Controller::AndroidOperationalCredentialsIssuer * opCredsIssuer = wrapper->mOpCredsIssuer.get();
 
     // Initialize device attestation verifier
     // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
@@ -161,7 +162,8 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
         return nullptr;
     }
 
-    *errInfoOnFailure = opCredsIssuer->GenerateNOCChainAfterValidation(nodeId, 0, ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan);
+    *errInfoOnFailure =
+        opCredsIssuer->GenerateNOCChainAfterValidation(nodeId, 0, ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan);
     if (*errInfoOnFailure != CHIP_NO_ERROR)
     {
         return nullptr;
