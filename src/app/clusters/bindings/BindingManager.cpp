@@ -125,7 +125,7 @@ void BindingManager::HandleDeviceConnected(OperationalDeviceProxy * device)
     FabricIndex fabricToRemove = kUndefinedFabricIndex;
     NodeId nodeToRemove        = kUndefinedNodeId;
 
-    for (const PendingNotificationEntry & pendingNotification : mPendingNotificationMap)
+    for (PendingNotificationEntry pendingNotification : mPendingNotificationMap)
     {
         EmberBindingTableEntry entry;
         emberGetBinding(pendingNotification.mBindingEntryId, &entry);
