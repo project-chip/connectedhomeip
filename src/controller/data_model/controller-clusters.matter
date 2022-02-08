@@ -176,12 +176,18 @@ client cluster ApplicationLauncher = 1292 {
     kLineupInfo = 0x2;
   }
 
+  struct ApplicationEP {
+    Application application = 0;
+    CHAR_STRING endpoint = 1;
+  }
+
   struct Application {
     INT16U catalogVendorId = 0;
     CHAR_STRING applicationId = 1;
   }
 
   readonly attribute INT16U applicationLauncherList[] = 0;
+  attribute ApplicationEP applicationLauncherApp = 1;
   readonly global attribute command_id serverGeneratedCommandList[] = 65528;
   readonly global attribute command_id clientGeneratedCommandList[] = 65529;
   readonly global attribute attrib_id attributeList[] = 65531;
@@ -567,7 +573,16 @@ client cluster Channel = 1284 {
     CHAR_STRING<32> affiliateCallSign = 4;
   }
 
+  struct LineupInfo {
+    CHAR_STRING operatorName = 0;
+    CHAR_STRING lineupName = 1;
+    CHAR_STRING postalCode = 2;
+    LineupInfoTypeEnum lineupInfoType = 3;
+  }
+
   readonly attribute ChannelInfo channelList[] = 0;
+  attribute LineupInfo channelLineup = 1;
+  attribute ChannelInfo currentChannel = 2;
   readonly global attribute command_id serverGeneratedCommandList[] = 65528;
   readonly global attribute command_id clientGeneratedCommandList[] = 65529;
   readonly global attribute attrib_id attributeList[] = 65531;
@@ -2291,9 +2306,15 @@ client cluster MediaPlayback = 1286 {
     kSeekOutOfRange = 5;
   }
 
+  struct PlaybackPosition {
+    INT64U updatedAt = 0;
+    INT64U position = 1;
+  }
+
   readonly attribute PlaybackStateEnum playbackState = 0;
   readonly attribute epoch_us startTime = 1;
   readonly attribute int64u duration = 2;
+  attribute PlaybackPosition position = 3;
   readonly attribute single playbackSpeed = 4;
   readonly attribute int64u seekRangeEnd = 5;
   readonly attribute int64u seekRangeStart = 6;
