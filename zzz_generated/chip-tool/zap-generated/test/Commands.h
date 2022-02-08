@@ -89049,7 +89049,7 @@ private:
 
     CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_1()
     {
-        const chip::GroupId groupId = 4660;
+        const chip::GroupId groupId = 257;
         using RequestType           = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -89087,7 +89087,7 @@ private:
 
     CHIP_ERROR TestTurnOffTheLightToSeeAttributeChange_3()
     {
-        const chip::GroupId groupId = 4660;
+        const chip::GroupId groupId = 257;
         using RequestType           = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -89125,7 +89125,7 @@ private:
 
     CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_5()
     {
-        const chip::GroupId groupId = 4660;
+        const chip::GroupId groupId = 257;
         using RequestType           = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -89163,7 +89163,7 @@ private:
 
     CHIP_ERROR TestTurnOffTheLightToSeeAttributeChange_7()
     {
-        const chip::GroupId groupId = 4660;
+        const chip::GroupId groupId = 257;
         using RequestType           = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -89201,7 +89201,7 @@ private:
 
     CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_9()
     {
-        const chip::GroupId groupId = 4660;
+        const chip::GroupId groupId = 257;
         using RequestType           = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -89239,7 +89239,7 @@ private:
 
     CHIP_ERROR TestTurnOffTheLightToSeeAttributeChange_11()
     {
-        const chip::GroupId groupId = 4660;
+        const chip::GroupId groupId = 257;
         using RequestType           = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -89277,7 +89277,7 @@ private:
 
     CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_13()
     {
-        const chip::GroupId groupId = 4660;
+        const chip::GroupId groupId = 257;
         using RequestType           = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -89315,7 +89315,7 @@ private:
 
     CHIP_ERROR TestTurnOffTheLightToSeeAttributeChange_15()
     {
-        const chip::GroupId groupId = 4660;
+        const chip::GroupId groupId = 257;
         using RequestType           = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -89353,7 +89353,7 @@ private:
 
     CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_17()
     {
-        const chip::GroupId groupId = 4660;
+        const chip::GroupId groupId = 257;
         using RequestType           = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -89391,7 +89391,7 @@ private:
 
     CHIP_ERROR TestTurnOffTheLightToSeeAttributeChange_19()
     {
-        const chip::GroupId groupId = 4660;
+        const chip::GroupId groupId = 257;
         using RequestType           = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -89473,6 +89473,14 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 1 : Add Group 1 - endpoint 1\n");
             err = TestAddGroup1Endpoint1_1();
             break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : KeySet Write 1\n");
+            err = TestKeySetWrite1_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Write Group Keys\n");
+            err = TestWriteGroupKeys_3();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -89484,7 +89492,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 2;
+    const uint16_t mTestCount = 4;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
@@ -89496,6 +89504,13 @@ private:
         VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
         NextTest();
     }
+
+    static void OnFailureCallback_3(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestGroupDemoConfig *>(context))->OnFailureResponse_3(error);
+    }
+
+    static void OnSuccessCallback_3(void * context) { (static_cast<TestGroupDemoConfig *>(context))->OnSuccessResponse_3(); }
 
     //
     // Tests methods
@@ -89513,7 +89528,7 @@ private:
         using RequestType               = chip::app::Clusters::Groups::Commands::AddGroup::Type;
 
         RequestType request;
-        request.groupId   = 4660U;
+        request.groupId   = 257U;
         request.groupName = chip::Span<const char>("Group #1garbage: not in length on purpose", 8);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
@@ -89538,10 +89553,92 @@ private:
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
-        VerifyOrReturn(CheckValue("groupId", groupId, 4660U));
+        VerifyOrReturn(CheckValue("groupId", groupId, 257U));
 
         NextTest();
     }
+
+    CHIP_ERROR TestKeySetWrite1_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        using RequestType               = chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::Type;
+
+        RequestType request;
+
+        request.groupKeySet.groupKeySetID = 417U;
+        request.groupKeySet.groupKeySecurityPolicy =
+            static_cast<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy>(0);
+        request.groupKeySet.epochKey0.SetNonNull();
+        request.groupKeySet.epochKey0.Value() =
+            chip::ByteSpan(chip::Uint8::from_const_char(
+                               "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xafgarbage: not in length on purpose"),
+                           16);
+        request.groupKeySet.epochStartTime0.SetNonNull();
+        request.groupKeySet.epochStartTime0.Value() = 1110000ULL;
+        request.groupKeySet.epochKey1.SetNonNull();
+        request.groupKeySet.epochKey1.Value() =
+            chip::ByteSpan(chip::Uint8::from_const_char(
+                               "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbfgarbage: not in length on purpose"),
+                           16);
+        request.groupKeySet.epochStartTime1.SetNonNull();
+        request.groupKeySet.epochStartTime1.Value() = 1110001ULL;
+        request.groupKeySet.epochKey2.SetNonNull();
+        request.groupKeySet.epochKey2.Value() =
+            chip::ByteSpan(chip::Uint8::from_const_char(
+                               "\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcfgarbage: not in length on purpose"),
+                           16);
+        request.groupKeySet.epochStartTime2.SetNonNull();
+        request.groupKeySet.epochStartTime2.Value() = 1110002ULL;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupDemoConfig *>(context))->OnSuccessResponse_2();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupDemoConfig *>(context))->OnFailureResponse_2(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_2() { NextTest(); }
+
+    CHIP_ERROR TestWriteGroupKeys_3()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::GroupKeyManagementClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type>
+            groupKeyMapArgument;
+
+        chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type groupKeyMapList_0[1];
+
+        groupKeyMapList_0[0].fabricIndex   = 1;
+        groupKeyMapList_0[0].groupId       = 257U;
+        groupKeyMapList_0[0].groupKeySetID = 417U;
+
+        groupKeyMapArgument = groupKeyMapList_0;
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::GroupKeyManagement::Attributes::GroupKeyMap::TypeInfo>(
+            groupKeyMapArgument, this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_3() { NextTest(); }
 };
 
 void registerCommandsTests(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
