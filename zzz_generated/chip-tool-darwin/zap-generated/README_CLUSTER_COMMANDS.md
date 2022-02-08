@@ -78,21 +78,6 @@ Usage:
 ```
 
 </details>
-<details><summary>Binding</summary><p>
-
-```bash
-Usage:
-  ./chip-tool-darwin binding command_name [param1 param2 ...]
-
-  +-------------------------------------------------------------------------------------+
-  | Commands:                                                                           |
-  +-------------------------------------------------------------------------------------+
-  | * bind                                                                              |
-  | * unbind                                                                            |
-  +-------------------------------------------------------------------------------------+
-```
-
-</details>
 <details><summary>Bridged Actions</summary><p>
 
 ```bash

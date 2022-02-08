@@ -1995,28 +1995,6 @@ public:
     }
 };
 
-class WriteApplicationBasicApplicationApp : public ModelCommand {
-public:
-    WriteApplicationBasicApplicationApp()
-        : ModelCommand("write")
-    {
-        AddArgument("attr-name", "application-app");
-        //  Struct parsing is not supported yet
-        ModelCommand::AddArguments();
-    }
-
-    ~WriteApplicationBasicApplicationApp() {}
-
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000050D) WriteAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
-
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-
-private:
-};
-
 /*
  * Attribute ApplicationStatus
  */
@@ -2554,6 +2532,7 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * ApplicationLauncherList                                           | 0x0000 |
+| * ApplicationLauncherApp                                            | 0x0001 |
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -2742,6 +2721,50 @@ private:
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
+};
+
+/*
+ * Attribute ApplicationLauncherApp
+ */
+class ReadApplicationLauncherApplicationLauncherApp : public ModelCommand {
+public:
+    ReadApplicationLauncherApplicationLauncherApp()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "application-launcher-app");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadApplicationLauncherApplicationLauncherApp() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050C) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
+
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+};
+
+class WriteApplicationLauncherApplicationLauncherApp : public ModelCommand {
+public:
+    WriteApplicationLauncherApplicationLauncherApp()
+        : ModelCommand("write")
+    {
+        AddArgument("attr-name", "application-launcher-app");
+        //  Struct parsing is not supported yet
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteApplicationLauncherApplicationLauncherApp() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050C) WriteAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
+
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+private:
 };
 
 /*
@@ -6579,10 +6602,9 @@ private:
 | Cluster Binding                                                     | 0x001E |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * Bind                                                              |   0x00 |
-| * Unbind                                                            |   0x01 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
+| * BindingList                                                       | 0x0000 |
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -6592,87 +6614,95 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*
- * Command Bind
+ * Attribute BindingList
  */
-class BindingBind : public ModelCommand {
+class ReadBindingBindingList : public ModelCommand {
 public:
-    BindingBind()
-        : ModelCommand("bind")
+    ReadBindingBindingList()
+        : ModelCommand("read")
     {
-        AddArgument("NodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("GroupId", 0, UINT16_MAX, &mGroupId);
-        AddArgument("EndpointId", 0, UINT16_MAX, &mEndpointId);
-        AddArgument("ClusterId", 0, UINT32_MAX, &mClusterId);
+        AddArgument("attr-name", "binding-list");
         ModelCommand::AddArguments();
     }
 
+    ~ReadBindingBindingList() {}
+
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001E) command (0x00000000) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001E) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBinding * cluster = [[CHIPBinding alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
 
-        __auto_type * params = [[CHIPBindingClusterBindParams alloc] init];
-        params.nodeId = [NSNumber numberWithUnsignedLongLong:mNodeId];
-        params.groupId = [NSNumber numberWithUnsignedShort:mGroupId];
-        params.endpointId = [NSNumber numberWithUnsignedShort:mEndpointId];
-        params.clusterId = [NSNumber numberWithUnsignedInt:mClusterId];
-        [cluster bindWithParams:params
-              completionHandler:^(NSError * _Nullable error) {
-                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-              }];
-
+        [cluster readAttributeBindingListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"Binding.BindingList response %@", [value description]);
+            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+        }];
         return CHIP_NO_ERROR;
     }
-
-private:
-    chip::NodeId mNodeId;
-    chip::GroupId mGroupId;
-    chip::EndpointId mEndpointId;
-    chip::ClusterId mClusterId;
 };
 
-/*
- * Command Unbind
- */
-class BindingUnbind : public ModelCommand {
+class WriteBindingBindingList : public ModelCommand {
 public:
-    BindingUnbind()
-        : ModelCommand("unbind")
+    WriteBindingBindingList()
+        : ModelCommand("write")
     {
-        AddArgument("NodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("GroupId", 0, UINT16_MAX, &mGroupId);
-        AddArgument("EndpointId", 0, UINT16_MAX, &mEndpointId);
-        AddArgument("ClusterId", 0, UINT32_MAX, &mClusterId);
+        AddArgument("attr-name", "binding-list");
+        //  Array parsing is not supported yet
         ModelCommand::AddArguments();
     }
 
+    ~WriteBindingBindingList() {}
+
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001E) command (0x00000001) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001E) WriteAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
 
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+private:
+};
+
+class SubscribeAttributeBindingBindingList : public ModelCommand {
+public:
+    SubscribeAttributeBindingBindingList()
+        : ModelCommand("subscribe")
+    {
+        AddArgument("attr-name", "binding-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~SubscribeAttributeBindingBindingList() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001E) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBinding * cluster = [[CHIPBinding alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-
-        __auto_type * params = [[CHIPBindingClusterUnbindParams alloc] init];
-        params.nodeId = [NSNumber numberWithUnsignedLongLong:mNodeId];
-        params.groupId = [NSNumber numberWithUnsignedShort:mGroupId];
-        params.endpointId = [NSNumber numberWithUnsignedShort:mEndpointId];
-        params.clusterId = [NSNumber numberWithUnsignedInt:mClusterId];
-        [cluster unbindWithParams:params
-                completionHandler:^(NSError * _Nullable error) {
-                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                }];
+        [cluster subscribeAttributeBindingListWithMinInterval:mMinInterval
+                                                  maxInterval:mMaxInterval
+                                      subscriptionEstablished:NULL
+                                                reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                    NSLog(@"Binding.BindingList response %@", [value description]);
+                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                }];
 
         return CHIP_NO_ERROR;
     }
 
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
 private:
-    chip::NodeId mNodeId;
-    chip::GroupId mGroupId;
-    chip::EndpointId mEndpointId;
-    chip::ClusterId mClusterId;
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -9729,6 +9759,8 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * ChannelList                                                       | 0x0000 |
+| * ChannelLineup                                                     | 0x0001 |
+| * CurrentChannel                                                    | 0x0002 |
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -9909,6 +9941,94 @@ private:
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
+};
+
+/*
+ * Attribute ChannelLineup
+ */
+class ReadChannelChannelLineup : public ModelCommand {
+public:
+    ReadChannelChannelLineup()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "channel-lineup");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadChannelChannelLineup() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000504) ReadAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
+
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+};
+
+class WriteChannelChannelLineup : public ModelCommand {
+public:
+    WriteChannelChannelLineup()
+        : ModelCommand("write")
+    {
+        AddArgument("attr-name", "channel-lineup");
+        //  Struct parsing is not supported yet
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteChannelChannelLineup() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000504) WriteAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
+
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+private:
+};
+
+/*
+ * Attribute CurrentChannel
+ */
+class ReadChannelCurrentChannel : public ModelCommand {
+public:
+    ReadChannelCurrentChannel()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "current-channel");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadChannelCurrentChannel() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000504) ReadAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
+
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+};
+
+class WriteChannelCurrentChannel : public ModelCommand {
+public:
+    WriteChannelCurrentChannel()
+        : ModelCommand("write")
+    {
+        AddArgument("attr-name", "current-channel");
+        //  Struct parsing is not supported yet
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteChannelCurrentChannel() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000504) WriteAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
+
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+private:
 };
 
 /*
@@ -30643,6 +30763,7 @@ private:
 | * PlaybackState                                                     | 0x0000 |
 | * StartTime                                                         | 0x0001 |
 | * Duration                                                          | 0x0002 |
+| * Position                                                          | 0x0003 |
 | * PlaybackSpeed                                                     | 0x0004 |
 | * SeekRangeEnd                                                      | 0x0005 |
 | * SeekRangeStart                                                    | 0x0006 |
@@ -31207,6 +31328,50 @@ private:
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
+};
+
+/*
+ * Attribute Position
+ */
+class ReadMediaPlaybackPosition : public ModelCommand {
+public:
+    ReadMediaPlaybackPosition()
+        : ModelCommand("read")
+    {
+        AddArgument("attr-name", "position");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadMediaPlaybackPosition() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) ReadAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
+
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+};
+
+class WriteMediaPlaybackPosition : public ModelCommand {
+public:
+    WriteMediaPlaybackPosition()
+        : ModelCommand("write")
+    {
+        AddArgument("attr-name", "position");
+        //  Struct parsing is not supported yet
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteMediaPlaybackPosition() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000506) WriteAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
+
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+private:
 };
 
 /*
@@ -67441,7 +67606,6 @@ void registerClusterApplicationBasic(Commands & commands)
         make_unique<ReadApplicationBasicProductId>(), //
         make_unique<SubscribeAttributeApplicationBasicProductId>(), //
         make_unique<ReadApplicationBasicApplicationApp>(), //
-        make_unique<WriteApplicationBasicApplicationApp>(), //
         make_unique<ReadApplicationBasicApplicationStatus>(), //
         make_unique<SubscribeAttributeApplicationBasicApplicationStatus>(), //
         make_unique<ReadApplicationBasicApplicationVersion>(), //
@@ -67470,6 +67634,8 @@ void registerClusterApplicationLauncher(Commands & commands)
         make_unique<ApplicationLauncherStopAppRequest>(), //
         make_unique<ReadApplicationLauncherApplicationLauncherList>(), //
         make_unique<SubscribeAttributeApplicationLauncherApplicationLauncherList>(), //
+        make_unique<ReadApplicationLauncherApplicationLauncherApp>(), //
+        make_unique<WriteApplicationLauncherApplicationLauncherApp>(), //
         make_unique<ReadApplicationLauncherServerGeneratedCommandList>(), //
         make_unique<SubscribeAttributeApplicationLauncherServerGeneratedCommandList>(), //
         make_unique<ReadApplicationLauncherClientGeneratedCommandList>(), //
@@ -67620,8 +67786,9 @@ void registerClusterBinding(Commands & commands)
     const char * clusterName = "Binding";
 
     commands_list clusterCommands = {
-        make_unique<BindingBind>(), //
-        make_unique<BindingUnbind>(), //
+        make_unique<ReadBindingBindingList>(), //
+        make_unique<WriteBindingBindingList>(), //
+        make_unique<SubscribeAttributeBindingBindingList>(), //
         make_unique<ReadBindingServerGeneratedCommandList>(), //
         make_unique<SubscribeAttributeBindingServerGeneratedCommandList>(), //
         make_unique<ReadBindingClientGeneratedCommandList>(), //
@@ -67744,6 +67911,10 @@ void registerClusterChannel(Commands & commands)
         make_unique<ChannelSkipChannelRequest>(), //
         make_unique<ReadChannelChannelList>(), //
         make_unique<SubscribeAttributeChannelChannelList>(), //
+        make_unique<ReadChannelChannelLineup>(), //
+        make_unique<WriteChannelChannelLineup>(), //
+        make_unique<ReadChannelCurrentChannel>(), //
+        make_unique<WriteChannelCurrentChannel>(), //
         make_unique<ReadChannelServerGeneratedCommandList>(), //
         make_unique<SubscribeAttributeChannelServerGeneratedCommandList>(), //
         make_unique<ReadChannelClientGeneratedCommandList>(), //
@@ -68509,6 +68680,8 @@ void registerClusterMediaPlayback(Commands & commands)
         make_unique<SubscribeAttributeMediaPlaybackStartTime>(), //
         make_unique<ReadMediaPlaybackDuration>(), //
         make_unique<SubscribeAttributeMediaPlaybackDuration>(), //
+        make_unique<ReadMediaPlaybackPosition>(), //
+        make_unique<WriteMediaPlaybackPosition>(), //
         make_unique<ReadMediaPlaybackPlaybackSpeed>(), //
         make_unique<SubscribeAttributeMediaPlaybackPlaybackSpeed>(), //
         make_unique<ReadMediaPlaybackSeekRangeEnd>(), //
