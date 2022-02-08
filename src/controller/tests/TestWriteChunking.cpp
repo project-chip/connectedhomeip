@@ -73,7 +73,7 @@ DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(testClusterAttrsOnEndpoint)
 DECLARE_DYNAMIC_ATTRIBUTE(kTestListAttribute, ARRAY, 1, ATTRIBUTE_MASK_WRITABLE), DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpointClusters)
-DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrsOnEndpoint), DECLARE_DYNAMIC_CLUSTER_LIST_END;
+DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrsOnEndpoint, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint, testEndpointClusters);
 
@@ -97,9 +97,15 @@ public:
         }
     }
 
-    void OnError(const app::WriteClient * apWriteClient, CHIP_ERROR aError) override { mErrorCount++; }
+    void OnError(const app::WriteClient * apWriteClient, CHIP_ERROR aError) override
+    {
+        mErrorCount++;
+    }
 
-    void OnDone(app::WriteClient * apWriteClient) override { mOnDoneCount++; }
+    void OnDone(app::WriteClient * apWriteClient) override
+    {
+        mOnDoneCount++;
+    }
 
     uint32_t mSuccessCount = 0;
     uint32_t mErrorCount   = 0;
