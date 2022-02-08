@@ -238,7 +238,6 @@ class ChipClusters:
                     "attributeId": 0x00000004,
                     "type": "",
                     "reportable": True,
-                    "writable": True,
                 },
                 0x00000005: {
                     "attributeName": "ApplicationStatus",

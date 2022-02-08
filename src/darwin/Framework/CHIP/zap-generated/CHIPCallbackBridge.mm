@@ -1227,6 +1227,34 @@ void CHIPAdministratorCommissioningAttributeListListAttributeCallbackSubscriptio
     }
 }
 
+void CHIPApplicationBasicApplicationAppStructAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::DecodableType & value)
+{
+    CHIPApplicationBasicClusterApplicationBasicApplication * _Nonnull objCValue;
+    objCValue = [CHIPApplicationBasicClusterApplicationBasicApplication new];
+    objCValue.catalogVendorId = [NSNumber numberWithUnsignedShort:value.catalogVendorId];
+    objCValue.applicationId = [[NSString alloc] initWithBytes:value.applicationId.data()
+                                                       length:value.applicationId.size()
+                                                     encoding:NSUTF8StringEncoding];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPApplicationBasicApplicationAppStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPApplicationBasicApplicationAppStructAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
 void CHIPApplicationBasicAllowedVendorListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::VendorId> & value)
 {
@@ -4093,6 +4121,32 @@ void CHIPFlowMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(
 void CHIPFlowMeasurementAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
     auto * self = static_cast<CHIPFlowMeasurementAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfo::DecodableType & value)
+{
+    CHIPGeneralCommissioningClusterBasicCommissioningInfo * _Nonnull objCValue;
+    objCValue = [CHIPGeneralCommissioningClusterBasicCommissioningInfo new];
+    objCValue.failSafeExpiryLengthSeconds = [NSNumber numberWithUnsignedShort:value.failSafeExpiryLengthSeconds];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -8386,6 +8440,38 @@ void CHIPTestClusterListNullablesAndOptionalsStructListAttributeCallbackSubscrip
     }
 }
 
+void CHIPTestClusterStructAttrStructAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType & value)
+{
+    CHIPTestClusterClusterSimpleStruct * _Nonnull objCValue;
+    objCValue = [CHIPTestClusterClusterSimpleStruct new];
+    objCValue.a = [NSNumber numberWithUnsignedChar:value.a];
+    objCValue.b = [NSNumber numberWithBool:value.b];
+    objCValue.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.c)];
+    objCValue.d = [NSData dataWithBytes:value.d.data() length:value.d.size()];
+    objCValue.e = [[NSString alloc] initWithBytes:value.e.data() length:value.e.size() encoding:NSUTF8StringEncoding];
+    objCValue.f = [NSNumber numberWithUnsignedChar:value.f.Raw()];
+    objCValue.g = [NSNumber numberWithFloat:value.g];
+    objCValue.h = [NSNumber numberWithDouble:value.h];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPTestClusterStructAttrStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPTestClusterStructAttrStructAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
 void CHIPTestClusterListLongOctetStringListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
 {
@@ -8412,6 +8498,44 @@ void CHIPTestClusterListLongOctetStringListAttributeCallbackBridge::OnSuccessFn(
 void CHIPTestClusterListLongOctetStringListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
     auto * self = static_cast<CHIPTestClusterListLongOctetStringListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPTestClusterNullableStructStructAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType> & value)
+{
+    CHIPTestClusterClusterSimpleStruct * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [CHIPTestClusterClusterSimpleStruct new];
+        objCValue.a = [NSNumber numberWithUnsignedChar:value.Value().a];
+        objCValue.b = [NSNumber numberWithBool:value.Value().b];
+        objCValue.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value().c)];
+        objCValue.d = [NSData dataWithBytes:value.Value().d.data() length:value.Value().d.size()];
+        objCValue.e = [[NSString alloc] initWithBytes:value.Value().e.data()
+                                               length:value.Value().e.size()
+                                             encoding:NSUTF8StringEncoding];
+        objCValue.f = [NSNumber numberWithUnsignedChar:value.Value().f.Raw()];
+        objCValue.g = [NSNumber numberWithFloat:value.Value().g];
+        objCValue.h = [NSNumber numberWithDouble:value.Value().h];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPTestClusterNullableStructStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPTestClusterNullableStructStructAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
