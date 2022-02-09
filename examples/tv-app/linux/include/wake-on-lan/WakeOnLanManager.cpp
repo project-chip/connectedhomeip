@@ -39,5 +39,5 @@ CHIP_ERROR WakeOnLanManager::HandleGetMacAddress(chip::app::AttributeValueEncode
     #else
     return aEncoder.Encode(CharSpan::fromCharString("00:00:00:00:00"));
     #endif // CHIP_ENABLE_WAKE_ON_LAN
-    
+
 }
