@@ -25750,9 +25750,9 @@ private:
         (static_cast<Test_TC_MC_6_1 *>(context))->OnFailureResponse_3(error);
     }
 
-    static void OnSuccessCallback_3(void * context, chip::app::Clusters::MediaPlayback::PlaybackStateEnum playbackState)
+    static void OnSuccessCallback_3(void * context, chip::app::Clusters::MediaPlayback::PlaybackStateEnum currentState)
     {
-        (static_cast<Test_TC_MC_6_1 *>(context))->OnSuccessResponse_3(playbackState);
+        (static_cast<Test_TC_MC_6_1 *>(context))->OnSuccessResponse_3(currentState);
     }
 
     //
@@ -25783,7 +25783,7 @@ private:
         chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::PlaybackState::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo>(
             this, OnSuccessCallback_3, OnFailureCallback_3));
         return CHIP_NO_ERROR;
     }
@@ -25794,9 +25794,9 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3(chip::app::Clusters::MediaPlayback::PlaybackStateEnum playbackState)
+    void OnSuccessResponse_3(chip::app::Clusters::MediaPlayback::PlaybackStateEnum currentState)
     {
-        VerifyOrReturn(CheckValue("playbackState", playbackState, 0));
+        VerifyOrReturn(CheckValue("currentState", currentState, 0));
 
         NextTest();
     }
@@ -25915,9 +25915,9 @@ private:
         (static_cast<Test_TC_MC_6_2 *>(context))->OnFailureResponse_3(error);
     }
 
-    static void OnSuccessCallback_3(void * context, chip::app::Clusters::MediaPlayback::PlaybackStateEnum playbackState)
+    static void OnSuccessCallback_3(void * context, chip::app::Clusters::MediaPlayback::PlaybackStateEnum currentState)
     {
-        (static_cast<Test_TC_MC_6_2 *>(context))->OnSuccessResponse_3(playbackState);
+        (static_cast<Test_TC_MC_6_2 *>(context))->OnSuccessResponse_3(currentState);
     }
 
     //
@@ -25948,7 +25948,7 @@ private:
         chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::PlaybackState::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo>(
             this, OnSuccessCallback_3, OnFailureCallback_3));
         return CHIP_NO_ERROR;
     }
@@ -25959,9 +25959,9 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3(chip::app::Clusters::MediaPlayback::PlaybackStateEnum playbackState)
+    void OnSuccessResponse_3(chip::app::Clusters::MediaPlayback::PlaybackStateEnum currentState)
     {
-        VerifyOrReturn(CheckValue("playbackState", playbackState, 0));
+        VerifyOrReturn(CheckValue("currentState", currentState, 0));
 
         NextTest();
     }
@@ -26217,9 +26217,9 @@ private:
         (static_cast<Test_TC_MC_6_4 *>(context))->OnFailureResponse_4(error);
     }
 
-    static void OnSuccessCallback_4(void * context, chip::app::Clusters::MediaPlayback::PlaybackStateEnum playbackState)
+    static void OnSuccessCallback_4(void * context, chip::app::Clusters::MediaPlayback::PlaybackStateEnum currentState)
     {
-        (static_cast<Test_TC_MC_6_4 *>(context))->OnSuccessResponse_4(playbackState);
+        (static_cast<Test_TC_MC_6_4 *>(context))->OnSuccessResponse_4(currentState);
     }
 
     static void OnFailureCallback_7(void * context, CHIP_ERROR error)
@@ -26227,9 +26227,9 @@ private:
         (static_cast<Test_TC_MC_6_4 *>(context))->OnFailureResponse_7(error);
     }
 
-    static void OnSuccessCallback_7(void * context, chip::app::Clusters::MediaPlayback::PlaybackStateEnum playbackState)
+    static void OnSuccessCallback_7(void * context, chip::app::Clusters::MediaPlayback::PlaybackStateEnum currentState)
     {
-        (static_cast<Test_TC_MC_6_4 *>(context))->OnSuccessResponse_7(playbackState);
+        (static_cast<Test_TC_MC_6_4 *>(context))->OnSuccessResponse_7(currentState);
     }
 
     //
@@ -26284,7 +26284,7 @@ private:
         chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::PlaybackState::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo>(
             this, OnSuccessCallback_4, OnFailureCallback_4));
         return CHIP_NO_ERROR;
     }
@@ -26295,9 +26295,9 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4(chip::app::Clusters::MediaPlayback::PlaybackStateEnum playbackState)
+    void OnSuccessResponse_4(chip::app::Clusters::MediaPlayback::PlaybackStateEnum currentState)
     {
-        VerifyOrReturn(CheckValue("playbackState", playbackState, 0));
+        VerifyOrReturn(CheckValue("currentState", currentState, 0));
 
         NextTest();
     }
@@ -26320,7 +26320,7 @@ private:
         chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::PlaybackState::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo>(
             this, OnSuccessCallback_7, OnFailureCallback_7));
         return CHIP_NO_ERROR;
     }
@@ -26331,9 +26331,9 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_7(chip::app::Clusters::MediaPlayback::PlaybackStateEnum playbackState)
+    void OnSuccessResponse_7(chip::app::Clusters::MediaPlayback::PlaybackStateEnum currentState)
     {
-        VerifyOrReturn(CheckValue("playbackState", playbackState, 0));
+        VerifyOrReturn(CheckValue("currentState", currentState, 0));
 
         NextTest();
     }
@@ -26565,8 +26565,6 @@ private:
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
-    uint8_t currentTarget;
-
     void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
     {
         bool isExpectedDnssdResult = false;
@@ -26580,9 +26578,9 @@ private:
         (static_cast<Test_TC_MC_8_1 *>(context))->OnFailureResponse_1(error);
     }
 
-    static void OnSuccessCallback_1(void * context, uint8_t currentNavigatorTarget)
+    static void OnSuccessCallback_1(void * context, uint8_t currentTarget)
     {
-        (static_cast<Test_TC_MC_8_1 *>(context))->OnSuccessResponse_1(currentNavigatorTarget);
+        (static_cast<Test_TC_MC_8_1 *>(context))->OnSuccessResponse_1(currentTarget);
     }
 
     static void OnFailureCallback_2(void * context, CHIP_ERROR error)
@@ -26593,9 +26591,9 @@ private:
     static void OnSuccessCallback_2(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> &
-            targetNavigatorList)
+            targetList)
     {
-        (static_cast<Test_TC_MC_8_1 *>(context))->OnSuccessResponse_2(targetNavigatorList);
+        (static_cast<Test_TC_MC_8_1 *>(context))->OnSuccessResponse_2(targetList);
     }
 
     //
@@ -26614,9 +26612,8 @@ private:
         chip::Controller::TargetNavigatorClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(
-            cluster.ReadAttribute<chip::app::Clusters::TargetNavigator::Attributes::CurrentNavigatorTarget::TypeInfo>(
-                this, OnSuccessCallback_1, OnFailureCallback_1));
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TargetNavigator::Attributes::CurrentTarget::TypeInfo>(
+            this, OnSuccessCallback_1, OnFailureCallback_1));
         return CHIP_NO_ERROR;
     }
 
@@ -26626,10 +26623,9 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1(uint8_t currentNavigatorTarget)
+    void OnSuccessResponse_1(uint8_t currentTarget)
     {
-        VerifyOrReturn(CheckConstraintType("currentNavigatorTarget", "", "uint8"));
-        currentTarget = currentNavigatorTarget;
+        VerifyOrReturn(CheckConstraintType("currentTarget", "", "uint8"));
         NextTest();
     }
 
@@ -26639,7 +26635,7 @@ private:
         chip::Controller::TargetNavigatorClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TargetNavigator::Attributes::TargetNavigatorList::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TargetNavigator::Attributes::TargetList::TypeInfo>(
             this, OnSuccessCallback_2, OnFailureCallback_2));
         return CHIP_NO_ERROR;
     }
@@ -26652,9 +26648,9 @@ private:
 
     void OnSuccessResponse_2(
         const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> &
-            targetNavigatorList)
+            targetList)
     {
-        VerifyOrReturn(CheckConstraintType("targetNavigatorList", "", "list"));
+        VerifyOrReturn(CheckConstraintType("targetList", "", "list"));
         NextTest();
     }
 };
@@ -26766,9 +26762,9 @@ private:
         (static_cast<Test_TC_MC_9_1 *>(context))->OnFailureResponse_3(error);
     }
 
-    static void OnSuccessCallback_3(void * context, uint16_t vendorId)
+    static void OnSuccessCallback_3(void * context, uint16_t vendorID)
     {
-        (static_cast<Test_TC_MC_9_1 *>(context))->OnSuccessResponse_3(vendorId);
+        (static_cast<Test_TC_MC_9_1 *>(context))->OnSuccessResponse_3(vendorID);
     }
 
     static void OnFailureCallback_4(void * context, CHIP_ERROR error)
@@ -26786,9 +26782,9 @@ private:
         (static_cast<Test_TC_MC_9_1 *>(context))->OnFailureResponse_5(error);
     }
 
-    static void OnSuccessCallback_5(void * context, uint16_t productId)
+    static void OnSuccessCallback_5(void * context, uint16_t productID)
     {
-        (static_cast<Test_TC_MC_9_1 *>(context))->OnSuccessResponse_5(productId);
+        (static_cast<Test_TC_MC_9_1 *>(context))->OnSuccessResponse_5(productID);
     }
 
     static void OnFailureCallback_6(void * context, CHIP_ERROR error)
@@ -26796,9 +26792,9 @@ private:
         (static_cast<Test_TC_MC_9_1 *>(context))->OnFailureResponse_6(error);
     }
 
-    static void OnSuccessCallback_6(void * context, chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum applicationStatus)
+    static void OnSuccessCallback_6(void * context, chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum status)
     {
-        (static_cast<Test_TC_MC_9_1 *>(context))->OnSuccessResponse_6(applicationStatus);
+        (static_cast<Test_TC_MC_9_1 *>(context))->OnSuccessResponse_6(status);
     }
 
     static void OnFailureCallback_7(void * context, CHIP_ERROR error)
@@ -26856,7 +26852,7 @@ private:
         chip::Controller::ApplicationBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::VendorId::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo>(
             this, OnSuccessCallback_3, OnFailureCallback_3));
         return CHIP_NO_ERROR;
     }
@@ -26867,10 +26863,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3(uint16_t vendorId)
+    void OnSuccessResponse_3(uint16_t vendorID)
     {
-        VerifyOrReturn(CheckValue("vendorId", vendorId, 0U));
-        VerifyOrReturn(CheckConstraintType("vendorId", "", "vendor-id"));
+        VerifyOrReturn(CheckValue("vendorID", vendorID, 0U));
+        VerifyOrReturn(CheckConstraintType("vendorID", "", "vendor-id"));
         NextTest();
     }
 
@@ -26904,7 +26900,7 @@ private:
         chip::Controller::ApplicationBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ProductId::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ProductID::TypeInfo>(
             this, OnSuccessCallback_5, OnFailureCallback_5));
         return CHIP_NO_ERROR;
     }
@@ -26915,9 +26911,9 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_5(uint16_t productId)
+    void OnSuccessResponse_5(uint16_t productID)
     {
-        VerifyOrReturn(CheckConstraintType("productId", "", "uint16"));
+        VerifyOrReturn(CheckConstraintType("productID", "", "uint16"));
         NextTest();
     }
 
@@ -26927,7 +26923,7 @@ private:
         chip::Controller::ApplicationBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationStatus::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::Status::TypeInfo>(
             this, OnSuccessCallback_6, OnFailureCallback_6));
         return CHIP_NO_ERROR;
     }
@@ -26938,9 +26934,9 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_6(chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum applicationStatus)
+    void OnSuccessResponse_6(chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum status)
     {
-        VerifyOrReturn(CheckValue("applicationStatus", applicationStatus, 0));
+        VerifyOrReturn(CheckValue("status", status, 0));
 
         NextTest();
     }
@@ -48563,9 +48559,9 @@ private:
     static void OnSuccessCallback_1(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> &
-            targetNavigatorList)
+            targetList)
     {
-        (static_cast<TV_TargetNavigatorCluster *>(context))->OnSuccessResponse_1(targetNavigatorList);
+        (static_cast<TV_TargetNavigatorCluster *>(context))->OnSuccessResponse_1(targetList);
     }
 
     static void OnFailureCallback_2(void * context, CHIP_ERROR error)
@@ -48573,9 +48569,9 @@ private:
         (static_cast<TV_TargetNavigatorCluster *>(context))->OnFailureResponse_2(error);
     }
 
-    static void OnSuccessCallback_2(void * context, uint8_t currentNavigatorTarget)
+    static void OnSuccessCallback_2(void * context, uint8_t currentTarget)
     {
-        (static_cast<TV_TargetNavigatorCluster *>(context))->OnSuccessResponse_2(currentNavigatorTarget);
+        (static_cast<TV_TargetNavigatorCluster *>(context))->OnSuccessResponse_2(currentTarget);
     }
 
     //
@@ -48594,7 +48590,7 @@ private:
         chip::Controller::TargetNavigatorClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TargetNavigator::Attributes::TargetNavigatorList::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TargetNavigator::Attributes::TargetList::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1));
         return CHIP_NO_ERROR;
     }
@@ -48607,19 +48603,17 @@ private:
 
     void OnSuccessResponse_1(
         const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> &
-            targetNavigatorList)
+            targetList)
     {
         {
-            auto iter_0 = targetNavigatorList.begin();
-            VerifyOrReturn(CheckNextListItemDecodes<decltype(targetNavigatorList)>("targetNavigatorList", iter_0, 0));
-            VerifyOrReturn(CheckValue("targetNavigatorList[0].identifier", iter_0.GetValue().identifier, 1));
-            VerifyOrReturn(
-                CheckValueAsString("targetNavigatorList[0].name", iter_0.GetValue().name, chip::CharSpan("exampleName", 11)));
-            VerifyOrReturn(CheckNextListItemDecodes<decltype(targetNavigatorList)>("targetNavigatorList", iter_0, 1));
-            VerifyOrReturn(CheckValue("targetNavigatorList[1].identifier", iter_0.GetValue().identifier, 2));
-            VerifyOrReturn(
-                CheckValueAsString("targetNavigatorList[1].name", iter_0.GetValue().name, chip::CharSpan("exampleName", 11)));
-            VerifyOrReturn(CheckNoMoreListItems<decltype(targetNavigatorList)>("targetNavigatorList", iter_0, 2));
+            auto iter_0 = targetList.begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(targetList)>("targetList", iter_0, 0));
+            VerifyOrReturn(CheckValue("targetList[0].identifier", iter_0.GetValue().identifier, 1));
+            VerifyOrReturn(CheckValueAsString("targetList[0].name", iter_0.GetValue().name, chip::CharSpan("exampleName", 11)));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(targetList)>("targetList", iter_0, 1));
+            VerifyOrReturn(CheckValue("targetList[1].identifier", iter_0.GetValue().identifier, 2));
+            VerifyOrReturn(CheckValueAsString("targetList[1].name", iter_0.GetValue().name, chip::CharSpan("exampleName", 11)));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(targetList)>("targetList", iter_0, 2));
         }
 
         NextTest();
@@ -48631,9 +48625,8 @@ private:
         chip::Controller::TargetNavigatorClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(
-            cluster.ReadAttribute<chip::app::Clusters::TargetNavigator::Attributes::CurrentNavigatorTarget::TypeInfo>(
-                this, OnSuccessCallback_2, OnFailureCallback_2));
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TargetNavigator::Attributes::CurrentTarget::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2));
         return CHIP_NO_ERROR;
     }
 
@@ -48643,9 +48636,9 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_2(uint8_t currentNavigatorTarget)
+    void OnSuccessResponse_2(uint8_t currentTarget)
     {
-        VerifyOrReturn(CheckValue("currentNavigatorTarget", currentNavigatorTarget, 0));
+        VerifyOrReturn(CheckValue("currentTarget", currentTarget, 0));
 
         NextTest();
     }
@@ -48653,7 +48646,7 @@ private:
     CHIP_ERROR TestNavigateTargetRequestCommand_3()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::TargetNavigator::Commands::NavigateTargetRequest::Type;
+        using RequestType               = chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type;
 
         RequestType request;
         request.target = 1;
@@ -48778,9 +48771,9 @@ private:
     static void OnSuccessCallback_1(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> &
-            audioOutputList)
+            outputList)
     {
-        (static_cast<TV_AudioOutputCluster *>(context))->OnSuccessResponse_1(audioOutputList);
+        (static_cast<TV_AudioOutputCluster *>(context))->OnSuccessResponse_1(outputList);
     }
 
     static void OnFailureCallback_2(void * context, CHIP_ERROR error)
@@ -48788,9 +48781,9 @@ private:
         (static_cast<TV_AudioOutputCluster *>(context))->OnFailureResponse_2(error);
     }
 
-    static void OnSuccessCallback_2(void * context, uint8_t currentAudioOutput)
+    static void OnSuccessCallback_2(void * context, uint8_t currentOutput)
     {
-        (static_cast<TV_AudioOutputCluster *>(context))->OnSuccessResponse_2(currentAudioOutput);
+        (static_cast<TV_AudioOutputCluster *>(context))->OnSuccessResponse_2(currentOutput);
     }
 
     //
@@ -48809,7 +48802,7 @@ private:
         chip::Controller::AudioOutputClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::AudioOutput::Attributes::AudioOutputList::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::AudioOutput::Attributes::OutputList::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1));
         return CHIP_NO_ERROR;
     }
@@ -48822,26 +48815,23 @@ private:
 
     void OnSuccessResponse_1(
         const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> &
-            audioOutputList)
+            outputList)
     {
         {
-            auto iter_0 = audioOutputList.begin();
-            VerifyOrReturn(CheckNextListItemDecodes<decltype(audioOutputList)>("audioOutputList", iter_0, 0));
-            VerifyOrReturn(CheckValue("audioOutputList[0].index", iter_0.GetValue().index, 1));
-            VerifyOrReturn(CheckValue("audioOutputList[0].outputType", iter_0.GetValue().outputType, 0));
-            VerifyOrReturn(
-                CheckValueAsString("audioOutputList[0].name", iter_0.GetValue().name, chip::CharSpan("exampleName", 11)));
-            VerifyOrReturn(CheckNextListItemDecodes<decltype(audioOutputList)>("audioOutputList", iter_0, 1));
-            VerifyOrReturn(CheckValue("audioOutputList[1].index", iter_0.GetValue().index, 2));
-            VerifyOrReturn(CheckValue("audioOutputList[1].outputType", iter_0.GetValue().outputType, 0));
-            VerifyOrReturn(
-                CheckValueAsString("audioOutputList[1].name", iter_0.GetValue().name, chip::CharSpan("exampleName", 11)));
-            VerifyOrReturn(CheckNextListItemDecodes<decltype(audioOutputList)>("audioOutputList", iter_0, 2));
-            VerifyOrReturn(CheckValue("audioOutputList[2].index", iter_0.GetValue().index, 3));
-            VerifyOrReturn(CheckValue("audioOutputList[2].outputType", iter_0.GetValue().outputType, 0));
-            VerifyOrReturn(
-                CheckValueAsString("audioOutputList[2].name", iter_0.GetValue().name, chip::CharSpan("exampleName", 11)));
-            VerifyOrReturn(CheckNoMoreListItems<decltype(audioOutputList)>("audioOutputList", iter_0, 3));
+            auto iter_0 = outputList.begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(outputList)>("outputList", iter_0, 0));
+            VerifyOrReturn(CheckValue("outputList[0].index", iter_0.GetValue().index, 1));
+            VerifyOrReturn(CheckValue("outputList[0].outputType", iter_0.GetValue().outputType, 0));
+            VerifyOrReturn(CheckValueAsString("outputList[0].name", iter_0.GetValue().name, chip::CharSpan("exampleName", 11)));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(outputList)>("outputList", iter_0, 1));
+            VerifyOrReturn(CheckValue("outputList[1].index", iter_0.GetValue().index, 2));
+            VerifyOrReturn(CheckValue("outputList[1].outputType", iter_0.GetValue().outputType, 0));
+            VerifyOrReturn(CheckValueAsString("outputList[1].name", iter_0.GetValue().name, chip::CharSpan("exampleName", 11)));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(outputList)>("outputList", iter_0, 2));
+            VerifyOrReturn(CheckValue("outputList[2].index", iter_0.GetValue().index, 3));
+            VerifyOrReturn(CheckValue("outputList[2].outputType", iter_0.GetValue().outputType, 0));
+            VerifyOrReturn(CheckValueAsString("outputList[2].name", iter_0.GetValue().name, chip::CharSpan("exampleName", 11)));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(outputList)>("outputList", iter_0, 3));
         }
 
         NextTest();
@@ -48853,7 +48843,7 @@ private:
         chip::Controller::AudioOutputClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::AudioOutput::Attributes::CurrentAudioOutput::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::AudioOutput::Attributes::CurrentOutput::TypeInfo>(
             this, OnSuccessCallback_2, OnFailureCallback_2));
         return CHIP_NO_ERROR;
     }
@@ -48864,9 +48854,9 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_2(uint8_t currentAudioOutput)
+    void OnSuccessResponse_2(uint8_t currentOutput)
     {
-        VerifyOrReturn(CheckValue("currentAudioOutput", currentAudioOutput, 0));
+        VerifyOrReturn(CheckValue("currentOutput", currentOutput, 0));
 
         NextTest();
     }
@@ -48874,7 +48864,7 @@ private:
     CHIP_ERROR TestSelectOutputCommand_3()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 2;
-        using RequestType               = chip::app::Clusters::AudioOutput::Commands::SelectOutputRequest::Type;
+        using RequestType               = chip::app::Clusters::AudioOutput::Commands::SelectOutput::Type;
 
         RequestType request;
         request.index = 1;
@@ -48902,7 +48892,7 @@ private:
     CHIP_ERROR TestRenameOutputCommand_4()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 2;
-        using RequestType               = chip::app::Clusters::AudioOutput::Commands::RenameOutputRequest::Type;
+        using RequestType               = chip::app::Clusters::AudioOutput::Commands::RenameOutput::Type;
 
         RequestType request;
         request.index = 1;
@@ -49015,9 +49005,9 @@ private:
         (static_cast<TV_ApplicationLauncherCluster *>(context))->OnFailureResponse_1(error);
     }
 
-    static void OnSuccessCallback_1(void * context, const chip::app::DataModel::DecodableList<uint16_t> & applicationLauncherList)
+    static void OnSuccessCallback_1(void * context, const chip::app::DataModel::DecodableList<uint16_t> & catalogList)
     {
-        (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_1(applicationLauncherList);
+        (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_1(catalogList);
     }
 
     //
@@ -49036,9 +49026,8 @@ private:
         chip::Controller::ApplicationLauncherClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(
-            cluster.ReadAttribute<chip::app::Clusters::ApplicationLauncher::Attributes::ApplicationLauncherList::TypeInfo>(
-                this, OnSuccessCallback_1, OnFailureCallback_1));
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationLauncher::Attributes::CatalogList::TypeInfo>(
+            this, OnSuccessCallback_1, OnFailureCallback_1));
         return CHIP_NO_ERROR;
     }
 
@@ -49048,15 +49037,15 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1(const chip::app::DataModel::DecodableList<uint16_t> & applicationLauncherList)
+    void OnSuccessResponse_1(const chip::app::DataModel::DecodableList<uint16_t> & catalogList)
     {
         {
-            auto iter_0 = applicationLauncherList.begin();
-            VerifyOrReturn(CheckNextListItemDecodes<decltype(applicationLauncherList)>("applicationLauncherList", iter_0, 0));
-            VerifyOrReturn(CheckValue("applicationLauncherList[0]", iter_0.GetValue(), 123U));
-            VerifyOrReturn(CheckNextListItemDecodes<decltype(applicationLauncherList)>("applicationLauncherList", iter_0, 1));
-            VerifyOrReturn(CheckValue("applicationLauncherList[1]", iter_0.GetValue(), 456U));
-            VerifyOrReturn(CheckNoMoreListItems<decltype(applicationLauncherList)>("applicationLauncherList", iter_0, 2));
+            auto iter_0 = catalogList.begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(catalogList)>("catalogList", iter_0, 0));
+            VerifyOrReturn(CheckValue("catalogList[0]", iter_0.GetValue(), 123U));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(catalogList)>("catalogList", iter_0, 1));
+            VerifyOrReturn(CheckValue("catalogList[1]", iter_0.GetValue(), 456U));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(catalogList)>("catalogList", iter_0, 2));
         }
 
         NextTest();
@@ -49065,7 +49054,7 @@ private:
     CHIP_ERROR TestLaunchAppCommand_2()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppRequest::Type;
+        using RequestType               = chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type;
 
         RequestType request;
 
@@ -49105,7 +49094,7 @@ private:
     CHIP_ERROR TestStopAppCommand_3()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::ApplicationLauncher::Commands::StopAppRequest::Type;
+        using RequestType               = chip::app::Clusters::ApplicationLauncher::Commands::StopApp::Type;
 
         RequestType request;
 
@@ -49142,7 +49131,7 @@ private:
     CHIP_ERROR TestHideAppCommand_4()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::ApplicationLauncher::Commands::HideAppRequest::Type;
+        using RequestType               = chip::app::Clusters::ApplicationLauncher::Commands::HideApp::Type;
 
         RequestType request;
 
@@ -49259,7 +49248,7 @@ private:
     CHIP_ERROR TestSendKeyCommand_1()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::KeypadInput::Commands::SendKeyRequest::Type;
+        using RequestType               = chip::app::Clusters::KeypadInput::Commands::SendKey::Type;
 
         RequestType request;
         request.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(3);
@@ -49380,7 +49369,7 @@ private:
     CHIP_ERROR TestGetSetupPinCommand_1()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
-        using RequestType               = chip::app::Clusters::AccountLogin::Commands::GetSetupPINRequest::Type;
+        using RequestType               = chip::app::Clusters::AccountLogin::Commands::GetSetupPIN::Type;
 
         RequestType request;
         request.tempAccountIdentifier = chip::Span<const char>("asdfgarbage: not in length on purpose", 4);
@@ -49414,7 +49403,7 @@ private:
     CHIP_ERROR TestLoginCommand_2()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
-        using RequestType               = chip::app::Clusters::AccountLogin::Commands::LoginRequest::Type;
+        using RequestType               = chip::app::Clusters::AccountLogin::Commands::Login::Type;
 
         RequestType request;
         request.tempAccountIdentifier = chip::Span<const char>("asdfgarbage: not in length on purpose", 4);
@@ -49444,7 +49433,7 @@ private:
     CHIP_ERROR TestLogoutCommand_3()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
-        using RequestType               = chip::app::Clusters::AccountLogin::Commands::LogoutRequest::Type;
+        using RequestType               = chip::app::Clusters::AccountLogin::Commands::Logout::Type;
 
         RequestType request;
 
@@ -49544,9 +49533,9 @@ private:
         (static_cast<TV_WakeOnLanCluster *>(context))->OnFailureResponse_1(error);
     }
 
-    static void OnSuccessCallback_1(void * context, chip::CharSpan wakeOnLanMacAddress)
+    static void OnSuccessCallback_1(void * context, chip::CharSpan MACAddress)
     {
-        (static_cast<TV_WakeOnLanCluster *>(context))->OnSuccessResponse_1(wakeOnLanMacAddress);
+        (static_cast<TV_WakeOnLanCluster *>(context))->OnSuccessResponse_1(MACAddress);
     }
 
     //
@@ -49565,7 +49554,7 @@ private:
         chip::Controller::WakeOnLanClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WakeOnLan::Attributes::WakeOnLanMacAddress::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WakeOnLan::Attributes::MACAddress::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1));
         return CHIP_NO_ERROR;
     }
@@ -49576,9 +49565,9 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1(chip::CharSpan wakeOnLanMacAddress)
+    void OnSuccessResponse_1(chip::CharSpan MACAddress)
     {
-        VerifyOrReturn(CheckValueAsString("wakeOnLanMacAddress", wakeOnLanMacAddress, chip::CharSpan("00:00:00:00:00", 14)));
+        VerifyOrReturn(CheckValueAsString("MACAddress", MACAddress, chip::CharSpan("00:00:00:00:00", 14)));
 
         NextTest();
     }
@@ -49688,9 +49677,9 @@ private:
         (static_cast<TV_ApplicationBasicCluster *>(context))->OnFailureResponse_2(error);
     }
 
-    static void OnSuccessCallback_2(void * context, uint16_t vendorId)
+    static void OnSuccessCallback_2(void * context, uint16_t vendorID)
     {
-        (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_2(vendorId);
+        (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_2(vendorID);
     }
 
     static void OnFailureCallback_3(void * context, CHIP_ERROR error)
@@ -49708,9 +49697,9 @@ private:
         (static_cast<TV_ApplicationBasicCluster *>(context))->OnFailureResponse_4(error);
     }
 
-    static void OnSuccessCallback_4(void * context, uint16_t productId)
+    static void OnSuccessCallback_4(void * context, uint16_t productID)
     {
-        (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_4(productId);
+        (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_4(productID);
     }
 
     static void OnFailureCallback_5(void * context, CHIP_ERROR error)
@@ -49718,9 +49707,9 @@ private:
         (static_cast<TV_ApplicationBasicCluster *>(context))->OnFailureResponse_5(error);
     }
 
-    static void OnSuccessCallback_5(void * context, chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum applicationStatus)
+    static void OnSuccessCallback_5(void * context, chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum status)
     {
-        (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_5(applicationStatus);
+        (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_5(status);
     }
 
     static void OnFailureCallback_6(void * context, CHIP_ERROR error)
@@ -49773,7 +49762,7 @@ private:
         chip::Controller::ApplicationBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::VendorId::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo>(
             this, OnSuccessCallback_2, OnFailureCallback_2));
         return CHIP_NO_ERROR;
     }
@@ -49784,9 +49773,9 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_2(uint16_t vendorId)
+    void OnSuccessResponse_2(uint16_t vendorID)
     {
-        VerifyOrReturn(CheckValue("vendorId", vendorId, 1U));
+        VerifyOrReturn(CheckValue("vendorID", vendorID, 1U));
 
         NextTest();
     }
@@ -49821,7 +49810,7 @@ private:
         chip::Controller::ApplicationBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ProductId::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ProductID::TypeInfo>(
             this, OnSuccessCallback_4, OnFailureCallback_4));
         return CHIP_NO_ERROR;
     }
@@ -49832,9 +49821,9 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4(uint16_t productId)
+    void OnSuccessResponse_4(uint16_t productID)
     {
-        VerifyOrReturn(CheckValue("productId", productId, 1U));
+        VerifyOrReturn(CheckValue("productID", productID, 1U));
 
         NextTest();
     }
@@ -49845,7 +49834,7 @@ private:
         chip::Controller::ApplicationBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationStatus::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::Status::TypeInfo>(
             this, OnSuccessCallback_5, OnFailureCallback_5));
         return CHIP_NO_ERROR;
     }
@@ -49856,9 +49845,9 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_5(chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum applicationStatus)
+    void OnSuccessResponse_5(chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum status)
     {
-        VerifyOrReturn(CheckValue("applicationStatus", applicationStatus, 0));
+        VerifyOrReturn(CheckValue("status", status, 0));
 
         NextTest();
     }
@@ -50026,9 +50015,9 @@ private:
         (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_1(error);
     }
 
-    static void OnSuccessCallback_1(void * context, chip::app::Clusters::MediaPlayback::PlaybackStateEnum playbackState)
+    static void OnSuccessCallback_1(void * context, chip::app::Clusters::MediaPlayback::PlaybackStateEnum currentState)
     {
-        (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_1(playbackState);
+        (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_1(currentState);
     }
 
     static void OnFailureCallback_2(void * context, CHIP_ERROR error)
@@ -50097,7 +50086,7 @@ private:
         chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::PlaybackState::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1));
         return CHIP_NO_ERROR;
     }
@@ -50108,9 +50097,9 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1(chip::app::Clusters::MediaPlayback::PlaybackStateEnum playbackState)
+    void OnSuccessResponse_1(chip::app::Clusters::MediaPlayback::PlaybackStateEnum currentState)
     {
-        VerifyOrReturn(CheckValue("playbackState", playbackState, 0));
+        VerifyOrReturn(CheckValue("currentState", currentState, 0));
 
         NextTest();
     }
@@ -50242,7 +50231,7 @@ private:
     CHIP_ERROR TestMediaPlaybackPlayCommand_7()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::PlayRequest::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::Play::Type;
 
         RequestType request;
 
@@ -50274,7 +50263,7 @@ private:
     CHIP_ERROR TestMediaPlaybackPauseCommand_8()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::PauseRequest::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::Pause::Type;
 
         RequestType request;
 
@@ -50306,7 +50295,7 @@ private:
     CHIP_ERROR TestMediaPlaybackStopCommand_9()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::StopRequest::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::StopPlayback::Type;
 
         RequestType request;
 
@@ -50338,7 +50327,7 @@ private:
     CHIP_ERROR TestMediaPlaybackStartOverCommand_10()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::StartOverRequest::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::StartOver::Type;
 
         RequestType request;
 
@@ -50370,7 +50359,7 @@ private:
     CHIP_ERROR TestMediaPlaybackPreviousCommand_11()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::PreviousRequest::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::Previous::Type;
 
         RequestType request;
 
@@ -50402,7 +50391,7 @@ private:
     CHIP_ERROR TestMediaPlaybackNextCommand_12()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::NextRequest::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::Next::Type;
 
         RequestType request;
 
@@ -50434,7 +50423,7 @@ private:
     CHIP_ERROR TestMediaPlaybackRewindCommand_13()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::RewindRequest::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::Rewind::Type;
 
         RequestType request;
 
@@ -50466,7 +50455,7 @@ private:
     CHIP_ERROR TestMediaPlaybackFastForwardCommand_14()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::FastForwardRequest::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::FastForward::Type;
 
         RequestType request;
 
@@ -50498,7 +50487,7 @@ private:
     CHIP_ERROR TestMediaPlaybackSkipForwardCommand_15()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::SkipForwardRequest::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::SkipForward::Type;
 
         RequestType request;
         request.deltaPositionMilliseconds = 100ULL;
@@ -50531,7 +50520,7 @@ private:
     CHIP_ERROR TestMediaPlaybackSkipBackwardCommand_16()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::SkipBackwardRequest::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::SkipBackward::Type;
 
         RequestType request;
         request.deltaPositionMilliseconds = 100ULL;
@@ -50564,7 +50553,7 @@ private:
     CHIP_ERROR TestMediaPlaybackSeekCommand_17()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::SeekRequest::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::Seek::Type;
 
         RequestType request;
         request.position = 100ULL;
@@ -50753,7 +50742,7 @@ private:
     CHIP_ERROR TestChangeChannelCommand_2()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::Channel::Commands::ChangeChannelRequest::Type;
+        using RequestType               = chip::app::Clusters::Channel::Commands::ChangeChannel::Type;
 
         RequestType request;
         request.match = chip::Span<const char>("CNNgarbage: not in length on purpose", 3);
@@ -50798,7 +50787,7 @@ private:
     CHIP_ERROR TestChangeChannelByNumberCommand_3()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::Channel::Commands::ChangeChannelByNumberRequest::Type;
+        using RequestType               = chip::app::Clusters::Channel::Commands::ChangeChannelByNumber::Type;
 
         RequestType request;
         request.majorNumber = 1U;
@@ -50827,7 +50816,7 @@ private:
     CHIP_ERROR TestSkipChannelCommand_4()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::Channel::Commands::SkipChannelRequest::Type;
+        using RequestType               = chip::app::Clusters::Channel::Commands::SkipChannel::Type;
 
         RequestType request;
         request.count = 1U;
@@ -51046,9 +51035,9 @@ private:
         (static_cast<TV_ContentLauncherCluster *>(context))->OnFailureResponse_1(error);
     }
 
-    static void OnSuccessCallback_1(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & acceptHeaderList)
+    static void OnSuccessCallback_1(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & acceptHeader)
     {
-        (static_cast<TV_ContentLauncherCluster *>(context))->OnSuccessResponse_1(acceptHeaderList);
+        (static_cast<TV_ContentLauncherCluster *>(context))->OnSuccessResponse_1(acceptHeader);
     }
 
     static void OnFailureCallback_2(void * context, CHIP_ERROR error)
@@ -51077,7 +51066,7 @@ private:
         chip::Controller::ContentLauncherClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ContentLauncher::Attributes::AcceptHeaderList::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ContentLauncher::Attributes::AcceptHeader::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1));
         return CHIP_NO_ERROR;
     }
@@ -51088,15 +51077,15 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_1(const chip::app::DataModel::DecodableList<chip::CharSpan> & acceptHeaderList)
+    void OnSuccessResponse_1(const chip::app::DataModel::DecodableList<chip::CharSpan> & acceptHeader)
     {
         {
-            auto iter_0 = acceptHeaderList.begin();
-            VerifyOrReturn(CheckNextListItemDecodes<decltype(acceptHeaderList)>("acceptHeaderList", iter_0, 0));
-            VerifyOrReturn(CheckValueAsString("acceptHeaderList[0]", iter_0.GetValue(), chip::CharSpan("example", 7)));
-            VerifyOrReturn(CheckNextListItemDecodes<decltype(acceptHeaderList)>("acceptHeaderList", iter_0, 1));
-            VerifyOrReturn(CheckValueAsString("acceptHeaderList[1]", iter_0.GetValue(), chip::CharSpan("example", 7)));
-            VerifyOrReturn(CheckNoMoreListItems<decltype(acceptHeaderList)>("acceptHeaderList", iter_0, 2));
+            auto iter_0 = acceptHeader.begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(acceptHeader)>("acceptHeader", iter_0, 0));
+            VerifyOrReturn(CheckValueAsString("acceptHeader[0]", iter_0.GetValue(), chip::CharSpan("example", 7)));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(acceptHeader)>("acceptHeader", iter_0, 1));
+            VerifyOrReturn(CheckValueAsString("acceptHeader[1]", iter_0.GetValue(), chip::CharSpan("example", 7)));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(acceptHeader)>("acceptHeader", iter_0, 2));
         }
 
         NextTest();
@@ -51130,7 +51119,7 @@ private:
     CHIP_ERROR TestLaunchContentCommand_3()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::ContentLauncher::Commands::LaunchContentRequest::Type;
+        using RequestType               = chip::app::Clusters::ContentLauncher::Commands::LaunchContent::Type;
 
         RequestType request;
 
@@ -51170,7 +51159,7 @@ private:
     CHIP_ERROR TestLaunchUrlCommand_4()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::ContentLauncher::Commands::LaunchURLRequest::Type;
+        using RequestType               = chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type;
 
         RequestType request;
         request.contentURL = chip::Span<const char>("exampleUrlgarbage: not in length on purpose", 10);
@@ -51380,10 +51369,9 @@ private:
 
     static void OnSuccessCallback_1(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> &
-            mediaInputList)
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> & inputList)
     {
-        (static_cast<TV_MediaInputCluster *>(context))->OnSuccessResponse_1(mediaInputList);
+        (static_cast<TV_MediaInputCluster *>(context))->OnSuccessResponse_1(inputList);
     }
 
     static void OnFailureCallback_2(void * context, CHIP_ERROR error)
@@ -51391,9 +51379,9 @@ private:
         (static_cast<TV_MediaInputCluster *>(context))->OnFailureResponse_2(error);
     }
 
-    static void OnSuccessCallback_2(void * context, uint8_t currentMediaInput)
+    static void OnSuccessCallback_2(void * context, uint8_t currentInput)
     {
-        (static_cast<TV_MediaInputCluster *>(context))->OnSuccessResponse_2(currentMediaInput);
+        (static_cast<TV_MediaInputCluster *>(context))->OnSuccessResponse_2(currentInput);
     }
 
     //
@@ -51412,7 +51400,7 @@ private:
         chip::Controller::MediaInputClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaInput::Attributes::MediaInputList::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaInput::Attributes::InputList::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1));
         return CHIP_NO_ERROR;
     }
@@ -51424,24 +51412,23 @@ private:
     }
 
     void OnSuccessResponse_1(
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> &
-            mediaInputList)
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> & inputList)
     {
         {
-            auto iter_0 = mediaInputList.begin();
-            VerifyOrReturn(CheckNextListItemDecodes<decltype(mediaInputList)>("mediaInputList", iter_0, 0));
-            VerifyOrReturn(CheckValue("mediaInputList[0].index", iter_0.GetValue().index, 1));
-            VerifyOrReturn(CheckValue("mediaInputList[0].inputType", iter_0.GetValue().inputType, 4));
-            VerifyOrReturn(CheckValueAsString("mediaInputList[0].name", iter_0.GetValue().name, chip::CharSpan("exampleName", 11)));
-            VerifyOrReturn(CheckValueAsString("mediaInputList[0].description", iter_0.GetValue().description,
+            auto iter_0 = inputList.begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(inputList)>("inputList", iter_0, 0));
+            VerifyOrReturn(CheckValue("inputList[0].index", iter_0.GetValue().index, 1));
+            VerifyOrReturn(CheckValue("inputList[0].inputType", iter_0.GetValue().inputType, 4));
+            VerifyOrReturn(CheckValueAsString("inputList[0].name", iter_0.GetValue().name, chip::CharSpan("exampleName", 11)));
+            VerifyOrReturn(CheckValueAsString("inputList[0].description", iter_0.GetValue().description,
                                               chip::CharSpan("exampleDescription", 18)));
-            VerifyOrReturn(CheckNextListItemDecodes<decltype(mediaInputList)>("mediaInputList", iter_0, 1));
-            VerifyOrReturn(CheckValue("mediaInputList[1].index", iter_0.GetValue().index, 2));
-            VerifyOrReturn(CheckValue("mediaInputList[1].inputType", iter_0.GetValue().inputType, 4));
-            VerifyOrReturn(CheckValueAsString("mediaInputList[1].name", iter_0.GetValue().name, chip::CharSpan("exampleName", 11)));
-            VerifyOrReturn(CheckValueAsString("mediaInputList[1].description", iter_0.GetValue().description,
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(inputList)>("inputList", iter_0, 1));
+            VerifyOrReturn(CheckValue("inputList[1].index", iter_0.GetValue().index, 2));
+            VerifyOrReturn(CheckValue("inputList[1].inputType", iter_0.GetValue().inputType, 4));
+            VerifyOrReturn(CheckValueAsString("inputList[1].name", iter_0.GetValue().name, chip::CharSpan("exampleName", 11)));
+            VerifyOrReturn(CheckValueAsString("inputList[1].description", iter_0.GetValue().description,
                                               chip::CharSpan("exampleDescription", 18)));
-            VerifyOrReturn(CheckNoMoreListItems<decltype(mediaInputList)>("mediaInputList", iter_0, 2));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(inputList)>("inputList", iter_0, 2));
         }
 
         NextTest();
@@ -51453,7 +51440,7 @@ private:
         chip::Controller::MediaInputClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaInput::Attributes::CurrentMediaInput::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaInput::Attributes::CurrentInput::TypeInfo>(
             this, OnSuccessCallback_2, OnFailureCallback_2));
         return CHIP_NO_ERROR;
     }
@@ -51464,9 +51451,9 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_2(uint8_t currentMediaInput)
+    void OnSuccessResponse_2(uint8_t currentInput)
     {
-        VerifyOrReturn(CheckValue("currentMediaInput", currentMediaInput, 0));
+        VerifyOrReturn(CheckValue("currentInput", currentInput, 0));
 
         NextTest();
     }
@@ -51474,7 +51461,7 @@ private:
     CHIP_ERROR TestSelectInputCommand_3()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::MediaInput::Commands::SelectInputRequest::Type;
+        using RequestType               = chip::app::Clusters::MediaInput::Commands::SelectInput::Type;
 
         RequestType request;
         request.index = 1;
@@ -51502,7 +51489,7 @@ private:
     CHIP_ERROR TestHideInputStatusCommand_4()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::MediaInput::Commands::HideInputStatusRequest::Type;
+        using RequestType               = chip::app::Clusters::MediaInput::Commands::HideInputStatus::Type;
 
         RequestType request;
 
@@ -51529,7 +51516,7 @@ private:
     CHIP_ERROR TestShowInputStatusCommand_5()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::MediaInput::Commands::ShowInputStatusRequest::Type;
+        using RequestType               = chip::app::Clusters::MediaInput::Commands::ShowInputStatus::Type;
 
         RequestType request;
 
@@ -51556,7 +51543,7 @@ private:
     CHIP_ERROR TestRenameInputCommand_6()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::MediaInput::Commands::RenameInputRequest::Type;
+        using RequestType               = chip::app::Clusters::MediaInput::Commands::RenameInput::Type;
 
         RequestType request;
         request.index = 1;
