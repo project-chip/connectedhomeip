@@ -25,18 +25,18 @@ limitations under the License.
     <server init="false" tick="false">true</server>
     <description>This cluster provides commands that facilitate user account login on a Content App or a node. For example, a Content App running on a Video Player device, which is represented as an endpoint (see [TV Architecture]), can use this cluster to help make the user account on the Content App match the user account on the Client.</description>
 
-    <command source="client" code="0x00" name="GetSetupPINRequest" response="GetSetupPINResponse" mustUseTimedInvoke="true" optional="false">
+    <command source="client" code="0x00" name="GetSetupPIN" response="GetSetupPINResponse" mustUseTimedInvoke="true" optional="false">
       <description>Upon receipt, the Content App checks if the account associated with the client Temp Account Identifier Rotating ID is the same acount that is active on the given Content App. If the accounts are the same, then the Content App includes the Setup PIN in the GetSetupPIN Response.</description>
       <arg name="tempAccountIdentifier" minLength="16" length="100" type="CHAR_STRING"/>
     </command>
 
-    <command source="client" code="0x02" name="LoginRequest" mustUseTimedInvoke="true" optional="false">
+    <command source="client" code="0x02" name="Login" mustUseTimedInvoke="true" optional="false">
       <description>Upon receipt, the Content App checks if the account associated with the client’s Temp Account Identifier (Rotating ID) has a current active Setup PIN with the given value. If the Setup PIN is valid for the user account associated with the Temp Account Identifier, then the Content App MAY make that user account active.</description>
       <arg name="tempAccountIdentifier" minLength="16" length="100" type="CHAR_STRING"/>
       <arg name="setupPIN" minLength="11" type="CHAR_STRING"/>
     </command>
 
-    <command source="client" code="0x03" name="LogoutRequest" mustUseTimedInvoke="true" optional="false">
+    <command source="client" code="0x03" name="Logout" mustUseTimedInvoke="true" optional="false">
       <description>The purpose of this command is to instruct the Content App to clear the current user account. This command SHOULD be used by clients of a Content App to indicate the end of a user session.</description>
     </command>
 

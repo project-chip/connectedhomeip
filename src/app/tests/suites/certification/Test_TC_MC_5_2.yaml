@@ -27,7 +27,7 @@ tests:
     - label: "Reads the ChannelList attribute"
       disabled: true
       command: "readAttribute"
-      attribute: "channel list"
+      attribute: "ChannelList"
       response:
           saveAs: ChanaelListValues
           constraints:
@@ -56,6 +56,6 @@ tests:
     - label: "Reads the CurrentChannel attribute"
       disabled: true
       command: "readAttribute"
-      attribute: "current channel"
+      attribute: "CurrentChannel"
       response:
           value: ChanaelListValues

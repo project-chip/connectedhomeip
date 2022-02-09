@@ -31,7 +31,7 @@ tests:
           "Precondition: Media content in a paused state at the beginning of the
           content"
       disabled: true
-      command: "MediaPause"
+      command: "Pause"
 
     - label: "log a command"
       cluster: "LogCommands"
@@ -44,13 +44,13 @@ tests:
     - label: "Reads the CurrentState attribute"
       disabled: true
       command: "readAttribute"
-      attribute: "playback state"
+      attribute: "CurrentState"
       response:
           value: 1
 
     - label: "sends a Play command"
       disabled: true
-      command: "MediaPlay"
+      command: "Play"
 
     - label: "log a command"
       cluster: "LogCommands"
@@ -62,13 +62,13 @@ tests:
 
     - label: "Reads the playback state attribute"
       command: "readAttribute"
-      attribute: "playback state"
+      attribute: "CurrentState"
       response:
           value: 0
 
     - label: "sends a Pause command"
       disabled: true
-      command: "MediaPause"
+      command: "Pause"
 
     - label: "log a command"
       cluster: "LogCommands"
@@ -81,13 +81,13 @@ tests:
     - label: "Reads the playback state attribute"
       disabled: true
       command: "readAttribute"
-      attribute: "playback state"
+      attribute: "CurrentState"
       response:
           value: 1
 
     - label: "sends a Stop command"
       disabled: true
-      command: "MediaStop"
+      command: "StopPlayback"
 
     - label: "log a command"
       cluster: "LogCommands"
@@ -100,6 +100,6 @@ tests:
     - label: "Reads the playback state attribute"
       disabled: true
       command: "readAttribute"
-      attribute: "playback state"
+      attribute: "CurrentState"
       response:
           value: 2

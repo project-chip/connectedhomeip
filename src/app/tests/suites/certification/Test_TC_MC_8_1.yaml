@@ -28,15 +28,14 @@ tests:
 
     - label: "Reads the CurrentTarget attribute"
       command: "readAttribute"
-      attribute: "current navigator target"
+      attribute: "CurrentTarget"
       response:
-          saveAs: currentTarget
           constraints:
               type: uint8
 
     - label: "Reads the TargetList attribute"
       command: "readAttribute"
-      attribute: "target navigator list"
+      attribute: "TargetList"
       response:
           constraints:
               type: list

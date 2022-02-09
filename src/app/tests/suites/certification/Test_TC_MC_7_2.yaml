@@ -27,7 +27,7 @@ tests:
     - label: "Reads the OutputList attribute from the DUT"
       disabled: true
       command: "readAttribute"
-      attribute: "audio output list"
+      attribute: "OutputList"
       response:
           saveAs: audioOutputListValues
           constraints:
@@ -48,6 +48,6 @@ tests:
     - label: "Reads the OutputList attribute from the DUT"
       disabled: true
       command: "readAttribute"
-      attribute: "audio output list"
+      attribute: "OutputList"
       response:
           value: audioOutputListValues
