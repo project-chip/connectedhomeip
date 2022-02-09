@@ -39,8 +39,6 @@ using namespace chip::app::Clusters::LocalizationConfiguration::Attributes;
 
 namespace {
 
-constexpr size_t kMaxActiveLocaleLength = 35;
-
 class LocalizationConfigurationAttrAccess : public AttributeAccessInterface
 {
 public:
@@ -153,7 +151,7 @@ void emberAfLocalizationConfigurationClusterServerInitCallback(EndpointId endpoi
     DeviceLayer::AttributeList<CharSpan, DeviceLayer::kMaxLanguageTags> supportedLocales;
     CharSpan validLocale;
 
-    char outBuffer[kMaxActiveLocaleLength];
+    char outBuffer[Attributes::ActiveLocale::TypeInfo::MaxLength()];
     MutableCharSpan activeLocale(outBuffer);
     EmberAfStatus status = ActiveLocale::Get(endpoint, activeLocale);
 

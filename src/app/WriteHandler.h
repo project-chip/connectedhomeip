@@ -18,7 +18,6 @@
 
 #pragma once
 #include <app/AttributePathParams.h>
-#include <app/InteractionModelDelegate.h>
 #include <app/MessageDef/WriteResponseMessage.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
@@ -37,16 +36,14 @@ namespace app {
 /**
  *  @brief The write handler is responsible for processing a write request and sending a write reply.
  */
-class WriteHandler
+class WriteHandler : public Messaging::ExchangeDelegate
 {
 public:
     /**
      *  Initialize the WriteHandler. Within the lifetime
      *  of this instance, this method is invoked once after object
-     *  construction until a call to Shutdown is made to terminate the
+     *  construction until a call to Close is made to terminate the
      *  instance.
-     *
-     *  @param[in]    apDelegate       InteractionModelDelegate set by application.
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE If the state is not equal to
      *          kState_NotInitialized.
@@ -56,7 +53,7 @@ public:
 
     /**
      *  Process a write request.  Parts of the processing may end up being asynchronous, but the WriteHandler
-     *  guarantees that it will call Shutdown on itself when processing is done (including if OnWriteRequest
+     *  guarantees that it will call Close on itself when processing is done (including if OnWriteRequest
      *  returns an error).
      *
      *  @param[in]    apExchangeContext    A pointer to the ExchangeContext.
@@ -68,6 +65,12 @@ public:
      */
     Protocols::InteractionModel::Status OnWriteRequest(Messaging::ExchangeContext * apExchangeContext,
                                                        System::PacketBufferHandle && aPayload, bool aIsTimedWrite);
+
+    /*
+     * This forcibly closes the exchange context if a valid one is pointed to and de-initializes the object. Such a situation does
+     * not arise during normal message processing flows that all normally call Close() below.
+     */
+    void Abort();
 
     bool IsFree() const { return mState == State::Uninitialized; }
 
@@ -114,8 +117,14 @@ private:
     /**
      *  Clean up state when we are done sending the write response.
      */
-    void Shutdown();
+    void Close();
 
+private: // ExchangeDelegate
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                 System::PacketBufferHandle && aPayload) override;
+    void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
+
+private:
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     WriteResponseMessage::Builder mWriteResponseBuilder;
     System::PacketBufferTLVWriter mMessageWriter;

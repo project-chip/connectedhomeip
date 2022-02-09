@@ -16,7 +16,7 @@ server cluster Basic = 40 {
     boolean reachableNewValue = 0;
   }
 
-  readonly attribute int16u interactionModelVersion = 0;
+  readonly attribute int16u dataModelRevision = 0;
   readonly attribute char_string<32> vendorName = 1;
   readonly attribute vendor_id vendorID = 2;
   readonly attribute char_string<32> productName = 3;
@@ -85,6 +85,21 @@ server cluster ColorControl = 768 {
     kDown = 3;
   }
 
+  bitmap ColorCapabilities : BITMAP16 {
+    kHueSaturationSupported = 0x1;
+    kEnhancedHueSupported = 0x2;
+    kColorLoopSupported = 0x4;
+    kXYAttributesSupported = 0x8;
+    kColorTemperatureSupported = 0x10;
+  }
+
+  bitmap ColorLoopUpdateFlags : BITMAP8 {
+    kUpdateAction = 0x1;
+    kUpdateDirection = 0x2;
+    kUpdateTime = 0x4;
+    kUpdateStartHue = 0x8;
+  }
+
   readonly attribute int16u currentX = 3;
   readonly attribute int16u currentY = 4;
   attribute bitmap8 colorControlOptions = 15;
@@ -133,8 +148,8 @@ server cluster Descriptor = 29 {
   readonly global attribute int16u clusterRevision = 65533;
 }
 
-server cluster GeneralCommissioning = 48 {
-  enum GeneralCommissioningError : ENUM8 {
+client cluster GeneralCommissioning = 48 {
+  enum CommissioningError : ENUM8 {
     kOk = 0;
     kValueOutsideRange = 1;
     kInvalidAuthentication = 2;
@@ -147,12 +162,52 @@ server cluster GeneralCommissioning = 48 {
     kIndoorOutdoor = 2;
   }
 
-  struct BasicCommissioningInfoType {
-    INT32U failSafeExpiryLengthMs = 0;
+  struct BasicCommissioningInfo {
+    INT16U failSafeExpiryLengthSeconds = 0;
   }
 
   attribute int64u breadcrumb = 0;
-  readonly attribute BasicCommissioningInfoType basicCommissioningInfoList[] = 1;
+  readonly attribute BasicCommissioningInfo basicCommissioningInfo = 1;
+  readonly global attribute int16u clusterRevision = 65533;
+
+  request struct ArmFailSafeRequest {
+    INT16U expiryLengthSeconds = 0;
+    INT64U breadcrumb = 1;
+    INT32U timeoutMs = 2;
+  }
+
+  request struct SetRegulatoryConfigRequest {
+    RegulatoryLocationType location = 0;
+    CHAR_STRING countryCode = 1;
+    INT64U breadcrumb = 2;
+    INT32U timeoutMs = 3;
+  }
+
+  command ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
+  command CommissioningComplete(): CommissioningCompleteResponse = 4;
+  command SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
+}
+
+server cluster GeneralCommissioning = 48 {
+  enum CommissioningError : ENUM8 {
+    kOk = 0;
+    kValueOutsideRange = 1;
+    kInvalidAuthentication = 2;
+    kNotCommissioning = 3;
+  }
+
+  enum RegulatoryLocationType : ENUM8 {
+    kIndoor = 0;
+    kOutdoor = 1;
+    kIndoorOutdoor = 2;
+  }
+
+  struct BasicCommissioningInfo {
+    INT16U failSafeExpiryLengthSeconds = 0;
+  }
+
+  attribute int64u breadcrumb = 0;
+  readonly attribute BasicCommissioningInfo basicCommissioningInfo = 1;
   readonly global attribute int16u clusterRevision = 65533;
 
   request struct ArmFailSafeRequest {
@@ -169,17 +224,17 @@ server cluster GeneralCommissioning = 48 {
   }
 
   response struct ArmFailSafeResponse {
-    GeneralCommissioningError errorCode = 0;
+    CommissioningError errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
   response struct CommissioningCompleteResponse {
-    GeneralCommissioningError errorCode = 0;
+    CommissioningError errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
   response struct SetRegulatoryConfigResponse {
-    GeneralCommissioningError errorCode = 0;
+    CommissioningError errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
@@ -293,6 +348,12 @@ server cluster LevelControl = 8 {
     kDown = 1;
   }
 
+  bitmap LevelControlFeature : BITMAP32 {
+    kOnOff = 0x1;
+    kLighting = 0x2;
+    kFrequency = 0x4;
+  }
+
   readonly attribute int8u currentLevel = 0;
   readonly global attribute int16u clusterRevision = 65533;
 
@@ -372,6 +433,12 @@ server cluster NetworkCommissioning = 49 {
     k5g = 2;
     k6g = 3;
     k60g = 4;
+  }
+
+  bitmap NetworkCommissioningFeature : BITMAP32 {
+    kWiFiNetworkInterface = 0x1;
+    kThreadNetworkInterface = 0x2;
+    kEthernetNetworkInterface = 0x4;
   }
 
   struct NetworkInfo {
@@ -484,6 +551,10 @@ server cluster OnOff = 6 {
     kDyingLight = 1;
   }
 
+  bitmap OnOffControl : BITMAP8 {
+    kAcceptOnlyWhenOn = 0x1;
+  }
+
   readonly attribute boolean onOff = 0;
   readonly global attribute int16u clusterRevision = 65533;
 
@@ -493,7 +564,7 @@ server cluster OnOff = 6 {
 }
 
 client cluster OperationalCredentials = 62 {
-  enum NodeOperationalCertStatus : ENUM8 {
+  enum OperationalCertStatus : ENUM8 {
     kSuccess = 0;
     kInvalidPublicKey = 1;
     kInvalidNodeOpId = 2;
@@ -538,16 +609,16 @@ client cluster OperationalCredentials = 62 {
     OCTET_STRING attestationNonce = 0;
   }
 
+  request struct CSRRequestRequest {
+    OCTET_STRING CSRNonce = 0;
+  }
+
   request struct CertificateChainRequestRequest {
     INT8U certificateType = 0;
   }
 
-  request struct OpCSRRequestRequest {
-    OCTET_STRING CSRNonce = 0;
-  }
-
   request struct RemoveFabricRequest {
-    INT8U fabricIndex = 0;
+    fabric_idx fabricIndex = 0;
   }
 
   request struct RemoveTrustedRootCertificateRequest {
@@ -566,8 +637,8 @@ client cluster OperationalCredentials = 62 {
   command AddNOC(AddNOCRequest): NOCResponse = 6;
   command AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
   command AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
+  command CSRRequest(CSRRequestRequest): CSRResponse = 4;
   command CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
-  command OpCSRRequest(OpCSRRequestRequest): OpCSRResponse = 4;
   command RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
   command RemoveTrustedRootCertificate(RemoveTrustedRootCertificateRequest): DefaultSuccess = 12;
   command UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
@@ -575,7 +646,7 @@ client cluster OperationalCredentials = 62 {
 }
 
 server cluster OperationalCredentials = 62 {
-  enum NodeOperationalCertStatus : ENUM8 {
+  enum OperationalCertStatus : ENUM8 {
     kSuccess = 0;
     kInvalidPublicKey = 1;
     kInvalidNodeOpId = 2;
@@ -620,16 +691,16 @@ server cluster OperationalCredentials = 62 {
     OCTET_STRING attestationNonce = 0;
   }
 
+  request struct CSRRequestRequest {
+    OCTET_STRING CSRNonce = 0;
+  }
+
   request struct CertificateChainRequestRequest {
     INT8U certificateType = 0;
   }
 
-  request struct OpCSRRequestRequest {
-    OCTET_STRING CSRNonce = 0;
-  }
-
   request struct RemoveFabricRequest {
-    INT8U fabricIndex = 0;
+    fabric_idx fabricIndex = 0;
   }
 
   request struct RemoveTrustedRootCertificateRequest {
@@ -650,26 +721,26 @@ server cluster OperationalCredentials = 62 {
     OCTET_STRING signature = 1;
   }
 
+  response struct CSRResponse {
+    OCTET_STRING NOCSRElements = 0;
+    OCTET_STRING attestationSignature = 1;
+  }
+
   response struct CertificateChainResponse {
     OCTET_STRING certificate = 0;
   }
 
   response struct NOCResponse {
-    INT8U statusCode = 0;
-    INT8U fabricIndex = 1;
-    CHAR_STRING debugText = 2;
-  }
-
-  response struct OpCSRResponse {
-    OCTET_STRING NOCSRElements = 0;
-    OCTET_STRING attestationSignature = 1;
+    OperationalCertStatus statusCode = 0;
+    optional fabric_idx fabricIndex = 1;
+    optional CHAR_STRING debugText = 2;
   }
 
   command AddNOC(AddNOCRequest): NOCResponse = 6;
   command AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
   command AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
+  command CSRRequest(CSRRequestRequest): CSRResponse = 4;
   command CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
-  command OpCSRRequest(OpCSRRequestRequest): OpCSRResponse = 4;
   command RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
   command RemoveTrustedRootCertificate(RemoveTrustedRootCertificateRequest): DefaultSuccess = 12;
   command UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
@@ -677,6 +748,10 @@ server cluster OperationalCredentials = 62 {
 }
 
 server cluster Scenes = 5 {
+  bitmap ScenesCopyMode : BITMAP8 {
+    kCopyAllScenes = 0x1;
+  }
+
   struct SceneExtensionFieldSet {
     CLUSTER_ID clusterId = 0;
     INT8U length = 1;
@@ -794,6 +869,7 @@ server cluster TemperatureMeasurement = 1026 {
 endpoint 0 {
   server  cluster Basic;
   server  cluster Descriptor;
+  binding cluster GeneralCommissioning;
   server  cluster GeneralCommissioning;
   server  cluster NetworkCommissioning;
   binding cluster OperationalCredentials;

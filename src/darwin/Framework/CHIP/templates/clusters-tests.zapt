@@ -19,7 +19,7 @@
 const uint16_t kPairingTimeoutInSeconds = 10;
 const uint16_t kAddressResolveTimeoutInSeconds = 10;
 const uint16_t kCASESetupTimeoutInSeconds = 30;
-const uint16_t kTimeoutInSeconds = 3;
+const uint16_t kTimeoutInSeconds = 5;
 const uint64_t kDeviceId = 1;
 const uint16_t kDiscriminator = 3840;
 const uint32_t kSetupPINCode = 20202021;
@@ -211,72 +211,5 @@ CHIPDevice * GetConnectedDevice(void)
 }
 
 {{>test_cluster tests=(getTests)}}
-
-{{#chip_client_clusters}}
-{{#unless (isStrEqual "Test Cluster" name)}}
-{{#unless (isStrEqual "Access Control" name)}}
-{{#unless (isStrEqual "Basic" name)}}
-{{#unless (isStrEqual "Thermostat" name)}}
-{{#unless (isStrEqual "OTA Software Update Provider" name)}}
-{{#unless (isStrEqual "Network Commissioning" name)}} {{! "Networks" is broken }}
-{{#chip_server_cluster_attributes}}
-{{#unless (isStrEqual chipCallback.name "Unsupported")}}
-- (void)testSendCluster{{asUpperCamelCase parent.name}}ReadAttribute{{asUpperCamelCase name}}WithCompletionHandler
-{
-    dispatch_queue_t queue = dispatch_get_main_queue();
-
-    XCTestExpectation * connectedExpectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
-    WaitForCommissionee(connectedExpectation, queue);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-
-    CHIPDevice * device = GetConnectedDevice();
-    CHIP{{asUpperCamelCase parent.name}} * cluster = [[CHIP{{asUpperCamelCase parent.name}} alloc] initWithDevice:device endpoint:{{asExpectedEndpointForCluster (asUpperCamelCase parent.name)}} queue:queue];
-    XCTAssertNotNil(cluster);
-
-    XCTestExpectation * expectation = [self expectationWithDescription:@"{{asUpperCamelCase parent.name}}ReadAttribute{{asUpperCamelCase name}}WithCompletionHandler"];
-
-    [cluster readAttribute{{asUpperCamelCase name}}WithCompletionHandler:^({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"{{asUpperCamelCase parent.name}} {{asUpperCamelCase name}} Error: %@", err);
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-
-{{#if isWritableAttribute}}
-- (void)testSendCluster{{asUpperCamelCase parent.name}}WriteAttribute{{asUpperCamelCase name}}WithValue
-{
-    dispatch_queue_t queue = dispatch_get_main_queue();
-
-    XCTestExpectation * connectedExpectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
-    WaitForCommissionee(connectedExpectation, queue);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-
-    CHIPDevice * device = GetConnectedDevice();
-    CHIP{{asUpperCamelCase parent.name}} * cluster = [[CHIP{{asUpperCamelCase parent.name}} alloc] initWithDevice:device endpoint:{{asExpectedEndpointForCluster (asUpperCamelCase parent.name)}} queue:queue];
-    XCTAssertNotNil(cluster);
-
-    XCTestExpectation * expectation = [self expectationWithDescription:@"{{asUpperCamelCase parent.name}}WriteAttribute{{asUpperCamelCase name}}WithValue"];
-
-    {{asObjectiveCType type parent.name}} value = {{asTestValue}};
-    [cluster writeAttribute{{asUpperCamelCase name}}WithValue:value completionHandler:^(NSError * _Nullable err) {
-        NSLog(@"{{asUpperCamelCase parent.name}} {{asUpperCamelCase name}} Error: %@", err);
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-{{/if}}
-{{/unless}}
-{{/chip_server_cluster_attributes}}
-{{/unless}}
-{{/unless}}
-{{/unless}}
-{{/unless}}
-{{/unless}}
-{{/unless}}
-{{/chip_client_clusters}}
 
 @end

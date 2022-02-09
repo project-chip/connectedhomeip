@@ -184,10 +184,15 @@ static EmberStatus sendToClient(EndpointId endpoint)
     // emberAfSendCommandUnicastToBindings()
     emberAfSetCommandEndpoints(endpoint, 0);
 
+    // TODO: Figure out how this sending should actually work in Matter.
+#if 0
     // A binding table entry is created on Zone Enrollment for each endpoint, so
     // a simple call to SendCommandUnicastToBinding will handle determining the
     // destination endpoint, address, etc for us.
     status = emberAfSendCommandUnicastToBindings();
+#else
+    status     = EMBER_ERR_FATAL;
+#endif
 
     if (EMBER_SUCCESS != status)
     {
@@ -632,7 +637,6 @@ static void unenrollSecurityDevice(EndpointId endpoint)
 void emberAfPluginIasZoneServerStackStatusCallback(EmberStatus status)
 {
     EndpointId endpoint;
-    uint8_t networkIndex;
     uint8_t i;
 
     // If the device has left the network, unenroll all endpoints on the device
@@ -641,9 +645,8 @@ void emberAfPluginIasZoneServerStackStatusCallback(EmberStatus status)
     {
         for (i = 0; i < emberAfEndpointCount(); i++)
         {
-            endpoint     = emberAfEndpointFromIndex(i);
-            networkIndex = emberAfNetworkIndexFromEndpointIndex(i);
-            if (networkIndex == 0 /* emberGetCurrentNetwork() */ && emberAfContainsServer(endpoint, ZCL_IAS_ZONE_CLUSTER_ID))
+            endpoint = emberAfEndpointFromIndex(i);
+            if (emberAfContainsServer(endpoint, ZCL_IAS_ZONE_CLUSTER_ID))
             {
                 unenrollSecurityDevice(endpoint);
             }

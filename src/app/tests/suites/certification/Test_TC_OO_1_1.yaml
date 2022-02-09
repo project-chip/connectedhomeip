@@ -23,10 +23,6 @@ tests:
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
 
-    - label: "Wait for the commissioned device to be retrieved"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-
     - label: "read the global attribute: ClusterRevision"
       command: "readAttribute"
       attribute: "ClusterRevision"
@@ -56,23 +52,14 @@ tests:
       response:
           value: 4
 
-    #issue #11053 disabled steps below Global attributes missing from YAML framework
     - label: "Read the global attribute: AttributeList"
-      disabled: true
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           constraints:
               type: list
 
-    - label: "Read the global attribute: CommandList"
-      disabled: true
-      command: "readAttribute"
-      attribute: "CommandList"
-      response:
-          constraints:
-              type: list
-
+    #issue #11053 disabled steps below Global attributes missing from YAML framework
     - label: "Read the global attribute: EventList"
       disabled: true
       command: "readAttribute"

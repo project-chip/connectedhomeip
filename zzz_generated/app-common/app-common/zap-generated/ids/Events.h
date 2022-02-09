@@ -153,6 +153,28 @@ static constexpr EventId Id = 0x00000002;
 } // namespace Events
 } // namespace WiFiNetworkDiagnostics
 
+namespace BridgedDeviceBasic {
+namespace Events {
+
+namespace StartUp {
+static constexpr EventId Id = 0x00000000;
+} // namespace StartUp
+
+namespace ShutDown {
+static constexpr EventId Id = 0x00000001;
+} // namespace ShutDown
+
+namespace Leave {
+static constexpr EventId Id = 0x00000002;
+} // namespace Leave
+
+namespace ReachableChanged {
+static constexpr EventId Id = 0x00000003;
+} // namespace ReachableChanged
+
+} // namespace Events
+} // namespace BridgedDeviceBasic
+
 namespace Switch {
 namespace Events {
 
@@ -303,6 +325,10 @@ namespace Events {
 namespace TestEvent {
 static constexpr EventId Id = 0x00000001;
 } // namespace TestEvent
+
+namespace TestFabricScopedEvent {
+static constexpr EventId Id = 0x00000002;
+} // namespace TestFabricScopedEvent
 
 } // namespace Events
 } // namespace TestCluster

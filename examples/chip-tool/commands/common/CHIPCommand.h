@@ -30,6 +30,16 @@ class PersistentStorage;
 constexpr const char kIdentityAlpha[] = "alpha";
 constexpr const char kIdentityBeta[]  = "beta";
 constexpr const char kIdentityGamma[] = "gamma";
+// The null fabric commissioner is a commissioner that isn't on a fabric.
+// This is a legal configuration in which the commissioner delegates
+// operational communication and invocation of the commssioning complete
+// command to a separate on-fabric administrator node.
+//
+// The null-fabric-commissioner identity is provided here to demonstrate the
+// commissioner portion of such an architecture.  The null-fabric-commissioner
+// can carry a commissioning flow up until the point of operational channel
+// (CASE) communcation.
+constexpr const char kIdentityNull[] = "null-fabric-commissioner";
 
 class CHIPCommand : public Command
 {
@@ -42,18 +52,14 @@ public:
     using PeerId                 = ::chip::PeerId;
     using PeerAddress            = ::chip::Transport::PeerAddress;
 
-    CHIPCommand(const char * commandName) : Command(commandName)
+    CHIPCommand(const char * commandName, CredentialIssuerCommands * credIssuerCmds) :
+        Command(commandName), mCredIssuerCmds(credIssuerCmds)
     {
         AddArgument("commissioner-name", &mCommissionerName);
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
         AddArgument("trace_file", &mTraceFile);
         AddArgument("trace_log", 0, 1, &mTraceLog);
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
-    }
-
-    CHIPCommand(const char * commandName, CredentialIssuerCommands * credIssuerCmds) : CHIPCommand(commandName)
-    {
-        mCredIssuerCmds = credIssuerCmds;
     }
 
     /////////// Command Interface /////////
@@ -84,8 +90,7 @@ protected:
     PersistentStorage mDefaultStorage;
     PersistentStorage mCommissionerStorage;
     chip::SimpleFabricStorage mFabricStorage;
-    ExampleCredentialIssuerCommands mExampleCredentialIssuerCmds;
-    CredentialIssuerCommands * mCredIssuerCmds = &mExampleCredentialIssuerCmds;
+    CredentialIssuerCommands * mCredIssuerCmds;
 
     std::string GetIdentity();
     void SetIdentity(const char * name);
@@ -98,7 +103,7 @@ protected:
 private:
     CHIP_ERROR InitializeCommissioner(std::string key, chip::FabricId fabricId);
     CHIP_ERROR ShutdownCommissioner(std::string key);
-    uint16_t CurrentCommissionerIndex();
+    chip::FabricId CurrentCommissionerId();
     std::map<std::string, std::unique_ptr<ChipDeviceCommissioner>> mCommissioners;
     chip::Optional<char *> mCommissionerName;
 

@@ -9,6 +9,10 @@ class FieldAttribute(enum.Enum):
     NULLABLE = enum.auto()
 
 
+class CommandAttribute(enum.Enum):
+    TIMED_INVOKE = enum.auto()
+
+
 class AttributeTag(enum.Enum):
     READABLE = enum.auto()
     WRITABLE = enum.auto()
@@ -57,7 +61,7 @@ class Field:
 @dataclass
 class Attribute:
     definition: Field
-    tags: Set[AttributeTag] = field(default_factory=set())
+    tags: Set[AttributeTag] = field(default_factory=set)
 
     @property
     def is_readable(self):
@@ -88,7 +92,7 @@ class Event:
 
 
 @dataclass
-class EnumEntry:
+class ConstantEntry:
     name: str
     code: int
 
@@ -97,7 +101,14 @@ class EnumEntry:
 class Enum:
     name: str
     base_type: str
-    entries: List[EnumEntry]
+    entries: List[ConstantEntry]
+
+
+@dataclass
+class Bitmap:
+    name: str
+    base_type: str
+    entries: List[ConstantEntry]
 
 
 @dataclass
@@ -106,6 +117,11 @@ class Command:
     code: int
     input_param: str
     output_param: str
+    attributes: Set[CommandAttribute] = field(default_factory=set)
+
+    @property
+    def is_timed_invoke(self):
+        return CommandAttribute.TIMED_INVOKE in self.attributes
 
 
 @dataclass
@@ -114,6 +130,7 @@ class Cluster:
     name: str
     code: int
     enums: List[Enum] = field(default_factory=list)
+    bitmaps: List[Bitmap] = field(default_factory=list)
     events: List[Event] = field(default_factory=list)
     attributes: List[Attribute] = field(default_factory=list)
     structs: List[Struct] = field(default_factory=list)

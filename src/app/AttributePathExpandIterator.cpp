@@ -22,7 +22,6 @@
 #include <app/ClusterInfo.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/EventManagement.h>
-#include <app/InteractionModelDelegate.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/support/CodeUtils.h>
@@ -47,6 +46,7 @@ extern Optional<ClusterId> emberAfGetNthClusterId(chip::EndpointId endpoint, uin
 extern Optional<AttributeId> emberAfGetServerAttributeIdByIndex(chip::EndpointId endpoint, chip::ClusterId cluster,
                                                                 uint16_t attributeIndex);
 extern uint8_t emberAfClusterIndex(EndpointId endpoint, ClusterId clusterId, EmberAfClusterMask mask);
+extern bool emberAfEndpointIndexIsEnabled(uint16_t index);
 
 namespace chip {
 namespace app {
@@ -139,6 +139,12 @@ bool AttributePathExpandIterator::Next()
 
         for (; mEndpointIndex < mEndEndpointIndex; (mEndpointIndex++, mClusterIndex = UINT8_MAX, mAttributeIndex = UINT16_MAX))
         {
+            if (!emberAfEndpointIndexIsEnabled(mEndpointIndex))
+            {
+                // Not an enabled endpoint; skip it.
+                continue;
+            }
+
             EndpointId endpointId = emberAfEndpointFromIndex(mEndpointIndex);
 
             if (mClusterIndex == UINT8_MAX)

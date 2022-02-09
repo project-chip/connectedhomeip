@@ -1,5 +1,6 @@
 struct: "struct"i id "{" struct_field* "}"
-enum: "enum"i id ":" type "{" enum_entry* "}"
+enum: "enum"i id ":" type "{" constant_entry* "}"
+bitmap: "bitmap"i id ":" type "{" constant_entry* "}"
 
 event: event_priority "event"i id "=" number "{" struct_field* "}"
 
@@ -15,9 +16,11 @@ attribute_tag: "readonly"i -> attr_readonly
 request_struct: "request"i struct
 response_struct: "response"i struct
 
-command: "command"i id "(" id? ")" ":" id "=" number ";"
+command_attribute: "timed"i -> timed_command
+command_attributes: command_attribute*
+command: command_attributes "command"i id "(" id? ")" ":" id "=" number ";"
 
-cluster: cluster_side "cluster"i id "=" number "{" (enum|event|attribute|struct|request_struct|response_struct|command)* "}"
+cluster: cluster_side "cluster"i id "=" number "{" (enum|bitmap|event|attribute|struct|request_struct|response_struct|command)* "}"
 ?cluster_side: "server"i -> server_cluster
              | "client"i -> client_cluster
 
@@ -27,7 +30,7 @@ endpoint_cluster: endpoint_cluster_type "cluster"i id ";"
 ?endpoint_cluster_type: "server"i   -> endpoint_server_cluster
                       | "binding"i  -> endpoint_binding_to_cluster
 
-enum_entry: id "=" number ";"
+constant_entry: id "=" number ";"
 number: POSITIVE_INTEGER | HEX_INTEGER
 
 struct_field: member_attribute* field

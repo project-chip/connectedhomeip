@@ -18,20 +18,26 @@
 
 #pragma once
 
-#include <app/clusters/application-launcher-server/application-launcher-delegate.h>
+#include <app/clusters/application-launcher-server/application-launcher-server.h>
 #include <list>
 
-class ApplicationLauncherManager : public chip::app::Clusters::ApplicationLauncher::Delegate
+using chip::ByteSpan;
+using chip::app::AttributeValueEncoder;
+using chip::app::CommandResponseHelper;
+using ApplicationLauncherDelegate = chip::app::Clusters::ApplicationLauncher::Delegate;
+using ApplicationType             = chip::app::Clusters::ApplicationLauncher::Structs::Application::Type;
+using LauncherResponseType        = chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type;
+
+class ApplicationLauncherManager : public ApplicationLauncherDelegate
 {
 public:
-    chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type HandleGetCurrentApp() override;
-    std::list<uint16_t> HandleGetCatalogList() override;
+    ApplicationLauncherManager() : ApplicationLauncherDelegate(){};
+    ApplicationLauncherManager(bool featureMapContentPlatform) : ApplicationLauncherDelegate(featureMapContentPlatform){};
 
-    chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type HandleLaunchApp(
-        const chip::CharSpan & data,
-        const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application) override;
-    chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type HandleStopApp(
-        const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application) override;
-    chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type HandleHideApp(
-        const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application) override;
+    CHIP_ERROR HandleGetCatalogList(AttributeValueEncoder & aEncoder) override;
+
+    void HandleLaunchApp(CommandResponseHelper<LauncherResponseType> & helper, const ByteSpan & data,
+                         const ApplicationType & application) override;
+    void HandleStopApp(CommandResponseHelper<LauncherResponseType> & helper, const ApplicationType & application) override;
+    void HandleHideApp(CommandResponseHelper<LauncherResponseType> & helper, const ApplicationType & application) override;
 };

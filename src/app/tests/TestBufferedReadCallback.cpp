@@ -78,25 +78,25 @@ public:
     // BufferedReadCallback::Callback
     //
 
-    void OnReportBegin(const ReadClient * apReadClient) override;
-    void OnReportEnd(const ReadClient * apReadClient) override;
-    void OnAttributeData(const ReadClient * apReadClient, const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
+    void OnReportBegin() override;
+    void OnReportEnd() override;
+    void OnAttributeData(const ConcreteDataAttributePath & aPath, DataVersion aVersion, TLV::TLVReader * apData,
                          const StatusIB & aStatus) override;
-    void OnDone(ReadClient * apClient) override {}
+    void OnDone() override {}
 
     std::vector<ValidationInstruction> mInstructionList;
     uint32_t mCurrentInstruction = 0;
 };
 
-void DataSeriesValidator::OnReportBegin(const ReadClient * apReadClient)
+void DataSeriesValidator::OnReportBegin()
 {
     mCurrentInstruction = 0;
 }
 
-void DataSeriesValidator::OnReportEnd(const ReadClient * apReadClient) {}
+void DataSeriesValidator::OnReportEnd() {}
 
-void DataSeriesValidator::OnAttributeData(const ReadClient * apReadClient, const ConcreteDataAttributePath & aPath,
-                                          TLV::TLVReader * apData, const StatusIB & aStatus)
+void DataSeriesValidator::OnAttributeData(const ConcreteDataAttributePath & aPath, DataVersion aVersion, TLV::TLVReader * apData,
+                                          const StatusIB & aStatus)
 {
     uint32_t expectedListLength;
 
@@ -302,8 +302,9 @@ void DataSeriesGenerator::Generate()
     ReadClient::Callback * callback = &mReadCallback;
     StatusIB status;
     bool hasData;
+    DataVersion version = kUndefinedDataVersion;
 
-    callback->OnReportBegin(nullptr);
+    callback->OnReportBegin();
 
     uint8_t index = 0;
     for (auto & instruction : mInstructionList)
@@ -402,7 +403,7 @@ void DataSeriesGenerator::Generate()
             path.mListOp      = ConcreteDataAttributePath::ListOperation::ReplaceAll;
             status.mStatus    = Protocols::InteractionModel::Status::Failure;
             hasData           = false;
-            callback->OnAttributeData(nullptr, path, &reader, status);
+            callback->OnAttributeData(path, version, &reader, status);
             break;
         }
 
@@ -413,7 +414,7 @@ void DataSeriesGenerator::Generate()
             path.mListOp      = ConcreteDataAttributePath::ListOperation::ReplaceAll;
             status.mStatus    = Protocols::InteractionModel::Status::Failure;
             hasData           = false;
-            callback->OnAttributeData(nullptr, path, &reader, status);
+            callback->OnAttributeData(path, version, &reader, status);
             break;
         }
 
@@ -431,7 +432,7 @@ void DataSeriesGenerator::Generate()
                 writer.Finalize(&handle);
                 reader.Init(std::move(handle));
                 NL_TEST_ASSERT(gSuite, reader.Next() == CHIP_NO_ERROR);
-                callback->OnAttributeData(nullptr, path, &reader, status);
+                callback->OnAttributeData(path, version, &reader, status);
             }
 
             ChipLogProgress(DataManagement, "\t -- Generating C0..C512");
@@ -454,7 +455,7 @@ void DataSeriesGenerator::Generate()
                 writer.Finalize(&handle);
                 reader.Init(std::move(handle));
                 NL_TEST_ASSERT(gSuite, reader.Next() == CHIP_NO_ERROR);
-                callback->OnAttributeData(nullptr, path, &reader, status);
+                callback->OnAttributeData(path, version, &reader, status);
             }
 
             break;
@@ -474,7 +475,7 @@ void DataSeriesGenerator::Generate()
                 writer.Finalize(&handle);
                 reader.Init(std::move(handle));
                 NL_TEST_ASSERT(gSuite, reader.Next() == CHIP_NO_ERROR);
-                callback->OnAttributeData(nullptr, path, &reader, status);
+                callback->OnAttributeData(path, version, &reader, status);
             }
 
             ChipLogProgress(DataManagement, "\t -- Generating D0..D512");
@@ -493,7 +494,7 @@ void DataSeriesGenerator::Generate()
                 writer.Finalize(&handle);
                 reader.Init(std::move(handle));
                 NL_TEST_ASSERT(gSuite, reader.Next() == CHIP_NO_ERROR);
-                callback->OnAttributeData(nullptr, path, &reader, status);
+                callback->OnAttributeData(path, version, &reader, status);
             }
 
             break;
@@ -508,13 +509,13 @@ void DataSeriesGenerator::Generate()
             writer.Finalize(&handle);
             reader.Init(std::move(handle));
             NL_TEST_ASSERT(gSuite, reader.Next() == CHIP_NO_ERROR);
-            callback->OnAttributeData(nullptr, path, &reader, status);
+            callback->OnAttributeData(path, version, &reader, status);
         }
 
         index++;
     }
 
-    callback->OnReportEnd(nullptr);
+    callback->OnReportEnd();
 }
 
 void RunAndValidateSequence(std::vector<ValidationInstruction> instructionList)

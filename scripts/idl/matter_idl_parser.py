@@ -56,12 +56,16 @@ class MatterIdlTransformer(Transformer):
             raise Error("Unexpected size for data type")
 
     @v_args(inline=True)
-    def enum_entry(self, id, number):
-        return EnumEntry(name=id, code=number)
+    def constant_entry(self, id, number):
+        return ConstantEntry(name=id, code=number)
 
     @v_args(inline=True)
     def enum(self, id, type, *entries):
         return Enum(name=id, base_type=type, entries=list(entries))
+
+    @v_args(inline=True)
+    def bitmap(self, id, type, *entries):
+        return Bitmap(name=id, base_type=type, entries=list(entries))
 
     def field(self, args):
         data_type, name = args[0], args[1]
@@ -100,6 +104,13 @@ class MatterIdlTransformer(Transformer):
     def endpoint_binding_to_cluster(self, _):
         return EndpointContentType.CLIENT_BINDING
 
+    def timed_command(self, _):
+        return CommandAttribute.TIMED_INVOKE
+
+    def command_attributes(self, attrs):
+        # List because attrs is a tuple
+        return set(list(attrs))
+
     def struct_field(self, args):
         # Last argument is the named_member, the rest
         # are attributes
@@ -114,12 +125,14 @@ class MatterIdlTransformer(Transformer):
         return ClusterSide.CLIENT
 
     def command(self, args):
-        # A command has 3 arguments if no input or
-        # 4 arguments if input parameter is available
+        # A command has 4 arguments if no input or
+        # 5 arguments if input parameter is available
         param_in = None
-        if len(args) > 3:
-            param_in = args[1]
-        return Command(name=args[0], input_param=param_in, output_param=args[-2], code=args[-1])
+        if len(args) > 4:
+            param_in = args[2]
+
+        return Command(
+            attributes=args[0], name=args[1], input_param=param_in, output_param=args[-2], code=args[-1])
 
     def event(self, args):
         return Event(priority=args[0], name=args[1], code=args[2], fields=args[3:], )
@@ -174,6 +187,8 @@ class MatterIdlTransformer(Transformer):
         for item in content:
             if type(item) == Enum:
                 result.enums.append(item)
+            elif type(item) == Bitmap:
+                result.bitmaps.append(item)
             elif type(item) == Event:
                 result.events.append(item)
             elif type(item) == Attribute:
@@ -183,7 +198,7 @@ class MatterIdlTransformer(Transformer):
             elif type(item) == Command:
                 result.commands.append(item)
             else:
-                raise Error("UNKNOWN cluster content item: %r" % item)
+                raise Exception("UNKNOWN cluster content item: %r" % item)
 
         return result
 
@@ -200,7 +215,7 @@ class MatterIdlTransformer(Transformer):
             elif type(item) == Endpoint:
                 idl.endpoints.append(item)
             else:
-                raise Error("UNKNOWN idl content item: %r" % item)
+                raise Exception("UNKNOWN idl content item: %r" % item)
 
         return idl
 

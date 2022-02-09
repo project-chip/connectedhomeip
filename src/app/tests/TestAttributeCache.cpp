@@ -126,8 +126,8 @@ void DataSeriesGenerator::Generate()
     System::PacketBufferTLVReader reader;
     ReadClient::Callback * callback = mReadCallback;
     StatusIB status;
-
-    callback->OnReportBegin(nullptr);
+    DataVersion version = kUndefinedDataVersion;
+    callback->OnReportBegin();
 
     uint8_t index = 0;
     for (auto & instruction : mInstructionList)
@@ -198,19 +198,19 @@ void DataSeriesGenerator::Generate()
             writer.Finalize(&handle);
             reader.Init(std::move(handle));
             NL_TEST_ASSERT(gSuite, reader.Next() == CHIP_NO_ERROR);
-            callback->OnAttributeData(nullptr, path, &reader, status);
+            callback->OnAttributeData(path, version, &reader, status);
         }
         else
         {
             ChipLogProgress(DataManagement, "\t -- Generating Status");
             status.mStatus = Protocols::InteractionModel::Status::Failure;
-            callback->OnAttributeData(nullptr, path, nullptr, status);
+            callback->OnAttributeData(path, version, nullptr, status);
         }
 
         index++;
     }
 
-    callback->OnReportEnd(nullptr);
+    callback->OnReportEnd();
 }
 
 class CacheValidator : public AttributeCache::Callback
@@ -221,7 +221,7 @@ public:
     Clusters::TestCluster::Attributes::TypeInfo::DecodableType clusterValue;
 
 private:
-    void OnDone(ReadClient * apReadClient) override {}
+    void OnDone() override {}
     void DecodeAttribute(const AttributeInstruction & instruction, const ConcreteAttributePath & path, AttributeCache * cache)
     {
         CHIP_ERROR err;
@@ -417,7 +417,7 @@ private:
         mExpectedEndpoints.erase(iter);
     }
 
-    void OnReportEnd(const ReadClient * apReadClient) override
+    void OnReportEnd() override
     {
         NL_TEST_ASSERT(gSuite, mExpectedAttributes.size() == 0);
         NL_TEST_ASSERT(gSuite, mExpectedClusters.size() == 0);

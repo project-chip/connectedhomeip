@@ -40,12 +40,13 @@ bool AccountLoginManager::HandleLogout()
     return true;
 }
 
-Commands::GetSetupPINResponse::Type AccountLoginManager::HandleGetSetupPin(const chip::CharSpan & tempAccountIdentifier)
+void AccountLoginManager::HandleGetSetupPin(CommandResponseHelper<GetSetupPINResponse> & helper,
+                                            const CharSpan & tempAccountIdentifier)
 {
     string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
     ChipLogProgress(Zcl, "temporary account id: %s", tempAccountIdentifierString.c_str());
     // TODO: Insert your code here to handle get setup pin
     Commands::GetSetupPINResponse::Type response;
     response.setupPIN = chip::CharSpan::fromCharString("tempPin123");
-    return response;
+    helper.Success(response);
 }

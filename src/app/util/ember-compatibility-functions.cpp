@@ -25,6 +25,7 @@
 #include <app/ClusterInfo.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
+#include <app/RequiredPrivilege.h>
 #include <app/reporting/Engine.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af.h>
@@ -58,7 +59,6 @@ namespace chip {
 namespace app {
 namespace Compatibility {
 namespace {
-constexpr uint32_t kTemporaryDataVersion = 0;
 // On some apps, ATTRIBUTE_LARGEST can as small as 3, making compiler unhappy since data[kAttributeReadBufferSize] cannot hold
 // uint64_t. Make kAttributeReadBufferSize at least 8 so it can fit all basic types.
 constexpr size_t kAttributeReadBufferSize = (ATTRIBUTE_LARGEST >= 8 ? ATTRIBUTE_LARGEST : 8);
@@ -203,7 +203,7 @@ bool IMEmberAfSendDefaultResponseWithCallback(EmberAfStatus status)
 {
     if (currentCommandObject == nullptr)
     {
-        // If this command is not handled by IM, then let ember send response.
+        // We have no idea what we're supposed to respond to.
         return false;
     }
 
@@ -247,14 +247,64 @@ CHIP_ERROR attributeBufferToNumericTlvData(TLV::TLVWriter & writer, bool isNulla
 
 } // anonymous namespace
 
-bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
+Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
 {
-    // TODO: Currently, we are using cluster catalog from the ember library, this should be modified or replaced after several
-    // updates to Commands.
-    return emberAfContainsServer(aCommandPath.mEndpointId, aCommandPath.mClusterId);
+    using Protocols::InteractionModel::Status;
+
+    const EmberAfEndpointType * type = emberAfFindEndpointType(aCommandPath.mEndpointId);
+    if (type == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+
+    const EmberAfCluster * cluster = emberAfFindClusterInType(type, aCommandPath.mClusterId, CLUSTER_MASK_SERVER);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedCluster;
+    }
+
+    for (const CommandId * cmd = cluster->clientGeneratedCommandList; cmd != nullptr; cmd++)
+    {
+        if (*cmd == aCommandPath.mCommandId)
+        {
+            return Status::Success;
+        }
+    }
+
+    return Status::UnsupportedCommand;
 }
 
 namespace {
+
+CHIP_ERROR ReadClusterDataVersion(const EndpointId & aEndpointId, const ClusterId & aClusterId, DataVersion & aDataVersion)
+{
+    DataVersion * version = emberAfDataVersionStorage(aEndpointId, aClusterId);
+    if (version == nullptr)
+    {
+        ChipLogError(DataManagement, "Endpoint %" PRIx16 ", Cluster " ChipLogFormatMEI " not found in ReadClusterDataVersion!",
+                     aEndpointId, ChipLogValueMEI(aClusterId));
+        return CHIP_ERROR_NOT_FOUND;
+    }
+    aDataVersion = *version;
+    return CHIP_NO_ERROR;
+}
+
+void IncreaseClusterDataVersion(const EndpointId & aEndpointId, const ClusterId & aClusterId)
+{
+    DataVersion * version = emberAfDataVersionStorage(aEndpointId, aClusterId);
+    if (version == nullptr)
+    {
+        ChipLogError(DataManagement, "Endpoint %" PRIx16 ", Cluster " ChipLogFormatMEI " not found in IncreaseClusterDataVersion!",
+                     aEndpointId, ChipLogValueMEI(aClusterId));
+    }
+    else
+    {
+        (*(version))++;
+        ChipLogDetail(DataManagement, "Endpoint %" PRIx16 ", Cluster " ChipLogFormatMEI " update version to %" PRIx32, aEndpointId,
+                      ChipLogValueMEI(aClusterId), *(version));
+    }
+    return;
+}
 
 CHIP_ERROR SendSuccessStatus(AttributeReportIB::Builder & aAttributeReport, AttributeDataIB::Builder & aAttributeDataIBBuilder)
 {
@@ -285,39 +335,62 @@ protected:
     const EmberAfCluster * mCluster;
 };
 
-class AttributeListReader : public MandatoryGlobalAttributeReader
+class GlobalAttributeReader : public MandatoryGlobalAttributeReader
 {
 public:
-    AttributeListReader(const EmberAfCluster * aCluster) : MandatoryGlobalAttributeReader(aCluster) {}
+    GlobalAttributeReader(const EmberAfCluster * aCluster) : MandatoryGlobalAttributeReader(aCluster) {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 };
 
-CHIP_ERROR AttributeListReader::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR GlobalAttributeReader::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    // The id of AttributeList is not in the attribute metadata.
+    using namespace Clusters::Globals::Attributes;
+    // The id of the attributes below is not in the attribute metadata.
     // TODO: This does not play nicely with wildcard reads.  Need to fix ZAP to
     // put it in the metadata, or fix wildcard expansion to add it.
-    return aEncoder.EncodeList([this](const auto & encoder) {
-        constexpr AttributeId ourId = Clusters::Globals::Attributes::AttributeList::Id;
-        const size_t count          = mCluster->attributeCount;
-        bool addedOurId             = false;
-        for (size_t i = 0; i < count; ++i)
-        {
-            AttributeId id = mCluster->attributes[i].attributeId;
-            if (!addedOurId && id > ourId)
+    switch (aPath.mAttributeId)
+    {
+    case AttributeList::Id:
+        return aEncoder.EncodeList([this](const auto & encoder) {
+            constexpr AttributeId ourId = Clusters::Globals::Attributes::AttributeList::Id;
+            const size_t count          = mCluster->attributeCount;
+            bool addedOurId             = false;
+            for (size_t i = 0; i < count; ++i)
+            {
+                AttributeId id = mCluster->attributes[i].attributeId;
+                if (!addedOurId && id > ourId)
+                {
+                    ReturnErrorOnFailure(encoder.Encode(ourId));
+                    addedOurId = true;
+                }
+                ReturnErrorOnFailure(encoder.Encode(id));
+            }
+            if (!addedOurId)
             {
                 ReturnErrorOnFailure(encoder.Encode(ourId));
-                addedOurId = true;
             }
-            ReturnErrorOnFailure(encoder.Encode(id));
-        }
-        if (!addedOurId)
-        {
-            ReturnErrorOnFailure(encoder.Encode(ourId));
-        }
+            return CHIP_NO_ERROR;
+        });
+    case ClientGeneratedCommandList::Id:
+        return aEncoder.EncodeList([this](const auto & encoder) {
+            for (const CommandId * cmd = mCluster->clientGeneratedCommandList; cmd != nullptr && *cmd != kInvalidCommandId; cmd++)
+            {
+                ReturnErrorOnFailure(encoder.Encode(*cmd));
+            }
+            return CHIP_NO_ERROR;
+        });
+    case ServerGeneratedCommandList::Id:
+        return aEncoder.EncodeList([this](const auto & encoder) {
+            for (const CommandId * cmd = mCluster->serverGeneratedCommandList; cmd != nullptr && *cmd != kInvalidCommandId; cmd++)
+            {
+                ReturnErrorOnFailure(encoder.Encode(*cmd));
+            }
+            return CHIP_NO_ERROR;
+        });
+    default:
         return CHIP_NO_ERROR;
-    });
+    }
 }
 
 // Helper function for trying to read an attribute value via an
@@ -330,8 +403,9 @@ CHIP_ERROR ReadViaAccessInterface(FabricIndex aAccessingFabricIndex, bool aIsFab
 {
     AttributeValueEncoder::AttributeEncodeState state =
         (aEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *aEncoderState);
-    AttributeValueEncoder valueEncoder(aAttributeReports, aAccessingFabricIndex, aPath, kTemporaryDataVersion, aIsFabricFiltered,
-                                       state);
+    DataVersion version = kUndefinedDataVersion;
+    ReturnErrorOnFailure(ReadClusterDataVersion(aPath.mEndpointId, aPath.mClusterId, version));
+    AttributeValueEncoder valueEncoder(aAttributeReports, aAccessingFabricIndex, aPath, version, aIsFabricFiltered, state);
     CHIP_ERROR err = aAccessInterface->Read(aPath, valueEncoder);
 
     if (err != CHIP_NO_ERROR)
@@ -349,6 +423,30 @@ CHIP_ERROR ReadViaAccessInterface(FabricIndex aAccessingFabricIndex, bool aIsFab
     return CHIP_NO_ERROR;
 }
 
+// Determine the appropriate status response for an unsupported attribute for
+// the given path.  Must be called when the attribute is known to be unsupported
+// (i.e. we found no attribute metadata for it).
+Protocols::InteractionModel::Status UnsupportedAttributeStatus(const ConcreteAttributePath & aPath)
+{
+    using Protocols::InteractionModel::Status;
+
+    const EmberAfEndpointType * type = emberAfFindEndpointType(aPath.mEndpointId);
+    if (type == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+
+    const EmberAfCluster * cluster = emberAfFindClusterInType(type, aPath.mClusterId, CLUSTER_MASK_SERVER);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedCluster;
+    }
+
+    // Since we know the attribute is unsupported and the endpoint/cluster are
+    // OK, this is the only option left.
+    return Status::UnsupportedAttribute;
+}
+
 } // anonymous namespace
 
 CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
@@ -363,22 +461,26 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
     // Check attribute existence. This includes attributes with registered metadata, but also specially handled
     // mandatory global attributes (which just check for cluster on endpoint).
 
-    EmberAfCluster * attributeCluster            = nullptr;
-    EmberAfAttributeMetadata * attributeMetadata = nullptr;
+    const EmberAfCluster * attributeCluster            = nullptr;
+    const EmberAfAttributeMetadata * attributeMetadata = nullptr;
 
-    if (aPath.mAttributeId == Clusters::Globals::Attributes::AttributeList::Id)
+    switch (aPath.mAttributeId)
     {
+    case Clusters::Globals::Attributes::AttributeList::Id:
+        FALLTHROUGH;
+    case Clusters::Globals::Attributes::ClientGeneratedCommandList::Id:
+        FALLTHROUGH;
+    case Clusters::Globals::Attributes::ServerGeneratedCommandList::Id:
         attributeCluster = emberAfFindCluster(aPath.mEndpointId, aPath.mClusterId, CLUSTER_MASK_SERVER);
-    }
-    else
-    {
+        break;
+    default:
         attributeMetadata =
             emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, CLUSTER_MASK_SERVER);
     }
 
     if (attributeCluster == nullptr && attributeMetadata == nullptr)
     {
-        return SendFailureStatus(aPath, aAttributeReports, Protocols::InteractionModel::Status::UnsupportedAttribute, nullptr);
+        return SendFailureStatus(aPath, aAttributeReports, UnsupportedAttributeStatus(aPath), nullptr);
     }
 
     // Check access control. A failed check will disallow the operation, and may or may not generate an attribute report
@@ -386,9 +488,14 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
 
     {
         Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
-        Access::Privilege requestPrivilege = Access::Privilege::kView; // TODO: get actual request privilege
+        Access::Privilege requestPrivilege = RequiredPrivilege::ForReadAttribute(aPath);
         CHIP_ERROR err                     = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requestPrivilege);
-        err                                = CHIP_NO_ERROR; // TODO: remove override
+        if (err != CHIP_NO_ERROR)
+        {
+            // Grace period until ACLs are in place
+            ChipLogError(DataManagement, "AccessControl: overriding DENY (for now)");
+            err = CHIP_NO_ERROR;
+        }
         if (err != CHIP_NO_ERROR)
         {
             ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
@@ -406,7 +513,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
     {
         // Special handling for mandatory global attributes: these are always for attribute list, using a special
         // reader (which can be lightweight constructed even from nullptr).
-        AttributeListReader reader(attributeCluster);
+        GlobalAttributeReader reader(attributeCluster);
         AttributeAccessInterface * attributeOverride =
             (attributeCluster != nullptr) ? &reader : findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId);
         if (attributeOverride)
@@ -429,7 +536,9 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
     AttributeDataIB::Builder & attributeDataIBBuilder = attributeReport.CreateAttributeData();
     ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
 
-    attributeDataIBBuilder.DataVersion(kTemporaryDataVersion);
+    DataVersion version = kUndefinedDataVersion;
+    ReturnErrorOnFailure(ReadClusterDataVersion(aPath.mEndpointId, aPath.mClusterId, version));
+    attributeDataIBBuilder.DataVersion(version);
     ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
 
     AttributePathIB::Builder & attributePathIBBuilder = attributeDataIBBuilder.CreatePath();
@@ -646,7 +755,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
         }
         default:
             ChipLogError(DataManagement, "Attribute type 0x%x not handled", static_cast<int>(attributeType));
-            emberStatus = EMBER_ZCL_STATUS_WRITE_ONLY;
+            emberStatus = EMBER_ZCL_STATUS_UNSUPPORTED_READ;
         }
     }
 
@@ -808,7 +917,7 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
 
     if (attributeMetadata == nullptr)
     {
-        return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::UnsupportedAttribute);
+        return apWriteHandler->AddStatus(aPath, UnsupportedAttributeStatus(aPath));
     }
 
     if (attributeMetadata->IsReadOnly())
@@ -818,9 +927,14 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
 
     {
         Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
-        Access::Privilege requestPrivilege = Access::Privilege::kOperate; // TODO: get actual request privilege
+        Access::Privilege requestPrivilege = RequiredPrivilege::ForWriteAttribute(aPath);
         CHIP_ERROR err                     = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requestPrivilege);
-        err                                = CHIP_NO_ERROR; // TODO: remove override
+        if (err != CHIP_NO_ERROR)
+        {
+            // Grace period until ACLs are in place
+            ChipLogError(DataManagement, "AccessControl: overriding DENY (for now)");
+            err = CHIP_NO_ERROR;
+        }
         if (err != CHIP_NO_ERROR)
         {
             ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
@@ -836,7 +950,7 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
 
     if (auto * attrOverride = findAttributeAccessOverride(aClusterInfo.mEndpointId, aClusterInfo.mClusterId))
     {
-        AttributeValueDecoder valueDecoder(aReader, apWriteHandler->GetAccessingFabricIndex());
+        AttributeValueDecoder valueDecoder(aReader, aSubjectDescriptor);
         ReturnErrorOnFailure(attrOverride->Write(aPath, valueDecoder));
 
         if (valueDecoder.TriedDecode())
@@ -886,6 +1000,7 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clust
     info.mAttributeId = attributeId;
     info.mEndpointId  = endpoint;
 
+    IncreaseClusterDataVersion(endpoint, clusterId);
     InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(info);
 
     // Schedule work to run asynchronously on the CHIP thread. The scheduled work won't execute until the current execution context

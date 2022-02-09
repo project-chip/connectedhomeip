@@ -96,6 +96,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
         return;
     }
 
+    imageProcessor->mHeaderParser.Init();
     imageProcessor->mOfs.open(imageProcessor->mParams.imageFile.data(),
                               std::ofstream::out | std::ofstream::ate | std::ofstream::app);
     if (!imageProcessor->mOfs.good())
@@ -134,7 +135,8 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     OTARequestorInterface * requestor = chip::GetRequestorInstance();
     if (requestor != nullptr)
     {
-        requestor->NotifyUpdateApplied(imageProcessor->mHeader.softwareVersion);
+        // TODO: Use software version from Configuration Manager
+        requestor->NotifyUpdateApplied(imageProcessor->mSoftwareVersion);
     }
 }
 
@@ -165,17 +167,46 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         return;
     }
 
-    // TODO: Process block header if any
+    ByteSpan block   = imageProcessor->mBlock;
+    CHIP_ERROR error = imageProcessor->ProcessHeader(block);
 
-    if (!imageProcessor->mOfs.write(reinterpret_cast<const char *>(imageProcessor->mBlock.data()),
-                                    static_cast<std::streamsize>(imageProcessor->mBlock.size())))
+    if (error == CHIP_NO_ERROR &&
+        !imageProcessor->mOfs.write(reinterpret_cast<const char *>(block.data()), static_cast<std::streamsize>(block.size())))
     {
-        imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
+        error = CHIP_ERROR_WRITE_FAILED;
+    }
+
+    if (error != CHIP_NO_ERROR)
+    {
+        imageProcessor->mDownloader->EndDownload(error);
         return;
     }
 
-    imageProcessor->mParams.downloadedBytes += imageProcessor->mBlock.size();
+    imageProcessor->mParams.downloadedBytes += block.size();
     imageProcessor->mDownloader->FetchNextData();
+}
+
+CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
+{
+    if (mHeaderParser.IsInitialized())
+    {
+        OTAImageHeader header;
+        CHIP_ERROR error = mHeaderParser.AccumulateAndDecode(block, header);
+
+        // Needs more data to decode the header
+        ReturnErrorCodeIf(error == CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(error);
+
+        // We save the software version to be used in the next NotifyUpdateApplied, but it's a non-standard
+        // behavior of the Linux implementation and the pattern should not be blindly followed by real-life
+        // products. In general, it's up to the implementation to decide which header fields will be
+        // validated or presented to the user.
+        mSoftwareVersion       = header.mSoftwareVersion;
+        mParams.totalFileBytes = header.mPayloadSize;
+        mHeaderParser.Clear();
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)

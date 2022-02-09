@@ -144,7 +144,8 @@ void TestCommandInteraction::TestNoHandler(nlTestSuite * apSuite, void * apConte
     // not safe to do so.
     auto onFailureCb = [apSuite](CHIP_ERROR aError) {
         NL_TEST_ASSERT(apSuite,
-                       aError.IsIMStatus() && app::StatusIB(aError).mStatus == Protocols::InteractionModel::Status::InvalidCommand);
+                       aError.IsIMStatus() &&
+                           app::StatusIB(aError).mStatus == Protocols::InteractionModel::Status::UnsupportedEndpoint);
     };
 
     responseDirective = kSendDataResponse;
@@ -176,9 +177,14 @@ DECLARE_DYNAMIC_ATTRIBUTE(chip::app::Clusters::Descriptor::Attributes::DeviceLis
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(testClusterAttrs)
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
+constexpr CommandId testClusterCommands[] = {
+    TestCluster::Commands::TestSimpleArgumentRequest::Id,
+    kInvalidCommandId,
+};
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpointClusters)
-DECLARE_DYNAMIC_CLUSTER(chip::app::Clusters::TestCluster::Id, testClusterAttrs),
-    DECLARE_DYNAMIC_CLUSTER(chip::app::Clusters::Descriptor::Id, descriptorAttrs), DECLARE_DYNAMIC_CLUSTER_LIST_END;
+DECLARE_DYNAMIC_CLUSTER(chip::app::Clusters::TestCluster::Id, testClusterAttrs, testClusterCommands, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(chip::app::Clusters::Descriptor::Id, descriptorAttrs, nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint, testEndpointClusters);
 
@@ -198,7 +204,8 @@ void TestCommandInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCo
     // Register descriptors for this endpoint since they are needed
     // at command validation time to ensure the command actually exists on that endpoint.
     //
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, 0, 0);
+    DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, 0, 0, Span<DataVersion>(dataVersionStorage));
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -236,6 +243,8 @@ void TestCommandInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCo
 
     NL_TEST_ASSERT(apSuite, onSuccessWasCalled && !onFailureWasCalled);
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+
+    emberAfClearDynamicEndpoint(0);
 }
 
 // clang-format off

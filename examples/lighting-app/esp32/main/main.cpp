@@ -26,12 +26,14 @@
 #include "freertos/task.h"
 #include "nvs_flash.h"
 #include "shell_extension/launch.h"
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/OTARequestor.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <platform/ESP32/NetworkCommissioningDriver.h>
 #include <platform/ESP32/OTAImageProcessorImpl.h>
 #include <platform/GenericOTARequestorDriver.h>
 
@@ -53,6 +55,11 @@ static const char * TAG = "light-app";
 
 static DeviceCallbacks EchoCallbacks;
 
+namespace {
+app::Clusters::NetworkCommissioning::Instance
+    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
+} // namespace
+
 static void InitOTARequestor(void)
 {
 #if CONFIG_ENABLE_OTA_REQUESTOR
@@ -73,6 +80,8 @@ static void InitServer(intptr_t context)
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+
+    sWiFiNetworkCommissioningInstance.Init();
 }
 
 extern "C" void app_main()

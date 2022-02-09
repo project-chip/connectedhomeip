@@ -4,10 +4,9 @@ This builds and runs the NLUnitTest on the efr32 device
 
 <hr>
 
--   [CHIP EFR32 Test Driver](#chip-efr32-test-driver)
-    -   [Introduction](#introduction)
-    -   [Building](#building)
-    -   [Running The Tests](#running-the-tests)
+-   [Introduction](#introduction)
+-   [Building](#building)
+-   [Running The Tests](#running-the-tests)
 
 <hr>
 
@@ -76,7 +75,13 @@ OR use GN/Ninja directly
 
 ## Running The Tests
 
-The included python test runner will be installed as part of building.
+Build the runner using gn:
+
+    $ gn gen out/debug
+    $ ninja -C out/debug runner
+
+The runner will be installed into the venv and python wheels will be packaged in
+the output folder for deploying.
 
 -   To run the tests:
 

@@ -17,12 +17,22 @@
 #pragma once
 
 #include "access/AccessControl.h"
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 
 namespace chip {
 namespace Access {
 namespace Examples {
 
-AccessControl::Delegate & GetAccessControlDelegate();
+/**
+ * @brief Get a global instance of the access control delegate implemented in this module.
+ *
+ * NOTE: This function should be followed by an ::Init() method call. This function does
+ *       not manage lifecycle considerations.
+ *
+ * @param storageDelegate Storage instance to access persisted ACL data.
+ * @return a reference to the AccessControl::Delegate singleton.
+ */
+AccessControl::Delegate & GetAccessControlDelegate(PersistentStorageDelegate * storageDelegate);
 
 } // namespace Examples
 } // namespace Access

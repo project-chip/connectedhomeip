@@ -203,6 +203,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_TIME_FORMAT_LOCALIZATION_CLUSTER_ID:
         emberAfTimeFormatLocalizationClusterInitCallback(endpoint);
         break;
+    case ZCL_UNIT_LOCALIZATION_CLUSTER_ID:
+        emberAfUnitLocalizationClusterInitCallback(endpoint);
+        break;
     case ZCL_USER_LABEL_CLUSTER_ID:
         emberAfUserLabelClusterInitCallback(endpoint);
         break;
@@ -511,6 +514,11 @@ void __attribute__((weak)) emberAfTimeFormatLocalizationClusterInitCallback(Endp
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfUnitLocalizationClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfUserLabelClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
@@ -574,14 +582,14 @@ bool __attribute__((weak)) emberAfMessageSentCallback(const MessageSendDestinati
 }
 
 EmberAfStatus __attribute__((weak))
-emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId, EmberAfAttributeMetadata * attributeMetadata,
+emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata,
                                      uint8_t * buffer, uint16_t maxReadLength)
 {
     return EMBER_ZCL_STATUS_FAILURE;
 }
 
 EmberAfStatus __attribute__((weak))
-emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId, EmberAfAttributeMetadata * attributeMetadata,
+emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata,
                                       uint8_t * buffer)
 {
     return EMBER_ZCL_STATUS_FAILURE;

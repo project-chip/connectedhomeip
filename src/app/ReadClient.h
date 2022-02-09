@@ -27,8 +27,8 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/EventHeader.h>
 #include <app/EventPathParams.h>
-#include <app/InteractionModelDelegate.h>
 #include <app/MessageDef/ReadRequestMessage.h>
+#include <app/MessageDef/StatusIB.h>
 #include <app/MessageDef/StatusResponseMessage.h>
 #include <app/MessageDef/SubscribeRequestMessage.h>
 #include <app/MessageDef/SubscribeResponseMessage.h>
@@ -72,7 +72,7 @@ public:
          * receives an OnDone call to destroy the object.
          *
          */
-        virtual void OnReportBegin(const ReadClient * apReadClient) {}
+        virtual void OnReportBegin() {}
 
         /**
          * Used to signal the completion of processing of the last attribute report in a given exchange.
@@ -81,7 +81,7 @@ public:
          * receives an OnDone call to destroy the object.
          *
          */
-        virtual void OnReportEnd(const ReadClient * apReadClient) {}
+        virtual void OnReportEnd() {}
 
         /**
          * Used to deliver event data received through the Read and Subscribe interactions
@@ -91,15 +91,12 @@ public:
          * This object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
          *
-         * @param[in] apReadClient: The read client object that initiated the read or subscribe transaction.
          * @param[in] aEventHeader: The event header in report response.
          * @param[in] apData: A TLVReader positioned right on the payload of the event.
          * @param[in] apStatus: Event-specific status, containing an InteractionModel::Status code as well as an optional
          *                     cluster-specific status code.
          */
-        virtual void OnEventData(const ReadClient * apReadClient, const EventHeader & aEventHeader, TLV::TLVReader * apData,
-                                 const StatusIB * apStatus)
-        {}
+        virtual void OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus) {}
 
         /**
          * Used to deliver attribute data received through the Read and Subscribe interactions.
@@ -112,14 +109,14 @@ public:
          * This object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
          *
-         * @param[in] apReadClient The read client object that initiated the read or subscribe transaction.
          * @param[in] aPath        The attribute path field in report response.
+         * @param[in] aVersion     The data version for cluster in report response.
          * @param[in] apData       The attribute data of the given path, will be a nullptr if status is not Success.
          * @param[in] aStatus      Attribute-specific status, containing an InteractionModel::Status code as well as an
          *                         optional cluster-specific status code.
          */
-        virtual void OnAttributeData(const ReadClient * apReadClient, const ConcreteDataAttributePath & aPath,
-                                     TLV::TLVReader * apData, const StatusIB & aStatus)
+        virtual void OnAttributeData(const ConcreteDataAttributePath & aPath, DataVersion aVersion, TLV::TLVReader * apData,
+                                     const StatusIB & aStatus)
         {}
 
         /**
@@ -128,9 +125,9 @@ public:
          * This object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
          *
-         * @param[in] apReadClient The read client object that initiated the read transaction.
+         * @param[in] aSubscriptionId The identifier of the subscription that was established.
          */
-        virtual void OnSubscriptionEstablished(const ReadClient * apReadClient) {}
+        virtual void OnSubscriptionEstablished(uint64_t aSubscriptionId) {}
 
         /**
          * OnError will be called when an error occurs *after* a successful call to SendRequest(). The following
@@ -146,10 +143,9 @@ public:
          * This object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
          *
-         * @param[in] apReadClient The read client object that initiated the attribute read transaction.
          * @param[in] aError       A system error code that conveys the overall error code.
          */
-        virtual void OnError(const ReadClient * apReadClient, CHIP_ERROR aError) {}
+        virtual void OnError(CHIP_ERROR aError) {}
 
         /**
          * OnDone will be called when ReadClient has finished all work and is safe to destroy and free the
@@ -161,9 +157,17 @@ public:
          *      - Only be called after a successful call to SendRequest has been
          *        made, when the read completes or the subscription is shut down.
          *
-         * @param[in] apReadClient The read client object of the terminated read or subscribe interaction.
          */
-        virtual void OnDone(ReadClient * apReadClient) = 0;
+        virtual void OnDone() = 0;
+
+        /**
+         * This function is invoked when using SendAutoResubscribeRequest, where the ReadClient was configured to auto re-subscribe
+         * and the ReadPrepareParams was moved into this client for management. This will have to be free'ed appropriately by the
+         * application. If SendAutoResubscribeRequest fails, this function will be called before it returns the failure. If
+         * SendAutoResubscribeRequest succeeds, this function will be called immediately before calling OnDone. If
+         * SendAutoResubscribeRequest is not called, this function will not be called.
+         */
+        virtual void OnDeallocatePaths(ReadPrepareParams && aReadPrepareParams) {}
     };
 
     enum class InteractionType : uint8_t
@@ -183,7 +187,7 @@ public:
      *
      *  @param[in]    apImEngine       A valid pointer to the IM engine.
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
-     *  @param[in]    apCallback       InteractionModelDelegate set by application.
+     *  @param[in]    apCallback       Callback set by application.
      *  @param[in]    aInteractionType Type of interaction (read or subscribe)
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE incorrect state if it is already initialized
@@ -240,6 +244,21 @@ public:
     ReadClient * GetNextClient() { return mpNext; }
     void SetNextClient(ReadClient * apClient) { mpNext = apClient; }
 
+    // Like SendSubscribeRequest, but the ReadClient will automatically attempt to re-establish the subscription if
+    // we decide that the subscription has dropped.  The exact behavior of the re-establishment can be controlled
+    // by setting mResubscribePolicy in the ReadPrepareParams.  If not set, a default behavior with exponential backoff will be
+    // used.
+    //
+    // The application has to know to
+    // a) allocate a ReadPrepareParams object that will have fields mpEventPathParamsList and mpAttributePathParamsList with
+    // lifetimes as long as the ReadClient itself and b) free those up later in the call to OnDeallocatePaths. Note: At a given
+    // time in the system, you can either have a single subscription with re-sub enabled that that has mKeepSubscriptions = false,
+    // OR, multiple subs with re-sub enabled with mKeepSubscriptions = true. You shall not have a mix of both simultaneously.
+    // If SendAutoResubscribeRequest is called at all, it guarantees that it will call OnDeallocatePaths when OnDone is called.
+    // SendAutoResubscribeRequest is the only case that calls OnDeallocatePaths, since that's the only case when the consumer moved
+    // a ReadParams into the client.
+    CHIP_ERROR SendAutoResubscribeRequest(ReadPrepareParams && aReadPrepareParams);
+
 private:
     friend class TestReadInteraction;
     friend class InteractionModelEngine;
@@ -282,14 +301,17 @@ private:
     CHIP_ERROR ProcessSubscribeResponse(System::PacketBufferHandle && aPayload);
     CHIP_ERROR RefreshLivenessCheckTimer();
     void CancelLivenessCheckTimer();
+    void CancelResubscribeTimer();
     void MoveToState(const ClientState aTargetState);
     CHIP_ERROR ProcessAttributePath(AttributePathIB::Parser & aAttributePath, ConcreteDataAttributePath & aClusterInfo);
     CHIP_ERROR ProcessReportData(System::PacketBufferHandle && aPayload);
     const char * GetStateStr() const;
-
+    bool ResubscribeIfNeeded();
     // Specialized request-sending functions.
     CHIP_ERROR SendReadRequest(ReadPrepareParams & aReadPrepareParams);
     CHIP_ERROR SendSubscribeRequest(ReadPrepareParams & aSubscribePrepareParams);
+
+    static void OnResubscribeTimerCallback(System::Layer * apSystemLayer, void * apAppState);
 
     /*
      * Called internally to signal the completion of all work on this object, gracefully close the
@@ -300,6 +322,9 @@ private:
      *
      */
     void Close(CHIP_ERROR aError);
+
+    void StopResubscription();
+    void ClearActiveSubscriptionState();
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
@@ -319,6 +344,8 @@ private:
 
     ReadClient * mpNext                 = nullptr;
     InteractionModelEngine * mpImEngine = nullptr;
+    ReadPrepareParams mReadPrepareParams;
+    uint32_t mNumRetries = 0;
 };
 
 }; // namespace app

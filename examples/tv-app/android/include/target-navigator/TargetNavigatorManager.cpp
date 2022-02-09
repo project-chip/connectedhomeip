@@ -18,22 +18,23 @@
 #include "TargetNavigatorManager.h"
 
 using namespace std;
+using namespace chip::app;
 using namespace chip::app::Clusters::TargetNavigator;
 
-std::list<Structs::TargetInfo::Type> TargetNavigatorManager::HandleGetTargetList()
+CHIP_ERROR TargetNavigatorManager::HandleGetTargetList(AttributeValueEncoder & aEncoder)
 {
-    std::list<Structs::TargetInfo::Type> list;
-    // TODO: Insert code here
-    int maximumVectorSize = 2;
-
-    for (int i = 0; i < maximumVectorSize; ++i)
-    {
-        Structs::TargetInfo::Type outputInfo;
-        outputInfo.identifier = static_cast<uint8_t>(i + 1);
-        outputInfo.name       = chip::CharSpan::fromCharString("exampleName");
-        list.push_back(outputInfo);
-    }
-    return list;
+    // NOTE: the ids for each target start at 1 so that we can reserve 0 as "no current target"
+    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
+        int maximumVectorSize = 2;
+        for (int i = 0; i < maximumVectorSize; ++i)
+        {
+            Structs::TargetInfo::Type outputInfo;
+            outputInfo.identifier = static_cast<uint8_t>(i + 1);
+            outputInfo.name       = chip::CharSpan::fromCharString("exampleName");
+            ReturnErrorOnFailure(encoder.Encode(outputInfo));
+        }
+        return CHIP_NO_ERROR;
+    });
 }
 
 uint8_t TargetNavigatorManager::HandleGetCurrentTarget()
@@ -41,12 +42,12 @@ uint8_t TargetNavigatorManager::HandleGetCurrentTarget()
     return 0;
 }
 
-Commands::NavigateTargetResponse::Type TargetNavigatorManager::HandleNavigateTarget(const uint64_t & target,
-                                                                                    const chip::CharSpan & data)
+void TargetNavigatorManager::HandleNavigateTarget(CommandResponseHelper<NavigateTargetResponseType> & helper,
+                                                  const uint64_t & target, const CharSpan & data)
 {
     // TODO: Insert code here
     Commands::NavigateTargetResponse::Type response;
-    response.data   = chip::CharSpan::fromCharString("data response");
+    response.data   = chip::Optional<CharSpan>(chip::CharSpan::fromCharString("data response"));
     response.status = chip::app::Clusters::TargetNavigator::StatusEnum::kSuccess;
-    return response;
+    helper.Success(response);
 }

@@ -177,6 +177,12 @@ efr32_executable("lock_app") {
       ]
     }
   }
+
+  if (chip_enable_ota_requestor) {
+    defines += [ "EFR32_OTA_ENABLED" ]
+    sources += [ "${examples_plat_dir}/OTAConfig.cpp" ]
+  }
+
   if (use_rs911x) {
     sources += rs911x_src_plat
 
@@ -259,6 +265,12 @@ efr32_executable("lock_app") {
     ldflags += [
       "-Wl,--print-memory-usage",
       "-fstack-usage",
+    ]
+  }
+  if (use_rs911x || use_wf200) {
+    ldflags += [
+      "-Wl,--defsym",
+      "-Wl,SILABS_WIFI=1",
     ]
   }
 

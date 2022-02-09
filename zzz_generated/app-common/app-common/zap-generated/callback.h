@@ -237,6 +237,14 @@ void emberAfLocalizationConfigurationClusterInitCallback(chip::EndpointId endpoi
  */
 void emberAfTimeFormatLocalizationClusterInitCallback(chip::EndpointId endpoint);
 
+/** @brief Unit Localization Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfUnitLocalizationClusterInitCallback(chip::EndpointId endpoint);
+
 /** @brief Power Source Configuration Cluster Init
  *
  * Cluster Init
@@ -3480,6 +3488,112 @@ void emberAfTimeFormatLocalizationClusterServerTickCallback(chip::EndpointId end
  * @param endpoint  Endpoint that is being served
  */
 void emberAfTimeFormatLocalizationClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Unit Localization Cluster
+//
+
+/** @brief Unit Localization Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfUnitLocalizationClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Unit Localization Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfUnitLocalizationClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Unit Localization Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterUnitLocalizationClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Unit Localization Cluster Client Attribute Changed
+ *
+ * Client Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterUnitLocalizationClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Unit Localization Cluster Server Message Sent
+ *
+ * Server Message Sent
+ *
+ * @param destination        The destination to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAfUnitLocalizationClusterServerMessageSentCallback(const chip::MessageSendDestination & destination,
+                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                             EmberStatus status);
+
+/** @brief Unit Localization Cluster Client Message Sent
+ *
+ * Client Message Sent
+ *
+ * @param destination        The destination to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAfUnitLocalizationClusterClientMessageSentCallback(const chip::MessageSendDestination & destination,
+                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                             EmberStatus status);
+
+/** @brief Unit Localization Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterUnitLocalizationClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Unit Localization Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterUnitLocalizationClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Unit Localization Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfUnitLocalizationClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Unit Localization Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfUnitLocalizationClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // Power Source Configuration Cluster
@@ -13901,22 +14015,6 @@ bool emberAfEthernetNetworkDiagnosticsClusterResetCountsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::EthernetNetworkDiagnostics::Commands::ResetCounts::DecodableType & commandData);
 /**
- * @brief Bridged Device Basic Cluster StartUp Command callback (from server)
- */
-bool emberAfBridgedDeviceBasicClusterStartUpCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj);
-/**
- * @brief Bridged Device Basic Cluster ShutDown Command callback (from server)
- */
-bool emberAfBridgedDeviceBasicClusterShutDownCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj);
-/**
- * @brief Bridged Device Basic Cluster Leave Command callback (from server)
- */
-bool emberAfBridgedDeviceBasicClusterLeaveCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj);
-/**
- * @brief Bridged Device Basic Cluster ReachableChanged Command callback (from server)
- */
-bool emberAfBridgedDeviceBasicClusterReachableChangedCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj);
-/**
  * @brief AdministratorCommissioning Cluster OpenCommissioningWindow Command callback (from client)
  */
 bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
@@ -13959,16 +14057,16 @@ bool emberAfOperationalCredentialsClusterCertificateChainResponseCallback(chip::
                                                                           chip::app::CommandSender * commandObj,
                                                                           chip::ByteSpan Certificate);
 /**
- * @brief Operational Credentials Cluster OpCSRRequest Command callback (from client)
+ * @brief Operational Credentials Cluster CSRRequest Command callback (from client)
  */
-bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(
+bool emberAfOperationalCredentialsClusterCSRRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OperationalCredentials::Commands::OpCSRRequest::DecodableType & commandData);
+    const chip::app::Clusters::OperationalCredentials::Commands::CSRRequest::DecodableType & commandData);
 /**
- * @brief Operational Credentials Cluster OpCSRResponse Command callback (from server)
+ * @brief Operational Credentials Cluster CSRResponse Command callback (from server)
  */
-bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                               chip::ByteSpan NOCSRElements, chip::ByteSpan AttestationSignature);
+bool emberAfOperationalCredentialsClusterCSRResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                             chip::ByteSpan NOCSRElements, chip::ByteSpan AttestationSignature);
 /**
  * @brief Operational Credentials Cluster AddNOC Command callback (from client)
  */
@@ -13985,7 +14083,8 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(
  * @brief Operational Credentials Cluster NOCResponse Command callback (from server)
  */
 bool emberAfOperationalCredentialsClusterNOCResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                             uint8_t StatusCode, uint8_t FabricIndex, chip::CharSpan DebugText);
+                                                             uint8_t StatusCode, chip::FabricIndex FabricIndex,
+                                                             chip::CharSpan DebugText);
 /**
  * @brief Operational Credentials Cluster UpdateFabricLabel Command callback (from client)
  */
@@ -14027,7 +14126,7 @@ bool emberAfGroupKeyManagementClusterKeySetReadCallback(
  */
 bool emberAfGroupKeyManagementClusterKeySetReadResponseCallback(
     chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-    chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySet::DecodableType groupKeySet);
+    chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySetStruct::DecodableType GroupKeySet);
 /**
  * @brief Group Key Management Cluster KeySetRemove Command callback (from client)
  */
@@ -14045,7 +14144,7 @@ bool emberAfGroupKeyManagementClusterKeySetReadAllIndicesCallback(
  */
 bool emberAfGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback(
     chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-    /* TYPE WARNING: array array defaults to */ uint8_t * groupKeySetIDs);
+    /* TYPE WARNING: array array defaults to */ uint8_t * GroupKeySetIDs);
 /**
  * @brief Mode Select Cluster ChangeToMode Command callback (from client)
  */
@@ -14887,7 +14986,7 @@ bool emberAfApplicationLauncherClusterHideAppRequestCallback(
  * @brief Application Launcher Cluster LauncherResponse Command callback (from server)
  */
 bool emberAfApplicationLauncherClusterLauncherResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                               uint8_t status, chip::CharSpan data);
+                                                               uint8_t status, chip::ByteSpan data);
 /**
  * @brief Account Login Cluster GetSetupPINRequest Command callback (from client)
  */
@@ -15054,6 +15153,11 @@ bool emberAfTestClusterClusterTestNestedStructListArgumentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TestCluster::Commands::TestNestedStructListArgumentRequest::DecodableType & commandData);
 /**
+ * @brief Test Cluster Cluster TestEmitTestFabricScopedEventResponse Command callback (from server)
+ */
+bool emberAfTestClusterClusterTestEmitTestFabricScopedEventResponseCallback(chip::EndpointId endpoint,
+                                                                            chip::app::CommandSender * commandObj, uint64_t value);
+/**
  * @brief Test Cluster Cluster TestListNestedStructListArgumentRequest Command callback (from client)
  */
 bool emberAfTestClusterClusterTestListNestedStructListArgumentRequestCallback(
@@ -15107,6 +15211,12 @@ bool emberAfTestClusterClusterTestSimpleOptionalArgumentRequestCallback(
 bool emberAfTestClusterClusterTestEmitTestEventRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TestCluster::Commands::TestEmitTestEventRequest::DecodableType & commandData);
+/**
+ * @brief Test Cluster Cluster TestEmitTestFabricScopedEventRequest Command callback (from client)
+ */
+bool emberAfTestClusterClusterTestEmitTestFabricScopedEventRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TestCluster::Commands::TestEmitTestFabricScopedEventRequest::DecodableType & commandData);
 /**
  * @brief Messaging Cluster DisplayMessage Command callback (from server)
  */
@@ -15379,7 +15489,7 @@ bool emberAfMessageSentCallback(const chip::MessageSendDestination & destination
  * application was not able to read the attribute.
  */
 EmberAfStatus emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                   EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
+                                                   const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
                                                    uint16_t maxReadLength);
 
 /** @brief External Attribute Write
@@ -15423,7 +15533,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, ch
  * attribute.
  */
 EmberAfStatus emberAfExternalAttributeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                    EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer);
+                                                    const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer);
 
 /** @brief Get Current Time
  *

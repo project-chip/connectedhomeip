@@ -1,0 +1,119 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Door Lock Cluster Lock/Unlock tests
+
+config:
+    cluster: "Door Lock"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
+    - label: "Create new PIN credential and lock/unlock user"
+      command: "SetCredential"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "operationType"
+                value: 0
+              - name: "credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }
+              - name: "credentialData"
+                value: "123456"
+              - name: "userIndex"
+                value: null
+              - name: "userStatus"
+                value: null
+              - name: "userType"
+                value: null
+      response:
+          values:
+              - name: "status"
+                value: 0x00
+              - name: "userIndex"
+                value: 1
+              - name: "nextCredentialIndex"
+                value: 2
+
+    - label: "Try to unlock the door with invalid PIN"
+      command: "UnlockDoor"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "pinCode"
+                value: "000000"
+      response:
+          error: FAILURE
+
+    - label: "Verify that lock state attribute value is set to Locked"
+      command: "readAttribute"
+      attribute: "LockState"
+      response:
+          value: 1
+
+    - label: "Try to unlock the door with valid PIN"
+      command: "UnlockDoor"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "pinCode"
+                value: "123456"
+
+    - label: "Verify that lock state attribute value is set to Unlocked"
+      command: "readAttribute"
+      attribute: "LockState"
+      response:
+          value: 2
+
+    - label: "Try to lock the door with invalid PIN"
+      command: "LockDoor"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "pinCode"
+                value: "000000"
+      response:
+          error: FAILURE
+
+    - label: "Verify that lock state attribute value is set to Unlocked"
+      command: "readAttribute"
+      attribute: "LockState"
+      response:
+          value: 2
+
+    - label: "Try to unlock the door with valid PIN"
+      command: "LockDoor"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "pinCode"
+                value: "123456"
+
+    - label: "Verify that lock state attribute value is set to Locked"
+      command: "readAttribute"
+      attribute: "LockState"
+      response:
+          value: 1
+
+    # Clean-up
+    - label: "Clean the created credential"
+      command: "ClearCredential"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }

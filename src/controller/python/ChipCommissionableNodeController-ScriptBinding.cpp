@@ -115,7 +115,7 @@ void pychip_CommissionableNodeController_PrintDiscoveredCommissioners(
             ChipLogProgress(Discovery, "\tMrp Interval active\tNot present");
         }
         ChipLogProgress(Discovery, "\tSupports TCP\t\t%d", dnsSdInfo->supportsTcp);
-        for (int j = 0; j < dnsSdInfo->numIPs; ++j)
+        for (unsigned j = 0; j < dnsSdInfo->numIPs; ++j)
         {
             char buf[chip::Inet::IPAddress::kMaxStringLength];
             dnsSdInfo->ipAddress[j].ToString(buf);

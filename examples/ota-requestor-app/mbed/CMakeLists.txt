@@ -59,7 +59,6 @@ target_sources(${APP_TARGET} PRIVATE
 
 chip_configure_data_model(${APP_TARGET}
     INCLUDE_SERVER
-    INCLUDE_CLIENT_CALLBACKS
     ZAP_FILE ${CHIP_ROOT}/examples/ota-requestor-app/ota-requestor-common/ota-requestor-app.zap
     GEN_DIR ${CHIP_ROOT}/zzz_generated/ota-requestor-app/zap-generated
 )

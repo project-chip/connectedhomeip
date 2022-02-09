@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <access/AccessControl.h>
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
 #include <app/DefaultAttributePersistenceProvider.h>
@@ -28,7 +29,6 @@
 #include <inet/InetConfig.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/SafeInt.h>
-#include <lib/support/TestPersistentStorageDelegate.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/KeyValueStoreManager.h>
 #include <protocols/secure_channel/CASEServer.h>
@@ -82,7 +82,7 @@ public:
     TransportMgrBase & GetTransportManager() { return mTransports; }
 
 #if CONFIG_NETWORK_LAYER_BLE
-    Ble::BleLayer * getBleLayerObject() { return mBleLayer; }
+    Ble::BleLayer * GetBleLayerObject() { return mBleLayer; }
 #endif
 
     CommissioningWindowManager & GetCommissioningWindowManager() { return mCommissioningWindowManager; }
@@ -104,7 +104,7 @@ private:
             ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size, &bytesRead));
             if (!CanCastTo<uint16_t>(bytesRead))
             {
-                ChipLogDetail(AppServer, "%zu is too big to fit in uint16_t", bytesRead);
+                ChipLogDetail(AppServer, "0x%" PRIx32 " is too big to fit in uint16_t", static_cast<uint32_t>(bytesRead));
                 return CHIP_ERROR_BUFFER_TOO_SMALL;
             }
             ChipLogProgress(AppServer, "Retrieved from server storage: %s", key);
@@ -190,16 +190,12 @@ private:
 
     // Both PersistentStorageDelegate, and GroupDataProvider should be injected by the applications
     // See: https://github.com/project-chip/connectedhomeip/issues/12276
-    // Currently, the GroupDataProvider cannot use KeyValueStoreMgr() due to
-    // (https://github.com/project-chip/connectedhomeip/issues/12174)
-#ifdef CHIP_USE_NON_PERSISTENT_STORAGE_DELEGATE
-    TestPersistentStorageDelegate mDeviceStorage;
-#else
     DeviceStorageDelegate mDeviceStorage;
-#endif
     Credentials::GroupDataProviderImpl mGroupsProvider;
     app::DefaultAttributePersistenceProvider mAttributePersister;
     GroupDataProviderListener mListener;
+
+    Access::AccessControl mAccessControl;
 
     // TODO @ceille: Maybe use OperationalServicePort and CommissionableServicePort
     uint16_t mSecuredServicePort;

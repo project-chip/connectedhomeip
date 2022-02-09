@@ -7,6 +7,7 @@
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/EventLoggingTypes.h>
 #include <app/util/basic-types.h>
 #include <lib/support/BitFlags.h>
@@ -118,8 +119,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter &writer, TLV::Tag tag) const;
 
     using ResponseType =
-    {{~#if responseRef}}
-      Clusters::{{asUpperCamelCase parent.name}}::Commands::{{getResponseCommandName responseRef}}::DecodableType;
+    {{~#if responseName}}
+      Clusters::{{asUpperCamelCase parent.name}}::Commands::{{responseName}}::DecodableType;
     {{else}}
       DataModel::NullObjectType;
     {{/if}}
@@ -208,10 +209,17 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::{{asUpperCamelCase name}}::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
+    static constexpr bool kIsFabricScoped = {{event_is_fabric_scoped}};
 
     {{#zcl_event_fields}}
     {{zapTypeToEncodableClusterObjectType type}} {{asLowerCamelCase name}}{{> cluster_objects_field_init}};
     {{/zcl_event_fields}}
+
+    {{#if event_is_fabric_scoped}}
+    auto GetFabricIndex() const {
+        return {{ asLowerCamelCase event_fabric_idx_field }};
+    }
+    {{/if}}
 
     CHIP_ERROR Encode(TLV::TLVWriter &writer, TLV::Tag tag) const;
 };
@@ -237,5 +245,8 @@ public:
 {{/zcl_clusters}}
 
 } // namespace Clusters
+
+bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand);
+
 } // namespace app
 } // namespace chip

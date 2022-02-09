@@ -126,8 +126,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPGeneralCommissioningClusterBasicCommissioningInfoType : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull failSafeExpiryLengthMs;
+@interface CHIPGeneralCommissioningClusterBasicCommissioningInfo : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull failSafeExpiryLengthSeconds;
 - (instancetype)init;
 @end
 
@@ -162,8 +162,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPGeneralDiagnosticsClusterNetworkInterfaceType : NSObject
 @property (strong, nonatomic) NSString * _Nonnull name;
 @property (strong, nonatomic) NSNumber * _Nonnull fabricConnected;
-@property (strong, nonatomic) NSNumber * _Nonnull offPremiseServicesReachableIPv4;
-@property (strong, nonatomic) NSNumber * _Nonnull offPremiseServicesReachableIPv6;
+@property (strong, nonatomic) NSNumber * _Nullable offPremiseServicesReachableIPv4;
+@property (strong, nonatomic) NSNumber * _Nullable offPremiseServicesReachableIPv6;
 @property (strong, nonatomic) NSData * _Nonnull hardwareAddress;
 @property (strong, nonatomic) NSNumber * _Nonnull type;
 - (instancetype)init;
@@ -252,34 +252,34 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPOperationalCredentialsClusterNOCStruct : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 @property (strong, nonatomic) NSData * _Nonnull noc;
-@property (strong, nonatomic) NSData * _Nonnull icac;
+@property (strong, nonatomic) NSData * _Nullable icac;
 - (instancetype)init;
 @end
 
-@interface CHIPGroupKeyManagementClusterGroupInfo : NSObject
+@interface CHIPGroupKeyManagementClusterGroupInfoMapStruct : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 @property (strong, nonatomic) NSNumber * _Nonnull groupId;
 @property (strong, nonatomic) NSArray * _Nonnull endpoints;
-@property (strong, nonatomic) NSString * _Nonnull groupName;
+@property (strong, nonatomic) NSString * _Nullable groupName;
 - (instancetype)init;
 @end
 
-@interface CHIPGroupKeyManagementClusterGroupKey : NSObject
+@interface CHIPGroupKeyManagementClusterGroupKeyMapStruct : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 @property (strong, nonatomic) NSNumber * _Nonnull groupId;
 @property (strong, nonatomic) NSNumber * _Nonnull groupKeySetID;
 - (instancetype)init;
 @end
 
-@interface CHIPGroupKeyManagementClusterGroupKeySet : NSObject
+@interface CHIPGroupKeyManagementClusterGroupKeySetStruct : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull groupKeySetID;
-@property (strong, nonatomic) NSNumber * _Nonnull securityPolicy;
-@property (strong, nonatomic) NSData * _Nonnull epochKey0;
-@property (strong, nonatomic) NSNumber * _Nonnull epochStartTime0;
-@property (strong, nonatomic) NSData * _Nonnull epochKey1;
-@property (strong, nonatomic) NSNumber * _Nonnull epochStartTime1;
-@property (strong, nonatomic) NSData * _Nonnull epochKey2;
-@property (strong, nonatomic) NSNumber * _Nonnull epochStartTime2;
+@property (strong, nonatomic) NSNumber * _Nonnull groupKeySecurityPolicy;
+@property (strong, nonatomic) NSData * _Nullable epochKey0;
+@property (strong, nonatomic) NSNumber * _Nullable epochStartTime0;
+@property (strong, nonatomic) NSData * _Nullable epochKey1;
+@property (strong, nonatomic) NSNumber * _Nullable epochStartTime1;
+@property (strong, nonatomic) NSData * _Nullable epochKey2;
+@property (strong, nonatomic) NSNumber * _Nullable epochStartTime2;
 - (instancetype)init;
 @end
 
@@ -323,16 +323,16 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPChannelClusterChannelInfo : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull majorNumber;
 @property (strong, nonatomic) NSNumber * _Nonnull minorNumber;
-@property (strong, nonatomic) NSString * _Nonnull name;
-@property (strong, nonatomic) NSString * _Nonnull callSign;
-@property (strong, nonatomic) NSString * _Nonnull affiliateCallSign;
+@property (strong, nonatomic) NSString * _Nullable name;
+@property (strong, nonatomic) NSString * _Nullable callSign;
+@property (strong, nonatomic) NSString * _Nullable affiliateCallSign;
 - (instancetype)init;
 @end
 
 @interface CHIPChannelClusterLineupInfo : NSObject
 @property (strong, nonatomic) NSString * _Nonnull operatorName;
-@property (strong, nonatomic) NSString * _Nonnull lineupName;
-@property (strong, nonatomic) NSString * _Nonnull postalCode;
+@property (strong, nonatomic) NSString * _Nullable lineupName;
+@property (strong, nonatomic) NSString * _Nullable postalCode;
 @property (strong, nonatomic) NSNumber * _Nonnull lineupInfoType;
 - (instancetype)init;
 @end
@@ -345,7 +345,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPMediaPlaybackClusterPlaybackPosition : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull updatedAt;
-@property (strong, nonatomic) NSNumber * _Nonnull position;
+@property (strong, nonatomic) NSNumber * _Nullable position;
 - (instancetype)init;
 @end
 
@@ -373,7 +373,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPContentLauncherClusterParameter : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull type;
 @property (strong, nonatomic) NSString * _Nonnull value;
-@property (strong, nonatomic) NSArray * _Nonnull externalIDList;
+@property (strong, nonatomic) NSArray * _Nullable externalIDList;
 - (instancetype)init;
 @end
 
@@ -383,19 +383,19 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CHIPContentLauncherClusterStyleInformation : NSObject
-@property (strong, nonatomic) NSString * _Nonnull imageUrl;
-@property (strong, nonatomic) NSString * _Nonnull color;
-@property (strong, nonatomic) CHIPContentLauncherClusterDimension * _Nonnull size;
+@property (strong, nonatomic) NSString * _Nullable imageUrl;
+@property (strong, nonatomic) NSString * _Nullable color;
+@property (strong, nonatomic) CHIPContentLauncherClusterDimension * _Nullable size;
 - (instancetype)init;
 @end
 
 @interface CHIPContentLauncherClusterBrandingInformation : NSObject
 @property (strong, nonatomic) NSString * _Nonnull providerName;
-@property (strong, nonatomic) CHIPContentLauncherClusterStyleInformation * _Nonnull background;
-@property (strong, nonatomic) CHIPContentLauncherClusterStyleInformation * _Nonnull logo;
-@property (strong, nonatomic) CHIPContentLauncherClusterStyleInformation * _Nonnull progressBar;
-@property (strong, nonatomic) CHIPContentLauncherClusterStyleInformation * _Nonnull splash;
-@property (strong, nonatomic) CHIPContentLauncherClusterStyleInformation * _Nonnull waterMark;
+@property (strong, nonatomic) CHIPContentLauncherClusterStyleInformation * _Nullable background;
+@property (strong, nonatomic) CHIPContentLauncherClusterStyleInformation * _Nullable logo;
+@property (strong, nonatomic) CHIPContentLauncherClusterStyleInformation * _Nullable progressBar;
+@property (strong, nonatomic) CHIPContentLauncherClusterStyleInformation * _Nullable splash;
+@property (strong, nonatomic) CHIPContentLauncherClusterStyleInformation * _Nullable waterMark;
 - (instancetype)init;
 @end
 
@@ -406,15 +406,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPApplicationLauncherClusterApplicationLauncherApplication : NSObject
+@interface CHIPApplicationLauncherClusterApplication : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull catalogVendorId;
 @property (strong, nonatomic) NSString * _Nonnull applicationId;
 - (instancetype)init;
 @end
 
 @interface CHIPApplicationLauncherClusterApplicationEP : NSObject
-@property (strong, nonatomic) CHIPApplicationLauncherClusterApplicationLauncherApplication * _Nonnull application;
-@property (strong, nonatomic) NSString * _Nonnull endpoint;
+@property (strong, nonatomic) CHIPApplicationLauncherClusterApplication * _Nonnull application;
+@property (strong, nonatomic) NSNumber * _Nullable endpoint;
 - (instancetype)init;
 @end
 

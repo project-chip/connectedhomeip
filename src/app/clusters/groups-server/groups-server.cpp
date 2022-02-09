@@ -83,8 +83,11 @@ static EmberAfStatus GroupAdd(FabricIndex fabricIndex, EndpointId endpointId, Gr
     GroupDataProvider * provider = GetGroupDataProvider();
     VerifyOrReturnError(nullptr != provider, EMBER_ZCL_STATUS_NOT_FOUND);
 
-    provider->SetGroupInfo(fabricIndex, GroupDataProvider::GroupInfo(groupId, groupName));
-    CHIP_ERROR err = provider->AddEndpoint(fabricIndex, groupId, endpointId);
+    CHIP_ERROR err = provider->SetGroupInfo(fabricIndex, GroupDataProvider::GroupInfo(groupId, groupName));
+    if (CHIP_NO_ERROR == err)
+    {
+        err = provider->AddEndpoint(fabricIndex, groupId, endpointId);
+    }
     if (CHIP_NO_ERROR == err)
     {
         return EMBER_ZCL_STATUS_SUCCESS;

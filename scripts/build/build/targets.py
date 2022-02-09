@@ -366,6 +366,8 @@ def K32WTargets():
 
 def Cyw30739Targets():
     yield Target('cyw30739-cyw930739m2evb_01-light', Cyw30739Builder, board=Cyw30739Board.CYW930739M2EVB_01, app=Cyw30739App.LIGHT)
+    yield Target('cyw30739-cyw930739m2evb_01-lock', Cyw30739Builder, board=Cyw30739Board.CYW930739M2EVB_01, app=Cyw30739App.LOCK)
+    yield Target('cyw30739-cyw930739m2evb_01-ota-requestor', Cyw30739Builder, board=Cyw30739Board.CYW930739M2EVB_01, app=Cyw30739App.OTA_REQUESTOR)
 
 
 ALL = []

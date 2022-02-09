@@ -6,6 +6,68 @@ struct LabelStruct {
     CHAR_STRING<16> value = 1;
 }
 
+server cluster AccessControl = 31 {
+  enum AuthMode : ENUM8 {
+    kPase = 1;
+    kCase = 2;
+    kGroup = 3;
+  }
+
+  enum ChangeTypeEnum : ENUM8 {
+    kChanged = 0;
+    kAdded = 1;
+    kRemoved = 2;
+  }
+
+  enum Privilege : ENUM8 {
+    kView = 1;
+    kProxyView = 2;
+    kOperate = 3;
+    kManage = 4;
+    kAdminister = 5;
+  }
+
+  struct AccessControlEntry {
+    fabric_idx fabricIndex = 0;
+    Privilege privilege = 1;
+    AuthMode authMode = 2;
+    nullable INT64U subjects[] = 3;
+    nullable Target targets[] = 4;
+  }
+
+  struct Target {
+    nullable cluster_id cluster = 0;
+    nullable endpoint_no endpoint = 1;
+    nullable devtype_id deviceType = 2;
+  }
+
+  struct ExtensionEntry {
+    fabric_idx fabricIndex = 0;
+    OCTET_STRING<254> data = 1;
+  }
+
+  info event AccessControlEntryChanged = 0 {
+    fabric_idx adminFabricIndex = 0;
+    nullable node_id adminNodeID = 1;
+    nullable INT16U adminPasscodeID = 2;
+    ChangeTypeEnum changeType = 3;
+    nullable AccessControlEntry latestValue = 4;
+  }
+
+  info event AccessControlExtensionChanged = 1 {
+    fabric_idx adminFabricIndex = 0;
+    nullable node_id adminNodeID = 1;
+    nullable INT16U adminPasscodeID = 2;
+    ChangeTypeEnum changeType = 3;
+    nullable ExtensionEntry latestValue = 4;
+  }
+
+  attribute AccessControlEntry acl[] = 0;
+  attribute ExtensionEntry extension[] = 1;
+  readonly global attribute attrib_id attributeList[] = 65531;
+  readonly global attribute int16u clusterRevision = 65533;
+}
+
 server cluster AdministratorCommissioning = 60 {
   enum CommissioningWindowStatus : ENUM8 {
     kWindowNotOpen = 0;
@@ -37,9 +99,9 @@ server cluster AdministratorCommissioning = 60 {
     INT16U passcodeID = 5;
   }
 
-  command OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
-  command OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
-  command RevokeCommissioning(): DefaultSuccess = 2;
+  timed command OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
+  timed command OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
+  timed command RevokeCommissioning(): DefaultSuccess = 2;
 }
 
 server cluster Basic = 40 {
@@ -57,7 +119,7 @@ server cluster Basic = 40 {
     boolean reachableNewValue = 0;
   }
 
-  readonly attribute int16u interactionModelVersion = 0;
+  readonly attribute int16u dataModelRevision = 0;
   readonly attribute char_string<32> vendorName = 1;
   readonly attribute vendor_id vendorID = 2;
   readonly attribute char_string<32> productName = 3;
@@ -153,11 +215,6 @@ server cluster DoorLock = 257 {
     kAdd = 0;
     kClear = 1;
     kModify = 2;
-  }
-
-  enum DlDoorLockStatus : ENUM8 {
-    kDuplicate = 2;
-    kOccupied = 3;
   }
 
   enum DlDoorState : ENUM8 {
@@ -316,6 +373,148 @@ server cluster DoorLock = 257 {
     kNotSupported = 255;
   }
 
+  bitmap DlAlarmMask : BITMAP16 {
+    kLockingMechanismJammed = 0x1;
+    kLockResetToFactoryDefaults = 0x2;
+    kReserved = 0x4;
+    kRFModulePowerCycled = 0x8;
+    kWrongCodeEntryLimit = 0x10;
+    kFrontEscutcheonRemovedFromMain = 0x20;
+    kForcedDoorOpenUnderDoorLockedCondition = 0x40;
+  }
+
+  bitmap DlCredentialRulesSupport : BITMAP8 {
+    kSingle = 0x1;
+    kDual = 0x2;
+    kTri = 0x4;
+  }
+
+  bitmap DlDaysMaskMap : BITMAP8 {
+    kSunday = 0x1;
+    kMonday = 0x2;
+    kTuesday = 0x4;
+    kWednesday = 0x8;
+    kThursday = 0x10;
+    kFriday = 0x20;
+    kSaturday = 0x40;
+  }
+
+  bitmap DlDefaultConfigurationRegister : BITMAP16 {
+    kEnableLocalProgrammingEnabled = 0x1;
+    kKeypadInterfaceDefaultAccessEnabled = 0x2;
+    kRemoteInterfaceDefaultAccessIsEnabled = 0x4;
+    kSoundEnabled = 0x20;
+    kAutoRelockTimeSet = 0x40;
+    kLEDSettingsSet = 0x80;
+  }
+
+  bitmap DlKeypadOperationEventMask : BITMAP16 {
+    kUnknown = 0x1;
+    kLock = 0x2;
+    kUnlock = 0x4;
+    kLockInvalidPIN = 0x8;
+    kLockInvalidSchedule = 0x10;
+    kUnlockInvalidCode = 0x20;
+    kUnlockInvalidSchedule = 0x40;
+    kNonAccessUserOpEvent = 0x80;
+  }
+
+  bitmap DlKeypadProgrammingEventMask : BITMAP16 {
+    kUnknown = 0x1;
+    kProgrammingPINChanged = 0x2;
+    kPINAdded = 0x4;
+    kPINCleared = 0x8;
+    kPINChanged = 0x10;
+  }
+
+  bitmap DlLocalProgrammingFeatures : BITMAP8 {
+    kAddUsersCredentialsSchedulesLocally = 0x1;
+    kModifyUsersCredentialsSchedulesLocally = 0x2;
+    kClearUsersCredentialsSchedulesLocally = 0x4;
+    kAdjustLockSettingsLocally = 0x8;
+  }
+
+  bitmap DlManualOperationEventMask : BITMAP16 {
+    kUnknown = 0x1;
+    kThumbturnLock = 0x2;
+    kThumbturnUnlock = 0x4;
+    kOneTouchLock = 0x8;
+    kKeyLock = 0x10;
+    kKeyUnlock = 0x20;
+    kAutoLock = 0x40;
+    kScheduleLock = 0x80;
+    kScheduleUnlock = 0x100;
+    kManualLock = 0x200;
+    kManualUnlock = 0x400;
+  }
+
+  bitmap DlRFIDOperationEventMask : BITMAP16 {
+    kUnknown = 0x1;
+    kLock = 0x2;
+    kUnlock = 0x4;
+    kLockInvalidRFID = 0x8;
+    kLockInvalidSchedule = 0x10;
+    kUnlockInvalidRFID = 0x20;
+    kUnlockInvalidSchedule = 0x40;
+  }
+
+  bitmap DlRFIDProgrammingEventMask : BITMAP16 {
+    kUnknown = 0x1;
+    kRFIDCodeAdded = 0x20;
+    kRFIDCodeCleared = 0x40;
+  }
+
+  bitmap DlRemoteOperationEventMask : BITMAP16 {
+    kUnknown = 0x1;
+    kLock = 0x2;
+    kUnlock = 0x4;
+    kLockInvalidCode = 0x8;
+    kLockInvalidSchedule = 0x10;
+    kUnlockInvalidCode = 0x20;
+    kUnlockInvalidSchedule = 0x40;
+  }
+
+  bitmap DlRemoteProgrammingEventMask : BITMAP16 {
+    kUnknown = 0x1;
+    kProgrammingPINChanged = 0x2;
+    kPINAdded = 0x4;
+    kPINCleared = 0x8;
+    kPINChanged = 0x10;
+    kRFIDCodeAdded = 0x20;
+    kRFIDCodeCleared = 0x40;
+  }
+
+  bitmap DlSupportedOperatingModes : BITMAP16 {
+    kNormal = 0x1;
+    kVacation = 0x2;
+    kPrivacy = 0x4;
+    kNoRemoteLockUnlock = 0x8;
+    kPassage = 0x10;
+  }
+
+  bitmap DoorLockDayOfWeek : BITMAP8 {
+    kSunday = 0x1;
+    kMonday = 0x2;
+    kTuesday = 0x4;
+    kWednesday = 0x8;
+    kThursday = 0x10;
+    kFriday = 0x20;
+    kSaturday = 0x40;
+  }
+
+  bitmap DoorLockFeature : BITMAP32 {
+    kPINCredentials = 0x1;
+    kRFIDCredentials = 0x2;
+    kFingerCredentials = 0x4;
+    kLogging = 0x8;
+    kAccessSchedules = 0x10;
+    kDoorPositionSensor = 0x20;
+    kFaceCredentials = 0x40;
+    kCredentialsOTA = 0x80;
+    kUsersManagement = 0x100;
+    kNotifications = 0x200;
+  }
+
   struct DlCredential {
     DlCredentialType credentialType = 0;
     INT16U credentialIndex = 1;
@@ -364,8 +563,13 @@ server cluster DoorLock = 257 {
   readonly attribute nullable DlDoorState doorState = 3;
   readonly attribute int16u numberOfTotalUsersSupported = 17;
   readonly attribute int16u numberOfPINUsersSupported = 18;
+  readonly attribute int16u numberOfRFIDUsersSupported = 19;
+  readonly attribute int8u numberOfWeekDaySchedulesSupportedPerUser = 20;
+  readonly attribute int8u numberOfYearDaySchedulesSupportedPerUser = 21;
   readonly attribute int8u maxPINCodeLength = 23;
   readonly attribute int8u minPINCodeLength = 24;
+  readonly attribute int8u maxRFIDCodeLength = 25;
+  readonly attribute int8u minRFIDCodeLength = 26;
   readonly attribute bitmap8 credentialRulesSupport = 27;
   attribute char_string<3> language = 33;
   attribute int32u autoRelockTime = 35;
@@ -376,14 +580,26 @@ server cluster DoorLock = 257 {
   attribute boolean enablePrivacyModeButton = 43;
   attribute int8u wrongCodeEntryLimit = 48;
   attribute int8u userCodeTemporaryDisableTime = 49;
+  attribute boolean requirePINforRemoteOperation = 51;
+  readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 
   request struct ClearCredentialRequest {
-    DlCredential credential = 0;
+    nullable DlCredential credential = 0;
   }
 
   request struct ClearUserRequest {
     INT16U userIndex = 0;
+  }
+
+  request struct ClearWeekDayScheduleRequest {
+    INT8U weekDayIndex = 0;
+    INT16U userIndex = 1;
+  }
+
+  request struct ClearYearDayScheduleRequest {
+    INT8U yearDayIndex = 0;
+    INT16U userIndex = 1;
   }
 
   request struct GetCredentialStatusRequest {
@@ -394,6 +610,16 @@ server cluster DoorLock = 257 {
     INT16U userIndex = 0;
   }
 
+  request struct GetWeekDayScheduleRequest {
+    INT8U weekDayIndex = 0;
+    INT16U userIndex = 1;
+  }
+
+  request struct GetYearDayScheduleRequest {
+    INT8U yearDayIndex = 0;
+    INT16U userIndex = 1;
+  }
+
   request struct LockDoorRequest {
     optional OCTET_STRING pinCode = 0;
   }
@@ -402,8 +628,9 @@ server cluster DoorLock = 257 {
     DlDataOperationType operationType = 0;
     DlCredential credential = 1;
     LONG_OCTET_STRING credentialData = 2;
-    INT16U userIndex = 3;
-    DlUserStatus userStatus = 4;
+    nullable INT16U userIndex = 3;
+    nullable DlUserStatus userStatus = 4;
+    nullable DlUserType userType = 5;
   }
 
   request struct SetUserRequest {
@@ -411,9 +638,26 @@ server cluster DoorLock = 257 {
     INT16U userIndex = 1;
     nullable CHAR_STRING userName = 2;
     nullable INT32U userUniqueId = 3;
-    DlUserStatus userStatus = 4;
-    DlUserType userType = 5;
-    DlCredentialRule credentialRule = 6;
+    nullable DlUserStatus userStatus = 4;
+    nullable DlUserType userType = 5;
+    nullable DlCredentialRule credentialRule = 6;
+  }
+
+  request struct SetWeekDayScheduleRequest {
+    INT8U weekDayIndex = 0;
+    INT16U userIndex = 1;
+    DlDaysMaskMap daysMask = 2;
+    INT8U startHour = 3;
+    INT8U startMinute = 4;
+    INT8U endHour = 5;
+    INT8U endMinute = 6;
+  }
+
+  request struct SetYearDayScheduleRequest {
+    INT8U yearDayIndex = 0;
+    INT16U userIndex = 1;
+    epoch_s localStartTime = 2;
+    epoch_s localEndTime = 3;
   }
 
   request struct UnlockDoorRequest {
@@ -436,7 +680,26 @@ server cluster DoorLock = 257 {
     nullable DlCredential credentials[] = 6;
     nullable fabric_idx creatorFabricIndex = 7;
     nullable fabric_idx lastModifiedFabricIndex = 8;
-    INT16U nextUserIndex = 9;
+    nullable INT16U nextUserIndex = 9;
+  }
+
+  response struct GetWeekDayScheduleResponse {
+    INT8U weekDayIndex = 0;
+    INT16U userIndex = 1;
+    DlStatus status = 2;
+    optional DlDaysMaskMap daysMask = 3;
+    optional INT8U startHour = 4;
+    optional INT8U startMinute = 5;
+    optional INT8U endHour = 6;
+    optional INT8U endMinute = 7;
+  }
+
+  response struct GetYearDayScheduleResponse {
+    INT8U yearDayIndex = 0;
+    INT16U userIndex = 1;
+    DlStatus status = 2;
+    optional epoch_s localStartTime = 3;
+    optional epoch_s localEndTime = 4;
   }
 
   response struct SetCredentialResponse {
@@ -445,14 +708,20 @@ server cluster DoorLock = 257 {
     nullable INT16U nextCredentialIndex = 2;
   }
 
-  command ClearCredential(ClearCredentialRequest): DefaultSuccess = 38;
-  command ClearUser(ClearUserRequest): DefaultSuccess = 29;
+  timed command ClearCredential(ClearCredentialRequest): DefaultSuccess = 38;
+  timed command ClearUser(ClearUserRequest): DefaultSuccess = 29;
+  command ClearWeekDaySchedule(ClearWeekDayScheduleRequest): DefaultSuccess = 13;
+  command ClearYearDaySchedule(ClearYearDayScheduleRequest): DefaultSuccess = 16;
   command GetCredentialStatus(GetCredentialStatusRequest): GetCredentialStatusResponse = 36;
   command GetUser(GetUserRequest): GetUserResponse = 27;
-  command LockDoor(LockDoorRequest): DefaultSuccess = 0;
-  command SetCredential(SetCredentialRequest): SetCredentialResponse = 34;
-  command SetUser(SetUserRequest): DefaultSuccess = 26;
-  command UnlockDoor(UnlockDoorRequest): DefaultSuccess = 1;
+  command GetWeekDaySchedule(GetWeekDayScheduleRequest): GetWeekDayScheduleResponse = 12;
+  command GetYearDaySchedule(GetYearDayScheduleRequest): GetYearDayScheduleResponse = 15;
+  timed command LockDoor(LockDoorRequest): DefaultSuccess = 0;
+  timed command SetCredential(SetCredentialRequest): SetCredentialResponse = 34;
+  timed command SetUser(SetUserRequest): DefaultSuccess = 26;
+  command SetWeekDaySchedule(SetWeekDayScheduleRequest): DefaultSuccess = 11;
+  command SetYearDaySchedule(SetYearDayScheduleRequest): DefaultSuccess = 14;
+  timed command UnlockDoor(UnlockDoorRequest): DefaultSuccess = 1;
 }
 
 server cluster EthernetNetworkDiagnostics = 55 {
@@ -469,14 +738,14 @@ server cluster EthernetNetworkDiagnostics = 55 {
     k400g = 9;
   }
 
-  readonly attribute enum8 PHYRate = 0;
-  readonly attribute boolean fullDuplex = 1;
+  readonly attribute nullable PHYRateType PHYRate = 0;
+  readonly attribute nullable boolean fullDuplex = 1;
   readonly attribute int64u packetRxCount = 2;
   readonly attribute int64u packetTxCount = 3;
   readonly attribute int64u txErrCount = 4;
   readonly attribute int64u collisionCount = 5;
   readonly attribute int64u overrunCount = 6;
-  readonly attribute boolean carrierDetect = 7;
+  readonly attribute nullable boolean carrierDetect = 7;
   readonly attribute int64u timeSinceReset = 8;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
@@ -488,7 +757,7 @@ server cluster FixedLabel = 64 {
 }
 
 server cluster GeneralCommissioning = 48 {
-  enum GeneralCommissioningError : ENUM8 {
+  enum CommissioningError : ENUM8 {
     kOk = 0;
     kValueOutsideRange = 1;
     kInvalidAuthentication = 2;
@@ -501,12 +770,12 @@ server cluster GeneralCommissioning = 48 {
     kIndoorOutdoor = 2;
   }
 
-  struct BasicCommissioningInfoType {
-    INT32U failSafeExpiryLengthMs = 0;
+  struct BasicCommissioningInfo {
+    INT16U failSafeExpiryLengthSeconds = 0;
   }
 
   attribute int64u breadcrumb = 0;
-  readonly attribute BasicCommissioningInfoType basicCommissioningInfoList[] = 1;
+  readonly attribute BasicCommissioningInfo basicCommissioningInfo = 1;
   readonly attribute enum8 regulatoryConfig = 2;
   readonly attribute enum8 locationCapability = 3;
   readonly global attribute bitmap32 featureMap = 65532;
@@ -526,17 +795,17 @@ server cluster GeneralCommissioning = 48 {
   }
 
   response struct ArmFailSafeResponse {
-    GeneralCommissioningError errorCode = 0;
+    CommissioningError errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
   response struct CommissioningCompleteResponse {
-    GeneralCommissioningError errorCode = 0;
+    CommissioningError errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
   response struct SetRegulatoryConfigResponse {
-    GeneralCommissioningError errorCode = 0;
+    CommissioningError errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
@@ -598,8 +867,8 @@ server cluster GeneralDiagnostics = 51 {
   struct NetworkInterfaceType {
     CHAR_STRING<32> name = 0;
     BOOLEAN fabricConnected = 1;
-    BOOLEAN offPremiseServicesReachableIPv4 = 2;
-    BOOLEAN offPremiseServicesReachableIPv6 = 3;
+    nullable BOOLEAN offPremiseServicesReachableIPv4 = 2;
+    nullable BOOLEAN offPremiseServicesReachableIPv6 = 3;
     OCTET_STRING<8> hardwareAddress = 4;
     InterfaceType type = 5;
   }
@@ -663,6 +932,12 @@ server cluster NetworkCommissioning = 49 {
     k5g = 2;
     k6g = 3;
     k60g = 4;
+  }
+
+  bitmap NetworkCommissioningFeature : BITMAP32 {
+    kWiFiNetworkInterface = 0x1;
+    kThreadNetworkInterface = 0x2;
+    kEthernetNetworkInterface = 0x4;
   }
 
   struct NetworkInfo {
@@ -760,7 +1035,7 @@ server cluster NetworkCommissioning = 49 {
 }
 
 server cluster OperationalCredentials = 62 {
-  enum NodeOperationalCertStatus : ENUM8 {
+  enum OperationalCertStatus : ENUM8 {
     kSuccess = 0;
     kInvalidPublicKey = 1;
     kInvalidNodeOpId = 2;
@@ -776,7 +1051,7 @@ server cluster OperationalCredentials = 62 {
   struct NOCStruct {
     fabric_idx fabricIndex = 0;
     OCTET_STRING noc = 1;
-    OCTET_STRING icac = 2;
+    nullable OCTET_STRING icac = 2;
   }
 
   struct FabricDescriptor {
@@ -812,16 +1087,16 @@ server cluster OperationalCredentials = 62 {
     OCTET_STRING attestationNonce = 0;
   }
 
+  request struct CSRRequestRequest {
+    OCTET_STRING CSRNonce = 0;
+  }
+
   request struct CertificateChainRequestRequest {
     INT8U certificateType = 0;
   }
 
-  request struct OpCSRRequestRequest {
-    OCTET_STRING CSRNonce = 0;
-  }
-
   request struct RemoveFabricRequest {
-    INT8U fabricIndex = 0;
+    fabric_idx fabricIndex = 0;
   }
 
   request struct RemoveTrustedRootCertificateRequest {
@@ -842,26 +1117,26 @@ server cluster OperationalCredentials = 62 {
     OCTET_STRING signature = 1;
   }
 
+  response struct CSRResponse {
+    OCTET_STRING NOCSRElements = 0;
+    OCTET_STRING attestationSignature = 1;
+  }
+
   response struct CertificateChainResponse {
     OCTET_STRING certificate = 0;
   }
 
   response struct NOCResponse {
-    INT8U statusCode = 0;
-    INT8U fabricIndex = 1;
-    CHAR_STRING debugText = 2;
-  }
-
-  response struct OpCSRResponse {
-    OCTET_STRING NOCSRElements = 0;
-    OCTET_STRING attestationSignature = 1;
+    OperationalCertStatus statusCode = 0;
+    optional fabric_idx fabricIndex = 1;
+    optional CHAR_STRING debugText = 2;
   }
 
   command AddNOC(AddNOCRequest): NOCResponse = 6;
   command AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
   command AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
+  command CSRRequest(CSRRequestRequest): CSRResponse = 4;
   command CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
-  command OpCSRRequest(OpCSRRequestRequest): OpCSRResponse = 4;
   command RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
   command RemoveTrustedRootCertificate(RemoveTrustedRootCertificateRequest): DefaultSuccess = 12;
   command UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
@@ -927,6 +1202,13 @@ server cluster PowerSource = 47 {
     kUnderVoltage = 2;
   }
 
+  bitmap PowerSourceFeature : BITMAP32 {
+    kWired = 0x1;
+    kBattery = 0x2;
+    kRechargeable = 0x4;
+    kReplaceable = 0x8;
+  }
+
   readonly attribute enum8 status = 0;
   readonly attribute int8u order = 1;
   readonly attribute char_string<60> description = 2;
@@ -988,6 +1270,13 @@ server cluster ThreadNetworkDiagnostics = 53 {
     kNotConnected = 1;
   }
 
+  bitmap ThreadNetworkDiagnosticsFeature : BITMAP32 {
+    kPacketCounts = 0x1;
+    kErrorCounts = 0x2;
+    kMLECounts = 0x4;
+    kMACCounts = 0x8;
+  }
+
   struct NeighborTable {
     INT64U extAddress = 0;
     INT32U age = 1;
@@ -1044,7 +1333,7 @@ server cluster ThreadNetworkDiagnostics = 53 {
 
   readonly attribute int16u channel = 0;
   readonly attribute enum8 routingRole = 1;
-  readonly attribute octet_string<16> networkName = 2;
+  readonly attribute char_string<16> networkName = 2;
   readonly attribute int16u panId = 3;
   readonly attribute int64u extendedPanId = 4;
   readonly attribute octet_string<17> meshLocalPrefix = 5;
@@ -1204,6 +1493,7 @@ server cluster WiFiNetworkDiagnostics = 54 {
 
 
 endpoint 0 {
+  server  cluster AccessControl;
   server  cluster AdministratorCommissioning;
   server  cluster Basic;
   server  cluster Descriptor;

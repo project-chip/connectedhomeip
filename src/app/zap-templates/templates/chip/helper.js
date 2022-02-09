@@ -38,10 +38,9 @@ function throwErrorIfUndefined(item, errorMsg, conditions)
 
 function checkIsInsideClusterBlock(context, name)
 {
-  const clusterName = context.name;
-  const clusterSide = context.side;
+  const clusterName = context.name ? context.name : context.clusterName;
+  const clusterSide = context.side ? context.side : context.clusterSide;
   const errorMsg    = name + ': Not inside a ({#chip_server_clusters}} block.';
-
   throwErrorIfUndefined(context, errorMsg, [ clusterName, clusterSide ]);
 
   return { clusterName, clusterSide };
@@ -275,11 +274,14 @@ function chip_cluster_command_arguments(options)
 function chip_cluster_command_arguments_with_structs_expanded(options)
 {
   const commandId = checkIsInsideCommandBlock(this, 'chip_cluster_command_arguments');
-  const commands  = getCommands.call(this.parent, 'chip_cluster_commands_argments_with_structs_expanded');
+  const commands  = getCommands.call(this.parent, 'chip_cluster_command_arguments_with_structs_expanded');
 
   const filter = command => command.id == commandId;
   return asBlocks.call(this, commands.then(items => {
     const item = items.find(filter);
+    if (item === undefined) {
+      return [];
+    }
     return item.expandedArguments || item.arguments;
   }),
       options);
@@ -333,6 +335,23 @@ function chip_client_has_list_attributes(options)
   const attributes      = ensureClusters(this).getClientAttributes(clusterName);
 
   const filter = attribute => attribute.isArray;
+  return attributes.then(items => items.find(filter));
+}
+
+/**
+ * Returns if a given server cluster has any reportable attribute
+ *
+ * This function is meant to be used inside a {{#chip_server_clusters}}
+ * block. It will throw otherwise.
+ *
+ * @param {*} options
+ */
+function chip_server_has_reportable_attributes(options)
+{
+  const { clusterName } = checkIsInsideClusterBlock(this, 'chip_server_has_reportable_attributes');
+  const attributes      = ensureClusters(this).getServerAttributes(clusterName);
+
+  const filter = attribute => attribute.isReportableAttribute;
   return attributes.then(items => items.find(filter));
 }
 
@@ -470,6 +489,7 @@ exports.chip_attribute_list_entryTypes                       = chip_attribute_li
 exports.chip_server_cluster_attributes                       = chip_server_cluster_attributes;
 exports.chip_server_cluster_events                           = chip_server_cluster_events;
 exports.chip_server_has_list_attributes                      = chip_server_has_list_attributes;
+exports.chip_server_has_reportable_attributes                = chip_server_has_reportable_attributes;
 exports.chip_available_cluster_commands                      = chip_available_cluster_commands;
 exports.chip_endpoints                                       = chip_endpoints;
 exports.chip_endpoint_clusters                               = chip_endpoint_clusters;

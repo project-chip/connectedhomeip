@@ -45,6 +45,7 @@
 #include <nlunit-test.h>
 
 using TestContext = chip::Test::AppContext;
+using namespace chip::Protocols;
 
 namespace chip {
 
@@ -65,11 +66,27 @@ namespace app {
 
 CommandHandler::Handle asyncCommandHandle;
 
-bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
+InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
 {
-    // Mock cluster catalog, only support one command on one cluster on one endpoint.
-    return (aCommandPath.mEndpointId == kTestEndpointId && aCommandPath.mClusterId == kTestClusterId &&
-            aCommandPath.mCommandId != kTestNonExistCommandId);
+    // Mock cluster catalog, only support commands on one cluster on one endpoint.
+    using InteractionModel::Status;
+
+    if (aCommandPath.mEndpointId != kTestEndpointId)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+
+    if (aCommandPath.mClusterId != kTestClusterId)
+    {
+        return Status::UnsupportedCluster;
+    }
+
+    if (aCommandPath.mCommandId == kTestNonExistCommandId)
+    {
+        return Status::UnsupportedCommand;
+    }
+
+    return Status::Success;
 }
 
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip::TLV::TLVReader & aReader,
@@ -101,15 +118,6 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
     }
 
     chip::isCommandDispatched = true;
-}
-
-void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPath, chip::TLV::TLVReader & aReader,
-                                          CommandSender * apCommandObj)
-{
-    ChipLogDetail(Controller,
-                  "Received Cluster Command: Endpoint=%" PRIx16 " Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
-                  aCommandPath.mEndpointId, ChipLogValueMEI(aCommandPath.mClusterId), ChipLogValueMEI(aCommandPath.mCommandId));
-    // Nothing todo.
 }
 
 class MockCommandSenderCallback : public CommandSender::Callback
@@ -151,7 +159,10 @@ public:
     {
         DispatchSingleClusterCommand(aCommandPath, apPayload, &apCommandObj);
     }
-    bool CommandExists(const ConcreteCommandPath & aCommandPath) { return ServerClusterCommandExists(aCommandPath); }
+    InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath)
+    {
+        return ServerClusterCommandExists(aCommandPath);
+    }
 
     int onFinalCalledTimes = 0;
 } mockCommandHandlerDelegate;

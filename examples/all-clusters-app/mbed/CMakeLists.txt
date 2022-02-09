@@ -54,8 +54,6 @@ target_sources(${APP_TARGET} PRIVATE
                ${MBED_COMMON}/util/LEDWidget.cpp
 
                ${GEN_DIR}/all-clusters-app/zap-generated/callback-stub.cpp
-               ${GEN_DIR}/all-clusters-app/zap-generated/CHIPClientCallbacks.cpp
-               ${GEN_DIR}/all-clusters-app/zap-generated/CHIPClusters.cpp
                ${GEN_DIR}/all-clusters-app/zap-generated/IMClusterCommandHandler.cpp
                ${GEN_DIR}/app-common/app-common/zap-generated/attributes/Accessors.cpp
                ${GEN_DIR}/app-common/app-common/zap-generated/cluster-objects.cpp
@@ -71,12 +69,10 @@ target_sources(${APP_TARGET} PRIVATE
 
                ${APP_UTIL}/DataModelHandler.cpp
                ${APP_UTIL}/af-event.cpp
-               ${APP_UTIL}/af-main-common.cpp
                ${APP_UTIL}/attribute-storage.cpp
                ${APP_UTIL}/attribute-table.cpp
                ${APP_UTIL}/attribute-size-util.cpp
                ${APP_UTIL}/binding-table.cpp
-               ${APP_UTIL}/chip-message-send.cpp
                ${APP_UTIL}/client-api.cpp
                ${APP_UTIL}/ember-print.cpp
                ${APP_UTIL}/ember-compatibility-functions.cpp
@@ -88,6 +84,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_CLUSTERS}/basic/basic.cpp
                ${APP_CLUSTERS}/bindings/BindingManager.cpp
                ${APP_CLUSTERS}/bindings/bindings.cpp
+               ${APP_CLUSTERS}/bindings/PendingNotificationMap.cpp
                ${APP_CLUSTERS}/on-off-server/on-off-server.cpp
                ${APP_CLUSTERS}/access-control-server/access-control-server.cpp
                ${APP_CLUSTERS}/account-login-server/account-login-server.cpp

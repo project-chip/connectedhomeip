@@ -27,6 +27,7 @@
 
 #include <utility>
 
+#include <crypto/RandUtils.h>
 #include <inet/IPAddress.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
@@ -206,7 +207,13 @@ public:
     Optional<SessionHandle> CreateUnauthenticatedSession(const Transport::PeerAddress & peerAddress,
                                                          const ReliableMessageProtocolConfig & config)
     {
-        return mUnauthenticatedSessions.FindOrAllocateEntry(peerAddress, config);
+        // Allocate ephemeralInitiatorNodeID in Operational Node ID range
+        NodeId ephemeralInitiatorNodeID;
+        do
+        {
+            ephemeralInitiatorNodeID = static_cast<NodeId>(Crypto::GetRandU64());
+        } while (!IsOperationalNodeId(ephemeralInitiatorNodeID));
+        return mUnauthenticatedSessions.AllocInitiator(ephemeralInitiatorNodeID, peerAddress, config);
     }
 
     // TODO: implements group sessions
@@ -251,7 +258,7 @@ private:
 
     SessionMessageDelegate * mCB = nullptr;
 
-    BitMapObjectPool<std::reference_wrapper<SessionRecoveryDelegate>, CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES>
+    ObjectPool<std::reference_wrapper<SessionRecoveryDelegate>, CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES>
         mSessionRecoveryDelegates;
 
     TransportMgrBase * mTransportMgr                                   = nullptr;
@@ -279,8 +286,8 @@ private:
     void SecureGroupMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                     System::PacketBufferHandle && msg);
 
-    void MessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                         System::PacketBufferHandle && msg);
+    void UnauthenticatedMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                        System::PacketBufferHandle && msg);
 
     void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source);
 

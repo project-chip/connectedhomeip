@@ -400,9 +400,13 @@ using CHIP_ERROR = ::chip::ChipError;
 
 #define CHIP_CORE_ERROR(e) CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kCore, (e))
 
-#define CHIP_IM_GLOBAL_STATUS(e) CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kIMGlobalStatus, to_underlying(e))
+#define CHIP_IM_GLOBAL_STATUS(type)                                                                                                \
+    CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kIMGlobalStatus, to_underlying(Protocols::InteractionModel::Status::type))
 
-#define CHIP_IM_CLUSTER_STATUS(e) CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kIMClusterStatus, e)
+//
+// type must be a compile-time constant as mandated by CHIP_SDK_ERROR.
+//
+#define CHIP_IM_CLUSTER_STATUS(type) CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kIMClusterStatus, type)
 
 // clang-format off
 
@@ -2388,6 +2392,33 @@ using CHIP_ERROR = ::chip::ChipError;
  *   range.
  */
 #define CHIP_ERROR_IM_CONSTRAINT_ERROR               CHIP_CORE_ERROR(0xd8)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE
+ *
+ * @brief
+ *   The Attribute DataElement is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE                    CHIP_CORE_ERROR(0xd9)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_TIMED_REQUEST_MESSAGE
+ *
+ * @brief
+ *   The Attribute DataElement is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_TIMED_REQUEST_MESSAGE                    CHIP_CORE_ERROR(0xda)
+
+/**
+ * @def CHIP_ERROR_INVALID_FILE_IDENTIFIER
+ *
+ * @brief
+ *   The file identifier, encoded in the first few bytes of a processed file,
+ *   has unexpected value.
+ */
+#define CHIP_ERROR_INVALID_FILE_IDENTIFIER                     CHIP_CORE_ERROR(0xdb)
 
 /**
  *  @}

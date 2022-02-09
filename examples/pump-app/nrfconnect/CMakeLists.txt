@@ -45,7 +45,11 @@ endif()
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/nrfconnect/chip-module)
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
-target_compile_options(app PRIVATE -Werror)
+# -Wmaybe-uninitialized has too many false positives, including on std::optional
+# and chip::Optional.  Make it nonfatal.
+#
+# See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80635
+target_compile_options(app PRIVATE -Werror -Wno-error=maybe-uninitialized)
 
 project(chip-nrfconnect-pump-example)
 

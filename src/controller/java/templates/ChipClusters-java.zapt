@@ -20,6 +20,7 @@ public class ChipClusters {
     /** Indicates a successful read for a CHAR_STRING attribute. */
     void onSuccess(String value);
     void onError(Exception error);
+    {{! TODO: use SubscriptionEstablishedCallback instead, here and below. }}
     default void onSubscriptionEstablished() {}
   }
 

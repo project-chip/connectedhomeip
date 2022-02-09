@@ -1629,7 +1629,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPOperationalCredentialsClusterOpCSRRequestParams
+@implementation CHIPOperationalCredentialsClusterCSRRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1640,7 +1640,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPOperationalCredentialsClusterOpCSRResponseParams
+@implementation CHIPOperationalCredentialsClusterCSRResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1692,9 +1692,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _statusCode = @(0);
 
-        _fabricIndex = @(0);
+        _fabricIndex = nil;
 
-        _debugText = @"";
+        _debugText = nil;
     }
     return self;
 }
@@ -1749,7 +1749,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _groupKeySet = [CHIPGroupKeyManagementClusterGroupKeySet new];
+        _groupKeySet = [CHIPGroupKeyManagementClusterGroupKeySetStruct new];
     }
     return self;
 }
@@ -1771,7 +1771,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _groupKeySet = [CHIPGroupKeyManagementClusterGroupKeySet new];
+        _groupKeySet = [CHIPGroupKeyManagementClusterGroupKeySetStruct new];
     }
     return self;
 }
@@ -1897,9 +1897,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _userId = @(0);
 
-        _userStatus = @(0);
+        _userStatus = nil;
 
-        _userType = @(0);
+        _userType = nil;
 
         _pin = [NSData data];
     }
@@ -2030,15 +2030,15 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _daysMask = @(0);
+        _daysMask = nil;
 
-        _startHour = @(0);
+        _startHour = nil;
 
-        _startMinute = @(0);
+        _startMinute = nil;
 
-        _endHour = @(0);
+        _endHour = nil;
 
-        _endMinute = @(0);
+        _endMinute = nil;
     }
     return self;
 }
@@ -2098,9 +2098,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _localStartTime = @(0);
+        _localStartTime = nil;
 
-        _localEndTime = @(0);
+        _localEndTime = nil;
     }
     return self;
 }
@@ -2156,11 +2156,11 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _localStartTime = @(0);
+        _localStartTime = nil;
 
-        _localEndTime = @(0);
+        _localEndTime = nil;
 
-        _operatingMode = @(0);
+        _operatingMode = nil;
     }
     return self;
 }
@@ -2221,9 +2221,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _userId = @(0);
 
-        _userStatus = @(0);
+        _userStatus = nil;
 
-        _userType = @(0);
+        _userType = nil;
 
         _rfidCode = [NSData data];
     }
@@ -2283,11 +2283,11 @@ NS_ASSUME_NONNULL_BEGIN
 
         _userUniqueId = nil;
 
-        _userStatus = @(0);
+        _userStatus = nil;
 
-        _userType = @(0);
+        _userType = nil;
 
-        _credentialRule = @(0);
+        _credentialRule = nil;
     }
     return self;
 }
@@ -2327,7 +2327,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _lastModifiedFabricIndex = nil;
 
-        _nextUserIndex = @(0);
+        _nextUserIndex = nil;
     }
     return self;
 }
@@ -2401,9 +2401,11 @@ NS_ASSUME_NONNULL_BEGIN
 
         _credentialData = [NSData data];
 
-        _userIndex = @(0);
+        _userIndex = nil;
 
-        _userStatus = @(0);
+        _userStatus = nil;
+
+        _userType = nil;
     }
     return self;
 }
@@ -2455,7 +2457,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _credential = [CHIPDoorLockClusterDlCredential new];
+        _credential = nil;
     }
     return self;
 }
@@ -3312,7 +3314,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _target = @(0);
 
-        _data = @"";
+        _data = nil;
     }
     return self;
 }
@@ -3325,7 +3327,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _data = @"";
+        _data = nil;
     }
     return self;
 }
@@ -3426,11 +3428,11 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
+        _search = [NSArray array];
+
         _autoPlay = @(0);
 
-        _data = @"";
-
-        _search = [NSArray array];
+        _data = nil;
     }
     return self;
 }
@@ -3443,9 +3445,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _contentURL = @"";
 
-        _displayString = @"";
+        _displayString = nil;
 
-        _brandingInformation = [CHIPContentLauncherClusterBrandingInformation new];
+        _brandingInformation = nil;
     }
     return self;
 }
@@ -3458,7 +3460,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _data = @"";
+        _data = nil;
     }
     return self;
 }
@@ -3493,9 +3495,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _data = @"";
+        _application = [CHIPApplicationLauncherClusterApplication new];
 
-        _application = [CHIPApplicationLauncherClusterApplicationLauncherApplication new];
+        _data = nil;
     }
     return self;
 }
@@ -3506,7 +3508,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _application = [CHIPApplicationLauncherClusterApplicationLauncherApplication new];
+        _application = [CHIPApplicationLauncherClusterApplication new];
     }
     return self;
 }
@@ -3517,7 +3519,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _application = [CHIPApplicationLauncherClusterApplicationLauncherApplication new];
+        _application = [CHIPApplicationLauncherClusterApplication new];
     }
     return self;
 }
@@ -3530,7 +3532,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _data = @"";
+        _data = [NSData data];
     }
     return self;
 }
@@ -3864,6 +3866,17 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPTestClusterClusterTestEmitTestFabricScopedEventResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _value = @(0);
+    }
+    return self;
+}
+@end
+
 @implementation CHIPTestClusterClusterTestListNestedStructListArgumentRequestParams
 - (instancetype)init
 {
@@ -3975,6 +3988,17 @@ NS_ASSUME_NONNULL_BEGIN
         _arg2 = @(0);
 
         _arg3 = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPTestClusterClusterTestEmitTestFabricScopedEventRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _arg1 = @(0);
     }
     return self;
 }

@@ -45,17 +45,15 @@ template <typename DecodableAttributeType>
 CHIP_ERROR ReportAttribute(Messaging::ExchangeManager * exchangeMgr, EndpointId endpointId, ClusterId clusterId,
                            AttributeId attributeId, ReportAttributeParams<DecodableAttributeType> && readParams)
 {
-    app::AttributePathParams attributePath(endpointId, clusterId, attributeId);
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
     CHIP_ERROR err                       = CHIP_NO_ERROR;
 
-    readParams.mpAttributePathParamsList    = &attributePath;
+    auto readPaths = Platform::MakeUnique<app::AttributePathParams>(endpointId, clusterId, attributeId);
+    VerifyOrReturnError(readPaths != nullptr, CHIP_ERROR_NO_MEMORY);
+    readParams.mpAttributePathParamsList    = readPaths.get();
     readParams.mAttributePathParamsListSize = 1;
 
-    auto onDone = [](app::ReadClient * apReadClient, TypedReadAttributeCallback<DecodableAttributeType> * callback) {
-        chip::Platform::Delete(apReadClient);
-        chip::Platform::Delete(callback);
-    };
+    auto onDone = [](TypedReadAttributeCallback<DecodableAttributeType> * callback) { chip::Platform::Delete(callback); };
 
     auto callback = chip::Platform::MakeUnique<TypedReadAttributeCallback<DecodableAttributeType>>(
         clusterId, attributeId, readParams.mOnReportCb, readParams.mOnErrorCb, onDone, readParams.mOnSubscriptionEstablishedCb);
@@ -63,16 +61,27 @@ CHIP_ERROR ReportAttribute(Messaging::ExchangeManager * exchangeMgr, EndpointId 
 
     auto readClient =
         chip::Platform::MakeUnique<app::ReadClient>(engine, exchangeMgr, callback->GetBufferedCallback(), readParams.mReportType);
+    VerifyOrReturnError(readClient != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    ReturnErrorOnFailure(readClient->SendRequest(readParams));
+    if (readClient->IsSubscriptionType())
+    {
+        readPaths.release();
+        err = readClient->SendAutoResubscribeRequest(std::move(readParams));
+        ReturnErrorOnFailure(err);
+    }
+    else
+    {
+        err = readClient->SendRequest(readParams);
+        ReturnErrorOnFailure(err);
+    }
 
     //
     // At this point, we'll get a callback through the OnDone callback above regardless of success or failure
     // of the read operation to permit us to free up the callback object. So, release ownership of the callback
     // object now to prevent it from being reclaimed at the end of this scoped block.
     //
+    callback->AdoptReadClient(std::move(readClient));
     callback.release();
-    readClient.release();
 
     return err;
 }
@@ -179,19 +188,19 @@ template <typename DecodableEventType>
 CHIP_ERROR ReportEvent(Messaging::ExchangeManager * apExchangeMgr, EndpointId endpointId,
                        ReportEventParams<DecodableEventType> && readParams)
 {
-    ClusterId clusterId = DecodableEventType::GetClusterId();
-    EventId eventId     = DecodableEventType::GetEventId();
-    app::EventPathParams eventPath(endpointId, clusterId, eventId);
+    ClusterId clusterId                  = DecodableEventType::GetClusterId();
+    EventId eventId                      = DecodableEventType::GetEventId();
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
     CHIP_ERROR err                       = CHIP_NO_ERROR;
 
-    readParams.mpEventPathParamsList    = &eventPath;
+    auto readPaths = Platform::MakeUnique<app::EventPathParams>(endpointId, clusterId, eventId);
+    VerifyOrReturnError(readPaths != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    readParams.mpEventPathParamsList = readPaths.get();
+
     readParams.mEventPathParamsListSize = 1;
 
-    auto onDone = [](app::ReadClient * apReadClient, TypedReadEventCallback<DecodableEventType> * callback) {
-        chip::Platform::Delete(apReadClient);
-        chip::Platform::Delete(callback);
-    };
+    auto onDone = [](TypedReadEventCallback<DecodableEventType> * callback) { chip::Platform::Delete(callback); };
 
     auto callback = chip::Platform::MakeUnique<TypedReadEventCallback<DecodableEventType>>(
         readParams.mOnReportCb, readParams.mOnErrorCb, onDone, readParams.mOnSubscriptionEstablishedCb);
@@ -199,14 +208,26 @@ CHIP_ERROR ReportEvent(Messaging::ExchangeManager * apExchangeMgr, EndpointId en
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
 
     auto readClient = chip::Platform::MakeUnique<app::ReadClient>(engine, apExchangeMgr, *callback.get(), readParams.mReportType);
-    ReturnErrorOnFailure(readClient->SendRequest(readParams));
+    VerifyOrReturnError(readClient != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    if (readClient->IsSubscriptionType())
+    {
+        readPaths.release();
+        err = readClient->SendAutoResubscribeRequest(std::move(readParams));
+        ReturnErrorOnFailure(err);
+    }
+    else
+    {
+        err = readClient->SendRequest(readParams);
+        ReturnErrorOnFailure(err);
+    }
 
     //
     // At this point, we'll get a callback through the OnDone callback above regardless of success or failure
     // of the read operation to permit us to free up the callback object. So, release ownership of the callback
     // object now to prevent it from being reclaimed at the end of this scoped block.
     //
-    callback.release();
+    callback->AdoptReadClient(std::move(readClient));
     readClient.release();
 
     return err;

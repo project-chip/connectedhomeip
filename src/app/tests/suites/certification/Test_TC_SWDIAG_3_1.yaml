@@ -16,17 +16,14 @@ name: 45.1.4. [TC-SWDIAG-3.1] Command received functionality with server as DUT
 
 config:
     cluster: "Software Diagnostics"
-    endpoint: 1
+    endpoint: 0
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
 
-    #issue #11578 ResetWatermarks command is Failing
-    #disabled due to issue  #13441
     - label: "Sends ResetWatermarks to DUT"
-      disabled: true
       command: "ResetWatermarks"
       PICS: CR_RESETWATERMARKS
 
@@ -36,7 +33,8 @@ tests:
       attribute: "ThreadMetrics"
       PICS: A_THREADMETRICS
       response:
-          value: 0
+          # TODO: Say something about the values?
+          value: {}
 
     - label: "Reads CurrentHeapUsed attribute value from DUT"
       optional: true

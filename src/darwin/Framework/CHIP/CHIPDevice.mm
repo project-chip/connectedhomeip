@@ -89,21 +89,21 @@ public:
     BufferedReadCallback & GetBufferedCallback() { return mBufferedReadAdapter; }
 
     // We need to exist to get a ReadClient, so can't take this as a constructor argument.
-    void SetReadClient(ReadClient * aReadClient) { mReadClient = aReadClient; }
+    void AdoptReadClient(std::unique_ptr<ReadClient> aReadClient) { mReadClient = std::move(aReadClient); }
 
 private:
-    void OnReportBegin(const ReadClient * apReadClient) override;
+    void OnReportBegin() override;
 
-    void OnReportEnd(const ReadClient * apReadClient) override;
+    void OnReportEnd() override;
 
-    void OnAttributeData(const ReadClient * apReadClient, const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
-        const StatusIB & aStatus) override;
+    void OnAttributeData(
+        const ConcreteDataAttributePath & aPath, DataVersion aVersion, TLV::TLVReader * apData, const StatusIB & aStatus) override;
 
-    void OnError(const ReadClient * apReadClient, CHIP_ERROR aError) override;
+    void OnError(CHIP_ERROR aError) override;
 
-    void OnDone(ReadClient * apReadClient) override;
+    void OnDone() override;
 
-    void OnSubscriptionEstablished(const ReadClient * apReadClient) override;
+    void OnSubscriptionEstablished(uint64_t aSubscriptionId) override;
 
     void ReportError(CHIP_ERROR err);
     void ReportError(EmberAfStatus status);
@@ -130,7 +130,7 @@ private:
     // 2) We ensure that we delete ourselves and the passed in ReadClient only from OnDone or a queued-up
     //    error callback, but not both, by tracking whether we have a queued-up
     //    deletion.
-    ReadClient * mReadClient = nullptr;
+    std::unique_ptr<ReadClient> mReadClient;
     bool mHaveQueuedDeletion = false;
 };
 
@@ -156,8 +156,8 @@ private:
     params.mpAttributePathParamsList = &attributePath;
     params.mAttributePathParamsListSize = 1;
 
-    auto callback = new SubscriptionCallback(queue, reportHandler, subscriptionEstablishedHandler);
-    ReadClient * readClient = new ReadClient(InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
+    auto callback = std::make_unique<SubscriptionCallback>(queue, reportHandler, subscriptionEstablishedHandler);
+    auto readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
         callback->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
 
     CHIP_ERROR err = readClient->SendRequest(params);
@@ -166,14 +166,13 @@ private:
             reportHandler(nil, [CHIPError errorForCHIPErrorCode:err]);
         });
 
-        delete readClient;
-        delete callback;
         return;
     }
 
     // Callback and ReadClient will be deleted when OnDone is called or an error is
     // encountered.
-    callback->SetReadClient(readClient);
+    callback->AdoptReadClient(std::move(readClient));
+    callback.release();
 }
 @end
 
@@ -201,9 +200,9 @@ private:
 @end
 
 namespace {
-void SubscriptionCallback::OnReportBegin(const ReadClient * apReadClient) { mReports = [NSMutableArray new]; }
+void SubscriptionCallback::OnReportBegin() { mReports = [NSMutableArray new]; }
 
-void SubscriptionCallback::OnReportEnd(const ReadClient * apReadClient)
+void SubscriptionCallback::OnReportEnd()
 {
     __block NSArray * reports = mReports;
     mReports = nil;
@@ -216,7 +215,7 @@ void SubscriptionCallback::OnReportEnd(const ReadClient * apReadClient)
 }
 
 void SubscriptionCallback::OnAttributeData(
-    const ReadClient * apReadClient, const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus)
+    const ConcreteDataAttributePath & aPath, DataVersion aVersion, TLV::TLVReader * apData, const StatusIB & aStatus)
 {
     if (aPath.IsListItemOperation()) {
         ReportError(CHIP_ERROR_INCORRECT_STATE);
@@ -254,21 +253,17 @@ void SubscriptionCallback::OnAttributeData(
     [mReports addObject:[[CHIPAttributeReport alloc] initWithPath:aPath value:value]];
 }
 
-void SubscriptionCallback::OnError(const ReadClient * apReadClient, CHIP_ERROR aError)
-{
-    ReportError([CHIPError errorForCHIPErrorCode:aError]);
-}
+void SubscriptionCallback::OnError(CHIP_ERROR aError) { ReportError([CHIPError errorForCHIPErrorCode:aError]); }
 
-void SubscriptionCallback::OnDone(ReadClient * apReadClient)
+void SubscriptionCallback::OnDone()
 {
     if (!mHaveQueuedDeletion) {
         delete this;
-        delete apReadClient;
         return; // Make sure we touch nothing else.
     }
 }
 
-void SubscriptionCallback::OnSubscriptionEstablished(const ReadClient * apReadClient)
+void SubscriptionCallback::OnSubscriptionEstablished(uint64_t aSubscriptionId)
 {
     if (mSubscriptionEstablishedHandler) {
         dispatch_async(mQueue, mSubscriptionEstablishedHandler);
@@ -299,7 +294,6 @@ void SubscriptionCallback::ReportError(NSError * _Nullable err)
     dispatch_async(mQueue, ^{
         callback(nil, err);
 
-        delete mReadClient;
         delete myself;
     });
 

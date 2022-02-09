@@ -8,7 +8,7 @@
 {{!TODO: consider #chip_clusters as iteration point as well.
 {{!      Unsure about the differences}}
 {{#all_user_clusters}}
-{{side}} cluster {{asUpperCamelCase name}} = {{code}} {
+  {{~side}} cluster {{asUpperCamelCase name}} = {{code}} {
   {{#zcl_enums}}
   enum {{asUpperCamelCase name}} : {{type}} {
     {{#zcl_enum_items}}
@@ -17,8 +17,16 @@
   }
 
   {{/zcl_enums}}
+  {{#zcl_bitmaps}}
+  bitmap {{name}} : {{type}} {
+    {{#zcl_bitmap_items}}
+    k{{asUpperCamelCase label}} = {{asHex mask}};
+    {{/zcl_bitmap_items}}
+  }
+
+  {{/zcl_bitmaps}}
   {{#chip_cluster_specific_structs}}
-{{>idl_structure_definition extraIndent=1}}
+    {{~>idl_structure_definition extraIndent=1}}
 
   {{/chip_cluster_specific_structs}}
   {{#zcl_events}}
@@ -53,36 +61,44 @@
     {{/unless}} {{asLowerCamelCase name~}}
     {{~#if isArray~}} [] {{~/if}} = {{code}};
   {{/chip_server_cluster_attributes}}
-  {{#chip_cluster_commands}}
-  {{#if arguments}}
-
-  request struct {{asUpperCamelCase name}}Request {
-    {{#chip_cluster_command_arguments}}
-    {{> idl_structure_member}}
-
-    {{/chip_cluster_command_arguments}}
-  }
+  {{~!--Open:Generating command request structs for all incoming commands into server side--~}}
+  {{#if (is_server side)}}
+    {{#all_incoming_commands_for_cluster name side}}
+      {{~>idl_command_request_struct}}
+    {{/all_incoming_commands_for_cluster}}
   {{/if}}
-  {{/chip_cluster_commands}}
-  {{#chip_cluster_responses}}
-
-  response struct {{asUpperCamelCase name}} {
-    {{#chip_cluster_response_arguments}}
-    {{> idl_structure_member}}
-
-    {{/chip_cluster_response_arguments}}
-  }
-  {{/chip_cluster_responses}}
-  {{#chip_cluster_commands}}
-  {{#first}}
-
-  {{/first}}
-  command {{asUpperCamelCase name}}(
-    {{~#if arguments~}}
-       {{asUpperCamelCase name}}Request
-    {{~/if~}}
-  ): {{asUpperCamelCase responseName}} = {{code}};
-  {{/chip_cluster_commands}}
+  {{~!--Close:Generating command request structs for all incoming commands into server side--~}}
+  {{~!--Open:Generating command request structs for all outgoing commands from client side--~}}
+  {{#if (is_client side)}}
+    {{#all_outgoing_commands_for_cluster name side}}
+      {{~>idl_command_request_struct}}
+    {{/all_outgoing_commands_for_cluster}}
+  {{/if}}
+  {{~!--Close:Generating command request structs for all outgoing commands from client side--~}}
+  {{~!--Open:Generating command response structs for all incoming commands into client side--~}}
+  {{#if (is_client side)}}
+    {{#all_incoming_commands_for_cluster name side}}
+      {{~>idl_command_response_struct}}
+    {{/all_incoming_commands_for_cluster}}
+  {{/if}}
+  {{~!--Close:Generating command response structs for all incoming commands into client side--~}}
+  {{~!--Open:Generating command response structs for all outgoing commands from server side--~}}
+  {{#if (is_server side)}}
+    {{#all_outgoing_commands_for_cluster name side}}
+      {{~>idl_command_response_struct}}
+    {{/all_outgoing_commands_for_cluster}}
+  {{/if}}
+  {{~!--Close:Generating command response structs for all outgoing commands from server side--~}}
+  {{#if (is_server side)}}
+    {{#all_incoming_commands_for_cluster name side}}
+      {{~>idl_command_request_response}}{{~new_line 1~}}
+    {{/all_incoming_commands_for_cluster}}
+  {{/if}}
+  {{#if (is_client side)}}
+    {{#all_outgoing_commands_for_cluster name side}}
+      {{~>idl_command_request_response}}{{~new_line 1~}}
+    {{/all_outgoing_commands_for_cluster}}
+  {{/if}}
 }
 
 {{/all_user_clusters}}

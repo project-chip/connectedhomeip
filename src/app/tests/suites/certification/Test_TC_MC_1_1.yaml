@@ -24,7 +24,6 @@ tests:
       command: "WaitForCommissionee"
 
     - label: "read the global attribute: ClusterRevision"
-      disabled: true
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -48,29 +47,19 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "reads back global attribute: ClusterRevision"
-      disabled: true
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
           value: 1
 
-    #issue #11053 disabled steps below Global attributes missing from YAML framework
     - label: "Read the global attribute: AttributeList"
-      disabled: true
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           constraints:
               type: list
 
-    - label: "Read the global attribute: CommandList"
-      disabled: true
-      command: "readAttribute"
-      attribute: "CommandList"
-      response:
-          constraints:
-              type: list
-
+    #issue #11053 disabled steps below Global attributes missing from YAML framework
     - label: "Read the global attribute: EventList"
       disabled: true
       command: "readAttribute"

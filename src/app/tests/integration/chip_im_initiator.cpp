@@ -126,18 +126,17 @@ void HandleSubscribeReportComplete()
            static_cast<double>(transitTime.count()) / 1000);
 }
 
-class MockInteractionModelApp : public chip::app::InteractionModelDelegate,
-                                public ::chip::app::CommandSender::Callback,
+class MockInteractionModelApp : public ::chip::app::CommandSender::Callback,
                                 public ::chip::app::WriteClient::Callback,
                                 public ::chip::app::ReadClient::Callback
 {
 public:
-    void OnEventData(const chip::app::ReadClient * apReadClient, const chip::app::EventHeader & aEventHeader,
-                     chip::TLV::TLVReader * apData, const chip::app::StatusIB * apStatus) override
+    void OnEventData(const chip::app::EventHeader & aEventHeader, chip::TLV::TLVReader * apData,
+                     const chip::app::StatusIB * apStatus) override
     {}
-    void OnSubscriptionEstablished(const chip::app::ReadClient * apReadClient) override
+    void OnSubscriptionEstablished(uint64_t aSubscriptionId) override
     {
-        if (apReadClient->IsSubscriptionType())
+        if (mReadClient->IsSubscriptionType())
         {
             gSubReportCount++;
             if (gSubReportCount == gSubMaxReport)
@@ -146,23 +145,20 @@ public:
             }
         }
     }
-    void OnAttributeData(const chip::app::ReadClient * apReadClient, const chip::app::ConcreteDataAttributePath & aPath,
+    void OnAttributeData(const chip::app::ConcreteDataAttributePath & aPath, chip::DataVersion aVersion,
                          chip::TLV::TLVReader * aData, const chip::app::StatusIB & status) override
     {}
 
-    void OnError(const chip::app::ReadClient * apReadClient, CHIP_ERROR aError) override
-    {
-        printf("ReadError with err %" CHIP_ERROR_FORMAT, aError.Format());
-    }
+    void OnError(CHIP_ERROR aError) override { printf("ReadError with err %" CHIP_ERROR_FORMAT, aError.Format()); }
 
-    void OnDone(chip::app::ReadClient * apReadClient) override
+    void OnDone() override
     {
-        if (!apReadClient->IsSubscriptionType())
+        if (!mReadClient->IsSubscriptionType())
         {
             HandleReadComplete();
         }
 
-        chip::Platform::Delete(apReadClient);
+        mReadClient.reset();
     }
 
     void OnResponse(chip::app::CommandSender * apCommandSender, const chip::app::ConcreteCommandPath & aPath,
@@ -206,6 +202,26 @@ public:
         printf("WriteClient::OnError happens with %" CHIP_ERROR_FORMAT, aError.Format());
     }
     void OnDone(chip::app::WriteClient * apWriteClient) override {}
+
+    void AdoptReadClient(chip::Platform::UniquePtr<chip::app::ReadClient> apReadClient) { mReadClient = std::move(apReadClient); }
+
+    void Shutdown() { mReadClient.reset(); }
+
+    void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
+    {
+        if (aReadPrepareParams.mpAttributePathParamsList != nullptr)
+        {
+            delete[] aReadPrepareParams.mpAttributePathParamsList;
+        }
+
+        if (aReadPrepareParams.mpEventPathParamsList != nullptr)
+        {
+            delete[] aReadPrepareParams.mpEventPathParamsList;
+        }
+    }
+
+private:
+    chip::Platform::UniquePtr<chip::app::ReadClient> mReadClient;
 };
 
 MockInteractionModelApp gMockDelegate;
@@ -327,7 +343,7 @@ CHIP_ERROR SendReadRequest()
 
     SuccessOrExit(readClient->SendRequest(readPrepareParams));
 
-    readClient.release();
+    gMockDelegate.AdoptReadClient(std::move(readClient));
 
 exit:
     if (err == CHIP_NO_ERROR)
@@ -380,8 +396,8 @@ CHIP_ERROR SendSubscribeRequest()
     gLastMessageTime = chip::System::SystemClock().GetMonotonicTimestamp();
 
     chip::app::ReadPrepareParams readPrepareParams(gSession.Get());
-    chip::app::EventPathParams eventPathParams[2];
-    chip::app::AttributePathParams attributePathParams[1];
+    chip::app::EventPathParams * eventPathParams           = new chip::app::EventPathParams[2];
+    chip::app::AttributePathParams * attributePathParams   = new chip::app::AttributePathParams[1];
     readPrepareParams.mpEventPathParamsList                = eventPathParams;
     readPrepareParams.mpEventPathParamsList[0].mEndpointId = kTestEndpointId;
     readPrepareParams.mpEventPathParamsList[0].mClusterId  = kTestClusterId;
@@ -402,19 +418,19 @@ CHIP_ERROR SendSubscribeRequest()
 
     readPrepareParams.mMinIntervalFloorSeconds   = 5;
     readPrepareParams.mMaxIntervalCeilingSeconds = 5;
+
     printf("\nSend subscribe request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
     auto readClient =
         chip::Platform::MakeUnique<chip::app::ReadClient>(chip::app::InteractionModelEngine::GetInstance(), &gExchangeManager,
                                                           gMockDelegate, chip::app::ReadClient::InteractionType::Subscribe);
 
-    SuccessOrExit(readClient->SendRequest(readPrepareParams));
+    err = readClient->SendAutoResubscribeRequest(std::move(readPrepareParams));
 
-    readClient.release();
+    gMockDelegate.AdoptReadClient(std::move(readClient));
 
     gSubCount++;
 
-exit:
     if (err != CHIP_NO_ERROR)
     {
         printf("Send subscribe request failed, err: %s\n", chip::ErrorStr(err));
@@ -616,33 +632,16 @@ exit:
 
 namespace chip {
 namespace app {
-bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
+Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
 {
-    // Always return true in test.
-    return true;
+    // Always return success in test.
+    return Protocols::InteractionModel::Status::Success;
 }
 
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip::TLV::TLVReader & aReader,
                                   CommandHandler * apCommandObj)
 {
     // Nothing todo.
-}
-
-void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPath, chip::TLV::TLVReader & aReader,
-                                          CommandSender * apCommandObj)
-{
-    if (aCommandPath.mClusterId != kTestClusterId || aCommandPath.mCommandId != kTestCommandId ||
-        aCommandPath.mEndpointId != kTestEndpointId)
-    {
-        return;
-    }
-
-    if (aReader.GetLength() != 0)
-    {
-        chip::TLV::Debug::Dump(aReader, TLVPrettyPrinter);
-    }
-
-    gLastCommandResult = TestCommandResult::kSuccess;
 }
 
 CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
@@ -730,6 +729,8 @@ int main(int argc, char * argv[])
     SuccessOrExit(err);
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
+
+    gMockDelegate.Shutdown();
 
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
     gTransportManager.Close();

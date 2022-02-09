@@ -9,3 +9,9 @@ static CHIP_ERROR LogValue(const char * label, size_t indent, {{zapTypeToDecodab
 static CHIP_ERROR LogValue(const char * label, size_t indent, const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Events::{{asUpperCamelCase name}}::DecodableType & value);
 {{/zcl_events}}
 {{/zcl_clusters}}
+
+{{#chip_client_clusters}}
+{{#chip_cluster_responses}}
+static CHIP_ERROR LogValue(const char * label, size_t indent, const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType & value);
+{{/chip_cluster_responses}}
+{{/chip_client_clusters}}

@@ -188,6 +188,11 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
         return CHIP_NO_ERROR == complexArgument->Parse(arg.name, argValue);
     }
 
+    case ArgumentType::Custom: {
+        auto customArgument = static_cast<CustomArgument *>(arg.value);
+        return CHIP_NO_ERROR == customArgument->Parse(arg.name, argValue);
+    }
+
     case ArgumentType::Attribute: {
         if (arg.isOptional() || arg.isNullable())
         {
@@ -269,7 +274,7 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
         break;
     }
 
-    case ArgumentType::Boolean:
+    case ArgumentType::Bool:
     case ArgumentType::Number_uint8: {
         isValidArgument = HandleNullableOptional<uint8_t>(arg, argValue, [&](auto * value) {
             // stringstream treats uint8_t as char, which is not what we want here.
@@ -490,6 +495,17 @@ size_t Command::AddArgument(const char * name, ComplexArgument * value)
     arg.type  = ArgumentType::Complex;
     arg.name  = name;
     arg.value = static_cast<void *>(value);
+    arg.flags = 0;
+
+    return AddArgumentToList(std::move(arg));
+}
+
+size_t Command::AddArgument(const char * name, CustomArgument * value)
+{
+    Argument arg;
+    arg.type  = ArgumentType::Custom;
+    arg.name  = name;
+    arg.value = const_cast<void *>(reinterpret_cast<const void *>(value));
     arg.flags = 0;
 
     return AddArgumentToList(std::move(arg));

@@ -486,8 +486,7 @@ void OperationalDataset::UnsetPSKc(void)
 
 bool OperationalDataset::IsCommissioned(void) const
 {
-    return Has(ThreadTLV::kNetworkName) && Has(ThreadTLV::kPanId) && Has(ThreadTLV::kMasterKey) && Has(ThreadTLV::kExtendedPanId) &&
-        Has(ThreadTLV::kChannel);
+    return Has(ThreadTLV::kPanId) && Has(ThreadTLV::kMasterKey) && Has(ThreadTLV::kExtendedPanId) && Has(ThreadTLV::kChannel);
 }
 
 const ThreadTLV * OperationalDataset::Locate(uint8_t aType) const
