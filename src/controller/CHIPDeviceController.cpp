@@ -554,32 +554,6 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowInternal()
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-Transport::PeerAddress DeviceController::ToPeerAddress(const chip::Dnssd::ResolvedNodeData & nodeData)
-{
-    Transport::PeerAddress address = Transport::PeerAddress(Transport::Type::kUdp);
-    address.SetPort(nodeData.mPort);
-
-    for (unsigned i = 0; i < nodeData.mNumIPs; i++)
-    {
-        const auto addr = nodeData.mAddress[i];
-        // Only use the mDNS resolution's InterfaceID for addresses that are IPv6 LLA.
-        // For all other addresses, we should rely on the device's routing table to route messages sent.
-        // Forcing messages down an InterfaceId might fail. For example, in bridged networks like Thread,
-        // mDNS advertisements are not usually received on the same interface the peer is reachable on.
-        // TODO: Right now, just use addr0, but we should really push all the addresses and interfaces to
-        // the device and allow it to make a proper decision about which addresses are preferred and reachable.
-        CHIP_ERROR err = address.AppendDestination(nodeData.mAddress[i],
-                                                   addr.IsIPv6LinkLocal() ? nodeData.mInterfaceId : Inet::InterfaceId::Null());
-
-        if (err != CHIP_NO_ERROR)
-        {
-            char addr_str[Inet::IPAddress::kMaxStringLength];
-            ChipLogError(Controller, "Could not append IP address %s: %s", addr.ToString(addr_str), err.AsString());
-        }
-    }
-
-    return address;
-}
 
 void DeviceController::OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & nodeData)
 {

@@ -178,8 +178,6 @@ public:
 
     static Transport::PeerAddress ToPeerAddress(const Dnssd::ResolvedNodeData & nodeData)
     {
-        // TODO: this is copied & pasted in CHIPDeviceController.cpp.
-        //       There should be a single place of implementation for things.
         Transport::PeerAddress address = Transport::PeerAddress(Transport::Type::kUdp);
         address.SetPort(nodeData.mPort);
 

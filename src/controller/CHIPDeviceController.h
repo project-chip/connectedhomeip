@@ -353,8 +353,6 @@ protected:
 
     PersistentStorageDelegate * mStorageDelegate = nullptr;
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-    static Transport::PeerAddress ToPeerAddress(const chip::Dnssd::ResolvedNodeData & nodeData);
-
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
     // TODO(cecille): Make this configuarable.
     static constexpr int kMaxCommissionableNodes = 10;
