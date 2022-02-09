@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-
 #include "OTAConfig.h"
 
 #include "platform/bootloader/api/application_properties.h"
@@ -61,13 +60,11 @@ __attribute__((used)) ApplicationProperties_t sl_app_properties = {
     },
 };
 
-
 // Global OTA objects
 chip::OTARequestor gRequestorCore;
 chip::DeviceLayer::GenericOTARequestorDriver gRequestorUser;
 chip::BDXDownloader gDownloader;
 chip::OTAImageProcessorImpl gImageProcessor;
-
 
 void OTAConfig::Init()
 {

@@ -29,5 +29,4 @@ public:
     OTAConfig(){};
 
     static void Init();
-
 };
