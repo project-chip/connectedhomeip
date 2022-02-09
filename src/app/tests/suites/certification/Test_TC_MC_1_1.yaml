@@ -24,7 +24,6 @@ tests:
       command: "WaitForCommissionee"
 
     - label: "read the global attribute: ClusterRevision"
-      disabled: true
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -48,7 +47,6 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "reads back global attribute: ClusterRevision"
-      disabled: true
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:

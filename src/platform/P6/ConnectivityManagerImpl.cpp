@@ -70,16 +70,21 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(WiFiStationMode val)
     VerifyOrExit(val != kWiFiStationMode_NotSupported, err = CHIP_ERROR_INVALID_ARGUMENT);
     if (val != kWiFiStationMode_ApplicationControlled)
     {
-        mWiFiStationMode = val;
-        DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
-    }
-    if (mWiFiStationMode != val)
-    {
         ChipLogProgress(DeviceLayer, "WiFi station mode change: %s -> %s", WiFiStationModeToStr(mWiFiStationMode),
                         WiFiStationModeToStr(val));
+        mWiFiStationMode = val;
+        /* Schedule work for disabled case causes station mode not getting enabled */
+        if (mWiFiStationMode != kWiFiStationMode_Disabled)
+        {
+            DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+        }
+        else
+        {
+            /* Call Drive Station directly to disable directly instead of scheduling */
+            DriveStationState();
+        }
     }
 
-    mWiFiStationMode = val;
 exit:
     return err;
 }
@@ -200,21 +205,38 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     // Ensure that P6 station mode is enabled.
     err = Internal::P6Utils::EnableStationMode();
     SuccessOrExit(err);
-    // If the code has been compiled with a default WiFi station provision, configure that now.
-    if (CHIP_DEVICE_CONFIG_DEFAULT_STA_SSID[0] != 0)
+    // If there is no persistent station provision...
+    if (!IsWiFiStationProvisioned())
     {
-        ChipLogProgress(DeviceLayer, "Setting default WiFi station configuration (SSID: %s)", CHIP_DEVICE_CONFIG_DEFAULT_STA_SSID);
+        // If the code has been compiled with a default WiFi station provision, configure that now.
+        if (CHIP_DEVICE_CONFIG_DEFAULT_STA_SSID[0] != 0)
+        {
+            ChipLogProgress(DeviceLayer, "Setting default WiFi station configuration (SSID: %s)",
+                            CHIP_DEVICE_CONFIG_DEFAULT_STA_SSID);
 
-        // Set a default station configuration.
-        wifi_config_t wifiConfig;
-        memset(&wifiConfig, 0, sizeof(wifiConfig));
-        memcpy(wifiConfig.sta.ssid, CHIP_DEVICE_CONFIG_DEFAULT_STA_SSID,
-               min(strlen(CHIP_DEVICE_CONFIG_DEFAULT_STA_SSID), sizeof(wifiConfig.sta.ssid)));
-        memcpy(wifiConfig.sta.password, CHIP_DEVICE_CONFIG_DEFAULT_STA_PASSWORD,
-               min(strlen(CHIP_DEVICE_CONFIG_DEFAULT_STA_PASSWORD), sizeof(wifiConfig.sta.password)));
-        wifiConfig.sta.security = CHIP_DEVICE_CONFIG_DEFAULT_STA_SECURITY;
-        err                     = Internal::P6Utils::p6_wifi_set_config(WIFI_IF_STA, &wifiConfig);
-        SuccessOrExit(err);
+            // Set a default station configuration.
+            wifi_config_t wifiConfig;
+            memset(&wifiConfig, 0, sizeof(wifiConfig));
+            memcpy(wifiConfig.sta.ssid, CHIP_DEVICE_CONFIG_DEFAULT_STA_SSID,
+                   min(strlen(CHIP_DEVICE_CONFIG_DEFAULT_STA_SSID), sizeof(wifiConfig.sta.ssid)));
+            memcpy(wifiConfig.sta.password, CHIP_DEVICE_CONFIG_DEFAULT_STA_PASSWORD,
+                   min(strlen(CHIP_DEVICE_CONFIG_DEFAULT_STA_PASSWORD), sizeof(wifiConfig.sta.password)));
+            wifiConfig.sta.security = CHIP_DEVICE_CONFIG_DEFAULT_STA_SECURITY;
+            err                     = Internal::P6Utils::p6_wifi_set_config(WIFI_IF_STA, &wifiConfig);
+            SuccessOrExit(err);
+
+            // Enable WiFi station mode.
+            ReturnErrorOnFailure(SetWiFiStationMode(kWiFiStationMode_Enabled));
+        }
+        else
+        {
+            ReturnErrorOnFailure(SetWiFiStationMode(kWiFiStationMode_Disabled));
+        }
+    }
+    else
+    {
+        // Enable WiFi station mode.
+        ReturnErrorOnFailure(SetWiFiStationMode(kWiFiStationMode_Enabled));
     }
     // Force AP mode off for now.
     err = Internal::P6Utils::SetAPMode(false);
@@ -473,9 +495,6 @@ void ConnectivityManagerImpl::DriveStationState()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     bool stationConnected;
-
-    // Refresh the current station mode by reading the configuration from storage.
-    GetWiFiStationMode();
 
     // If the station interface is NOT under application control...
     if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)

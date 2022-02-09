@@ -85,7 +85,7 @@ void ContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchRes
         JniUtfString dataStr(env, jdataStr);
 
         response.status = static_cast<chip::app::Clusters::ContentLauncher::StatusEnum>(status);
-        response.data   = dataStr.charSpan();
+        response.data   = chip::Optional<CharSpan>(dataStr.charSpan());
 
         err = helper.Success(response);
     }
@@ -140,7 +140,7 @@ void ContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchRespons
         JniUtfString dataStr(env, jdataStr);
 
         response.status = static_cast<chip::app::Clusters::ContentLauncher::StatusEnum>(status);
-        response.data   = dataStr.charSpan();
+        response.data   = chip::Optional<CharSpan>(dataStr.charSpan());
 
         err = helper.Success(response);
     }

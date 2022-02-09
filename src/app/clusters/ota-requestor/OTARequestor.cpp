@@ -511,8 +511,7 @@ void OTARequestor::RecordErrorUpdateState(UpdateFailureState failureState, CHIP_
     // Log the DownloadError event
     OTAImageProcessorInterface * imageProcessor = mBdxDownloader->GetImageProcessorDelegate();
     VerifyOrReturn(imageProcessor != nullptr);
-    Nullable<uint8_t> progressPercent;
-    imageProcessor->GetPercentComplete(progressPercent);
+    Nullable<uint8_t> progressPercent = imageProcessor->GetPercentComplete();
     Nullable<int64_t> platformCode;
     OtaRequestorServerOnDownloadError(mTargetVersion, imageProcessor->GetBytesDownloaded(), progressPercent, platformCode);
 

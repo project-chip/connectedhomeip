@@ -135,7 +135,7 @@ class MyPostCommissioningListener : public PostCommissioningListener
     }
 
     /* Callback when command results in success */
-    static void OnSuccessResponse(void * context)
+    static void OnSuccessResponse(void * context, const chip::app::DataModel::NullObjectType &)
     {
         ChipLogProgress(Controller, "OnSuccessResponse - Binding Add Successfully");
         CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
