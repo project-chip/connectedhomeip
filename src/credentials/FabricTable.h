@@ -42,12 +42,11 @@
 
 namespace chip {
 
-static constexpr FabricIndex kInvalidFabricIndex      = 0;
 static constexpr FabricIndex kMinValidFabricIndex     = 1;
 static constexpr FabricIndex kMaxValidFabricIndex     = std::min<FabricIndex>(UINT8_MAX - 1, CHIP_CONFIG_MAX_FABRICS);
 static constexpr uint8_t kFabricLabelMaxLengthInBytes = 32;
 
-static_assert(kInvalidFabricIndex < chip::kMinValidFabricIndex, "Invalid fabric index must be invalid");
+static_assert(kUndefinedFabricIndex < chip::kMinValidFabricIndex, "Undefined fabric index should not be valid");
 
 // KVS store is sensitive to length of key strings, based on the underlying
 // platform. Keeping them short.

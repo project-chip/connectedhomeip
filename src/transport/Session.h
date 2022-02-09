@@ -92,7 +92,7 @@ protected:
 
 private:
     IntrusiveList<SessionHolder> mHolders;
-    FabricIndex mFabricIndex = kInvalidFabricIndex;
+    FabricIndex mFabricIndex = kUndefinedFabricIndex;
 };
 
 } // namespace Transport
