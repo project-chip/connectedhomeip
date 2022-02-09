@@ -123,11 +123,7 @@ CHIP_ERROR Delegate::HandleGetCurrentApp(app::AttributeValueEncoder & aEncoder)
     }
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
-    // TODO: change to return null once 13606 is fixed
     ApplicationEPType currentApp;
-    currentApp.application.catalogVendorId = 123;
-    currentApp.application.applicationId   = CharSpan("applicationId", strlen("applicationId"));
-    currentApp.endpoint                    = Optional<EndpointId>::Missing();
     return aEncoder.Encode(currentApp);
 }
 
@@ -212,14 +208,6 @@ bool emberAfApplicationLauncherClusterLaunchAppRequestCallback(app::CommandHandl
     app::CommandResponseHelper<LauncherResponseType> responder(command, commandPath);
 
     std::string appId(application.applicationId.data(), application.applicationId.size());
-
-    if (appId.length() == 0 && data.HasValue())
-    {
-        // chip-tool can't send structs from command line so treat data value as appid if appid is blank
-        // TODO: fix this once chip-tool support sending structs from command line
-        ChipLogError(Zcl, "ApplicationLauncher blank content id, taking data as appid");
-        appId = std::string((char *) data.Value().data(), data.Value().size());
-    }
     CatalogVendorApp vendorApp(application.catalogVendorId, appId.c_str());
 
     Delegate * delegate = GetDelegate(endpoint);
