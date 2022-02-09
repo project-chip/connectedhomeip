@@ -81,8 +81,11 @@ public:
     CHIP_ERROR GetSpake2pIterationCount(uint32_t & iterationCount) override;
     CHIP_ERROR GetSpake2pSalt(uint8_t * buf, size_t bufSize, size_t & saltLen) override;
     CHIP_ERROR GetSpake2pVerifier(uint8_t * buf, size_t bufSize, size_t & verifierLen) override;
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
     CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter) override;
     CHIP_ERROR IncrementLifetimeCounter() override;
+    CHIP_ERROR GetRotatingDeviceIdUniqueId(uint8_t * buf, size_t & outSize, size_t bufSize) override;
+#endif
     CHIP_ERROR GetFailSafeArmed(bool & val) override;
     CHIP_ERROR SetFailSafeArmed(bool val) override;
     CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) override;
@@ -114,6 +117,8 @@ public:
     CHIP_ERROR GetLocalConfigDisabled(bool & disabled) override;
     CHIP_ERROR GetReachable(bool & reachable) override;
     CHIP_ERROR GetUniqueId(char * buf, size_t bufSize) override;
+    CHIP_ERROR StoreUniqueId(const char * uniqueId, size_t uniqueIdLen) override;
+    CHIP_ERROR GenerateUniqueId(char * buf, size_t bufSize) override;
     CHIP_ERROR RunUnitTests(void) override;
     bool IsFullyProvisioned() override;
     void InitiateFactoryReset() override;

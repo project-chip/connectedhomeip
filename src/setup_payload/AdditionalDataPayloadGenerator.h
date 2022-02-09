@@ -51,8 +51,8 @@ public:
      * Generate additional data payload (i.e. TLV encoded).
      *
      * @param lifetimeCounter lifetime counter
-     * @param serialNumberBuffer null-terminated serial number buffer
-     * @param serialNumberBufferSize size of the serial number buffer supplied.
+     * @param uniqueIdBuffer unique id buffer
+     * @param uniqueIdBufferSize size of the unique id buffer supplied.
      * @param bufferHandle output buffer handle
      * @param additionalDataFields bitfield for what fields should be generated in the additional data
      *
@@ -69,28 +69,28 @@ public:
      *                              TLVBackingStore
      *
      */
-    CHIP_ERROR generateAdditionalDataPayload(uint16_t lifetimeCounter, const char * serialNumberBuffer,
-                                             size_t serialNumberBufferSize, chip::System::PacketBufferHandle & bufferHandle,
+    CHIP_ERROR generateAdditionalDataPayload(uint16_t lifetimeCounter, const char * uniqueIdBuffer, size_t uniqueIdBufferSize,
+                                             chip::System::PacketBufferHandle & bufferHandle,
                                              BitFlags<AdditionalDataFields> additionalDataFields);
     /**
      * Generate Rotating Device ID in Binary Format
      *
      * @param lifetimeCounter lifetime counter
-     * @param serialNumberBuffer null-terminated serial number buffer
-     * @param serialNumberBufferSize size of the serial number buffer supplied.
+     * @param uniqueIdBuffer unique id buffer
+     * @param uniqueIdBufferSize size of the unique id buffer supplied.
      * @param [in,out] rotatingDeviceIdBuffer as input, the buffer to use for
      *                 the binary data.  As output, will have its size set to
      *                 the actual size used upon successful generation
      */
-    CHIP_ERROR generateRotatingDeviceIdAsBinary(uint16_t lifetimeCounter, const char * serialNumberBuffer,
-                                                size_t serialNumberBufferSize, MutableByteSpan & rotatingDeviceIdBuffer);
+    CHIP_ERROR generateRotatingDeviceIdAsBinary(uint16_t lifetimeCounter, const char * uniqueIdBuffer, size_t uniqueIdBufferSize,
+                                                MutableByteSpan & rotatingDeviceIdBuffer);
 
     /**
      * Generate Device Rotating ID in String Format
      *
      * @param lifetimeCounter lifetime counter
-     * @param serialNumberBuffer null-terminated serial number buffer
-     * @param serialNumberBufferSize size of the serial number buffer supplied.
+     * @param uniqueIdBuffer unique id buffer
+     * @param uniqueIdBufferSize size of the unique id buffer supplied.
      * @param rotatingDeviceIdBuffer rotating device id buffer
      * @param rotatingDeviceIdBufferSize the current size of the supplied buffer
      * @param rotatingDeviceIdValueOutputSize the number of chars making up the actual value of the returned rotating device id
@@ -99,9 +99,9 @@ public:
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise.
      *
      */
-    CHIP_ERROR generateRotatingDeviceIdAsHexString(uint16_t lifetimeCounter, const char * serialNumberBuffer,
-                                                   size_t serialNumberBufferSize, char * rotatingDeviceIdBuffer,
-                                                   size_t rotatingDeviceIdBufferSize, size_t & rotatingDeviceIdValueOutputSize);
+    CHIP_ERROR generateRotatingDeviceIdAsHexString(uint16_t lifetimeCounter, const char * uniqueIdBuffer, size_t uniqueIdBufferSize,
+                                                   char * rotatingDeviceIdBuffer, size_t rotatingDeviceIdBufferSize,
+                                                   size_t & rotatingDeviceIdValueOutputSize);
 };
 
 } // namespace chip

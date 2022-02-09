@@ -71,7 +71,9 @@ public:
         kMaxProductLabelLength          = 64,
         kMaxSerialNumberLength          = 32,
         kMaxUniqueIDLength              = 32,
-
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
+        kRotatingDeviceIDUniqueIDLength = 16,
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
         kPrimaryMACAddressLength = 8,
 #else
@@ -99,9 +101,14 @@ public:
     virtual CHIP_ERROR GetSpake2pIterationCount(uint32_t & iterationCount)                          = 0;
     virtual CHIP_ERROR GetSpake2pSalt(uint8_t * buf, size_t bufSize, size_t & saltLen)              = 0;
     virtual CHIP_ERROR GetSpake2pVerifier(uint8_t * buf, size_t bufSize, size_t & verifierLen)      = 0;
-    // Lifetime counter is monotonic counter that is incremented only in the case of a factory reset
-    virtual CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter)                  = 0;
-    virtual CHIP_ERROR IncrementLifetimeCounter()                                      = 0;
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
+    // Lifetime counter is monotonic counter that is incremented upon each commencement of advertising
+    virtual CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter) = 0;
+    virtual CHIP_ERROR IncrementLifetimeCounter()                     = 0;
+    // Unique ID is identifier utilized for the rotating device ID calculation purpose as an input key. It is separate identifier
+    // from the Basic cluster unique ID.
+    virtual CHIP_ERROR GetRotatingDeviceIdUniqueId(uint8_t * buf, size_t & outSize, size_t bufSize) = 0;
+#endif
     virtual CHIP_ERROR GetRegulatoryLocation(uint8_t & location)                       = 0;
     virtual CHIP_ERROR GetCountryCode(char * buf, size_t bufSize, size_t & codeLen)    = 0;
     virtual CHIP_ERROR GetBreadcrumb(uint64_t & breadcrumb)                            = 0;
@@ -129,6 +136,8 @@ public:
     virtual CHIP_ERROR GetLocalConfigDisabled(bool & disabled)                         = 0;
     virtual CHIP_ERROR GetReachable(bool & reachable)                                  = 0;
     virtual CHIP_ERROR GetUniqueId(char * buf, size_t bufSize)                         = 0;
+    virtual CHIP_ERROR StoreUniqueId(const char * uniqueId, size_t uniqueIdLen)        = 0;
+    virtual CHIP_ERROR GenerateUniqueId(char * buf, size_t bufSize)                    = 0;
 
     virtual CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) = 0;
 
