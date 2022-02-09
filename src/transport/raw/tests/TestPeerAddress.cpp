@@ -120,6 +120,22 @@ void TestToString(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+void TestAppendDestinationLimit(nlTestSuite * inSuite, void * inContext)
+{
+    IPAddress ip;
+    IPAddress::FromString("::1", ip);
+
+    PeerAddress udp = PeerAddress(Transport::Type::kUdp);
+    udp.SetPort(123);
+
+    for (unsigned i = 0; i < PeerAddress::kMaxPeerDestinations; i++)
+    {
+        NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == udp.AppendDestination(ip, InterfaceId::Null()));
+    }
+
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR != udp.AppendDestination(ip, InterfaceId::Null()));
+}
+
 /**
  *   Test Suite. It lists all the test functions.
  */
@@ -129,6 +145,7 @@ const nlTest sTests[] =
 {
     NL_TEST_DEF("PeerAddress Multicast", TestPeerAddressMulticast),
     NL_TEST_DEF("ToString", TestToString),
+    NL_TEST_DEF("AppendDestination", TestAppendDestinationLimit),
     NL_TEST_SENTINEL()
 };
 // clang-format on
