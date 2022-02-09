@@ -145,7 +145,7 @@ CHIP_ERROR ContentLauncherAttrAccess::Read(const app::ConcreteReadAttributePath 
 
     switch (aPath.mAttributeId)
     {
-    case app::Clusters::ContentLauncher::Attributes::AcceptHeaderList::Id: {
+    case app::Clusters::ContentLauncher::Attributes::AcceptHeader::Id: {
         if (isDelegateNull(delegate, endpoint))
         {
             return aEncoder.EncodeEmptyList();
@@ -186,9 +186,9 @@ CHIP_ERROR ContentLauncherAttrAccess::ReadSupportedStreamingProtocolsAttribute(a
 // -----------------------------------------------------------------------------
 // Matter Framework Callbacks Implementation
 
-bool emberAfContentLauncherClusterLaunchContentRequestCallback(
+bool emberAfContentLauncherClusterLaunchContentCallback(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-    const ContentLauncher::Commands::LaunchContentRequest::DecodableType & commandData)
+    const ContentLauncher::Commands::LaunchContent::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
@@ -208,7 +208,7 @@ bool emberAfContentLauncherClusterLaunchContentRequestCallback(
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "emberAfContentLauncherClusterLaunchContentRequestCallback error: %s", err.AsString());
+        ChipLogError(Zcl, "emberAfContentLauncherClusterLaunchContentCallback error: %s", err.AsString());
     }
 
     // If isDelegateNull, no one will call responder, so HasSentResponse will be false
@@ -220,9 +220,9 @@ exit:
     return true;
 }
 
-bool emberAfContentLauncherClusterLaunchURLRequestCallback(
+bool emberAfContentLauncherClusterLaunchURLCallback(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-    const ContentLauncher::Commands::LaunchURLRequest::DecodableType & commandData)
+    const ContentLauncher::Commands::LaunchURL::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
