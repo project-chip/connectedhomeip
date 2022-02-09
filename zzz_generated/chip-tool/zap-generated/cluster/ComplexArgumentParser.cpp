@@ -193,15 +193,16 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("ApplicationEP.application", "application", value.isMember("application")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("ApplicationEP.endpoint", "endpoint", value.isMember("endpoint")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "application");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.application, value["application"]));
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "endpoint");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.endpoint, value["endpoint"]));
+    if (value.isMember("endpoint"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "endpoint");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.endpoint, value["endpoint"]));
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -328,34 +329,40 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("BrandingInformation.providerName", "providerName",
                                                                   value.isMember("providerName")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("BrandingInformation.background", "background", value.isMember("background")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("BrandingInformation.logo", "logo", value.isMember("logo")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("BrandingInformation.progressBar", "progressBar", value.isMember("progressBar")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("BrandingInformation.splash", "splash", value.isMember("splash")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("BrandingInformation.waterMark", "waterMark", value.isMember("waterMark")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "providerName");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.providerName, value["providerName"]));
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "background");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.background, value["background"]));
+    if (value.isMember("background"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "background");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.background, value["background"]));
+    }
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "logo");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.logo, value["logo"]));
+    if (value.isMember("logo"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "logo");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.logo, value["logo"]));
+    }
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "progressBar");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.progressBar, value["progressBar"]));
+    if (value.isMember("progressBar"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "progressBar");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.progressBar, value["progressBar"]));
+    }
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "splash");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.splash, value["splash"]));
+    if (value.isMember("splash"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "splash");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.splash, value["splash"]));
+    }
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "waterMark");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.waterMark, value["waterMark"]));
+    if (value.isMember("waterMark"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "waterMark");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.waterMark, value["waterMark"]));
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -378,10 +385,6 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
         ComplexArgumentParser::EnsureMemberExist("ChannelInfo.majorNumber", "majorNumber", value.isMember("majorNumber")));
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("ChannelInfo.minorNumber", "minorNumber", value.isMember("minorNumber")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ChannelInfo.name", "name", value.isMember("name")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ChannelInfo.callSign", "callSign", value.isMember("callSign")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ChannelInfo.affiliateCallSign", "affiliateCallSign",
-                                                                  value.isMember("affiliateCallSign")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "majorNumber");
@@ -390,14 +393,23 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "minorNumber");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.minorNumber, value["minorNumber"]));
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "name");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.name, value["name"]));
+    if (value.isMember("name"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "name");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.name, value["name"]));
+    }
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "callSign");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.callSign, value["callSign"]));
+    if (value.isMember("callSign"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "callSign");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.callSign, value["callSign"]));
+    }
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "affiliateCallSign");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.affiliateCallSign, value["affiliateCallSign"]));
+    if (value.isMember("affiliateCallSign"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "affiliateCallSign");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.affiliateCallSign, value["affiliateCallSign"]));
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -860,21 +872,23 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("LineupInfo.operatorName", "operatorName", value.isMember("operatorName")));
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("LineupInfo.lineupName", "lineupName", value.isMember("lineupName")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("LineupInfo.postalCode", "postalCode", value.isMember("postalCode")));
-    ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("LineupInfo.lineupInfoType", "lineupInfoType", value.isMember("lineupInfoType")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "operatorName");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.operatorName, value["operatorName"]));
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "lineupName");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.lineupName, value["lineupName"]));
+    if (value.isMember("lineupName"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "lineupName");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.lineupName, value["lineupName"]));
+    }
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "postalCode");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.postalCode, value["postalCode"]));
+    if (value.isMember("postalCode"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "postalCode");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.postalCode, value["postalCode"]));
+    }
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "lineupInfoType");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.lineupInfoType, value["lineupInfoType"]));
@@ -1427,8 +1441,6 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("Parameter.type", "type", value.isMember("type")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("Parameter.value", "value", value.isMember("value")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("Parameter.externalIDList", "externalIDList", value.isMember("externalIDList")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "type");
@@ -1437,8 +1449,11 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "value");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.value, value["value"]));
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "externalIDList");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.externalIDList, value["externalIDList"]));
+    if (value.isMember("externalIDList"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "externalIDList");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.externalIDList, value["externalIDList"]));
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -1808,20 +1823,24 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("StyleInformation.imageUrl", "imageUrl", value.isMember("imageUrl")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("StyleInformation.color", "color", value.isMember("color")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("StyleInformation.size", "size", value.isMember("size")));
-
     char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "imageUrl");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.imageUrl, value["imageUrl"]));
+    if (value.isMember("imageUrl"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "imageUrl");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.imageUrl, value["imageUrl"]));
+    }
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "color");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.color, value["color"]));
+    if (value.isMember("color"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "color");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.color, value["color"]));
+    }
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "size");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.size, value["size"]));
+    if (value.isMember("size"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "size");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.size, value["size"]));
+    }
 
     return CHIP_NO_ERROR;
 }

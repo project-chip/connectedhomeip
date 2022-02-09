@@ -1543,13 +1543,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPTargetNavigatorClusterNavigateTargetRequestParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull target;
-@property (strong, nonatomic) NSString * _Nonnull data;
+@property (strong, nonatomic) NSString * _Nullable data;
 - (instancetype)init;
 @end
 
 @interface CHIPTargetNavigatorClusterNavigateTargetResponseParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull status;
-@property (strong, nonatomic) NSString * _Nonnull data;
+@property (strong, nonatomic) NSString * _Nullable data;
 - (instancetype)init;
 @end
 
@@ -1595,22 +1595,22 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CHIPContentLauncherClusterLaunchContentRequestParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull autoPlay;
-@property (strong, nonatomic) NSString * _Nonnull data;
 @property (strong, nonatomic) NSArray * _Nonnull search;
+@property (strong, nonatomic) NSNumber * _Nonnull autoPlay;
+@property (strong, nonatomic) NSString * _Nullable data;
 - (instancetype)init;
 @end
 
 @interface CHIPContentLauncherClusterLaunchURLRequestParams : NSObject
 @property (strong, nonatomic) NSString * _Nonnull contentURL;
-@property (strong, nonatomic) NSString * _Nonnull displayString;
-@property (strong, nonatomic) CHIPContentLauncherClusterBrandingInformation * _Nonnull brandingInformation;
+@property (strong, nonatomic) NSString * _Nullable displayString;
+@property (strong, nonatomic) CHIPContentLauncherClusterBrandingInformation * _Nullable brandingInformation;
 - (instancetype)init;
 @end
 
 @interface CHIPContentLauncherClusterLaunchResponseParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull status;
-@property (strong, nonatomic) NSString * _Nonnull data;
+@property (strong, nonatomic) NSString * _Nullable data;
 - (instancetype)init;
 @end
 
@@ -1627,7 +1627,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPApplicationLauncherClusterLaunchAppRequestParams : NSObject
 @property (strong, nonatomic) CHIPApplicationLauncherClusterApplication * _Nonnull application;
-@property (strong, nonatomic) NSData * _Nonnull data;
+@property (strong, nonatomic) NSData * _Nullable data;
 - (instancetype)init;
 @end
 

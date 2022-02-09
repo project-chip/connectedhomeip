@@ -932,14 +932,14 @@ public class ChipClusters {
     public void launchAppRequest(
         LauncherResponseCallback callback,
         ChipStructs.ApplicationLauncherClusterApplication application,
-        byte[] data) {
+        Optional<byte[]> data) {
       launchAppRequest(chipClusterPtr, callback, application, data, null);
     }
 
     public void launchAppRequest(
         LauncherResponseCallback callback,
         ChipStructs.ApplicationLauncherClusterApplication application,
-        byte[] data,
+        Optional<byte[]> data,
         int timedInvokeTimeoutMs) {
       launchAppRequest(chipClusterPtr, callback, application, data, timedInvokeTimeoutMs);
     }
@@ -967,7 +967,7 @@ public class ChipClusters {
         long chipClusterPtr,
         LauncherResponseCallback Callback,
         ChipStructs.ApplicationLauncherClusterApplication application,
-        byte[] data,
+        Optional<byte[]> data,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void stopAppRequest(
@@ -5346,26 +5346,26 @@ public class ChipClusters {
 
     public void launchContentRequest(
         LaunchResponseCallback callback,
+        ArrayList<ChipStructs.ContentLauncherClusterContentSearch> search,
         Boolean autoPlay,
-        String data,
-        ArrayList<ChipStructs.ContentLauncherClusterContentSearch> search) {
-      launchContentRequest(chipClusterPtr, callback, autoPlay, data, search, null);
+        Optional<String> data) {
+      launchContentRequest(chipClusterPtr, callback, search, autoPlay, data, null);
     }
 
     public void launchContentRequest(
         LaunchResponseCallback callback,
-        Boolean autoPlay,
-        String data,
         ArrayList<ChipStructs.ContentLauncherClusterContentSearch> search,
+        Boolean autoPlay,
+        Optional<String> data,
         int timedInvokeTimeoutMs) {
-      launchContentRequest(chipClusterPtr, callback, autoPlay, data, search, timedInvokeTimeoutMs);
+      launchContentRequest(chipClusterPtr, callback, search, autoPlay, data, timedInvokeTimeoutMs);
     }
 
     public void launchURLRequest(
         LaunchResponseCallback callback,
         String contentURL,
-        String displayString,
-        ChipStructs.ContentLauncherClusterBrandingInformation brandingInformation) {
+        Optional<String> displayString,
+        Optional<ChipStructs.ContentLauncherClusterBrandingInformation> brandingInformation) {
       launchURLRequest(
           chipClusterPtr, callback, contentURL, displayString, brandingInformation, null);
     }
@@ -5373,8 +5373,8 @@ public class ChipClusters {
     public void launchURLRequest(
         LaunchResponseCallback callback,
         String contentURL,
-        String displayString,
-        ChipStructs.ContentLauncherClusterBrandingInformation brandingInformation,
+        Optional<String> displayString,
+        Optional<ChipStructs.ContentLauncherClusterBrandingInformation> brandingInformation,
         int timedInvokeTimeoutMs) {
       launchURLRequest(
           chipClusterPtr,
@@ -5388,21 +5388,21 @@ public class ChipClusters {
     private native void launchContentRequest(
         long chipClusterPtr,
         LaunchResponseCallback Callback,
-        Boolean autoPlay,
-        String data,
         ArrayList<ChipStructs.ContentLauncherClusterContentSearch> search,
+        Boolean autoPlay,
+        Optional<String> data,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void launchURLRequest(
         long chipClusterPtr,
         LaunchResponseCallback Callback,
         String contentURL,
-        String displayString,
-        ChipStructs.ContentLauncherClusterBrandingInformation brandingInformation,
+        Optional<String> displayString,
+        Optional<ChipStructs.ContentLauncherClusterBrandingInformation> brandingInformation,
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface LaunchResponseCallback {
-      void onSuccess(Integer status, String data);
+      void onSuccess(Integer status, Optional<String> data);
 
       void onError(Exception error);
     }
@@ -10720,6 +10720,38 @@ public class ChipClusters {
       void onError(Exception error);
     }
 
+    public interface StartTimeAttributeCallback {
+      void onSuccess(@Nullable Long value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface DurationAttributeCallback {
+      void onSuccess(@Nullable Long value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface SeekRangeEndAttributeCallback {
+      void onSuccess(@Nullable Long value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface SeekRangeStartAttributeCallback {
+      void onSuccess(@Nullable Long value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
     public interface ServerGeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
@@ -10753,21 +10785,21 @@ public class ChipClusters {
       subscribePlaybackStateAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readStartTimeAttribute(LongAttributeCallback callback) {
+    public void readStartTimeAttribute(StartTimeAttributeCallback callback) {
       readStartTimeAttribute(chipClusterPtr, callback);
     }
 
     public void subscribeStartTimeAttribute(
-        LongAttributeCallback callback, int minInterval, int maxInterval) {
+        StartTimeAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeStartTimeAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readDurationAttribute(LongAttributeCallback callback) {
+    public void readDurationAttribute(DurationAttributeCallback callback) {
       readDurationAttribute(chipClusterPtr, callback);
     }
 
     public void subscribeDurationAttribute(
-        LongAttributeCallback callback, int minInterval, int maxInterval) {
+        DurationAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeDurationAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -10780,21 +10812,21 @@ public class ChipClusters {
       subscribePlaybackSpeedAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readSeekRangeEndAttribute(LongAttributeCallback callback) {
+    public void readSeekRangeEndAttribute(SeekRangeEndAttributeCallback callback) {
       readSeekRangeEndAttribute(chipClusterPtr, callback);
     }
 
     public void subscribeSeekRangeEndAttribute(
-        LongAttributeCallback callback, int minInterval, int maxInterval) {
+        SeekRangeEndAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeSeekRangeEndAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readSeekRangeStartAttribute(LongAttributeCallback callback) {
+    public void readSeekRangeStartAttribute(SeekRangeStartAttributeCallback callback) {
       readSeekRangeStartAttribute(chipClusterPtr, callback);
     }
 
     public void subscribeSeekRangeStartAttribute(
-        LongAttributeCallback callback, int minInterval, int maxInterval) {
+        SeekRangeStartAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeSeekRangeStartAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -10844,15 +10876,17 @@ public class ChipClusters {
     private native void subscribePlaybackStateAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readStartTimeAttribute(long chipClusterPtr, LongAttributeCallback callback);
+    private native void readStartTimeAttribute(
+        long chipClusterPtr, StartTimeAttributeCallback callback);
 
     private native void subscribeStartTimeAttribute(
-        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr, StartTimeAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readDurationAttribute(long chipClusterPtr, LongAttributeCallback callback);
+    private native void readDurationAttribute(
+        long chipClusterPtr, DurationAttributeCallback callback);
 
     private native void subscribeDurationAttribute(
-        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr, DurationAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readPlaybackSpeedAttribute(
         long chipClusterPtr, FloatAttributeCallback callback);
@@ -10861,16 +10895,22 @@ public class ChipClusters {
         long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readSeekRangeEndAttribute(
-        long chipClusterPtr, LongAttributeCallback callback);
+        long chipClusterPtr, SeekRangeEndAttributeCallback callback);
 
     private native void subscribeSeekRangeEndAttribute(
-        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr,
+        SeekRangeEndAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
     private native void readSeekRangeStartAttribute(
-        long chipClusterPtr, LongAttributeCallback callback);
+        long chipClusterPtr, SeekRangeStartAttributeCallback callback);
 
     private native void subscribeSeekRangeStartAttribute(
-        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr,
+        SeekRangeStartAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
     private native void readServerGeneratedCommandListAttribute(
         long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
@@ -14998,14 +15038,14 @@ public class ChipClusters {
     public native long initWithDevice(long devicePtr, int endpointId);
 
     public void navigateTargetRequest(
-        NavigateTargetResponseCallback callback, Integer target, String data) {
+        NavigateTargetResponseCallback callback, Integer target, Optional<String> data) {
       navigateTargetRequest(chipClusterPtr, callback, target, data, null);
     }
 
     public void navigateTargetRequest(
         NavigateTargetResponseCallback callback,
         Integer target,
-        String data,
+        Optional<String> data,
         int timedInvokeTimeoutMs) {
       navigateTargetRequest(chipClusterPtr, callback, target, data, timedInvokeTimeoutMs);
     }
@@ -15014,11 +15054,11 @@ public class ChipClusters {
         long chipClusterPtr,
         NavigateTargetResponseCallback Callback,
         Integer target,
-        String data,
+        Optional<String> data,
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface NavigateTargetResponseCallback {
-      void onSuccess(Integer status, String data);
+      void onSuccess(Integer status, Optional<String> data);
 
       void onError(Exception error);
     }

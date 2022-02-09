@@ -1066,14 +1066,12 @@ class ChipClusters:
                     "attributeId": 0x00000001,
                     "type": "",
                     "reportable": True,
-                    "writable": True,
                 },
                 0x00000002: {
                     "attributeName": "CurrentChannel",
                     "attributeId": 0x00000002,
                     "type": "",
                     "reportable": True,
-                    "writable": True,
                 },
                 0x0000FFF8: {
                     "attributeName": "ServerGeneratedCommandList",
@@ -1671,9 +1669,9 @@ class ChipClusters:
                     "commandId": 0x00000000,
                     "commandName": "LaunchContentRequest",
                     "args": {
+                        "parameterList": "",
                         "autoPlay": "bool",
                         "data": "str",
-                        "parameterList": "",
                     },
                 },
             0x00000001: {
@@ -3357,7 +3355,6 @@ class ChipClusters:
                     "attributeId": 0x00000003,
                     "type": "",
                     "reportable": True,
-                    "writable": True,
                 },
                 0x00000004: {
                     "attributeName": "PlaybackSpeed",
