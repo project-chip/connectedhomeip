@@ -112,10 +112,8 @@ public:
     // Register for the Test Cluster cluster on all endpoints.
     TestAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), TestCluster::Id) {}
 
-    CHIP_ERROR Read(FabricIndex fabricIndex, const app::ConcreteReadAttributePath & aPath,
-                    app::AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(FabricIndex fabricIndex, const app::ConcreteDataAttributePath & aPath,
-                     app::AttributeValueDecoder & aDecoder) override;
+    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Write(const app::ConcreteDataAttributePath & aPath, app::AttributeValueDecoder & aDecoder) override;
 } testServer;
 
 CHIP_ERROR TestAttrAccess::Read(FabricIndex fabricIndex, const app::ConcreteReadAttributePath & aPath,

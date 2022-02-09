@@ -459,7 +459,7 @@ CHIP_ERROR TestAttrAccess::WriteListNullablesAndOptionalsStructAttribute(const C
         ReturnErrorOnFailure(aDecoder.Decode(list));
 
         ReturnErrorOnFailure(list.ComputeSize(&count));
-        // We are assuming we are using list chuking feature for attribute writes.
+        // We are assuming we are using list chunking feature for attribute writes.
         VerifyOrReturnError(count == 0, CHIP_ERROR_INVALID_ARGUMENT);
 
         return CHIP_NO_ERROR;
