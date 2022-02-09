@@ -76,7 +76,10 @@ qpg_executable("lock_app") {
     deps += [ "${chip_root}/third_party/openthread/repo:libopenthread-mtd" ]
   }
 
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+    "${examples_plat_dir}/ota",
+  ]
 
   defines = []
 
