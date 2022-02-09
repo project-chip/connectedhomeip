@@ -419,7 +419,7 @@ void AppTask::ResetActionEventHandler(AppEvent * aEvent)
             return;
         }
 
-        K32W_LOG("Factory Reset Triggered. Push the RESET button within %u ms to cancel!", resetTimeout);
+        K32W_LOG("Factory Reset Triggered. Push the RESET button within %lu ms to cancel!", resetTimeout);
         sAppTask.mFunction = kFunction_FactoryReset;
 
         /* LEDs will start blinking to signal that a Factory Reset was scheduled */
