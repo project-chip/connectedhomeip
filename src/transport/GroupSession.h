@@ -27,7 +27,7 @@ namespace Transport {
 class GroupSession : public Session
 {
 public:
-    GroupSession(GroupId group, FabricIndex fabricIndex) : mGroupId(group), mFabricIndex(fabricIndex) {}
+    GroupSession(GroupId group, FabricIndex fabricIndex) : mGroupId(group) { SetFabricIndex(fabricIndex); }
     ~GroupSession() { NotifySessionReleased(); }
 
     Session::SessionType GetSessionType() const override { return Session::SessionType::kGroup; }
@@ -59,11 +59,9 @@ public:
     }
 
     GroupId GetGroupId() const { return mGroupId; }
-    FabricIndex GetFabricIndex() const { return mFabricIndex; }
 
 private:
     const GroupId mGroupId;
-    const FabricIndex mFabricIndex;
 };
 
 /*
