@@ -27,6 +27,7 @@
 #include <cstdint>
 
 #include <lib/core/CHIPError.h>
+#include <lib/support/CHIPArgParser.hpp>
 #include <setup_payload/SetupPayload.h>
 
 struct LinuxDeviceOptions
@@ -45,4 +46,4 @@ struct LinuxDeviceOptions
     static LinuxDeviceOptions & GetInstance();
 };
 
-CHIP_ERROR ParseArguments(int argc, char * argv[]);
+CHIP_ERROR ParseArguments(int argc, char * argv[], chip::ArgParser::OptionSet * customOptions = nullptr);
