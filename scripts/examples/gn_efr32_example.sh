@@ -127,7 +127,7 @@ else
                 fi
                 if [ "$1" =~ *"OTA_periodic_query_timeout"* ] ; then
 		    USE_OTA_TIMEOUT=true
-                    echo $OTA_periodic_query_timeout
+                    echo "$OTA_periodic_query_timeout"
                 fi
                 optArgs+=$1" "
                 shift
