@@ -87,9 +87,11 @@ android_library("java") {
     "java/chip/platform/DiagnosticDataProviderImpl.java",
     "java/chip/platform/KeyValueStoreManager.java",
     "java/chip/platform/NetworkInterface.java",
+    "java/chip/platform/NsdManagerServiceBrowser.java",
     "java/chip/platform/NsdManagerServiceResolver.java",
     "java/chip/platform/PreferencesConfigurationManager.java",
     "java/chip/platform/PreferencesKeyValueStoreManager.java",
+    "java/chip/platform/ServiceBrowser.java",
     "java/chip/platform/ServiceResolver.java",
   ]
 

@@ -39,8 +39,10 @@ using namespace chip::Platform;
 
 namespace {
 jobject sResolverObject           = nullptr;
+jobject sBrowserObject            = nullptr;
 jobject sMdnsCallbackObject       = nullptr;
 jmethodID sResolveMethod          = nullptr;
+jmethodID sBrowseMethod           = nullptr;
 jmethodID sGetTextEntryKeysMethod = nullptr;
 jmethodID sGetTextEntryDataMethod = nullptr;
 jclass sMdnsCallbackClass         = nullptr;
@@ -146,8 +148,29 @@ CHIP_ERROR ChipDnssdFinalizeServiceUpdate()
 CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, Inet::IPAddressType addressType,
                            Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context)
 {
-    // TODO: Implement DNS-SD browse for Android
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    VerifyOrReturnError(type != nullptr && callback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(sBrowserObject != nullptr && sBrowseMethod != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(sMdnsCallbackObject != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    std::string serviceType = type;
+    serviceType += '.';
+    serviceType += (protocol == DnssdServiceProtocol::kDnssdProtocolUdp ? "_udp" : "_tcp");
+
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    UtfString jniServiceType(env, serviceType.c_str());
+
+    env->CallVoidMethod(sBrowserObject, sBrowseMethod, jniServiceType.jniValue(), reinterpret_cast<jlong>(callback),
+                        reinterpret_cast<jlong>(context), sMdnsCallbackObject);
+
+    if (env->ExceptionCheck())
+    {
+        ChipLogError(Discovery, "Java exception in ChipDnssdBrowse");
+        env->ExceptionDescribe();
+        env->ExceptionClear();
+        return CHIP_JNI_ERROR_EXCEPTION_THROWN;
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ChipDnssdResolve(DnssdService * service, Inet::InterfaceId interface, DnssdResolveCallback callback, void * context)
@@ -183,14 +206,17 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * service, Inet::InterfaceId interface,
 
 // Implemention of Java-specific functions
 
-void InitializeWithObjects(jobject resolverObject, jobject mdnsCallbackObject)
+void InitializeWithObjects(jobject resolverObject, jobject browserObject, jobject mdnsCallbackObject)
 {
     JNIEnv * env         = JniReferences::GetInstance().GetEnvForCurrentThread();
     sResolverObject      = env->NewGlobalRef(resolverObject);
+    sBrowserObject      = env->NewGlobalRef(browserObject);
     sMdnsCallbackObject  = env->NewGlobalRef(mdnsCallbackObject);
     jclass resolverClass = env->GetObjectClass(sResolverObject);
+    jclass browserClass   = env->GetObjectClass(browserObject);
     sMdnsCallbackClass   = env->GetObjectClass(sMdnsCallbackObject);
 
+    VerifyOrReturn(browserClass != nullptr, ChipLogError(Discovery, "Failed to get Browse Java class"));
     VerifyOrReturn(resolverClass != nullptr, ChipLogError(Discovery, "Failed to get Resolver Java class"));
 
     sGetTextEntryKeysMethod = env->GetMethodID(sMdnsCallbackClass, "getTextEntryKeys", "(Ljava/util/Map;)[Ljava/lang/String;");
@@ -199,9 +225,18 @@ void InitializeWithObjects(jobject resolverObject, jobject mdnsCallbackObject)
 
     sResolveMethod =
         env->GetMethodID(resolverClass, "resolve", "(Ljava/lang/String;Ljava/lang/String;JJLchip/platform/ChipMdnsCallback;)V");
+
+    sBrowseMethod = env->GetMethodID(browserClass, "browse", "(Ljava/lang/String;JJLchip/platform/ChipMdnsCallback;)V");
+
     if (sResolveMethod == nullptr)
     {
         ChipLogError(Discovery, "Failed to access Resolver 'resolve' method");
+        env->ExceptionClear();
+    }
+
+    if (sBrowseMethod == nullptr)
+    {
+        ChipLogError(Discovery, "Failed to access Discover 'browse' method");
         env->ExceptionClear();
     }
 
@@ -234,8 +269,8 @@ void InitializeWithObjects(jobject resolverObject, jobject mdnsCallbackObject)
     }
 }
 
-void HandleResolve(jstring instanceName, jstring serviceType, jstring address, jint port, jobject textEntries, jlong callbackHandle,
-                   jlong contextHandle)
+void HandleResolve(jstring instanceName, jstring serviceType, jstring hostName, jstring address, jint port, jobject textEntries,
+                   jlong callbackHandle, jlong contextHandle)
 {
     VerifyOrReturn(callbackHandle != 0, ChipLogError(Discovery, "HandleResolve called with callback equal to nullptr"));
 
@@ -252,6 +287,7 @@ void HandleResolve(jstring instanceName, jstring serviceType, jstring address, j
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     JniUtfString jniInstanceName(env, instanceName);
     JniUtfString jniServiceType(env, serviceType);
+    JniUtfString jnihostName(env, hostName);
     JniUtfString jniAddress(env, address);
     Inet::IPAddress ipAddress;
 
@@ -262,6 +298,7 @@ void HandleResolve(jstring instanceName, jstring serviceType, jstring address, j
 
     DnssdService service = {};
     CopyString(service.mName, jniInstanceName.c_str());
+    CopyString(service.mHostName, jnihostName.c_str());
     CopyString(service.mType, jniServiceType.c_str());
     service.mPort          = static_cast<uint16_t>(port);
     service.mTextEntrySize = 0;
@@ -331,6 +368,37 @@ exit:
         }
         delete[] service.mTextEntries;
     }
+}
+
+void HandleBrowse(jobjectArray instanceName, jstring serviceType, jlong callbackHandle, jlong contextHandle)
+{
+    VerifyOrReturn(callbackHandle != 0, ChipLogError(Discovery, "HandleDiscover called with callback equal to nullptr"));
+
+    const auto dispatch = [callbackHandle, contextHandle](CHIP_ERROR error, DnssdService * service = nullptr, size_t size = 0) {
+        DeviceLayer::StackLock lock;
+        DnssdBrowseCallback callback = reinterpret_cast<DnssdBrowseCallback>(callbackHandle);
+        callback(reinterpret_cast<void *>(contextHandle), service, size, error);
+    };
+
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    JniUtfString jniServiceType(env, serviceType);
+
+    VerifyOrReturn(strlen(jniServiceType.c_str()) <= kDnssdTypeAndProtocolMaxSize, dispatch(CHIP_ERROR_INVALID_ARGUMENT));
+
+    size_t size            = env->GetArrayLength(instanceName);
+    DnssdService * service = new DnssdService[size];
+    for (size_t i = 0; i < size; i++)
+    {
+        JniUtfString jniInstanceName(env, (jstring) env->GetObjectArrayElement(instanceName, i));
+        VerifyOrReturn(strlen(jniInstanceName.c_str()) <= Operational::kInstanceNameMaxLength,
+                       dispatch(CHIP_ERROR_INVALID_ARGUMENT));
+
+        CopyString(service[i].mName, jniInstanceName.c_str());
+        CopyString(service[i].mType, jniServiceType.c_str());
+    }
+
+    dispatch(CHIP_NO_ERROR, service, size);
+    delete[] service;
 }
 
 } // namespace Dnssd
