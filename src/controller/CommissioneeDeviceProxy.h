@@ -216,7 +216,7 @@ public:
 
     Messaging::ExchangeManager * GetExchangeManager() const override { return mExchangeMgr; }
 
-    void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceAddress.SetIPAddress(deviceAddr); }
+    void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceAddress.SetSingleIPAddress(deviceAddr); }
 
     PASESession & GetPairing() { return mPairing; }
 
