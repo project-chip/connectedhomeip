@@ -105,6 +105,8 @@ int AppTask::Init()
 {
     LED_Params ledParams;
     Button_Params buttonParams;
+    uint8_t EUI64[8];
+    char stringEUI64[sizeof(EUI64)*2 + 1]; // just big enough for string(EUI64)
 
     cc13x2_26x2LogInit();
 
@@ -150,6 +152,23 @@ int AppTask::Init()
         while (1)
             ;
     }
+
+    // set serial number to flash
+    // this is before ZCL is started, so Basic Cluster populates Serial Number with this EUI64 (in string)
+    ThreadStackMgrImpl().GetIeeeEui64(EUI64);
+    for (int i = 0; i < (int)sizeof(EUI64); i++)
+    {
+        sprintf(&stringEUI64[i*2], "%02x", EUI64[i]);
+    }
+    ConfigurationMgr().StoreSerialNumber(stringEUI64, strlen(stringEUI64) + 1);
+    PLAT_LOG("StoreSerialNumber: %s", stringEUI64);
+    if (ret != CHIP_NO_ERROR)
+    {
+        PLAT_LOG("ConfigurationMgr().StoreSerialNumber failed (%X)", ret.AsInteger());
+        while (1)
+            ;
+    }
+
 
     // Init ZCL Data Model and start server
     PLAT_LOG("Initialize Server");
