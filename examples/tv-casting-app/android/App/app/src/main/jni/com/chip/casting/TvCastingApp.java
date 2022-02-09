@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2021 Project CHIP Authors
+ *   Copyright (c) 2022 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,8 +17,28 @@
  */
 package com.chip.casting;
 
+import android.util.Log;
+
 public class TvCastingApp {
-  public TvCastingApp() {}
+  private TvCastingAppCallback mCallback;
+  private static final String TAG = TvCastingApp.class.getSimpleName();
+
+  public TvCastingApp(TvCastingAppCallback callback) {
+    mCallback = callback;
+    nativeInit();
+  }
+
+  private void postClusterInit(int clusterId, int endpoint) {
+    Log.d(TAG, "postClusterInit for " + clusterId + " at " + endpoint);
+    if (mCallback != null) {
+      mCallback.onClusterInit(this, clusterId, endpoint);
+    }
+  }
+
+  public native void nativeInit();
+
+  /** TBD: Temp dummy function for testing */
+  public native void doSomethingInCpp(int endpoint);
 
   static {
     System.loadLibrary("TvCastingApp");
