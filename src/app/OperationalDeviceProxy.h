@@ -196,7 +196,9 @@ public:
             if (err != CHIP_NO_ERROR)
             {
                 char addr_str[Inet::IPAddress::kMaxStringLength];
-                ChipLogError(Controller, "Could not append IP address %s: %s", addr.ToString(addr_str), err.AsString());
+                addr.ToString(addr_str);
+
+                ChipLogError(Controller, "Could not append IP address %s: %s", addr_str, err.AsString());
             }
         }
 
