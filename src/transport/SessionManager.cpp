@@ -601,12 +601,15 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
     PayloadHeader payloadHeader;
     SessionMessageDelegate::DuplicateMessage isDuplicate = SessionMessageDelegate::DuplicateMessage::No;
     Credentials::GroupDataProvider * groups              = Credentials::GetGroupDataProvider();
+    GroupId groupId;
     VerifyOrReturn(nullptr != groups);
 
     if (!packetHeader.GetDestinationGroupId().HasValue())
     {
         return; // malformed packet
     }
+
+    groupId = packetHeader.GetDestinationGroupId().Value();
 
     if (msg.IsNull())
     {
