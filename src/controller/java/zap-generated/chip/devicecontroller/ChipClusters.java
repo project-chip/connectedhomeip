@@ -5359,7 +5359,7 @@ public class ChipClusters {
 
     public void launchContentRequest(
         LaunchResponseCallback callback,
-        ArrayList<ChipStructs.ContentLauncherClusterContentSearch> search,
+        ChipStructs.ContentLauncherClusterContentSearch search,
         Boolean autoPlay,
         Optional<String> data) {
       launchContentRequest(chipClusterPtr, callback, search, autoPlay, data, null);
@@ -5367,7 +5367,7 @@ public class ChipClusters {
 
     public void launchContentRequest(
         LaunchResponseCallback callback,
-        ArrayList<ChipStructs.ContentLauncherClusterContentSearch> search,
+        ChipStructs.ContentLauncherClusterContentSearch search,
         Boolean autoPlay,
         Optional<String> data,
         int timedInvokeTimeoutMs) {
@@ -5401,7 +5401,7 @@ public class ChipClusters {
     private native void launchContentRequest(
         long chipClusterPtr,
         LaunchResponseCallback Callback,
-        ArrayList<ChipStructs.ContentLauncherClusterContentSearch> search,
+        ChipStructs.ContentLauncherClusterContentSearch search,
         Boolean autoPlay,
         Optional<String> data,
         @Nullable Integer timedInvokeTimeoutMs);

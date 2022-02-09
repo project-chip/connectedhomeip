@@ -2265,8 +2265,7 @@ public:
 
 private:
     chip::app::Clusters::ContentLauncher::Commands::LaunchContentRequest::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type>>
-        mComplex_Search;
+    TypedComplexArgument<chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type> mComplex_Search;
 };
 
 /*
