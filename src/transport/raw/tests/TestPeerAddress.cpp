@@ -79,6 +79,18 @@ void TestToString(nlTestSuite * inSuite, void * inContext)
     }
 
     {
+        IPAddress::FromString("::1", ip);
+        PeerAddress::TCP(ip, 1122).ToString(buff);
+
+        NL_TEST_ASSERT(inSuite, !strcmp(buff, "TCP:[::1]:1122"));
+    }
+
+    {
+        PeerAddress::BLE().ToString(buff);
+        NL_TEST_ASSERT(inSuite, !strcmp(buff, "BLE"));
+    }
+
+    {
         IPAddress::FromString("1223::3456:789a", ip);
         PeerAddress::UDP(ip, 8080).ToString(buff);
 
