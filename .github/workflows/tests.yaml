@@ -97,7 +97,7 @@ jobs:
             - name: Build and run OTA example
               timeout-minutes: 20
               run: |
-                  scripts/examples/ota_test.sh
+                  scripts/tests/ota_test.sh
             - name: Uploading OTA logs
               if: always()
               uses: actions/upload-artifact@v2
