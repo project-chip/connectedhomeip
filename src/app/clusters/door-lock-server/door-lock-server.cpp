@@ -228,7 +228,7 @@ bool emberAfDoorLockClusterLockDoorCallback(chip::app::CommandHandler * commandO
 
     if (success)
     {
-        success = DoorLockServer::Instance().SetLockState(endpoint, DlLockState::kLocked) == EMBER_ZCL_STATUS_SUCCESS;
+        success = DoorLockServer::Instance().SetLockState(endpoint, DlLockState::kLocked);
     }
 
     emberAfSendImmediateDefaultResponse(success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
@@ -274,7 +274,7 @@ bool emberAfDoorLockClusterUnlockDoorCallback(
 
     if (success)
     {
-        success = DoorLockServer::Instance().SetLockState(endpoint, DlLockState::kUnlocked) == EMBER_ZCL_STATUS_SUCCESS;
+        success = DoorLockServer::Instance().SetLockState(endpoint, DlLockState::kUnlocked);
     }
 
     emberAfSendImmediateDefaultResponse(success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
