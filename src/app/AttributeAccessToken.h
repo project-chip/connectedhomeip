@@ -25,7 +25,7 @@ namespace chip {
 namespace app {
 
 /**
- * AttributeAccessToken records the privilege for accessing the specified attribute granted. This structs is used in chunked write
+ * AttributeAccessToken records the privilege granted for accessing the specified attribute. This struct is used in chunked write
  * to avoid losing privilege when updating ACL items.
  */
 struct AttributeAccessToken

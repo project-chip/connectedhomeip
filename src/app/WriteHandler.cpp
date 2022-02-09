@@ -92,7 +92,6 @@ Status WriteHandler::HandleWriteRequestMessage(Messaging::ExchangeContext * apEx
     Status status = ProcessWriteRequest(std::move(aPayload), aIsTimedWrite);
 
     // Do not send response on Group Write
-    // Also, hold the response until finished processing the last chunk.
     if (status == Status::Success && !apExchangeContext->IsGroupExchangeContext())
     {
         CHIP_ERROR err = SendWriteResponse();
@@ -136,6 +135,12 @@ CHIP_ERROR WriteHandler::OnMessageReceived(Messaging::ExchangeContext * apExchan
                        "Incoming exchange context should be same as the initial request.");
     VerifyOrDieWithMsg(!apExchangeContext->IsGroupExchangeContext(), DataManagement,
                        "OnMessageReceived should not be called on GroupExchangeContext");
+    if (!aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteRequest))
+    {
+        ChipLogDetail(DataManagement, "Unexpected message type %d", aPayloadHeader.GetMessageType());
+        Close();
+        return CHIP_ERROR_INVALID_MESSAGE_TYPE;
+    }
 
     Status status =
         HandleWriteRequestMessage(apExchangeContext, std::move(aPayload), false /* chunked write should not be timed write */);
@@ -157,7 +162,9 @@ CHIP_ERROR WriteHandler::OnMessageReceived(Messaging::ExchangeContext * apExchan
 
 void WriteHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
 {
-    Abort();
+    ChipLogProgress(DataManagement, "Time out! failed to receive status response from Exchange: " ChipLogFormatExchange,
+                    ChipLogValueExchange(apExchangeContext));
+    Close();
 }
 
 CHIP_ERROR WriteHandler::FinalizeMessage(System::PacketBufferHandle & packet)

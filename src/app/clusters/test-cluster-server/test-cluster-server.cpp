@@ -252,8 +252,6 @@ CHIP_ERROR TestAttrAccess::WriteListInt8uAttribute(const ConcreteDataAttributePa
     }
     else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
-        // We never change our length, so fail out attempts to change it.  This
-        // should really return one of the spec errors!
         VerifyOrReturnError(gListUint8DataLen < kAttributeListLength, CHIP_ERROR_INVALID_ARGUMENT);
         ReturnErrorOnFailure(aDecoder.Decode(gListUint8Data[gListUint8DataLen]));
         gListUint8DataLen++;
@@ -306,8 +304,6 @@ CHIP_ERROR TestAttrAccess::WriteListOctetStringAttribute(const ConcreteDataAttri
         ByteSpan entry;
         ReturnErrorOnFailure(aDecoder.Decode(entry));
 
-        // We never change our length, so fail out attempts to change it.  This
-        // should really return one of the spec errors!
         VerifyOrReturnError(gListOctetStringDataLen < kAttributeListLength, CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(entry.size() <= kAttributeEntryLength, CHIP_ERROR_BUFFER_TOO_SMALL);
         memcpy(gListOctetStringData[gListOctetStringDataLen].Data(), entry.data(), entry.size());
@@ -456,60 +452,64 @@ CHIP_ERROR TestAttrAccess::ReadListNullablesAndOptionalsStructAttribute(Attribut
 CHIP_ERROR TestAttrAccess::WriteListNullablesAndOptionalsStructAttribute(const ConcreteDataAttributePath & aPath,
                                                                          AttributeValueDecoder & aDecoder)
 {
+    static size_t count = 1;
     if (!aPath.IsListItemOperation())
     {
         DataModel::DecodableList<Structs::NullablesAndOptionalsStruct::DecodableType> list;
         ReturnErrorOnFailure(aDecoder.Decode(list));
 
-        size_t count;
         ReturnErrorOnFailure(list.ComputeSize(&count));
-        // This should really send proper errors on invalid input!
-        VerifyOrReturnError(count == 1, CHIP_ERROR_INVALID_ARGUMENT);
+        // We are assuming we are using list chuking feature for attribute writes.
+        VerifyOrReturnError(count == 0, CHIP_ERROR_INVALID_ARGUMENT);
 
-        auto iter = list.begin();
-        while (iter.Next())
+        return CHIP_NO_ERROR;
+    }
+    else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+    {
+        // And we only support one entry in the list.
+        VerifyOrReturnError(count == 0, CHIP_ERROR_INVALID_ARGUMENT);
+
+        Structs::NullablesAndOptionalsStruct::DecodableType value;
+        ReturnErrorOnFailure(aDecoder.Decode(value));
+
+        // We only support some values so far.
+        VerifyOrReturnError(value.nullableString.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(value.nullableStruct.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
+
+        VerifyOrReturnError(!value.optionalString.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(!value.nullableOptionalString.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(!value.optionalStruct.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(!value.nullableOptionalStruct.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(!value.optionalList.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(!value.nullableOptionalList.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+
+        count++;
+
+        // Start our value off as null, just in case we fail to decode things.
+        gNullablesAndOptionalsStruct.nullableList.SetNull();
+        if (!value.nullableList.IsNull())
         {
-            auto & value = iter.GetValue();
-            // We only support some values so far.
-            VerifyOrReturnError(value.nullableString.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
-            VerifyOrReturnError(value.nullableStruct.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
-
-            VerifyOrReturnError(!value.optionalString.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
-            VerifyOrReturnError(!value.nullableOptionalString.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
-            VerifyOrReturnError(!value.optionalStruct.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
-            VerifyOrReturnError(!value.nullableOptionalStruct.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
-            VerifyOrReturnError(!value.optionalList.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
-            VerifyOrReturnError(!value.nullableOptionalList.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
-
-            // Start our value off as null, just in case we fail to decode things.
-            gNullablesAndOptionalsStruct.nullableList.SetNull();
-            if (!value.nullableList.IsNull())
+            ReturnErrorOnFailure(value.nullableList.Value().ComputeSize(&count));
+            VerifyOrReturnError(count <= ArraySize(gSimpleEnums), CHIP_ERROR_INVALID_ARGUMENT);
+            auto iter2       = value.nullableList.Value().begin();
+            gSimpleEnumCount = 0;
+            while (iter2.Next())
             {
-                ReturnErrorOnFailure(value.nullableList.Value().ComputeSize(&count));
-                VerifyOrReturnError(count <= ArraySize(gSimpleEnums), CHIP_ERROR_INVALID_ARGUMENT);
-                auto iter2       = value.nullableList.Value().begin();
-                gSimpleEnumCount = 0;
-                while (iter2.Next())
-                {
-                    gSimpleEnums[gSimpleEnumCount] = iter2.GetValue();
-                    ++gSimpleEnumCount;
-                }
-                ReturnErrorOnFailure(iter2.GetStatus());
-                gNullablesAndOptionalsStruct.nullableList.SetNonNull(Span<SimpleEnum>(gSimpleEnums, gSimpleEnumCount));
+                gSimpleEnums[gSimpleEnumCount] = iter2.GetValue();
+                ++gSimpleEnumCount;
             }
-            gNullablesAndOptionalsStruct.nullableInt         = value.nullableInt;
-            gNullablesAndOptionalsStruct.optionalInt         = value.optionalInt;
-            gNullablesAndOptionalsStruct.nullableOptionalInt = value.nullableOptionalInt;
+            ReturnErrorOnFailure(iter2.GetStatus());
+            gNullablesAndOptionalsStruct.nullableList.SetNonNull(Span<SimpleEnum>(gSimpleEnums, gSimpleEnumCount));
         }
+        gNullablesAndOptionalsStruct.nullableInt         = value.nullableInt;
+        gNullablesAndOptionalsStruct.optionalInt         = value.optionalInt;
+        gNullablesAndOptionalsStruct.nullableOptionalInt = value.nullableOptionalInt;
 
-        return iter.GetStatus();
+        return CHIP_NO_ERROR;
     }
     else
     {
-        // This attribute does not support list chunking feature.
-        // Note: For now, the list chunking will send an list with first element and then the remaining elements (see WriteClient.h
-        // for details), so it should still working.
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
 }
 

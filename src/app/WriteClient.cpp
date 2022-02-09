@@ -300,7 +300,7 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
         dataReader.OpenContainer(valueReader);
 
         // Encode an empty list for the chunking protocol.
-        ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, DataModel::List<uint8_t>(nullptr, 0)));
+        ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, DataModel::List<uint8_t>()));
 
         if (err == CHIP_NO_ERROR)
         {

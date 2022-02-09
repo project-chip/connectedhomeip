@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -45,7 +45,7 @@ void ChunkedWriteCallback::OnResponse(const WriteClient * apWriteClient, const C
         }
     }
 
-    // This is the first report to a new attribute, we assume it will never be list item operations.
+    // This is the first report for a new attribute.  We assume it will never be a list item operation.
     if (aPath.IsListItemOperation())
     {
         aStatus = StatusIB(CHIP_ERROR_INCORRECT_STATE);
@@ -74,17 +74,17 @@ void ChunkedWriteCallback::OnDone(WriteClient * apWriteClient)
     callback->OnDone(apWriteClient);
 }
 
-bool ChunkedWriteCallback::IsAppendingToLastItem(const ConcreteDataAttributePath & path)
+bool ChunkedWriteCallback::IsAppendingToLastItem(const ConcreteDataAttributePath & aPath)
 {
-    if (!path.IsListItemOperation())
+    if (!aPath.IsListItemOperation())
     {
         return false;
     }
-    if (!mLastAttributePath.HasValue() || !(static_cast<ConcreteAttributePath>(path) == mLastAttributePath.Value()))
+    if (!mLastAttributePath.HasValue() || !(mLastAttributePath.Value() == aPath))
     {
         return false;
     }
-    return path.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem;
+    return aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem;
 }
 
 } // namespace app

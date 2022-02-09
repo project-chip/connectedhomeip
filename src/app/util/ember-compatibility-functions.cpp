@@ -941,7 +941,7 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
             // TODO: when wildcard/group writes are supported, handle them to discard rather than fail with status
             return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::UnsupportedAccess);
         }
-        apWriteHandler->CacheACLCheckResult({ static_cast<ConcreteAttributePath>(aPath), requestPrivilege });
+        apWriteHandler->CacheACLCheckResult({ aPath, requestPrivilege });
     }
 
     if (attributeMetadata->MustUseTimedWrite() && !apWriteHandler->IsTimedWrite())

@@ -107,8 +107,6 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
                     listStructOctetStringElementCount++;
                 }
 
-                // VerifyOrReturnError(i == 4, CHIP_ERROR_INVALID_ARGUMENT);
-
                 aWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::Success);
             }
             else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)

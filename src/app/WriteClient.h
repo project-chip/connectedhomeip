@@ -142,7 +142,7 @@ public:
     {
         ReturnErrorOnFailure(EnsureMessage());
 
-        // Here, we are using kInvalidEndpointId to for missing endpoint id, which is used when sending group write requests.
+        // Here, we are using kInvalidEndpointId for missing endpoint id, which is used when sending group write requests.
         return EncodeSingleAttributeDataIB(
             ConcreteDataAttributePath(attributePath.HasWildcardEndpointId() ? kInvalidEndpointId : attributePath.mEndpointId,
                                       attributePath.mClusterId, attributePath.mAttributeId),
@@ -155,7 +155,7 @@ public:
     template <class T>
     CHIP_ERROR EncodeAttribute(const AttributePathParams & attributePath, const DataModel::List<T> & value)
     {
-        // Here, we are using kInvalidEndpointId to for missing endpoint id, which is used when sending group write requests.
+        // Here, we are using kInvalidEndpointId for missing endpoint id, which is used when sending group write requests.
         ConcreteDataAttributePath path =
             ConcreteDataAttributePath(attributePath.HasWildcardEndpointId() ? kInvalidEndpointId : attributePath.mEndpointId,
                                       attributePath.mClusterId, attributePath.mAttributeId);
@@ -163,7 +163,7 @@ public:
         ReturnErrorOnFailure(EnsureMessage());
 
         // Encode an empty list for the chunking protocol.
-        ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, DataModel::List<uint8_t>(nullptr, 0)));
+        ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, DataModel::List<uint8_t>()));
 
         path.mListOp = ConcreteDataAttributePath::ListOperation::AppendItem;
         for (ListIndex i = 0; i < value.size(); i++)
@@ -345,6 +345,7 @@ private:
 
     // Encodes the header of an AttributeDataIB, a special case for attributePath is its EndpointId can be kInvalidEndpointId, this
     // is used when sending group write requests.
+    // TODO(#14935) Update AttributePathParams to support more list operations.
     CHIP_ERROR PrepareAttributeIB(const ConcreteDataAttributePath & attributePath);
     CHIP_ERROR FinishAttributeIB();
     TLV::TLVWriter * GetAttributeDataIBTLVWriter();
