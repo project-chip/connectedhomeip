@@ -38,7 +38,6 @@ extern "C" void platformAlarmSignal();
 extern "C" void platformAlarmMicroSignal();
 extern "C" void platformRadioSignal(uintptr_t arg);
 extern "C" void platformUartSignal(uintptr_t arg);
-extern "C" void otPlatRadioGetIeeeEui64(otInstance *aInstance, uint8_t *aIeeeEui64);
 
 namespace chip {
 namespace DeviceLayer {
@@ -72,7 +71,6 @@ class ThreadStackManagerImpl final : public ThreadStackManager,
     friend void ::platformRadioSignal(uintptr_t arg);
     friend void ::platformUartSignal(uintptr_t arg);
     friend void ::otTaskletsSignalPending(otInstance * otInst);
-    friend void ::otPlatRadioGetIeeeEui64(otInstance *aInstance, uint8_t *aIeeeEui64);
 
     enum procQueueCmd
     {

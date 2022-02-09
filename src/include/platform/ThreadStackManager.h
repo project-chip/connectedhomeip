@@ -426,9 +426,9 @@ inline CHIP_ERROR ThreadStackManager::GetPrimary802154MACAddress(uint8_t * buf)
     return static_cast<ImplClass *>(this)->_GetPrimary802154MACAddress(buf);
 }
 
-inline CHIP_ERROR ThreadStackManager::GetPrimary802154MACAddress(uint8_t * buf)
+inline CHIP_ERROR ThreadStackManager::GetIeeeEui64(uint8_t * buf)
 {
-    return static_cast<ImplClass *>(this)->_GetPrimary802154MACAddress(buf);
+    return static_cast<ImplClass *>(this)->_GetIeeeEui64(buf);
 }
 
 inline CHIP_ERROR ThreadStackManager::GetExternalIPv6Address(chip::Inet::IPAddress & addr)

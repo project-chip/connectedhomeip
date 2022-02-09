@@ -848,10 +848,9 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetPrimary80215
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetPrimary802154MACAddress(uint8_t * buf)
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetIeeeEui64(uint8_t * buf)
 {
-    const otExtAddress * extendedAddr = otLinkGetExtendedAddress(mOTInst);
-    memcpy(buf, extendedAddr, sizeof(otExtAddress));
+    otPlatRadioGetIeeeEui64(mOTInst, buf);
     return CHIP_NO_ERROR;
 }
 
