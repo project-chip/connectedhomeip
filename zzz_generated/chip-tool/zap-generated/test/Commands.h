@@ -157,6 +157,7 @@ public:
         printf("TestClusterComplexTypes\n");
         printf("TestConstraints\n");
         printf("TestDelayCommands\n");
+        printf("TestDiscovery\n");
         printf("TestLogCommands\n");
         printf("TestSaveAs\n");
         printf("TestConfigVariables\n");
@@ -71610,6 +71611,543 @@ private:
     }
 };
 
+class TestDiscovery : public TestCommand
+{
+public:
+    TestDiscovery(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestDiscovery", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("discriminator", 0, UINT16_MAX, &mDiscriminator);
+        AddArgument("vendorId", 0, UINT16_MAX, &mVendorId);
+        AddArgument("productId", 0, UINT16_MAX, &mProductId);
+        AddArgument("deviceType", 0, UINT16_MAX, &mDeviceType);
+    }
+
+    ~TestDiscovery()
+    {
+        if (deviceInstanceNameBeforeRebootBuffer != nullptr)
+        {
+            chip::Platform::MemoryFree(deviceInstanceNameBeforeRebootBuffer);
+            deviceInstanceNameBeforeRebootBuffer = nullptr;
+        }
+    }
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: TestDiscovery\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: TestDiscovery\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Reboot target device\n");
+            err = TestRebootTargetDevice_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Open Commissioning Window\n");
+            err = TestOpenCommissioningWindow_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Wait Commissionable advertisement\n");
+            err = TestWaitCommissionableAdvertisement_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Check Instance Name\n");
+            err = TestCheckInstanceName_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Check Long Discriminator _L\n");
+            err = TestCheckLongDiscriminatorL_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Check Short Discriminator (_S)\n");
+            err = TestCheckShortDiscriminatorS_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Check Commissioning Mode (_CM)\n");
+            err = TestCheckCommissioningModeCm_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Check Vendor ID (_V)\n");
+            if (ShouldSkip("VENDOR_SUBTYPE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestCheckVendorIdV_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : TXT key for discriminator (D)\n");
+            err = TestTxtKeyForDiscriminatorD_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : TXT key for Vendor ID and Product ID (VP)\n");
+            if (ShouldSkip("VP_KEY"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestTxtKeyForVendorIdAndProductIdVp_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : TXT key for Vendor ID and Product ID (VP)\n");
+            if (ShouldSkip("VP_KEY"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestTxtKeyForVendorIdAndProductIdVp_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Optional TXT key for MRP Retry Interval Idle (CRI)\n");
+            if (ShouldSkip("CRI_COMM_DISCOVERY_KEY"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestOptionalTxtKeyForMrpRetryIntervalIdleCri_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : Optional TXT key for MRP Retry Interval Active (CRA)\n");
+            if (ShouldSkip("CRA_COMM_DISCOVERY_KEY"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestOptionalTxtKeyForMrpRetryIntervalActiveCra_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : TXT key for commissioning mode (CM)\n");
+            err = TestTxtKeyForCommissioningModeCm_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool, " ***** Test Step 15 : Optional TXT key for device name (DN)\n");
+            if (ShouldSkip("DN_KEY"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestOptionalTxtKeyForDeviceNameDn_15();
+            break;
+        case 16:
+            ChipLogProgress(chipTool, " ***** Test Step 16 : Optional TXT key for rotating device identifier (RI)\n");
+            if (ShouldSkip("RI_KEY"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestOptionalTxtKeyForRotatingDeviceIdentifierRi_16();
+            break;
+        case 17:
+            ChipLogProgress(chipTool, " ***** Test Step 17 : Optional TXT key for pairing hint (PH)\n");
+            if (ShouldSkip("PH_KEY"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestOptionalTxtKeyForPairingHintPh_17();
+            break;
+        case 18:
+            ChipLogProgress(chipTool, " ***** Test Step 18 : Optional TXT key for pairing instructions (PI)\n");
+            if (ShouldSkip("PI_KEY"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestOptionalTxtKeyForPairingInstructionsPi_18();
+            break;
+        case 19:
+            ChipLogProgress(chipTool, " ***** Test Step 19 : Check IPs\n");
+            err = TestCheckIPs_19();
+            break;
+        case 20:
+            ChipLogProgress(chipTool, " ***** Test Step 20 : Reboot target device\n");
+            err = TestRebootTargetDevice_20();
+            break;
+        case 21:
+            ChipLogProgress(chipTool, " ***** Test Step 21 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_21();
+            break;
+        case 22:
+            ChipLogProgress(chipTool, " ***** Test Step 22 : Open Commissioning Window\n");
+            err = TestOpenCommissioningWindow_22();
+            break;
+        case 23:
+            ChipLogProgress(chipTool, " ***** Test Step 23 : Wait Commissionable advertisement\n");
+            err = TestWaitCommissionableAdvertisement_23();
+            break;
+        case 24:
+            ChipLogProgress(chipTool, " ***** Test Step 24 : Check Instance Name\n");
+            err = TestCheckInstanceName_24();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 25;
+
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mDiscriminator;
+    chip::Optional<uint16_t> mVendorId;
+    chip::Optional<uint16_t> mProductId;
+    chip::Optional<uint16_t> mDeviceType;
+
+    char * deviceInstanceNameBeforeRebootBuffer = nullptr;
+    chip::CharSpan deviceInstanceNameBeforeReboot;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+        if ((mTestIndex - 1) == 4)
+        {
+            isExpectedDnssdResult = true;
+
+            VerifyOrReturn(CheckConstraintMinLength("instanceName", nodeData.instanceName.size(), 16));
+            VerifyOrReturn(CheckConstraintMaxLength("instanceName", nodeData.instanceName.size(), 16));
+
+            if (deviceInstanceNameBeforeRebootBuffer != nullptr)
+            {
+                chip::Platform::MemoryFree(deviceInstanceNameBeforeRebootBuffer);
+            }
+            deviceInstanceNameBeforeRebootBuffer = static_cast<char *>(chip::Platform::MemoryAlloc(nodeData.instanceName.size()));
+            memcpy(deviceInstanceNameBeforeRebootBuffer, nodeData.instanceName.data(), nodeData.instanceName.size());
+            deviceInstanceNameBeforeReboot = chip::CharSpan(deviceInstanceNameBeforeRebootBuffer, nodeData.instanceName.size());
+        }
+        if ((mTestIndex - 1) == 5)
+        {
+            isExpectedDnssdResult = true;
+        }
+        if ((mTestIndex - 1) == 6)
+        {
+            isExpectedDnssdResult = true;
+        }
+        if ((mTestIndex - 1) == 7)
+        {
+            isExpectedDnssdResult = true;
+        }
+        if ((mTestIndex - 1) == 8)
+        {
+            isExpectedDnssdResult = true;
+        }
+        if ((mTestIndex - 1) == 9)
+        {
+            isExpectedDnssdResult = true;
+
+            VerifyOrReturn(CheckValue("longDiscriminator", nodeData.longDiscriminator,
+                                      mDiscriminator.HasValue() ? mDiscriminator.Value() : GetUniqueDiscriminator()));
+
+            VerifyOrReturn(CheckConstraintMinValue<uint16_t>("longDiscriminator", nodeData.longDiscriminator, 0U));
+            VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("longDiscriminator", nodeData.longDiscriminator, 4096U));
+        }
+        if ((mTestIndex - 1) == 10)
+        {
+            isExpectedDnssdResult = true;
+
+            VerifyOrReturn(CheckValue("vendorId", nodeData.vendorId, mVendorId.HasValue() ? mVendorId.Value() : 65521U));
+        }
+        if ((mTestIndex - 1) == 11)
+        {
+            isExpectedDnssdResult = true;
+
+            VerifyOrReturn(CheckValue("productId", nodeData.productId, mProductId.HasValue() ? mProductId.Value() : 32768U));
+        }
+        if ((mTestIndex - 1) == 12)
+        {
+            isExpectedDnssdResult = true;
+
+            VerifyOrReturn(CheckValuePresent("mrpRetryIntervalIdle", nodeData.mrpRetryIntervalIdle));
+
+            VerifyOrReturn(
+                CheckConstraintMaxValue<uint32_t>("mrpRetryIntervalIdle", nodeData.mrpRetryIntervalIdle.Value(), 3600000UL));
+        }
+        if ((mTestIndex - 1) == 13)
+        {
+            isExpectedDnssdResult = true;
+
+            VerifyOrReturn(CheckValuePresent("mrpRetryIntervalActive", nodeData.mrpRetryIntervalActive));
+
+            VerifyOrReturn(
+                CheckConstraintMaxValue<uint32_t>("mrpRetryIntervalActive", nodeData.mrpRetryIntervalActive.Value(), 3600000UL));
+        }
+        if ((mTestIndex - 1) == 14)
+        {
+            isExpectedDnssdResult = true;
+
+            VerifyOrReturn(CheckValue("commissioningMode", nodeData.commissioningMode, 1));
+        }
+        if ((mTestIndex - 1) == 15)
+        {
+            isExpectedDnssdResult = true;
+
+            VerifyOrReturn(CheckConstraintMaxLength("deviceName", nodeData.deviceName.size(), 32));
+        }
+        if ((mTestIndex - 1) == 16)
+        {
+            isExpectedDnssdResult = true;
+
+            VerifyOrReturn(CheckConstraintMaxValue<uint64_t>("rotatingIdLen", nodeData.rotatingIdLen, 100ULL));
+        }
+        if ((mTestIndex - 1) == 17)
+        {
+            isExpectedDnssdResult = true;
+        }
+        if ((mTestIndex - 1) == 18)
+        {
+            isExpectedDnssdResult = true;
+
+            VerifyOrReturn(CheckConstraintMaxLength("pairingInstruction", nodeData.pairingInstruction.size(), 128));
+        }
+        if ((mTestIndex - 1) == 19)
+        {
+            isExpectedDnssdResult = true;
+
+            VerifyOrReturn(CheckConstraintMinValue<uint8_t>("numIPs", nodeData.numIPs, 1));
+        }
+        if ((mTestIndex - 1) == 24)
+        {
+            isExpectedDnssdResult = true;
+
+            VerifyOrReturn(CheckConstraintMinLength("instanceName", nodeData.instanceName.size(), 16));
+            VerifyOrReturn(CheckConstraintMaxLength("instanceName", nodeData.instanceName.size(), 16));
+
+            VerifyOrReturn(CheckConstraintNotValue("instanceName", nodeData.instanceName, deviceInstanceNameBeforeReboot));
+        }
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestRebootTargetDevice_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : GetUniqueDiscriminator());
+    }
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_1()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestOpenCommissioningWindow_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        using RequestType = chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type;
+
+        RequestType request;
+        request.commissioningTimeout = 120U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestDiscovery *>(context))->OnSuccessResponse_2();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestDiscovery *>(context))->OnFailureResponse_2(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_2() { NextTest(); }
+
+    CHIP_ERROR TestWaitCommissionableAdvertisement_3()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionableAdvertisement();
+    }
+
+    CHIP_ERROR TestCheckInstanceName_4()
+    {
+        SetIdentity(kIdentityAlpha);
+        return FindCommissionable();
+    }
+
+    CHIP_ERROR TestCheckLongDiscriminatorL_5()
+    {
+        SetIdentity(kIdentityAlpha);
+        return FindCommissionableByLongDiscriminator(mDiscriminator.HasValue() ? mDiscriminator.Value() : GetUniqueDiscriminator());
+    }
+
+    CHIP_ERROR TestCheckShortDiscriminatorS_6()
+    {
+        SetIdentity(kIdentityAlpha);
+        return FindCommissionableByShortDiscriminator(mDiscriminator.HasValue() ? mDiscriminator.Value()
+                                                                                : GetUniqueDiscriminator());
+    }
+
+    CHIP_ERROR TestCheckCommissioningModeCm_7()
+    {
+        SetIdentity(kIdentityAlpha);
+        return FindCommissionableByCommissioningMode();
+    }
+
+    CHIP_ERROR TestCheckVendorIdV_8()
+    {
+        SetIdentity(kIdentityAlpha);
+        return FindCommissionableByVendorId(mVendorId.HasValue() ? mVendorId.Value() : 65521U);
+    }
+
+    CHIP_ERROR TestTxtKeyForDiscriminatorD_9()
+    {
+        SetIdentity(kIdentityAlpha);
+        return FindCommissionable();
+    }
+
+    CHIP_ERROR TestTxtKeyForVendorIdAndProductIdVp_10()
+    {
+        SetIdentity(kIdentityAlpha);
+        return FindCommissionable();
+    }
+
+    CHIP_ERROR TestTxtKeyForVendorIdAndProductIdVp_11()
+    {
+        SetIdentity(kIdentityAlpha);
+        return FindCommissionable();
+    }
+
+    CHIP_ERROR TestOptionalTxtKeyForMrpRetryIntervalIdleCri_12()
+    {
+        SetIdentity(kIdentityAlpha);
+        return FindCommissionable();
+    }
+
+    CHIP_ERROR TestOptionalTxtKeyForMrpRetryIntervalActiveCra_13()
+    {
+        SetIdentity(kIdentityAlpha);
+        return FindCommissionable();
+    }
+
+    CHIP_ERROR TestTxtKeyForCommissioningModeCm_14()
+    {
+        SetIdentity(kIdentityAlpha);
+        return FindCommissionable();
+    }
+
+    CHIP_ERROR TestOptionalTxtKeyForDeviceNameDn_15()
+    {
+        SetIdentity(kIdentityAlpha);
+        return FindCommissionable();
+    }
+
+    CHIP_ERROR TestOptionalTxtKeyForRotatingDeviceIdentifierRi_16()
+    {
+        SetIdentity(kIdentityAlpha);
+        return FindCommissionable();
+    }
+
+    CHIP_ERROR TestOptionalTxtKeyForPairingHintPh_17()
+    {
+        SetIdentity(kIdentityAlpha);
+        return FindCommissionable();
+    }
+
+    CHIP_ERROR TestOptionalTxtKeyForPairingInstructionsPi_18()
+    {
+        SetIdentity(kIdentityAlpha);
+        return FindCommissionable();
+    }
+
+    CHIP_ERROR TestCheckIPs_19()
+    {
+        SetIdentity(kIdentityAlpha);
+        return FindCommissionable();
+    }
+
+    CHIP_ERROR TestRebootTargetDevice_20()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : GetUniqueDiscriminator());
+    }
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_21()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestOpenCommissioningWindow_22()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        using RequestType = chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type;
+
+        RequestType request;
+        request.commissioningTimeout = 120U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestDiscovery *>(context))->OnSuccessResponse_22();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestDiscovery *>(context))->OnFailureResponse_22(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_22(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_22() { NextTest(); }
+
+    CHIP_ERROR TestWaitCommissionableAdvertisement_23()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionableAdvertisement();
+    }
+
+    CHIP_ERROR TestCheckInstanceName_24()
+    {
+        SetIdentity(kIdentityAlpha);
+        return FindCommissionable();
+    }
+};
+
 class TestLogCommands : public TestCommand
 {
 public:
@@ -91019,6 +91557,7 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<TestClusterComplexTypes>(credsIssuerConfig),
         make_unique<TestConstraints>(credsIssuerConfig),
         make_unique<TestDelayCommands>(credsIssuerConfig),
+        make_unique<TestDiscovery>(credsIssuerConfig),
         make_unique<TestLogCommands>(credsIssuerConfig),
         make_unique<TestSaveAs>(credsIssuerConfig),
         make_unique<TestConfigVariables>(credsIssuerConfig),
