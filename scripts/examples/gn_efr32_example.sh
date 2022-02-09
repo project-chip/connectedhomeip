@@ -73,7 +73,7 @@ if [ "$#" == "0" ]; then
         use_wf200
             Build wifi example with extension board wf200. (Default false)
         OTA_periodic_query_timeout
-            
+
         'import("//with_pw_rpc.gni")'
             Use to build the example with pigweed RPC
 
