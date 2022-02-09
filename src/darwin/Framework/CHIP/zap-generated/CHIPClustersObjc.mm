@@ -6960,77 +6960,54 @@ using namespace chip::app::Clusters;
     ListFreer listFreer;
     ContentLauncher::Commands::LaunchContentRequest::Type request;
     {
-        using ListType_0 = std::remove_reference_t<decltype(request.search)>;
-        using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-        if (params.search.count != 0) {
-            auto * listHolder_0 = new ListHolder<ListMemberType_0>(params.search.count);
-            if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+        using ListType_1 = std::remove_reference_t<decltype(request.search.parameterList)>;
+        using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+        if (params.search.parameterList.count != 0) {
+            auto * listHolder_1 = new ListHolder<ListMemberType_1>(params.search.parameterList.count);
+            if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
                 return;
             }
-            listFreer.add(listHolder_0);
-            for (size_t i_0 = 0; i_0 < params.search.count; ++i_0) {
-                if (![params.search[i_0] isKindOfClass:[CHIPContentLauncherClusterContentSearch class]]) {
+            listFreer.add(listHolder_1);
+            for (size_t i_1 = 0; i_1 < params.search.parameterList.count; ++i_1) {
+                if (![params.search.parameterList[i_1] isKindOfClass:[CHIPContentLauncherClusterParameter class]]) {
                     // Wrong kind of value.
                     return;
                 }
-                auto element_0 = (CHIPContentLauncherClusterContentSearch *) params.search[i_0];
-                {
-                    using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].parameterList)>;
-                    using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
-                    if (element_0.parameterList.count != 0) {
-                        auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.parameterList.count);
-                        if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
-                            return;
-                        }
-                        listFreer.add(listHolder_2);
-                        for (size_t i_2 = 0; i_2 < element_0.parameterList.count; ++i_2) {
-                            if (![element_0.parameterList[i_2] isKindOfClass:[CHIPContentLauncherClusterParameter class]]) {
-                                // Wrong kind of value.
+                auto element_1 = (CHIPContentLauncherClusterParameter *) params.search.parameterList[i_1];
+                listHolder_1->mList[i_1].type = static_cast<std::remove_reference_t<decltype(listHolder_1->mList[i_1].type)>>(
+                    element_1.type.unsignedCharValue);
+                listHolder_1->mList[i_1].value = [self asCharSpan:element_1.value];
+                if (element_1.externalIDList != nil) {
+                    auto & definedValue_3 = listHolder_1->mList[i_1].externalIDList.Emplace();
+                    {
+                        using ListType_4 = std::remove_reference_t<decltype(definedValue_3)>;
+                        using ListMemberType_4 = ListMemberTypeGetter<ListType_4>::Type;
+                        if (element_1.externalIDList.count != 0) {
+                            auto * listHolder_4 = new ListHolder<ListMemberType_4>(element_1.externalIDList.count);
+                            if (listHolder_4 == nullptr || listHolder_4->mList == nullptr) {
                                 return;
                             }
-                            auto element_2 = (CHIPContentLauncherClusterParameter *) element_0.parameterList[i_2];
-                            listHolder_2->mList[i_2].type
-                                = static_cast<std::remove_reference_t<decltype(listHolder_2->mList[i_2].type)>>(
-                                    element_2.type.unsignedCharValue);
-                            listHolder_2->mList[i_2].value = [self asCharSpan:element_2.value];
-                            if (element_2.externalIDList != nil) {
-                                auto & definedValue_4 = listHolder_2->mList[i_2].externalIDList.Emplace();
-                                {
-                                    using ListType_5 = std::remove_reference_t<decltype(definedValue_4)>;
-                                    using ListMemberType_5 = ListMemberTypeGetter<ListType_5>::Type;
-                                    if (element_2.externalIDList.count != 0) {
-                                        auto * listHolder_5 = new ListHolder<ListMemberType_5>(element_2.externalIDList.count);
-                                        if (listHolder_5 == nullptr || listHolder_5->mList == nullptr) {
-                                            return;
-                                        }
-                                        listFreer.add(listHolder_5);
-                                        for (size_t i_5 = 0; i_5 < element_2.externalIDList.count; ++i_5) {
-                                            if (![element_2.externalIDList[i_5]
-                                                    isKindOfClass:[CHIPContentLauncherClusterAdditionalInfo class]]) {
-                                                // Wrong kind of value.
-                                                return;
-                                            }
-                                            auto element_5
-                                                = (CHIPContentLauncherClusterAdditionalInfo *) element_2.externalIDList[i_5];
-                                            listHolder_5->mList[i_5].name = [self asCharSpan:element_5.name];
-                                            listHolder_5->mList[i_5].value = [self asCharSpan:element_5.value];
-                                        }
-                                        definedValue_4 = ListType_5(listHolder_5->mList, element_2.externalIDList.count);
-                                    } else {
-                                        definedValue_4 = ListType_5();
-                                    }
+                            listFreer.add(listHolder_4);
+                            for (size_t i_4 = 0; i_4 < element_1.externalIDList.count; ++i_4) {
+                                if (![element_1.externalIDList[i_4]
+                                        isKindOfClass:[CHIPContentLauncherClusterAdditionalInfo class]]) {
+                                    // Wrong kind of value.
+                                    return;
                                 }
+                                auto element_4 = (CHIPContentLauncherClusterAdditionalInfo *) element_1.externalIDList[i_4];
+                                listHolder_4->mList[i_4].name = [self asCharSpan:element_4.name];
+                                listHolder_4->mList[i_4].value = [self asCharSpan:element_4.value];
                             }
+                            definedValue_3 = ListType_4(listHolder_4->mList, element_1.externalIDList.count);
+                        } else {
+                            definedValue_3 = ListType_4();
                         }
-                        listHolder_0->mList[i_0].parameterList = ListType_2(listHolder_2->mList, element_0.parameterList.count);
-                    } else {
-                        listHolder_0->mList[i_0].parameterList = ListType_2();
                     }
                 }
             }
-            request.search = ListType_0(listHolder_0->mList, params.search.count);
+            request.search.parameterList = ListType_1(listHolder_1->mList, params.search.parameterList.count);
         } else {
-            request.search = ListType_0();
+            request.search.parameterList = ListType_1();
         }
     }
     request.autoPlay = params.autoPlay.boolValue;

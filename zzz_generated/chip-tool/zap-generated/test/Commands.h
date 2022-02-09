@@ -49156,7 +49156,21 @@ private:
 
         RequestType request;
 
-        request.search   = chip::app::DataModel::List<chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type>();
+        chip::app::Clusters::ContentLauncher::Structs::Parameter::Type parameterListList_1[1];
+
+        parameterListList_1[0].type  = static_cast<chip::app::Clusters::ContentLauncher::ParameterEnum>(1);
+        parameterListList_1[0].value = chip::Span<const char>("exampleValuegarbage: not in length on purpose", 12);
+        parameterListList_1[0].externalIDList.Emplace();
+
+        chip::app::Clusters::ContentLauncher::Structs::AdditionalInfo::Type externalIDListList_4[1];
+
+        externalIDListList_4[0].name  = chip::Span<const char>("namegarbage: not in length on purpose", 4);
+        externalIDListList_4[0].value = chip::Span<const char>("valuegarbage: not in length on purpose", 5);
+
+        parameterListList_1[0].externalIDList.Value() = externalIDListList_4;
+
+        request.search.parameterList = parameterListList_1;
+
         request.autoPlay = true;
         request.data.Emplace();
         request.data.Value() = chip::Span<const char>("exampleDatagarbage: not in length on purpose", 11);

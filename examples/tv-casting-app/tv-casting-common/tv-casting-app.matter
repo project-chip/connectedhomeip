@@ -692,7 +692,7 @@ client cluster ContentLauncher = 1290 {
   readonly global attribute int16u clusterRevision = 65533;
 
   request struct LaunchContentRequestRequest {
-    ContentSearch search[] = 0;
+    ContentSearch search = 0;
     BOOLEAN autoPlay = 1;
     optional CHAR_STRING data = 2;
   }

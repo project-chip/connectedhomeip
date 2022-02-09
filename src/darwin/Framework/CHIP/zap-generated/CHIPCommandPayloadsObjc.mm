@@ -3428,7 +3428,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _search = [NSArray array];
+        _search = [CHIPContentLauncherClusterContentSearch new];
 
         _autoPlay = @(0);
 
