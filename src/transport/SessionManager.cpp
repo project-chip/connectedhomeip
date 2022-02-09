@@ -630,6 +630,11 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
     bool decrypted = false;
     while (!decrypted && iter->Next(groupContext))
     {
+        // Optimization to reduce number of decryption attempt
+        if (groupId != groupContext.group_id)
+        {
+            continue;
+        }
         msgCopy = msg.CloneData();
         decrypted =
             (CHIP_NO_ERROR == SecureMessageCodec::Decrypt(CryptoContext(groupContext.key), payloadHeader, packetHeader, msgCopy));
