@@ -5212,10 +5212,10 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace WakeOnLan {
 namespace Attributes {
 
-namespace WakeOnLanMacAddress {
+namespace MACAddress {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
-} // namespace WakeOnLanMacAddress
+} // namespace MACAddress
 
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
@@ -5249,10 +5249,10 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace TargetNavigator {
 namespace Attributes {
 
-namespace CurrentNavigatorTarget {
+namespace CurrentTarget {
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace CurrentNavigatorTarget
+} // namespace CurrentTarget
 
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
@@ -5270,10 +5270,10 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace MediaPlayback {
 namespace Attributes {
 
-namespace PlaybackState {
+namespace CurrentState {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::MediaPlayback::PlaybackStateEnum * value); // PlaybackStateEnum
 EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::MediaPlayback::PlaybackStateEnum value);
-} // namespace PlaybackState
+} // namespace CurrentState
 
 namespace StartTime {
 EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & value); // epoch_us
@@ -5324,10 +5324,10 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace MediaInput {
 namespace Attributes {
 
-namespace CurrentMediaInput {
+namespace CurrentInput {
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace CurrentMediaInput
+} // namespace CurrentInput
 
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
@@ -5398,10 +5398,10 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace AudioOutput {
 namespace Attributes {
 
-namespace CurrentAudioOutput {
+namespace CurrentOutput {
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace CurrentAudioOutput
+} // namespace CurrentOutput
 
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
@@ -5440,26 +5440,26 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // ch
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace VendorName
 
-namespace VendorId {
+namespace VendorID {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
-} // namespace VendorId
+} // namespace VendorID
 
 namespace ApplicationName {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace ApplicationName
 
-namespace ProductId {
+namespace ProductID {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
-} // namespace ProductId
+} // namespace ProductID
 
-namespace ApplicationStatus {
+namespace Status {
 EmberAfStatus Get(chip::EndpointId endpoint,
                   chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum * value); // ApplicationStatusEnum
 EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum value);
-} // namespace ApplicationStatus
+} // namespace Status
 
 namespace ApplicationVersion {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string

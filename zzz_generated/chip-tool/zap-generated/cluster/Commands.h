@@ -267,11 +267,38 @@ private:
     uint16_t mValue;
 };
 
+<<<<<<< HEAD
 class WritePowerConfigurationMainsVoltageMaxThreshold : public WriteAttribute
 {
 public:
     WritePowerConfigurationMainsVoltageMaxThreshold(CredentialIssuerCommands * credsIssuerConfig) :
         WriteAttribute("MainsVoltageMaxThreshold", credsIssuerConfig)
+=======
+/*----------------------------------------------------------------------------*\
+| Cluster AccountLogin                                                | 0x050E |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * GetSetupPIN                                                       |   0x00 |
+| * Login                                                             |   0x02 |
+| * Logout                                                            |   0x03 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command GetSetupPIN
+ */
+class AccountLoginGetSetupPIN : public ClusterCommand
+{
+public:
+    AccountLoginGetSetupPIN(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("get-setup-pin", credsIssuerConfig)
+>>>>>>> 0ef834bbc1 (Run zap regen script)
     {
         AddArgument("attr-name", "mains-voltage-max-threshold");
         AddArgument("attr-value", 0, UINT16_MAX, &mValue);
@@ -286,6 +313,7 @@ public:
     }
 
 private:
+<<<<<<< HEAD
     uint16_t mValue;
 };
 
@@ -294,6 +322,18 @@ class WritePowerConfigurationMainsVoltageDwellTrip : public WriteAttribute
 public:
     WritePowerConfigurationMainsVoltageDwellTrip(CredentialIssuerCommands * credsIssuerConfig) :
         WriteAttribute("MainsVoltageDwellTrip", credsIssuerConfig)
+=======
+    chip::app::Clusters::AccountLogin::Commands::GetSetupPIN::Type mRequest;
+};
+
+/*
+ * Command Login
+ */
+class AccountLoginLogin : public ClusterCommand
+{
+public:
+    AccountLoginLogin(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("login", credsIssuerConfig)
+>>>>>>> 0ef834bbc1 (Run zap regen script)
     {
         AddArgument("attr-name", "mains-voltage-dwell-trip");
         AddArgument("attr-value", 0, UINT16_MAX, &mValue);
@@ -308,6 +348,7 @@ public:
     }
 
 private:
+<<<<<<< HEAD
     uint16_t mValue;
 };
 
@@ -316,6 +357,18 @@ class WritePowerConfigurationBatteryManufacturer : public WriteAttribute
 public:
     WritePowerConfigurationBatteryManufacturer(CredentialIssuerCommands * credsIssuerConfig) :
         WriteAttribute("BatteryManufacturer", credsIssuerConfig)
+=======
+    chip::app::Clusters::AccountLogin::Commands::Login::Type mRequest;
+};
+
+/*
+ * Command Logout
+ */
+class AccountLoginLogout : public ClusterCommand
+{
+public:
+    AccountLoginLogout(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("logout", credsIssuerConfig)
+>>>>>>> 0ef834bbc1 (Run zap regen script)
     {
         AddArgument("attr-name", "battery-manufacturer");
         AddArgument("attr-value", &mValue);
@@ -330,7 +383,11 @@ public:
     }
 
 private:
+<<<<<<< HEAD
     chip::CharSpan mValue;
+=======
+    chip::app::Clusters::AccountLogin::Commands::Logout::Type mRequest;
+>>>>>>> 0ef834bbc1 (Run zap regen script)
 };
 
 class WritePowerConfigurationBatterySize : public WriteAttribute
@@ -399,6 +456,7 @@ private:
     uint8_t mValue;
 };
 
+<<<<<<< HEAD
 class WritePowerConfigurationBatteryRatedVoltage : public WriteAttribute
 {
 public:
@@ -426,6 +484,57 @@ class WritePowerConfigurationBatteryAlarmMask : public WriteAttribute
 public:
     WritePowerConfigurationBatteryAlarmMask(CredentialIssuerCommands * credsIssuerConfig) :
         WriteAttribute("BatteryAlarmMask", credsIssuerConfig)
+=======
+/*----------------------------------------------------------------------------*\
+| Cluster ApplicationBasic                                            | 0x050D |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * VendorName                                                        | 0x0000 |
+| * VendorID                                                          | 0x0001 |
+| * ApplicationName                                                   | 0x0002 |
+| * ProductID                                                         | 0x0003 |
+| * Application                                                       | 0x0004 |
+| * Status                                                            | 0x0005 |
+| * ApplicationVersion                                                | 0x0006 |
+| * AllowedVendorList                                                 | 0x0007 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster ApplicationLauncher                                         | 0x050C |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * HideApp                                                           |   0x02 |
+| * LaunchApp                                                         |   0x00 |
+| * StopApp                                                           |   0x01 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * CatalogList                                                       | 0x0000 |
+| * CurrentApp                                                        | 0x0001 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command HideApp
+ */
+class ApplicationLauncherHideApp : public ClusterCommand
+{
+public:
+    ApplicationLauncherHideApp(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("hide-app", credsIssuerConfig), mComplex_Application(&mRequest.application)
+>>>>>>> 0ef834bbc1 (Run zap regen script)
     {
         AddArgument("attr-name", "battery-alarm-mask");
         AddArgument("attr-value", 0, UINT8_MAX, &mValue);
@@ -440,6 +549,7 @@ public:
     }
 
 private:
+<<<<<<< HEAD
     uint8_t mValue;
 };
 
@@ -448,6 +558,20 @@ class WritePowerConfigurationBatteryVoltageMinThreshold : public WriteAttribute
 public:
     WritePowerConfigurationBatteryVoltageMinThreshold(CredentialIssuerCommands * credsIssuerConfig) :
         WriteAttribute("BatteryVoltageMinThreshold", credsIssuerConfig)
+=======
+    chip::app::Clusters::ApplicationLauncher::Commands::HideApp::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::ApplicationLauncher::Structs::Application::Type> mComplex_Application;
+};
+
+/*
+ * Command LaunchApp
+ */
+class ApplicationLauncherLaunchApp : public ClusterCommand
+{
+public:
+    ApplicationLauncherLaunchApp(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("launch-app", credsIssuerConfig), mComplex_Application(&mRequest.application)
+>>>>>>> 0ef834bbc1 (Run zap regen script)
     {
         AddArgument("attr-name", "battery-voltage-min-threshold");
         AddArgument("attr-value", 0, UINT8_MAX, &mValue);
@@ -462,6 +586,7 @@ public:
     }
 
 private:
+<<<<<<< HEAD
     uint8_t mValue;
 };
 
@@ -470,6 +595,20 @@ class WritePowerConfigurationBatteryVoltageThreshold1 : public WriteAttribute
 public:
     WritePowerConfigurationBatteryVoltageThreshold1(CredentialIssuerCommands * credsIssuerConfig) :
         WriteAttribute("BatteryVoltageThreshold1", credsIssuerConfig)
+=======
+    chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::ApplicationLauncher::Structs::Application::Type> mComplex_Application;
+};
+
+/*
+ * Command StopApp
+ */
+class ApplicationLauncherStopApp : public ClusterCommand
+{
+public:
+    ApplicationLauncherStopApp(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("stop-app", credsIssuerConfig), mComplex_Application(&mRequest.application)
+>>>>>>> 0ef834bbc1 (Run zap regen script)
     {
         AddArgument("attr-name", "battery-voltage-threshold1");
         AddArgument("attr-value", 0, UINT8_MAX, &mValue);
@@ -484,6 +623,7 @@ public:
     }
 
 private:
+<<<<<<< HEAD
     uint8_t mValue;
 };
 
@@ -499,6 +639,24 @@ public:
     }
 
     ~WritePowerConfigurationBatteryVoltageThreshold2() {}
+=======
+    chip::app::Clusters::ApplicationLauncher::Commands::StopApp::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::ApplicationLauncher::Structs::Application::Type> mComplex_Application;
+};
+
+class WriteApplicationLauncherCurrentApp : public WriteAttribute
+{
+public:
+    WriteApplicationLauncherCurrentApp(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("CurrentApp", credsIssuerConfig), mComplex(&mValue)
+    {
+        AddArgument("attr-name", "current-app");
+        AddArgument("attr-value", &mComplex);
+        WriteAttribute::AddArguments();
+    }
+
+    ~WriteApplicationLauncherCurrentApp() {}
+>>>>>>> 0ef834bbc1 (Run zap regen script)
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -509,11 +667,39 @@ private:
     uint8_t mValue;
 };
 
+<<<<<<< HEAD
 class WritePowerConfigurationBatteryVoltageThreshold3 : public WriteAttribute
 {
 public:
     WritePowerConfigurationBatteryVoltageThreshold3(CredentialIssuerCommands * credsIssuerConfig) :
         WriteAttribute("BatteryVoltageThreshold3", credsIssuerConfig)
+=======
+/*----------------------------------------------------------------------------*\
+| Cluster AudioOutput                                                 | 0x050B |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * RenameOutput                                                      |   0x01 |
+| * SelectOutput                                                      |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * OutputList                                                        | 0x0000 |
+| * CurrentOutput                                                     | 0x0001 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command RenameOutput
+ */
+class AudioOutputRenameOutput : public ClusterCommand
+{
+public:
+    AudioOutputRenameOutput(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("rename-output", credsIssuerConfig)
+>>>>>>> 0ef834bbc1 (Run zap regen script)
     {
         AddArgument("attr-name", "battery-voltage-threshold3");
         AddArgument("attr-value", 0, UINT8_MAX, &mValue);
@@ -528,6 +714,7 @@ public:
     }
 
 private:
+<<<<<<< HEAD
     uint8_t mValue;
 };
 
@@ -536,6 +723,18 @@ class WritePowerConfigurationBatteryPercentageMinThreshold : public WriteAttribu
 public:
     WritePowerConfigurationBatteryPercentageMinThreshold(CredentialIssuerCommands * credsIssuerConfig) :
         WriteAttribute("BatteryPercentageMinThreshold", credsIssuerConfig)
+=======
+    chip::app::Clusters::AudioOutput::Commands::RenameOutput::Type mRequest;
+};
+
+/*
+ * Command SelectOutput
+ */
+class AudioOutputSelectOutput : public ClusterCommand
+{
+public:
+    AudioOutputSelectOutput(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("select-output", credsIssuerConfig)
+>>>>>>> 0ef834bbc1 (Run zap regen script)
     {
         AddArgument("attr-name", "battery-percentage-min-threshold");
         AddArgument("attr-value", 0, UINT8_MAX, &mValue);
@@ -550,7 +749,11 @@ public:
     }
 
 private:
+<<<<<<< HEAD
     uint8_t mValue;
+=======
+    chip::app::Clusters::AudioOutput::Commands::SelectOutput::Type mRequest;
+>>>>>>> 0ef834bbc1 (Run zap regen script)
 };
 
 class WritePowerConfigurationBatteryPercentageThreshold1 : public WriteAttribute
@@ -1059,6 +1262,7 @@ private:
     uint8_t mValue;
 };
 
+<<<<<<< HEAD
 class WritePowerConfigurationBattery3VoltageMinThreshold : public WriteAttribute
 {
 public:
@@ -1068,12 +1272,45 @@ public:
         AddArgument("attr-name", "battery3voltage-min-threshold");
         AddArgument("attr-value", 0, UINT8_MAX, &mValue);
         WriteAttribute::AddArguments();
+=======
+/*----------------------------------------------------------------------------*\
+| Cluster Channel                                                     | 0x0504 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ChangeChannel                                                     |   0x00 |
+| * ChangeChannelByNumber                                             |   0x02 |
+| * SkipChannel                                                       |   0x03 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ChannelList                                                       | 0x0000 |
+| * Lineup                                                            | 0x0001 |
+| * CurrentChannel                                                    | 0x0002 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command ChangeChannel
+ */
+class ChannelChangeChannel : public ClusterCommand
+{
+public:
+    ChannelChangeChannel(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("change-channel", credsIssuerConfig)
+    {
+        AddArgument("Match", &mRequest.match);
+        ClusterCommand::AddArguments();
+>>>>>>> 0ef834bbc1 (Run zap regen script)
     }
 
     ~WritePowerConfigurationBattery3VoltageMinThreshold() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
+<<<<<<< HEAD
         return WriteAttribute::SendCommand(device, endpointId, 0x00000001, 0x00000076, mValue);
     }
 
@@ -1090,12 +1327,36 @@ public:
         AddArgument("attr-name", "battery3voltage-threshold1");
         AddArgument("attr-value", 0, UINT8_MAX, &mValue);
         WriteAttribute::AddArguments();
+=======
+        ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000000) on endpoint %" PRIu16, endpointId);
+
+        return ClusterCommand::SendCommand(device, endpointId, 0x00000504, 0x00000000, mRequest);
+    }
+
+private:
+    chip::app::Clusters::Channel::Commands::ChangeChannel::Type mRequest;
+};
+
+/*
+ * Command ChangeChannelByNumber
+ */
+class ChannelChangeChannelByNumber : public ClusterCommand
+{
+public:
+    ChannelChangeChannelByNumber(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("change-channel-by-number", credsIssuerConfig)
+    {
+        AddArgument("MajorNumber", 0, UINT16_MAX, &mRequest.majorNumber);
+        AddArgument("MinorNumber", 0, UINT16_MAX, &mRequest.minorNumber);
+        ClusterCommand::AddArguments();
+>>>>>>> 0ef834bbc1 (Run zap regen script)
     }
 
     ~WritePowerConfigurationBattery3VoltageThreshold1() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
+<<<<<<< HEAD
         return WriteAttribute::SendCommand(device, endpointId, 0x00000001, 0x00000077, mValue);
     }
 
@@ -1108,6 +1369,24 @@ class WritePowerConfigurationBattery3VoltageThreshold2 : public WriteAttribute
 public:
     WritePowerConfigurationBattery3VoltageThreshold2(CredentialIssuerCommands * credsIssuerConfig) :
         WriteAttribute("Battery3VoltageThreshold2", credsIssuerConfig)
+=======
+        ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000002) on endpoint %" PRIu16, endpointId);
+
+        return ClusterCommand::SendCommand(device, endpointId, 0x00000504, 0x00000002, mRequest);
+    }
+
+private:
+    chip::app::Clusters::Channel::Commands::ChangeChannelByNumber::Type mRequest;
+};
+
+/*
+ * Command SkipChannel
+ */
+class ChannelSkipChannel : public ClusterCommand
+{
+public:
+    ChannelSkipChannel(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("skip-channel", credsIssuerConfig)
+>>>>>>> 0ef834bbc1 (Run zap regen script)
     {
         AddArgument("attr-name", "battery3voltage-threshold2");
         AddArgument("attr-value", 0, UINT8_MAX, &mValue);
@@ -1122,7 +1401,11 @@ public:
     }
 
 private:
+<<<<<<< HEAD
     uint8_t mValue;
+=======
+    chip::app::Clusters::Channel::Commands::SkipChannel::Type mRequest;
+>>>>>>> 0ef834bbc1 (Run zap regen script)
 };
 
 class WritePowerConfigurationBattery3VoltageThreshold3 : public WriteAttribute
@@ -1933,6 +2216,7 @@ private:
 | Cluster OnOff                                                       | 0x0006 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+<<<<<<< HEAD
 | * Off                                                               |   0x00 |
 | * On                                                                |   0x01 |
 | * Toggle                                                            |   0x02 |
@@ -1946,6 +2230,14 @@ private:
 | * OnTime                                                            | 0x4001 |
 | * OffWaitTime                                                       | 0x4002 |
 | * StartUpOnOff                                                      | 0x4003 |
+=======
+| * LaunchContent                                                     |   0x00 |
+| * LaunchURL                                                         |   0x01 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * AcceptHeader                                                      | 0x0000 |
+| * SupportedStreamingProtocols                                       | 0x0001 |
+>>>>>>> 0ef834bbc1 (Run zap regen script)
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -1956,12 +2248,22 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*
+<<<<<<< HEAD
  * Command Off
  */
 class OnOffOff : public ClusterCommand
 {
 public:
     OnOffOff(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("off", credsIssuerConfig)
+=======
+ * Command LaunchContent
+ */
+class ContentLauncherLaunchContent : public ClusterCommand
+{
+public:
+    ContentLauncherLaunchContent(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("launch-content", credsIssuerConfig), mComplex_Search(&mRequest.search)
+>>>>>>> 0ef834bbc1 (Run zap regen script)
     {
         ClusterCommand::AddArguments();
     }
@@ -1974,6 +2276,7 @@ public:
     }
 
 private:
+<<<<<<< HEAD
     chip::app::Clusters::OnOff::Commands::Off::Type mRequest;
 };
 
@@ -1984,6 +2287,26 @@ class OnOffOn : public ClusterCommand
 {
 public:
     OnOffOn(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("on", credsIssuerConfig)
+=======
+<<<<<<< HEAD
+    chip::app::Clusters::ContentLauncher::Commands::LaunchContentRequest::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type> mComplex_Search;
+=======
+    chip::app::Clusters::ContentLauncher::Commands::LaunchContent::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type>>
+        mComplex_Search;
+>>>>>>> feed37d1c6 (Run zap regen script)
+};
+
+/*
+ * Command LaunchURL
+ */
+class ContentLauncherLaunchURL : public ClusterCommand
+{
+public:
+    ContentLauncherLaunchURL(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("launch-url", credsIssuerConfig), mComplex_BrandingInformation(&mRequest.brandingInformation)
+>>>>>>> 0ef834bbc1 (Run zap regen script)
     {
         ClusterCommand::AddArguments();
     }
@@ -1996,7 +2319,13 @@ public:
     }
 
 private:
+<<<<<<< HEAD
     chip::app::Clusters::OnOff::Commands::On::Type mRequest;
+=======
+    chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type mRequest;
+    TypedComplexArgument<chip::Optional<chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type>>
+        mComplex_BrandingInformation;
+>>>>>>> 0ef834bbc1 (Run zap regen script)
 };
 
 /*
@@ -3149,6 +3478,7 @@ private:
     chip::app::Clusters::PowerProfile::Commands::GetOverallSchedulePriceResponse::Type mRequest;
 };
 
+<<<<<<< HEAD
 /*
  * Command EnergyPhasesScheduleNotification
  */
@@ -3158,6 +3488,49 @@ public:
     PowerProfileEnergyPhasesScheduleNotification(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("energy-phases-schedule-notification", credsIssuerConfig),
         mComplex_ScheduledPhases(&mRequest.scheduledPhases)
+=======
+/*----------------------------------------------------------------------------*\
+| Cluster IlluminanceMeasurement                                      | 0x0400 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * Tolerance                                                         | 0x0003 |
+| * LightSensorType                                                   | 0x0004 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster KeypadInput                                                 | 0x0509 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * SendKey                                                           |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command SendKey
+ */
+class KeypadInputSendKey : public ClusterCommand
+{
+public:
+    KeypadInputSendKey(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("send-key", credsIssuerConfig)
+>>>>>>> 0ef834bbc1 (Run zap regen script)
     {
         AddArgument("PowerProfileId", 0, UINT8_MAX, &mRequest.powerProfileId);
         AddArgument("NumOfScheduledPhases", 0, UINT8_MAX, &mRequest.numOfScheduledPhases);
@@ -3173,9 +3546,13 @@ public:
     }
 
 private:
+<<<<<<< HEAD
     chip::app::Clusters::PowerProfile::Commands::EnergyPhasesScheduleNotification::Type mRequest;
     TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::PowerProfile::Structs::ScheduledPhase::Type>>
         mComplex_ScheduledPhases;
+=======
+    chip::app::Clusters::KeypadInput::Commands::SendKey::Type mRequest;
+>>>>>>> 0ef834bbc1 (Run zap regen script)
 };
 
 /*
@@ -3712,6 +4089,7 @@ private:
     chip::app::Clusters::PollControl::Commands::FastPollStop::Type mRequest;
 };
 
+<<<<<<< HEAD
 /*
  * Command SetLongPollInterval
  */
@@ -3720,6 +4098,35 @@ class PollControlSetLongPollInterval : public ClusterCommand
 public:
     PollControlSetLongPollInterval(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("set-long-poll-interval", credsIssuerConfig)
+=======
+/*----------------------------------------------------------------------------*\
+| Cluster MediaInput                                                  | 0x0507 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * HideInputStatus                                                   |   0x02 |
+| * RenameInput                                                       |   0x03 |
+| * SelectInput                                                       |   0x00 |
+| * ShowInputStatus                                                   |   0x01 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * InputList                                                         | 0x0000 |
+| * CurrentInput                                                      | 0x0001 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command HideInputStatus
+ */
+class MediaInputHideInputStatus : public ClusterCommand
+{
+public:
+    MediaInputHideInputStatus(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("hide-input-status", credsIssuerConfig)
+>>>>>>> 0ef834bbc1 (Run zap regen script)
     {
         AddArgument("NewLongPollInterval", 0, UINT32_MAX, &mRequest.newLongPollInterval);
         ClusterCommand::AddArguments();
@@ -3733,6 +4140,7 @@ public:
     }
 
 private:
+<<<<<<< HEAD
     chip::app::Clusters::PollControl::Commands::SetLongPollInterval::Type mRequest;
 };
 
@@ -3744,6 +4152,18 @@ class PollControlSetShortPollInterval : public ClusterCommand
 public:
     PollControlSetShortPollInterval(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("set-short-poll-interval", credsIssuerConfig)
+=======
+    chip::app::Clusters::MediaInput::Commands::HideInputStatus::Type mRequest;
+};
+
+/*
+ * Command RenameInput
+ */
+class MediaInputRenameInput : public ClusterCommand
+{
+public:
+    MediaInputRenameInput(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("rename-input", credsIssuerConfig)
+>>>>>>> 0ef834bbc1 (Run zap regen script)
     {
         AddArgument("NewShortPollInterval", 0, UINT16_MAX, &mRequest.newShortPollInterval);
         ClusterCommand::AddArguments();
@@ -3757,6 +4177,7 @@ public:
     }
 
 private:
+<<<<<<< HEAD
     chip::app::Clusters::PollControl::Commands::SetShortPollInterval::Type mRequest;
 };
 
@@ -3765,6 +4186,18 @@ class WritePollControlCheckInInterval : public WriteAttribute
 public:
     WritePollControlCheckInInterval(CredentialIssuerCommands * credsIssuerConfig) :
         WriteAttribute("CheckInInterval", credsIssuerConfig)
+=======
+    chip::app::Clusters::MediaInput::Commands::RenameInput::Type mRequest;
+};
+
+/*
+ * Command SelectInput
+ */
+class MediaInputSelectInput : public ClusterCommand
+{
+public:
+    MediaInputSelectInput(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("select-input", credsIssuerConfig)
+>>>>>>> 0ef834bbc1 (Run zap regen script)
     {
         AddArgument("attr-name", "check-in-interval");
         AddArgument("attr-value", 0, UINT32_MAX, &mValue);
@@ -3779,6 +4212,7 @@ public:
     }
 
 private:
+<<<<<<< HEAD
     uint32_t mValue;
 };
 
@@ -3787,6 +4221,18 @@ class WritePollControlFastPollTimeout : public WriteAttribute
 public:
     WritePollControlFastPollTimeout(CredentialIssuerCommands * credsIssuerConfig) :
         WriteAttribute("FastPollTimeout", credsIssuerConfig)
+=======
+    chip::app::Clusters::MediaInput::Commands::SelectInput::Type mRequest;
+};
+
+/*
+ * Command ShowInputStatus
+ */
+class MediaInputShowInputStatus : public ClusterCommand
+{
+public:
+    MediaInputShowInputStatus(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("show-input-status", credsIssuerConfig)
+>>>>>>> 0ef834bbc1 (Run zap regen script)
     {
         AddArgument("attr-name", "fast-poll-timeout");
         AddArgument("attr-value", 0, UINT16_MAX, &mValue);
@@ -3801,13 +4247,18 @@ public:
     }
 
 private:
+<<<<<<< HEAD
     uint16_t mValue;
+=======
+    chip::app::Clusters::MediaInput::Commands::ShowInputStatus::Type mRequest;
+>>>>>>> 0ef834bbc1 (Run zap regen script)
 };
 
 /*----------------------------------------------------------------------------*\
 | Cluster BridgedActions                                              | 0x0025 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+<<<<<<< HEAD
 | * InstantAction                                                     |   0x00 |
 | * InstantActionWithTransition                                       |   0x01 |
 | * StartAction                                                       |   0x02 |
@@ -3825,6 +4276,28 @@ private:
 | * ActionList                                                        | 0x0000 |
 | * EndpointList                                                      | 0x0001 |
 | * SetupUrl                                                          | 0x0002 |
+=======
+| * FastForward                                                       |   0x07 |
+| * Next                                                              |   0x05 |
+| * Pause                                                             |   0x01 |
+| * Play                                                              |   0x00 |
+| * Previous                                                          |   0x04 |
+| * Rewind                                                            |   0x06 |
+| * Seek                                                              |   0x0B |
+| * SkipBackward                                                      |   0x09 |
+| * SkipForward                                                       |   0x08 |
+| * StartOver                                                         |   0x03 |
+| * StopPlayback                                                      |   0x02 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * CurrentState                                                      | 0x0000 |
+| * StartTime                                                         | 0x0001 |
+| * Duration                                                          | 0x0002 |
+| * SampledPosition                                                   | 0x0003 |
+| * PlaybackSpeed                                                     | 0x0004 |
+| * SeekRangeEnd                                                      | 0x0005 |
+| * SeekRangeStart                                                    | 0x0006 |
+>>>>>>> 0ef834bbc1 (Run zap regen script)
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -3837,12 +4310,21 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*
+<<<<<<< HEAD
  * Command InstantAction
  */
 class BridgedActionsInstantAction : public ClusterCommand
 {
 public:
     BridgedActionsInstantAction(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("instant-action", credsIssuerConfig)
+=======
+ * Command FastForward
+ */
+class MediaPlaybackFastForward : public ClusterCommand
+{
+public:
+    MediaPlaybackFastForward(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("fast-forward", credsIssuerConfig)
+>>>>>>> 0ef834bbc1 (Run zap regen script)
     {
         AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
         AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
@@ -3857,6 +4339,7 @@ public:
     }
 
 private:
+<<<<<<< HEAD
     chip::app::Clusters::BridgedActions::Commands::InstantAction::Type mRequest;
 };
 
@@ -3868,6 +4351,18 @@ class BridgedActionsInstantActionWithTransition : public ClusterCommand
 public:
     BridgedActionsInstantActionWithTransition(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("instant-action-with-transition", credsIssuerConfig)
+=======
+    chip::app::Clusters::MediaPlayback::Commands::FastForward::Type mRequest;
+};
+
+/*
+ * Command Next
+ */
+class MediaPlaybackNext : public ClusterCommand
+{
+public:
+    MediaPlaybackNext(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("next", credsIssuerConfig)
+>>>>>>> 0ef834bbc1 (Run zap regen script)
     {
         AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
         AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
@@ -3883,6 +4378,7 @@ public:
     }
 
 private:
+<<<<<<< HEAD
     chip::app::Clusters::BridgedActions::Commands::InstantActionWithTransition::Type mRequest;
 };
 
@@ -3893,6 +4389,18 @@ class BridgedActionsStartAction : public ClusterCommand
 {
 public:
     BridgedActionsStartAction(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("start-action", credsIssuerConfig)
+=======
+    chip::app::Clusters::MediaPlayback::Commands::Next::Type mRequest;
+};
+
+/*
+ * Command Pause
+ */
+class MediaPlaybackPause : public ClusterCommand
+{
+public:
+    MediaPlaybackPause(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("pause", credsIssuerConfig)
+>>>>>>> 0ef834bbc1 (Run zap regen script)
     {
         AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
         AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
@@ -3907,6 +4415,7 @@ public:
     }
 
 private:
+<<<<<<< HEAD
     chip::app::Clusters::BridgedActions::Commands::StartAction::Type mRequest;
 };
 
@@ -3918,6 +4427,18 @@ class BridgedActionsStartActionWithDuration : public ClusterCommand
 public:
     BridgedActionsStartActionWithDuration(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("start-action-with-duration", credsIssuerConfig)
+=======
+    chip::app::Clusters::MediaPlayback::Commands::Pause::Type mRequest;
+};
+
+/*
+ * Command Play
+ */
+class MediaPlaybackPlay : public ClusterCommand
+{
+public:
+    MediaPlaybackPlay(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("play", credsIssuerConfig)
+>>>>>>> 0ef834bbc1 (Run zap regen script)
     {
         AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
         AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
@@ -3933,6 +4454,7 @@ public:
     }
 
 private:
+<<<<<<< HEAD
     chip::app::Clusters::BridgedActions::Commands::StartActionWithDuration::Type mRequest;
 };
 
@@ -3943,6 +4465,18 @@ class BridgedActionsStopAction : public ClusterCommand
 {
 public:
     BridgedActionsStopAction(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("stop-action", credsIssuerConfig)
+=======
+    chip::app::Clusters::MediaPlayback::Commands::Play::Type mRequest;
+};
+
+/*
+ * Command Previous
+ */
+class MediaPlaybackPrevious : public ClusterCommand
+{
+public:
+    MediaPlaybackPrevious(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("previous", credsIssuerConfig)
+>>>>>>> 0ef834bbc1 (Run zap regen script)
     {
         AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
         AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
@@ -3957,6 +4491,7 @@ public:
     }
 
 private:
+<<<<<<< HEAD
     chip::app::Clusters::BridgedActions::Commands::StopAction::Type mRequest;
 };
 
@@ -3967,6 +4502,18 @@ class BridgedActionsPauseAction : public ClusterCommand
 {
 public:
     BridgedActionsPauseAction(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("pause-action", credsIssuerConfig)
+=======
+    chip::app::Clusters::MediaPlayback::Commands::Previous::Type mRequest;
+};
+
+/*
+ * Command Rewind
+ */
+class MediaPlaybackRewind : public ClusterCommand
+{
+public:
+    MediaPlaybackRewind(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("rewind", credsIssuerConfig)
+>>>>>>> 0ef834bbc1 (Run zap regen script)
     {
         AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
         AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
@@ -3981,6 +4528,7 @@ public:
     }
 
 private:
+<<<<<<< HEAD
     chip::app::Clusters::BridgedActions::Commands::PauseAction::Type mRequest;
 };
 
@@ -3992,6 +4540,18 @@ class BridgedActionsPauseActionWithDuration : public ClusterCommand
 public:
     BridgedActionsPauseActionWithDuration(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("pause-action-with-duration", credsIssuerConfig)
+=======
+    chip::app::Clusters::MediaPlayback::Commands::Rewind::Type mRequest;
+};
+
+/*
+ * Command Seek
+ */
+class MediaPlaybackSeek : public ClusterCommand
+{
+public:
+    MediaPlaybackSeek(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("seek", credsIssuerConfig)
+>>>>>>> 0ef834bbc1 (Run zap regen script)
     {
         AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
         AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
@@ -4007,6 +4567,7 @@ public:
     }
 
 private:
+<<<<<<< HEAD
     chip::app::Clusters::BridgedActions::Commands::PauseActionWithDuration::Type mRequest;
 };
 
@@ -4017,6 +4578,18 @@ class BridgedActionsResumeAction : public ClusterCommand
 {
 public:
     BridgedActionsResumeAction(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("resume-action", credsIssuerConfig)
+=======
+    chip::app::Clusters::MediaPlayback::Commands::Seek::Type mRequest;
+};
+
+/*
+ * Command SkipBackward
+ */
+class MediaPlaybackSkipBackward : public ClusterCommand
+{
+public:
+    MediaPlaybackSkipBackward(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("skip-backward", credsIssuerConfig)
+>>>>>>> 0ef834bbc1 (Run zap regen script)
     {
         AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
         AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
@@ -4031,6 +4604,7 @@ public:
     }
 
 private:
+<<<<<<< HEAD
     chip::app::Clusters::BridgedActions::Commands::ResumeAction::Type mRequest;
 };
 
@@ -4041,6 +4615,18 @@ class BridgedActionsEnableAction : public ClusterCommand
 {
 public:
     BridgedActionsEnableAction(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("enable-action", credsIssuerConfig)
+=======
+    chip::app::Clusters::MediaPlayback::Commands::SkipBackward::Type mRequest;
+};
+
+/*
+ * Command SkipForward
+ */
+class MediaPlaybackSkipForward : public ClusterCommand
+{
+public:
+    MediaPlaybackSkipForward(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("skip-forward", credsIssuerConfig)
+>>>>>>> 0ef834bbc1 (Run zap regen script)
     {
         AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
         AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
@@ -4055,6 +4641,7 @@ public:
     }
 
 private:
+<<<<<<< HEAD
     chip::app::Clusters::BridgedActions::Commands::EnableAction::Type mRequest;
 };
 
@@ -4066,6 +4653,18 @@ class BridgedActionsEnableActionWithDuration : public ClusterCommand
 public:
     BridgedActionsEnableActionWithDuration(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("enable-action-with-duration", credsIssuerConfig)
+=======
+    chip::app::Clusters::MediaPlayback::Commands::SkipForward::Type mRequest;
+};
+
+/*
+ * Command StartOver
+ */
+class MediaPlaybackStartOver : public ClusterCommand
+{
+public:
+    MediaPlaybackStartOver(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("start-over", credsIssuerConfig)
+>>>>>>> 0ef834bbc1 (Run zap regen script)
     {
         AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
         AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
@@ -4081,6 +4680,7 @@ public:
     }
 
 private:
+<<<<<<< HEAD
     chip::app::Clusters::BridgedActions::Commands::EnableActionWithDuration::Type mRequest;
 };
 
@@ -4091,6 +4691,18 @@ class BridgedActionsDisableAction : public ClusterCommand
 {
 public:
     BridgedActionsDisableAction(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("disable-action", credsIssuerConfig)
+=======
+    chip::app::Clusters::MediaPlayback::Commands::StartOver::Type mRequest;
+};
+
+/*
+ * Command StopPlayback
+ */
+class MediaPlaybackStopPlayback : public ClusterCommand
+{
+public:
+    MediaPlaybackStopPlayback(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("stop-playback", credsIssuerConfig)
+>>>>>>> 0ef834bbc1 (Run zap regen script)
     {
         AddArgument("ActionID", 0, UINT16_MAX, &mRequest.actionID);
         AddArgument("InvokeID", 0, UINT32_MAX, &mRequest.invokeID);
@@ -4105,7 +4717,11 @@ public:
     }
 
 private:
+<<<<<<< HEAD
     chip::app::Clusters::BridgedActions::Commands::DisableAction::Type mRequest;
+=======
+    chip::app::Clusters::MediaPlayback::Commands::StopPlayback::Type mRequest;
+>>>>>>> 0ef834bbc1 (Run zap regen script)
 };
 
 /*
@@ -5599,6 +6215,7 @@ private:
     chip::app::Clusters::OperationalCredentials::Commands::AddNOC::Type mRequest;
 };
 
+<<<<<<< HEAD
 /*
  * Command UpdateNOC
  */
@@ -5606,6 +6223,58 @@ class OperationalCredentialsUpdateNOC : public ClusterCommand
 {
 public:
     OperationalCredentialsUpdateNOC(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("update-noc", credsIssuerConfig)
+=======
+/*----------------------------------------------------------------------------*\
+| Cluster Switch                                                      | 0x003B |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * NumberOfPositions                                                 | 0x0000 |
+| * CurrentPosition                                                   | 0x0001 |
+| * MultiPressMax                                                     | 0x0002 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+| * SwitchLatched                                                     | 0x0000 |
+| * InitialPress                                                      | 0x0001 |
+| * LongPress                                                         | 0x0002 |
+| * ShortRelease                                                      | 0x0003 |
+| * LongRelease                                                       | 0x0004 |
+| * MultiPressOngoing                                                 | 0x0005 |
+| * MultiPressComplete                                                | 0x0006 |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster TargetNavigator                                             | 0x0505 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * NavigateTarget                                                    |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * TargetList                                                        | 0x0000 |
+| * CurrentTarget                                                     | 0x0001 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command NavigateTarget
+ */
+class TargetNavigatorNavigateTarget : public ClusterCommand
+{
+public:
+    TargetNavigatorNavigateTarget(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("navigate-target", credsIssuerConfig)
+>>>>>>> 0ef834bbc1 (Run zap regen script)
     {
         AddArgument("NOCValue", &mRequest.NOCValue);
         AddArgument("ICACValue", &mRequest.ICACValue);
@@ -5620,7 +6289,11 @@ public:
     }
 
 private:
+<<<<<<< HEAD
     chip::app::Clusters::OperationalCredentials::Commands::UpdateNOC::Type mRequest;
+=======
+    chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type mRequest;
+>>>>>>> 0ef834bbc1 (Run zap regen script)
 };
 
 /*
@@ -8902,7 +9575,61 @@ private:
     uint8_t mValue;
 };
 
+<<<<<<< HEAD
 class WriteFanControlFanModeSequence : public WriteAttribute
+=======
+/*----------------------------------------------------------------------------*\
+| Cluster WakeOnLan                                                   | 0x0503 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MACAddress                                                        | 0x0000 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster WiFiNetworkDiagnostics                                      | 0x0036 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ResetCounts                                                       |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * Bssid                                                             | 0x0000 |
+| * SecurityType                                                      | 0x0001 |
+| * WiFiVersion                                                       | 0x0002 |
+| * ChannelNumber                                                     | 0x0003 |
+| * Rssi                                                              | 0x0004 |
+| * BeaconLostCount                                                   | 0x0005 |
+| * BeaconRxCount                                                     | 0x0006 |
+| * PacketMulticastRxCount                                            | 0x0007 |
+| * PacketMulticastTxCount                                            | 0x0008 |
+| * PacketUnicastRxCount                                              | 0x0009 |
+| * PacketUnicastTxCount                                              | 0x000A |
+| * CurrentMaxRate                                                    | 0x000B |
+| * OverrunCount                                                      | 0x000C |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+| * Disconnection                                                     | 0x0000 |
+| * AssociationFailure                                                | 0x0001 |
+| * ConnectionStatus                                                  | 0x0002 |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command ResetCounts
+ */
+class WiFiNetworkDiagnosticsResetCounts : public ClusterCommand
+>>>>>>> 0ef834bbc1 (Run zap regen script)
 {
 public:
     WriteFanControlFanModeSequence(CredentialIssuerCommands * credsIssuerConfig) :
@@ -9249,10 +9976,49 @@ private:
 | Events:                                                             |        |
 \*----------------------------------------------------------------------------*/
 
+<<<<<<< HEAD
 /*
  * Command MoveToHue
  */
 class ColorControlMoveToHue : public ClusterCommand
+=======
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),      //
+        make_unique<AccountLoginGetSetupPIN>(credsIssuerConfig), //
+        make_unique<AccountLoginLogin>(credsIssuerConfig),       //
+        make_unique<AccountLoginLogout>(credsIssuerConfig),      //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                          //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                     //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                 //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterAdministratorCommissioning(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+>>>>>>> 0ef834bbc1 (Run zap regen script)
 {
 public:
     ColorControlMoveToHue(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("move-to-hue", credsIssuerConfig)
@@ -9295,8 +10061,56 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000001) on endpoint %" PRIu16, endpointId);
 
+<<<<<<< HEAD
         return ClusterCommand::SendCommand(device, endpointId, 0x00000300, 0x00000001, mRequest);
     }
+=======
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                            //
+        make_unique<ReadAttribute>(Id, "vendor-name", Attributes::VendorName::Id, credsIssuerConfig),                 //
+        make_unique<ReadAttribute>(Id, "vendor-id", Attributes::VendorID::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "application-name", Attributes::ApplicationName::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "product-id", Attributes::ProductID::Id, credsIssuerConfig),                   //
+        make_unique<ReadAttribute>(Id, "application", Attributes::Application::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "status", Attributes::Status::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "application-version", Attributes::ApplicationVersion::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "allowed-vendor-list", Attributes::AllowedVendorList::Id, credsIssuerConfig),  //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                            //
+        make_unique<SubscribeAttribute>(Id, "vendor-name", Attributes::VendorName::Id, credsIssuerConfig),                 //
+        make_unique<SubscribeAttribute>(Id, "vendor-id", Attributes::VendorID::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "application-name", Attributes::ApplicationName::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "product-id", Attributes::ProductID::Id, credsIssuerConfig),                   //
+        make_unique<SubscribeAttribute>(Id, "application", Attributes::Application::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "status", Attributes::Status::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, "application-version", Attributes::ApplicationVersion::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "allowed-vendor-list", Attributes::AllowedVendorList::Id, credsIssuerConfig),  //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+>>>>>>> 0ef834bbc1 (Run zap regen script)
 
 private:
     chip::app::Clusters::ColorControl::Commands::MoveHue::Type mRequest;
@@ -9322,8 +10136,48 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000002) on endpoint %" PRIu16, endpointId);
 
+<<<<<<< HEAD
         return ClusterCommand::SendCommand(device, endpointId, 0x00000300, 0x00000002, mRequest);
     }
+=======
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),           //
+        make_unique<ApplicationLauncherHideApp>(credsIssuerConfig),   //
+        make_unique<ApplicationLauncherLaunchApp>(credsIssuerConfig), //
+        make_unique<ApplicationLauncherStopApp>(credsIssuerConfig),   //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                              //
+        make_unique<ReadAttribute>(Id, "catalog-list", Attributes::CatalogList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "current-app", Attributes::CurrentApp::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                          //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                     //
+        make_unique<WriteApplicationLauncherCurrentApp>(credsIssuerConfig),                                     //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                 //
+        make_unique<SubscribeAttribute>(Id, "catalog-list", Attributes::CatalogList::Id, credsIssuerConfig),    //
+        make_unique<SubscribeAttribute>(Id, "current-app", Attributes::CurrentApp::Id, credsIssuerConfig),      //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+>>>>>>> 0ef834bbc1 (Run zap regen script)
 
 private:
     chip::app::Clusters::ColorControl::Commands::StepHue::Type mRequest;
@@ -9349,8 +10203,46 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000003) on endpoint %" PRIu16, endpointId);
 
+<<<<<<< HEAD
         return ClusterCommand::SendCommand(device, endpointId, 0x00000300, 0x00000003, mRequest);
     }
+=======
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),      //
+        make_unique<AudioOutputRenameOutput>(credsIssuerConfig), //
+        make_unique<AudioOutputSelectOutput>(credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                  //
+        make_unique<ReadAttribute>(Id, "output-list", Attributes::OutputList::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "current-output", Attributes::CurrentOutput::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                           //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),  //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                      //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                  //
+        make_unique<SubscribeAttribute>(Id, "output-list", Attributes::OutputList::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "current-output", Attributes::CurrentOutput::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+>>>>>>> 0ef834bbc1 (Run zap regen script)
 
 private:
     chip::app::Clusters::ColorControl::Commands::MoveToSaturation::Type mRequest;
@@ -9565,8 +10457,49 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000040) on endpoint %" PRIu16, endpointId);
 
+<<<<<<< HEAD
         return ClusterCommand::SendCommand(device, endpointId, 0x00000300, 0x00000040, mRequest);
     }
+=======
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),           //
+        make_unique<ChannelChangeChannel>(credsIssuerConfig),         //
+        make_unique<ChannelChangeChannelByNumber>(credsIssuerConfig), //
+        make_unique<ChannelSkipChannel>(credsIssuerConfig),           //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                    //
+        make_unique<ReadAttribute>(Id, "channel-list", Attributes::ChannelList::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "lineup", Attributes::Lineup::Id, credsIssuerConfig),                  //
+        make_unique<ReadAttribute>(Id, "current-channel", Attributes::CurrentChannel::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                             //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),    //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                        //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                    //
+        make_unique<SubscribeAttribute>(Id, "channel-list", Attributes::ChannelList::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "lineup", Attributes::Lineup::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeAttribute>(Id, "current-channel", Attributes::CurrentChannel::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+>>>>>>> 0ef834bbc1 (Run zap regen script)
 
 private:
     chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type mRequest;
@@ -9620,8 +10553,49 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000042) on endpoint %" PRIu16, endpointId);
 
+<<<<<<< HEAD
         return ClusterCommand::SendCommand(device, endpointId, 0x00000300, 0x00000042, mRequest);
     }
+=======
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),           //
+        make_unique<ContentLauncherLaunchContent>(credsIssuerConfig), //
+        make_unique<ContentLauncherLaunchURL>(credsIssuerConfig),     //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                //
+        make_unique<ReadAttribute>(Id, "accept-header", Attributes::AcceptHeader::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "supported-streaming-protocols", Attributes::SupportedStreamingProtocols::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                          //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                     //
+        make_unique<WriteContentLauncherSupportedStreamingProtocols>(credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                 //
+        make_unique<SubscribeAttribute>(Id, "accept-header", Attributes::AcceptHeader::Id, credsIssuerConfig),  //
+        make_unique<SubscribeAttribute>(Id, "supported-streaming-protocols", Attributes::SupportedStreamingProtocols::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+>>>>>>> 0ef834bbc1 (Run zap regen script)
 
 private:
     chip::app::Clusters::ColorControl::Commands::EnhancedStepHue::Type mRequest;
@@ -9928,10 +10902,43 @@ public:
 
     ~WriteColorControlColorPointGY() {}
 
+<<<<<<< HEAD
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
         return WriteAttribute::SendCommand(device, endpointId, 0x00000300, 0x00000037, mValue);
     }
+=======
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        make_unique<KeypadInputSendKey>(credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                          //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                     //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                 //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+>>>>>>> 0ef834bbc1 (Run zap regen script)
 
 private:
     uint16_t mValue;
@@ -10014,10 +11021,50 @@ public:
 
     ~WriteColorControlColorPointBIntensity() {}
 
+<<<<<<< HEAD
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
         return WriteAttribute::SendCommand(device, endpointId, 0x00000300, 0x0000003C, mValue);
     }
+=======
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),        //
+        make_unique<MediaInputHideInputStatus>(credsIssuerConfig), //
+        make_unique<MediaInputRenameInput>(credsIssuerConfig),     //
+        make_unique<MediaInputSelectInput>(credsIssuerConfig),     //
+        make_unique<MediaInputShowInputStatus>(credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                //
+        make_unique<ReadAttribute>(Id, "input-list", Attributes::InputList::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "current-input", Attributes::CurrentInput::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                          //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                     //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                 //
+        make_unique<SubscribeAttribute>(Id, "input-list", Attributes::InputList::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "current-input", Attributes::CurrentInput::Id, credsIssuerConfig),  //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+>>>>>>> 0ef834bbc1 (Run zap regen script)
 
 private:
     uint8_t mValue;
@@ -10036,10 +11083,67 @@ public:
 
     ~WriteColorControlStartUpColorTemperatureMireds() {}
 
+<<<<<<< HEAD
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
         return WriteAttribute::SendCommand(device, endpointId, 0x00000300, 0x00004010, mValue);
     }
+=======
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),        //
+        make_unique<MediaPlaybackFastForward>(credsIssuerConfig),  //
+        make_unique<MediaPlaybackNext>(credsIssuerConfig),         //
+        make_unique<MediaPlaybackPause>(credsIssuerConfig),        //
+        make_unique<MediaPlaybackPlay>(credsIssuerConfig),         //
+        make_unique<MediaPlaybackPrevious>(credsIssuerConfig),     //
+        make_unique<MediaPlaybackRewind>(credsIssuerConfig),       //
+        make_unique<MediaPlaybackSeek>(credsIssuerConfig),         //
+        make_unique<MediaPlaybackSkipBackward>(credsIssuerConfig), //
+        make_unique<MediaPlaybackSkipForward>(credsIssuerConfig),  //
+        make_unique<MediaPlaybackStartOver>(credsIssuerConfig),    //
+        make_unique<MediaPlaybackStopPlayback>(credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                      //
+        make_unique<ReadAttribute>(Id, "current-state", Attributes::CurrentState::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "start-time", Attributes::StartTime::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "duration", Attributes::Duration::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "sampled-position", Attributes::SampledPosition::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "playback-speed", Attributes::PlaybackSpeed::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "seek-range-end", Attributes::SeekRangeEnd::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "seek-range-start", Attributes::SeekRangeStart::Id, credsIssuerConfig),  //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                               //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),      //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                      //
+        make_unique<SubscribeAttribute>(Id, "current-state", Attributes::CurrentState::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "start-time", Attributes::StartTime::Id, credsIssuerConfig),             //
+        make_unique<SubscribeAttribute>(Id, "duration", Attributes::Duration::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "sampled-position", Attributes::SampledPosition::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "playback-speed", Attributes::PlaybackSpeed::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "seek-range-end", Attributes::SeekRangeEnd::Id, credsIssuerConfig),      //
+        make_unique<SubscribeAttribute>(Id, "seek-range-start", Attributes::SeekRangeStart::Id, credsIssuerConfig),  //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+>>>>>>> 0ef834bbc1 (Run zap regen script)
 
 private:
     uint16_t mValue;
@@ -10522,10 +11626,47 @@ public:
 
     ~WriteOccupancySensingPirUnoccupiedToOccupiedThreshold() {}
 
+<<<<<<< HEAD
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
         return WriteAttribute::SendCommand(device, endpointId, 0x00000406, 0x00000012, mValue);
     }
+=======
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),            //
+        make_unique<TargetNavigatorNavigateTarget>(credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                  //
+        make_unique<ReadAttribute>(Id, "target-list", Attributes::TargetList::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "current-target", Attributes::CurrentTarget::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                   credsIssuerConfig),                                                           //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),  //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                      //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                  //
+        make_unique<SubscribeAttribute>(Id, "target-list", Attributes::TargetList::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "current-target", Attributes::CurrentTarget::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
+                                        credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+>>>>>>> 0ef834bbc1 (Run zap regen script)
 
 private:
     uint8_t mValue;
@@ -23074,16 +24215,28 @@ void registerClusterApplianceEventsAndAlert(Commands & commands, CredentialIssue
         //
         // Attributes
         //
+<<<<<<< HEAD
         make_unique<ReadAttribute>(Id, credsIssuerConfig), //
+=======
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                           //
+        make_unique<ReadAttribute>(Id, "macaddress", Attributes::MACAddress::Id, credsIssuerConfig), //
+>>>>>>> 0ef834bbc1 (Run zap regen script)
         make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
                                    credsIssuerConfig),                                                          //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
+<<<<<<< HEAD
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),           //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                     //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                 //
+=======
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                     //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                 //
+        make_unique<SubscribeAttribute>(Id, "macaddress", Attributes::MACAddress::Id, credsIssuerConfig),       //
+>>>>>>> 0ef834bbc1 (Run zap regen script)
         make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,

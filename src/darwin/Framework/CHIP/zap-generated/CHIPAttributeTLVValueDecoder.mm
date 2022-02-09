@@ -487,8 +487,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
             return value;
         }
-        case Attributes::VendorId::Id: {
-            using TypeInfo = Attributes::VendorId::TypeInfo;
+        case Attributes::VendorID::Id: {
+            using TypeInfo = Attributes::VendorID::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -509,8 +509,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
             return value;
         }
-        case Attributes::ProductId::Id: {
-            using TypeInfo = Attributes::ProductId::TypeInfo;
+        case Attributes::ProductID::Id: {
+            using TypeInfo = Attributes::ProductID::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -520,8 +520,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = [NSNumber numberWithUnsignedShort:cppValue];
             return value;
         }
-        case Attributes::ApplicationApp::Id: {
-            using TypeInfo = Attributes::ApplicationApp::TypeInfo;
+        case Attributes::Application::Id: {
+            using TypeInfo = Attributes::Application::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -535,8 +535,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                                                          encoding:NSUTF8StringEncoding];
             return value;
         }
-        case Attributes::ApplicationStatus::Id: {
-            using TypeInfo = Attributes::ApplicationStatus::TypeInfo;
+        case Attributes::Status::Id: {
+            using TypeInfo = Attributes::Status::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -681,8 +681,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
     case Clusters::ApplicationLauncher::Id: {
         using namespace Clusters::ApplicationLauncher;
         switch (aPath.mAttributeId) {
-        case Attributes::ApplicationLauncherList::Id: {
-            using TypeInfo = Attributes::ApplicationLauncherList::TypeInfo;
+        case Attributes::CatalogList::Id: {
+            using TypeInfo = Attributes::CatalogList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -707,8 +707,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = array_0;
             return value;
         }
-        case Attributes::ApplicationLauncherApp::Id: {
-            using TypeInfo = Attributes::ApplicationLauncherApp::TypeInfo;
+        case Attributes::CurrentApp::Id: {
+            using TypeInfo = Attributes::CurrentApp::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -830,8 +830,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
     case Clusters::AudioOutput::Id: {
         using namespace Clusters::AudioOutput;
         switch (aPath.mAttributeId) {
-        case Attributes::AudioOutputList::Id: {
-            using TypeInfo = Attributes::AudioOutputList::TypeInfo;
+        case Attributes::OutputList::Id: {
+            using TypeInfo = Attributes::OutputList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -861,8 +861,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = array_0;
             return value;
         }
-        case Attributes::CurrentAudioOutput::Id: {
-            using TypeInfo = Attributes::CurrentAudioOutput::TypeInfo;
+        case Attributes::CurrentOutput::Id: {
+            using TypeInfo = Attributes::CurrentOutput::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -2248,8 +2248,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = array_0;
             return value;
         }
-        case Attributes::ChannelLineup::Id: {
-            using TypeInfo = Attributes::ChannelLineup::TypeInfo;
+        case Attributes::Lineup::Id: {
+            using TypeInfo = Attributes::Lineup::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -3087,8 +3087,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
     case Clusters::ContentLauncher::Id: {
         using namespace Clusters::ContentLauncher;
         switch (aPath.mAttributeId) {
-        case Attributes::AcceptHeaderList::Id: {
-            using TypeInfo = Attributes::AcceptHeaderList::TypeInfo;
+        case Attributes::AcceptHeader::Id: {
+            using TypeInfo = Attributes::AcceptHeader::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -6155,8 +6155,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
     case Clusters::MediaInput::Id: {
         using namespace Clusters::MediaInput;
         switch (aPath.mAttributeId) {
-        case Attributes::MediaInputList::Id: {
-            using TypeInfo = Attributes::MediaInputList::TypeInfo;
+        case Attributes::InputList::Id: {
+            using TypeInfo = Attributes::InputList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -6189,8 +6189,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = array_0;
             return value;
         }
-        case Attributes::CurrentMediaInput::Id: {
-            using TypeInfo = Attributes::CurrentMediaInput::TypeInfo;
+        case Attributes::CurrentInput::Id: {
+            using TypeInfo = Attributes::CurrentInput::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -6298,8 +6298,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
     case Clusters::MediaPlayback::Id: {
         using namespace Clusters::MediaPlayback;
         switch (aPath.mAttributeId) {
-        case Attributes::PlaybackState::Id: {
-            using TypeInfo = Attributes::PlaybackState::TypeInfo;
+        case Attributes::CurrentState::Id: {
+            using TypeInfo = Attributes::CurrentState::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -6339,20 +6339,24 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             return value;
         }
-        case Attributes::Position::Id: {
-            using TypeInfo = Attributes::Position::TypeInfo;
+        case Attributes::SampledPosition::Id: {
+            using TypeInfo = Attributes::SampledPosition::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            CHIPMediaPlaybackClusterPlaybackPosition * _Nonnull value;
-            value = [CHIPMediaPlaybackClusterPlaybackPosition new];
-            value.updatedAt = [NSNumber numberWithUnsignedLongLong:cppValue.updatedAt];
-            if (cppValue.position.IsNull()) {
-                value.position = nil;
+            CHIPMediaPlaybackClusterPlaybackPosition * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
             } else {
-                value.position = [NSNumber numberWithUnsignedLongLong:cppValue.position.Value()];
+                value = [CHIPMediaPlaybackClusterPlaybackPosition new];
+                value.updatedAt = [NSNumber numberWithUnsignedLongLong:cppValue.Value().updatedAt];
+                if (cppValue.Value().position.IsNull()) {
+                    value.position = nil;
+                } else {
+                    value.position = [NSNumber numberWithUnsignedLongLong:cppValue.Value().position.Value()];
+                }
             }
             return value;
         }
@@ -9073,8 +9077,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
     case Clusters::TargetNavigator::Id: {
         using namespace Clusters::TargetNavigator;
         switch (aPath.mAttributeId) {
-        case Attributes::TargetNavigatorList::Id: {
-            using TypeInfo = Attributes::TargetNavigatorList::TypeInfo;
+        case Attributes::TargetList::Id: {
+            using TypeInfo = Attributes::TargetList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -9103,8 +9107,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = array_0;
             return value;
         }
-        case Attributes::CurrentNavigatorTarget::Id: {
-            using TypeInfo = Attributes::CurrentNavigatorTarget::TypeInfo;
+        case Attributes::CurrentTarget::Id: {
+            using TypeInfo = Attributes::CurrentTarget::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -12264,8 +12268,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
     case Clusters::WakeOnLan::Id: {
         using namespace Clusters::WakeOnLan;
         switch (aPath.mAttributeId) {
-        case Attributes::WakeOnLanMacAddress::Id: {
-            using TypeInfo = Attributes::WakeOnLanMacAddress::TypeInfo;
+        case Attributes::MACAddress::Id: {
+            using TypeInfo = Attributes::MACAddress::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
