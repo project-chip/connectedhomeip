@@ -53,8 +53,8 @@ ResponseHandler {{> subscribeDataCallback}} = nil;
     {{#chip_tests_item_parameters}}
     {{asObjectiveCBasicType type}} {{asLowerCamelCase name}}Argument = {{asTypedLiteral definedValue type}};
     {{/chip_tests_item_parameters}}
-    [cluster subscribeAttribute{{asUpperCamelCase attribute}}WithMinInterval:minIntervalArgument
-                                                                 maxInterval:maxIntervalArgument
+    [cluster subscribeAttribute{{asUpperCamelCase attribute}}WithMinInterval:@(minIntervalArgument)
+                                                                 maxInterval:@(maxIntervalArgument)
                                                      subscriptionEstablished:^{
         XCTAssertEqual(testSendCluster{{parent.filename}}_{{asTestIndex waitForReport.index}}_{{asUpperCamelCase waitForReport.command}}_Fulfilled, true);
         [expectation fulfill];

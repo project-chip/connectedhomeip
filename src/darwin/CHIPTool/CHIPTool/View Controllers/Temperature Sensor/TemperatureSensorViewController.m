@@ -201,8 +201,8 @@
             if (chipDevice) {
                 CHIPTemperatureMeasurement * cluster =
                     [[CHIPTemperatureMeasurement alloc] initWithDevice:chipDevice endpoint:1 queue:dispatch_get_main_queue()];
-                [cluster subscribeAttributeMeasuredValueWithMinInterval:minIntervalSeconds
-                    maxInterval:maxIntervalSeconds
+                [cluster subscribeAttributeMeasuredValueWithMinInterval:@(minIntervalSeconds)
+                    maxInterval:@(maxIntervalSeconds)
                     subscriptionEstablished:^{
 
                     }
