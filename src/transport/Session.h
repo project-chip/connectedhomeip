@@ -34,10 +34,6 @@ class Session
 public:
     virtual ~Session() {}
 
-    static constexpr FabricIndex kInvalidFabricIndex = 0;
-
-    static_assert(kInvalidFabricIndex < chip::kMinValidFabricIndex, "Invalid fabric index must be invalid");
-
     enum class SessionType : uint8_t
     {
         kUndefined       = 0,
