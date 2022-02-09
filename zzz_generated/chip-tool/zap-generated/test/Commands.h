@@ -89478,8 +89478,8 @@ public:
             err = TestKeySetWrite1_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Write Group Keys\n");
-            err = TestWriteGroupKeys_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Map Group Key Set to group ID on a given fabric\n");
+            err = TestMapGroupKeySetToGroupIdOnAGivenFabric_3();
             break;
         }
 
@@ -89610,7 +89610,7 @@ private:
 
     void OnSuccessResponse_2() { NextTest(); }
 
-    CHIP_ERROR TestWriteGroupKeys_3()
+    CHIP_ERROR TestMapGroupKeySetToGroupIdOnAGivenFabric_3()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::GroupKeyManagementClusterTest cluster;
