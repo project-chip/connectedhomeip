@@ -85,7 +85,7 @@ public:
 
     // When using DNSSD, a peer may be discovered at multiple addresses.
     // This controls how many addresses can be kept.
-    static constexpr unsigned kMaxPeerDestinations = 5;
+    static constexpr unsigned kMaxPeerDestinations = 3;
 
     PeerAddress() : mTransportType(Type::kUndefined) {}
     PeerAddress(const Inet::IPAddress & addr, Type type) : mTransportType(type)
