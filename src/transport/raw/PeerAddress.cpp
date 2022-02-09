@@ -34,9 +34,9 @@ namespace {
 ///    10.20.30.40:5040              // exactly one IP address in the address list, interface is empty
 ///    10.0.0.10%wlan0:123 (+3 more) // 4 input addresses in the list
 /// <ip>%<iface>:port
-void AddIpInfo(StringBuilderBase & dest, const char * interface, uint16_t port, Span<const Inet::IPAddress> addresses)
+void AddIpInfo(StringBuilderBase & dest, uint16_t port, Span<const PeerAddress::IPDestination> destinations)
 {
-    if (addresses.empty())
+    if (destinations.empty())
     {
         dest.Add("NONE:");
     }
@@ -47,17 +47,36 @@ void AddIpInfo(StringBuilderBase & dest, const char * interface, uint16_t port, 
         // In time, peer addresses should have an 'active address' to determine  which IP is
         // used to communicate with peers, in which case the output here should be the current
         // active address rather than just the first in the list.
+
         dest.Add(":");
-        char ip_addr[Inet::IPAddress::kMaxStringLength];
-        auto first = addresses.begin();
-        first->ToString(ip_addr);
-        if (first->IsIPv6())
+        auto first = destinations.begin();
+
         {
-            dest.Add("[");
+            char ip_addr[Inet::IPAddress::kMaxStringLength];
+            first->ipAddress.ToString(ip_addr);
+            if (first->ipAddress.IsIPv6())
+            {
+                dest.Add("[");
+            }
+            dest.Add(ip_addr);
         }
-        dest.Add(ip_addr);
-        dest.Add(interface);
-        if (first->IsIPv6())
+
+        if (first->interface.IsPresent())
+        {
+            dest.Add("%");
+
+            char interface[Inet::InterfaceId::kMaxIfNameLength] = {}; // +1 to prepend '%'
+
+            if (first->interface.GetInterfaceName(interface, sizeof(interface)) != CHIP_NO_ERROR)
+            {
+                dest.Add("(err)");
+            }
+            else
+            {
+                dest.Add(interface);
+            }
+        }
+        if (first->ipAddress.IsIPv6())
         {
             dest.Add("]");
         }
@@ -65,10 +84,10 @@ void AddIpInfo(StringBuilderBase & dest, const char * interface, uint16_t port, 
         dest.Add(port);
     }
 
-    if (addresses.size() > 1)
+    if (destinations.size() > 1)
     {
         dest.Add(" (+");
-        dest.Add(static_cast<int>(addresses.size() - 1));
+        dest.Add(static_cast<int>(destinations.size() - 1));
         dest.Add(" more)");
     }
 }
@@ -77,19 +96,6 @@ void AddIpInfo(StringBuilderBase & dest, const char * interface, uint16_t port, 
 
 void PeerAddress::ToString(char * buf, size_t bufSize) const
 {
-
-    char interface[Inet::InterfaceId::kMaxIfNameLength + 1] = {}; // +1 to prepend '%'
-    if (mInterface.IsPresent())
-    {
-        interface[0]   = '%';
-        interface[1]   = 0;
-        CHIP_ERROR err = mInterface.GetInterfaceName(interface + 1, sizeof(interface) - 1);
-        if (err != CHIP_NO_ERROR)
-        {
-            Platform::CopyString(interface, sizeof(interface), "%(err)");
-        }
-    }
-
     StringBuilderBase out(buf, bufSize);
 
     switch (mTransportType)
@@ -99,11 +105,11 @@ void PeerAddress::ToString(char * buf, size_t bufSize) const
         break;
     case Type::kUdp:
         out.Add("UDP:");
-        AddIpInfo(out, interface, mPort, Span<const Inet::IPAddress>(mIPAddresses, mNumValidIPAddresses));
+        AddIpInfo(out, mPort, Span<const IPDestination>(mDestinations, mNumValidDestinations));
         break;
     case Type::kTcp:
         out.Add("TCP:");
-        AddIpInfo(out, interface, mPort, Span<const Inet::IPAddress>(mIPAddresses, mNumValidIPAddresses));
+        AddIpInfo(out, mPort, Span<const IPDestination>(mDestinations, mNumValidDestinations));
         break;
     case Type::kBle:
         // Note that BLE does not currently use any specific address.

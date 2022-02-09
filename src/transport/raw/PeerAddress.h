@@ -63,12 +63,35 @@ enum class Type : uint8_t
 class PeerAddress
 {
 public:
+    /// Target destinations for Peer addresses
+    struct IPDestination
+    {
+        Inet::IPAddress ipAddress;
+        Inet::InterfaceId interface = Inet::InterfaceId::Null();
+
+        void Set(const Inet::IPAddress & ip, const Inet::InterfaceId & iface)
+        {
+            ipAddress = ip;
+            interface = iface;
+        }
+
+        bool operator==(const IPDestination & other) const
+        {
+            return (ipAddress == other.ipAddress) && (interface == other.interface);
+        }
+
+        bool operator!=(const IPDestination & other) const { return !(*this == other); }
+    };
+
     // When using DNSSD, a peer may be discovered at multiple addresses.
     // This controls how many addresses can be kept.
-    static constexpr unsigned kMaxPeerIPAddresses = 5;
+    static constexpr unsigned kMaxPeerDestinations = 5;
 
     PeerAddress() : mTransportType(Type::kUndefined) {}
-    PeerAddress(const Inet::IPAddress & addr, Type type) : mNumValidIPAddresses(1), mTransportType(type) { mIPAddresses[0] = addr; }
+    PeerAddress(const Inet::IPAddress & addr, Type type) : mTransportType(type)
+    {
+        AppendDestination(addr, Inet::InterfaceId::Null());
+    }
     PeerAddress(Type type) : mTransportType(type) {}
 
     PeerAddress(PeerAddress &&)      = default;
@@ -78,9 +101,9 @@ public:
 
     const Inet::IPAddress & GetIPAddress() const
     {
-        if (mNumValidIPAddresses > 0)
+        if (mNumValidDestinations > 0)
         {
-            return mIPAddresses[0];
+            return mDestinations[0].ipAddress;
         }
         else
         {
@@ -88,13 +111,19 @@ public:
         }
     }
 
-    /// DEPRECATED: this method does not take into account that peers may be
-    /// reachable via multiple IP addresses via DNSsd.
-    PeerAddress & SetSingleIPAddress(const Inet::IPAddress & addr)
+    /// Add another IP address to the list of internal IP addresses that
+    /// are considred valid.
+    ///
+    /// Returns failure if insufficient memory available to append more
+    /// addresses
+    CHIP_ERROR AppendDestination(const Inet::IPAddress & addr, const Inet::InterfaceId & interface)
     {
-        mIPAddresses[0]      = addr;
-        mNumValidIPAddresses = 1;
-        return *this;
+        if (mNumValidDestinations + 1 >= kMaxPeerDestinations)
+        {
+            return CHIP_ERROR_NO_MEMORY;
+        }
+        mDestinations[mNumValidDestinations++].Set(addr, interface);
+        return CHIP_NO_ERROR;
     }
 
     Type GetTransportType() const { return mTransportType; }
@@ -111,10 +140,41 @@ public:
         return *this;
     }
 
-    Inet::InterfaceId GetInterface() const { return mInterface; }
-    PeerAddress & SetInterface(Inet::InterfaceId interface)
+    Inet::InterfaceId GetInterface() const
     {
-        mInterface = interface;
+        if (mNumValidDestinations > 0)
+        {
+            return mDestinations[0].interface;
+        }
+        else
+        {
+            return Inet::InterfaceId::Null();
+        }
+    }
+
+    /// DEPRECATED: Setting this has several drawbacks:
+    ///   - Interface is not set and LL ip addresses will not work without a
+    ///     set interface
+    ///   - Nodes are generally expected to support multiple IP addresses when
+    ///     discovered using DNSSD.
+    PeerAddress & SetSingleIPAddress(const Inet::IPAddress & addr)
+    {
+        // NOTE: mDestinations[0].interface is NOT changed in any way
+        mDestinations[0].ipAddress = addr;
+        mNumValidDestinations      = 1;
+        return *this;
+    }
+
+    /// DEPRECATED: Setting this has several drawbacks:
+    ///   - IP address is not set (pair of IP + interface is not maintained as
+    ///     always a pair)
+    ///   - Nodes are generally expected to support multiple IP addresses when
+    ///     discovered using DNSSD.
+    PeerAddress & SetSingleInterface(Inet::InterfaceId interface)
+    {
+        // NOTE: mDestinations[0].ipAddress is NOT changed in any way
+        mDestinations[0].interface = interface;
+        mNumValidDestinations      = 1;
         return *this;
     }
 
@@ -127,29 +187,29 @@ public:
             return false;
         }
 
-        if (mNumValidIPAddresses == 0)
+        if (mNumValidDestinations == 0)
         {
             return false;
         }
 
         // Assumption here is that if any IP address is multicast, the entire object should
         // be multicast
-        return mIPAddresses[0].IsIPv6Multicast();
+        return mDestinations[0].ipAddress.IsIPv6Multicast();
     }
 
     bool operator==(const PeerAddress & other) const
     {
-        if ((mTransportType != other.mTransportType) || (mPort != other.mPort) || (mInterface != other.mInterface) ||
-            mNumValidIPAddresses != other.mNumValidIPAddresses)
+        if ((mTransportType != other.mTransportType) || (mPort != other.mPort) ||
+            mNumValidDestinations != other.mNumValidDestinations)
         {
             return false;
         }
 
         // NOTE: we do NOT try to oder IP addresses here, we check that the valid
         // IP addresses are identical only.
-        for (unsigned i = 0; i < mNumValidIPAddresses; i++)
+        for (unsigned i = 0; i < mNumValidDestinations; i++)
         {
-            if (mIPAddresses[i] != other.mIPAddresses[i])
+            if (mDestinations[i] != other.mDestinations[i])
             {
                 return false;
             }
@@ -175,7 +235,7 @@ public:
         + 6                                      // " more)"
         + 1;                                     // NullTerminator
 
-    static_assert(kMaxPeerIPAddresses < 100, "for maxStringSize to be correct for the 'more' part");
+    static_assert(kMaxPeerDestinations < 100, "for maxStringSize to be correct for the 'more' part");
 
     template <size_t N>
     inline void ToString(char (&buf)[N]) const
@@ -190,17 +250,21 @@ public:
     static PeerAddress Uninitialized() { return PeerAddress(Type::kUndefined); }
 
     static PeerAddress BLE() { return PeerAddress(Type::kBle); }
-    static PeerAddress UDP(const Inet::IPAddress & addr) { return PeerAddress(addr, Type::kUdp); }
-    static PeerAddress UDP(const Inet::IPAddress & addr, uint16_t port) { return UDP(addr).SetPort(port); }
-    static PeerAddress UDP(const Inet::IPAddress & addr, uint16_t port, Inet::InterfaceId interface)
+
+    static PeerAddress UDP(const Inet::IPAddress & addr, uint16_t port = CHIP_PORT,
+                           Inet::InterfaceId interface = Inet::InterfaceId::Null())
     {
-        return UDP(addr).SetPort(port).SetInterface(interface);
+        PeerAddress result = PeerAddress(Type::kUdp);
+        result.SetPort(port).AppendDestination(addr, interface);
+        return result;
     }
-    static PeerAddress TCP(const Inet::IPAddress & addr) { return PeerAddress(addr, Type::kTcp); }
-    static PeerAddress TCP(const Inet::IPAddress & addr, uint16_t port) { return TCP(addr).SetPort(port); }
-    static PeerAddress TCP(const Inet::IPAddress & addr, uint16_t port, Inet::InterfaceId interface)
+
+    static PeerAddress TCP(const Inet::IPAddress & addr, uint16_t port = CHIP_PORT,
+                           Inet::InterfaceId interface = Inet::InterfaceId::Null())
     {
-        return TCP(addr).SetPort(port).SetInterface(interface);
+        PeerAddress result = PeerAddress(Type::kTcp);
+        result.SetPort(port).AppendDestination(addr, interface);
+        return result;
     }
 
     static PeerAddress Multicast(chip::FabricId fabric, chip::GroupId group)
@@ -216,15 +280,15 @@ public:
         // * 0x00
         // * The 16-bits Group Identifier in big-endian order
         uint32_t groupId = static_cast<uint32_t>((fabric << 24) & 0xff000000) | group;
+
         return UDP(Inet::IPAddress::MakeIPv6PrefixMulticast(scope, prefixLength, prefix, groupId));
     }
 
 private:
-    Inet::IPAddress mIPAddresses[kMaxPeerIPAddresses] = {};
-    unsigned mNumValidIPAddresses                     = 0;
+    IPDestination mDestinations[kMaxPeerDestinations] = {};
+    unsigned mNumValidDestinations                    = 0;
     Type mTransportType                               = Type::kUndefined;
     uint16_t mPort                                    = CHIP_PORT; ///< Relevant for UDP data sending.
-    Inet::InterfaceId mInterface                      = Inet::InterfaceId::Null();
 };
 
 } // namespace Transport
