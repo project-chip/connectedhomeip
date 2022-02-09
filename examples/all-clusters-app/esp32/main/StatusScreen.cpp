@@ -37,40 +37,150 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#include <app/server/Server.h>
+#include <lib/core/DataModelTypes.h>
+
+#define MAX_IP4_ADDRESS_STRING 16
+#define MAX_IP6_ADDRESS_STRING 40
+#define MAX_LENGTH_SMALL_FONT 30
+
+using namespace chip;
+
 class StatusListModel : public ListScreen::Model
 {
 public:
+    enum
+    {
+        kStatusItemFabricIndex,
+        kStatusItemFabricId,
+        kStatusItemNodeId,
+        kStatusItemPort,
+        kStatusItemIp4,
+        kStatusItemIp6LinkLocal,
+        kStatusItemIp6Ula,
+    };
+
     StatusListModel()
     {
-        options.emplace_back("state : commissioning");
+        options.emplace_back("FabricIndex : none");
+        options.emplace_back("FabricID : none");
+        options.emplace_back("NodeID : none");
+        options.emplace_back("UDP port : " + std::to_string(CHIP_PORT));
         options.emplace_back("IPv4 : none");
-        options.emplace_back("IPv6 : none");
-        options.emplace_back("UDP port : 5540");
-        options.emplace_back("Node ID : none");
-        options.emplace_back("Fabric ID : none");
+        options.emplace_back("IPv6 LL : none");
+        options.emplace_back("IPv6 ULA : none");
     }
 
     virtual std::string GetTitle() { return "Status"; }
 
     virtual int GetItemCount() { return options.size(); }
-    virtual std::string GetItemText(int i) { 
+    virtual std::string GetItemText(int i)
+    {
         std::string itemString = options.at(i);
-        //case (i) {}
+        switch (i)
+        {
+        case kStatusItemFabricIndex: {
+            for (const auto & fb : Server::GetInstance().GetFabricTable())
+            {
+                FabricIndex fabricIndex = fb.GetFabricIndex();
+                itemString              = "FabricIdx : " + std::to_string(fabricIndex);
+                break; // Only print first fabric for now
+            }
+            break;
+        }
+
+        case kStatusItemFabricId: {
+            for (const auto & fb : Server::GetInstance().GetFabricTable())
+            {
+                FabricId fabricId = fb.GetFabricId();
+                itemString        = "FabricID : " + std::to_string(fabricId);
+                break; // Only print first fabric for now
+            }
+            break;
+        }
+
+        case kStatusItemNodeId: {
+            for (const auto & fb : Server::GetInstance().GetFabricTable())
+            {
+                NodeId nodeId = fb.GetNodeId();
+                itemString    = "NodeID : " + std::to_string(nodeId);
+                break; // Only print first fabric for now
+            }
+            break;
+        }
+
+        case kStatusItemIp4: {
+            chip::Inet::IPAddress addr;
+            for (chip::Inet::InterfaceAddressIterator it; it.HasCurrent(); it.Next())
+            {
+                if ((it.GetAddress(addr) == CHIP_NO_ERROR) && addr.IsIPv4())
+                {
+                    char buf[MAX_IP4_ADDRESS_STRING];
+                    addr.ToString(buf, sizeof(buf));
+                    itemString = std::string(buf);
+                    break; // Only print first fabric for now
+                }
+            }
+            break;
+        }
+
+        case kStatusItemIp6LinkLocal: {
+            chip::Inet::IPAddress addr;
+            for (chip::Inet::InterfaceAddressIterator it; it.HasCurrent(); it.Next())
+            {
+                if ((it.GetAddress(addr) == CHIP_NO_ERROR) && addr.IsIPv6LinkLocal())
+                {
+                    char buf[MAX_IP6_ADDRESS_STRING];
+                    addr.ToString(buf, sizeof(buf));
+                    itemString = std::string(buf);
+                    if (itemString.length() < MAX_LENGTH_SMALL_FONT)
+                    {
+                        TFT_setFont(SMALL_FONT, nullptr);
+                    }
+                    else
+                    {
+                        TFT_setFont(DEF_SMALL_FONT, nullptr);
+                    }
+                    break; // Only print first fabric for now
+                }
+            }
+            break;
+        }
+
+        case kStatusItemIp6Ula: {
+            chip::Inet::IPAddress addr;
+            for (chip::Inet::InterfaceAddressIterator it; it.HasCurrent(); it.Next())
+            {
+                if ((it.GetAddress(addr) == CHIP_NO_ERROR) && addr.IsIPv6ULA())
+                {
+                    char buf[MAX_IP6_ADDRESS_STRING];
+                    addr.ToString(buf, sizeof(buf));
+                    itemString = std::string(buf);
+                    if (itemString.length() < MAX_LENGTH_SMALL_FONT)
+                    {
+                        TFT_setFont(SMALL_FONT, nullptr);
+                    }
+                    else
+                    {
+                        TFT_setFont(DEF_SMALL_FONT, nullptr);
+                    }
+                    break; // Only print first fabric for now
+                }
+            }
+            break;
+        }
+        }
         ESP_LOGI("M5 UI", "Display status %d: %s", i, itemString.c_str());
+
         return itemString;
     }
 
-    virtual void ItemAction(int i)
-    {
-    }
+    virtual void ItemAction(int i) {}
 
 private:
     std::vector<std::string> options;
 };
 
-StatusScreen::StatusScreen() : ListScreen(chip::Platform::New<StatusListModel>())
-{
-}
-
+StatusScreen::StatusScreen() : ListScreen(chip::Platform::New<StatusListModel>()) {}
 
 #endif // CONFIG_HAVE_DISPLAY

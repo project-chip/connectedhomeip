@@ -39,7 +39,7 @@ class StatusScreen : public ListScreen
 public:
     StatusScreen();
 
-    virtual ~StatusScreen() { }
+    virtual ~StatusScreen() {}
 };
 
 #endif // CONFIG_HAVE_DISPLAY

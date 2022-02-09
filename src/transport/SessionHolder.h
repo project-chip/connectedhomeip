@@ -21,7 +21,6 @@
 #include <transport/SessionDelegate.h>
 #include <transport/SessionHandle.h>
 
-
 namespace chip {
 
 /** @brief

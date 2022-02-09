@@ -142,6 +142,7 @@ public:
         ReleaseOperationalCerts();
     }
 
+    NodeId GetNodeId() const { return mOperationalId.GetNodeId(); }
     PeerId GetPeerId() const { return mOperationalId; }
     PeerId GetPeerIdForNode(const NodeId node) const
     {
