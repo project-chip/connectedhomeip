@@ -93,8 +93,7 @@ public:
     AudioOutputAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), chip::app::Clusters::AudioOutput::Id)
     {}
 
-    CHIP_ERROR Read(FabricIndex fabricIndex, const app::ConcreteReadAttributePath & aPath,
-                    app::AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
 
 private:
     CHIP_ERROR ReadOutputListAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
@@ -103,8 +102,7 @@ private:
 
 AudioOutputAttrAccess gAudioOutputAttrAccess;
 
-CHIP_ERROR AudioOutputAttrAccess::Read(FabricIndex fabricIndex, const app::ConcreteReadAttributePath & aPath,
-                                       app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR AudioOutputAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder)
 {
     EndpointId endpoint = aPath.mEndpointId;
     Delegate * delegate = GetDelegate(endpoint);

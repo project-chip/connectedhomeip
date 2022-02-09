@@ -97,9 +97,11 @@ Status P6WiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials)
     VerifyOrReturnError(credentials.size() <= sizeof(mStagingNetwork.credentials), Status::kOutOfRange);
     VerifyOrReturnError(ssid.size() <= sizeof(mStagingNetwork.ssid), Status::kOutOfRange);
 
+    memset(mStagingNetwork.credentials, 0, sizeof(mStagingNetwork.credentials));
     memcpy(mStagingNetwork.credentials, credentials.data(), credentials.size());
     mStagingNetwork.credentialsLen = static_cast<decltype(mStagingNetwork.credentialsLen)>(credentials.size());
 
+    memset(mStagingNetwork.ssid, 0, sizeof(mStagingNetwork.ssid));
     memcpy(mStagingNetwork.ssid, ssid.data(), ssid.size());
     mStagingNetwork.ssidLen = static_cast<decltype(mStagingNetwork.ssidLen)>(ssid.size());
 
@@ -147,6 +149,7 @@ void P6WiFiDriver::OnConnectWiFiNetwork()
 {
     if (mpConnectCallback)
     {
+        CommitConfiguration();
         mpConnectCallback->OnResult(Status::kSuccess, CharSpan(), 0);
         mpConnectCallback = nullptr;
     }
@@ -159,7 +162,7 @@ void P6WiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback
 
     VerifyOrExit(NetworkMatch(mStagingNetwork, networkId), networkingStatus = Status::kNetworkIDNotFound);
     VerifyOrExit(mpConnectCallback == nullptr, networkingStatus = Status::kUnknownError);
-    ChipLogProgress(NetworkProvisioning, "P6 NetworkCommissioningDelegate: SSID: %s", networkId.data());
+    ChipLogProgress(NetworkProvisioning, "P6 NetworkCommissioningDelegate: SSID: %s", mStagingNetwork.ssid);
     err               = ConnectWiFiNetwork(reinterpret_cast<const char *>(mStagingNetwork.ssid), mStagingNetwork.ssidLen,
                              reinterpret_cast<const char *>(mStagingNetwork.credentials), mStagingNetwork.credentialsLen);
     mpConnectCallback = callback;
