@@ -31,7 +31,8 @@ ContentLauncherManager::ContentLauncherManager(list<std::string> acceptHeaderLis
 }
 
 void ContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchResponseType> & helper,
-                                                 const DecodableList<ParameterType> & parameterList, bool autoplay, const CharSpan & data)
+                                                 const DecodableList<ParameterType> & parameterList, bool autoplay,
+                                                 const CharSpan & data)
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchContent for endpoint %d", mEndpointId);
     string dataString(data.data(), data.size());

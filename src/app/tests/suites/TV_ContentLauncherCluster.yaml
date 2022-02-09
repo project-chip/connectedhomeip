@@ -44,9 +44,17 @@ tests:
               - name: "data"
                 value: "exampleData"
               - name: "search"
-                value: 
+                value:
                     {
-                      parameterList: [{ type: 1, value: "exampleValue", externalIDList: [{ name: "name", value: "value" }]}]
+                        parameterList:
+                            [
+                                {
+                                    type: 1,
+                                    value: "exampleValue",
+                                    externalIDList:
+                                        [{ name: "name", value: "value" }],
+                                },
+                            ],
                     }
       response:
           values:

@@ -39,8 +39,9 @@ public:
     static void NewManager(jint endpoint, jobject manager);
     void InitializeWithObjects(jobject managerObject);
 
-    void HandleLaunchContent(CommandResponseHelper<LaunchResponseType> & helper, const chip::app::DataModel::DecodableList<ParameterType> & parameterList,
-                             bool autoplay, const CharSpan & data) override;
+    void HandleLaunchContent(CommandResponseHelper<LaunchResponseType> & helper,
+                             const chip::app::DataModel::DecodableList<ParameterType> & parameterList, bool autoplay,
+                             const CharSpan & data) override;
     void HandleLaunchUrl(CommandResponseHelper<LaunchResponseType> & helper, const CharSpan & contentUrl,
                          const CharSpan & displayString, const BrandingInformationType & brandingInformation) override;
     CHIP_ERROR HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder) override;

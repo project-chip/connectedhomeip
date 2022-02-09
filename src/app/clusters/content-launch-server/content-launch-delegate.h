@@ -41,7 +41,8 @@ class Delegate
 {
 public:
     virtual void HandleLaunchContent(CommandResponseHelper<Commands::LaunchResponse::Type> & helper,
-                                     const DataModel::DecodableList<Parameter> & parameterList, bool autoplay, const CharSpan & data) = 0;
+                                     const DataModel::DecodableList<Parameter> & parameterList, bool autoplay,
+                                     const CharSpan & data) = 0;
 
     virtual void HandleLaunchUrl(CommandResponseHelper<Commands::LaunchResponse::Type> & helper, const CharSpan & contentUrl,
                                  const CharSpan & displayString, const BrandingInformation & brandingInformation) = 0;
