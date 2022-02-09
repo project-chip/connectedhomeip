@@ -60,9 +60,9 @@ public:
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(120); }
 
 private:
-    void PairWithCode(NSError * error);
-    void PairWithIPAddress(NSError * error);
-    void Unpair(NSError * error);
+    void PairWithCode(NSError * __autoreleasing * error);
+    void PairWithIPAddress(NSError * __autoreleasing * error);
+    void Unpair(NSError * __autoreleasing * error);
     void SetUpPairingDelegate();
 
     const PairingMode mPairingMode;
