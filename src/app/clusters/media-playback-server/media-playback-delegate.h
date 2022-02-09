@@ -54,10 +54,10 @@ public:
                                     const uint64_t & deltaPositionMilliseconds)                           = 0;
     virtual void HandleSkipForward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
                                    const uint64_t & deltaPositionMilliseconds)                            = 0;
-    virtual void HandleSeekRequest(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
+    virtual void HandleSeek(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
                                    const uint64_t & positionMilliseconds)                                 = 0;
     virtual void HandleNext(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)             = 0;
-    virtual void HandleStartOverRequest(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper) = 0;
+    virtual void HandleStartOver(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper) = 0;
 
     virtual ~Delegate() = default;
 };

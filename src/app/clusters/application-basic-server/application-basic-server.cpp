@@ -163,19 +163,19 @@ CHIP_ERROR ApplicationBasicAttrAccess::Read(const app::ConcreteReadAttributePath
     case chip::app::Clusters::ApplicationBasic::Attributes::VendorName::Id: {
         return ReadVendorNameAttribute(aEncoder, delegate);
     }
-    case chip::app::Clusters::ApplicationBasic::Attributes::VendorId::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::VendorID::Id: {
         return ReadVendorIdAttribute(aEncoder, delegate);
     }
     case chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::Id: {
         return ReadApplicationNameAttribute(aEncoder, delegate);
     }
-    case chip::app::Clusters::ApplicationBasic::Attributes::ProductId::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::ProductID::Id: {
         return ReadProductIdAttribute(aEncoder, delegate);
     }
-    case chip::app::Clusters::ApplicationBasic::Attributes::ApplicationApp::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::Application::Id: {
         return ReadApplicationAttribute(aEncoder, delegate);
     }
-    case chip::app::Clusters::ApplicationBasic::Attributes::ApplicationStatus::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::Status::Id: {
         return ReadStatusAttribute(aEncoder, delegate);
     }
     case chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::Id: {
