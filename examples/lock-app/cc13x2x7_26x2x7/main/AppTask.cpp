@@ -106,7 +106,9 @@ int AppTask::Init()
     LED_Params ledParams;
     Button_Params buttonParams;
     uint8_t EUI64[8];
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING && CHIP_ENABLE_ROTATING_DEVICE_ID
     char stringEUI64[sizeof(EUI64)*2 + 1]; // just big enough for string(EUI64)
+#endif
 
     cc13x2_26x2LogInit();
 
@@ -153,6 +155,7 @@ int AppTask::Init()
             ;
     }
 
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING && CHIP_ENABLE_ROTATING_DEVICE_ID
     // set serial number to flash
     // this is before ZCL is started, so Basic Cluster populates Serial Number with this EUI64 (in string)
     ThreadStackMgrImpl().GetIeeeEui64(EUI64);
@@ -168,7 +171,7 @@ int AppTask::Init()
         while (1)
             ;
     }
-
+#endif
 
     // Init ZCL Data Model and start server
     PLAT_LOG("Initialize Server");
