@@ -37,7 +37,7 @@ void AddIpInfo(StringBuilderBase & dest, uint16_t port, Span<const PeerAddress::
 {
     if (destinations.empty())
     {
-        dest.Add("NONE:");
+        dest.Add(":NONE:");
     }
     else
     {
@@ -80,8 +80,8 @@ void AddIpInfo(StringBuilderBase & dest, uint16_t port, Span<const PeerAddress::
             dest.Add("]");
         }
         dest.Add(":");
-        dest.Add(port);
     }
+    dest.Add(port);
 
     if (destinations.size() > 1)
     {

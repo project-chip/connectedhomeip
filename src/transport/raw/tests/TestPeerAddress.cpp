@@ -112,6 +112,14 @@ void TestToString(nlTestSuite * inSuite, void * inContext)
         udp.ToString(buff);
         NL_TEST_ASSERT(inSuite, !strcmp(buff, "UDP:[::1]:5840 (+2 more)"));
     }
+
+    {
+
+        PeerAddress udp = PeerAddress(Transport::Type::kUdp);
+        udp.SetPort(5840);
+        udp.ToString(buff);
+        NL_TEST_ASSERT(inSuite, !strcmp(buff, "UDP:NONE:5840"));
+    }
 }
 
 /**
