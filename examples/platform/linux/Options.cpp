@@ -188,7 +188,6 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         else
         {
             LinuxDeviceOptions::GetInstance().payload.discriminator = value;
-            DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(value);
         }
         break;
     }
@@ -232,7 +231,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 
 OptionSet sDeviceOptions = { HandleOption, sDeviceOptionDefs, "GENERAL OPTIONS", sDeviceOptionHelp };
 
-OptionSet * sLinuxDeviceOptionSets[] = { &sDeviceOptions, nullptr, nullptr };
+OptionSet * sLinuxDeviceOptionSets[] = { &sDeviceOptions, nullptr, nullptr, nullptr };
 } // namespace
 
 CHIP_ERROR ParseArguments(int argc, char * argv[], OptionSet * customOptions)

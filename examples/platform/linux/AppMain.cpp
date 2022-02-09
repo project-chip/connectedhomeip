@@ -122,12 +122,6 @@ int ChipLinuxAppInit(int argc, char ** argv, OptionSet * customOptions)
     err = Platform::MemoryInit();
     SuccessOrExit(err);
 
-    err = DeviceLayer::PlatformMgr().InitChipStack();
-    SuccessOrExit(err);
-
-    err = GetSetupPayload(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
-    SuccessOrExit(err);
-
     err = ParseArguments(argc, argv, customOptions);
     SuccessOrExit(err);
 
@@ -142,6 +136,19 @@ int ChipLinuxAppInit(int argc, char ** argv, OptionSet * customOptions)
     }
     SuccessOrExit(err);
 #endif
+
+    err = DeviceLayer::PlatformMgr().InitChipStack();
+    SuccessOrExit(err);
+
+    if (0 != LinuxDeviceOptions::GetInstance().payload.discriminator)
+    {
+        uint16_t discriminator = LinuxDeviceOptions::GetInstance().payload.discriminator;
+        err                    = DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(discriminator);
+        SuccessOrExit(err);
+    }
+
+    err = GetSetupPayload(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
+    SuccessOrExit(err);
 
     ConfigurationMgr().LogDeviceConfig();
 
