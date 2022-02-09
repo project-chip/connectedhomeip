@@ -104,11 +104,11 @@ void PeerAddress::ToString(char * buf, size_t bufSize) const
         out.Add("UNDEFINED");
         break;
     case Type::kUdp:
-        out.Add("UDP:");
+        out.Add("UDP");
         AddIpInfo(out, mPort, Span<const IPDestination>(mDestinations, mNumValidDestinations));
         break;
     case Type::kTcp:
-        out.Add("TCP:");
+        out.Add("TCP");
         AddIpInfo(out, mPort, Span<const IPDestination>(mDestinations, mNumValidDestinations));
         break;
     case Type::kBle:
