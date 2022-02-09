@@ -324,7 +324,7 @@ ChipError::StorageType pychip_DeviceController_ConnectIP(chip::Controller::Devic
     VerifyOrReturnError(chip::Inet::IPAddress::FromString(peerAddrStr, peerAddr), CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
 
     // TODO: IP rendezvous should use TCP connection.
-    addr.SetTransportType(chip::Transport::Type::kUdp).SetIPAddress(peerAddr);
+    addr.SetTransportType(chip::Transport::Type::kUdp).SetSingleIPAddress(peerAddr);
     params.SetPeerAddress(addr).SetDiscriminator(0);
 
     devCtrl->ReleaseOperationalDevice(nodeid);
