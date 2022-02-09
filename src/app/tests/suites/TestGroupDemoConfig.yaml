@@ -68,7 +68,7 @@ tests:
                         EpochStartTime2: 1110002,
                     }
 
-    - label: "Write Group Keys"
+    - label: "Map Group Key Set to group ID on a given fabric"
       cluster: "Group Key Management"
       command: "writeAttribute"
       attribute: "GroupKeyMap"
