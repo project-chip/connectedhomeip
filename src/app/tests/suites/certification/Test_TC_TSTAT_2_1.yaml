@@ -568,7 +568,6 @@ tests:
 
     - label: "Reads optional attributes from DUT: OutdoorTemperature"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "OutdoorTemperature"
       response:
@@ -577,7 +576,6 @@ tests:
     - label:
           "Reads constraints of optional attributes from DUT: OutdoorTemperature"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "OutdoorTemperature"
       response:
@@ -588,7 +586,6 @@ tests:
           "Writes the respective default value to optional attributes to DUT:
           OutdoorTemperature"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "OutdoorTemperature"
       arguments:
@@ -596,7 +593,6 @@ tests:
 
     - label: "Read back optional attributes from DUT: OutdoorTemperature"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "OutdoorTemperature"
       response:
@@ -604,7 +600,6 @@ tests:
 
     - label: "Reads optional attributes from DUT: Occupancy"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "Occupancy"
       response:
@@ -612,7 +607,6 @@ tests:
 
     - label: "Reads constraints of optional attributes from DUT: Occupancy"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "Occupancy"
       response:
@@ -625,7 +619,6 @@ tests:
           "Writes the respective default value to optional attributes to DUT:
           Occupancy"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "Occupancy"
       arguments:
@@ -633,7 +626,6 @@ tests:
 
     - label: "Read back optional attributes from DUT: Occupancy"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "Occupancy"
       response:
@@ -641,7 +633,6 @@ tests:
 
     - label: "Reads optionl attributes from DUT: HVACSystemTypeConfiguration"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "HVACSystemTypeConfiguration"
       response:
@@ -651,7 +642,6 @@ tests:
           "Reads constraints of optional attributes from DUT:
           HVACSystemTypeConfiguration"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "HVACSystemTypeConfiguration"
       response:
@@ -664,7 +654,6 @@ tests:
           "Writes the respective default value to optional attributes to DUT:
           HVACSystemTypeConfiguration"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "HVACSystemTypeConfiguration"
       arguments:
@@ -673,7 +662,6 @@ tests:
     - label:
           "Read back optional attributes from DUT: HVACSystemTypeConfiguration"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "HVACSystemTypeConfiguration"
       response:
@@ -681,7 +669,6 @@ tests:
 
     - label: "Reads optional attributes from DUT: LocalTemperatureCalibration"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "LocalTemperatureCalibration"
       response:
@@ -691,7 +678,6 @@ tests:
           "Reads constraints of optional attributes from DUT:
           LocalTemperatureCalibration"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "LocalTemperatureCalibration"
       response:
@@ -704,7 +690,6 @@ tests:
           "Writes the respective default value to optional attributes to DUT:
           LocalTemperatureCalibration"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "LocalTemperatureCalibration"
       arguments:
@@ -713,7 +698,6 @@ tests:
     - label:
           "Read back optional attributes from DUT: LocalTemperatureCalibration"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "LocalTemperatureCalibration"
       response:
@@ -756,7 +740,6 @@ tests:
 
     - label: "Reads optional attributes from DUT: RemoteSensing"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "RemoteSensing"
       response:
@@ -764,7 +747,6 @@ tests:
 
     - label: "Reads constraints of optional attributes from DUT: RemoteSensing"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "RemoteSensing"
       response:
@@ -775,7 +757,6 @@ tests:
           "Writes the respective default value to optional attributes to DUT:
           RemoteSensing"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "RemoteSensing"
       arguments:
@@ -783,7 +764,6 @@ tests:
 
     - label: "Read back optional attributes from DUT: RemoteSensing"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "RemoteSensing"
       response:
@@ -791,7 +771,6 @@ tests:
 
     - label: "Reads optional attributes from DUT: AlarmMask"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "AlarmMask"
       response:
@@ -799,7 +778,6 @@ tests:
 
     - label: "Reads constraints of optional attributes from DUT: AlarmMask"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "AlarmMask"
       response:
@@ -812,7 +790,6 @@ tests:
           "Writes the respective default value to optional attributes to DUT:
           AlarmMask"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "AlarmMask"
       arguments:
@@ -822,7 +799,6 @@ tests:
 
     - label: "Read back optional attributes from DUT: AlarmMask"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "AlarmMask"
       response:
@@ -830,7 +806,6 @@ tests:
 
     - label: "Reads optional attributes from DUT: ThermostatRunningMode"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "ThermostatRunningMode"
       response:
@@ -840,7 +815,6 @@ tests:
           "Reads constraints of optional attributes from DUT:
           ThermostatRunningMode"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "ThermostatRunningMode"
       response:
@@ -853,7 +827,6 @@ tests:
           "Writes the respective default value to optional attributes to DUT:
           ThermostatRunningMode"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "ThermostatRunningMode"
       arguments:
@@ -863,7 +836,6 @@ tests:
 
     - label: "Read back optional attributes from DUT: ThermostatRunningMode"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "ThermostatRunningMode"
       response:
@@ -900,7 +872,6 @@ tests:
     #issue #11625 default value is 0 as per spec but expecting 7
     - label: "Reads optional attributes from DUT: NumberOfWeeklyTransitions"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "number of weekly transitions"
       response:
@@ -929,7 +900,6 @@ tests:
 
     - label: "Read back optional attributes from DUT: NumberOfWeeklyTransitions"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "number of weekly transitions"
       response:
@@ -938,7 +908,6 @@ tests:
     #issue #11625 default value is 0 as per spec but expecting 4
     - label: "Reads optional attributes from DUT: NumberOfDailyTransitions"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "number of daily transitions"
       response:
@@ -967,7 +936,6 @@ tests:
 
     - label: "Read back optional attributes from DUT: NumberOfDailyTransitions"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "number of daily transitions"
       response:
@@ -975,7 +943,6 @@ tests:
 
     - label: "Reads optional attributes from DUT: TemperatureSetpointHold"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "TemperatureSetpointHold"
       response:
@@ -985,7 +952,6 @@ tests:
           "Reads constraints of optional attributes from DUT:
           TemperatureSetpointHold"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "TemperatureSetpointHold"
       response:
@@ -998,7 +964,6 @@ tests:
           "Writes the respective default value to optional attributes to DUT:
           TemperatureSetpointHold"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "TemperatureSetpointHold"
       arguments:
@@ -1006,7 +971,6 @@ tests:
 
     - label: "Read back optional attributes from DUT: TemperatureSetpointHold"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "TemperatureSetpointHold"
       response:
@@ -1015,7 +979,6 @@ tests:
     - label:
           "Reads optional attributes from DUT: TemperatureSetpointHoldDuration"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "TemperatureSetpointHoldDuration"
       response:
@@ -1025,7 +988,6 @@ tests:
           "Reads constraints of optional attributes from DUT:
           TemperatureSetpointHoldDuration"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "TemperatureSetpointHoldDuration"
       response:
@@ -1038,7 +1000,6 @@ tests:
           "Writes the respective default value to optional attributes to DUT:
           TemperatureSetpointHoldDuration"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "TemperatureSetpointHoldDuration"
       arguments:
@@ -1048,7 +1009,6 @@ tests:
           "Read back optional attributes from DUT:
           TemperatureSetpointHoldDuration"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "TemperatureSetpointHoldDuration"
       response:
@@ -1058,7 +1018,6 @@ tests:
           "Reads optional attributes from DUT:
           ThermostatProgrammingOperationMode"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "ThermostatProgrammingOperationMode"
       response:
@@ -1068,7 +1027,6 @@ tests:
           "Reads constraints of optional attributes from DUT:
           ThermostatProgrammingOperationMode"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "ThermostatProgrammingOperationMode"
       response:
@@ -1081,7 +1039,6 @@ tests:
           "Writes the respective default value to optional attributes to DUT:
           ThermostatProgrammingOperationMode"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "ThermostatProgrammingOperationMode"
       arguments:
@@ -1091,7 +1048,6 @@ tests:
           "Read back optional attributes from DUT:
           ThermostatProgrammingOperationMode"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "ThermostatProgrammingOperationMode"
       response:
@@ -1101,7 +1057,6 @@ tests:
           "Reads constraints of optional attributes from DUT:
           ThermostatRunningState"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "ThermostatRunningState"
       response:
@@ -1114,7 +1069,6 @@ tests:
           "Writes the respective default value to optional attributes to DUT:
           ThermostatRunningState"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "ThermostatRunningState"
       arguments:
@@ -1124,7 +1078,6 @@ tests:
 
     - label: "Read back optional attributes from DUT: ThermostatRunningState"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "ThermostatRunningState"
       response:
@@ -1132,7 +1085,6 @@ tests:
 
     - label: "Reads optional attributes from DUT: SetpointChangeSource"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "SetpointChangeSource"
       response:
@@ -1142,7 +1094,6 @@ tests:
           "Reads constraints of optional attributes from DUT:
           SetpointChangeSource"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "SetpointChangeSource"
       response:
@@ -1155,7 +1106,6 @@ tests:
           "Writes the respective default value to optional attributes to DUT:
           SetpointChangeSource"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "SetpointChangeSource"
       arguments:
@@ -1165,7 +1115,6 @@ tests:
 
     - label: "Read back optional attributes from DUT: SetpointChangeSource"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "SetpointChangeSource"
       response:
@@ -1173,7 +1122,6 @@ tests:
 
     - label: "Reads optional attributes from DUT: SetpointChangeAmount"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "SetpointChangeAmount"
       response:
@@ -1183,7 +1131,6 @@ tests:
           "Reads constraints of optional attributes from DUT:
           SetpointChangeAmount"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "SetpointChangeAmount"
       response:
@@ -1194,7 +1141,6 @@ tests:
           "Writes the respective default value to optional attributes to DUT:
           SetpointChangeAmount"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "SetpointChangeAmount"
       arguments:
@@ -1204,7 +1150,6 @@ tests:
 
     - label: "Read back optional attributes from DUT: SetpointChangeAmount"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "SetpointChangeAmount"
       response:
@@ -1212,7 +1157,6 @@ tests:
 
     - label: "Reads optional attributes from DUT: SetpointChangeSourceTimestamp"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "SetpointChangeSourceTimestamp"
       response:
@@ -1222,7 +1166,6 @@ tests:
           "Reads constraints of optional attributes from DUT:
           SetpointChangeSourceTimestamp"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "SetpointChangeSourceTimestamp"
       response:
@@ -1233,7 +1176,6 @@ tests:
           "Writes the respective default value to optional attributes to DUT:
           SetpointChangeSourceTimestamp"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "SetpointChangeSourceTimestamp"
       arguments:
@@ -1244,7 +1186,6 @@ tests:
     - label:
           "Read back optional attributes from DUT: SetpointChangeSourceTimestamp"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "SetpointChangeSourceTimestamp"
       response:
@@ -1252,7 +1193,6 @@ tests:
 
     - label: "Reads optional attributes from DUT: OccupiedSetback"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "OccupiedSetback"
       response:
@@ -1261,7 +1201,6 @@ tests:
     - label:
           "Reads constraints of optional attributes from DUT: OccupiedSetback"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "OccupiedSetback"
       response:
@@ -1274,7 +1213,6 @@ tests:
           "Writes the respective default value to optional attributes to DUT:
           OccupiedSetback"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "OccupiedSetback"
       arguments:
@@ -1284,7 +1222,6 @@ tests:
 
     - label: "Read back optional attributes from DUT: OccupiedSetback"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "OccupiedSetback"
       response:
@@ -1292,7 +1229,6 @@ tests:
 
     - label: "Reads optional attributes from DUT: OccupiedSetbackMin"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "OccupiedSetbackMin"
       response:
@@ -1301,7 +1237,6 @@ tests:
     - label:
           "Reads constraints of optional attributes from DUT: OccupiedSetbackMin"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "OccupiedSetbackMin"
       response:
@@ -1314,7 +1249,6 @@ tests:
           "Writes the respective default value to optional attributes to DUT:
           OccupiedSetbackMin"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "OccupiedSetbackMin"
       arguments:
@@ -1322,7 +1256,6 @@ tests:
 
     - label: "Read back optional attributes from DUT: OccupiedSetbackMin"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "OccupiedSetbackMin"
       response:
@@ -1330,7 +1263,6 @@ tests:
 
     - label: "Reads optional attributes from DUT: OccupiedSetbackMax"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "OccupiedSetbackMax"
       response:
@@ -1339,7 +1271,6 @@ tests:
     - label:
           "Reads constraints of optional attributes from DUT: OccupiedSetbackMax"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "OccupiedSetbackMax"
       response:
@@ -1352,7 +1283,6 @@ tests:
           "Writes the respective default value to optional attributes to DUT:
           OccupiedSetbackMax"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "OccupiedSetbackMax"
       arguments:
@@ -1360,7 +1290,6 @@ tests:
 
     - label: "Read back optional attributes from DUT: OccupiedSetbackMax"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "OccupiedSetbackMax"
       response:
@@ -1368,7 +1297,6 @@ tests:
 
     - label: "Reads optional attributes from DUT: UnoccupiedSetback"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "UnoccupiedSetback"
       response:
@@ -1377,7 +1305,6 @@ tests:
     - label:
           "Reads constraints of optional attributes from DUT: UnoccupiedSetback"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "UnoccupiedSetback"
       response:
@@ -1390,7 +1317,6 @@ tests:
           "Writes the respective default value to optional attributes to DUT:
           UnoccupiedSetback"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "UnoccupiedSetback"
       arguments:
@@ -1400,7 +1326,6 @@ tests:
 
     - label: "Read back optional attributes from DUT: UnoccupiedSetback"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "UnoccupiedSetback"
       response:
@@ -1408,7 +1333,6 @@ tests:
 
     - label: "Reads optional attributes from DUT: UnoccupiedSetbackMin"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "UnoccupiedSetbackMin"
       response:
@@ -1418,7 +1342,6 @@ tests:
           "Reads constraints of optional attributes from DUT:
           UnoccupiedSetbackMin"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "UnoccupiedSetbackMin"
       response:
@@ -1431,7 +1354,6 @@ tests:
           "Writes the respective default value to optional attributes to DUT:
           UnoccupiedSetbackMin"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "UnoccupiedSetbackMin"
       arguments:
@@ -1439,7 +1361,6 @@ tests:
 
     - label: "Read back optional attributes from DUT: UnoccupiedSetbackMin"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "UnoccupiedSetbackMin"
       response:
@@ -1447,7 +1368,6 @@ tests:
 
     - label: "Reads optional attributes from DUT: UnoccupiedSetbackMax"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "UnoccupiedSetbackMax"
       response:
@@ -1457,7 +1377,6 @@ tests:
           "Reads constraints of optional attributes from DUT:
           UnoccupiedSetbackMax"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "UnoccupiedSetbackMax"
       response:
@@ -1470,7 +1389,6 @@ tests:
           "Writes the respective default value to optional attributes to DUT:
           UnoccupiedSetbackMax"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "UnoccupiedSetbackMax"
       arguments:
@@ -1478,7 +1396,6 @@ tests:
 
     - label: "Read back optional attributes from DUT: UnoccupiedSetbackMax"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "UnoccupiedSetbackMax"
       response:
@@ -1486,7 +1403,6 @@ tests:
 
     - label: "Reads optional attributes from DUT: EmergencyHeatDelta"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "EmergencyHeatDelta"
       response:
@@ -1495,7 +1411,6 @@ tests:
     - label:
           "Reads constraints of optional attributes from DUT: EmergencyHeatDelta"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "EmergencyHeatDelta"
       response:
@@ -1506,7 +1421,6 @@ tests:
           "Writes the respective default value to optional attributes to DUT:
           EmergencyHeatDelta"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "EmergencyHeatDelta"
       arguments:
@@ -1514,7 +1428,6 @@ tests:
 
     - label: "Read back optional attributes from DUT: EmergencyHeatDelta"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "EmergencyHeatDelta"
       response:
@@ -1522,7 +1435,6 @@ tests:
 
     - label: "Reads optional attributes from DUT: ACType"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "ACType"
       response:
@@ -1530,7 +1442,6 @@ tests:
 
     - label: "Reads constraints of optional attributes from DUT: ACType"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "ACType"
       response:
@@ -1543,7 +1454,6 @@ tests:
           "Writes the respective default value to optional attributes to DUT:
           ACType"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "ACType"
       arguments:
@@ -1551,7 +1461,6 @@ tests:
 
     - label: "Read back optional attributes from DUT: ACType"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "ACType"
       response:
@@ -1559,7 +1468,6 @@ tests:
 
     - label: "Reads optional attributes from DUT: ACCapacity"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "ACCapacity"
       response:
@@ -1567,7 +1475,6 @@ tests:
 
     - label: "Reads constraints of optional attributes from DUT: ACCapacity"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "ACCapacity"
       response:
@@ -1578,7 +1485,6 @@ tests:
           "Writes the respective default value to optional attributes to DUT:
           ACCapacity"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "ACCapacity"
       arguments:
@@ -1586,7 +1492,6 @@ tests:
 
     - label: "Read back optional attributes from DUT: ACCapacity"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "ACCapacity"
       response:
@@ -1594,7 +1499,6 @@ tests:
 
     - label: "Reads optional attributes from DUT: ACRefrigerantType"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "ACRefrigerantType"
       response:
@@ -1603,7 +1507,6 @@ tests:
     - label:
           "Reads constraints of optional attributes from DUT: ACRefrigerantType"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "ACRefrigerantType"
       response:
@@ -1616,7 +1519,6 @@ tests:
           "Writes the respective default value to optional attributes to DUT:
           ACRefrigerantType"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "ACRefrigerantType"
       arguments:
@@ -1624,7 +1526,6 @@ tests:
 
     - label: "Read back optional attributes from DUT: ACRefrigerantType"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "ACRefrigerantType"
       response:
@@ -1632,7 +1533,6 @@ tests:
 
     - label: "Reads optional attributes from DUT: ACCompressorType"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "ACCompressorType"
       response:
@@ -1641,7 +1541,6 @@ tests:
     - label:
           "Reads constraints of optional attributes from DUT: ACCompressorType"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "ACCompressorType"
       response:
@@ -1654,7 +1553,6 @@ tests:
           "Writes the respective default value to optional attributes to DUT:
           ACCompressorType"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "ACCompressorType"
       arguments:
@@ -1662,7 +1560,6 @@ tests:
 
     - label: "Read back optional attributes from DUT: ACCompressorType"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "ACCompressorType"
       response:
@@ -1670,7 +1567,6 @@ tests:
 
     - label: "Reads optional attributes from DUT: ACErrorCode"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "ACErrorCode"
       response:
@@ -1678,7 +1574,6 @@ tests:
 
     - label: "Reads constraints of optional attributes from DUT: ACErrorCode"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "ACErrorCode"
       response:
@@ -1689,7 +1584,6 @@ tests:
           "Writes the respective default value to optional attributes to DUT:
           ACErrorCode"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "ACErrorCode"
       arguments:
@@ -1697,7 +1591,6 @@ tests:
 
     - label: "Read back optional attributes from DUT: ACErrorCode"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "ACErrorCode"
       response:
@@ -1705,7 +1598,6 @@ tests:
 
     - label: "Reads optional attributes from DUT: ACLouverPosition"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "ACLouverPosition"
       response:
@@ -1714,7 +1606,6 @@ tests:
     - label:
           "Reads constraints of optional attributes from DUT: ACLouverPosition"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "ACLouverPosition"
       response:
@@ -1727,7 +1618,6 @@ tests:
           "Writes the respective default value to optional attributes to DUT:
           ACLouverPosition"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "ACLouverPosition"
       arguments:
@@ -1735,7 +1625,6 @@ tests:
 
     - label: "Read back optional attributes from DUT: ACLouverPosition"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "ACLouverPosition"
       response:
@@ -1743,7 +1632,6 @@ tests:
 
     - label: "Reads optional attributes from DUT: ACCoilTemperature"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "ACCoilTemperature"
       response:
@@ -1752,7 +1640,6 @@ tests:
     - label:
           "Reads constraints of optional attributes from DUT: ACCoilTemperature"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "ACCoilTemperature"
       response:
@@ -1763,7 +1650,6 @@ tests:
           "Writes the respective default value to optional attributes to DUT:
           ACCoilTemperature"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "ACCoilTemperature"
       arguments:
@@ -1773,7 +1659,6 @@ tests:
 
     - label: "Read back optional attributes from DUT: ACCoilTemperature"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "ACCoilTemperature"
       response:
@@ -1781,7 +1666,6 @@ tests:
 
     - label: "Reads optional attributes from DUT: ACCapacityFormat"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "ACCapacityFormat"
       response:
@@ -1790,7 +1674,6 @@ tests:
     - label:
           "Reads constraints of optional attributes from DUT: ACCapacityFormat"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "ACCapacityFormat"
       response:
@@ -1801,7 +1684,6 @@ tests:
           "Writes the respective default value to optional attributes to DUT:
           ACCapacityFormat"
       disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "ACCapacityFormat"
       arguments:
@@ -1809,7 +1691,6 @@ tests:
 
     - label: "Read back optional attributes from DUT: ACCapacityFormat"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "ACCapacityFormat"
       response:

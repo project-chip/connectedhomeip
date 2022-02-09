@@ -19,6 +19,7 @@
 #pragma once
 
 #include "../common/CHIPCommand.h"
+#include <app/tests/suites/commands/discovery/DiscoveryCommands.h>
 #include <app/tests/suites/commands/log/LogCommands.h>
 #include <app/tests/suites/commands/system/SystemCommands.h>
 #include <app/tests/suites/include/ConstraintsChecker.h>
@@ -34,6 +35,7 @@ class TestCommand : public CHIPCommand,
                     public ConstraintsChecker,
                     public PICSChecker,
                     public LogCommands,
+                    public DiscoveryCommands,
                     public SystemCommands
 {
 public:

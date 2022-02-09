@@ -61,6 +61,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+@interface CHIPBindingClusterBindingEntry : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull nodeId;
+@property (strong, nonatomic) NSNumber * _Nonnull groupId;
+@property (strong, nonatomic) NSNumber * _Nonnull endpointId;
+@property (strong, nonatomic) NSNumber * _Nonnull clusterId;
+- (instancetype)init;
+@end
+
 @interface CHIPAccessControlClusterTarget : NSObject
 @property (strong, nonatomic) NSNumber * _Nullable cluster;
 @property (strong, nonatomic) NSNumber * _Nullable endpoint;
@@ -323,16 +331,16 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPChannelClusterChannelInfo : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull majorNumber;
 @property (strong, nonatomic) NSNumber * _Nonnull minorNumber;
-@property (strong, nonatomic) NSString * _Nonnull name;
-@property (strong, nonatomic) NSString * _Nonnull callSign;
-@property (strong, nonatomic) NSString * _Nonnull affiliateCallSign;
+@property (strong, nonatomic) NSString * _Nullable name;
+@property (strong, nonatomic) NSString * _Nullable callSign;
+@property (strong, nonatomic) NSString * _Nullable affiliateCallSign;
 - (instancetype)init;
 @end
 
 @interface CHIPChannelClusterLineupInfo : NSObject
 @property (strong, nonatomic) NSString * _Nonnull operatorName;
-@property (strong, nonatomic) NSString * _Nonnull lineupName;
-@property (strong, nonatomic) NSString * _Nonnull postalCode;
+@property (strong, nonatomic) NSString * _Nullable lineupName;
+@property (strong, nonatomic) NSString * _Nullable postalCode;
 @property (strong, nonatomic) NSNumber * _Nonnull lineupInfoType;
 - (instancetype)init;
 @end
@@ -345,7 +353,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPMediaPlaybackClusterPlaybackPosition : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull updatedAt;
-@property (strong, nonatomic) NSNumber * _Nonnull position;
+@property (strong, nonatomic) NSNumber * _Nullable position;
 - (instancetype)init;
 @end
 
@@ -373,7 +381,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPContentLauncherClusterParameter : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull type;
 @property (strong, nonatomic) NSString * _Nonnull value;
-@property (strong, nonatomic) NSArray * _Nonnull externalIDList;
+@property (strong, nonatomic) NSArray * _Nullable externalIDList;
 - (instancetype)init;
 @end
 
@@ -383,19 +391,19 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CHIPContentLauncherClusterStyleInformation : NSObject
-@property (strong, nonatomic) NSString * _Nonnull imageUrl;
-@property (strong, nonatomic) NSString * _Nonnull color;
-@property (strong, nonatomic) CHIPContentLauncherClusterDimension * _Nonnull size;
+@property (strong, nonatomic) NSString * _Nullable imageUrl;
+@property (strong, nonatomic) NSString * _Nullable color;
+@property (strong, nonatomic) CHIPContentLauncherClusterDimension * _Nullable size;
 - (instancetype)init;
 @end
 
 @interface CHIPContentLauncherClusterBrandingInformation : NSObject
 @property (strong, nonatomic) NSString * _Nonnull providerName;
-@property (strong, nonatomic) CHIPContentLauncherClusterStyleInformation * _Nonnull background;
-@property (strong, nonatomic) CHIPContentLauncherClusterStyleInformation * _Nonnull logo;
-@property (strong, nonatomic) CHIPContentLauncherClusterStyleInformation * _Nonnull progressBar;
-@property (strong, nonatomic) CHIPContentLauncherClusterStyleInformation * _Nonnull splash;
-@property (strong, nonatomic) CHIPContentLauncherClusterStyleInformation * _Nonnull waterMark;
+@property (strong, nonatomic) CHIPContentLauncherClusterStyleInformation * _Nullable background;
+@property (strong, nonatomic) CHIPContentLauncherClusterStyleInformation * _Nullable logo;
+@property (strong, nonatomic) CHIPContentLauncherClusterStyleInformation * _Nullable progressBar;
+@property (strong, nonatomic) CHIPContentLauncherClusterStyleInformation * _Nullable splash;
+@property (strong, nonatomic) CHIPContentLauncherClusterStyleInformation * _Nullable waterMark;
 - (instancetype)init;
 @end
 
@@ -414,7 +422,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPApplicationLauncherClusterApplicationEP : NSObject
 @property (strong, nonatomic) CHIPApplicationLauncherClusterApplication * _Nonnull application;
-@property (strong, nonatomic) NSString * _Nonnull endpoint;
+@property (strong, nonatomic) NSNumber * _Nullable endpoint;
 - (instancetype)init;
 @end
 

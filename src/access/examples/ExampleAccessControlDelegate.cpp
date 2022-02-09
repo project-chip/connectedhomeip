@@ -353,7 +353,7 @@ class EntryStorage
 {
 public:
     // ACL support
-    static constexpr size_t kNumberOfFabrics  = CHIP_CONFIG_MAX_DEVICE_ADMINS;
+    static constexpr size_t kNumberOfFabrics  = CHIP_CONFIG_MAX_FABRICS;
     static constexpr size_t kEntriesPerFabric = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC;
     static EntryStorage acl[kNumberOfFabrics * kEntriesPerFabric];
 

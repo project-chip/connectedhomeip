@@ -252,6 +252,7 @@
 // Client attributes
 
 // Server attributes
+#define ZCL_BINDING_LIST_ATTRIBUTE_ID (0x0000)
 
 // Attribute ids for cluster: Access Control
 

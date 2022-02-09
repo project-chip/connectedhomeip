@@ -46,12 +46,13 @@ public:
     // Register for the ThreadNetworkDiagnostics cluster on all endpoints.
     ThreadDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), ThreadNetworkDiagnostics::Id) {}
 
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(FabricIndex fabricIndex, const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 };
 
 ThreadDiagosticsAttrAccess gAttrAccess;
 
-CHIP_ERROR ThreadDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR ThreadDiagosticsAttrAccess::Read(FabricIndex fabricIndex, const ConcreteReadAttributePath & aPath,
+                                            AttributeValueEncoder & aEncoder)
 {
     if (aPath.mClusterId != ThreadNetworkDiagnostics::Id)
     {

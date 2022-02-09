@@ -340,10 +340,11 @@ class GlobalAttributeReader : public MandatoryGlobalAttributeReader
 public:
     GlobalAttributeReader(const EmberAfCluster * aCluster) : MandatoryGlobalAttributeReader(aCluster) {}
 
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(FabricIndex fabricIndex, const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 };
 
-CHIP_ERROR GlobalAttributeReader::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR GlobalAttributeReader::Read(FabricIndex fabricIndex, const ConcreteReadAttributePath & aPath,
+                                       AttributeValueEncoder & aEncoder)
 {
     using namespace Clusters::Globals::Attributes;
     // The id of the attributes below is not in the attribute metadata.
@@ -406,7 +407,7 @@ CHIP_ERROR ReadViaAccessInterface(FabricIndex aAccessingFabricIndex, bool aIsFab
     DataVersion version = kUndefinedDataVersion;
     ReturnErrorOnFailure(ReadClusterDataVersion(aPath.mEndpointId, aPath.mClusterId, version));
     AttributeValueEncoder valueEncoder(aAttributeReports, aAccessingFabricIndex, aPath, version, aIsFabricFiltered, state);
-    CHIP_ERROR err = aAccessInterface->Read(aPath, valueEncoder);
+    CHIP_ERROR err = aAccessInterface->Read(aAccessingFabricIndex, aPath, valueEncoder);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -951,7 +952,7 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
     if (auto * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId))
     {
         AttributeValueDecoder valueDecoder(aReader, aSubjectDescriptor);
-        ReturnErrorOnFailure(attrOverride->Write(aPath, valueDecoder));
+        ReturnErrorOnFailure(attrOverride->Write(aSubjectDescriptor.fabricIndex, aPath, valueDecoder));
 
         if (valueDecoder.TriedDecode())
         {

@@ -25,10 +25,11 @@ tests:
 
     #issue #12190 as per spec default value is 3 but expecting 2
     - label: "read the global attribute: ClusterRevision"
+      disabled: true
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
-          value: 2
+          value: 3
 
     - label: "Read the global attribute constraints: ClusterRevision"
       command: "readAttribute"
@@ -43,7 +44,7 @@ tests:
       command: "writeAttribute"
       attribute: "ClusterRevision"
       arguments:
-          value: 2
+          value: 3
       response:
           error: UNSUPPORTED_WRITE
 
@@ -52,7 +53,7 @@ tests:
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
-          value: 2
+          value: 3
 
     - label: "Read the global attribute: AttributeList"
       command: "readAttribute"

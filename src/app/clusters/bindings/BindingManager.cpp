@@ -179,7 +179,7 @@ CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, Cluste
                 VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_NOT_FOUND);
                 PeerId peer                         = fabricInfo->GetPeerIdForNode(entry.nodeId);
                 OperationalDeviceProxy * peerDevice = mAppServer->GetCASESessionManager()->FindExistingSession(peer);
-                if (peerDevice != nullptr && mBoundDeviceChangedHandler)
+                if (peerDevice != nullptr && peerDevice->IsConnected() && mBoundDeviceChangedHandler)
                 {
                     // We already have an active connection
                     mBoundDeviceChangedHandler(&entry, peerDevice, context);
@@ -187,7 +187,10 @@ CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, Cluste
                 else
                 {
                     mPendingNotificationMap.AddPendingNotification(i, context);
-                    ReturnErrorOnFailure(EstablishConnection(entry.fabricIndex, entry.nodeId));
+                    if (!peerDevice->IsConnecting())
+                    {
+                        ReturnErrorOnFailure(EstablishConnection(entry.fabricIndex, entry.nodeId));
+                    }
                 }
             }
             else if (entry.type == EMBER_MULTICAST_BINDING)

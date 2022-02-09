@@ -5276,13 +5276,17 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::MediaPlayback:
 } // namespace PlaybackState
 
 namespace StartTime {
-EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * value); // epoch_us
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & value); // epoch_us
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value);
 } // namespace StartTime
 
 namespace Duration {
-EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * value); // int64u
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & value); // int64u
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value);
 } // namespace Duration
 
 namespace PlaybackSpeed {
@@ -5291,13 +5295,17 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 } // namespace PlaybackSpeed
 
 namespace SeekRangeEnd {
-EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * value); // int64u
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & value); // int64u
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value);
 } // namespace SeekRangeEnd
 
 namespace SeekRangeStart {
-EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * value); // int64u
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & value); // int64u
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value);
 } // namespace SeekRangeStart
 
 namespace FeatureMap {

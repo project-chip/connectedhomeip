@@ -978,40 +978,6 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPBindingClusterBindParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _nodeId = @(0);
-
-        _groupId = @(0);
-
-        _endpointId = @(0);
-
-        _clusterId = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPBindingClusterUnbindParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _nodeId = @(0);
-
-        _groupId = @(0);
-
-        _endpointId = @(0);
-
-        _clusterId = @(0);
-    }
-    return self;
-}
-@end
-
 @implementation CHIPPollControlClusterCheckInResponseParams
 - (instancetype)init
 {
@@ -3314,7 +3280,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _target = @(0);
 
-        _data = @"";
+        _data = nil;
     }
     return self;
 }
@@ -3327,7 +3293,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _data = @"";
+        _data = nil;
     }
     return self;
 }
@@ -3428,11 +3394,11 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
+        _search = [NSArray array];
+
         _autoPlay = @(0);
 
-        _data = @"";
-
-        _search = [NSArray array];
+        _data = nil;
     }
     return self;
 }
@@ -3445,9 +3411,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _contentURL = @"";
 
-        _displayString = @"";
+        _displayString = nil;
 
-        _brandingInformation = [CHIPContentLauncherClusterBrandingInformation new];
+        _brandingInformation = nil;
     }
     return self;
 }
@@ -3460,7 +3426,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _data = @"";
+        _data = nil;
     }
     return self;
 }
@@ -3497,7 +3463,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _application = [CHIPApplicationLauncherClusterApplication new];
 
-        _data = [NSData data];
+        _data = nil;
     }
     return self;
 }
