@@ -34,6 +34,7 @@ class PeerMessageCounter
 public:
     static constexpr size_t kChallengeSize = 8;
 
+    PeerMessageCounter(bool isGroup) : mStatus(Status::NotSynced), mIsGroup(isGroup) {}
     PeerMessageCounter() : mStatus(Status::NotSynced) {}
     ~PeerMessageCounter() { Reset(); }
 
@@ -94,11 +95,29 @@ public:
 
         if (counter <= mSynced.mMaxCounter)
         {
-            uint32_t offset = mSynced.mMaxCounter - counter;
+            uint32_t offset = mSynced.mMaxCounter - counter;;
+
+            if (mIsGroup && (offset > (UINT32_MAX / 2)))
+            {
+                // Different behaviour since Group Counter can roll over
+                // spec 4.5.1.3
+
+                // Possible roll over, set the offset to the smallest of the two
+                uint32_t secondOffset = counter - mSynced.mMaxCounter;
+                if (secondOffset < offset)
+                {
+                    offset = secondOffset;
+                }
+            }
+
+
             if (offset >= CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
             {
                 return CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW; // outside valid range
             }
+
+
+
             if (mSynced.mWindow.test(offset))
             {
                 return CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED; // duplicated, in window
@@ -118,7 +137,8 @@ public:
             return CHIP_NO_ERROR;
         case Status::Synced: {
             CHIP_ERROR err = Verify(counter);
-            if (err == CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW)
+            if (err == CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW && !mIsGroup)
+            // if (err == CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW)
             {
                 // According to chip spec, when global unencrypted message
                 // counter is out of window, the peer may have reset and is
@@ -144,14 +164,28 @@ public:
      */
     void Commit(uint32_t counter)
     {
+        uint32_t offset = mSynced.mMaxCounter - counter;
         if (counter <= mSynced.mMaxCounter)
         {
-            uint32_t offset = mSynced.mMaxCounter - counter;
+            if (mIsGroup && (offset > (UINT32_MAX / 2)))
+            {
+                // Different behaviour since Group Counter can roll over
+                // spec 4.5.1.3
+
+                // Possible roll over, set the offset to the smallest of the two
+                uint32_t secondOffset = counter - mSynced.mMaxCounter;
+                if (secondOffset < offset)
+                {
+                    offset = secondOffset;
+                }
+
+            }
+
             mSynced.mWindow.set(offset);
         }
         else
         {
-            uint32_t offset = counter - mSynced.mMaxCounter;
+            offset = counter - mSynced.mMaxCounter;
             // advance max counter by `offset`
             mSynced.mMaxCounter = counter;
             if (offset < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
@@ -200,7 +234,7 @@ private:
          *  | <-- mWindow -->|
          *  |[n]|  ...   |[0]|
          */
-        uint32_t mMaxCounter; // The most recent counter we have seen
+        uint32_t mMaxCounter = 0; // The most recent counter we have seen
         std::bitset<CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE> mWindow;
     };
 
@@ -210,6 +244,8 @@ private:
         SyncInProcess mSyncInProcess;
         Synced mSynced;
     };
+
+    bool mIsGroup = false;
 };
 
 } // namespace Transport
