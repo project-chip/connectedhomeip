@@ -30,8 +30,7 @@ namespace {
 ///
 /// Examples:
 ///    NONE:123                      // when addresses are empty
-///    NONE%eth0:5040                // addresses are empty but interface is set to something
-///    10.20.30.40:5040              // exactly one IP address in the address list, interface is empty
+///    10.20.30.40:5040              // exactly one IP address in the destination list with null interface
 ///    10.0.0.10%wlan0:123 (+3 more) // 4 input addresses in the list
 /// <ip>%<iface>:port
 void AddIpInfo(StringBuilderBase & dest, uint16_t port, Span<const PeerAddress::IPDestination> destinations)
