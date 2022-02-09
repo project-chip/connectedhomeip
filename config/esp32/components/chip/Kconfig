@@ -267,15 +267,15 @@ menu "CHIP Device Layer"
         config DEVICE_VENDOR_ID
             hex "Device Vendor Id"
             range 1 0xFFFE
-            default 0x235A
+            default 0xFFF1
             help
                 The device vendor id (in hex). This a CHIP-assigned id for the organization responsible for producing the device.
-                Defaults to CHIP (0x235A).
+                Defaults to test VID 0xFFF1.
 
         config DEVICE_PRODUCT_ID
             hex "Device Product Id"
             range 1 0xFFFE
-            default 0xFEFF
+            default 0x8000
             help
                 The device product id (in hex).  This is a unique id assigned by the device vendor to identify the product or device type.
                 Defaults to a CHIP-assigned id designating a non-production or test "product".
