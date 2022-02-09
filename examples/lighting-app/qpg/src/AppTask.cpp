@@ -86,7 +86,7 @@ CHIP_ERROR AppTask::StartAppTask()
     sAppTaskHandle = xTaskCreateStatic(AppTaskMain, APP_TASK_NAME, ArraySize(appStack), nullptr, 1, appStack, &appTaskStruct);
     if (sAppTaskHandle == nullptr)
     {
-        return CHIP_NO_ERROR;
+        return CHIP_ERROR_NO_MEMORY;
     }
 
     return CHIP_NO_ERROR;
@@ -365,7 +365,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
 
 void AppTask::CancelTimer()
 {
-    SystemLayer().CancelTimer(TimerEventHandler, this);
+    chip::DeviceLayer::SystemLayer().CancelTimer(TimerEventHandler, this);
     mFunctionTimerActive = false;
 }
 
@@ -373,7 +373,8 @@ void AppTask::StartTimer(uint32_t aTimeoutInMs)
 {
     CHIP_ERROR err;
 
-    err = SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(aTimeoutInMs), TimerEventHandler, this);
+    chip::DeviceLayer::SystemLayer().CancelTimer(TimerEventHandler, this);
+    err = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(aTimeoutInMs), TimerEventHandler, this);
     SuccessOrExit(err);
 
     mFunctionTimerActive = true;

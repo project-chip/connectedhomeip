@@ -41,37 +41,31 @@ void PairingCommandBridge::SetUpPairingDelegate()
 CHIP_ERROR PairingCommandBridge::RunCommand()
 {
     NSError * error;
-    CHIP_ERROR err = CHIP_NO_ERROR;
     switch (mPairingMode) {
     case PairingMode::None:
-        Unpair(error);
-        err = [CHIPError errorToCHIPErrorCode:error];
-        SetCommandExitStatus(err);
-        return err;
+        Unpair(&error);
+        break;
     case PairingMode::QRCode:
     case PairingMode::ManualCode:
-        PairWithCode(error);
+        PairWithCode(&error);
         break;
     case PairingMode::Ethernet:
-        PairWithIPAddress(error);
+        PairWithIPAddress(&error);
         break;
     }
-    err = [CHIPError errorToCHIPErrorCode:error];
-    if (err != CHIP_NO_ERROR) {
-        ChipLogProgress(chipTool, "Error: %s", chip::ErrorStr(err));
-    }
-    return err;
+
+    return [CHIPError errorToCHIPErrorCode:error];
 }
 
-void PairingCommandBridge::PairWithCode(NSError * error)
+void PairingCommandBridge::PairWithCode(NSError * __autoreleasing * error)
 {
     NSString * payload = [NSString stringWithUTF8String:mOnboardingPayload];
 
     SetUpPairingDelegate();
-    [CurrentCommissioner() pairDevice:mNodeId onboardingPayload:payload error:&error];
+    [CurrentCommissioner() pairDevice:mNodeId onboardingPayload:payload error:error];
 }
 
-void PairingCommandBridge::PairWithIPAddress(NSError * error)
+void PairingCommandBridge::PairWithIPAddress(NSError * __autoreleasing * error)
 {
     SetUpPairingDelegate();
     [CurrentCommissioner() pairDevice:mNodeId
@@ -79,11 +73,7 @@ void PairingCommandBridge::PairWithIPAddress(NSError * error)
                                  port:mRemotePort
                         discriminator:mDiscriminator
                          setupPINCode:mSetupPINCode
-                                error:&error];
+                                error:error];
 }
 
-void PairingCommandBridge::Unpair(NSError * error)
-{
-    [CurrentCommissioner() unpairDevice:mNodeId error:&error];
-    NSLog(@"Upairing error: %@", error);
-}
+void PairingCommandBridge::Unpair(NSError * __autoreleasing * error) { [CurrentCommissioner() unpairDevice:mNodeId error:error]; }
