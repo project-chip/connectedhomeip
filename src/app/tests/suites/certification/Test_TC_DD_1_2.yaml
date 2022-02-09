@@ -13,20 +13,25 @@
 # limitations under the License.
 
 name: 7.1.2. [TC-DD-1.2] Manual Pairing Code Payload Verification
+
 config:
     cluster: "Basic"
     endpoint: 0
+
 tests:
     - label: "Verify the first digit of the pairing code"
       disabled: true
+
     - label:
           "If the pairing code is 11 digits/the VID_PID flag is not set, verify
           the encoded elements."
       disabled: true
+
     - label:
           "If the pairing code is 21 digits/the VID_PID flag is set, verify the
           encoded elements."
       disabled: true
+
     - label:
           'Verify the "check digit" of the pairing code (digit 11 or 21) by
           entering the preceding digits in to the checksum script/Test Harness'

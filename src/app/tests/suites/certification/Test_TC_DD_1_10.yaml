@@ -15,11 +15,14 @@
 name:
     7.1.10. [TC-DD-1.10] NFC Onboarding Payload Verification [DUT -
     Commissioner]
+
 config:
     cluster: "Basic"
     endpoint: 0
+
 tests:
     - label: "Power up the Device and put the Device in pairing mode"
       disabled: true
+
     - label: "Bring the DUT close to the NFC code on the Device"
       disabled: true

@@ -13,9 +13,11 @@
 # limitations under the License.
 
 name: 7.1.4. [TC-DD-1.4] Concatenation - QR Code Onboarding Payload Verification
+
 config:
     cluster: "Basic"
     endpoint: 0
+
 tests:
     - label:
           "If supported, scan larger QR code that will support the commissioning
