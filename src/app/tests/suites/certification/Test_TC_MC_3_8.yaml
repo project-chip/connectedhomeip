@@ -27,6 +27,6 @@ tests:
     - label: "Read attribute media input list"
       disabled: true
       command: "readAttribute"
-      attribute: "media input list"
+      attribute: "InputList"
       response:
           value: []

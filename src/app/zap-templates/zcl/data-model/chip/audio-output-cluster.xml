@@ -23,17 +23,16 @@ limitations under the License.
     <define>AUDIO_OUTPUT_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
-    <!-- TODO: Add feature map once it is supported -->
     <description>This cluster provides an interface for controlling the Output on a media device such as a TV.</description>
-    <attribute side="server" code="0x0000" define="AUDIO_OUTPUT_LIST"           type="ARRAY" entryType="OutputInfo" length="254"          writable="false"  optional="false">audio output list</attribute>
-    <attribute side="server" code="0x0001" define="AUDIO_OUTPUT_CURRENT_OUTPUT" type="INT8U" default="0x00"         min="0x00" max="0xFF" writable="false"  optional="true">current audio output</attribute>
+    <attribute side="server" code="0x0000" define="AUDIO_OUTPUT_LIST"           type="ARRAY" entryType="OutputInfo" length="254"          writable="false"  optional="false">OutputList</attribute>
+    <attribute side="server" code="0x0001" define="AUDIO_OUTPUT_CURRENT_OUTPUT" type="INT8U" default="0x00"         min="0x00" max="0xFF" writable="false"  optional="true">CurrentOutput</attribute>
 
-    <command source="client" code="0x00" name="SelectOutputRequest" optional="false">
+    <command source="client" code="0x00" name="SelectOutput" optional="false">
       <description>Upon receipt, this SHALL change the output on the media device to the output at a specific index in the Output List.</description>
       <arg name="index" type="INT8U"/>
     </command>
 
-    <command source="client" code="0x01" name="RenameOutputRequest" optional="false">
+    <command source="client" code="0x01" name="RenameOutput" optional="false">
       <description>Upon receipt, this SHALL rename the output at a specific index in the Output List. Updates to the output name SHALL appear in the TV settings menus.</description>
       <arg name="index" type="INT8U"/>
       <arg name="name" type="CHAR_STRING"/>
