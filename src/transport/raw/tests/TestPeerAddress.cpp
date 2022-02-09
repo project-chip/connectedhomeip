@@ -106,11 +106,9 @@ void TestToString(nlTestSuite * inSuite, void * inContext)
         udp.AppendDestination(ip, InterfaceId::Null());
         IPAddress::FromString("1223::3456:789a", ip);
         udp.AppendDestination(ip, InterfaceId::Null());
-        IPAddress::FromString("1223::3456:989a", ip);
-        udp.AppendDestination(ip, InterfaceId::Null());
 
         udp.ToString(buff);
-        NL_TEST_ASSERT(inSuite, !strcmp(buff, "UDP:[::1]:5840 (+2 more)"));
+        NL_TEST_ASSERT(inSuite, !strcmp(buff, "UDP:[::1]:5840 (+1 more)"));
     }
 
     {
