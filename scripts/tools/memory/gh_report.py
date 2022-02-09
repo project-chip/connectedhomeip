@@ -691,6 +691,9 @@ def report_matching_commits(db: SizeDatabase) -> Dict[str, pd.DataFrame]:
             continue
 
         df = changes_for_commit(db, pr, commit, parent)
+        if df.empty:
+            # Matching commits had no new matching builds.
+            continue
         dfs[df.attrs['name']] = df
 
         if (event == 'pull_request' and comment_enabled

@@ -21,6 +21,7 @@ include(${MBED_PATH}/tools/cmake/app.cmake)
 
 project(${APP_TARGET})
 
+
 add_subdirectory(${MBED_PATH} ./mbed_build)
 add_subdirectory(${MBED_OS_POSIX_SOCKET_PATH} ./mbed_os_posix_socket_build)
 

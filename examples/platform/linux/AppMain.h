@@ -18,9 +18,6 @@
 
 #pragma once
 
-#include <iostream>
-#include <thread>
-
 #include <controller/CHIPDeviceController.h>
 #include <controller/CommissionerDiscoveryController.h>
 #include <lib/core/CHIPError.h>

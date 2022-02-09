@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -28,13 +28,11 @@
 
 #pragma once
 
+#include <app/AttributeCache.h>
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
-#include <app/DeviceControllerInteractionModelDelegate.h>
-#include <app/InteractionModelDelegate.h>
 #include <app/OperationalDeviceProxy.h>
 #include <app/OperationalDeviceProxyPool.h>
-#include <controller-clusters/zap-generated/CHIPClientCallbacks.h>
 #include <controller/AbstractDnssdDiscoveryController.h>
 #include <controller/AutoCommissioner.h>
 #include <controller/CHIPCluster.h>
@@ -51,6 +49,7 @@
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/Pool.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/SerializableIntegerSet.h>
 #include <lib/support/Span.h>
 #include <lib/support/ThreadOperationalDataset.h>
@@ -88,10 +87,7 @@ constexpr uint16_t kNumMaxActiveDevices = CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVI
 constexpr uint16_t kNumMaxPairedDevices = 128;
 
 // Raw functions for cluster callbacks
-typedef void (*BasicSuccessCallback)(void * context, uint16_t val);
-typedef void (*BasicFailureCallback)(void * context, uint8_t status);
-void BasicSuccess(void * context, uint16_t val);
-void BasicFailure(void * context, uint8_t status);
+void OnBasicFailure(void * context, CHIP_ERROR err);
 
 struct ControllerInitParams
 {
@@ -158,7 +154,8 @@ public:
 
 struct CommissionerInitParams : public ControllerInitParams
 {
-    DevicePairingDelegate * pairingDelegate = nullptr;
+    DevicePairingDelegate * pairingDelegate     = nullptr;
+    CommissioningDelegate * defaultCommissioner = nullptr;
 };
 
 typedef void (*OnOpenCommissioningWindow)(void * context, NodeId deviceId, CHIP_ERROR status, SetupPayload payload);
@@ -171,11 +168,11 @@ typedef void (*OnOpenCommissioningWindow)(void * context, NodeId deviceId, CHIP_
  *   and device pairing information for individual devices). Alternatively, this class can retrieve the
  *   relevant information when the application tries to communicate with the device
  */
-class DLL_EXPORT DeviceController : public SessionRecoveryDelegate,
+class DLL_EXPORT DeviceController : public SessionRecoveryDelegate
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-                                    public AbstractDnssdDiscoveryController,
+    ,
+                                    public AbstractDnssdDiscoveryController
 #endif
-                                    public app::InteractionModelDelegate
 {
 public:
     DeviceController();
@@ -215,7 +212,7 @@ public:
      *   callback. If it fails to establish the connection, it calls `onError` callback.
      */
     virtual CHIP_ERROR GetConnectedDevice(NodeId deviceId, Callback::Callback<OnDeviceConnected> * onConnection,
-                                          Callback::Callback<OnDeviceConnectionFailure> * onFailure)
+                                          chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure)
     {
         VerifyOrReturnError(mState == State::Initialized && mFabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
         return mCASESessionManager->FindOrEstablishSession(mFabricInfo->GetPeerIdForNode(deviceId), onConnection, onFailure);
@@ -251,7 +248,7 @@ public:
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
     CHIP_ERROR ComputePASEVerifier(uint32_t iterations, uint32_t setupPincode, const ByteSpan & salt, PASEVerifier & outVerifier,
-                                   uint32_t & outPasscodeId);
+                                   PasscodeId & outPasscodeId);
 
     /**
      * @brief
@@ -273,7 +270,7 @@ public:
      *
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
-    CHIP_ERROR OpenCommissioningWindow(NodeId deviceId, uint16_t timeout, uint16_t iteration, uint16_t discriminator,
+    CHIP_ERROR OpenCommissioningWindow(NodeId deviceId, uint16_t timeout, uint32_t iteration, uint16_t discriminator,
                                        uint8_t option, SetupPayload & payload)
     {
         mSuggestedSetUpPINCode = payload.setUpPINCode;
@@ -304,29 +301,9 @@ public:
      *
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
-    CHIP_ERROR OpenCommissioningWindowWithCallback(NodeId deviceId, uint16_t timeout, uint16_t iteration, uint16_t discriminator,
+    CHIP_ERROR OpenCommissioningWindowWithCallback(NodeId deviceId, uint16_t timeout, uint32_t iteration, uint16_t discriminator,
                                                    uint8_t option, Callback::Callback<OnOpenCommissioningWindow> * callback,
                                                    bool readVIDPIDAttributes = false);
-
-    /**
-     * @brief
-     *   Add a binding.
-     *
-     * @param[in] deviceId           The device Id.
-     * @param[in] deviceEndpointId   The endpoint on the device containing the binding cluster.
-     * @param[in] bindingNodeId      The NodeId for the binding that will be created.
-     * @param[in] bindingGroupId     The GroupId for the binding that will be created.
-     * @param[in] bindingEndpointId  The EndpointId for the binding that will be created.
-     * @param[in] bindingClusterId   The ClusterId for the binding that will be created.
-     * @param[in] onSuccessCallback        The function to be called on success of adding the binding.
-     * @param[in] onFailureCallback        The function to be called on failure of adding the binding.
-     *
-     * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
-     */
-    CHIP_ERROR CreateBindingWithCallback(chip::NodeId deviceId, chip::EndpointId deviceEndpointId, chip::NodeId bindingNodeId,
-                                         chip::GroupId bindingGroupId, chip::EndpointId bindingEndpointId,
-                                         chip::ClusterId bindingClusterId, Callback::Cancelable * onSuccessCallback,
-                                         Callback::Cancelable * onFailureCallback);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     void RegisterDeviceAddressUpdateDelegate(DeviceAddressUpdateDelegate * delegate) { mDeviceAddressUpdateDelegate = delegate; }
@@ -349,6 +326,8 @@ public:
     NodeId GetNodeId() const { return mLocalId.GetNodeId(); }
 
     void ReleaseOperationalDevice(NodeId remoteDeviceId);
+
+    OperationalCredentialsDelegate * GetOperationalCredentialsDelegate() { return mOperationalCredentialsDelegate; }
 
 protected:
     enum class State
@@ -395,8 +374,6 @@ protected:
 
     uint16_t mVendorId;
 
-    ReliableMessageProtocolConfig mMRPConfig = gDefaultMRPConfig;
-
     //////////// SessionRecoveryDelegate Implementation ///////////////
     void OnFirstMessageDeliveryFailed(const SessionHandle & session) override;
 
@@ -409,9 +386,6 @@ protected:
 
 private:
     void ReleaseOperationalDevice(OperationalDeviceProxy * device);
-
-    Callback::Callback<DefaultSuccessCallback> mOpenPairingSuccessCallback;
-    Callback::Callback<DefaultFailureCallback> mOpenPairingFailureCallback;
 
     static void OnPIDReadResponse(void * context, uint16_t value);
     static void OnVIDReadResponse(void * context, VendorId value);
@@ -431,15 +405,15 @@ private:
     uint32_t mSuggestedSetUpPINCode = 0;
 
     uint16_t mCommissioningWindowTimeout;
-    uint16_t mCommissioningWindowIteration;
+    uint32_t mCommissioningWindowIteration;
 
     CommissioningWindowOption mCommissioningWindowOption;
 
-    static void OnOpenPairingWindowSuccessResponse(void * context);
-    static void OnOpenPairingWindowFailureResponse(void * context, uint8_t status);
+    static void OnOpenPairingWindowSuccessResponse(void * context, const chip::app::DataModel::NullObjectType &);
+    static void OnOpenPairingWindowFailureResponse(void * context, CHIP_ERROR error);
 
     CHIP_ERROR ProcessControllerNOCChain(const ControllerInitParams & params);
-    uint16_t mPAKEVerifierID = 1;
+    PasscodeId mPAKEVerifierID = 1;
 };
 
 /**
@@ -452,7 +426,8 @@ class DLL_EXPORT DeviceCommissioner : public DeviceController,
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
                                       public Protocols::UserDirectedCommissioning::InstanceNameResolver,
 #endif
-                                      public SessionEstablishmentDelegate
+                                      public SessionEstablishmentDelegate,
+                                      public app::AttributeCache::Callback
 {
 public:
     DeviceCommissioner();
@@ -575,8 +550,18 @@ public:
 
     CHIP_ERROR GetDeviceBeingCommissioned(NodeId deviceId, CommissioneeDeviceProxy ** device);
 
-    CHIP_ERROR GetConnectedDevice(NodeId deviceId, Callback::Callback<OnDeviceConnected> * onConnection,
-                                  Callback::Callback<OnDeviceConnectionFailure> * onFailure) override;
+    CHIP_ERROR GetConnectedDevice(NodeId deviceId, chip::Callback::Callback<OnDeviceConnected> * onConnection,
+                                  chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure) override;
+
+    /**
+     * @brief
+     *   This function returns the attestation challenge for the secure session of the device being commissioned.
+     *
+     * @param[out] attestationChallenge The output for the attestationChallenge
+     *
+     * @return CHIP_ERROR               CHIP_NO_ERROR on success, or CHIP_ERROR_INVALID_ARGUMENT if no secure session is active
+     */
+    CHIP_ERROR GetAttestationChallenge(ByteSpan & attestationChallenge);
 
     /**
      * @brief
@@ -617,12 +602,20 @@ public:
      * @param[in] attestationNonce    Attestation nonce
      * @param[in] pai                 PAI certificate
      * @param[in] dac                 DAC certificates
+     * @param[in] remoteVendorId      vendor ID read from the device Basic Information cluster
+     * @param[in] remoteProductId     product ID read from the device Basic Information cluster
      * @param[in] proxy               device proxy that is being attested.
      */
     CHIP_ERROR ValidateAttestationInfo(const ByteSpan & attestationElements, const ByteSpan & signature,
                                        const ByteSpan & attestationNonce, const ByteSpan & pai, const ByteSpan & dac,
-                                       DeviceProxy * proxy);
+                                       VendorId remoteVendorId, uint16_t remoteProductId, DeviceProxy * proxy);
 
+    /**
+     * @brief
+     * Sends CommissioningStepComplete report to the commissioning delegate. Function will fill in current step.
+     * @params[in] err      error from the current step
+     * @params[in] report   report to send. Current step will be filled in automatically
+     */
     void
     CommissioningStageComplete(CHIP_ERROR err,
                                CommissioningDelegate::CommissioningReport report = CommissioningDelegate::CommissioningReport());
@@ -698,6 +691,9 @@ public:
 
     void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
 
+    // AttributeCache::Callback impl
+    void OnDone() override;
+
 private:
     DevicePairingDelegate * mPairingDelegate;
 
@@ -717,7 +713,7 @@ private:
     CommissioningStage mCommissioningStage = CommissioningStage::kSecurePairing;
     bool mRunCommissioningAfterConnection  = false;
 
-    BitMapObjectPool<CommissioneeDeviceProxy, kNumMaxActiveDevices> mCommissioneeDevicePool;
+    ObjectPool<CommissioneeDeviceProxy, kNumMaxActiveDevices> mCommissioneeDevicePool;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     UserDirectedCommissioningServer * mUdcServer = nullptr;
@@ -744,7 +740,7 @@ private:
        The function does not hold a reference to the device object.
      */
     CHIP_ERROR SendAttestationRequestCommand(DeviceProxy * device, const ByteSpan & attestationNonce);
-    /* This function sends an OpCSR request to the device.
+    /* This function sends an CSR request to the device.
        The function does not hold a reference to the device object.
      */
     CHIP_ERROR SendOperationalCertificateSigningRequestCommand(DeviceProxy * device, const ByteSpan & csrNonce);
@@ -765,34 +761,42 @@ private:
     CHIP_ERROR OnOperationalCredentialsProvisioningCompletion(CommissioneeDeviceProxy * device);
 
     /* Callback when the previously sent CSR request results in failure */
-    static void OnCSRFailureResponse(void * context, uint8_t status);
+    static void OnCSRFailureResponse(void * context, CHIP_ERROR error);
 
-    static void OnCertificateChainFailureResponse(void * context, uint8_t status);
-    static void OnCertificateChainResponse(void * context, ByteSpan certificate);
+    static void OnCertificateChainFailureResponse(void * context, CHIP_ERROR error);
+    static void OnCertificateChainResponse(
+        void * context, const app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType & response);
 
-    static void OnAttestationFailureResponse(void * context, uint8_t status);
-    static void OnAttestationResponse(void * context, chip::ByteSpan attestationElements, chip::ByteSpan signature);
+    static void OnAttestationFailureResponse(void * context, CHIP_ERROR error);
+    static void
+    OnAttestationResponse(void * context,
+                          const app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType & data);
 
     /**
      * @brief
      *   This function is called by the IM layer when the commissioner receives the CSR from the device.
-     *   (Reference: Specifications section 11.22.5.8. OpCSR Elements)
+     *   (Reference: Specifications section 11.18.5.6. NOCSR Elements)
      *
      * @param[in] context               The context provided while registering the callback.
-     * @param[in] NOCSRElements         CSR elements as per specifications section 11.22.5.6. NOCSR Elements.
-     * @param[in] AttestationSignature  Cryptographic signature generated for the fields in the response message.
+     * @param[in] data                  The response struct containing the following fields:
+     *                                    NOCSRElements: CSR elements as per specifications section 11.22.5.6. NOCSR Elements.
+     *                                    AttestationSignature: Cryptographic signature generated for the fields in the response
+     * message.
      */
-    static void OnOperationalCertificateSigningRequest(void * context, ByteSpan NOCSRElements, ByteSpan AttestationSignature);
+    static void OnOperationalCertificateSigningRequest(
+        void * context, const app::Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType & data);
 
     /* Callback when adding operational certs to device results in failure */
-    static void OnAddNOCFailureResponse(void * context, uint8_t status);
+    static void OnAddNOCFailureResponse(void * context, CHIP_ERROR errro);
     /* Callback when the device confirms that it has added the operational certificates */
-    static void OnOperationalCertificateAddResponse(void * context, uint8_t StatusCode, uint8_t FabricIndex, CharSpan DebugText);
+    static void
+    OnOperationalCertificateAddResponse(void * context,
+                                        const app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType & data);
 
     /* Callback when the device confirms that it has added the root certificate */
-    static void OnRootCertSuccessResponse(void * context);
+    static void OnRootCertSuccessResponse(void * context, const chip::app::DataModel::NullObjectType &);
     /* Callback called when adding root cert to device results in failure */
-    static void OnRootCertFailureResponse(void * context, uint8_t status);
+    static void OnRootCertFailureResponse(void * context, CHIP_ERROR error);
 
     static void OnDeviceConnectedFn(void * context, OperationalDeviceProxy * device);
     static void OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error);
@@ -801,11 +805,24 @@ private:
 
     static void OnDeviceNOCChainGeneration(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
                                            const ByteSpan & rcac, Optional<AesCcm128KeySpan> ipk, Optional<NodeId> adminSubject);
+    static void OnArmFailSafe(void * context,
+                              const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
+    static void OnSetRegulatoryConfigResponse(
+        void * context,
+        const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType & data);
+    static void
+    OnNetworkConfigResponse(void * context,
+                            const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data);
+    static void OnConnectNetworkResponse(
+        void * context, const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & data);
+    static void OnCommissioningCompleteResponse(
+        void * context,
+        const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & data);
 
     /**
      * @brief
      *   This function processes the CSR sent by the device.
-     *   (Reference: Specifications section 11.22.5.8. OpCSR Elements)
+     *   (Reference: Specifications section 11.18.5.6. NOCSR Elements)
      *
      * @param[in] proxy           device proxy
      * @param[in] NOCSRElements   CSR elements as per specifications section 11.22.5.6. NOCSR Elements.
@@ -813,8 +830,8 @@ private:
      * @param[in] dac               device attestation certificate
      * @param[in] csrNonce          certificate signing request nonce
      */
-    CHIP_ERROR ProcessOpCSR(DeviceProxy * proxy, const ByteSpan & NOCSRElements, const ByteSpan & AttestationSignature,
-                            ByteSpan dac, ByteSpan csrNonce);
+    CHIP_ERROR ProcessCSR(DeviceProxy * proxy, const ByteSpan & NOCSRElements, const ByteSpan & AttestationSignature, ByteSpan dac,
+                          ByteSpan csrNonce);
 
     /**
      * @brief
@@ -828,32 +845,43 @@ private:
     CommissioneeDeviceProxy * FindCommissioneeDevice(NodeId id);
     void ReleaseCommissioneeDevice(CommissioneeDeviceProxy * device);
 
-    // Cluster callbacks for advancing commissioning flows
-    Callback::Callback<BasicSuccessCallback> mSuccess;
-    Callback::Callback<BasicFailureCallback> mFailure;
+    template <typename ClusterObjectT, typename RequestObjectT>
+    CHIP_ERROR SendCommand(DeviceProxy * device, const RequestObjectT & request,
+                           CommandResponseSuccessCallback<typename RequestObjectT::ResponseType> successCb,
+                           CommandResponseFailureCallback failureCb)
+    {
+        return SendCommand<ClusterObjectT>(device, request, successCb, failureCb, 0, NullOptional);
+    }
 
-    static CHIP_ERROR ConvertFromNodeOperationalCertStatus(uint8_t err);
+    template <typename ClusterObjectT, typename RequestObjectT>
+    CHIP_ERROR SendCommand(DeviceProxy * device, const RequestObjectT & request,
+                           CommandResponseSuccessCallback<typename RequestObjectT::ResponseType> successCb,
+                           CommandResponseFailureCallback failureCb, EndpointId endpoint, Optional<System::Clock::Timeout> timeout)
+    {
+        ClusterObjectT cluster;
+        cluster.Associate(device, endpoint);
+        cluster.SetCommandTimeout(timeout);
 
-    Callback::Callback<OperationalCredentialsClusterCertificateChainResponseCallback> mCertificateChainResponseCallback;
-    Callback::Callback<OperationalCredentialsClusterAttestationResponseCallback> mAttestationResponseCallback;
-    Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback> mOpCSRResponseCallback;
-    Callback::Callback<OperationalCredentialsClusterNOCResponseCallback> mNOCResponseCallback;
-    Callback::Callback<DefaultSuccessCallback> mRootCertResponseCallback;
-    Callback::Callback<DefaultFailureCallback> mOnCertificateChainFailureCallback;
-    Callback::Callback<DefaultFailureCallback> mOnAttestationFailureCallback;
-    Callback::Callback<DefaultFailureCallback> mOnCSRFailureCallback;
-    Callback::Callback<DefaultFailureCallback> mOnCertFailureCallback;
-    Callback::Callback<DefaultFailureCallback> mOnRootCertFailureCallback;
+        return cluster.InvokeCommand(request, this, successCb, failureCb);
+    }
 
-    Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;
-    Callback::Callback<OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
+    static CHIP_ERROR ConvertFromOperationalCertStatus(chip::app::Clusters::OperationalCredentials::OperationalCertStatus err);
 
-    Callback::Callback<Credentials::OnAttestationInformationVerification> mDeviceAttestationInformationVerificationCallback;
+    chip::Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;
+    chip::Callback::Callback<OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 
-    Callback::Callback<OnNOCChainGeneration> mDeviceNOCChainCallback;
+    chip::Callback::Callback<Credentials::OnAttestationInformationVerification> mDeviceAttestationInformationVerificationCallback;
+
+    chip::Callback::Callback<OnNOCChainGeneration> mDeviceNOCChainCallback;
     SetUpCodePairer mSetUpCodePairer;
     AutoCommissioner mAutoCommissioner;
-    CommissioningDelegate * mCommissioningDelegate = nullptr;
+    CommissioningDelegate * mDefaultCommissioner =
+        nullptr; // Commissioning delegate to call when PairDevice / Commission functions are used
+    CommissioningDelegate * mCommissioningDelegate =
+        nullptr; // Commissioning delegate that issued the PerformCommissioningStep command
+
+    Platform::UniquePtr<app::AttributeCache> mAttributeCache;
+    Platform::UniquePtr<app::ReadClient> mReadClient;
 };
 
 } // namespace Controller

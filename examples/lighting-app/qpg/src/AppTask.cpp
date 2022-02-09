@@ -76,17 +76,17 @@ constexpr int extDiscTimeoutSecs = 20;
 CHIP_ERROR AppTask::StartAppTask()
 {
     sAppEventQueue = xQueueCreateStatic(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent), sAppEventQueueBuffer, &sAppEventQueueStruct);
-    if (sAppEventQueue == NULL)
+    if (sAppEventQueue == nullptr)
     {
         ChipLogError(NotSpecified, "Failed to allocate app event queue");
         return CHIP_ERROR_NO_MEMORY;
     }
 
     // Start App task.
-    sAppTaskHandle = xTaskCreateStatic(AppTaskMain, APP_TASK_NAME, ArraySize(appStack), NULL, 1, appStack, &appTaskStruct);
-    if (sAppTaskHandle != NULL)
+    sAppTaskHandle = xTaskCreateStatic(AppTaskMain, APP_TASK_NAME, ArraySize(appStack), nullptr, 1, appStack, &appTaskStruct);
+    if (sAppTaskHandle == nullptr)
     {
-        return CHIP_NO_ERROR;
+        return CHIP_ERROR_NO_MEMORY;
     }
 
     return CHIP_NO_ERROR;
@@ -142,10 +142,8 @@ void AppTask::AppTaskMain(void * pvParameter)
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "AppTask.Init() failed: %" CHIP_ERROR_FORMAT, err.Format());
-        // appError(err);
+        return;
     }
-
-    ChipLogProgress(NotSpecified, "App Task started");
 
     while (true)
     {
@@ -367,7 +365,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
 
 void AppTask::CancelTimer()
 {
-    SystemLayer().CancelTimer(TimerEventHandler, this);
+    chip::DeviceLayer::SystemLayer().CancelTimer(TimerEventHandler, this);
     mFunctionTimerActive = false;
 }
 
@@ -375,7 +373,8 @@ void AppTask::StartTimer(uint32_t aTimeoutInMs)
 {
     CHIP_ERROR err;
 
-    err = SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(aTimeoutInMs), TimerEventHandler, this);
+    chip::DeviceLayer::SystemLayer().CancelTimer(TimerEventHandler, this);
+    err = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(aTimeoutInMs), TimerEventHandler, this);
     SuccessOrExit(err);
 
     mFunctionTimerActive = true;

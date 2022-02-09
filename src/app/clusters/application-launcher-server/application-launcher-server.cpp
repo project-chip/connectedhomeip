@@ -42,6 +42,7 @@ using namespace chip::app::Clusters::ApplicationLauncher;
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 using namespace chip::AppPlatform;
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+using namespace chip::Uint8;
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -113,10 +114,9 @@ CHIP_ERROR Delegate::HandleGetCurrentApp(app::AttributeValueEncoder & aEncoder)
             {
                 ApplicationEPType currentApp;
                 CatalogVendorApp * vendorApp           = app->GetApplicationBasicDelegate()->GetCatalogVendorApp();
-                std::string endpointStr                = std::to_string(app->GetEndpointId());
                 currentApp.application.catalogVendorId = vendorApp->catalogVendorId;
                 currentApp.application.applicationId   = CharSpan(vendorApp->applicationId, strlen(vendorApp->applicationId));
-                currentApp.endpoint                    = CharSpan(endpointStr.c_str(), endpointStr.length());
+                currentApp.endpoint                    = Optional<EndpointId>(app->GetEndpointId());
                 return aEncoder.Encode(currentApp);
             }
         }
@@ -127,7 +127,7 @@ CHIP_ERROR Delegate::HandleGetCurrentApp(app::AttributeValueEncoder & aEncoder)
     ApplicationEPType currentApp;
     currentApp.application.catalogVendorId = 123;
     currentApp.application.applicationId   = CharSpan("applicationId", strlen("applicationId"));
-    currentApp.endpoint                    = CharSpan("endpointId", strlen("endpointId"));
+    currentApp.endpoint                    = Optional<EndpointId>::Missing();
     return aEncoder.Encode(currentApp);
 }
 
@@ -212,12 +212,13 @@ bool emberAfApplicationLauncherClusterLaunchAppRequestCallback(app::CommandHandl
     app::CommandResponseHelper<LauncherResponseType> responder(command, commandPath);
 
     std::string appId(application.applicationId.data(), application.applicationId.size());
-    if (appId.length() == 0)
+
+    if (appId.length() == 0 && data.HasValue())
     {
         // chip-tool can't send structs from command line so treat data value as appid if appid is blank
         // TODO: fix this once chip-tool support sending structs from command line
         ChipLogError(Zcl, "ApplicationLauncher blank content id, taking data as appid");
-        appId = std::string(data.data(), data.size());
+        appId = std::string((char *) data.Value().data(), data.Value().size());
     }
     CatalogVendorApp vendorApp(application.catalogVendorId, appId.c_str());
 
@@ -234,13 +235,14 @@ bool emberAfApplicationLauncherClusterLaunchAppRequestCallback(app::CommandHandl
         if (delegate->HasFeature(ApplicationLauncherFeature::kApplicationPlatform))
         {
             ChipLogError(Zcl, "ApplicationLauncher has content platform feature");
-            ContentApp * app = ContentAppPlatform::GetInstance().LoadContentApp(vendorApp);
+            ContentApp * app = ContentAppPlatform::GetInstance().LoadContentApp(&vendorApp);
             if (app == nullptr)
             {
                 ChipLogError(Zcl, "ApplicationLauncher target app not found");
                 LauncherResponseType response;
-                response.data   = CharSpan("data", strlen("data"));
-                response.status = StatusEnum::kAppNotAvailable;
+                const char * buf = "data";
+                response.data    = ByteSpan(from_const_char(buf), strlen(buf));
+                response.status  = StatusEnum::kAppNotAvailable;
                 responder.Success(response);
                 return true;
             }
@@ -248,7 +250,8 @@ bool emberAfApplicationLauncherClusterLaunchAppRequestCallback(app::CommandHandl
             ContentAppPlatform::GetInstance().SetCurrentApp(app);
 
             ChipLogError(Zcl, "ApplicationLauncher handling launch on ContentApp");
-            app->GetApplicationLauncherDelegate()->HandleLaunchApp(responder, data, application);
+            app->GetApplicationLauncherDelegate()->HandleLaunchApp(responder, data.HasValue() ? data.Value() : ByteSpan(),
+                                                                   application);
             return true;
         }
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
@@ -265,7 +268,7 @@ bool emberAfApplicationLauncherClusterLaunchAppRequestCallback(app::CommandHandl
         }
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-        ContentApp * app = ContentAppPlatform::GetInstance().LoadContentApp(vendorApp);
+        ContentApp * app = ContentAppPlatform::GetInstance().LoadContentApp(&vendorApp);
         if (app != nullptr)
         {
             ContentAppPlatform::GetInstance().SetCurrentApp(app);
@@ -273,7 +276,7 @@ bool emberAfApplicationLauncherClusterLaunchAppRequestCallback(app::CommandHandl
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
         ChipLogError(Zcl, "ApplicationLauncher handling launch");
-        delegate->HandleLaunchApp(responder, data, application);
+        delegate->HandleLaunchApp(responder, data.HasValue() ? data.Value() : ByteSpan(), application);
     }
 
 exit:
@@ -314,13 +317,14 @@ bool emberAfApplicationLauncherClusterStopAppRequestCallback(app::CommandHandler
         if (delegate->HasFeature(ApplicationLauncherFeature::kApplicationPlatform))
         {
             ChipLogError(Zcl, "ApplicationLauncher has content platform feature");
-            ContentApp * app = ContentAppPlatform::GetInstance().LoadContentApp(vendorApp);
+            ContentApp * app = ContentAppPlatform::GetInstance().LoadContentApp(&vendorApp);
             if (app == nullptr)
             {
                 ChipLogError(Zcl, "ApplicationLauncher target app not loaded");
                 LauncherResponseType response;
-                response.data   = CharSpan("data", strlen("data"));
-                response.status = StatusEnum::kAppNotAvailable;
+                const char * buf = "data";
+                response.data    = ByteSpan(from_const_char(buf), strlen(buf));
+                response.status  = StatusEnum::kAppNotAvailable;
                 responder.Success(response);
                 return true;
             }
@@ -342,7 +346,7 @@ bool emberAfApplicationLauncherClusterStopAppRequestCallback(app::CommandHandler
         ChipLogError(Zcl, "ApplicationLauncher no content platform feature");
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-        ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(vendorApp);
+        ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(&vendorApp);
         if (app != nullptr)
         {
             ContentAppPlatform::GetInstance().UnsetIfCurrentApp(app);
@@ -397,13 +401,14 @@ bool emberAfApplicationLauncherClusterHideAppRequestCallback(app::CommandHandler
         if (delegate->HasFeature(ApplicationLauncherFeature::kApplicationPlatform))
         {
             ChipLogError(Zcl, "ApplicationLauncher has content platform feature");
-            ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(vendorApp);
+            ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(&vendorApp);
             if (app == nullptr)
             {
                 ChipLogError(Zcl, "ApplicationLauncher target app not loaded");
                 LauncherResponseType response;
-                response.data   = CharSpan("data", strlen("data"));
-                response.status = StatusEnum::kAppNotAvailable;
+                const char * buf = "data";
+                response.data    = ByteSpan(from_const_char(buf), strlen(buf));
+                response.status  = StatusEnum::kAppNotAvailable;
                 responder.Success(response);
                 return true;
             }
@@ -422,7 +427,7 @@ bool emberAfApplicationLauncherClusterHideAppRequestCallback(app::CommandHandler
         ChipLogError(Zcl, "ApplicationLauncher no content platform feature");
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-        ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(vendorApp);
+        ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(&vendorApp);
         if (app != nullptr)
         {
             ContentAppPlatform::GetInstance().UnsetIfCurrentApp(app);

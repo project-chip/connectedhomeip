@@ -64,14 +64,15 @@ public:
 protected:
     // ===== Methods that implement the ThreadStackManager abstract interface.
 
-    CHIP_ERROR _StartThreadTask();
+    CHIP_ERROR _StartThreadTask() { return CHIP_NO_ERROR; }
     void _LockThreadStack();
     bool _TryLockThreadStack();
     void _UnlockThreadStack();
 
     // ===== Methods that override the GenericThreadStackManagerImpl_OpenThread abstract interface.
 
-    void _ProcessThreadActivity();
+    void _ProcessThreadActivity() {}
+    void _OnPlatformEvent(const ChipDeviceEvent * event);
 
     //} // namespace Internal
 
@@ -85,7 +86,7 @@ private:
 
     // ===== Private members for use by this class only.
 
-    ThreadStackManagerImpl() = default;
+    bool mIsAttached = false;
 };
 
 /**

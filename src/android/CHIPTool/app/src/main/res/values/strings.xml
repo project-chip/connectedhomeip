@@ -91,6 +91,8 @@
     <string name="sensor_client_unsubscribe_error_text">Failed to unsubscribe from the sensor: %1$s</string>
     <string name="cluster_interaction_tool">Cluster Interaction Tool</string>
 
+    <string name="wildcard_btn_text">Wildcard</string>
+
     <string name="multi_admin_client_btn_text">Multi-admin cluster</string>
     <string name="basic_commissioning_method_btn_text">Basic Commissioning Method</string>
     <string name="enter_discriminator_hint_text">Enter Discriminator</string>
@@ -108,7 +110,7 @@
     <string name="basic_cluster_write_location_hint_text">Enter Location</string>
     <string name="basic_cluster_local_config_disabled_btn_text">Set LocalConfigDisabled</string>
     <string name="basic_cluster_read_attribute_btn_text">Read Attribute</string>
-    <string name="basic_cluster_interaction_mode_version_text">InteractionModelVersion</string>
+    <string name="basic_cluster_data_model_revision_text">DataModelRevision</string>
     <string name="basic_cluster_vendor_name_text">VendorName</string>
     <string name="basic_cluster_vendor_id_text">VendorID</string>
     <string name="basic_cluster_product_name_text">ProductName</string>
@@ -128,10 +130,17 @@
     <string name="basic_cluster_reachable_text">Reachable</string>
     <string name="basic_cluster_cluster_revision_text">ClusterRevision</string>
 
-    <string name="subscribe_dialog_title_text">Subscribe on/off</string>
+    <string name="subscribe_dialog_title_text">Subscribe</string>
     <string name="subscribe_dialog_subscribe_btn_text">Subscribe</string>
     <string name="subscribe_dialog_min_interval_hint">Minimum interval (seconds)</string>
     <string name="subscribe_dialog_max_interval_hint">Maximum interval (seconds)</string>
+
+    <string name="endpoint_id_label">Endpoint ID</string>
+    <string name="cluster_id_label">Cluster ID</string>
+    <string name="attribute_id_label">Attribute ID</string>
+    <string name="wildcard_help_label">Leave blank for wildcard</string>
+    <string name="wildcard_subscribe_btn_text">Subscribe</string>
+    <string name="wildcard_read_btn_text">Read</string>
 
     <string name="provision_custom_flow_btn_text">Provision CHIP device with Custom Flow</string>
     <string name="chip_device_info_commissioning_flow_label">Commissioning Flow:</string>

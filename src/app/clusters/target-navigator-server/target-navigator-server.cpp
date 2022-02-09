@@ -180,7 +180,7 @@ bool emberAfTargetNavigatorClusterNavigateTargetRequestCallback(app::CommandHand
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
 
     {
-        delegate->HandleNavigateTarget(responder, target, data);
+        delegate->HandleNavigateTarget(responder, target, data.HasValue() ? data.Value() : CharSpan());
     }
 
 exit:

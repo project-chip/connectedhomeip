@@ -345,6 +345,7 @@ exit:
 CHIP_ERROR Spake2p::ComputeRoundTwo(const uint8_t * in, size_t in_len, uint8_t * out, size_t * out_len)
 {
     CHIP_ERROR error = CHIP_ERROR_INTERNAL;
+    MutableByteSpan out_span{ out, *out_len };
     uint8_t point_buffer[kMAX_Point_Length];
     void * MN        = nullptr; // Choose N if a prover, M if a verifier
     void * XY        = nullptr; // Choose Y if a prover, X if a verifier
@@ -406,7 +407,8 @@ CHIP_ERROR Spake2p::ComputeRoundTwo(const uint8_t * in, size_t in_len, uint8_t *
 
     SuccessOrExit(error = GenerateKeys());
 
-    SuccessOrExit(error = Mac(Kcaorb, hash_size / 2, in, in_len, out));
+    SuccessOrExit(error = Mac(Kcaorb, hash_size / 2, in, in_len, out_span));
+    VerifyOrExit(out_span.size() == hash_size, error = CHIP_ERROR_INTERNAL);
 
     state = CHIP_SPAKE2P_STATE::R2;
     error = CHIP_NO_ERROR;
@@ -419,7 +421,9 @@ CHIP_ERROR Spake2p::GenerateKeys()
 {
     static const uint8_t info_keyconfirm[16] = { 'C', 'o', 'n', 'f', 'i', 'r', 'm', 'a', 't', 'i', 'o', 'n', 'K', 'e', 'y', 's' };
 
-    ReturnErrorOnFailure(HashFinalize(Kae));
+    MutableByteSpan Kae_span{ &Kae[0], sizeof(Kae) };
+
+    ReturnErrorOnFailure(HashFinalize(Kae_span));
     ReturnErrorOnFailure(KDF(Ka, hash_size / 2, nullptr, 0, info_keyconfirm, sizeof(info_keyconfirm), Kcab, hash_size));
 
     return CHIP_NO_ERROR;
@@ -486,9 +490,8 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::Hash(const uint8_t * in, size_t in_len
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::HashFinalize(uint8_t * out)
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::HashFinalize(MutableByteSpan & out_span)
 {
-    MutableByteSpan out_span(out, kSHA256_Hash_Length);
     ReturnErrorOnFailure(sha256_hash_ctx.Finish(out_span));
     return CHIP_NO_ERROR;
 }

@@ -83,13 +83,16 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             }
 {{#last}}
           }
+          break;
         }
 {{/last}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
         default:
-          return CHIP_NO_ERROR;
+          break;
     }
+    ChipLogProgress(chipTool, "  Don't know how to log atribute value");
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & path, chip::TLV::TLVReader * data)
@@ -115,13 +118,16 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             }
 {{#last}}
           }
+          break;
         }
 {{/last}}
 {{/chip_cluster_responses}}
 {{/chip_client_clusters}}
         default:
-          return CHIP_NO_ERROR;
+          break;
     }
+    ChipLogProgress(chipTool, "  Don't know how to log command response data");
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip::TLV::TLVReader * data)
@@ -168,11 +174,14 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             }
 {{#last}}
           }
+          break;
         }
 {{/last}}
 {{/chip_server_cluster_events}}
 {{/chip_client_clusters}}
         default:
-          return CHIP_NO_ERROR;
+          break;
     }
+    ChipLogProgress(chipTool, "  Don't know how to log event data");
+    return CHIP_NO_ERROR;
 }

@@ -59,13 +59,6 @@ int AppTask::Init()
         },
         0);
 
-    // Start BLE advertising if needed
-    if (!CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART)
-    {
-        ChipLogProgress(NotSpecified, "Enabling BLE advertising.");
-        ConnectivityMgr().SetBLEAdvertisingEnabled(true);
-    }
-
     chip::DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
 
     // Init ZCL Data Model and start server

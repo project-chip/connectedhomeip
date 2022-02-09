@@ -34,6 +34,15 @@ tests:
       response:
           value: 1
 
+    - label: "Reads CurrentHue attribute from DUT."
+      command: "readAttribute"
+      attribute: "current hue"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
     - label: "Move to hue shortest distance command"
       command: "MoveToHue"
       arguments:
@@ -43,7 +52,7 @@ tests:
               - name: "direction"
                 value: 0
               - name: "transitionTime"
-                value: 100
+                value: 300
               - name: "optionsMask"
                 value: 0
               - name: "optionsOverride"
@@ -67,7 +76,7 @@ tests:
               - name: "direction"
                 value: 1
               - name: "transitionTime"
-                value: 100
+                value: 300
               - name: "optionsMask"
                 value: 0
               - name: "optionsOverride"
@@ -91,7 +100,7 @@ tests:
               - name: "direction"
                 value: 2
               - name: "transitionTime"
-                value: 100
+                value: 300
               - name: "optionsMask"
                 value: 0
               - name: "optionsOverride"
@@ -115,7 +124,7 @@ tests:
               - name: "direction"
                 value: 3
               - name: "transitionTime"
-                value: 100
+                value: 300
               - name: "optionsMask"
                 value: 0
               - name: "optionsOverride"

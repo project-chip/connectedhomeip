@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019-2020 Google LLC.
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
@@ -43,15 +43,18 @@ const char PosixConfig::kConfigNamespace_ChipConfig[]   = "chip-config";
 const char PosixConfig::kConfigNamespace_ChipCounters[] = "chip-counters";
 
 // Keys stored in the Chip-factory namespace
-const PosixConfig::Key PosixConfig::kConfigKey_SerialNum           = { kConfigNamespace_ChipFactory, "serial-num" };
-const PosixConfig::Key PosixConfig::kConfigKey_MfrDeviceId         = { kConfigNamespace_ChipFactory, "device-id" };
-const PosixConfig::Key PosixConfig::kConfigKey_MfrDeviceCert       = { kConfigNamespace_ChipFactory, "device-cert" };
-const PosixConfig::Key PosixConfig::kConfigKey_MfrDeviceICACerts   = { kConfigNamespace_ChipFactory, "device-ca-certs" };
-const PosixConfig::Key PosixConfig::kConfigKey_MfrDevicePrivateKey = { kConfigNamespace_ChipFactory, "device-key" };
-const PosixConfig::Key PosixConfig::kConfigKey_HardwareVersion     = { kConfigNamespace_ChipFactory, "hardware-ver" };
-const PosixConfig::Key PosixConfig::kConfigKey_ManufacturingDate   = { kConfigNamespace_ChipFactory, "mfg-date" };
-const PosixConfig::Key PosixConfig::kConfigKey_SetupPinCode        = { kConfigNamespace_ChipFactory, "pin-code" };
-const PosixConfig::Key PosixConfig::kConfigKey_SetupDiscriminator  = { kConfigNamespace_ChipFactory, "discriminator" };
+const PosixConfig::Key PosixConfig::kConfigKey_SerialNum             = { kConfigNamespace_ChipFactory, "serial-num" };
+const PosixConfig::Key PosixConfig::kConfigKey_MfrDeviceId           = { kConfigNamespace_ChipFactory, "device-id" };
+const PosixConfig::Key PosixConfig::kConfigKey_MfrDeviceCert         = { kConfigNamespace_ChipFactory, "device-cert" };
+const PosixConfig::Key PosixConfig::kConfigKey_MfrDeviceICACerts     = { kConfigNamespace_ChipFactory, "device-ca-certs" };
+const PosixConfig::Key PosixConfig::kConfigKey_MfrDevicePrivateKey   = { kConfigNamespace_ChipFactory, "device-key" };
+const PosixConfig::Key PosixConfig::kConfigKey_HardwareVersion       = { kConfigNamespace_ChipFactory, "hardware-ver" };
+const PosixConfig::Key PosixConfig::kConfigKey_ManufacturingDate     = { kConfigNamespace_ChipFactory, "mfg-date" };
+const PosixConfig::Key PosixConfig::kConfigKey_SetupPinCode          = { kConfigNamespace_ChipFactory, "pin-code" };
+const PosixConfig::Key PosixConfig::kConfigKey_SetupDiscriminator    = { kConfigNamespace_ChipFactory, "discriminator" };
+const PosixConfig::Key PosixConfig::kConfigKey_Spake2pIterationCount = { kConfigNamespace_ChipFactory, "iteration-count" };
+const PosixConfig::Key PosixConfig::kConfigKey_Spake2pSalt           = { kConfigNamespace_ChipFactory, "salt" };
+const PosixConfig::Key PosixConfig::kConfigKey_Spake2pVerifier       = { kConfigNamespace_ChipFactory, "verifier" };
 
 // Keys stored in the Chip-config namespace
 const PosixConfig::Key PosixConfig::kConfigKey_FabricId           = { kConfigNamespace_ChipConfig, "fabric-id" };
@@ -71,6 +74,7 @@ const PosixConfig::Key PosixConfig::kConfigKey_Breadcrumb         = { kConfigNam
 const char PosixConfig::kGroupKeyNamePrefix[] = "gk-";
 
 uint16_t PosixConfig::mPosixSetupDiscriminator = 0xF00; // CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
+char PosixConfig::mPosixCountryCode[3]         = "XX";
 
 CHIP_ERROR PosixConfig::Init()
 {
@@ -111,9 +115,17 @@ exit:
 CHIP_ERROR PosixConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
     CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    SuccessOrExit(err);
 
-exit:
+    if (key == kConfigKey_CountryCode)
+    {
+        // Do no assume null-termination on read-out
+        constexpr size_t kMaxLen = sizeof(PosixConfig::mPosixCountryCode) - 1;
+        outLen                   = strnlen(PosixConfig::mPosixCountryCode, kMaxLen);
+        VerifyOrReturnError(bufSize >= kMaxLen, CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(&buf[0], &PosixConfig::mPosixCountryCode[0], outLen);
+        return CHIP_NO_ERROR;
+    }
+
     return err;
 }
 
@@ -167,6 +179,15 @@ exit:
 
 CHIP_ERROR PosixConfig::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
+    if (key == kConfigKey_CountryCode)
+    {
+        VerifyOrReturnError(strLen < sizeof(PosixConfig::mPosixCountryCode), CHIP_ERROR_INVALID_ARGUMENT);
+        memcpy(&PosixConfig::mPosixCountryCode[0], str, strLen);
+        // Internally null-terminate so we may be able to log later. Don't assume we got null-termination on input.
+        PosixConfig::mPosixCountryCode[strLen] = '\0';
+        return CHIP_NO_ERROR;
+    }
+
     CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     SuccessOrExit(err);
 

@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <access/AccessControl.h>
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
 #include <app/DefaultAttributePersistenceProvider.h>
@@ -81,7 +82,7 @@ public:
     TransportMgrBase & GetTransportManager() { return mTransports; }
 
 #if CONFIG_NETWORK_LAYER_BLE
-    Ble::BleLayer * getBleLayerObject() { return mBleLayer; }
+    Ble::BleLayer * GetBleLayerObject() { return mBleLayer; }
 #endif
 
     CommissioningWindowManager & GetCommissioningWindowManager() { return mCommissioningWindowManager; }
@@ -103,7 +104,7 @@ private:
             ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size, &bytesRead));
             if (!CanCastTo<uint16_t>(bytesRead))
             {
-                ChipLogDetail(AppServer, "%zu is too big to fit in uint16_t", bytesRead);
+                ChipLogDetail(AppServer, "0x%" PRIx32 " is too big to fit in uint16_t", static_cast<uint32_t>(bytesRead));
                 return CHIP_ERROR_BUFFER_TOO_SMALL;
             }
             ChipLogProgress(AppServer, "Retrieved from server storage: %s", key);
@@ -193,6 +194,8 @@ private:
     Credentials::GroupDataProviderImpl mGroupsProvider;
     app::DefaultAttributePersistenceProvider mAttributePersister;
     GroupDataProviderListener mListener;
+
+    Access::AccessControl mAccessControl;
 
     // TODO @ceille: Maybe use OperationalServicePort and CommissionableServicePort
     uint16_t mSecuredServicePort;

@@ -108,37 +108,41 @@ void Instance::InvokeCommand(HandlerContext & ctxt)
     switch (ctxt.mRequestPath.mCommandId)
     {
     case Commands::ScanNetworks::Id:
-        VerifyOrReturn((mType & kFeatureMapWireless) != 0);
+        VerifyOrReturn(mFeatureFlags.Has(NetworkCommissioningFeature::kWiFiNetworkInterface) ||
+                       mFeatureFlags.Has(NetworkCommissioningFeature::kThreadNetworkInterface));
         HandleCommand<Commands::ScanNetworks::DecodableType>(
             ctxt, [this](HandlerContext & ctx, const auto & req) { HandleScanNetworks(ctx, req); });
         return;
 
     case Commands::AddOrUpdateWiFiNetwork::Id:
-        VerifyOrReturn(mType == kFeatureMapWiFi);
+        VerifyOrReturn(mFeatureFlags.Has(NetworkCommissioningFeature::kWiFiNetworkInterface));
         HandleCommand<Commands::AddOrUpdateWiFiNetwork::DecodableType>(
             ctxt, [this](HandlerContext & ctx, const auto & req) { HandleAddOrUpdateWiFiNetwork(ctx, req); });
         return;
 
     case Commands::AddOrUpdateThreadNetwork::Id:
-        VerifyOrReturn(mType == kFeatureMapThread);
+        VerifyOrReturn(mFeatureFlags.Has(NetworkCommissioningFeature::kThreadNetworkInterface));
         HandleCommand<Commands::AddOrUpdateThreadNetwork::DecodableType>(
             ctxt, [this](HandlerContext & ctx, const auto & req) { HandleAddOrUpdateThreadNetwork(ctx, req); });
         return;
 
     case Commands::RemoveNetwork::Id:
-        VerifyOrReturn((mType & kFeatureMapWireless) != 0);
+        VerifyOrReturn(mFeatureFlags.Has(NetworkCommissioningFeature::kWiFiNetworkInterface) ||
+                       mFeatureFlags.Has(NetworkCommissioningFeature::kThreadNetworkInterface));
         HandleCommand<Commands::RemoveNetwork::DecodableType>(
             ctxt, [this](HandlerContext & ctx, const auto & req) { HandleRemoveNetwork(ctx, req); });
         return;
 
     case Commands::ConnectNetwork::Id:
-        VerifyOrReturn((mType & kFeatureMapWireless) != 0);
+        VerifyOrReturn(mFeatureFlags.Has(NetworkCommissioningFeature::kWiFiNetworkInterface) ||
+                       mFeatureFlags.Has(NetworkCommissioningFeature::kThreadNetworkInterface));
         HandleCommand<Commands::ConnectNetwork::DecodableType>(
             ctxt, [this](HandlerContext & ctx, const auto & req) { HandleConnectNetwork(ctx, req); });
         return;
 
     case Commands::ReorderNetwork::Id:
-        VerifyOrReturn((mType & kFeatureMapWireless) != 0);
+        VerifyOrReturn(mFeatureFlags.Has(NetworkCommissioningFeature::kWiFiNetworkInterface) ||
+                       mFeatureFlags.Has(NetworkCommissioningFeature::kThreadNetworkInterface));
         HandleCommand<Commands::ReorderNetwork::DecodableType>(
             ctxt, [this](HandlerContext & ctx, const auto & req) { HandleReorderNetwork(ctx, req); });
         return;
@@ -174,14 +178,14 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         });
 
     case Attributes::ScanMaxTimeSeconds::Id:
-        if (mType & kFeatureMapWireless)
+        if (mpWirelessDriver != nullptr)
         {
             return aEncoder.Encode(mpWirelessDriver->GetScanNetworkTimeoutSeconds());
         }
         return CHIP_NO_ERROR;
 
     case Attributes::ConnectMaxTimeSeconds::Id:
-        if (mType & kFeatureMapWireless)
+        if (mpWirelessDriver != nullptr)
         {
             return aEncoder.Encode(mpWirelessDriver->GetConnectNetworkTimeoutSeconds());
         }
@@ -201,7 +205,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         return aEncoder.Encode(Attributes::LastConnectErrorValue::TypeInfo::Type(0));
 
     case Attributes::FeatureMap::Id:
-        return aEncoder.Encode(mType);
+        return aEncoder.Encode(mFeatureFlags);
 
     default:
         return CHIP_NO_ERROR;
@@ -223,19 +227,20 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeVal
 
 void Instance::HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetworks::DecodableType & req)
 {
-    switch (mType)
+
+    if (mFeatureFlags.Has(NetworkCommissioningFeature::kWiFiNetworkInterface))
     {
-    case kFeatureMapWiFi:
         mAsyncCommandHandle = app::CommandHandler::Handle(&ctx.mCommandHandler);
         mpDriver.Get<WiFiDriver *>()->ScanNetworks(req.ssid, this);
-        return;
-    case kFeatureMapThread:
+    }
+    else if (mFeatureFlags.Has(NetworkCommissioningFeature::kThreadNetworkInterface))
+    {
         mAsyncCommandHandle = app::CommandHandler::Handle(&ctx.mCommandHandler);
         mpDriver.Get<ThreadDriver *>()->ScanNetworks(this);
-        return;
-    default:
+    }
+    else
+    {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::UnsupportedCommand);
-        return;
     }
 }
 
@@ -414,7 +419,8 @@ void Instance::_OnCommissioningComplete(const DeviceLayer::ChipDeviceEvent * eve
 
 void Instance::OnCommissioningComplete(CHIP_ERROR err)
 {
-    VerifyOrReturn((mType & kFeatureMapWireless) != 0);
+    VerifyOrReturn(mpWirelessDriver != nullptr);
+
     if (err == CHIP_NO_ERROR)
     {
         ChipLogDetail(Zcl, "Commissioning complete, notify platform driver to persist network credentails.");

@@ -44,8 +44,6 @@
     EmberEventControl emberAfLevelControlClusterServerTickCallbackControl1;                                                        \
     EmberEventControl emberAfBarrierControlClusterServerTickCallbackControl1;                                                      \
     EmberEventControl emberAfIasZoneClusterServerTickCallbackControl1;                                                             \
-    extern EmberEventControl emberAfPluginDoorLockServerLockoutEventControl;                                                       \
-    extern EmberEventControl emberAfPluginDoorLockServerRelockEventControl;                                                        \
     extern EmberEventControl emberAfPluginIasZoneServerManageQueueEventControl;                                                    \
     extern void emberAfPluginColorControlServerTempTransitionEventHandler(void);                                                   \
     extern void emberAfPluginColorControlServerXyTransitionEventHandler(void);                                                     \
@@ -80,8 +78,6 @@
         { &emberAfBarrierControlClusterServerTickCallbackControl1,                                                                 \
           emberAfBarrierControlClusterServerTickCallbackWrapperFunction1 },                                                        \
         { &emberAfIasZoneClusterServerTickCallbackControl1, emberAfIasZoneClusterServerTickCallbackWrapperFunction1 },             \
-        { &emberAfPluginDoorLockServerLockoutEventControl, emberAfPluginDoorLockServerLockoutEventHandler },                       \
-        { &emberAfPluginDoorLockServerRelockEventControl, emberAfPluginDoorLockServerRelockEventHandler },                         \
         { &emberAfPluginIasZoneServerManageQueueEventControl, emberAfPluginIasZoneServerManageQueueEventHandler },
 
 #define EMBER_AF_GENERATED_EVENT_STRINGS                                                                                           \

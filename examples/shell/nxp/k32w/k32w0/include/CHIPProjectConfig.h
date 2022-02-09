@@ -53,16 +53,16 @@
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
  *
- * 0x235A: Chip's Vendor Id.
+ * 0xFFF1: Test vendor.
  */
-#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0x235A
+#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0xFFF1
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
  *
- * 0x4B4C: K32W lighting-app
+ * 0x8009: example shell
  */
-#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x4B4C
+#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8012
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION
@@ -168,14 +168,14 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_NFC 0
 
 /**
- *  @def CHIP_CONFIG_MAX_DEVICE_ADMINS
+ *  @def CHIP_CONFIG_MAX_FABRICS
  *
  *  @brief
- *    Maximum number of administrators that can provision the device. Each admin
- *    can provision the device with their unique operational credentials and manage
- *    their access control lists.
+ *    Maximum number of fabrics the device can participate in.  Each fabric can
+ *    provision the device with its unique operational credentials and manage
+ *    its own access control lists.
  */
-#define CHIP_CONFIG_MAX_DEVICE_ADMINS 2 // 1 fabrics + 1 for rotation slack
+#define CHIP_CONFIG_MAX_FABRICS 2 // 1 fabrics + 1 for rotation slack
 
 /**
  * CHIP_CONFIG_EVENT_LOGGING_DEFAULT_IMPORTANCE

@@ -45,9 +45,9 @@ def _singleton(cls):
 
 @_singleton
 class ChipCommissionableNodeController(object):
-    def __init__(self, startNetworkThread=True):
+    def __init__(self, chipStack: ChipStack):
         self.commissionableNodeCtrl = None
-        self._ChipStack = ChipStack()
+        self._ChipStack = chipStack
         self._dmLib = None
 
         self._InitLib()

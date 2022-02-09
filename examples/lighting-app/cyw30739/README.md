@@ -18,12 +18,12 @@ An example showing the use of Matter on the Infineon CYW30739 platform.
 
 The CYW30739 lighting example provides a baseline demonstration of a Light
 control device, built using Matter and the Infineon Modustoolbox SDK. It can be
-controlled by a Matter controller over Openthread network.
+controlled by a Matter controller over Thread network.
 
 The CYW30739 device can be commissioned over Bluetooth Low Energy where the
 device and the Matter controller will exchange security information with the
-Rendez-vous procedure. Thread Network credentials are then provided to the
-CYW30739 device which will then join the network.
+Rendez-vous procedure. Target Thread Network information including the active
+dataset and CASE credentials are then provided.
 
 ## Building
 

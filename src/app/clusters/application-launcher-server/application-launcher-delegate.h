@@ -30,9 +30,9 @@ namespace app {
 namespace Clusters {
 namespace ApplicationLauncher {
 
-using ApplicationLauncherApplicationType = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type;
-using ApplicationEPType                  = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type;
-using LauncherResponseType               = chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type;
+using Application          = chip::app::Clusters::ApplicationLauncher::Structs::Application::Type;
+using ApplicationEPType    = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type;
+using LauncherResponseType = chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type;
 
 /** @brief
  *    Defines methods for implementing application-specific logic for the Application Launcher Cluster.
@@ -57,12 +57,10 @@ public:
 
     virtual CHIP_ERROR HandleGetCatalogList(app::AttributeValueEncoder & aEncoder) = 0;
 
-    virtual void HandleLaunchApp(CommandResponseHelper<LauncherResponseType> & helper, const CharSpan & data,
-                                 const ApplicationLauncherApplicationType & application) = 0;
-    virtual void HandleStopApp(CommandResponseHelper<LauncherResponseType> & helper,
-                               const ApplicationLauncherApplicationType & application)   = 0;
-    virtual void HandleHideApp(CommandResponseHelper<LauncherResponseType> & helper,
-                               const ApplicationLauncherApplicationType & application)   = 0;
+    virtual void HandleLaunchApp(CommandResponseHelper<LauncherResponseType> & helper, const ByteSpan & data,
+                                 const Application & application)                                                     = 0;
+    virtual void HandleStopApp(CommandResponseHelper<LauncherResponseType> & helper, const Application & application) = 0;
+    virtual void HandleHideApp(CommandResponseHelper<LauncherResponseType> & helper, const Application & application) = 0;
 
     virtual ~Delegate() = default;
 

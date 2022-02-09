@@ -1,0 +1,20 @@
+{{~#if isArray~}}
+  {{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}List
+{{~else~}}
+  {{~#if_is_struct type~}}
+    {{~! Structs are not used as types of attributes much, so it's
+         less code to generate the callbacks on a per-attribute basis
+         than a per-struct-type basis. ~}}
+    {{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}Struct
+  {{~else~}}
+    {{~#if isNullable}}Nullable{{/if~}}
+    {{~#if (isStrEqual (asUpperCamelCase type) (asUpperCamelCase "vendor_id"))~}}
+      VendorId
+    {{~else if isEnum~}}
+      {{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase type}}
+    {{~else~}}
+      {{chipCallback.name}}
+    {{~/if~}}
+  {{~/if_is_struct~}}
+{{~/if~}}
+Attribute

@@ -16,7 +16,7 @@ name: 45.1.3. [TC-SWDIAG-2.1] Event functionality with server as DUT
 
 config:
     cluster: "Software Diagnostics"
-    endpoint: 1
+    endpoint: 0
 
 tests:
     #issue #11725 Reading the List is not implemented in YAML framework

@@ -25,6 +25,7 @@
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/core/CHIPTLVUtilities.hpp>
 #include <lib/support/ErrorStr.h>
+#include <lib/support/TestGroupData.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <messaging/ExchangeContext.h>
@@ -261,6 +262,22 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
 
     TestContext & ctx = *static_cast<TestContext *>(apContext);
 
+    //
+    // We have to enable async dispatch here to ensure that the exchange
+    // gets correctly closed out in the test below. Otherwise, the following happens:
+    //
+    // 1. WriteHandler generates a response upon OnWriteRequest being called.
+    // 2. Since there is no matching active client-side exchange for that request, the IM engine
+    //    handles it incorrectly and treats it like an unsolicited message.
+    // 3. It is invalid to receive a WriteResponse as an unsolicited message so it correctly sends back
+    //    a StatusResponse containing an error to that message.
+    // 4. Without unwinding the existing call stack, a response is received on the same exchange that the handler
+    //    generated a WriteResponse on. This exchange should have been closed in a normal execution model, but in
+    //    a synchronous model, the exchange is still open, and the status response is sent to the WriteHandler.
+    // 5. WriteHandler::OnMessageReceived is invoked, and it correctly asserts.
+    //
+    ctx.EnableAsyncDispatch();
+
     constexpr bool allBooleans[] = { true, false };
     for (auto messageIsTimed : allBooleans)
     {
@@ -270,7 +287,6 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
 
             app::WriteHandler writeHandler;
 
-            chip::app::InteractionModelDelegate IMdelegate;
             System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
             err                            = writeHandler.Init();
 
@@ -278,27 +294,35 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
 
             TestExchangeDelegate delegate;
             Messaging::ExchangeContext * exchange = ctx.NewExchangeToBob(&delegate);
-            Status status                         = writeHandler.OnWriteRequest(exchange, std::move(buf), transactionIsTimed);
+
+            Status status = writeHandler.OnWriteRequest(exchange, std::move(buf), transactionIsTimed);
             if (messageIsTimed == transactionIsTimed)
             {
                 NL_TEST_ASSERT(apSuite, status == Status::Success);
             }
             else
             {
-                NL_TEST_ASSERT(apSuite, status == Status::UnsupportedAccess);
-                // In the normal code flow, the exchange would now get closed
-                // when we send the error status on it (of if that fails when
-                // the stack unwinds).  In the success case it's been closed
-                // already by the WriteHandler sending the response on it, but
-                // if we are in the error case we need to make sure it gets
-                // closed.
+                //
+                // In a normal execution flow, the exchange manager would have closed out the exchange after the
+                // message dispatch call path had unwound. In this test however, we've manually allocated the exchange
+                // ourselves (as opposed to the exchange manager), so we need to take ownership of closing out the exchange.
+                //
+                // Note that this doesn't happen in the success case above, since that results in a call to send a message through
+                // the exchange context, which results in the exchange manager correctly closing it.
+                //
                 exchange->Close();
+                NL_TEST_ASSERT(apSuite, status == Status::UnsupportedAccess);
             }
+
+            ctx.DrainAndServiceIO();
+            ctx.DrainAndServiceIO();
 
             Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
             NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
         }
     }
+
+    ctx.DisableAsyncDispatch();
 }
 
 CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
@@ -418,12 +442,6 @@ void TestWriteInteraction::TestWriteRoundtrip(nlTestSuite * apSuite, void * apCo
 
 namespace {
 
-constexpr uint16_t kMaxGroupsPerFabric    = 5;
-constexpr uint16_t kMaxGroupKeysPerFabric = 8;
-
-static chip::TestPersistentStorageDelegate sDelegate;
-static chip::Credentials::GroupDataProviderImpl sProvider(sDelegate, kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
-
 /**
  *   Test Suite. It lists all the test functions.
  */
@@ -447,12 +465,11 @@ const nlTest sTests[] =
  */
 int Test_Setup(void * inContext)
 {
-    SetGroupDataProvider(&sProvider);
     VerifyOrReturnError(CHIP_NO_ERROR == chip::Platform::MemoryInit(), FAILURE);
-    VerifyOrReturnError(CHIP_NO_ERROR == sProvider.Init(), FAILURE);
-
 
     VerifyOrReturnError(TestContext::Initialize(inContext) == SUCCESS, FAILURE);
+
+    VerifyOrReturnError(CHIP_NO_ERROR == chip::GroupTesting::InitGroupData(), FAILURE);
 
     return SUCCESS;
 }

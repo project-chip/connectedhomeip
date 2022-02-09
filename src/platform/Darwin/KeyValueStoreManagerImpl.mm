@@ -165,7 +165,7 @@ namespace DeviceLayer {
 
                 url = [NSURL URLWithString:[NSString stringWithUTF8String:fileName] relativeToURL:documentsDirectory];
             } else {
-                url = [NSURL URLWithString:[NSString stringWithUTF8String:fileName]];
+                url = [NSURL fileURLWithPath:[NSString stringWithUTF8String:fileName]];
             }
             ReturnErrorCodeIf(url == nullptr, CHIP_ERROR_NO_MEMORY);
 

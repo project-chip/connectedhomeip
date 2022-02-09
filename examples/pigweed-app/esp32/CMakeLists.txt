@@ -32,6 +32,12 @@ idf_build_set_property(C_COMPILE_OPTIONS "-Os;-DLWIP_IPV6_SCOPES=0" APPEND)
 # flags that depend on -Wformat
 idf_build_set_property(COMPILE_OPTIONS "-Wno-format-nonliteral;-Wno-format-security" APPEND)
 
+# -Wmaybe-uninitialized has too many false positives, including on std::optional
+# and chip::Optional.  Make it nonfatal.
+#
+# See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80635
+idf_build_set_property(COMPILE_OPTIONS "-Wno-error=maybe-uninitialized" APPEND)
+
 get_filename_component(CHIP_ROOT ./third_party/connectedhomeip REALPATH)
 set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
 

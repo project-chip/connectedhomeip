@@ -204,16 +204,10 @@ static constexpr uint16_t kMaxMessagePadding = (chip::Logging::kMaxPrefixLen + c
                                                 chip::Logging::kMaxSeparatorLen + chip::Logging::kMaxTrailerLen);
 
 void GetMessageWithPrefix(char * buf, uint8_t bufSize, uint8_t module, const char * msg);
-void GetModuleName(char * buf, uint8_t bufSize, uint8_t module);
 
 #else
 
 static inline void GetMessageWithPrefix(char * buf, uint8_t bufSize, uint8_t module, const char * msg)
-{
-    return;
-}
-
-static inline void GetModuleName(char * buf, uint8_t bufSize, uint8_t module)
 {
     return;
 }

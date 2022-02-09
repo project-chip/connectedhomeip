@@ -23,7 +23,8 @@
 class DiscoverCommissionablesCommand : public CHIPCommand, public chip::Controller::DeviceDiscoveryDelegate
 {
 public:
-    DiscoverCommissionablesCommand() : CHIPCommand("commissionables") {}
+    DiscoverCommissionablesCommand(CredentialIssuerCommands * credsIssuerConfig) : CHIPCommand("commissionables", credsIssuerConfig)
+    {}
 
     /////////// DeviceDiscoveryDelegate Interface /////////
     void OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData) override;

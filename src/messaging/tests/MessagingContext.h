@@ -31,10 +31,41 @@ namespace chip {
 namespace Test {
 
 /**
+ * @brief
+ *  Test contexts that use Platform::Memory and might call Free() on destruction can inherit from this class and call its Init().
+ *  Platform::MemoryShutdown() will then be called after the subclasses' destructor.
+ */
+class PlatformMemoryUser
+{
+public:
+    PlatformMemoryUser() : mInitialized(false) {}
+    ~PlatformMemoryUser()
+    {
+        if (mInitialized)
+        {
+            chip::Platform::MemoryShutdown();
+        }
+    }
+    CHIP_ERROR Init()
+    {
+        CHIP_ERROR status = CHIP_NO_ERROR;
+        if (!mInitialized)
+        {
+            status       = chip::Platform::MemoryInit();
+            mInitialized = (status == CHIP_NO_ERROR);
+        }
+        return status;
+    }
+
+private:
+    bool mInitialized;
+};
+
+/**
  * @brief The context of test cases for messaging layer. It wil initialize network layer and system layer, and create
  *        two secure sessions, connected with each other. Exchanges can be created for each secure session.
  */
-class MessagingContext
+class MessagingContext : public PlatformMemoryUser
 {
 public:
     MessagingContext() :
@@ -120,7 +151,7 @@ private:
     NodeId mAliceNodeId     = 111222333;
     uint16_t mBobKeyId      = 1;
     uint16_t mAliceKeyId    = 2;
-    GroupId mFriendsGroupId = 517;
+    GroupId mFriendsGroupId = 0x0101;
     Transport::PeerAddress mAliceAddress;
     Transport::PeerAddress mBobAddress;
     SecurePairingUsingTestSecret mPairingAliceToBob;
@@ -201,6 +232,20 @@ public:
     {
         auto & impl = GetLoopback();
         impl.EnableAsyncDispatch(&mIOContext.GetSystemLayer());
+    }
+
+    /*
+     * Reset the dispatch back to a model that synchronously dispatches received messages up the stack.
+     *
+     * NOTE: This results in highly atypical/complex call stacks that are not representative of what happens on real
+     * devices and can cause subtle and complex bugs to either appear or get masked in the system. Where possible, please
+     * use this sparingly!
+     *
+     */
+    void DisableAsyncDispatch()
+    {
+        auto & impl = GetLoopback();
+        impl.DisableAsyncDispatch();
     }
 
     /*

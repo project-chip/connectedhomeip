@@ -54,6 +54,7 @@ shared_library("ChipDeviceCtrl") {
       "ChipDeviceController-ScriptDevicePairingDelegate.h",
       "ChipDeviceController-StorageDelegate.cpp",
       "ChipDeviceController-StorageDelegate.h",
+      "OpCredsBinding.cpp",
       "chip/clusters/attribute.cpp",
       "chip/clusters/command.cpp",
       "chip/discovery/NodeResolution.cpp",
@@ -124,6 +125,7 @@ pw_python_action("python") {
         "chip/ChipReplStartup.py",
         "chip/ChipStack.py",
         "chip/ChipUtility.py",
+        "chip/FabricAdmin.py",
         "chip/__init__.py",
         "chip/ble/__init__.py",
         "chip/ble/commissioning/__init__.py",
@@ -156,6 +158,7 @@ pw_python_action("python") {
         "chip/native/__init__.py",
         "chip/setup_payload/__init__.py",
         "chip/setup_payload/setup_payload.py",
+        "chip/storage/__init__.py",
         "chip/tlv/__init__.py",
       ]
 

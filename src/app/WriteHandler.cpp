@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include "messaging/ExchangeContext.h"
 #include <app/AppBuildConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/EventPathIB.h>
@@ -48,18 +49,65 @@ CHIP_ERROR WriteHandler::Init()
     return CHIP_NO_ERROR;
 }
 
-void WriteHandler::Shutdown()
+void WriteHandler::Close()
 {
     VerifyOrReturn(mState != State::Uninitialized);
+
     mMessageWriter.Reset();
-    mpExchangeCtx = nullptr;
+
+    if (mpExchangeCtx != nullptr)
+    {
+        mpExchangeCtx->SetDelegate(nullptr);
+        mpExchangeCtx = nullptr;
+    }
+
     ClearState();
+}
+
+void WriteHandler::Abort()
+{
+#if 0
+    // TODO: When chunking gets added, we should add this back.
+    //
+    // If the exchange context hasn't already been gracefully closed
+    // (signaled by setting it to null), then we need to forcibly
+    // tear it down.
+    //
+    if (mpExchangeCtx != nullptr)
+    {
+        // We might be a delegate for this exchange, and we don't want the
+        // OnExchangeClosing notification in that case.  Null out the delegate
+        // to avoid that.
+        //
+        // TODO: This makes all sorts of assumptions about what the delegate is
+        // (notice the "might" above!) that might not hold in practice.  We
+        // really need a better solution here....
+        mpExchangeCtx->SetDelegate(nullptr);
+        mpExchangeCtx->Abort();
+        mpExchangeCtx = nullptr;
+    }
+
+    ClearState();
+#else
+    //
+    // The WriteHandler should get synchronously allocated and destroyed in the same execution
+    // context given that it's just a 2 message exchange (request + response). Consequently, we should
+    // never arrive at a situation where we have active handlers at any time Abort() is called.
+    //
+    VerifyOrDie(mState == State::Uninitialized);
+#endif
 }
 
 Status WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload,
                                     bool aIsTimedWrite)
 {
     mpExchangeCtx = apExchangeContext;
+
+    //
+    // Let's take over further message processing on this exchange from the IM.
+    // This is only relevant during chunked requests.
+    //
+    mpExchangeCtx->SetDelegate(this);
 
     Status status = ProcessWriteRequest(std::move(aPayload), aIsTimedWrite);
 
@@ -73,8 +121,35 @@ Status WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeConte
         }
     }
 
-    Shutdown();
+    Close();
     return status;
+}
+
+CHIP_ERROR WriteHandler::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                           System::PacketBufferHandle && aPayload)
+{
+    //
+    // As part of write handling, the exchange should get closed sychronously given there is always
+    // just a single response to a Write Request message before the exchange gets closed. There-after,
+    // even if we get any more messages on that exchange from a non-compliant client, our exchange layer
+    // should correctly discard those. If there is a bug there, this function here may get invoked.
+    //
+    // NOTE: Once chunking gets implemented, this will no longer be true.
+    //
+    VerifyOrDieWithMsg(false, DataManagement, "This function should never get invoked");
+}
+
+void WriteHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
+{
+    //
+    // As part of write handling, the exchange should get closed sychronously given there is always
+    // just a single response to a Write Request message before the exchange gets closed. That response
+    // does not solicit any further responses back. Consequently, we never expect to get notified
+    // of any response timeouts.
+    //
+    // NOTE: Once chunking gets implemented, this will no longer be true.
+    //
+    VerifyOrDieWithMsg(false, DataManagement, "This function should never get invoked");
 }
 
 CHIP_ERROR WriteHandler::FinalizeMessage(System::PacketBufferHandle & packet)
@@ -404,17 +479,7 @@ CHIP_ERROR WriteHandler::AddStatus(const ConcreteAttributePath & aPath, const St
 
 FabricIndex WriteHandler::GetAccessingFabricIndex() const
 {
-    FabricIndex fabric = kUndefinedFabricIndex;
-    if (mpExchangeCtx->GetSessionHandle()->IsGroupSession())
-    {
-        fabric = mpExchangeCtx->GetSessionHandle()->AsGroupSession()->GetFabricIndex();
-    }
-    else
-    {
-        fabric = mpExchangeCtx->GetSessionHandle()->AsSecureSession()->GetFabricIndex();
-    }
-
-    return fabric;
+    return mpExchangeCtx->GetSessionHandle()->GetFabricIndex();
 }
 
 const char * WriteHandler::GetStateStr() const

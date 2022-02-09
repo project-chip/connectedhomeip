@@ -17,7 +17,7 @@
 
 #import "RootViewController.h"
 #import "BindingsViewController.h"
-#import "EchoViewController.h"
+#import "EnumerateViewController.h"
 #import "FabricUIViewController.h"
 #import "MultiAdminViewController.h"
 #import "OnOffViewController.h"
@@ -42,7 +42,7 @@
     self.tableView.dataSource = self;
     [self.view addSubview:self.tableView];
     self.options = @[
-        @"QRCode scanner", @"Echo client", @"Light on / off cluster", @"Temperature Sensor", @"Bindings", @"WiFi Configuration",
+        @"QRCode scanner", @"Enumeration", @"Light on / off cluster", @"Temperature Sensor", @"Bindings", @"WiFi Configuration",
         @"Enable Pairing", @"Unpair Devices", @"Fabric Management"
     ];
 }
@@ -73,7 +73,7 @@
         [self pushQRCodeScanner];
         break;
     case 1:
-        [self pushEchoClient];
+        [self pushEnumeration];
         break;
     case 2:
         [self pushLightOnOffCluster];
@@ -131,9 +131,9 @@
     [self.navigationController pushViewController:controller animated:YES];
 }
 
-- (void)pushEchoClient
+- (void)pushEnumeration
 {
-    EchoViewController * controller = [EchoViewController new];
+    EnumerateViewController * controller = [EnumerateViewController new];
     [self.navigationController pushViewController:controller animated:YES];
 }
 

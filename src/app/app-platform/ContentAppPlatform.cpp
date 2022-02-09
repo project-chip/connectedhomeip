@@ -24,8 +24,6 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/app-platform/ContentAppPlatform.h>
-#include <cstdio>
-#include <inttypes.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CHIPArgParser.hpp>
@@ -33,6 +31,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ZclString.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <zap-generated/CHIPClusters.h>
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
@@ -46,7 +45,7 @@ using GetSetupPINResponseType = app::Clusters::AccountLogin::Commands::GetSetupP
 #define DEVICE_VERSION_DEFAULT 1
 
 EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
-                                                   EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
+                                                   const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
                                                    uint16_t maxReadLength)
 {
     uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
@@ -65,7 +64,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
 }
 
 EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
-                                                    EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
+                                                    const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
 {
     uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
 
@@ -85,7 +84,8 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
 namespace chip {
 namespace AppPlatform {
 
-EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep, uint16_t deviceType)
+EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep, uint16_t deviceType,
+                                             const Span<DataVersion> & dataVersionStorage)
 {
     CatalogVendorApp vendorApp = app->GetApplicationBasicDelegate()->GetCatalogVendorApp();
 
@@ -111,7 +111,8 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
             EmberAfStatus ret;
             while (1)
             {
-                ret = emberAfSetDynamicEndpoint(index, mCurrentEndpointId, ep, deviceType, DEVICE_VERSION_DEFAULT);
+                ret = emberAfSetDynamicEndpoint(index, mCurrentEndpointId, ep, deviceType, DEVICE_VERSION_DEFAULT,
+                                                dataVersionStorage);
                 if (ret == EMBER_ZCL_STATUS_SUCCESS)
                 {
                     ChipLogProgress(DeviceLayer, "Added ContentApp %s to dynamic endpoint %d (index=%d)", vendorApp.applicationId,
@@ -194,7 +195,7 @@ void ContentAppPlatform::SetupAppPlatform()
     // emberAfEndpointEnableDisable(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1)), false);
 }
 
-ContentApp * ContentAppPlatform::GetContentAppInternal(CatalogVendorApp vendorApp)
+ContentApp * ContentAppPlatform::GetContentAppInternal(const CatalogVendorApp & vendorApp)
 {
     if (vendorApp.catalogVendorId != mContentAppFactory->GetPlatformCatalogVendorId())
     {
@@ -213,7 +214,7 @@ ContentApp * ContentAppPlatform::GetContentAppInternal(CatalogVendorApp vendorAp
     return nullptr;
 }
 
-ContentApp * ContentAppPlatform::LoadContentAppInternal(CatalogVendorApp vendorApp)
+ContentApp * ContentAppPlatform::LoadContentAppInternal(const CatalogVendorApp & vendorApp)
 {
     ContentApp * app = GetContentAppInternal(vendorApp);
     if (app != nullptr)
@@ -239,10 +240,10 @@ ContentApp * ContentAppPlatform::LoadContentAppByClient(uint16_t vendorId, uint1
                         vendorId, productId);
         return nullptr;
     }
-    return LoadContentAppInternal(vendorApp);
+    return LoadContentAppInternal(&vendorApp);
 }
 
-ContentApp * ContentAppPlatform::LoadContentApp(CatalogVendorApp vendorApp)
+ContentApp * ContentAppPlatform::LoadContentApp(const CatalogVendorApp & vendorApp)
 {
     if (vendorApp.catalogVendorId == mContentAppFactory->GetPlatformCatalogVendorId())
     {
@@ -256,10 +257,10 @@ ContentApp * ContentAppPlatform::LoadContentApp(CatalogVendorApp vendorApp)
                         vendorApp.catalogVendorId, vendorApp.applicationId);
         return nullptr;
     }
-    return LoadContentAppInternal(destinationApp);
+    return LoadContentAppInternal(&destinationApp);
 }
 
-ContentApp * ContentAppPlatform::GetContentApp(CatalogVendorApp vendorApp)
+ContentApp * ContentAppPlatform::GetContentApp(const CatalogVendorApp & vendorApp)
 {
     if (vendorApp.catalogVendorId == mContentAppFactory->GetPlatformCatalogVendorId())
     {
@@ -273,7 +274,7 @@ ContentApp * ContentAppPlatform::GetContentApp(CatalogVendorApp vendorApp)
                         vendorApp.catalogVendorId, vendorApp.applicationId);
         return nullptr;
     }
-    return GetContentAppInternal(destinationApp);
+    return GetContentAppInternal(&destinationApp);
 }
 
 ContentApp * ContentAppPlatform::GetContentApp(EndpointId id)
@@ -384,6 +385,26 @@ uint32_t ContentAppPlatform::GetPincodeFromContentApp(uint16_t vendorId, uint16_
 
     char * eptr;
     return (uint32_t) strtol(pinString.c_str(), &eptr, 10);
+}
+
+CHIP_ERROR ContentAppPlatform::CreateBindingWithCallback(OperationalDeviceProxy * device, chip::EndpointId deviceEndpointId,
+                                                         chip::NodeId bindingNodeId, chip::GroupId bindingGroupId,
+                                                         chip::EndpointId bindingEndpointId, chip::ClusterId bindingClusterId,
+                                                         CommandResponseSuccessCallback<app::DataModel::NullObjectType> successCb,
+                                                         CommandResponseFailureCallback failureCb)
+{
+    chip::Controller::BindingCluster cluster;
+    cluster.Associate(device, deviceEndpointId);
+
+    Binding::Commands::Bind::Type request;
+    request.nodeId     = bindingNodeId;
+    request.groupId    = bindingGroupId;
+    request.endpointId = bindingEndpointId;
+    request.clusterId  = bindingClusterId;
+    ReturnErrorOnFailure(cluster.InvokeCommand(request, this, successCb, failureCb));
+
+    ChipLogDetail(Controller, "CreateBindingWithCallback: Sent Bind command request, waiting for response");
+    return CHIP_NO_ERROR;
 }
 
 } // namespace AppPlatform
