@@ -145,20 +145,6 @@ const EmberAfEndpointType * emberAfFindEndpointType(chip::EndpointId endpointId)
 const EmberAfCluster * emberAfFindClusterInType(const EmberAfEndpointType * endpointType, chip::ClusterId clusterId,
                                                 EmberAfClusterMask mask, uint8_t * index = nullptr);
 
-// For a given cluster and mask, retrieves the list of endpoints sorted by endpoint that contain the matching cluster and returns
-// the index within that list that matches the given endpoint.
-//
-// Mask is either CLUSTER_MASK_CLIENT or CLUSTER_MASK_SERVER
-// For example, if you have 3 endpoints, 10, 11, 12, and cluster X server is
-// located on 11 and 12, and cluster Y server is located only on 10 then
-//    clusterIndex(X,11,CLUSTER_MASK_SERVER) returns 0,
-//    clusterIndex(X,12,CLUSTER_MASK_SERVER) returns 1,
-//    clusterIndex(X,10,CLUSTER_MASK_SERVER) returns 0xFF
-//    clusterIndex(Y,10,CLUSTER_MASK_SERVER) returns 0
-//    clusterIndex(Y,11,CLUSTER_MASK_SERVER) returns 0xFF
-//    clusterIndex(Y,12,CLUSTER_MASK_SERVER) returns 0xFF
-uint8_t emberAfClusterIndexInMatchingEndpoints(chip::EndpointId endpoint, chip::ClusterId clusterId, EmberAfClusterMask mask);
-
 //
 // Given a cluster ID, endpoint ID and a cluster mask, finds a matching cluster within that endpoint
 // with a matching mask. If one is found, the relative index of that cluster within the list of clusters on that
@@ -239,6 +225,8 @@ void emberAfClusterMessageSentCallback(const chip::MessageSendDestination & dest
 // returns true if the mask matches a passed interval
 bool emberAfCheckTick(EmberAfClusterMask mask, uint8_t passedMask);
 
+// Check whether there is an endpoint defined with the given endpoint id that is
+// enabled.
 bool emberAfEndpointIsEnabled(chip::EndpointId endpoint);
 
 // Note the difference in implementation from emberAfGetNthCluster().

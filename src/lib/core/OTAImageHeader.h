@@ -18,12 +18,14 @@
 #pragma once
 
 #include <lib/core/Optional.h>
+#include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
 
 #include <cstdint>
 
 namespace chip {
 
+/// File signature (aka magic number) of a valid Matter OTA image
 constexpr uint32_t kOTAImageFileIdentifier = 0x1BEEF11E;
 
 enum class OTAImageDigestType : uint8_t
@@ -44,8 +46,6 @@ enum class OTAImageDigestType : uint8_t
 
 struct OTAImageHeader
 {
-    uint64_t mTotalSize;
-    uint32_t mHeaderSize;
     uint16_t mVendorId;
     uint16_t mProductId;
     uint32_t mSoftwareVersion;
@@ -58,6 +58,65 @@ struct OTAImageHeader
     ByteSpan mImageDigest;
 };
 
-CHIP_ERROR DecodeOTAImageHeader(ByteSpan buffer, OTAImageHeader & header);
+class OTAImageHeaderParser
+{
+public:
+    /**
+     * @brief Prepare the parser for accepting Matter OTA image chunks.
+     *
+     * The method can be called many times to reset the parser state.
+     */
+    void Init();
+
+    /**
+     * @brief Clear all resources associated with the parser.
+     */
+    void Clear();
+
+    /**
+     * @brief Returns if the parser is ready to accept subsequent Matter OTA image chunks.
+     */
+    bool IsInitialized() const { return mState != State::kNotInitialized; }
+
+    /**
+     * @brief Decode Matter OTA image header
+     *
+     * The method takes subsequent chunks of the Matter OTA image file and decodes the header when
+     * enough data has been provided. If more image chunks are needed, CHIP_ERROR_BUFFER_TOO_SMALL
+     * error is returned. Other error codes indicate that the header is invalid.
+     *
+     * @param buffer Byte span containing a subsequent Matter OTA image chunk. When the method
+     *               returns CHIP_NO_ERROR, the byte span is used to return a remaining part
+     *               of the chunk, not used by the header.
+     * @param header Structure to store results of the operation. Note that the results must not be
+     *               referenced after the parser is cleared since string members of the structure
+     *               are only shallow-copied by the method.
+     *
+     * @retval CHIP_NO_ERROR                        Header has been decoded successfully.
+     * @retval CHIP_ERROR_BUFFER_TOO_SMALL          Provided buffers are insufficient to decode the
+     *                                              header. A user is expected call the method again
+     *                                              when the next image chunk is available.
+     * @retval CHIP_ERROR_INVALID_FILE_IDENTIFIER   Not a Matter OTA image file.
+     * @retval Error code                           Encoded header is invalid.
+     */
+    CHIP_ERROR AccumulateAndDecode(ByteSpan & buffer, OTAImageHeader & header);
+
+private:
+    enum State
+    {
+        kNotInitialized,
+        kInitialized,
+        kTlv
+    };
+
+    void Append(ByteSpan & buffer, uint32_t numBytes);
+    CHIP_ERROR DecodeFixed();
+    CHIP_ERROR DecodeTlv(OTAImageHeader & header);
+
+    State mState;
+    uint32_t mHeaderTlvSize;
+    uint32_t mBufferOffset;
+    Platform::ScopedMemoryBuffer<uint8_t> mBuffer;
+};
 
 } // namespace chip

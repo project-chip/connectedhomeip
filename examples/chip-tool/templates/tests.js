@@ -202,7 +202,7 @@ function getTests()
   ];
 
   const ThreadNetworkDiagnostics = [
-    'Test_TC_DIAGTH_1_1',
+    'Test_TC_DIAG_TH_NW_1_1',
   ];
 
   const WiFiNetworkDiagnostics = [
@@ -241,7 +241,6 @@ function getTests()
     'TestClusterComplexTypes',
     'TestConstraints',
     'TestDelayCommands',
-    'TestDiscovery',
     'TestLogCommands',
     'TestSaveAs',
     'TestConfigVariables',

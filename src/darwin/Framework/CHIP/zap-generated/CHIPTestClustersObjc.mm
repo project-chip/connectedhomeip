@@ -3110,13 +3110,93 @@ using namespace chip::app::Clusters;
                         auto element_0 = (CHIPChannelClusterChannelInfo *) value[i_0];
                         listHolder_0->mList[i_0].majorNumber = element_0.majorNumber.unsignedShortValue;
                         listHolder_0->mList[i_0].minorNumber = element_0.minorNumber.unsignedShortValue;
-                        listHolder_0->mList[i_0].name = [self asCharSpan:element_0.name];
-                        listHolder_0->mList[i_0].callSign = [self asCharSpan:element_0.callSign];
-                        listHolder_0->mList[i_0].affiliateCallSign = [self asCharSpan:element_0.affiliateCallSign];
+                        if (element_0.name != nil) {
+                            auto & definedValue_2 = listHolder_0->mList[i_0].name.Emplace();
+                            definedValue_2 = [self asCharSpan:element_0.name];
+                        }
+                        if (element_0.callSign != nil) {
+                            auto & definedValue_2 = listHolder_0->mList[i_0].callSign.Emplace();
+                            definedValue_2 = [self asCharSpan:element_0.callSign];
+                        }
+                        if (element_0.affiliateCallSign != nil) {
+                            auto & definedValue_2 = listHolder_0->mList[i_0].affiliateCallSign.Emplace();
+                            definedValue_2 = [self asCharSpan:element_0.affiliateCallSign];
+                        }
                     }
                     cppValue = ListType_0(listHolder_0->mList, value.count);
                 } else {
                     cppValue = ListType_0();
+                }
+            }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeChannelLineupWithValue:(CHIPChannelClusterLineupInfo * _Nullable)value
+                           completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = Channel::Attributes::ChannelLineup::TypeInfo;
+            TypeInfo::Type cppValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0.operatorName = [self asCharSpan:value.operatorName];
+                if (value.lineupName != nil) {
+                    auto & definedValue_2 = nonNullValue_0.lineupName.Emplace();
+                    definedValue_2 = [self asCharSpan:value.lineupName];
+                }
+                if (value.postalCode != nil) {
+                    auto & definedValue_2 = nonNullValue_0.postalCode.Emplace();
+                    definedValue_2 = [self asCharSpan:value.postalCode];
+                }
+                nonNullValue_0.lineupInfoType = static_cast<std::remove_reference_t<decltype(nonNullValue_0.lineupInfoType)>>(
+                    value.lineupInfoType.unsignedCharValue);
+            }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeCurrentChannelWithValue:(CHIPChannelClusterChannelInfo * _Nullable)value
+                            completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = Channel::Attributes::CurrentChannel::TypeInfo;
+            TypeInfo::Type cppValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0.majorNumber = value.majorNumber.unsignedShortValue;
+                nonNullValue_0.minorNumber = value.minorNumber.unsignedShortValue;
+                if (value.name != nil) {
+                    auto & definedValue_2 = nonNullValue_0.name.Emplace();
+                    definedValue_2 = [self asCharSpan:value.name];
+                }
+                if (value.callSign != nil) {
+                    auto & definedValue_2 = nonNullValue_0.callSign.Emplace();
+                    definedValue_2 = [self asCharSpan:value.callSign];
+                }
+                if (value.affiliateCallSign != nil) {
+                    auto & definedValue_2 = nonNullValue_0.affiliateCallSign.Emplace();
+                    definedValue_2 = [self asCharSpan:value.affiliateCallSign];
                 }
             }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
@@ -8705,7 +8785,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeStartTimeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeStartTimeWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -8716,14 +8796,19 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = MediaPlayback::Attributes::StartTime::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedLongLongValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.unsignedLongLongValue;
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)writeAttributeDurationWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeDurationWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -8734,7 +8819,37 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = MediaPlayback::Attributes::Duration::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedLongLongValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.unsignedLongLongValue;
+            }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributePositionWithValue:(CHIPMediaPlaybackClusterPlaybackPosition * _Nonnull)value
+                      completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = MediaPlayback::Attributes::Position::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue.updatedAt = value.updatedAt.unsignedLongLongValue;
+            if (value.position == nil) {
+                cppValue.position.SetNull();
+            } else {
+                auto & nonNullValue_1 = cppValue.position.SetNonNull();
+                nonNullValue_1 = value.position.unsignedLongLongValue;
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -8759,7 +8874,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeSeekRangeEndWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeSeekRangeEndWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -8770,14 +8885,19 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = MediaPlayback::Attributes::SeekRangeEnd::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedLongLongValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.unsignedLongLongValue;
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)writeAttributeSeekRangeStartWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeSeekRangeStartWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -8788,7 +8908,12 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = MediaPlayback::Attributes::SeekRangeStart::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedLongLongValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.unsignedLongLongValue;
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);

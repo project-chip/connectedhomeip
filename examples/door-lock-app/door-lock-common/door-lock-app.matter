@@ -580,6 +580,7 @@ server cluster DoorLock = 257 {
   attribute boolean enablePrivacyModeButton = 43;
   attribute int8u wrongCodeEntryLimit = 48;
   attribute int8u userCodeTemporaryDisableTime = 49;
+  attribute boolean requirePINforRemoteOperation = 51;
   readonly global attribute bitmap32 featureMap = 65532;
   readonly global attribute int16u clusterRevision = 65533;
 

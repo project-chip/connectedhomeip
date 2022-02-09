@@ -21,11 +21,13 @@
 #include "esp_spi_flash.h"
 #include "esp_spiffs.h"
 #include "nvs_flash.h"
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/ESP32/NetworkCommissioningDriver.h>
 
 #include <OTAProviderCommands.h>
 #include <app/clusters/ota-provider/ota-provider.h>
@@ -61,6 +63,20 @@ static OTAProviderExample otaProvider;
 chip::Callback::Callback<OnBdxBlockQuery> onBlockQueryCallback(OnBlockQuery, nullptr);
 chip::Callback::Callback<OnBdxTransferComplete> onTransferCompleteCallback(OnTransferComplete, nullptr);
 chip::Callback::Callback<OnBdxTransferFailed> onTransferFailedCallback(OnTransferFailed, nullptr);
+
+app::Clusters::NetworkCommissioning::Instance
+    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
+
+static void InitServer(intptr_t context)
+{
+    chip::Server::GetInstance().Init();
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+
+    sWiFiNetworkCommissioningInstance.Init();
+}
+
 } // namespace
 
 CHIP_ERROR OnBlockQuery(void * context, chip::System::PacketBufferHandle & blockBuf, size_t & size, bool & isEof, uint32_t offset)
@@ -136,10 +152,7 @@ extern "C" void app_main()
         return;
     }
 
-    chip::Server::GetInstance().Init();
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 
     BdxOtaSender * bdxOtaSender = otaProvider.GetBdxOtaSender();
     VerifyOrReturn(bdxOtaSender != nullptr, ESP_LOGE(TAG, "bdxOtaSender is nullptr"));

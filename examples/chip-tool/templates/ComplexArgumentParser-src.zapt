@@ -9,7 +9,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, {{zapTypeToEncodable
 
     {{#zcl_struct_items}}
     {{#unless isOptional}}
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("{{parent.name}}.{{asLowerCamelCase label}}", value.isMember("{{asLowerCamelCase label}}")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("{{parent.name}}.{{asLowerCamelCase label}}", "{{asLowerCamelCase label}}", value.isMember("{{asLowerCamelCase label}}")));
     {{/unless}}
     {{/zcl_struct_items}}
 

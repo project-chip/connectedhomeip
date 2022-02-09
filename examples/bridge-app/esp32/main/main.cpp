@@ -22,6 +22,7 @@
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/reporting/reporting.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -30,6 +31,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/ErrorStr.h>
+#include <platform/ESP32/NetworkCommissioningDriver.h>
 
 #include <app/server/Server.h>
 
@@ -42,6 +44,11 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::Platform;
 
 static DeviceCallbacks AppCallback;
+
+namespace {
+app::Clusters::NetworkCommissioning::Instance
+    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
+} // namespace
 
 static const int kNodeLabelSize = 32;
 // Current ZCL implementation of Struct uses a max-size array of 254 bytes
@@ -367,6 +374,8 @@ static void InitServer(intptr_t context)
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+
+    sWiFiNetworkCommissioningInstance.Init();
 
     // Set starting endpoint id where dynamic endpoints will be assigned, which
     // will be the next consecutive endpoint id after the last fixed endpoint.

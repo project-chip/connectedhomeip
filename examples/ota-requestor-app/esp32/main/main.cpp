@@ -28,9 +28,11 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "nvs_flash.h"
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/OTARequestor.h>
 #include <app/server/Server.h>
+#include <platform/ESP32/NetworkCommissioningDriver.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -55,6 +57,20 @@ OTARequestor gRequestorCore;
 GenericOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
+
+app::Clusters::NetworkCommissioning::Instance
+    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
+
+static void InitServer(intptr_t context)
+{
+    chip::Server::GetInstance().Init();
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+
+    sWiFiNetworkCommissioningInstance.Init();
+}
+
 } // namespace
 
 extern "C" void app_main()
@@ -89,10 +105,7 @@ extern "C" void app_main()
         return;
     }
 
-    chip::Server::GetInstance().Init();
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 
     SetRequestorInstance(&gRequestorCore);
     gRequestorCore.Init(&(Server::GetInstance()), &gRequestorUser, &gDownloader);
