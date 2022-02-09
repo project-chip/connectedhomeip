@@ -82,7 +82,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
                 TAG,
                 "Failed to resolve service '" + serviceInfo.getServiceName() + "': " + errorCode);
             chipMdnsCallback.handleServiceResolve(
-                instanceName, serviceType, null, 0, callbackHandle, contextHandle);
+                instanceName, serviceType, null, null, 0, null, callbackHandle, contextHandle);
 
             if (multicastLock.isHeld()) {
               multicastLock.release();
@@ -102,8 +102,10 @@ public class NsdManagerServiceResolver implements ServiceResolver {
             chipMdnsCallback.handleServiceResolve(
                 instanceName,
                 serviceType,
+                serviceInfo.getHost().getHostName(),
                 serviceInfo.getHost().getHostAddress(),
                 serviceInfo.getPort(),
+                serviceInfo.getAttributes(),
                 callbackHandle,
                 contextHandle);
 

@@ -25,6 +25,7 @@ public final class AndroidChipPlatform {
       KeyValueStoreManager kvm,
       ConfigurationManager cfg,
       ServiceResolver resolver,
+      ServiceBrowser browser,
       ChipMdnsCallback chipMdnsCallback) {
     // Order is important here: initChipStack() initializes the BLEManagerImpl, which depends on the
     // BLEManager being set. setConfigurationManager() depends on the CHIP stack being initialized.
@@ -32,7 +33,7 @@ public final class AndroidChipPlatform {
     initChipStack();
     setKeyValueStoreManager(kvm);
     setConfigurationManager(cfg);
-    setServiceResolver(resolver, chipMdnsCallback);
+    setDnssdDelegates(resolver, browser, chipMdnsCallback);
   }
 
   // for BLEManager
@@ -78,13 +79,14 @@ public final class AndroidChipPlatform {
   /** Initialize the CHIP stack. */
   private native void initChipStack();
 
-  // for ServiceResolver
-  private void setServiceResolver(ServiceResolver resolver, ChipMdnsCallback chipMdnsCallback) {
+  // for DnssdDelegates
+  private void setDnssdDelegates(
+      ServiceResolver resolver, ServiceBrowser browser, ChipMdnsCallback chipMdnsCallback) {
     if (resolver != null) {
-      nativeSetServiceResolver(resolver, chipMdnsCallback);
+      nativeSetDnssdDelegates(resolver, browser, chipMdnsCallback);
     }
   }
 
-  private native void nativeSetServiceResolver(
-      ServiceResolver resolver, ChipMdnsCallback chipMdnsCallback);
+  private native void nativeSetDnssdDelegates(
+      ServiceResolver resolver, ServiceBrowser browser, ChipMdnsCallback chipMdnsCallback);
 }
