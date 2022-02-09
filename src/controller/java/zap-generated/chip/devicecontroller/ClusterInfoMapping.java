@@ -1052,31 +1052,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedBindingClusterBindingListAttributeCallback
-      implements ChipClusters.BindingCluster.BindingListAttributeCallback,
-          DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<ChipStructs.BindingClusterBindingEntry> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo =
-          new CommandResponseInfo("valueList", "List<ChipStructs.BindingClusterBindingEntry>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedBindingClusterServerGeneratedCommandListAttributeCallback
       implements ChipClusters.BindingCluster.ServerGeneratedCommandListAttributeCallback,
           DelegatedClusterCallback {
@@ -1623,11 +1598,11 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer status, String data) {
+    public void onSuccess(Integer status, Optional<String> data) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
       responseValues.put(statusResponseValue, status);
-      CommandResponseInfo dataResponseValue = new CommandResponseInfo("data", "String");
+      CommandResponseInfo dataResponseValue = new CommandResponseInfo("data", "Optional<String>");
       responseValues.put(dataResponseValue, data);
       callback.onSuccess(responseValues);
     }
@@ -5695,11 +5670,11 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer status, String data) {
+    public void onSuccess(Integer status, Optional<String> data) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
       responseValues.put(statusResponseValue, status);
-      CommandResponseInfo dataResponseValue = new CommandResponseInfo("data", "String");
+      CommandResponseInfo dataResponseValue = new CommandResponseInfo("data", "Optional<String>");
       responseValues.put(dataResponseValue, data);
       callback.onSuccess(responseValues);
     }
@@ -7644,7 +7619,7 @@ public class ClusterInfoMapping {
     Map<String, CommandParameterInfo> applicationLauncherlaunchAppRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo applicationLauncherlaunchAppRequestdataCommandParameterInfo =
-        new CommandParameterInfo("data", byte[].class);
+        new CommandParameterInfo("data", Optional.class);
     applicationLauncherlaunchAppRequestCommandParams.put(
         "data", applicationLauncherlaunchAppRequestdataCommandParameterInfo);
 
@@ -7656,7 +7631,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.ApplicationLauncherCluster.LauncherResponseCallback) callback,
                       (ChipStructs.ApplicationLauncherClusterApplication)
                           commandArguments.get("application"),
-                      (byte[]) commandArguments.get("data"));
+                      (Optional<byte[]>) commandArguments.get("data"));
             },
             () -> new DelegatedLauncherResponseCallback(),
             applicationLauncherlaunchAppRequestCommandParams);
@@ -7761,6 +7736,70 @@ public class ClusterInfoMapping {
     Map<String, InteractionInfo> binaryInputBasicClusterInteractionInfoMap = new LinkedHashMap<>();
     commandMap.put("binaryInputBasic", binaryInputBasicClusterInteractionInfoMap);
     Map<String, InteractionInfo> bindingClusterInteractionInfoMap = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> bindingbindCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo bindingbindnodeIdCommandParameterInfo =
+        new CommandParameterInfo("nodeId", Long.class);
+    bindingbindCommandParams.put("nodeId", bindingbindnodeIdCommandParameterInfo);
+
+    CommandParameterInfo bindingbindgroupIdCommandParameterInfo =
+        new CommandParameterInfo("groupId", Integer.class);
+    bindingbindCommandParams.put("groupId", bindingbindgroupIdCommandParameterInfo);
+
+    CommandParameterInfo bindingbindendpointIdCommandParameterInfo =
+        new CommandParameterInfo("endpointId", Integer.class);
+    bindingbindCommandParams.put("endpointId", bindingbindendpointIdCommandParameterInfo);
+
+    CommandParameterInfo bindingbindclusterIdCommandParameterInfo =
+        new CommandParameterInfo("clusterId", Long.class);
+    bindingbindCommandParams.put("clusterId", bindingbindclusterIdCommandParameterInfo);
+
+    InteractionInfo bindingbindInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BindingCluster) cluster)
+                  .bind(
+                      (DefaultClusterCallback) callback,
+                      (Long) commandArguments.get("nodeId"),
+                      (Integer) commandArguments.get("groupId"),
+                      (Integer) commandArguments.get("endpointId"),
+                      (Long) commandArguments.get("clusterId"));
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            bindingbindCommandParams);
+    bindingClusterInteractionInfoMap.put("bind", bindingbindInteractionInfo);
+    Map<String, CommandParameterInfo> bindingunbindCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo bindingunbindnodeIdCommandParameterInfo =
+        new CommandParameterInfo("nodeId", Long.class);
+    bindingunbindCommandParams.put("nodeId", bindingunbindnodeIdCommandParameterInfo);
+
+    CommandParameterInfo bindingunbindgroupIdCommandParameterInfo =
+        new CommandParameterInfo("groupId", Integer.class);
+    bindingunbindCommandParams.put("groupId", bindingunbindgroupIdCommandParameterInfo);
+
+    CommandParameterInfo bindingunbindendpointIdCommandParameterInfo =
+        new CommandParameterInfo("endpointId", Integer.class);
+    bindingunbindCommandParams.put("endpointId", bindingunbindendpointIdCommandParameterInfo);
+
+    CommandParameterInfo bindingunbindclusterIdCommandParameterInfo =
+        new CommandParameterInfo("clusterId", Long.class);
+    bindingunbindCommandParams.put("clusterId", bindingunbindclusterIdCommandParameterInfo);
+
+    InteractionInfo bindingunbindInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BindingCluster) cluster)
+                  .unbind(
+                      (DefaultClusterCallback) callback,
+                      (Long) commandArguments.get("nodeId"),
+                      (Integer) commandArguments.get("groupId"),
+                      (Integer) commandArguments.get("endpointId"),
+                      (Long) commandArguments.get("clusterId"));
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            bindingunbindCommandParams);
+    bindingClusterInteractionInfoMap.put("unbind", bindingunbindInteractionInfo);
     commandMap.put("binding", bindingClusterInteractionInfoMap);
     Map<String, InteractionInfo> booleanStateClusterInteractionInfoMap = new LinkedHashMap<>();
     commandMap.put("booleanState", booleanStateClusterInteractionInfoMap);
@@ -8971,7 +9010,7 @@ public class ClusterInfoMapping {
         "autoPlay", contentLauncherlaunchContentRequestautoPlayCommandParameterInfo);
 
     CommandParameterInfo contentLauncherlaunchContentRequestdataCommandParameterInfo =
-        new CommandParameterInfo("data", String.class);
+        new CommandParameterInfo("data", Optional.class);
     contentLauncherlaunchContentRequestCommandParams.put(
         "data", contentLauncherlaunchContentRequestdataCommandParameterInfo);
 
@@ -8981,10 +9020,10 @@ public class ClusterInfoMapping {
               ((ChipClusters.ContentLauncherCluster) cluster)
                   .launchContentRequest(
                       (ChipClusters.ContentLauncherCluster.LaunchResponseCallback) callback,
-                      (Boolean) commandArguments.get("autoPlay"),
-                      (String) commandArguments.get("data"),
                       (ArrayList<ChipStructs.ContentLauncherClusterContentSearch>)
-                          commandArguments.get("search"));
+                          commandArguments.get("search"),
+                      (Boolean) commandArguments.get("autoPlay"),
+                      (Optional<String>) commandArguments.get("data"));
             },
             () -> new DelegatedLaunchResponseCallback(),
             contentLauncherlaunchContentRequestCommandParams);
@@ -8998,7 +9037,7 @@ public class ClusterInfoMapping {
         "contentURL", contentLauncherlaunchURLRequestcontentURLCommandParameterInfo);
 
     CommandParameterInfo contentLauncherlaunchURLRequestdisplayStringCommandParameterInfo =
-        new CommandParameterInfo("displayString", String.class);
+        new CommandParameterInfo("displayString", Optional.class);
     contentLauncherlaunchURLRequestCommandParams.put(
         "displayString", contentLauncherlaunchURLRequestdisplayStringCommandParameterInfo);
 
@@ -9009,8 +9048,8 @@ public class ClusterInfoMapping {
                   .launchURLRequest(
                       (ChipClusters.ContentLauncherCluster.LaunchResponseCallback) callback,
                       (String) commandArguments.get("contentURL"),
-                      (String) commandArguments.get("displayString"),
-                      (ChipStructs.ContentLauncherClusterBrandingInformation)
+                      (Optional<String>) commandArguments.get("displayString"),
+                      (Optional<ChipStructs.ContentLauncherClusterBrandingInformation>)
                           commandArguments.get("brandingInformation"));
             },
             () -> new DelegatedLaunchResponseCallback(),
@@ -11232,7 +11271,7 @@ public class ClusterInfoMapping {
         "target", targetNavigatornavigateTargetRequesttargetCommandParameterInfo);
 
     CommandParameterInfo targetNavigatornavigateTargetRequestdataCommandParameterInfo =
-        new CommandParameterInfo("data", String.class);
+        new CommandParameterInfo("data", Optional.class);
     targetNavigatornavigateTargetRequestCommandParams.put(
         "data", targetNavigatornavigateTargetRequestdataCommandParameterInfo);
 
@@ -11243,7 +11282,7 @@ public class ClusterInfoMapping {
                   .navigateTargetRequest(
                       (ChipClusters.TargetNavigatorCluster.NavigateTargetResponseCallback) callback,
                       (Integer) commandArguments.get("target"),
-                      (String) commandArguments.get("data"));
+                      (Optional<String>) commandArguments.get("data"));
             },
             () -> new DelegatedNavigateTargetResponseCallback(),
             targetNavigatornavigateTargetRequestCommandParams);

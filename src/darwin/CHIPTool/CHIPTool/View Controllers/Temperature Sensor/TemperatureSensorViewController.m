@@ -201,25 +201,18 @@
             if (chipDevice) {
                 CHIPTemperatureMeasurement * cluster =
                     [[CHIPTemperatureMeasurement alloc] initWithDevice:chipDevice endpoint:1 queue:dispatch_get_main_queue()];
-                // TODO - Fix temperature reporting in iOS CHIPTool
-                /*
-                [cluster
-                    subscribeAttributeMeasuredValueWithMinInterval:minIntervalSeconds
-                                                       maxInterval:maxIntervalSeconds
-                                                   responseHandler:^(NSError * error, NSDictionary * values) {
-                                                       if (error == nil)
-                                                           return;
-                                                       NSLog(@"Status: update reportAttributeMeasuredValue completed with error %@",
-                                                           [error description]);
-                                                   }];
+                [cluster subscribeAttributeMeasuredValueWithMinInterval:minIntervalSeconds
+                    maxInterval:maxIntervalSeconds
+                    subscriptionEstablished:^{
 
-                [cluster reportAttributeMeasuredValueWithResponseHandler:^(NSError * error, NSDictionary * values) {
-                    if (error != nil)
-                        return;
-                    NSNumber * value = values[@"value"];
-                    [self updateTempInUI:value.shortValue];
-                }];
-                 */
+                    }
+                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                        if (error) {
+                            NSLog(@"Status: update reportAttributeMeasuredValue completed with error %@", [error description]);
+                            return;
+                        }
+                        [self updateTempInUI:value.shortValue];
+                    }];
             } else {
                 NSLog(@"Status: Failed to establish a connection with the device");
             }

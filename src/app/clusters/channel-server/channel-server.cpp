@@ -125,8 +125,7 @@ class ChannelAttrAccess : public app::AttributeAccessInterface
 public:
     ChannelAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), Channel::Id) {}
 
-    CHIP_ERROR Read(FabricIndex fabricIndex, const app::ConcreteReadAttributePath & aPath,
-                    app::AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
 
 private:
     CHIP_ERROR ReadChannelListAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
@@ -136,8 +135,7 @@ private:
 
 ChannelAttrAccess gChannelAttrAccess;
 
-CHIP_ERROR ChannelAttrAccess::Read(FabricIndex fabricIndex, const app::ConcreteReadAttributePath & aPath,
-                                   app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR ChannelAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder)
 {
     EndpointId endpoint = aPath.mEndpointId;
     Delegate * delegate = GetDelegate(endpoint);

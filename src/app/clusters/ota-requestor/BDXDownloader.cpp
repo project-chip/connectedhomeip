@@ -184,9 +184,7 @@ CHIP_ERROR BDXDownloader::HandleBdxEvent(const chip::bdx::TransferSession::Outpu
     case TransferSession::OutputEventType::kBlockReceived: {
         chip::ByteSpan blockData(outEvent.blockdata.Data, outEvent.blockdata.Length);
         ReturnErrorOnFailure(mImageProcessor->ProcessBlock(blockData));
-        Nullable<uint8_t> percent;
-        mImageProcessor->GetPercentComplete(percent);
-        mStateDelegate->OnUpdateProgressChanged(percent);
+        mStateDelegate->OnUpdateProgressChanged(mImageProcessor->GetPercentComplete());
 
         // TODO: this will cause problems if Finalize() is not guaranteed to do its work after ProcessBlock().
         if (outEvent.blockdata.IsEof)
