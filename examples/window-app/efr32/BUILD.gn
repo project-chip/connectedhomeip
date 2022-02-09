@@ -140,8 +140,8 @@ efr32_executable("window_app") {
   ]
 
   if (chip_enable_ota_requestor) {
-    defines += ["EFR32_OTA_ENABLED"]
-    sources += ["${examples_plat_dir}/OTAConfig.cpp"]
+    defines += [ "EFR32_OTA_ENABLED" ]
+    sources += [ "${examples_plat_dir}/OTAConfig.cpp" ]
   }
 
   if (use_rs911x) {
