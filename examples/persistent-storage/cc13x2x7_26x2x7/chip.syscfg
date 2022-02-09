@@ -136,12 +136,6 @@ TRNG1.$name     = "CONFIG_TRNG_0";
 TRNG2.$name     = "CONFIG_TRNG_1";
 TRNG3.$name     = "CONFIG_TRNG_APP";
 
-/* Thread */
-Thread.deviceType         = "ftd";
-Thread.deviceTypeReadOnly = true;
-/* Thread SysConfig generated sources are not used until the upstream modules
- * can be updated to enable CHIP.
- */
 RTOS.name = "FreeRTOS";
 
 /* BLE */

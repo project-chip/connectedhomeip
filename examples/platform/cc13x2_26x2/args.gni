@@ -16,7 +16,6 @@ import("//build_overrides/chip.gni")
 
 import("${chip_root}/src/platform/cc13x2_26x2/args.gni")
 
-chip_openthread_ftd = true
 openthread_config_file = "<OpenThreadConfig.h>"
 openthread_core_config_deps = []
 
