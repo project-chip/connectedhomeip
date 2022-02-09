@@ -125,8 +125,8 @@ else
                 if [ "$1" =~ *"use_rs911x=true"* ] || [ "$1" =~ *"use_wf200=true"* ]; then
                     USE_WIFI=true
                 fi
-                if [ "$1" =~ *"OTA_periodic_query_timeout"* ] ; then
-		    USE_OTA_TIMEOUT=true
+                if [ "$1" =~ *"OTA_periodic_query_timeout"* ]; then
+                    USE_OTA_TIMEOUT=true
                     echo "$OTA_periodic_query_timeout"
                 fi
                 optArgs+=$1" "
