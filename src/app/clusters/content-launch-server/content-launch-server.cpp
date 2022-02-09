@@ -193,8 +193,8 @@ bool emberAfContentLauncherClusterLaunchContentRequestCallback(
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
 
-    auto & autoplay = commandData.autoPlay;
-    auto & data     = commandData.data;
+    auto & autoplay               = commandData.autoPlay;
+    auto & data                   = commandData.data;
     auto & decodableParameterList = commandData.search.parameterList;
 
     app::CommandResponseHelper<Commands::LaunchResponse::Type> responder(commandObj, commandPath);
@@ -237,7 +237,8 @@ bool emberAfContentLauncherClusterLaunchURLRequestCallback(
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
     {
         delegate->HandleLaunchUrl(responder, contentUrl, displayString.HasValue() ? displayString.Value() : CharSpan(),
-                                  brandingInformation.HasValue() ? brandingInformation.Value() : chip::app::Clusters::ContentLauncher::BrandingInformation());
+                                  brandingInformation.HasValue() ? brandingInformation.Value()
+                                                                 : chip::app::Clusters::ContentLauncher::BrandingInformation());
     }
 
 exit:

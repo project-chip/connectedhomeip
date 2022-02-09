@@ -35,8 +35,9 @@ public:
     ContentLauncherManager() : ContentLauncherManager({ "example", "example" }, 0){};
     ContentLauncherManager(std::list<std::string> acceptHeaderList, uint32_t supportedStreamingProtocols);
 
-    void HandleLaunchContent(CommandResponseHelper<LaunchResponseType> & helper, const chip::app::DataModel::DecodableList<ParameterType> & parameterList,
-                             bool autoplay, const CharSpan & data) override;
+    void HandleLaunchContent(CommandResponseHelper<LaunchResponseType> & helper,
+                             const chip::app::DataModel::DecodableList<ParameterType> & parameterList, bool autoplay,
+                             const CharSpan & data) override;
     void HandleLaunchUrl(CommandResponseHelper<LaunchResponseType> & helper, const CharSpan & contentUrl,
                          const CharSpan & displayString, const BrandingInformationType & brandingInformation) override;
     CHIP_ERROR HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder) override;

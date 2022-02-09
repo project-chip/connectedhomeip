@@ -17,9 +17,9 @@
  */
 
 #include "WakeOnLanManager.h"
-#include <string>
-#include <iostream>
 #include <fstream>
+#include <iostream>
+#include <string>
 
 using namespace chip;
 using namespace chip::app::Clusters::WakeOnLan;
@@ -34,10 +34,9 @@ std::string getMacAddress()
 
 CHIP_ERROR WakeOnLanManager::HandleGetMacAddress(chip::app::AttributeValueEncoder & aEncoder)
 {
-    #if CHIP_ENABLE_WAKE_ON_LAN
+#if CHIP_ENABLE_WAKE_ON_LAN
     return aEncoder.Encode(CharSpan::fromCharString(getMacAddress().c_str()));
-    #else
+#else
     return aEncoder.Encode(CharSpan::fromCharString("00:00:00:00:00"));
-    #endif // CHIP_ENABLE_WAKE_ON_LAN
-
+#endif // CHIP_ENABLE_WAKE_ON_LAN
 }
