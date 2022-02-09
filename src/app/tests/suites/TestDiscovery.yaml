@@ -51,13 +51,9 @@ tests:
               - name: "CommissioningTimeout"
                 value: 120
 
-    - label: "Wait 1000ms for the mdns advertisement to be published"
+    - label: "Wait Commissionable advertisement"
       cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 1000
+      command: "WaitForCommissionableAdvertisement"
 
     - label: "Check Instance Name"
       cluster: "DiscoveryCommands"
@@ -292,13 +288,9 @@ tests:
               - name: "CommissioningTimeout"
                 value: 120
 
-    - label: "Wait 1000ms for the mdns advertisement to be published"
+    - label: "Wait Commissionable advertisement"
       cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 1000
+      command: "WaitForCommissionableAdvertisement"
 
     - label: "Check Instance Name"
       cluster: "DiscoveryCommands"

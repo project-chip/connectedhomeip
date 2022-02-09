@@ -29,12 +29,15 @@ public:
     virtual ~DelayCommands(){};
 
     virtual CHIP_ERROR ContinueOnChipMainThread() = 0;
-    virtual void OnWaitForMs() = 0;
+    virtual void OnWaitForMs()                    = 0;
 
     virtual CHIP_ERROR WaitForCommissionee() { return CHIP_ERROR_NOT_IMPLEMENTED; };
     virtual CHIP_ERROR WaitForCommissioning() { return CHIP_ERROR_NOT_IMPLEMENTED; };
     CHIP_ERROR WaitForMs(uint16_t ms);
+    CHIP_ERROR WaitForCommissionableAdvertisement();
+    CHIP_ERROR WaitForOperationalAdvertisement();
 
 private:
     static void OnWaitForMsFn(chip::System::Layer * systemLayer, void * context);
+    CHIP_ERROR RunInternal(const char * command);
 };
