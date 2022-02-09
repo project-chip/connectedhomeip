@@ -137,7 +137,7 @@ static void HandleProgress(intptr_t context)
         }
         else
         {
-            streamer_printf(streamer_get(), "Update progress: %d %%\r\n", progress);
+            streamer_printf(streamer_get(), "Update progress: %d %%\r\n", progress.Value());
         }
     }
     else
