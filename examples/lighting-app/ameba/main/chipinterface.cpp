@@ -167,7 +167,7 @@ extern "C" void ChipTest(void)
 
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
 
-    err                           = deviceMgr.Init(&EchoCallbacks);
+    err = deviceMgr.Init(&EchoCallbacks);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "DeviceManagerInit() - ERROR!\r\n");

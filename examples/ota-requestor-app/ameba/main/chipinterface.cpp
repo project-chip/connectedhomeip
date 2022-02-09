@@ -21,8 +21,8 @@
 #include "DeviceCallbacks.h"
 #include "chip_porting.h"
 
-#include <app/server/Server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
