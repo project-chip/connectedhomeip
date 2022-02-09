@@ -31,7 +31,7 @@ limitations under the License.
 
     <command source="client" code="0x00" name="LaunchContentRequest" response="LaunchResponse" optional="false">
       <description>Upon receipt, this SHALL launch the specified content with optional search criteria.</description>
-      <arg name="search" type="ContentSearch" array="true"/>
+      <arg name="search" type="ContentSearch"/>
       <arg name="autoPlay" type="BOOLEAN"/>
       <arg name="data" type="CHAR_STRING" optional="true"/>
     </command>
