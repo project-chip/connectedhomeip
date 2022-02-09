@@ -380,7 +380,7 @@ ChipError::StorageType pychip_DeviceController_EstablishPASESessionIP(chip::Cont
     chip::Transport::PeerAddress addr;
     RendezvousParameters params = chip::RendezvousParameters().SetSetupPINCode(setupPINCode);
     VerifyOrReturnError(chip::Inet::IPAddress::FromString(peerAddrStr, peerAddr), CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
-    addr.SetTransportType(chip::Transport::Type::kUdp).SetIPAddress(peerAddr);
+    addr.SetTransportType(chip::Transport::Type::kUdp).SetSingleIPAddress(peerAddr);
     params.SetPeerAddress(addr).SetDiscriminator(0);
     return devCtrl->EstablishPASEConnection(nodeid, params).AsInteger();
 }
