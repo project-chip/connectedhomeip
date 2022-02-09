@@ -47,6 +47,16 @@ menu "CHIP Core"
                 A Binding object is used to configure how the local device communicates with
                 a remote entity, be it a cloud service, a mobile application, or another device.
 
+        config MAX_FABRICS
+            int "Max Fabrics"
+            range 5 255
+            default 5
+            help
+                The maxinum number of fabrics the device can participate in.
+
+                Each fabric can provision the device with its unique operational credentials and
+                manage its own access control lists.
+
         config MAX_PEER_NODES
             int "Max Peer Nodes"
             range 0 65535
