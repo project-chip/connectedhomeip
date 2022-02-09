@@ -113,7 +113,7 @@ CHIP_ERROR WakeOnLanAttrAccess::Read(const app::ConcreteReadAttributePath & aPat
 
     switch (aPath.mAttributeId)
     {
-    case app::Clusters::WakeOnLan::Attributes::WakeOnLanMacAddress::Id: {
+    case app::Clusters::WakeOnLan::Attributes::MACAddress::Id: {
         return ReadMacAddressAttribute(aEncoder, delegate);
     }
     default: {
