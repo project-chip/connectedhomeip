@@ -35,6 +35,7 @@
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <protocols/secure_channel/Constants.h>
 #include <transport/CryptoContext.h>
+#include <transport/GroupPeerMessageCounter.h>
 #include <transport/GroupSession.h>
 #include <transport/MessageCounterManagerInterface.h>
 #include <transport/SecureSessionTable.h>
@@ -184,7 +185,8 @@ public:
      * @param messageCounterManager The message counter manager
      */
     CHIP_ERROR Init(System::Layer * systemLayer, TransportMgrBase * transportMgr,
-                    Transport::MessageCounterManagerInterface * messageCounterManager);
+                    Transport::MessageCounterManagerInterface * messageCounterManager,
+                    chip::PersistentStorageDelegate * storageDelegate);
 
     /**
      * @brief
@@ -217,9 +219,9 @@ public:
     }
 
     // TODO: implements group sessions
-    Optional<SessionHandle> CreateGroupSession(GroupId group, chip::FabricIndex fabricIndex)
+    Optional<SessionHandle> CreateGroupSession(GroupId group, chip::FabricIndex fabricIndex, NodeId sourceNodeId)
     {
-        return mGroupSessions.AllocEntry(group, fabricIndex);
+        return mGroupSessions.AllocEntry(group, fabricIndex, sourceNodeId);
     }
     Optional<SessionHandle> FindGroupSession(GroupId group, chip::FabricIndex fabricIndex)
     {
@@ -255,6 +257,7 @@ private:
     Transport::SecureSessionTable<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mSecureSessions;
     Transport::GroupSessionTable<CHIP_CONFIG_GROUP_CONNECTION_POOL_SIZE> mGroupSessions;
     State mState; // < Initialization state of the object
+    chip::Transport::GroupClientCounters mGroupClientCounter;
 
     SessionMessageDelegate * mCB = nullptr;
 

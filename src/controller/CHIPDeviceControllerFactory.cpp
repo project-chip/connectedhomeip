@@ -52,6 +52,7 @@ CHIP_ERROR DeviceControllerFactory::Init(FactoryInitParams params)
 
     mListenPort    = params.listenPort;
     mFabricStorage = params.fabricStorage;
+    mStorage       = params.storageDelegate;
 
     CHIP_ERROR err = InitSystemState(params);
 
@@ -137,8 +138,9 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.messageCounterManager = chip::Platform::New<secure_channel::MessageCounterManager>();
 
     ReturnErrorOnFailure(stateParams.fabricTable->Init(mFabricStorage));
-    ReturnErrorOnFailure(
-        stateParams.sessionMgr->Init(stateParams.systemLayer, stateParams.transportMgr, stateParams.messageCounterManager));
+
+    ReturnErrorOnFailure(stateParams.sessionMgr->Init(stateParams.systemLayer, stateParams.transportMgr,
+                                                      stateParams.messageCounterManager, mStorage));
     ReturnErrorOnFailure(stateParams.exchangeMgr->Init(stateParams.sessionMgr));
     ReturnErrorOnFailure(stateParams.messageCounterManager->Init(stateParams.exchangeMgr));
 
@@ -175,6 +177,7 @@ void DeviceControllerFactory::PopulateInitParams(ControllerInitParams & controll
 CHIP_ERROR DeviceControllerFactory::SetupController(SetupParams params, DeviceController & controller)
 {
     VerifyOrReturnError(mSystemState != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    mStorage = params.storageDelegate;
     ReturnErrorOnFailure(InitSystemState());
 
     ControllerInitParams controllerParams;
@@ -187,6 +190,7 @@ CHIP_ERROR DeviceControllerFactory::SetupController(SetupParams params, DeviceCo
 CHIP_ERROR DeviceControllerFactory::SetupCommissioner(SetupParams params, DeviceCommissioner & commissioner)
 {
     VerifyOrReturnError(mSystemState != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    mStorage = params.storageDelegate;
     ReturnErrorOnFailure(InitSystemState());
 
     CommissionerInitParams commissionerParams;

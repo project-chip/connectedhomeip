@@ -24,57 +24,50 @@
 #include <array>
 #include <bitset>
 
-#include <lib/support/Span.h>
-#include <transport/PeerMessageCounter.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/NodeId.h>
 #include <lib/core/PeerId.h>
-#include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/support/Span.h>
+#include <transport/PeerMessageCounter.h>
 
+#define GROUP_MSG_COUNTER_MAX_NUMBER_OF_GROUP_DATA_PEER 15
+#define GROUP_MSG_COUNTER_MAX_NUMBER_OF_GROUP_CONTROL_PEER 15
 
-#define GROUP_MSG_COUNTER_MAX_NUMBER_OF_GROUP_DATA_PEER     15
-#define GROUP_MSG_COUNTER_MAX_NUMBER_OF_GROUP_CONTROL_PEER  15
-
-#define GROUP_MSG_COUNTER_MIN_INCREMENT                     1000
+#define GROUP_MSG_COUNTER_MIN_INCREMENT 1000
 
 namespace chip {
 namespace Transport {
 
 class GroupSender
 {
-    public:
-    NodeId mNodeId=kUndefinedNodeId;
-    PeerMessageCounter msgCounter = {true};
+public:
+    NodeId mNodeId                = kUndefinedNodeId;
+    PeerMessageCounter msgCounter = { true };
 };
 
 class GroupFabric
 {
-    public :
-    FabricId mFabricId = kUndefinedFabricId;
+public:
+    FabricId mFabricId        = kUndefinedFabricId;
     uint8_t mControlPeerCount = 0;
-    uint8_t mDataPeerCount = 0;
+    uint8_t mDataPeerCount    = 0;
     GroupSender mDataGroupSenders[GROUP_MSG_COUNTER_MAX_NUMBER_OF_GROUP_DATA_PEER];
     GroupSender mControlGroupSenders[GROUP_MSG_COUNTER_MAX_NUMBER_OF_GROUP_CONTROL_PEER];
-
 };
-
 
 class GroupPeerTable
 {
-    public:
-
-    CHIP_ERROR FindOrAddPeer(FabricId fabricId, NodeId nodeId, bool isControl, chip::Transport::PeerMessageCounter * & counter);
+public:
+    CHIP_ERROR FindOrAddPeer(FabricId fabricId, NodeId nodeId, bool isControl, chip::Transport::PeerMessageCounter *& counter);
 
     // Used in case of MCSP failure
     CHIP_ERROR RemovePeer(FabricId fabricId, NodeId nodeId, bool isControl);
 
-
     // For Unit Test
     FabricId GetFabricIdAt(uint8_t index);
 
-
-    private:
+private:
     GroupFabric mGroupFabrics[CHIP_CONFIG_MAX_FABRICS];
-
 };
 
 // Might want to rename this so that it is explicitly the sending side of counters
@@ -86,13 +79,13 @@ public:
     CHIP_ERROR Init(chip::PersistentStorageDelegate * storage_delegate);
     uint32_t GetCounter(bool isControl);
     void SetCounter(bool isControl, uint32_t value);
+
 private:
     // TODO Initialize those to random value
-    uint32_t mGroupDataCounter = 0;
-    uint32_t mGroupControlCounter = 0;
+    uint32_t mGroupDataCounter                 = 0;
+    uint32_t mGroupControlCounter              = 0;
     chip::PersistentStorageDelegate * mStorage = nullptr;
 };
-
 
 } // namespace Transport
 } // namespace chip

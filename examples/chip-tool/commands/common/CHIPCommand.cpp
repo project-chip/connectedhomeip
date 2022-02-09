@@ -48,8 +48,9 @@ CHIP_ERROR CHIPCommand::Run()
     ReturnLogErrorOnFailure(mFabricStorage.Initialize(&mDefaultStorage));
 
     chip::Controller::FactoryInitParams factoryInitParams;
-    factoryInitParams.fabricStorage = &mFabricStorage;
-    factoryInitParams.listenPort    = static_cast<uint16_t>(mDefaultStorage.GetListenPort() + CurrentCommissionerId());
+    factoryInitParams.fabricStorage   = &mFabricStorage;
+    factoryInitParams.storageDelegate = &mDefaultStorage;
+    factoryInitParams.listenPort      = static_cast<uint16_t>(mDefaultStorage.GetListenPort() + CurrentCommissionerId());
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryInitParams));
 
     ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityNull, kIdentityNullFabricId));
