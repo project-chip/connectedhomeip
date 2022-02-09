@@ -39,7 +39,7 @@ tests:
     - label: "Turn On the light to see attribute change"
       cluster: "On/Off"
       command: "On"
-      groupId: "4660"
+      groupId: 0x0101
 
     - label: "Wait 100ms"
       cluster: "DelayCommands"
@@ -52,7 +52,7 @@ tests:
     - label: "Turn Off the light to see attribute change"
       cluster: "On/Off"
       command: "Off"
-      groupId: "4660"
+      groupId: 0x0101
 
     - label: "Wait 100ms"
       cluster: "DelayCommands"
@@ -66,7 +66,7 @@ tests:
     - label: "Turn On the light to see attribute change"
       cluster: "On/Off"
       command: "On"
-      groupId: "4660"
+      groupId: 0x0101
 
     - label: "Wait 100ms"
       cluster: "DelayCommands"
@@ -79,7 +79,7 @@ tests:
     - label: "Turn Off the light to see attribute change"
       cluster: "On/Off"
       command: "Off"
-      groupId: "4660"
+      groupId: 0x0101
 
     - label: "Wait 100ms"
       cluster: "DelayCommands"
@@ -93,7 +93,7 @@ tests:
     - label: "Turn On the light to see attribute change"
       cluster: "On/Off"
       command: "On"
-      groupId: "4660"
+      groupId: 0x0101
 
     - label: "Wait 100ms"
       cluster: "DelayCommands"
@@ -106,7 +106,7 @@ tests:
     - label: "Turn Off the light to see attribute change"
       cluster: "On/Off"
       command: "Off"
-      groupId: "4660"
+      groupId: 0x0101
 
     - label: "Wait 100ms"
       cluster: "DelayCommands"
@@ -120,7 +120,7 @@ tests:
     - label: "Turn On the light to see attribute change"
       cluster: "On/Off"
       command: "On"
-      groupId: "4660"
+      groupId: 0x0101
 
     - label: "Wait 100ms"
       cluster: "DelayCommands"
@@ -133,7 +133,7 @@ tests:
     - label: "Turn Off the light to see attribute change"
       cluster: "On/Off"
       command: "Off"
-      groupId: "4660"
+      groupId: 0x0101
 
     - label: "Wait 100ms"
       cluster: "DelayCommands"
@@ -147,7 +147,7 @@ tests:
     - label: "Turn On the light to see attribute change"
       cluster: "On/Off"
       command: "On"
-      groupId: "4660"
+      groupId: 0x0101
 
     - label: "Wait 100ms"
       cluster: "DelayCommands"
@@ -160,7 +160,7 @@ tests:
     - label: "Turn Off the light to see attribute change"
       cluster: "On/Off"
       command: "Off"
-      groupId: "4660"
+      groupId: 0x0101
 
     - label: "Wait 100ms"
       cluster: "DelayCommands"
