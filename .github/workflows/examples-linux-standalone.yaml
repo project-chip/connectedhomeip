@@ -127,6 +127,17 @@ jobs:
                     linux debug ota-requestor-app \
                     out/ota_requestor_debug/chip-ota-requestor-app \
                     /tmp/bloat_reports/
+            - name: Build and run OTA example
+              timeout-minutes: 20
+              run: |
+                  scripts/tests/ota_test.sh
+            - name: Uploading OTA logs
+              if: always()
+              uses: actions/upload-artifact@v2
+              with:
+                  name: OTA,Linux-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
+                  path: |
+                      /tmp/ota/        
             - name: Build example Standalone Door Lock App
               timeout-minutes: 5
               run: |
