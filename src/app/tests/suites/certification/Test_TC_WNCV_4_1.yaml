@@ -1,0 +1,220 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    39.4.1. [TC-WNCV-4.1] GoToLiftPercentage Long-Run Verification with server
+    as DUT
+
+config:
+    cluster: "Window Covering"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
+    - label: "TH sends DownOrClose command to DUT"
+      command: "DownOrClose"
+
+    - label: "TH waits for 5-15 seconds movement(s) on the DUT"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label:
+          "If (PA_LF & LF) TH reads CurrentPositionLiftPercent100ths attribute
+          from DUT"
+      command: "readAttribute"
+      attribute: "CurrentPositionLiftPercent100ths"
+      PICS: "WNCV_PA_LF && WNCV_LF"
+      response:
+          constraints:
+              type: percent100ths
+              notValue: 0
+              minValue: 1
+              maxValue: 10000
+
+    #Disabled due to issue #14230
+    - label: "TH sends GoToLiftPercentage command with 25 percent to DUT"
+      disabled: true
+      command: "GoToLiftPercentage"
+      arguments:
+          values:
+              - name: "LiftPercentageValue"
+                value: 25
+              - name: "LiftPercent100thsValue"
+                value: 2500
+
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label:
+          "If (PA_LF & LF) TH reads TargetPositionLiftPercent100ths attribute
+          from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "TargetPositionLiftPercent100ths"
+      PICS: "WNCV_PA_LF && WNCV_LF"
+      response:
+          value: 2500
+
+    - label:
+          "If (PA_LF & LF) TH reads TargetPositionLiftPercent100ths attribute
+          from DUT"
+      command: "readAttribute"
+      attribute: "TargetPositionLiftPercent100ths"
+      PICS: "WNCV_PA_LF && WNCV_LF"
+      response:
+          constraints:
+              type: percent100ths
+              minValue: 1
+              maxValue: 10000
+
+    - label: "TH set a timeout of 5-10 minutes for failure"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+    #Need Bitwise operator support #14491
+    - label: "TH reads OperationalStatus attribute from DUT"
+      command: "readAttribute"
+      attribute: "OperationalStatus"
+      response:
+          constraints:
+              type: map8
+
+    - label:
+          "If (PA_LF & LF) TH reads CurrentPositionLiftPercent100ths attribute
+          from DUT"
+      command: "readAttribute"
+      attribute: "CurrentPositionLiftPercent100ths"
+      PICS: "WNCV_PA_LF && WNCV_LF"
+      response:
+          constraints:
+              type: percent100ths
+              minValue: 1
+              maxValue: 10000
+
+    - label:
+          "If (PA_LF & LF) TH reads CurrentPositionLiftPercentage attribute from
+          DUT"
+      command: "readAttribute"
+      attribute: "CurrentPositionLiftPercentage"
+      PICS: "WNCV_PA_LF && WNCV_LF"
+      response:
+          constraints:
+              type: percent
+              minValue: 0
+              maxValue: 100
+
+    #Disabled due to issue #14230
+    - label: "TH sends GoToLiftPercentage command to DUT"
+      disabled: true
+      command: "GoToLiftPercentage"
+      arguments:
+          values:
+              - name: "LiftPercentageValue"
+                value: 75
+              - name: "LiftPercent100thsValue"
+                value: 7500
+
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label:
+          "If (PA_LF & LF) TH reads TargetPositionLiftPercent100ths attribute
+          from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "TargetPositionLiftPercent100ths"
+      PICS: "WNCV_PA_LF && WNCV_LF"
+      response:
+          value: 7500
+
+    - label: "TH waits for 5-15 seconds movement(s) on the DUT"
+      disabled: true
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    #Need Bitwise operator support #14491
+    - label: "TH reads OperationalStatus attribute from DUT"
+      command: "readAttribute"
+      attribute: "OperationalStatus"
+      response:
+          constraints:
+              type: map8
+
+    - label:
+          "If (PA_LF & LF) TH reads CurrentPositionLiftPercent100ths attribute
+          from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "CurrentPositionLiftPercent100ths"
+      PICS: "WNCV_PA_LF && WNCV_LF"
+      response:
+          value: 7500
+
+    - label:
+          "If (PA_LF & LF) TH reads CurrentPositionLiftPercent100ths attribute
+          from DUT"
+      command: "readAttribute"
+      attribute: "CurrentPositionLiftPercent100ths"
+      PICS: "WNCV_PA_LF && WNCV_LF"
+      response:
+          constraints:
+              type: percent100ths
+              minValue: 1
+              maxValue: 10000
+
+    - label:
+          "If (PA_LF & LF) TH reads CurrentPositionLiftPercentage attribute from
+          DUT"
+      disabled: true
+      PICS: "WNCV_PA_LF && WNCV_LF"
+      command: "readAttribute"
+      attribute: "CurrentPositionLiftPercentage"
+      response:
+          value: 7500
+
+    - label:
+          "If (PA_LF & LF) TH reads CurrentPositionLiftPercentage attribute from
+          DUT"
+      PICS: "WNCV_PA_LF && WNCV_LF"
+      command: "readAttribute"
+      attribute: "CurrentPositionLiftPercentage"
+      response:
+          constraints:
+              type: percent
+              minValue: 0
+              maxValue: 100
