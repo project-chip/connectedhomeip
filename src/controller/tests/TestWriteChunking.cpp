@@ -116,14 +116,12 @@ public:
     CHIP_ERROR Write(const app::ConcreteDataAttributePath & aPath, app::AttributeValueDecoder & aDecoder) override;
 } testServer;
 
-CHIP_ERROR TestAttrAccess::Read(FabricIndex fabricIndex, const app::ConcreteReadAttributePath & aPath,
-                                app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR TestAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-CHIP_ERROR TestAttrAccess::Write(FabricIndex fabricIndex, const app::ConcreteDataAttributePath & aPath,
-                                 app::AttributeValueDecoder & aDecoder)
+CHIP_ERROR TestAttrAccess::Write(const app::ConcreteDataAttributePath & aPath, app::AttributeValueDecoder & aDecoder)
 {
     // We only care about the number of attribute data.
     if (!aPath.IsListItemOperation())
