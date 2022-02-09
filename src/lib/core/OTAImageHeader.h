@@ -82,17 +82,20 @@ public:
      * @brief Decode Matter OTA image header
      *
      * The method takes subsequent chunks of the Matter OTA image file and decodes the header when
-     * enough data has been provided.
+     * enough data has been provided. If more image chunks are needed, CHIP_ERROR_BUFFER_TOO_SMALL
+     * error is returned. Other error codes indicate that the header is invalid.
      *
      * @param buffer Byte span containing a subsequent Matter OTA image chunk. When the method
-     *               returns CHIP_NO_ERROR, it contains a remaining part of the chunk, not used
-     *               by the header.
+     *               returns CHIP_NO_ERROR, the byte span is used to return a remaining part
+     *               of the chunk, not used by the header.
      * @param header Structure to store results of the operation. Note that the results must not be
-     *               referenced after the parser is cleared since its string members are not cloned
-     *               by the method.
+     *               referenced after the parser is cleared since string members of the structure
+     *               are only shallow-copied by the method.
      *
      * @retval CHIP_NO_ERROR                        Header has been decoded successfully.
-     * @retval CHIP_ERROR_BUFFER_TOO_SMALL          Provided buffers are insufficient to decode the header.
+     * @retval CHIP_ERROR_BUFFER_TOO_SMALL          Provided buffers are insufficient to decode the
+     *                                              header. A user is expected call the method again
+     *                                              when the next image chunk is available.
      * @retval CHIP_ERROR_INVALID_FILE_IDENTIFIER   Not a Matter OTA image file.
      * @retval Error code                           Encoded header is invalid.
      */
