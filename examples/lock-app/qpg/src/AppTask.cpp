@@ -328,7 +328,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
 
     // To trigger BLE advertising: press the APP_FUNCTION_BUTTON button briefly (<
     // OTA_START_TRIGGER_TIMEOUT). To trigger software update: press the button
-	// between 1.5sec and 3sec. To initiate factory reset: press the
+    // between 1.5sec and 3sec. To initiate factory reset: press the
     // APP_FUNCTION_BUTTON for FACTORY_RESET_TRIGGER_TIMEOUT +
     // FACTORY_RESET_CANCEL_WINDOW_TIMEOUT All LEDs start blinking after
     // FACTORY_RESET_TRIGGER_TIMEOUT to signal factory reset has been initiated.
