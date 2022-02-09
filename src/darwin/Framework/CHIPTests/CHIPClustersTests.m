@@ -14436,7 +14436,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     CHIPTestMediaPlayback * cluster = [[CHIPTestMediaPlayback alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributePlaybackStateWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+    [cluster readAttributeCurrentStateWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads the playback state attribute Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
@@ -14501,7 +14501,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     CHIPTestMediaPlayback * cluster = [[CHIPTestMediaPlayback alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributePlaybackStateWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+    [cluster readAttributeCurrentStateWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads the CurrentState attribute Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
@@ -14647,7 +14647,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     CHIPTestMediaPlayback * cluster = [[CHIPTestMediaPlayback alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributePlaybackStateWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+    [cluster readAttributeCurrentStateWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads the CurrentState attribute Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
@@ -14687,7 +14687,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     CHIPTestMediaPlayback * cluster = [[CHIPTestMediaPlayback alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributePlaybackStateWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+    [cluster readAttributeCurrentStateWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads the CurrentState attribute Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
@@ -14745,7 +14745,6 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     WaitForCommissionee(expectation, queue);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-NSNumber * _Nonnull currentTarget;
 - (void)testSendClusterTest_TC_MC_8_1_000001_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Reads the CurrentTarget attribute"];
@@ -14755,15 +14754,10 @@ NSNumber * _Nonnull currentTarget;
     CHIPTestTargetNavigator * cluster = [[CHIPTestTargetNavigator alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeCurrentNavigatorTargetWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+    [cluster readAttributeCurrentTargetWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads the CurrentTarget attribute Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            currentTarget = actualValue;
-        }
 
         [expectation fulfill];
     }];
@@ -14779,7 +14773,7 @@ NSNumber * _Nonnull currentTarget;
     CHIPTestTargetNavigator * cluster = [[CHIPTestTargetNavigator alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeTargetNavigatorListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+    [cluster readAttributeTargetListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads the TargetList attribute Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
@@ -14834,7 +14828,7 @@ NSNumber * _Nonnull currentTarget;
     CHIPTestApplicationBasic * cluster = [[CHIPTestApplicationBasic alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeVendorIdWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+    [cluster readAttributeVendorIDWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads the VendorID attribute Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
@@ -14882,7 +14876,7 @@ NSNumber * _Nonnull currentTarget;
     CHIPTestApplicationBasic * cluster = [[CHIPTestApplicationBasic alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeProductIdWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+    [cluster readAttributeProductIDWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads the ProductID attribute Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
@@ -14901,7 +14895,7 @@ NSNumber * _Nonnull currentTarget;
     CHIPTestApplicationBasic * cluster = [[CHIPTestApplicationBasic alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeApplicationStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+    [cluster readAttributeStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads the Status attribute Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);

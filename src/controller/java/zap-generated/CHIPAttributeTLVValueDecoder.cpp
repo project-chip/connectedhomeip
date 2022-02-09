@@ -594,8 +594,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             value = env->NewStringUTF(std::string(cppValue.data(), cppValue.size()).c_str());
             return value;
         }
-        case Attributes::VendorId::Id: {
-            using TypeInfo = Attributes::VendorId::TypeInfo;
+        case Attributes::VendorID::Id: {
+            using TypeInfo = Attributes::VendorID::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -621,8 +621,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             value = env->NewStringUTF(std::string(cppValue.data(), cppValue.size()).c_str());
             return value;
         }
-        case Attributes::ProductId::Id: {
-            using TypeInfo = Attributes::ProductId::TypeInfo;
+        case Attributes::ProductID::Id: {
+            using TypeInfo = Attributes::ProductID::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -636,8 +636,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            cppValue, value);
             return value;
         }
-        case Attributes::ApplicationApp::Id: {
-            using TypeInfo = Attributes::ApplicationApp::TypeInfo;
+        case Attributes::Application::Id: {
+            using TypeInfo = Attributes::Application::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -676,8 +676,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                    value_catalogVendorId, value_applicationId);
             return value;
         }
-        case Attributes::ApplicationStatus::Id: {
-            using TypeInfo = Attributes::ApplicationStatus::TypeInfo;
+        case Attributes::Status::Id: {
+            using TypeInfo = Attributes::Status::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -824,8 +824,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         using namespace app::Clusters::ApplicationLauncher;
         switch (aPath.mAttributeId)
         {
-        case Attributes::ApplicationLauncherList::Id: {
-            using TypeInfo = Attributes::ApplicationLauncherList::TypeInfo;
+        case Attributes::CatalogList::Id: {
+            using TypeInfo = Attributes::CatalogList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -848,8 +848,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ApplicationLauncherApp::Id: {
-            using TypeInfo = Attributes::ApplicationLauncherApp::TypeInfo;
+        case Attributes::CurrentApp::Id: {
+            using TypeInfo = Attributes::CurrentApp::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -1025,8 +1025,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         using namespace app::Clusters::AudioOutput;
         switch (aPath.mAttributeId)
         {
-        case Attributes::AudioOutputList::Id: {
-            using TypeInfo = Attributes::AudioOutputList::TypeInfo;
+        case Attributes::OutputList::Id: {
+            using TypeInfo = Attributes::OutputList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -1078,8 +1078,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::CurrentAudioOutput::Id: {
-            using TypeInfo = Attributes::CurrentAudioOutput::TypeInfo;
+        case Attributes::CurrentOutput::Id: {
+            using TypeInfo = Attributes::CurrentOutput::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -2657,8 +2657,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::ChannelLineup::Id: {
-            using TypeInfo = Attributes::ChannelLineup::TypeInfo;
+        case Attributes::Lineup::Id: {
+            using TypeInfo = Attributes::Lineup::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -3778,8 +3778,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         using namespace app::Clusters::ContentLauncher;
         switch (aPath.mAttributeId)
         {
-        case Attributes::AcceptHeaderList::Id: {
-            using TypeInfo = Attributes::AcceptHeaderList::TypeInfo;
+        case Attributes::AcceptHeader::Id: {
+            using TypeInfo = Attributes::AcceptHeader::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -7320,8 +7320,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         using namespace app::Clusters::MediaInput;
         switch (aPath.mAttributeId)
         {
-        case Attributes::MediaInputList::Id: {
-            using TypeInfo = Attributes::MediaInputList::TypeInfo;
+        case Attributes::InputList::Id: {
+            using TypeInfo = Attributes::InputList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -7377,8 +7377,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::CurrentMediaInput::Id: {
-            using TypeInfo = Attributes::CurrentMediaInput::TypeInfo;
+        case Attributes::CurrentInput::Id: {
+            using TypeInfo = Attributes::CurrentInput::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -7489,8 +7489,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         using namespace app::Clusters::MediaPlayback;
         switch (aPath.mAttributeId)
         {
-        case Attributes::PlaybackState::Id: {
-            using TypeInfo = Attributes::PlaybackState::TypeInfo;
+        case Attributes::CurrentState::Id: {
+            using TypeInfo = Attributes::CurrentState::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -7548,8 +7548,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::Position::Id: {
-            using TypeInfo = Attributes::Position::TypeInfo;
+        case Attributes::SampledPosition::Id: {
+            using TypeInfo = Attributes::SampledPosition::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -7557,42 +7557,50 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            jobject value_updatedAt;
-            std::string value_updatedAtClassName     = "java/lang/Long";
-            std::string value_updatedAtCtorSignature = "(J)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(
-                value_updatedAtClassName.c_str(), value_updatedAtCtorSignature.c_str(), cppValue.updatedAt, value_updatedAt);
-            jobject value_position;
-            if (cppValue.position.IsNull())
+            if (cppValue.IsNull())
             {
-                value_position = nullptr;
+                value = nullptr;
             }
             else
             {
-                std::string value_positionClassName     = "java/lang/Long";
-                std::string value_positionCtorSignature = "(J)V";
-                chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(value_positionClassName.c_str(),
-                                                                               value_positionCtorSignature.c_str(),
-                                                                               cppValue.position.Value(), value_position);
-            }
+                jobject value_updatedAt;
+                std::string value_updatedAtClassName     = "java/lang/Long";
+                std::string value_updatedAtCtorSignature = "(J)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(value_updatedAtClassName.c_str(),
+                                                                               value_updatedAtCtorSignature.c_str(),
+                                                                               cppValue.Value().updatedAt, value_updatedAt);
+                jobject value_position;
+                if (cppValue.Value().position.IsNull())
+                {
+                    value_position = nullptr;
+                }
+                else
+                {
+                    std::string value_positionClassName     = "java/lang/Long";
+                    std::string value_positionCtorSignature = "(J)V";
+                    chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(
+                        value_positionClassName.c_str(), value_positionCtorSignature.c_str(), cppValue.Value().position.Value(),
+                        value_position);
+                }
 
-            jclass playbackPositionStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipStructs$MediaPlaybackClusterPlaybackPosition", playbackPositionStructClass);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(Zcl, "Could not find class ChipStructs$MediaPlaybackClusterPlaybackPosition");
-                return nullptr;
-            }
-            jmethodID playbackPositionStructCtor =
-                env->GetMethodID(playbackPositionStructClass, "<init>", "(Ljava/lang/Long;Ljava/lang/Long;)V");
-            if (playbackPositionStructCtor == nullptr)
-            {
-                ChipLogError(Zcl, "Could not find ChipStructs$MediaPlaybackClusterPlaybackPosition constructor");
-                return nullptr;
-            }
+                jclass playbackPositionStructClass;
+                err = chip::JniReferences::GetInstance().GetClassRef(
+                    env, "chip/devicecontroller/ChipStructs$MediaPlaybackClusterPlaybackPosition", playbackPositionStructClass);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "Could not find class ChipStructs$MediaPlaybackClusterPlaybackPosition");
+                    return nullptr;
+                }
+                jmethodID playbackPositionStructCtor =
+                    env->GetMethodID(playbackPositionStructClass, "<init>", "(Ljava/lang/Long;Ljava/lang/Long;)V");
+                if (playbackPositionStructCtor == nullptr)
+                {
+                    ChipLogError(Zcl, "Could not find ChipStructs$MediaPlaybackClusterPlaybackPosition constructor");
+                    return nullptr;
+                }
 
-            value = env->NewObject(playbackPositionStructClass, playbackPositionStructCtor, value_updatedAt, value_position);
+                value = env->NewObject(playbackPositionStructClass, playbackPositionStructCtor, value_updatedAt, value_position);
+            }
             return value;
         }
         case Attributes::PlaybackSpeed::Id: {
@@ -10826,8 +10834,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         using namespace app::Clusters::TargetNavigator;
         switch (aPath.mAttributeId)
         {
-        case Attributes::TargetNavigatorList::Id: {
-            using TypeInfo = Attributes::TargetNavigatorList::TypeInfo;
+        case Attributes::TargetList::Id: {
+            using TypeInfo = Attributes::TargetList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -10873,8 +10881,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::CurrentNavigatorTarget::Id: {
-            using TypeInfo = Attributes::CurrentNavigatorTarget::TypeInfo;
+        case Attributes::CurrentTarget::Id: {
+            using TypeInfo = Attributes::CurrentTarget::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -15418,8 +15426,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         using namespace app::Clusters::WakeOnLan;
         switch (aPath.mAttributeId)
         {
-        case Attributes::WakeOnLanMacAddress::Id: {
-            using TypeInfo = Attributes::WakeOnLanMacAddress::TypeInfo;
+        case Attributes::MACAddress::Id: {
+            using TypeInfo = Attributes::MACAddress::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)

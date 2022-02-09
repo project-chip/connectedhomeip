@@ -94,12 +94,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPAccountLogin : CHIPCluster
 
-- (void)getSetupPINRequestWithParams:(CHIPAccountLoginClusterGetSetupPINRequestParams *)params
-                   completionHandler:(void (^)(CHIPAccountLoginClusterGetSetupPINResponseParams * _Nullable data,
-                                         NSError * _Nullable error))completionHandler;
-- (void)loginRequestWithParams:(CHIPAccountLoginClusterLoginRequestParams *)params
-             completionHandler:(StatusCompletion)completionHandler;
-- (void)logoutRequestWithCompletionHandler:(StatusCompletion)completionHandler;
+- (void)getSetupPINWithParams:(CHIPAccountLoginClusterGetSetupPINParams *)params
+            completionHandler:(void (^)(CHIPAccountLoginClusterGetSetupPINResponseParams * _Nullable data,
+                                  NSError * _Nullable error))completionHandler;
+- (void)loginWithParams:(CHIPAccountLoginClusterLoginParams *)params completionHandler:(StatusCompletion)completionHandler;
+- (void)logoutWithCompletionHandler:(StatusCompletion)completionHandler;
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
@@ -222,10 +221,15 @@ NS_ASSUME_NONNULL_BEGIN
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
-- (void)readAttributeVendorIdWithCompletionHandler:(void (^)(
+- (void)readAttributeVendorIDWithCompletionHandler:(void (^)(
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+<<<<<<< HEAD
 - (void)subscribeAttributeVendorIdWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
+=======
+- (void)subscribeAttributeVendorIDWithMinInterval:(uint16_t)minInterval
+                                      maxInterval:(uint16_t)maxInterval
+>>>>>>> 208b919f18 (Run zap regen script)
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
@@ -237,8 +241,9 @@ NS_ASSUME_NONNULL_BEGIN
                                            reportHandler:
                                                (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
 
-- (void)readAttributeProductIdWithCompletionHandler:(void (^)(
+- (void)readAttributeProductIDWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+<<<<<<< HEAD
 - (void)subscribeAttributeProductIdWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
@@ -261,6 +266,28 @@ NS_ASSUME_NONNULL_BEGIN
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+=======
+- (void)subscribeAttributeProductIDWithMinInterval:(uint16_t)minInterval
+                                       maxInterval:(uint16_t)maxInterval
+                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeApplicationWithCompletionHandler:(void (^)(
+                                                          CHIPApplicationBasicClusterApplicationBasicApplication * _Nullable value,
+                                                          NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeApplicationWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                       reportHandler:
+                                           (void (^)(CHIPApplicationBasicClusterApplicationBasicApplication * _Nullable value,
+                                               NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeStatusWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeStatusWithMinInterval:(uint16_t)minInterval
+                                    maxInterval:(uint16_t)maxInterval
+                        subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+>>>>>>> 208b919f18 (Run zap regen script)
 
 - (void)readAttributeApplicationVersionWithCompletionHandler:(void (^)(NSString * _Nullable value,
                                                                  NSError * _Nullable error))completionHandler;
@@ -320,16 +347,17 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPApplicationLauncher : CHIPCluster
 
-- (void)hideAppRequestWithParams:(CHIPApplicationLauncherClusterHideAppRequestParams *)params
-               completionHandler:(void (^)(CHIPApplicationLauncherClusterLauncherResponseParams * _Nullable data,
-                                     NSError * _Nullable error))completionHandler;
-- (void)launchAppRequestWithParams:(CHIPApplicationLauncherClusterLaunchAppRequestParams *)params
-                 completionHandler:(void (^)(CHIPApplicationLauncherClusterLauncherResponseParams * _Nullable data,
-                                       NSError * _Nullable error))completionHandler;
-- (void)stopAppRequestWithParams:(CHIPApplicationLauncherClusterStopAppRequestParams *)params
-               completionHandler:(void (^)(CHIPApplicationLauncherClusterLauncherResponseParams * _Nullable data,
-                                     NSError * _Nullable error))completionHandler;
+- (void)hideAppWithParams:(CHIPApplicationLauncherClusterHideAppParams *)params
+        completionHandler:(void (^)(CHIPApplicationLauncherClusterLauncherResponseParams * _Nullable data,
+                              NSError * _Nullable error))completionHandler;
+- (void)launchAppWithParams:(CHIPApplicationLauncherClusterLaunchAppParams *)params
+          completionHandler:(void (^)(CHIPApplicationLauncherClusterLauncherResponseParams * _Nullable data,
+                                NSError * _Nullable error))completionHandler;
+- (void)stopAppWithParams:(CHIPApplicationLauncherClusterStopAppParams *)params
+        completionHandler:(void (^)(CHIPApplicationLauncherClusterLauncherResponseParams * _Nullable data,
+                              NSError * _Nullable error))completionHandler;
 
+<<<<<<< HEAD
 - (void)readAttributeApplicationLauncherListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                       NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeApplicationLauncherListWithMinInterval:(NSNumber * _Nonnull)minInterval
@@ -349,6 +377,24 @@ NS_ASSUME_NONNULL_BEGIN
                                     subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                               reportHandler:(void (^)(CHIPApplicationLauncherClusterApplicationEP * _Nullable value,
                                                                 NSError * _Nullable error))reportHandler;
+=======
+- (void)readAttributeCatalogListWithCompletionHandler:(void (^)(
+                                                          NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeCatalogListWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeCurrentAppWithCompletionHandler:(void (^)(CHIPApplicationLauncherClusterApplicationEP * _Nullable value,
+                                                         NSError * _Nullable error))completionHandler;
+- (void)writeAttributeCurrentAppWithValue:(CHIPApplicationLauncherClusterApplicationEP * _Nullable)value
+                        completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeCurrentAppWithMinInterval:(uint16_t)minInterval
+                                        maxInterval:(uint16_t)maxInterval
+                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                      reportHandler:(void (^)(CHIPApplicationLauncherClusterApplicationEP * _Nullable value,
+                                                        NSError * _Nullable error))reportHandler;
+>>>>>>> 208b919f18 (Run zap regen script)
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
@@ -392,11 +438,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPAudioOutput : CHIPCluster
 
-- (void)renameOutputRequestWithParams:(CHIPAudioOutputClusterRenameOutputRequestParams *)params
-                    completionHandler:(StatusCompletion)completionHandler;
-- (void)selectOutputRequestWithParams:(CHIPAudioOutputClusterSelectOutputRequestParams *)params
-                    completionHandler:(StatusCompletion)completionHandler;
+- (void)renameOutputWithParams:(CHIPAudioOutputClusterRenameOutputParams *)params
+             completionHandler:(StatusCompletion)completionHandler;
+- (void)selectOutputWithParams:(CHIPAudioOutputClusterSelectOutputParams *)params
+             completionHandler:(StatusCompletion)completionHandler;
 
+<<<<<<< HEAD
 - (void)readAttributeAudioOutputListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAudioOutputListWithMinInterval:(NSNumber * _Nonnull)minInterval
@@ -412,6 +459,22 @@ NS_ASSUME_NONNULL_BEGIN
                                     subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                               reportHandler:
                                                   (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+=======
+- (void)readAttributeOutputListWithCompletionHandler:(void (^)(
+                                                         NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeOutputListWithMinInterval:(uint16_t)minInterval
+                                        maxInterval:(uint16_t)maxInterval
+                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                      reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeCurrentOutputWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeCurrentOutputWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                         reportHandler:
+                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+>>>>>>> 208b919f18 (Run zap regen script)
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
@@ -1124,13 +1187,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPChannel : CHIPCluster
 
-- (void)changeChannelByNumberRequestWithParams:(CHIPChannelClusterChangeChannelByNumberRequestParams *)params
-                             completionHandler:(StatusCompletion)completionHandler;
-- (void)changeChannelRequestWithParams:(CHIPChannelClusterChangeChannelRequestParams *)params
-                     completionHandler:(void (^)(CHIPChannelClusterChangeChannelResponseParams * _Nullable data,
-                                           NSError * _Nullable error))completionHandler;
-- (void)skipChannelRequestWithParams:(CHIPChannelClusterSkipChannelRequestParams *)params
-                   completionHandler:(StatusCompletion)completionHandler;
+- (void)changeChannelWithParams:(CHIPChannelClusterChangeChannelParams *)params
+              completionHandler:(void (^)(CHIPChannelClusterChangeChannelResponseParams * _Nullable data,
+                                    NSError * _Nullable error))completionHandler;
+- (void)changeChannelByNumberWithParams:(CHIPChannelClusterChangeChannelByNumberParams *)params
+                      completionHandler:(StatusCompletion)completionHandler;
+- (void)skipChannelWithParams:(CHIPChannelClusterSkipChannelParams *)params completionHandler:(StatusCompletion)completionHandler;
 
 - (void)readAttributeChannelListWithCompletionHandler:(void (^)(
                                                           NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
@@ -1139,6 +1201,7 @@ NS_ASSUME_NONNULL_BEGIN
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
+<<<<<<< HEAD
 - (void)readAttributeChannelLineupWithCompletionHandler:(void (^)(CHIPChannelClusterLineupInfo * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeChannelLineupWithMinInterval:(NSNumber * _Nonnull)minInterval
@@ -1146,6 +1209,15 @@ NS_ASSUME_NONNULL_BEGIN
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:(void (^)(CHIPChannelClusterLineupInfo * _Nullable value,
                                                            NSError * _Nullable error))reportHandler;
+=======
+- (void)readAttributeLineupWithCompletionHandler:(void (^)(CHIPChannelClusterLineupInfo * _Nullable value,
+                                                     NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeLineupWithMinInterval:(uint16_t)minInterval
+                                    maxInterval:(uint16_t)maxInterval
+                        subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                  reportHandler:(void (^)(CHIPChannelClusterLineupInfo * _Nullable value,
+                                                    NSError * _Nullable error))reportHandler;
+>>>>>>> 208b919f18 (Run zap regen script)
 
 - (void)readAttributeCurrentChannelWithCompletionHandler:(void (^)(CHIPChannelClusterChannelInfo * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
@@ -1698,13 +1770,14 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPContentLauncher : CHIPCluster
 
-- (void)launchContentRequestWithParams:(CHIPContentLauncherClusterLaunchContentRequestParams *)params
-                     completionHandler:(void (^)(CHIPContentLauncherClusterLaunchResponseParams * _Nullable data,
-                                           NSError * _Nullable error))completionHandler;
-- (void)launchURLRequestWithParams:(CHIPContentLauncherClusterLaunchURLRequestParams *)params
-                 completionHandler:(void (^)(CHIPContentLauncherClusterLaunchResponseParams * _Nullable data,
-                                       NSError * _Nullable error))completionHandler;
+- (void)launchContentWithParams:(CHIPContentLauncherClusterLaunchContentParams *)params
+              completionHandler:(void (^)(CHIPContentLauncherClusterLaunchResponseParams * _Nullable data,
+                                    NSError * _Nullable error))completionHandler;
+- (void)launchURLWithParams:(CHIPContentLauncherClusterLaunchURLParams *)params
+          completionHandler:(void (^)(CHIPContentLauncherClusterLaunchResponseParams * _Nullable data,
+                                NSError * _Nullable error))completionHandler;
 
+<<<<<<< HEAD
 - (void)readAttributeAcceptHeaderListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeAcceptHeaderListWithMinInterval:(NSNumber * _Nonnull)minInterval
@@ -1712,6 +1785,14 @@ NS_ASSUME_NONNULL_BEGIN
                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                             reportHandler:
                                                 (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
+=======
+- (void)readAttributeAcceptHeaderWithCompletionHandler:(void (^)(
+                                                           NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeAcceptHeaderWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                        reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
+>>>>>>> 208b919f18 (Run zap regen script)
 
 - (void)readAttributeSupportedStreamingProtocolsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                           NSError * _Nullable error))completionHandler;
@@ -2987,9 +3068,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPKeypadInput : CHIPCluster
 
-- (void)sendKeyRequestWithParams:(CHIPKeypadInputClusterSendKeyRequestParams *)params
-               completionHandler:(void (^)(CHIPKeypadInputClusterSendKeyResponseParams * _Nullable data,
-                                     NSError * _Nullable error))completionHandler;
+- (void)sendKeyWithParams:(CHIPKeypadInputClusterSendKeyParams *)params
+        completionHandler:
+            (void (^)(CHIPKeypadInputClusterSendKeyResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
@@ -3308,13 +3389,14 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPMediaInput : CHIPCluster
 
-- (void)hideInputStatusRequestWithCompletionHandler:(StatusCompletion)completionHandler;
-- (void)renameInputRequestWithParams:(CHIPMediaInputClusterRenameInputRequestParams *)params
-                   completionHandler:(StatusCompletion)completionHandler;
-- (void)selectInputRequestWithParams:(CHIPMediaInputClusterSelectInputRequestParams *)params
-                   completionHandler:(StatusCompletion)completionHandler;
-- (void)showInputStatusRequestWithCompletionHandler:(StatusCompletion)completionHandler;
+- (void)hideInputStatusWithCompletionHandler:(StatusCompletion)completionHandler;
+- (void)renameInputWithParams:(CHIPMediaInputClusterRenameInputParams *)params
+            completionHandler:(StatusCompletion)completionHandler;
+- (void)selectInputWithParams:(CHIPMediaInputClusterSelectInputParams *)params
+            completionHandler:(StatusCompletion)completionHandler;
+- (void)showInputStatusWithCompletionHandler:(StatusCompletion)completionHandler;
 
+<<<<<<< HEAD
 - (void)readAttributeMediaInputListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeMediaInputListWithMinInterval:(NSNumber * _Nonnull)minInterval
@@ -3330,6 +3412,22 @@ NS_ASSUME_NONNULL_BEGIN
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+=======
+- (void)readAttributeInputListWithCompletionHandler:(void (^)(
+                                                        NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeInputListWithMinInterval:(uint16_t)minInterval
+                                       maxInterval:(uint16_t)maxInterval
+                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeCurrentInputWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeCurrentInputWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                        reportHandler:
+                                            (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+>>>>>>> 208b919f18 (Run zap regen script)
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
@@ -3373,32 +3471,33 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPMediaPlayback : CHIPCluster
 
-- (void)fastForwardRequestWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                                    NSError * _Nullable error))completionHandler;
-- (void)nextRequestWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+- (void)fastForwardWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                              NSError * _Nullable error))completionHandler;
-- (void)pauseRequestWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                              NSError * _Nullable error))completionHandler;
-- (void)playRequestWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                             NSError * _Nullable error))completionHandler;
-- (void)previousRequestWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                                 NSError * _Nullable error))completionHandler;
-- (void)rewindRequestWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                               NSError * _Nullable error))completionHandler;
-- (void)seekRequestWithParams:(CHIPMediaPlaybackClusterSeekRequestParams *)params
+- (void)nextWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                      NSError * _Nullable error))completionHandler;
+- (void)pauseWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                       NSError * _Nullable error))completionHandler;
+- (void)playWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                      NSError * _Nullable error))completionHandler;
+- (void)previousWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                          NSError * _Nullable error))completionHandler;
+- (void)rewindWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                        NSError * _Nullable error))completionHandler;
+- (void)seekWithParams:(CHIPMediaPlaybackClusterSeekParams *)params
+     completionHandler:
+         (void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
+- (void)skipBackwardWithParams:(CHIPMediaPlaybackClusterSkipBackwardParams *)params
+             completionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                   NSError * _Nullable error))completionHandler;
+- (void)skipForwardWithParams:(CHIPMediaPlaybackClusterSkipForwardParams *)params
             completionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                   NSError * _Nullable error))completionHandler;
-- (void)skipBackwardRequestWithParams:(CHIPMediaPlaybackClusterSkipBackwardRequestParams *)params
-                    completionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                          NSError * _Nullable error))completionHandler;
-- (void)skipForwardRequestWithParams:(CHIPMediaPlaybackClusterSkipForwardRequestParams *)params
-                   completionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                         NSError * _Nullable error))completionHandler;
-- (void)startOverRequestWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                                  NSError * _Nullable error))completionHandler;
-- (void)stopRequestWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                             NSError * _Nullable error))completionHandler;
+- (void)startOverWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                           NSError * _Nullable error))completionHandler;
+- (void)stopPlaybackWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                              NSError * _Nullable error))completionHandler;
 
+<<<<<<< HEAD
 - (void)readAttributePlaybackStateWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePlaybackStateWithMinInterval:(NSNumber * _Nonnull)minInterval
@@ -3406,6 +3505,15 @@ NS_ASSUME_NONNULL_BEGIN
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+=======
+- (void)readAttributeCurrentStateWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeCurrentStateWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                        reportHandler:
+                                            (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+>>>>>>> 208b919f18 (Run zap regen script)
 
 - (void)readAttributeStartTimeWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
@@ -3421,6 +3529,7 @@ NS_ASSUME_NONNULL_BEGIN
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
 
+<<<<<<< HEAD
 - (void)readAttributePositionWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackPosition * _Nullable value,
                                                        NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributePositionWithMinInterval:(NSNumber * _Nonnull)minInterval
@@ -3428,6 +3537,15 @@ NS_ASSUME_NONNULL_BEGIN
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackPosition * _Nullable value,
                                                       NSError * _Nullable error))reportHandler;
+=======
+- (void)readAttributeSampledPositionWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackPosition * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeSampledPositionWithMinInterval:(uint16_t)minInterval
+                                             maxInterval:(uint16_t)maxInterval
+                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                           reportHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackPosition * _Nullable value,
+                                                             NSError * _Nullable error))reportHandler;
+>>>>>>> 208b919f18 (Run zap regen script)
 
 - (void)readAttributePlaybackSpeedWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
@@ -4915,10 +5033,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPTargetNavigator : CHIPCluster
 
-- (void)navigateTargetRequestWithParams:(CHIPTargetNavigatorClusterNavigateTargetRequestParams *)params
-                      completionHandler:(void (^)(CHIPTargetNavigatorClusterNavigateTargetResponseParams * _Nullable data,
-                                            NSError * _Nullable error))completionHandler;
+- (void)navigateTargetWithParams:(CHIPTargetNavigatorClusterNavigateTargetParams *)params
+               completionHandler:(void (^)(CHIPTargetNavigatorClusterNavigateTargetResponseParams * _Nullable data,
+                                     NSError * _Nullable error))completionHandler;
 
+<<<<<<< HEAD
 - (void)readAttributeTargetNavigatorListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeTargetNavigatorListWithMinInterval:(NSNumber * _Nonnull)minInterval
@@ -4936,6 +5055,22 @@ NS_ASSUME_NONNULL_BEGIN
                                             (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                   reportHandler:(void (^)(NSNumber * _Nullable value,
                                                                     NSError * _Nullable error))reportHandler;
+=======
+- (void)readAttributeTargetListWithCompletionHandler:(void (^)(
+                                                         NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeTargetListWithMinInterval:(uint16_t)minInterval
+                                        maxInterval:(uint16_t)maxInterval
+                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                      reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeCurrentTargetWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeCurrentTargetWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                         reportHandler:
+                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+>>>>>>> 208b919f18 (Run zap regen script)
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
@@ -6799,6 +6934,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPWakeOnLan : CHIPCluster
 
+<<<<<<< HEAD
 - (void)readAttributeWakeOnLanMacAddressWithCompletionHandler:(void (^)(NSString * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeWakeOnLanMacAddressWithMinInterval:(NSNumber * _Nonnull)minInterval
@@ -6807,6 +6943,14 @@ NS_ASSUME_NONNULL_BEGIN
                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                reportHandler:
                                                    (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
+=======
+- (void)readAttributeMACAddressWithCompletionHandler:(void (^)(
+                                                         NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeMACAddressWithMinInterval:(uint16_t)minInterval
+                                        maxInterval:(uint16_t)maxInterval
+                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                      reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
+>>>>>>> 208b919f18 (Run zap regen script)
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;

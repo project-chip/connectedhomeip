@@ -20019,8 +20019,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::WakeOnLanMacAddress::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, wakeOnLanMacAddress));
+    case Attributes::MACAddress::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, MACAddress));
         break;
     case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
@@ -20156,7 +20156,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace Structs
 
 namespace Commands {
-namespace ChangeChannelRequest {
+namespace ChangeChannel {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -20189,7 +20189,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace ChangeChannelRequest.
+} // namespace ChangeChannel.
 namespace ChangeChannelResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
@@ -20228,7 +20228,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 } // namespace ChangeChannelResponse.
-namespace ChangeChannelByNumberRequest {
+namespace ChangeChannelByNumber {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -20265,8 +20265,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace ChangeChannelByNumberRequest.
-namespace SkipChannelRequest {
+} // namespace ChangeChannelByNumber.
+namespace SkipChannel {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -20299,7 +20299,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace SkipChannelRequest.
+} // namespace SkipChannel.
 } // namespace Commands
 
 namespace Attributes {
@@ -20310,8 +20310,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::ChannelList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, channelList));
         break;
-    case Attributes::ChannelLineup::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, channelLineup));
+    case Attributes::Lineup::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, lineup));
         break;
     case Attributes::CurrentChannel::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, currentChannel));
@@ -20389,7 +20389,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace Structs
 
 namespace Commands {
-namespace NavigateTargetRequest {
+namespace NavigateTarget {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -20426,7 +20426,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace NavigateTargetRequest.
+} // namespace NavigateTarget.
 namespace NavigateTargetResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
@@ -20472,11 +20472,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::TargetNavigatorList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, targetNavigatorList));
+    case Attributes::TargetList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, targetList));
         break;
-    case Attributes::CurrentNavigatorTarget::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, currentNavigatorTarget));
+    case Attributes::CurrentTarget::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, currentTarget));
         break;
     case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
@@ -20551,7 +20551,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace Structs
 
 namespace Commands {
-namespace PlayRequest {
+namespace Play {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -20580,8 +20580,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace PlayRequest.
-namespace PauseRequest {
+} // namespace Play.
+namespace Pause {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -20610,8 +20610,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace PauseRequest.
-namespace StopRequest {
+} // namespace Pause.
+namespace StopPlayback {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -20640,8 +20640,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace StopRequest.
-namespace StartOverRequest {
+} // namespace StopPlayback.
+namespace StartOver {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -20670,8 +20670,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace StartOverRequest.
-namespace PreviousRequest {
+} // namespace StartOver.
+namespace Previous {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -20700,8 +20700,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace PreviousRequest.
-namespace NextRequest {
+} // namespace Previous.
+namespace Next {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -20730,8 +20730,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace NextRequest.
-namespace RewindRequest {
+} // namespace Next.
+namespace Rewind {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -20760,8 +20760,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace RewindRequest.
-namespace FastForwardRequest {
+} // namespace Rewind.
+namespace FastForward {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -20790,43 +20790,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace FastForwardRequest.
-namespace SkipForwardRequest {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(
-        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kDeltaPositionMilliseconds)), deltaPositionMilliseconds));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(reader.EnterContainer(outer));
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kDeltaPositionMilliseconds):
-            ReturnErrorOnFailure(DataModel::Decode(reader, deltaPositionMilliseconds));
-            break;
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-    return CHIP_NO_ERROR;
-}
-} // namespace SkipForwardRequest.
-namespace SkipBackwardRequest {
+} // namespace FastForward.
+namespace SkipForward {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -20860,7 +20825,42 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace SkipBackwardRequest.
+} // namespace SkipForward.
+namespace SkipBackward {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kDeltaPositionMilliseconds)), deltaPositionMilliseconds));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVType outer;
+    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    ReturnErrorOnFailure(reader.EnterContainer(outer));
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        switch (TLV::TagNumFromTag(reader.GetTag()))
+        {
+        case to_underlying(Fields::kDeltaPositionMilliseconds):
+            ReturnErrorOnFailure(DataModel::Decode(reader, deltaPositionMilliseconds));
+            break;
+        default:
+            break;
+        }
+    }
+
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+    return CHIP_NO_ERROR;
+}
+} // namespace SkipBackward.
 namespace PlaybackResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
@@ -20895,7 +20895,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 } // namespace PlaybackResponse.
-namespace SeekRequest {
+namespace Seek {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -20928,7 +20928,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace SeekRequest.
+} // namespace Seek.
 } // namespace Commands
 
 namespace Attributes {
@@ -20936,8 +20936,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::PlaybackState::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, playbackState));
+    case Attributes::CurrentState::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, currentState));
         break;
     case Attributes::StartTime::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, startTime));
@@ -20945,8 +20945,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Duration::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, duration));
         break;
-    case Attributes::Position::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, position));
+    case Attributes::SampledPosition::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, sampledPosition));
         break;
     case Attributes::PlaybackSpeed::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, playbackSpeed));
@@ -21038,7 +21038,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace Structs
 
 namespace Commands {
-namespace SelectInputRequest {
+namespace SelectInput {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -21071,8 +21071,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace SelectInputRequest.
-namespace ShowInputStatusRequest {
+} // namespace SelectInput.
+namespace ShowInputStatus {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -21101,8 +21101,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace ShowInputStatusRequest.
-namespace HideInputStatusRequest {
+} // namespace ShowInputStatus.
+namespace HideInputStatus {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -21131,8 +21131,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace HideInputStatusRequest.
-namespace RenameInputRequest {
+} // namespace HideInputStatus.
+namespace RenameInput {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -21169,7 +21169,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace RenameInputRequest.
+} // namespace RenameInput.
 } // namespace Commands
 
 namespace Attributes {
@@ -21177,11 +21177,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::MediaInputList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, mediaInputList));
+    case Attributes::InputList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, inputList));
         break;
-    case Attributes::CurrentMediaInput::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, currentMediaInput));
+    case Attributes::CurrentInput::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, currentInput));
         break;
     case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
@@ -21280,7 +21280,7 @@ namespace Events {
 namespace KeypadInput {
 
 namespace Commands {
-namespace SendKeyRequest {
+namespace SendKey {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -21313,7 +21313,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace SendKeyRequest.
+} // namespace SendKey.
 namespace SendKeyResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
@@ -21657,7 +21657,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace Structs
 
 namespace Commands {
-namespace LaunchContentRequest {
+namespace LaunchContent {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -21698,8 +21698,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace LaunchContentRequest.
-namespace LaunchURLRequest {
+} // namespace LaunchContent.
+namespace LaunchURL {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -21741,7 +21741,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace LaunchURLRequest.
+} // namespace LaunchURL.
 namespace LaunchResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
@@ -21787,8 +21787,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::AcceptHeaderList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, acceptHeaderList));
+    case Attributes::AcceptHeader::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptHeader));
         break;
     case Attributes::SupportedStreamingProtocols::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, supportedStreamingProtocols));
@@ -21870,7 +21870,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace Structs
 
 namespace Commands {
-namespace SelectOutputRequest {
+namespace SelectOutput {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -21903,8 +21903,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace SelectOutputRequest.
-namespace RenameOutputRequest {
+} // namespace SelectOutput.
+namespace RenameOutput {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -21941,7 +21941,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace RenameOutputRequest.
+} // namespace RenameOutput.
 } // namespace Commands
 
 namespace Attributes {
@@ -21949,11 +21949,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::AudioOutputList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, audioOutputList));
+    case Attributes::OutputList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, outputList));
         break;
-    case Attributes::CurrentAudioOutput::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, currentAudioOutput));
+    case Attributes::CurrentOutput::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, currentOutput));
         break;
     case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
@@ -22069,7 +22069,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace Structs
 
 namespace Commands {
-namespace LaunchAppRequest {
+namespace LaunchApp {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -22106,8 +22106,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace LaunchAppRequest.
-namespace StopAppRequest {
+} // namespace LaunchApp.
+namespace StopApp {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -22140,8 +22140,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace StopAppRequest.
-namespace HideAppRequest {
+} // namespace StopApp.
+namespace HideApp {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -22174,7 +22174,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace HideAppRequest.
+} // namespace HideApp.
 namespace LauncherResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
@@ -22220,11 +22220,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::ApplicationLauncherList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, applicationLauncherList));
+    case Attributes::CatalogList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, catalogList));
         break;
-    case Attributes::ApplicationLauncherApp::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, applicationLauncherApp));
+    case Attributes::CurrentApp::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, currentApp));
         break;
     case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));
@@ -22309,20 +22309,20 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::VendorName::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, vendorName));
         break;
-    case Attributes::VendorId::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, vendorId));
+    case Attributes::VendorID::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, vendorID));
         break;
     case Attributes::ApplicationName::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, applicationName));
         break;
-    case Attributes::ProductId::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, productId));
+    case Attributes::ProductID::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, productID));
         break;
-    case Attributes::ApplicationApp::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, applicationApp));
+    case Attributes::Application::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, application));
         break;
-    case Attributes::ApplicationStatus::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, applicationStatus));
+    case Attributes::Status::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, status));
         break;
     case Attributes::ApplicationVersion::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, applicationVersion));
@@ -22360,7 +22360,7 @@ namespace Events {
 namespace AccountLogin {
 
 namespace Commands {
-namespace GetSetupPINRequest {
+namespace GetSetupPIN {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -22394,7 +22394,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace GetSetupPINRequest.
+} // namespace GetSetupPIN.
 namespace GetSetupPINResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
@@ -22429,7 +22429,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 } // namespace GetSetupPINResponse.
-namespace LoginRequest {
+namespace Login {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -22467,8 +22467,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace LoginRequest.
-namespace LogoutRequest {
+} // namespace Login.
+namespace Logout {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -22497,7 +22497,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace LogoutRequest.
+} // namespace Logout.
 } // namespace Commands
 
 namespace Attributes {
@@ -26236,9 +26236,9 @@ bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand)
     case Clusters::AccountLogin::Id: {
         switch (aCommand)
         {
-        case Clusters::AccountLogin::Commands::GetSetupPINRequest::Id:
-        case Clusters::AccountLogin::Commands::LoginRequest::Id:
-        case Clusters::AccountLogin::Commands::LogoutRequest::Id:
+        case Clusters::AccountLogin::Commands::GetSetupPIN::Id:
+        case Clusters::AccountLogin::Commands::Login::Id:
+        case Clusters::AccountLogin::Commands::Logout::Id:
             return true;
         default:
             return false;

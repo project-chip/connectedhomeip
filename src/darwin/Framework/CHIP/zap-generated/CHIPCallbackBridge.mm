@@ -1227,7 +1227,7 @@ void CHIPAdministratorCommissioningAttributeListListAttributeCallbackSubscriptio
     }
 }
 
-void CHIPApplicationBasicApplicationAppStructAttributeCallbackBridge::OnSuccessFn(
+void CHIPApplicationBasicApplicationStructAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::DecodableType & value)
 {
     CHIPApplicationBasicClusterApplicationBasicApplication * _Nonnull objCValue;
@@ -1239,9 +1239,9 @@ void CHIPApplicationBasicApplicationAppStructAttributeCallbackBridge::OnSuccessF
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPApplicationBasicApplicationAppStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPApplicationBasicApplicationStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPApplicationBasicApplicationAppStructAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPApplicationBasicApplicationStructAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -1413,7 +1413,7 @@ void CHIPApplicationBasicAttributeListListAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void CHIPApplicationLauncherApplicationLauncherListListAttributeCallbackBridge::OnSuccessFn(
+void CHIPApplicationLauncherCatalogListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<uint16_t> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -1436,10 +1436,9 @@ void CHIPApplicationLauncherApplicationLauncherListListAttributeCallbackBridge::
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPApplicationLauncherApplicationLauncherListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void CHIPApplicationLauncherCatalogListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPApplicationLauncherApplicationLauncherListListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPApplicationLauncherCatalogListListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -1453,7 +1452,7 @@ void CHIPApplicationLauncherApplicationLauncherListListAttributeCallbackSubscrip
     }
 }
 
-void CHIPApplicationLauncherApplicationLauncherAppStructAttributeCallbackBridge::OnSuccessFn(void * context,
+void CHIPApplicationLauncherCurrentAppStructAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType> & value)
 {
     CHIPApplicationLauncherClusterApplicationEP * _Nullable objCValue;
@@ -1475,10 +1474,9 @@ void CHIPApplicationLauncherApplicationLauncherAppStructAttributeCallbackBridge:
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPApplicationLauncherApplicationLauncherAppStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void CHIPApplicationLauncherCurrentAppStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPApplicationLauncherApplicationLauncherAppStructAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPApplicationLauncherCurrentAppStructAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -1611,7 +1609,7 @@ void CHIPApplicationLauncherAttributeListListAttributeCallbackSubscriptionBridge
     }
 }
 
-void CHIPAudioOutputAudioOutputListListAttributeCallbackBridge::OnSuccessFn(void * context,
+void CHIPAudioOutputOutputListListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -1639,9 +1637,9 @@ void CHIPAudioOutputAudioOutputListListAttributeCallbackBridge::OnSuccessFn(void
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPAudioOutputAudioOutputListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPAudioOutputOutputListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPAudioOutputAudioOutputListListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPAudioOutputOutputListListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -2765,7 +2763,7 @@ void CHIPChannelChannelListListAttributeCallbackSubscriptionBridge::OnSubscripti
     }
 }
 
-void CHIPChannelChannelLineupStructAttributeCallbackBridge::OnSuccessFn(
+void CHIPChannelLineupStructAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType> & value)
 {
     CHIPChannelClusterLineupInfo * _Nullable objCValue;
@@ -2795,9 +2793,9 @@ void CHIPChannelChannelLineupStructAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPChannelChannelLineupStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPChannelLineupStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPChannelChannelLineupStructAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPChannelLineupStructAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -3096,7 +3094,7 @@ void CHIPColorControlAttributeListListAttributeCallbackSubscriptionBridge::OnSub
     }
 }
 
-void CHIPContentLauncherAcceptHeaderListListAttributeCallbackBridge::OnSuccessFn(
+void CHIPContentLauncherAcceptHeaderListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -3119,9 +3117,9 @@ void CHIPContentLauncherAcceptHeaderListListAttributeCallbackBridge::OnSuccessFn
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPContentLauncherAcceptHeaderListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPContentLauncherAcceptHeaderListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPContentLauncherAcceptHeaderListListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPContentLauncherAcceptHeaderListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -5775,7 +5773,7 @@ void CHIPLowPowerAttributeListListAttributeCallbackSubscriptionBridge::OnSubscri
     }
 }
 
-void CHIPMediaInputMediaInputListListAttributeCallbackBridge::OnSuccessFn(void * context,
+void CHIPMediaInputInputListListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -5806,9 +5804,9 @@ void CHIPMediaInputMediaInputListListAttributeCallbackBridge::OnSuccessFn(void *
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPMediaInputMediaInputListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPMediaInputInputListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPMediaInputMediaInputListListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPMediaInputInputListListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -5939,23 +5937,27 @@ void CHIPMediaInputAttributeListListAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void CHIPMediaPlaybackPositionStructAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType & value)
+void CHIPMediaPlaybackSampledPositionStructAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType> & value)
 {
-    CHIPMediaPlaybackClusterPlaybackPosition * _Nonnull objCValue;
-    objCValue = [CHIPMediaPlaybackClusterPlaybackPosition new];
-    objCValue.updatedAt = [NSNumber numberWithUnsignedLongLong:value.updatedAt];
-    if (value.position.IsNull()) {
-        objCValue.position = nil;
+    CHIPMediaPlaybackClusterPlaybackPosition * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
     } else {
-        objCValue.position = [NSNumber numberWithUnsignedLongLong:value.position.Value()];
+        objCValue = [CHIPMediaPlaybackClusterPlaybackPosition new];
+        objCValue.updatedAt = [NSNumber numberWithUnsignedLongLong:value.Value().updatedAt];
+        if (value.Value().position.IsNull()) {
+            objCValue.position = nil;
+        } else {
+            objCValue.position = [NSNumber numberWithUnsignedLongLong:value.Value().position.Value()];
+        }
     }
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPMediaPlaybackPositionStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPMediaPlaybackSampledPositionStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPMediaPlaybackPositionStructAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPMediaPlaybackSampledPositionStructAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -8101,7 +8103,7 @@ void CHIPSwitchAttributeListListAttributeCallbackSubscriptionBridge::OnSubscript
     }
 }
 
-void CHIPTargetNavigatorTargetNavigatorListListAttributeCallbackBridge::OnSuccessFn(void * context,
+void CHIPTargetNavigatorTargetListListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -8128,9 +8130,9 @@ void CHIPTargetNavigatorTargetNavigatorListListAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPTargetNavigatorTargetNavigatorListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPTargetNavigatorTargetListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPTargetNavigatorTargetNavigatorListListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPTargetNavigatorTargetListListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
