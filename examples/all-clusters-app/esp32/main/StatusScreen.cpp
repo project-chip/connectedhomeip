@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -118,7 +118,7 @@ public:
                     char buf[MAX_IP4_ADDRESS_STRING];
                     addr.ToString(buf, sizeof(buf));
                     itemString = std::string(buf);
-                    break; // Only print first fabric for now
+                    break; // Only print first IPv4 address for now
                 }
             }
             break;
@@ -141,7 +141,7 @@ public:
                     {
                         TFT_setFont(DEF_SMALL_FONT, nullptr);
                     }
-                    break; // Only print first fabric for now
+                    break; // Only print first IPv6 LL for now
                 }
             }
             break;
@@ -164,7 +164,7 @@ public:
                     {
                         TFT_setFont(DEF_SMALL_FONT, nullptr);
                     }
-                    break; // Only print first fabric for now
+                    break; // Only print first IPv6 ULA for now
                 }
             }
             break;
