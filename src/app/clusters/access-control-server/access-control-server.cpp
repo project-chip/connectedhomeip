@@ -291,8 +291,8 @@ class AccessControlAttribute : public chip::app::AttributeAccessInterface
 public:
     AccessControlAttribute() : AttributeAccessInterface(Optional<EndpointId>(0), AccessControlCluster::Id) {}
 
-    CHIP_ERROR Read( const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write( const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
     static constexpr uint16_t ClusterRevision = 1;
 
@@ -383,8 +383,7 @@ CHIP_ERROR LogAccessControlEvent(const AccessControl::Entry & entry, const Acces
     return err;
 }
 
-CHIP_ERROR AccessControlAttribute::Read( const ConcreteReadAttributePath & aPath,
-                                        AttributeValueEncoder & aEncoder)
+CHIP_ERROR AccessControlAttribute::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     switch (aPath.mAttributeId)
     {
@@ -422,8 +421,7 @@ CHIP_ERROR AccessControlAttribute::ReadExtension(AttributeValueEncoder & aEncode
     return aEncoder.EncodeEmptyList();
 }
 
-CHIP_ERROR AccessControlAttribute::Write( const ConcreteDataAttributePath & aPath,
-                                         AttributeValueDecoder & aDecoder)
+CHIP_ERROR AccessControlAttribute::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
     switch (aPath.mAttributeId)
     {

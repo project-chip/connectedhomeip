@@ -42,8 +42,7 @@ class TvAttrAccess : public app::AttributeAccessInterface
 public:
     TvAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), AttrTypeInfo::GetClusterId()) {}
 
-    CHIP_ERROR Read( const app::ConcreteReadAttributePath & aPath,
-                    app::AttributeValueEncoder & aEncoder) override
+    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override
     {
         if (aPath.mAttributeId == AttrTypeInfo::GetAttributeId())
         {

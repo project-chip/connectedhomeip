@@ -44,8 +44,8 @@ public:
     // Register for the User Label cluster on all endpoints.
     UserLabelAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), UserLabel::Id) {}
 
-    CHIP_ERROR Read( const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write( const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
 private:
     CHIP_ERROR ReadLabelList(EndpointId endpoint, AttributeValueEncoder & aEncoder);
@@ -96,8 +96,7 @@ CHIP_ERROR UserLabelAttrAccess::WriteLabelList(EndpointId endpoint, AttributeVal
     return DeviceLayer::PlatformMgr().SetUserLabelList(endpoint, labelList);
 }
 
-CHIP_ERROR UserLabelAttrAccess::Read( const ConcreteReadAttributePath & aPath,
-                                     AttributeValueEncoder & aEncoder)
+CHIP_ERROR UserLabelAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == UserLabel::Id);
 
@@ -111,8 +110,7 @@ CHIP_ERROR UserLabelAttrAccess::Read( const ConcreteReadAttributePath & aPath,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR UserLabelAttrAccess::Write( const ConcreteDataAttributePath & aPath,
-                                      AttributeValueDecoder & aDecoder)
+CHIP_ERROR UserLabelAttrAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
     VerifyOrDie(aPath.mClusterId == UserLabel::Id);
 

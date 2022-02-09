@@ -110,8 +110,7 @@ class MediaPlaybackAttrAccess : public app::AttributeAccessInterface
 public:
     MediaPlaybackAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), MediaPlayback::Id) {}
 
-    CHIP_ERROR Read( const app::ConcreteReadAttributePath & aPath,
-                    app::AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
 
 private:
     CHIP_ERROR ReadCurrentStateAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
@@ -125,8 +124,7 @@ private:
 
 MediaPlaybackAttrAccess gMediaPlaybackAttrAccess;
 
-CHIP_ERROR MediaPlaybackAttrAccess::Read( const app::ConcreteReadAttributePath & aPath,
-                                         app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR MediaPlaybackAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder)
 {
     EndpointId endpoint = aPath.mEndpointId;
     Delegate * delegate = GetDelegate(endpoint);

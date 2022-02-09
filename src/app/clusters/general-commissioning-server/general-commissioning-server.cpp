@@ -58,7 +58,7 @@ public:
     // Register for the GeneralCommissioning cluster on all endpoints.
     GeneralCommissioningAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), GeneralCommissioning::Id) {}
 
-    CHIP_ERROR Read( const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
     CHIP_ERROR ReadIfSupported(CHIP_ERROR (ConfigurationManager::*getter)(uint8_t &), AttributeValueEncoder & aEncoder);
@@ -67,8 +67,7 @@ private:
 
 GeneralCommissioningAttrAccess gAttrAccess;
 
-CHIP_ERROR GeneralCommissioningAttrAccess::Read( const ConcreteReadAttributePath & aPath,
-                                                AttributeValueEncoder & aEncoder)
+CHIP_ERROR GeneralCommissioningAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     if (aPath.mClusterId != GeneralCommissioning::Id)
     {

@@ -110,8 +110,7 @@ class TargetNavigatorAttrAccess : public app::AttributeAccessInterface
 public:
     TargetNavigatorAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), TargetNavigator::Id) {}
 
-    CHIP_ERROR Read( const app::ConcreteReadAttributePath & aPath,
-                    app::AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
 
 private:
     CHIP_ERROR ReadTargetListAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
@@ -120,8 +119,7 @@ private:
 
 TargetNavigatorAttrAccess gTargetNavigatorAttrAccess;
 
-CHIP_ERROR TargetNavigatorAttrAccess::Read( const app::ConcreteReadAttributePath & aPath,
-                                           app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR TargetNavigatorAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder)
 {
     EndpointId endpoint = aPath.mEndpointId;
     Delegate * delegate = GetDelegate(endpoint);
