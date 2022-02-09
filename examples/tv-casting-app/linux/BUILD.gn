@@ -30,6 +30,7 @@ executable("chip-tv-casting-app") {
     "${chip_root}/examples/tv-casting-app/tv-casting-common",
     "${chip_root}/src/lib",
     "${chip_root}/third_party/inipp",
+    "${chip_root}/src/credentials:default_attestation_verifier",
   ]
 
   cflags = [ "-Wconversion" ]

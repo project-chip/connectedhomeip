@@ -70,6 +70,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       "${chip_root}/src/ble",
       "${chip_root}/src/controller",
       "${chip_root}/src/credentials",
+      "${chip_root}/src/credentials:default_attestation_verifier",
       "${chip_root}/src/crypto",
       "${chip_root}/src/inet",
       "${chip_root}/src/lib",

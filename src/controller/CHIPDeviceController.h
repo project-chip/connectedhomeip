@@ -41,7 +41,7 @@
 #include <controller/CommissioningDelegate.h>
 #include <controller/OperationalCredentialsDelegate.h>
 #include <controller/SetUpCodePairer.h>
-#include <credentials/DeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/FabricTable.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPCore.h>
