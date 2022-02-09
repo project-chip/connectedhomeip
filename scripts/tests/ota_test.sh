@@ -20,10 +20,6 @@ fi
 ./out/ota_provider_debug/chip-ota-provider-app -f my-firmware.ota | tee /tmp/ota/provider-log.txt &
 provider_pid=$!
 
-if [ ! -f "/tmp/ota/provider-log.txt" ]; then
-    exit 1
-fi
-
 echo "Commissioning Provider"
 
 ./out/chip-tool pairing onnetwork 1 "$PASSCODE" | tee /tmp/ota/chip-tool-commission-provider.txt
@@ -31,7 +27,6 @@ if grep "Device commissioning completed with success" /tmp/ota/chip-tool-commiss
     echo Provider Commissioned
 else
     echo Provider not commissioned properly
-    exit 1
 fi
 
 # TODO: This should be removed once chip_kvs is fixed
@@ -48,7 +43,6 @@ if grep "Device commissioning completed with success" /tmp/ota/chip-tool-commiss
     echo Requestor Commissioned
 else
     echo Requestor not commissioned properly
-    exit 1
 fi
 
 echo "Sending announce-ota-provider"
