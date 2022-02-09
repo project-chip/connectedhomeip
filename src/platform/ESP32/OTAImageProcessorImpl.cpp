@@ -159,19 +159,24 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
     }
 
     ByteSpan block = ByteSpan(imageProcessor->mBlock.data(), imageProcessor->mBlock.size());
-    if (imageProcessor->ProcessHeader(block) == CHIP_NO_ERROR)
+
+    CHIP_ERROR error = imageProcessor->ProcessBlock(block);
+    if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(SoftwareUpdate, "######## ProcessHeader(block) before:%d after:%d", imageProcessor->mBlock.size(),
-                     block.size());
-        esp_err_t err = esp_ota_write(imageProcessor->mOTAUpdateHandle, block.data(), block.size());
-        if (err != ESP_OK)
-        {
-            ESP_LOGE(TAG, "esp_ota_write failed (%s)", esp_err_to_name(err));
-            imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
-        }
-        imageProcessor->mParams.downloadedBytes += block.size();
-        imageProcessor->mDownloader->FetchNextData();
+        ESP_LOGE(TAG, "Failed to process OTA image header");
+        imageProcessor->mDownloader->EndDownload(error);
+        return;
     }
+
+    esp_err_t err = esp_ota_write(imageProcessor->mOTAUpdateHandle, block.data(), block.size());
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "esp_ota_write failed (%s)", esp_err_to_name(err));
+        imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
+        return;
+    }
+    imageProcessor->mParams.downloadedBytes += block.size();
+    imageProcessor->mDownloader->FetchNextData();
 }
 
 void OTAImageProcessorImpl::HandleApply(intptr_t context)
