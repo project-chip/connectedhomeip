@@ -165,19 +165,6 @@ public:
         return *this;
     }
 
-    /// DEPRECATED: Setting this has several drawbacks:
-    ///   - IP address is not set (pair of IP + interface is not maintained as
-    ///     always a pair)
-    ///   - Nodes are generally expected to support multiple IP addresses when
-    ///     discovered using DNSSD.
-    PeerAddress & SetSingleInterface(Inet::InterfaceId interface)
-    {
-        // NOTE: mDestinations[0].ipAddress is NOT changed in any way
-        mDestinations[0].interface = interface;
-        mNumValidDestinations      = 1;
-        return *this;
-    }
-
     bool IsInitialized() const { return mTransportType != Type::kUndefined; }
 
     bool IsMulticast()
