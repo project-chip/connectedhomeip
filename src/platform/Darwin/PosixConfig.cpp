@@ -79,6 +79,7 @@ const PosixConfig::Key PosixConfig::kCounterKey_UpTime                = { kConfi
 const PosixConfig::Key PosixConfig::kCounterKey_BootReason            = { kConfigNamespace_ChipCounters, "boot-reason" };
 const PosixConfig::Key PosixConfig::kCounterKey_TotalOperationalHours = { kConfigNamespace_ChipCounters,
                                                                           "total-operational-hours" };
+const PosixConfig::Key PosixConfig::kConfigKey_UniqueId               = { kConfigNamespace_ChipConfig, "unique-id" };
 
 // Prefix used for NVS keys that contain Chip group encryption keys.
 const char PosixConfig::kGroupKeyNamePrefix[] = "gk-";

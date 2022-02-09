@@ -95,6 +95,7 @@ const AndroidConfig::Key AndroidConfig::kConfigKey_WiFiStationSecType = { kConfi
 const AndroidConfig::Key AndroidConfig::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "regulatory-location" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_Breadcrumb         = { kConfigNamespace_ChipConfig, "breadcrumb" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_UniqueId           = { kConfigNamespace_ChipConfig, "unique-id" };
 
 // Prefix used for NVS keys that contain Chip group encryption keys.
 const char AndroidConfig::kGroupKeyNamePrefix[] = "gk-";

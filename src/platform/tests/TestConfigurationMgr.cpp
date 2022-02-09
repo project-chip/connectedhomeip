@@ -87,6 +87,32 @@ static void TestConfigurationMgr_SerialNumber(nlTestSuite * inSuite, void * inCo
     NL_TEST_ASSERT(inSuite, strcmp(buf, "89051") == 0);
 }
 
+static void TestConfigurationMgr_UniqueId(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    char buf[64];
+    const char * uniqueId = "67MXAZ012RT8UE";
+
+    err = ConfigurationMgr().StoreUniqueId(uniqueId, strlen(uniqueId));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = ConfigurationMgr().GetUniqueId(buf, 64);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, strlen(buf) == 14);
+    NL_TEST_ASSERT(inSuite, strcmp(buf, uniqueId) == 0);
+
+    err = ConfigurationMgr().StoreUniqueId(uniqueId, 7);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = ConfigurationMgr().GetUniqueId(buf, 64);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, strlen(buf) == 7);
+    NL_TEST_ASSERT(inSuite, strcmp(buf, "67MXAZ0") == 0);
+}
+
 static void TestConfigurationMgr_ManufacturingDate(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -221,6 +247,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test PlatformMgr::RunUnitTest", TestPlatformMgr_RunUnitTest),
 #endif
     NL_TEST_DEF("Test ConfigurationMgr::SerialNumber", TestConfigurationMgr_SerialNumber),
+    NL_TEST_DEF("Test ConfigurationMgr::UniqueId", TestConfigurationMgr_UniqueId),
     NL_TEST_DEF("Test ConfigurationMgr::ManufacturingDate", TestConfigurationMgr_ManufacturingDate),
     NL_TEST_DEF("Test ConfigurationMgr::HardwareVersion", TestConfigurationMgr_HardwareVersion),
     NL_TEST_DEF("Test ConfigurationMgr::SetupPinCode", TestConfigurationMgr_SetupPinCode),

@@ -28,9 +28,11 @@
 
 #include <ble/CHIPBleServiceData.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <crypto/RandUtils.h>
 #include <inttypes.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/Base64.h>
+#include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
@@ -48,11 +50,24 @@ namespace Internal {
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::Init()
 {
+    CHIP_ERROR err;
+
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
     mLifetimePersistedCounter.Init(CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY);
 #endif
 
-    return CHIP_NO_ERROR;
+    char uniqueId[kMaxUniqueIDLength + 1];
+
+    // Generate Unique ID only if it is not present in the storage.
+    if (GetUniqueId(uniqueId, sizeof(uniqueId)) == CHIP_NO_ERROR)
+        return CHIP_NO_ERROR;
+
+    err = GenerateUniqueId(uniqueId, sizeof(uniqueId));
+    ReturnErrorOnFailure(err);
+
+    err = StoreUniqueId(uniqueId, strlen(uniqueId));
+
+    return err;
 }
 
 template <class ConfigClass>
@@ -548,29 +563,62 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetReachable(bool & rea
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetUniqueId(char * buf, size_t bufSize)
 {
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    CHIP_ERROR err;
+    size_t uniqueIdLen = 0; // without counting null-terminator
+    err                = ReadConfigValueStr(ConfigClass::kConfigKey_UniqueId, buf, bufSize, uniqueIdLen);
+
+    ReturnErrorOnFailure(err);
+
+    ReturnErrorCodeIf(uniqueIdLen >= bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorCodeIf(buf[uniqueIdLen] != 0, CHIP_ERROR_INVALID_STRING_LENGTH);
+
+    return err;
 }
 
 template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreUniqueId(const char * uniqueId, size_t uniqueIdLen)
+{
+    return WriteConfigValueStr(ConfigClass::kConfigKey_UniqueId, uniqueId, uniqueIdLen);
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GenerateUniqueId(char * buf, size_t bufSize)
+{
+    uint64_t randomUniqueId = Crypto::GetRandU64();
+    return Encoding::BytesToUppercaseHexString(reinterpret_cast<uint8_t *>(&randomUniqueId), sizeof(uint64_t), buf, bufSize);
+}
+
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
+template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetLifetimeCounter(uint16_t & lifetimeCounter)
 {
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
     lifetimeCounter = static_cast<uint16_t>(mLifetimePersistedCounter.GetValue());
     return CHIP_NO_ERROR;
-#else
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif
 }
 
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::IncrementLifetimeCounter()
 {
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
     return mLifetimePersistedCounter.Advance();
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetRotatingDeviceIdUniqueId(uint8_t * buf, size_t & outSize,
+                                                                                     size_t bufSize)
+{
+#ifdef CHIP_DEVICE_CONFIG_TEST_ROTATING_DEVICE_ID_UNIQUE_ID
+    uint8_t uniqueId[] = CHIP_DEVICE_CONFIG_TEST_ROTATING_DEVICE_ID_UNIQUE_ID;
+
+    ReturnErrorCodeIf(sizeof(uniqueId) > bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorCodeIf(sizeof(uniqueId) != kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(buf, uniqueId, sizeof(uniqueId));
+    outSize = sizeof(uniqueId);
+    return CHIP_NO_ERROR;
 #else
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif
 }
+#endif // CHIP_ENABLE_ROTATING_DEVICE_ID
 
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetFailSafeArmed(bool & val)

@@ -77,6 +77,7 @@ const P6Config::Key P6Config::kConfigKey_WiFiSSID           = { kConfigNamespace
 const P6Config::Key P6Config::kConfigKey_WiFiPassword       = { kConfigNamespace_ChipConfig, "wifi-password" };
 const P6Config::Key P6Config::kConfigKey_WiFiSecurity       = { kConfigNamespace_ChipConfig, "wifi-security" };
 const P6Config::Key P6Config::kConfigKey_WiFiMode           = { kConfigNamespace_ChipConfig, "wifimode" };
+const P6Config::Key P6Config::kConfigKey_UniqueId           = { kConfigNamespace_ChipConfig, "unique-id" };
 
 // Keys stored in the Chip-counters namespace
 const P6Config::Key P6Config::kCounterKey_RebootCount           = { kConfigNamespace_ChipCounters, "reboot-count" };
