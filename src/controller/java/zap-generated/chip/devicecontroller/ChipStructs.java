@@ -225,41 +225,6 @@ public class ChipStructs {
     }
   }
 
-  public static class BindingClusterBindingEntry {
-    public Long nodeId;
-    public Integer groupId;
-    public Integer endpointId;
-    public Long clusterId;
-
-    public BindingClusterBindingEntry(
-        Long nodeId, Integer groupId, Integer endpointId, Long clusterId) {
-      this.nodeId = nodeId;
-      this.groupId = groupId;
-      this.endpointId = endpointId;
-      this.clusterId = clusterId;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("BindingClusterBindingEntry {\n");
-      output.append("\tnodeId: ");
-      output.append(nodeId);
-      output.append("\n");
-      output.append("\tgroupId: ");
-      output.append(groupId);
-      output.append("\n");
-      output.append("\tendpointId: ");
-      output.append(endpointId);
-      output.append("\n");
-      output.append("\tclusterId: ");
-      output.append(clusterId);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
   public static class BridgedActionsClusterActionStruct {
     public Integer actionID;
     public String name;
