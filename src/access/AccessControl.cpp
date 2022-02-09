@@ -303,7 +303,8 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
 
 bool AccessControl::IsValid(const Entry & entry)
 {
-    const char * msg = "unexpected error";
+    const char * log = "unexpected error";
+    IgnoreUnusedVariable(log); // logging may be disabled
 
     AuthMode authMode;
     FabricIndex fabricIndex;
@@ -318,18 +319,18 @@ bool AccessControl::IsValid(const Entry & entry)
     SuccessOrExit(entry.GetTargetCount(targetCount));
 
     // Fabric index must be defined.
-    VerifyOrExit(fabricIndex != kUndefinedFabricIndex, msg = "invalid fabric index");
+    VerifyOrExit(fabricIndex != kUndefinedFabricIndex, log = "invalid fabric index");
 
     if (authMode != AuthMode::kCase)
     {
         // Operational PASE not supported for v1.0 (so must be group).
-        VerifyOrExit(authMode == AuthMode::kGroup, msg = "invalid auth mode");
+        VerifyOrExit(authMode == AuthMode::kGroup, log = "invalid auth mode");
 
         // Privilege must not be administer.
-        VerifyOrExit(privilege != Privilege::kAdminister, msg = "invalid privilege");
+        VerifyOrExit(privilege != Privilege::kAdminister, log = "invalid privilege");
 
         // Subject must be present.
-        VerifyOrExit(subjectCount > 0, msg = "invalid subject count");
+        VerifyOrExit(subjectCount > 0, log = "invalid subject count");
     }
 
     for (size_t i = 0; i < subjectCount; ++i)
@@ -338,7 +339,7 @@ bool AccessControl::IsValid(const Entry & entry)
         SuccessOrExit(entry.GetSubject(i, subject));
         const bool kIsCase  = authMode == AuthMode::kCase;
         const bool kIsGroup = authMode == AuthMode::kGroup;
-        VerifyOrExit((kIsCase && IsValidCaseNodeId(subject)) || (kIsGroup && IsValidGroupNodeId(subject)), msg = "invalid subject");
+        VerifyOrExit((kIsCase && IsValidCaseNodeId(subject)) || (kIsGroup && IsValidGroupNodeId(subject)), log = "invalid subject");
     }
 
     for (size_t i = 0; i < targetCount; ++i)
@@ -352,15 +353,15 @@ bool AccessControl::IsValid(const Entry & entry)
                          (!kHasCluster || IsValidClusterId(target.cluster)) &&
                          (!kHasEndpoint || IsValidEndpointId(target.endpoint)) &&
                          (!kHasDeviceType || IsValidDeviceTypeId(target.deviceType)),
-                     msg = "invalid target");
+                     log = "invalid target");
         // TODO(#14431): device type target not yet supported (remove check when supported)
-        VerifyOrExit(!kHasDeviceType, msg = "device type target not yet supported");
+        VerifyOrExit(!kHasDeviceType, log = "device type target not yet supported");
     }
 
     return true;
 
 exit:
-    ChipLogError(DataManagement, "AccessControl: %s", msg);
+    ChipLogError(DataManagement, "AccessControl: %s", log);
     return false;
 }
 
