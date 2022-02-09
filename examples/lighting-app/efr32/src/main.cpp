@@ -16,9 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#ifdef OTA_PERIODIC_TIMEOUT
-#define TIMEOUT OTA_PERIODIC_TIMEOUT
-#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -127,7 +124,6 @@ int main(void)
 #ifdef HEAP_MONITORING
     MemMonitoring::startHeapMonitoring();
 #endif
-    EFR32_LOG("timeout: %d", TIMEOUT);
     EFR32_LOG("==================================================");
     EFR32_LOG("chip-efr32-lighting-example starting");
     EFR32_LOG("==================================================");
