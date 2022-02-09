@@ -126,7 +126,7 @@ CHIP_ERROR TargetNavigatorAttrAccess::Read(const app::ConcreteReadAttributePath 
 
     switch (aPath.mAttributeId)
     {
-    case app::Clusters::TargetNavigator::Attributes::TargetNavigatorList::Id: {
+    case app::Clusters::TargetNavigator::Attributes::TargetList::Id: {
         if (isDelegateNull(delegate, endpoint))
         {
             return aEncoder.EncodeEmptyList();
@@ -134,7 +134,7 @@ CHIP_ERROR TargetNavigatorAttrAccess::Read(const app::ConcreteReadAttributePath 
 
         return ReadTargetListAttribute(aEncoder, delegate);
     }
-    case app::Clusters::TargetNavigator::Attributes::CurrentNavigatorTarget::Id: {
+    case app::Clusters::TargetNavigator::Attributes::CurrentTarget::Id: {
         if (isDelegateNull(delegate, endpoint))
         {
             return CHIP_NO_ERROR;
@@ -166,9 +166,9 @@ CHIP_ERROR TargetNavigatorAttrAccess::ReadCurrentTargetAttribute(app::AttributeV
 // -----------------------------------------------------------------------------
 // Matter Framework Callbacks Implementation
 
-bool emberAfTargetNavigatorClusterNavigateTargetRequestCallback(app::CommandHandler * command,
+bool emberAfTargetNavigatorClusterNavigateTargetCallback(app::CommandHandler * command,
                                                                 const app::ConcreteCommandPath & commandPath,
-                                                                const Commands::NavigateTargetRequest::DecodableType & commandData)
+                                                                const Commands::NavigateTarget::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
@@ -186,7 +186,7 @@ bool emberAfTargetNavigatorClusterNavigateTargetRequestCallback(app::CommandHand
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "emberAfTargetNavigatorClusterNavigateTargetRequestCallback error: %s", err.AsString());
+        ChipLogError(Zcl, "emberAfTargetNavigatorClusterNavigateTargetCallback error: %s", err.AsString());
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
 
