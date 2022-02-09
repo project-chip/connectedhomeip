@@ -32939,12 +32939,12 @@ class ContentLauncher(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="search", Tag=0, Type=typing.List[ContentLauncher.Structs.ContentSearch]),
+                            ClusterObjectFieldDescriptor(Label="search", Tag=0, Type=ContentLauncher.Structs.ContentSearch),
                             ClusterObjectFieldDescriptor(Label="autoPlay", Tag=1, Type=bool),
                             ClusterObjectFieldDescriptor(Label="data", Tag=2, Type=typing.Optional[str]),
                     ])
 
-            search: 'typing.List[ContentLauncher.Structs.ContentSearch]' = field(default_factory=lambda: [])
+            search: 'ContentLauncher.Structs.ContentSearch' = field(default_factory=lambda: ContentLauncher.Structs.ContentSearch())
             autoPlay: 'bool' = False
             data: 'typing.Optional[str]' = None
 
