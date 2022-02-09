@@ -26,7 +26,7 @@ tests:
     # Remove disable flag when SDK supports command.
     - label: "Select Input Command"
       disabled: true
-      command: "SelectInputRequest"
+      command: "SelectInput"
       arguments:
           values:
               - name: "index"
@@ -35,6 +35,6 @@ tests:
     - label: "Read current input list"
       disabled: true
       command: "readAttribute"
-      attribute: "current media input"
+      attribute: "CurrentInput"
       response:
           value: 1

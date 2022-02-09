@@ -25,18 +25,18 @@ tests:
 
     - label: "Read attribute accept header list"
       command: "readAttribute"
-      attribute: "accept header list"
+      attribute: "AcceptHeader"
       response:
           value: ["example", "example"]
 
     - label: "Read attribute supported streaming protocols"
       command: "readAttribute"
-      attribute: "supported streaming protocols"
+      attribute: "SupportedStreamingProtocols"
       response:
           value: 0
 
     - label: "Launch Content Command"
-      command: "launchContentRequest"
+      command: "launchContent"
       arguments:
           values:
               - name: "autoPlay"
@@ -64,7 +64,7 @@ tests:
                 value: 0
 
     - label: "Launch URL Command"
-      command: "launchURLRequest"
+      command: "launchURL"
       arguments:
           values:
               - name: "contentURL"

@@ -27,7 +27,7 @@ tests:
     - label: "Read attribute Channel list"
       disabled: true
       command: "readAttribute"
-      attribute: "Channel list"
+      attribute: "ChannelList"
       response:
           value:
               [
@@ -49,7 +49,7 @@ tests:
 
     - label: "Reads the ChannelList attribute from the DUT"
       command: "readAttribute"
-      attribute: "channel list"
+      attribute: "ChannelList"
       response:
           constraints:
               type: list
