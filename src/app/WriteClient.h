@@ -377,9 +377,12 @@ private:
     // A list of buffers, one buffer for each chunk.
     System::PacketBufferHandle mChunks;
 
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    // TODO: `mReservedSize` should be wrapped in #if, however this file might be compiled with different build flags on Darwin
+    // platform (when building WriteClient.cpp and CHIPClustersObjc.mm), which will cause undefined behavior when building write
+    // requests.
+    // #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     uint16_t mReservedSize = 0;
-#endif
+    // #endif
 
     /**
      * Below we define several const variables for encoding overheads.
