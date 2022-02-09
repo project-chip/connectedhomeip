@@ -123,7 +123,8 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
         return;
     }
 
-    // TODO: Handle abort flash area updates (clear flash area?)
+    flash_area_erase(imageProcessor->mFlashArea, 0, imageProcessor->mFlashArea->fa_size);
+
     imageProcessor->ReleaseBlock();
 }
 
