@@ -789,8 +789,11 @@ menu "CHIP Device Layer"
             string "OTA image creator extra arguments"
             depends on CHIP_OTA_IMAGE_BUILD
             help
-              This option allows one to pass optional arguments to the ota_image_tool.py script,
-              used for building OTA image with Matter OTA header.
+              ota_image_tool.py is used to create the OTA image.
+              Mandatory arguments(Version, VersionString, VID, PID) are picked up from the config options.
+              This option allows us to pass optional arguments(MinApplicableSoftwareVersion, MaxApplicableSoftwareVersion,
+              and ReleaseNotesURL) to the ota_image_tool.py script.
+              eg: "-mi 2 -ma 4 -rn https://github.com/espressif/esp-idf/releases/tag/v4.4"
 
     endmenu
 
