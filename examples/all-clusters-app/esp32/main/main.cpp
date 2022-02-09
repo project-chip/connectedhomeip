@@ -25,6 +25,7 @@
 #include "ListScreen.h"
 #include "OpenThreadLaunch.h"
 #include "QRCodeScreen.h"
+#include "StatusScreen.h"
 #include "ScreenManager.h"
 #include "ShellCommands.h"
 #include "WiFiWidget.h"
@@ -705,6 +706,11 @@ extern "C" void app_main()
                    [=]() {
                        ESP_LOGI(TAG, "Opening Setup list");
                        ScreenManager::PushScreen(chip::Platform::New<ListScreen>(chip::Platform::New<SetupListModel>()));
+                   })
+            ->Item("Status",
+                   [=]() {
+                       ESP_LOGI(TAG, "Opening Status screen");
+                       ScreenManager::PushScreen(chip::Platform::New<StatusScreen>());
                    })
             ->Item("Custom",
                    []() {
