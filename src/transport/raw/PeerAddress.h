@@ -28,6 +28,7 @@
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <lib/core/CHIPConfig.h>
+#include <lib/core/PeerId.h>
 #include <lib/support/CHIPMemString.h>
 
 namespace chip {
@@ -62,8 +63,12 @@ enum class Type : uint8_t
 class PeerAddress
 {
 public:
-    PeerAddress() : mIPAddress(Inet::IPAddress::Any), mTransportType(Type::kUndefined) {}
-    PeerAddress(const Inet::IPAddress & addr, Type type) : mIPAddress(addr), mTransportType(type) {}
+    // When using DNSSD, a peer may be discovered at multiple addresses.
+    // This controls how many addresses can be kept.
+    static constexpr unsigned kMaxPeerIPAddresses = 5;
+
+    PeerAddress() : mTransportType(Type::kUndefined) {}
+    PeerAddress(const Inet::IPAddress & addr, Type type) : mNumValidIPAddresses(1), mTransportType(type) { mIPAddresses[0] = addr; }
     PeerAddress(Type type) : mTransportType(type) {}
 
     PeerAddress(PeerAddress &&)      = default;
@@ -71,10 +76,24 @@ public:
     PeerAddress & operator=(const PeerAddress &) = default;
     PeerAddress & operator=(PeerAddress &&) = default;
 
-    const Inet::IPAddress & GetIPAddress() const { return mIPAddress; }
-    PeerAddress & SetIPAddress(const Inet::IPAddress & addr)
+    const Inet::IPAddress & GetIPAddress() const
     {
-        mIPAddress = addr;
+        if (mNumValidIPAddresses > 0)
+        {
+            return mIPAddresses[0];
+        }
+        else
+        {
+            return Inet::IPAddress::Any; // not initialized really
+        }
+    }
+
+    /// DEPRECATED: this method does not take into account that peers may be
+    /// reachable via multiple IP addresses via DNSsd.
+    PeerAddress & SetSingleIPAddress(const Inet::IPAddress & addr)
+    {
+        mIPAddresses[0]      = addr;
+        mNumValidIPAddresses = 1;
         return *this;
     }
 
@@ -101,18 +120,48 @@ public:
 
     bool IsInitialized() const { return mTransportType != Type::kUndefined; }
 
-    bool IsMulticast() { return Type::kUdp == mTransportType && mIPAddress.IsIPv6Multicast(); }
+    bool IsMulticast()
+    {
+        if (Type::kUdp != mTransportType)
+        {
+            return false;
+        }
+
+        if (mNumValidIPAddresses == 0)
+        {
+            return false;
+        }
+
+        // Assumption here is that if any IP address is multicast, the entire object should
+        // be multicast
+        return mIPAddresses[0].IsIPv6Multicast();
+    }
 
     bool operator==(const PeerAddress & other) const
     {
-        return (mTransportType == other.mTransportType) && (mIPAddress == other.mIPAddress) && (mPort == other.mPort) &&
-            (mInterface == other.mInterface);
+        if ((mTransportType != other.mTransportType) || (mPort != other.mPort) || (mInterface != other.mInterface) ||
+            mNumValidIPAddresses != other.mNumValidIPAddresses)
+        {
+            return false;
+        }
+
+        // NOTE: we do NOT try to oder IP addresses here, we check that the valid
+        // IP addresses are identical only.
+        for (unsigned i = 0; i < mNumValidIPAddresses; i++)
+        {
+            if (mIPAddresses[i] != other.mIPAddresses[i])
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     bool operator!=(const PeerAddress & other) const { return !(*this == other); }
 
     /// Maximum size of the string outputes by ToString. Format is of the form:
-    /// "UDP:<ip>:<port>"
+    /// "UDP:<ip>:<port> (+N more)"
     static constexpr size_t kMaxToStringSize = 3 // type: UDP/TCP/BLE
         + 1                                      // splitter :
         + 2                                      // brackets around address
@@ -121,7 +170,12 @@ public:
         + Inet::InterfaceId::kMaxIfNameLength    // interface
         + 1                                      // splitter :
         + 5                                      // port: 16 bit interger
+        + 3                                      // " (+"
+        + 2                                      // integer for "more", low digits expected
+        + 6                                      // " more)"
         + 1;                                     // NullTerminator
+
+    static_assert(kMaxPeerIPAddresses < 100, "for maxStringSize to be correct for the 'more' part");
 
     template <size_t N>
     inline void ToString(char (&buf)[N]) const
@@ -129,58 +183,11 @@ public:
         ToString(buf, N);
     }
 
-    void ToString(char * buf, size_t bufSize) const
-    {
-        char ip_addr[Inet::IPAddress::kMaxStringLength];
-
-        char interface[Inet::InterfaceId::kMaxIfNameLength + 1] = {}; // +1 to prepend '%'
-        if (mInterface.IsPresent())
-        {
-            interface[0]   = '%';
-            interface[1]   = 0;
-            CHIP_ERROR err = mInterface.GetInterfaceName(interface + 1, sizeof(interface) - 1);
-            if (err != CHIP_NO_ERROR)
-            {
-                Platform::CopyString(interface, sizeof(interface), "%(err)");
-            }
-        }
-
-        switch (mTransportType)
-        {
-        case Type::kUndefined:
-            snprintf(buf, bufSize, "UNDEFINED");
-            break;
-        case Type::kUdp:
-            mIPAddress.ToString(ip_addr);
-#if INET_CONFIG_ENABLE_IPV4
-            if (mIPAddress.IsIPv4())
-                snprintf(buf, bufSize, "UDP:%s%s:%d", ip_addr, interface, mPort);
-            else
-#endif
-                snprintf(buf, bufSize, "UDP:[%s%s]:%d", ip_addr, interface, mPort);
-            break;
-        case Type::kTcp:
-            mIPAddress.ToString(ip_addr);
-#if INET_CONFIG_ENABLE_IPV4
-            if (mIPAddress.IsIPv4())
-                snprintf(buf, bufSize, "TCP:%s%s:%d", ip_addr, interface, mPort);
-            else
-#endif
-                snprintf(buf, bufSize, "TCP:[%s%s]:%d", ip_addr, interface, mPort);
-            break;
-        case Type::kBle:
-            // Note that BLE does not currently use any specific address.
-            snprintf(buf, bufSize, "BLE");
-            break;
-        default:
-            snprintf(buf, bufSize, "ERROR");
-            break;
-        }
-    }
+    void ToString(char * buf, size_t bufSize) const;
 
     /****** Factory methods for convenience ******/
 
-    static PeerAddress Uninitialized() { return PeerAddress(Inet::IPAddress::Any, Type::kUndefined); }
+    static PeerAddress Uninitialized() { return PeerAddress(Type::kUndefined); }
 
     static PeerAddress BLE() { return PeerAddress(Type::kBle); }
     static PeerAddress UDP(const Inet::IPAddress & addr) { return PeerAddress(addr, Type::kUdp); }
@@ -213,10 +220,11 @@ public:
     }
 
 private:
-    Inet::IPAddress mIPAddress   = {};
-    Type mTransportType          = Type::kUndefined;
-    uint16_t mPort               = CHIP_PORT; ///< Relevant for UDP data sending.
-    Inet::InterfaceId mInterface = Inet::InterfaceId::Null();
+    Inet::IPAddress mIPAddresses[kMaxPeerIPAddresses] = {};
+    unsigned mNumValidIPAddresses                     = 0;
+    Type mTransportType                               = Type::kUndefined;
+    uint16_t mPort                                    = CHIP_PORT; ///< Relevant for UDP data sending.
+    Inet::InterfaceId mInterface                      = Inet::InterfaceId::Null();
 };
 
 } // namespace Transport
