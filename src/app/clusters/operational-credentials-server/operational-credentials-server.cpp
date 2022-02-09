@@ -36,6 +36,7 @@
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <credentials/CHIPCert.h>
+#include <credentials/CertificationDeclaration.h>
 #include <credentials/DeviceAttestationConstructor.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/FabricTable.h>
@@ -89,7 +90,7 @@ public:
         AttributeAccessInterface(Optional<EndpointId>::Missing(), Clusters::OperationalCredentials::Id)
     {}
 
-    CHIP_ERROR Read(FabricIndex fabricIndex, const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
     CHIP_ERROR ReadNOCs(EndpointId endpoint, AttributeValueEncoder & aEncoder);
@@ -193,8 +194,7 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadRootCertificates(EndpointId end
 
 OperationalCredentialsAttrAccess gAttrAccess;
 
-CHIP_ERROR OperationalCredentialsAttrAccess::Read(FabricIndex fabricIndex, const ConcreteReadAttributePath & aPath,
-                                                  AttributeValueEncoder & aEncoder)
+CHIP_ERROR OperationalCredentialsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == Clusters::OperationalCredentials::Id);
 
@@ -352,7 +352,7 @@ public:
     void OnResponseTimeout(chip::Messaging::ExchangeContext * ec) override {}
     void OnExchangeClosing(chip::Messaging::ExchangeContext * ec) override
     {
-        FabricIndex currentFabricIndex = ec->GetSessionHandle()->AsSecureSession()->GetFabricIndex();
+        FabricIndex currentFabricIndex = ec->GetSessionHandle()->GetFabricIndex();
         ec->GetExchangeMgr()->GetSessionManager()->ExpireAllPairingsForFabric(currentFabricIndex);
     }
 };
@@ -662,7 +662,8 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
     Platform::ScopedMemoryBuffer<uint8_t> attestationElements;
     size_t attestationElementsLen = 0;
     MutableByteSpan attestationElementsSpan;
-    uint8_t certDeclBuf[512];
+    uint8_t certDeclBuf[Credentials::kMaxCMSSignedCDMessage]; // Sized to hold the example certificate declaration with 100 PIDs.
+                                                              // See DeviceAttestationCredsExample
     MutableByteSpan certDeclSpan(certDeclBuf);
     Credentials::DeviceAttestationCredentialsProvider * dacProvider = Credentials::GetDeviceAttestationCredentialsProvider();
 

@@ -18,6 +18,7 @@
 #pragma once
 
 #include <lib/core/GroupId.h>
+#include <lib/core/PasscodeId.h>
 
 #include <cstdint>
 
@@ -79,12 +80,12 @@ constexpr NodeId NodeIdFromGroupId(GroupId aGroupId)
     return kMinGroupNodeId | aGroupId;
 }
 
-constexpr NodeId NodeIdFromPAKEKeyId(uint16_t aPAKEKeyId)
+constexpr NodeId NodeIdFromPAKEKeyId(PasscodeId aPAKEKeyId)
 {
     return kMinPAKEKeyId | aPAKEKeyId;
 }
 
-constexpr uint16_t PAKEKeyIdFromNodeId(NodeId aNodeId)
+constexpr PasscodeId PAKEKeyIdFromNodeId(NodeId aNodeId)
 {
     return aNodeId & kMaskPAKEKeyId;
 }

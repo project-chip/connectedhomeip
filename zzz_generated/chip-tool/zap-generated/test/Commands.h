@@ -46010,20 +46010,179 @@ public:
         switch (mTestIndex++)
         {
         case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
-            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            ChipLogProgress(chipTool, " ***** Test Step 0 : 0: Wait for the commissioned device to be retrieved\n");
+            err = Test0WaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : 1a: TH adjusts the the DUT to a non-open position\n");
-            err = Test1aThAdjustsTheTheDutToANonOpenPosition_1();
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 1 : 1a: TH sends DownOrClose command to preposition the DUT in the opposite direction\n");
+            err = Test1aThSendsDownOrCloseCommandToPrepositionTheDutInTheOppositeDirection_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : 2a: TH sends UpOrOpen command to DUT\n");
-            err = Test2aThSendsUpOrOpenCommandToDut_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : 1b: TH Waits for 10 seconds movement(s) on the device\n");
+            err = Test1bThWaitsFor10SecondsMovementsOnTheDevice_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : 3a: TH reads OperationalStatus attribute from DUT\n");
-            err = Test3aThReadsOperationalStatusAttributeFromDut_3();
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 3 : 1c: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT\n");
+            if (ShouldSkip("WNCV_LF && WNCV_PA_LF"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test1cIfPaLfThReadsCurrentPositionLiftPercent100thsAttributeFromDut_3();
+            break;
+        case 4:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 4 : 1d: If (PA & LF) TH reads CurrentPositionLiftPercentage optional attribute from DUT\n");
+            if (ShouldSkip("WNCV_LF && WNCV_PA_LF && A_CURRENTPOSITIONLIFTPERCENTAGE"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test1dIfPaLfThReadsCurrentPositionLiftPercentageOptionalAttributeFromDut_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 5 : 1e: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT\n");
+            if (ShouldSkip("WNCV_TL && WNCV_PA_TL"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test1eIfPaTlThReadsCurrentPositionTiltPercent100thsAttributeFromDut_5();
+            break;
+        case 6:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 6 : 1f: If (PA & TL) TH reads CurrentPositionTiltPercentage optional attribute from DUT\n");
+            if (ShouldSkip("WNCV_TL && WNCV_PA_TL && A_CURRENTPOSITIONTILTPERCENTAGE"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test1fIfPaTlThReadsCurrentPositionTiltPercentageOptionalAttributeFromDut_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Report: 2: Subscribe to DUT reports on OperationalStatus attribute\n");
+            err = TestReport2SubscribeToDutReportsOnOperationalStatusAttribute_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : 2: Subscribe to DUT reports on OperationalStatus attribute\n");
+            err = Test2SubscribeToDutReportsOnOperationalStatusAttribute_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : 2a: TH sends UpOrOpen command to DUT\n");
+            err = Test2aThSendsUpOrOpenCommandToDut_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : 2b: DUT updates its attributes\n");
+            err = Test2bDutUpdatesItsAttributes_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 11 : 2c: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute from DUT\n");
+            if (ShouldSkip("WNCV_LF && WNCV_PA_LF"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test2cIfPaLfThReadsTargetPositionLiftPercent100thsAttributeFromDut_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : 2e: TH leave the device moving for 2 seconds\n");
+            err = Test2eThLeaveTheDeviceMovingFor2Seconds_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 13 : 3a1: Verify DUT reports OperationalStatus attribute to TH after a UpOrOpen\n");
+            err = Test3a1VerifyDutReportsOperationalStatusAttributeToThAfterAUpOrOpen_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : 3a2: DUT updates its attributes\n");
+            err = Test3a2DutUpdatesItsAttributes_14();
+            break;
+        case 15:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 15 : 3b: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT\n");
+            if (ShouldSkip("WNCV_LF && WNCV_PA_LF"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test3bIfPaLfThReadsCurrentPositionLiftPercent100thsAttributeFromDut_15();
+            break;
+        case 16:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 16 : 3c: If (PA & LF) TH reads CurrentPositionLiftPercentage optional attribute from DUT\n");
+            if (ShouldSkip("WNCV_LF && WNCV_PA_LF && A_CURRENTPOSITIONLIFTPERCENTAGE"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test3cIfPaLfThReadsCurrentPositionLiftPercentageOptionalAttributeFromDut_16();
+            break;
+        case 17:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 17 : 3d: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT\n");
+            if (ShouldSkip("WNCV_TL && WNCV_PA_TL"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test3dIfPaTlThReadsCurrentPositionTiltPercent100thsAttributeFromDut_17();
+            break;
+        case 18:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 18 : 3e: If (PA & LF) TH reads CurrentPositionTiltPercentage optional attribute from DUT\n");
+            if (ShouldSkip("WNCV_TL && WNCV_PA_TL && A_CURRENTPOSITIONTILTPERCENTAGE"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test3eIfPaLfThReadsCurrentPositionTiltPercentageOptionalAttributeFromDut_18();
+            break;
+        case 19:
+            ChipLogProgress(chipTool, " ***** Test Step 19 : 4a: TH sends a StopMotion command to DUT\n");
+            err = Test4aThSendsAStopMotionCommandToDut_19();
+            break;
+        case 20:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 20 : 4b: TH waits for 3 seconds the end of inertial movement(s) on the device\n");
+            err = Test4bThWaitsFor3SecondsTheEndOfInertialMovementsOnTheDevice_20();
+            break;
+        case 21:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 21 : 4c: Verify DUT update OperationalStatus attribute to TH after a StopMotion\n");
+            err = Test4cVerifyDutUpdateOperationalStatusAttributeToThAfterAStopMotion_21();
+            break;
+        case 22:
+            ChipLogProgress(chipTool, " ***** Test Step 22 : 5a: TH waits for x seconds attributes update on the device\n");
+            err = Test5aThWaitsForXSecondsAttributesUpdateOnTheDevice_22();
+            break;
+        case 23:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 23 : 5b: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute from DUT\n");
+            if (ShouldSkip("WNCV_LF && WNCV_PA_LF"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test5bIfPaLfThReadsTargetPositionLiftPercent100thsAttributeFromDut_23();
+            break;
+        case 24:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 24 : 5c: If (PA & TL) TH reads TargetPositionTiltPercent100ths attribute from DUT\n");
+            if (ShouldSkip("WNCV_TL && WNCV_PA_TL"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test5cIfPaTlThReadsTargetPositionTiltPercent100thsAttributeFromDut_24();
             break;
         }
 
@@ -46036,7 +46195,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 4;
+    const uint16_t mTestCount = 25;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
@@ -46049,27 +46208,190 @@ private:
         NextTest();
     }
 
+    typedef void (*Test_Test_TC_WNCV_3_1_OperationalStatus_ReportCallback)(void * context, uint8_t value);
+    Test_Test_TC_WNCV_3_1_OperationalStatus_ReportCallback mTest_Test_TC_WNCV_3_1_OperationalStatus_Reported = nullptr;
+
     static void OnFailureCallback_3(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_WNCV_3_1 *>(context))->OnFailureResponse_3(error);
     }
 
-    static void OnSuccessCallback_3(void * context, uint8_t operationalStatus)
+    static void OnSuccessCallback_3(void * context,
+                                    const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionLiftPercent100ths)
     {
-        (static_cast<Test_TC_WNCV_3_1 *>(context))->OnSuccessResponse_3(operationalStatus);
+        (static_cast<Test_TC_WNCV_3_1 *>(context))->OnSuccessResponse_3(currentPositionLiftPercent100ths);
+    }
+
+    static void OnFailureCallback_4(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_1 *>(context))->OnFailureResponse_4(error);
+    }
+
+    static void OnSuccessCallback_4(void * context,
+                                    const chip::app::DataModel::Nullable<chip::Percent> & currentPositionLiftPercentage)
+    {
+        (static_cast<Test_TC_WNCV_3_1 *>(context))->OnSuccessResponse_4(currentPositionLiftPercentage);
+    }
+
+    static void OnFailureCallback_5(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_1 *>(context))->OnFailureResponse_5(error);
+    }
+
+    static void OnSuccessCallback_5(void * context,
+                                    const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionTiltPercent100ths)
+    {
+        (static_cast<Test_TC_WNCV_3_1 *>(context))->OnSuccessResponse_5(currentPositionTiltPercent100ths);
+    }
+
+    static void OnFailureCallback_6(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_1 *>(context))->OnFailureResponse_6(error);
+    }
+
+    static void OnSuccessCallback_6(void * context,
+                                    const chip::app::DataModel::Nullable<chip::Percent> & currentPositionTiltPercentage)
+    {
+        (static_cast<Test_TC_WNCV_3_1 *>(context))->OnSuccessResponse_6(currentPositionTiltPercentage);
+    }
+
+    static void OnFailureCallback_7(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_1 *>(context))->OnFailureResponse_7(error);
+    }
+
+    static void OnSuccessCallback_7(void * context, uint8_t operationalStatus)
+    {
+        (static_cast<Test_TC_WNCV_3_1 *>(context))->OnSuccessResponse_7(operationalStatus);
+    }
+
+    bool mReceivedReport_7 = false;
+
+    static void OnFailureCallback_8(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_1 *>(context))->OnFailureResponse_8(error);
+    }
+
+    static void OnSuccessCallback_8(void * context, uint8_t operationalStatus)
+    {
+        (static_cast<Test_TC_WNCV_3_1 *>(context))->OnSuccessResponse_8(operationalStatus);
+    }
+
+    static void OnSubscriptionEstablished_8(void * context)
+    {
+        (static_cast<Test_TC_WNCV_3_1 *>(context))->OnSubscriptionEstablishedResponse_8();
+    }
+
+    static void OnFailureCallback_11(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_1 *>(context))->OnFailureResponse_11(error);
+    }
+
+    static void OnSuccessCallback_11(void * context,
+                                     const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionLiftPercent100ths)
+    {
+        (static_cast<Test_TC_WNCV_3_1 *>(context))->OnSuccessResponse_11(targetPositionLiftPercent100ths);
+    }
+
+    static void OnFailureCallback_13(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_1 *>(context))->OnFailureResponse_13(error);
+    }
+
+    static void OnSuccessCallback_13(void * context, uint8_t operationalStatus)
+    {
+        (static_cast<Test_TC_WNCV_3_1 *>(context))->OnSuccessResponse_13(operationalStatus);
+    }
+
+    bool mReceivedReport_13 = false;
+
+    static void OnFailureCallback_15(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_1 *>(context))->OnFailureResponse_15(error);
+    }
+
+    static void OnSuccessCallback_15(void * context,
+                                     const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionLiftPercent100ths)
+    {
+        (static_cast<Test_TC_WNCV_3_1 *>(context))->OnSuccessResponse_15(currentPositionLiftPercent100ths);
+    }
+
+    static void OnFailureCallback_16(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_1 *>(context))->OnFailureResponse_16(error);
+    }
+
+    static void OnSuccessCallback_16(void * context,
+                                     const chip::app::DataModel::Nullable<chip::Percent> & currentPositionLiftPercentage)
+    {
+        (static_cast<Test_TC_WNCV_3_1 *>(context))->OnSuccessResponse_16(currentPositionLiftPercentage);
+    }
+
+    static void OnFailureCallback_17(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_1 *>(context))->OnFailureResponse_17(error);
+    }
+
+    static void OnSuccessCallback_17(void * context,
+                                     const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionTiltPercent100ths)
+    {
+        (static_cast<Test_TC_WNCV_3_1 *>(context))->OnSuccessResponse_17(currentPositionTiltPercent100ths);
+    }
+
+    static void OnFailureCallback_18(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_1 *>(context))->OnFailureResponse_18(error);
+    }
+
+    static void OnSuccessCallback_18(void * context,
+                                     const chip::app::DataModel::Nullable<chip::Percent> & currentPositionTiltPercentage)
+    {
+        (static_cast<Test_TC_WNCV_3_1 *>(context))->OnSuccessResponse_18(currentPositionTiltPercentage);
+    }
+
+    static void OnFailureCallback_21(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_1 *>(context))->OnFailureResponse_21(error);
+    }
+
+    static void OnSuccessCallback_21(void * context, uint8_t operationalStatus)
+    {
+        (static_cast<Test_TC_WNCV_3_1 *>(context))->OnSuccessResponse_21(operationalStatus);
+    }
+
+    static void OnFailureCallback_23(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_1 *>(context))->OnFailureResponse_23(error);
+    }
+
+    static void OnSuccessCallback_23(void * context,
+                                     const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionLiftPercent100ths)
+    {
+        (static_cast<Test_TC_WNCV_3_1 *>(context))->OnSuccessResponse_23(targetPositionLiftPercent100ths);
+    }
+
+    static void OnFailureCallback_24(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_1 *>(context))->OnFailureResponse_24(error);
+    }
+
+    static void OnSuccessCallback_24(void * context,
+                                     const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionTiltPercent100ths)
+    {
+        (static_cast<Test_TC_WNCV_3_1 *>(context))->OnSuccessResponse_24(targetPositionTiltPercent100ths);
     }
 
     //
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    CHIP_ERROR Test0WaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
         return WaitForCommissionee();
     }
 
-    CHIP_ERROR Test1aThAdjustsTheTheDutToANonOpenPosition_1()
+    CHIP_ERROR Test1aThSendsDownOrCloseCommandToPrepositionTheDutInTheOppositeDirection_1()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type;
@@ -46096,41 +46418,21 @@ private:
 
     void OnSuccessResponse_1() { NextTest(); }
 
-    CHIP_ERROR Test2aThSendsUpOrOpenCommandToDut_2()
+    CHIP_ERROR Test1bThWaitsFor10SecondsMovementsOnTheDevice_2()
     {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type;
-
-        RequestType request;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<Test_TC_WNCV_3_1 *>(context))->OnSuccessResponse_2();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<Test_TC_WNCV_3_1 *>(context))->OnFailureResponse_2(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(10000);
     }
 
-    void OnFailureResponse_2(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_2() { NextTest(); }
-
-    CHIP_ERROR Test3aThReadsOperationalStatusAttributeFromDut_3()
+    CHIP_ERROR Test1cIfPaLfThReadsCurrentPositionLiftPercent100thsAttributeFromDut_3()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo>(
+                this, OnSuccessCallback_3, OnFailureCallback_3));
         return CHIP_NO_ERROR;
     }
 
@@ -46140,10 +46442,480 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3(uint8_t operationalStatus)
+    void OnSuccessResponse_3(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionLiftPercent100ths)
+    {
+        VerifyOrReturn(CheckConstraintType("currentPositionLiftPercent100ths", "", "uint16"));
+        VerifyOrReturn(
+            CheckConstraintMinValue<chip::Percent100ths>("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 1U));
+        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("currentPositionLiftPercent100ths",
+                                                                    currentPositionLiftPercent100ths, 10000U));
+        NextTest();
+    }
+
+    CHIP_ERROR Test1dIfPaLfThReadsCurrentPositionLiftPercentageOptionalAttributeFromDut_4()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::TypeInfo>(
+                this, OnSuccessCallback_4, OnFailureCallback_4));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_4(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_4(const chip::app::DataModel::Nullable<chip::Percent> & currentPositionLiftPercentage)
+    {
+        VerifyOrReturn(CheckConstraintType("currentPositionLiftPercentage", "", "uint8"));
+        VerifyOrReturn(CheckConstraintMinValue<chip::Percent>("currentPositionLiftPercentage", currentPositionLiftPercentage, 1));
+        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent>("currentPositionLiftPercentage", currentPositionLiftPercentage, 100));
+        NextTest();
+    }
+
+    CHIP_ERROR Test1eIfPaTlThReadsCurrentPositionTiltPercent100thsAttributeFromDut_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo>(
+                this, OnSuccessCallback_5, OnFailureCallback_5));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_5(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionTiltPercent100ths)
+    {
+        VerifyOrReturn(CheckConstraintType("currentPositionTiltPercent100ths", "", "uint16"));
+        VerifyOrReturn(
+            CheckConstraintMinValue<chip::Percent100ths>("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 1U));
+        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("currentPositionTiltPercent100ths",
+                                                                    currentPositionTiltPercent100ths, 10000U));
+        NextTest();
+    }
+
+    CHIP_ERROR Test1fIfPaTlThReadsCurrentPositionTiltPercentageOptionalAttributeFromDut_6()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::TypeInfo>(
+                this, OnSuccessCallback_6, OnFailureCallback_6));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_6(const chip::app::DataModel::Nullable<chip::Percent> & currentPositionTiltPercentage)
+    {
+        VerifyOrReturn(CheckConstraintType("currentPositionTiltPercentage", "", "uint8"));
+        VerifyOrReturn(CheckConstraintMinValue<chip::Percent>("currentPositionTiltPercentage", currentPositionTiltPercentage, 1));
+        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent>("currentPositionTiltPercentage", currentPositionTiltPercentage, 100));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReport2SubscribeToDutReportsOnOperationalStatusAttribute_7()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        mTest_Test_TC_WNCV_3_1_OperationalStatus_Reported = OnSuccessCallback_7;
+        return WaitForMs(0);
+    }
+
+    void OnFailureResponse_7(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_7(uint8_t operationalStatus)
+    {
+        mReceivedReport_7 = true;
+
+        VerifyOrReturn(CheckConstraintType("operationalStatus", "", "map8"));
+    }
+
+    CHIP_ERROR Test2SubscribeToDutReportsOnOperationalStatusAttribute_8()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        uint16_t minIntervalArgument;
+        minIntervalArgument = 4U;
+        uint16_t maxIntervalArgument;
+        maxIntervalArgument = 5U;
+
+        ReturnErrorOnFailure(
+            cluster.SubscribeAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
+                this, OnSuccessCallback_8, OnFailureCallback_8, minIntervalArgument, maxIntervalArgument,
+                OnSubscriptionEstablished_8));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_8(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_8(uint8_t value)
+    {
+        if (mTest_Test_TC_WNCV_3_1_OperationalStatus_Reported)
+        {
+            auto callback                                     = mTest_Test_TC_WNCV_3_1_OperationalStatus_Reported;
+            mTest_Test_TC_WNCV_3_1_OperationalStatus_Reported = nullptr;
+            callback(this, value);
+        }
+    }
+
+    void OnSubscriptionEstablishedResponse_8()
+    {
+        VerifyOrReturn(mReceivedReport_7, Exit("Initial report not received!"));
+        NextTest();
+    }
+
+    CHIP_ERROR Test2aThSendsUpOrOpenCommandToDut_9()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_WNCV_3_1 *>(context))->OnSuccessResponse_9();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<Test_TC_WNCV_3_1 *>(context))->OnFailureResponse_9(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_9(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_9() { NextTest(); }
+
+    CHIP_ERROR Test2bDutUpdatesItsAttributes_10()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(100);
+    }
+
+    CHIP_ERROR Test2cIfPaLfThReadsTargetPositionLiftPercent100thsAttributeFromDut_11()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionLiftPercent100ths::TypeInfo>(
+                this, OnSuccessCallback_11, OnFailureCallback_11));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_11(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_11(const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionLiftPercent100ths)
+    {
+        VerifyOrReturn(CheckValueNonNull("targetPositionLiftPercent100ths", targetPositionLiftPercent100ths));
+        VerifyOrReturn(CheckValue("targetPositionLiftPercent100ths.Value()", targetPositionLiftPercent100ths.Value(), 0U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR Test2eThLeaveTheDeviceMovingFor2Seconds_12()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(2000);
+    }
+
+    CHIP_ERROR Test3a1VerifyDutReportsOperationalStatusAttributeToThAfterAUpOrOpen_13()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        mTest_Test_TC_WNCV_3_1_OperationalStatus_Reported = OnSuccessCallback_13;
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_13(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_13(uint8_t operationalStatus)
+    {
+        mReceivedReport_13 = true;
+
+        VerifyOrReturn(CheckConstraintType("operationalStatus", "", "map8"));
+        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("operationalStatus", operationalStatus, 5));
+        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("operationalStatus", operationalStatus, 21));
+        NextTest();
+    }
+
+    CHIP_ERROR Test3a2DutUpdatesItsAttributes_14()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(2000);
+    }
+
+    CHIP_ERROR Test3bIfPaLfThReadsCurrentPositionLiftPercent100thsAttributeFromDut_15()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo>(
+                this, OnSuccessCallback_15, OnFailureCallback_15));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_15(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_15(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionLiftPercent100ths)
+    {
+        VerifyOrReturn(CheckConstraintType("currentPositionLiftPercent100ths", "", "uint16"));
+        VerifyOrReturn(
+            CheckConstraintMinValue<chip::Percent100ths>("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("currentPositionLiftPercent100ths",
+                                                                    currentPositionLiftPercent100ths, 9999U));
+        NextTest();
+    }
+
+    CHIP_ERROR Test3cIfPaLfThReadsCurrentPositionLiftPercentageOptionalAttributeFromDut_16()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::TypeInfo>(
+                this, OnSuccessCallback_16, OnFailureCallback_16));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_16(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_16(const chip::app::DataModel::Nullable<chip::Percent> & currentPositionLiftPercentage)
+    {
+        VerifyOrReturn(CheckConstraintType("currentPositionLiftPercentage", "", "uint8"));
+        VerifyOrReturn(CheckConstraintMinValue<chip::Percent>("currentPositionLiftPercentage", currentPositionLiftPercentage, 0));
+        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent>("currentPositionLiftPercentage", currentPositionLiftPercentage, 99));
+        NextTest();
+    }
+
+    CHIP_ERROR Test3dIfPaTlThReadsCurrentPositionTiltPercent100thsAttributeFromDut_17()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo>(
+                this, OnSuccessCallback_17, OnFailureCallback_17));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_17(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_17(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionTiltPercent100ths)
+    {
+        VerifyOrReturn(CheckConstraintType("currentPositionTiltPercent100ths", "", "uint16"));
+        VerifyOrReturn(
+            CheckConstraintMinValue<chip::Percent100ths>("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("currentPositionTiltPercent100ths",
+                                                                    currentPositionTiltPercent100ths, 9999U));
+        NextTest();
+    }
+
+    CHIP_ERROR Test3eIfPaLfThReadsCurrentPositionTiltPercentageOptionalAttributeFromDut_18()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::TypeInfo>(
+                this, OnSuccessCallback_18, OnFailureCallback_18));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_18(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_18(const chip::app::DataModel::Nullable<chip::Percent> & currentPositionTiltPercentage)
+    {
+        VerifyOrReturn(CheckConstraintType("currentPositionTiltPercentage", "", "uint8"));
+        VerifyOrReturn(CheckConstraintMinValue<chip::Percent>("currentPositionTiltPercentage", currentPositionTiltPercentage, 0));
+        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent>("currentPositionTiltPercentage", currentPositionTiltPercentage, 99));
+        NextTest();
+    }
+
+    CHIP_ERROR Test4aThSendsAStopMotionCommandToDut_19()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::WindowCovering::Commands::StopMotion::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_WNCV_3_1 *>(context))->OnSuccessResponse_19();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<Test_TC_WNCV_3_1 *>(context))->OnFailureResponse_19(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_19(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_19() { NextTest(); }
+
+    CHIP_ERROR Test4bThWaitsFor3SecondsTheEndOfInertialMovementsOnTheDevice_20()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(3000);
+    }
+
+    CHIP_ERROR Test4cVerifyDutUpdateOperationalStatusAttributeToThAfterAStopMotion_21()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
+            this, OnSuccessCallback_21, OnFailureCallback_21));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_21(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_21(uint8_t operationalStatus)
     {
         VerifyOrReturn(CheckValue("operationalStatus", operationalStatus, 0));
 
+        NextTest();
+    }
+
+    CHIP_ERROR Test5aThWaitsForXSecondsAttributesUpdateOnTheDevice_22()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(1000);
+    }
+
+    CHIP_ERROR Test5bIfPaLfThReadsTargetPositionLiftPercent100thsAttributeFromDut_23()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionLiftPercent100ths::TypeInfo>(
+                this, OnSuccessCallback_23, OnFailureCallback_23));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_23(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_23(const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionLiftPercent100ths)
+    {
+        VerifyOrReturn(CheckConstraintType("targetPositionLiftPercent100ths", "", "uint16"));
+        VerifyOrReturn(
+            CheckConstraintMinValue<chip::Percent100ths>("targetPositionLiftPercent100ths", targetPositionLiftPercent100ths, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("targetPositionLiftPercent100ths",
+                                                                    targetPositionLiftPercent100ths, 9999U));
+        NextTest();
+    }
+
+    CHIP_ERROR Test5cIfPaTlThReadsTargetPositionTiltPercent100thsAttributeFromDut_24()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionTiltPercent100ths::TypeInfo>(
+                this, OnSuccessCallback_24, OnFailureCallback_24));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_24(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_24(const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionTiltPercent100ths)
+    {
+        VerifyOrReturn(CheckConstraintType("targetPositionTiltPercent100ths", "", "uint16"));
+        VerifyOrReturn(
+            CheckConstraintMinValue<chip::Percent100ths>("targetPositionTiltPercent100ths", targetPositionTiltPercent100ths, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("targetPositionTiltPercent100ths",
+                                                                    targetPositionTiltPercent100ths, 9999U));
         NextTest();
     }
 };
@@ -46186,20 +46958,178 @@ public:
         switch (mTestIndex++)
         {
         case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
-            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            ChipLogProgress(chipTool, " ***** Test Step 0 : 0: Wait for the commissioned device to be retrieved\n");
+            err = Test0WaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : 1a: TH adjusts the the DUT to a non-closed position\n");
-            err = Test1aThAdjustsTheTheDutToANonClosedPosition_1();
+            ChipLogProgress(
+                chipTool, " ***** Test Step 1 : 1a: TH sends UpOrOpen command to preposition the DUT in the opposite direction\n");
+            err = Test1aThSendsUpOrOpenCommandToPrepositionTheDutInTheOppositeDirection_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : 2a: TH sends DownOrClose command to DUT\n");
-            err = Test2aThSendsDownOrCloseCommandToDut_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : 1b: TH Waits for 10 seconds movement(s) on the device\n");
+            err = Test1bThWaitsFor10SecondsMovementsOnTheDevice_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : 3a: TH reads OperationalStatus attribute from DUT\n");
-            err = Test3aThReadsOperationalStatusAttributeFromDut_3();
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 3 : 1c: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT\n");
+            if (ShouldSkip("WNCV_LF && WNCV_PA_LF"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test1cIfPaLfThReadsCurrentPositionLiftPercent100thsAttributeFromDut_3();
+            break;
+        case 4:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 4 : 1d: If (PA & LF) TH reads CurrentPositionLiftPercentage optional attribute from DUT\n");
+            if (ShouldSkip("WNCV_LF && WNCV_PA_LF && A_CURRENTPOSITIONLIFTPERCENTAGE"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test1dIfPaLfThReadsCurrentPositionLiftPercentageOptionalAttributeFromDut_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 5 : 1e: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT\n");
+            if (ShouldSkip("WNCV_TL && WNCV_PA_TL"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test1eIfPaTlThReadsCurrentPositionTiltPercent100thsAttributeFromDut_5();
+            break;
+        case 6:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 6 : 1f: If (PA & TL) TH reads CurrentPositionTiltPercentage optional attribute from DUT\n");
+            if (ShouldSkip("WNCV_TL && WNCV_PA_TL && A_CURRENTPOSITIONTILTPERCENTAGE"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test1fIfPaTlThReadsCurrentPositionTiltPercentageOptionalAttributeFromDut_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Report: 2: Subscribe to DUT reports on OperationalStatus attribute\n");
+            err = TestReport2SubscribeToDutReportsOnOperationalStatusAttribute_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : 2: Subscribe to DUT reports on OperationalStatus attribute\n");
+            err = Test2SubscribeToDutReportsOnOperationalStatusAttribute_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : 2a: TH sends DownOrClose command to DUT\n");
+            err = Test2aThSendsDownOrCloseCommandToDut_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : 2b: DUT updates its attributes\n");
+            err = Test2bDutUpdatesItsAttributes_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 11 : 2c: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute from DUT\n");
+            if (ShouldSkip("WNCV_LF && WNCV_PA_LF"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test2cIfPaLfThReadsTargetPositionLiftPercent100thsAttributeFromDut_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : 2e: TH leave the device moving for 2 seconds\n");
+            err = Test2eThLeaveTheDeviceMovingFor2Seconds_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 13 : 3a: Verify DUT reports OperationalStatus attribute to TH after a DownOrClose\n");
+            err = Test3aVerifyDutReportsOperationalStatusAttributeToThAfterADownOrClose_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : 3a2: DUT updates its attributes\n");
+            err = Test3a2DutUpdatesItsAttributes_14();
+            break;
+        case 15:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 15 : 3b: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT\n");
+            if (ShouldSkip("WNCV_LF && WNCV_PA_LF"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test3bIfPaLfThReadsCurrentPositionLiftPercent100thsAttributeFromDut_15();
+            break;
+        case 16:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 16 : 3c: If (PA & LF) TH reads CurrentPositionLiftPercentage optional attribute from DUT\n");
+            if (ShouldSkip("WNCV_LF && WNCV_PA_LF && A_CURRENTPOSITIONLIFTPERCENTAGE"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test3cIfPaLfThReadsCurrentPositionLiftPercentageOptionalAttributeFromDut_16();
+            break;
+        case 17:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 17 : 3d: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT\n");
+            if (ShouldSkip("WNCV_TL && WNCV_PA_TL"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test3dIfPaTlThReadsCurrentPositionTiltPercent100thsAttributeFromDut_17();
+            break;
+        case 18:
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 18 : 3e: If (PA & LF) TH reads CurrentPositionTiltPercentage optional attribute from DUT\n");
+            if (ShouldSkip("WNCV_TL && WNCV_PA_TL && A_CURRENTPOSITIONTILTPERCENTAGE"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test3eIfPaLfThReadsCurrentPositionTiltPercentageOptionalAttributeFromDut_18();
+            break;
+        case 19:
+            ChipLogProgress(chipTool, " ***** Test Step 19 : 4a: TH sends a StopMotion command to DUT\n");
+            err = Test4aThSendsAStopMotionCommandToDut_19();
+            break;
+        case 20:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 20 : 4b: TH waits for 3 seconds the end of inertial movement(s) on the device\n");
+            err = Test4bThWaitsFor3SecondsTheEndOfInertialMovementsOnTheDevice_20();
+            break;
+        case 21:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 21 : 4c: Verify DUT update OperationalStatus attribute to TH after a StopMotion\n");
+            err = Test4cVerifyDutUpdateOperationalStatusAttributeToThAfterAStopMotion_21();
+            break;
+        case 22:
+            ChipLogProgress(chipTool, " ***** Test Step 22 : 5a: TH waits for x seconds attributes update on the device\n");
+            err = Test5aThWaitsForXSecondsAttributesUpdateOnTheDevice_22();
+            break;
+        case 23:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 23 : 5b: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute from DUT\n");
+            if (ShouldSkip("WNCV_LF && WNCV_PA_LF"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test5bIfPaLfThReadsTargetPositionLiftPercent100thsAttributeFromDut_23();
+            break;
+        case 24:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 24 : 5c: If (PA & TL) TH reads TargetPositionTiltPercent100ths attribute from DUT\n");
+            if (ShouldSkip("WNCV_TL && WNCV_PA_TL"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test5cIfPaTlThReadsTargetPositionTiltPercent100thsAttributeFromDut_24();
             break;
         }
 
@@ -46212,7 +47142,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 4;
+    const uint16_t mTestCount = 25;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
@@ -46225,27 +47155,190 @@ private:
         NextTest();
     }
 
+    typedef void (*Test_Test_TC_WNCV_3_2_OperationalStatus_ReportCallback)(void * context, uint8_t value);
+    Test_Test_TC_WNCV_3_2_OperationalStatus_ReportCallback mTest_Test_TC_WNCV_3_2_OperationalStatus_Reported = nullptr;
+
     static void OnFailureCallback_3(void * context, CHIP_ERROR error)
     {
         (static_cast<Test_TC_WNCV_3_2 *>(context))->OnFailureResponse_3(error);
     }
 
-    static void OnSuccessCallback_3(void * context, uint8_t operationalStatus)
+    static void OnSuccessCallback_3(void * context,
+                                    const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionLiftPercent100ths)
     {
-        (static_cast<Test_TC_WNCV_3_2 *>(context))->OnSuccessResponse_3(operationalStatus);
+        (static_cast<Test_TC_WNCV_3_2 *>(context))->OnSuccessResponse_3(currentPositionLiftPercent100ths);
+    }
+
+    static void OnFailureCallback_4(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_2 *>(context))->OnFailureResponse_4(error);
+    }
+
+    static void OnSuccessCallback_4(void * context,
+                                    const chip::app::DataModel::Nullable<chip::Percent> & currentPositionLiftPercentage)
+    {
+        (static_cast<Test_TC_WNCV_3_2 *>(context))->OnSuccessResponse_4(currentPositionLiftPercentage);
+    }
+
+    static void OnFailureCallback_5(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_2 *>(context))->OnFailureResponse_5(error);
+    }
+
+    static void OnSuccessCallback_5(void * context,
+                                    const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionTiltPercent100ths)
+    {
+        (static_cast<Test_TC_WNCV_3_2 *>(context))->OnSuccessResponse_5(currentPositionTiltPercent100ths);
+    }
+
+    static void OnFailureCallback_6(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_2 *>(context))->OnFailureResponse_6(error);
+    }
+
+    static void OnSuccessCallback_6(void * context,
+                                    const chip::app::DataModel::Nullable<chip::Percent> & currentPositionTiltPercentage)
+    {
+        (static_cast<Test_TC_WNCV_3_2 *>(context))->OnSuccessResponse_6(currentPositionTiltPercentage);
+    }
+
+    static void OnFailureCallback_7(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_2 *>(context))->OnFailureResponse_7(error);
+    }
+
+    static void OnSuccessCallback_7(void * context, uint8_t operationalStatus)
+    {
+        (static_cast<Test_TC_WNCV_3_2 *>(context))->OnSuccessResponse_7(operationalStatus);
+    }
+
+    bool mReceivedReport_7 = false;
+
+    static void OnFailureCallback_8(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_2 *>(context))->OnFailureResponse_8(error);
+    }
+
+    static void OnSuccessCallback_8(void * context, uint8_t operationalStatus)
+    {
+        (static_cast<Test_TC_WNCV_3_2 *>(context))->OnSuccessResponse_8(operationalStatus);
+    }
+
+    static void OnSubscriptionEstablished_8(void * context)
+    {
+        (static_cast<Test_TC_WNCV_3_2 *>(context))->OnSubscriptionEstablishedResponse_8();
+    }
+
+    static void OnFailureCallback_11(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_2 *>(context))->OnFailureResponse_11(error);
+    }
+
+    static void OnSuccessCallback_11(void * context,
+                                     const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionLiftPercent100ths)
+    {
+        (static_cast<Test_TC_WNCV_3_2 *>(context))->OnSuccessResponse_11(targetPositionLiftPercent100ths);
+    }
+
+    static void OnFailureCallback_13(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_2 *>(context))->OnFailureResponse_13(error);
+    }
+
+    static void OnSuccessCallback_13(void * context, uint8_t operationalStatus)
+    {
+        (static_cast<Test_TC_WNCV_3_2 *>(context))->OnSuccessResponse_13(operationalStatus);
+    }
+
+    bool mReceivedReport_13 = false;
+
+    static void OnFailureCallback_15(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_2 *>(context))->OnFailureResponse_15(error);
+    }
+
+    static void OnSuccessCallback_15(void * context,
+                                     const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionLiftPercent100ths)
+    {
+        (static_cast<Test_TC_WNCV_3_2 *>(context))->OnSuccessResponse_15(currentPositionLiftPercent100ths);
+    }
+
+    static void OnFailureCallback_16(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_2 *>(context))->OnFailureResponse_16(error);
+    }
+
+    static void OnSuccessCallback_16(void * context,
+                                     const chip::app::DataModel::Nullable<chip::Percent> & currentPositionLiftPercentage)
+    {
+        (static_cast<Test_TC_WNCV_3_2 *>(context))->OnSuccessResponse_16(currentPositionLiftPercentage);
+    }
+
+    static void OnFailureCallback_17(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_2 *>(context))->OnFailureResponse_17(error);
+    }
+
+    static void OnSuccessCallback_17(void * context,
+                                     const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionTiltPercent100ths)
+    {
+        (static_cast<Test_TC_WNCV_3_2 *>(context))->OnSuccessResponse_17(currentPositionTiltPercent100ths);
+    }
+
+    static void OnFailureCallback_18(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_2 *>(context))->OnFailureResponse_18(error);
+    }
+
+    static void OnSuccessCallback_18(void * context,
+                                     const chip::app::DataModel::Nullable<chip::Percent> & currentPositionTiltPercentage)
+    {
+        (static_cast<Test_TC_WNCV_3_2 *>(context))->OnSuccessResponse_18(currentPositionTiltPercentage);
+    }
+
+    static void OnFailureCallback_21(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_2 *>(context))->OnFailureResponse_21(error);
+    }
+
+    static void OnSuccessCallback_21(void * context, uint8_t operationalStatus)
+    {
+        (static_cast<Test_TC_WNCV_3_2 *>(context))->OnSuccessResponse_21(operationalStatus);
+    }
+
+    static void OnFailureCallback_23(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_2 *>(context))->OnFailureResponse_23(error);
+    }
+
+    static void OnSuccessCallback_23(void * context,
+                                     const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionLiftPercent100ths)
+    {
+        (static_cast<Test_TC_WNCV_3_2 *>(context))->OnSuccessResponse_23(targetPositionLiftPercent100ths);
+    }
+
+    static void OnFailureCallback_24(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_2 *>(context))->OnFailureResponse_24(error);
+    }
+
+    static void OnSuccessCallback_24(void * context,
+                                     const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionTiltPercent100ths)
+    {
+        (static_cast<Test_TC_WNCV_3_2 *>(context))->OnSuccessResponse_24(targetPositionTiltPercent100ths);
     }
 
     //
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    CHIP_ERROR Test0WaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
         return WaitForCommissionee();
     }
 
-    CHIP_ERROR Test1aThAdjustsTheTheDutToANonClosedPosition_1()
+    CHIP_ERROR Test1aThSendsUpOrOpenCommandToPrepositionTheDutInTheOppositeDirection_1()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type;
@@ -46272,41 +47365,21 @@ private:
 
     void OnSuccessResponse_1() { NextTest(); }
 
-    CHIP_ERROR Test2aThSendsDownOrCloseCommandToDut_2()
+    CHIP_ERROR Test1bThWaitsFor10SecondsMovementsOnTheDevice_2()
     {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type;
-
-        RequestType request;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<Test_TC_WNCV_3_2 *>(context))->OnSuccessResponse_2();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<Test_TC_WNCV_3_2 *>(context))->OnFailureResponse_2(error);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(10000);
     }
 
-    void OnFailureResponse_2(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_2() { NextTest(); }
-
-    CHIP_ERROR Test3aThReadsOperationalStatusAttributeFromDut_3()
+    CHIP_ERROR Test1cIfPaLfThReadsCurrentPositionLiftPercent100thsAttributeFromDut_3()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo>(
+                this, OnSuccessCallback_3, OnFailureCallback_3));
         return CHIP_NO_ERROR;
     }
 
@@ -46316,10 +47389,480 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3(uint8_t operationalStatus)
+    void OnSuccessResponse_3(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionLiftPercent100ths)
+    {
+        VerifyOrReturn(CheckConstraintType("currentPositionLiftPercent100ths", "", "uint16"));
+        VerifyOrReturn(
+            CheckConstraintMinValue<chip::Percent100ths>("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("currentPositionLiftPercent100ths",
+                                                                    currentPositionLiftPercent100ths, 9999U));
+        NextTest();
+    }
+
+    CHIP_ERROR Test1dIfPaLfThReadsCurrentPositionLiftPercentageOptionalAttributeFromDut_4()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::TypeInfo>(
+                this, OnSuccessCallback_4, OnFailureCallback_4));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_4(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_4(const chip::app::DataModel::Nullable<chip::Percent> & currentPositionLiftPercentage)
+    {
+        VerifyOrReturn(CheckConstraintType("currentPositionLiftPercentage", "", "uint8"));
+        VerifyOrReturn(CheckConstraintMinValue<chip::Percent>("currentPositionLiftPercentage", currentPositionLiftPercentage, 0));
+        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent>("currentPositionLiftPercentage", currentPositionLiftPercentage, 99));
+        NextTest();
+    }
+
+    CHIP_ERROR Test1eIfPaTlThReadsCurrentPositionTiltPercent100thsAttributeFromDut_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo>(
+                this, OnSuccessCallback_5, OnFailureCallback_5));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_5(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionTiltPercent100ths)
+    {
+        VerifyOrReturn(CheckConstraintType("currentPositionTiltPercent100ths", "", "uint16"));
+        VerifyOrReturn(
+            CheckConstraintMinValue<chip::Percent100ths>("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("currentPositionTiltPercent100ths",
+                                                                    currentPositionTiltPercent100ths, 9999U));
+        NextTest();
+    }
+
+    CHIP_ERROR Test1fIfPaTlThReadsCurrentPositionTiltPercentageOptionalAttributeFromDut_6()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::TypeInfo>(
+                this, OnSuccessCallback_6, OnFailureCallback_6));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_6(const chip::app::DataModel::Nullable<chip::Percent> & currentPositionTiltPercentage)
+    {
+        VerifyOrReturn(CheckConstraintType("currentPositionTiltPercentage", "", "uint8"));
+        VerifyOrReturn(CheckConstraintMinValue<chip::Percent>("currentPositionTiltPercentage", currentPositionTiltPercentage, 0));
+        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent>("currentPositionTiltPercentage", currentPositionTiltPercentage, 99));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReport2SubscribeToDutReportsOnOperationalStatusAttribute_7()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        mTest_Test_TC_WNCV_3_2_OperationalStatus_Reported = OnSuccessCallback_7;
+        return WaitForMs(0);
+    }
+
+    void OnFailureResponse_7(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_7(uint8_t operationalStatus)
+    {
+        mReceivedReport_7 = true;
+
+        VerifyOrReturn(CheckConstraintType("operationalStatus", "", "map8"));
+    }
+
+    CHIP_ERROR Test2SubscribeToDutReportsOnOperationalStatusAttribute_8()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        uint16_t minIntervalArgument;
+        minIntervalArgument = 4U;
+        uint16_t maxIntervalArgument;
+        maxIntervalArgument = 5U;
+
+        ReturnErrorOnFailure(
+            cluster.SubscribeAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
+                this, OnSuccessCallback_8, OnFailureCallback_8, minIntervalArgument, maxIntervalArgument,
+                OnSubscriptionEstablished_8));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_8(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_8(uint8_t value)
+    {
+        if (mTest_Test_TC_WNCV_3_2_OperationalStatus_Reported)
+        {
+            auto callback                                     = mTest_Test_TC_WNCV_3_2_OperationalStatus_Reported;
+            mTest_Test_TC_WNCV_3_2_OperationalStatus_Reported = nullptr;
+            callback(this, value);
+        }
+    }
+
+    void OnSubscriptionEstablishedResponse_8()
+    {
+        VerifyOrReturn(mReceivedReport_7, Exit("Initial report not received!"));
+        NextTest();
+    }
+
+    CHIP_ERROR Test2aThSendsDownOrCloseCommandToDut_9()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_WNCV_3_2 *>(context))->OnSuccessResponse_9();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<Test_TC_WNCV_3_2 *>(context))->OnFailureResponse_9(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_9(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_9() { NextTest(); }
+
+    CHIP_ERROR Test2bDutUpdatesItsAttributes_10()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(100);
+    }
+
+    CHIP_ERROR Test2cIfPaLfThReadsTargetPositionLiftPercent100thsAttributeFromDut_11()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionLiftPercent100ths::TypeInfo>(
+                this, OnSuccessCallback_11, OnFailureCallback_11));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_11(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_11(const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionLiftPercent100ths)
+    {
+        VerifyOrReturn(CheckValueNonNull("targetPositionLiftPercent100ths", targetPositionLiftPercent100ths));
+        VerifyOrReturn(CheckValue("targetPositionLiftPercent100ths.Value()", targetPositionLiftPercent100ths.Value(), 10000U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR Test2eThLeaveTheDeviceMovingFor2Seconds_12()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(2000);
+    }
+
+    CHIP_ERROR Test3aVerifyDutReportsOperationalStatusAttributeToThAfterADownOrClose_13()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        mTest_Test_TC_WNCV_3_2_OperationalStatus_Reported = OnSuccessCallback_13;
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_13(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_13(uint8_t operationalStatus)
+    {
+        mReceivedReport_13 = true;
+
+        VerifyOrReturn(CheckConstraintType("operationalStatus", "", "map8"));
+        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("operationalStatus", operationalStatus, 10));
+        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("operationalStatus", operationalStatus, 42));
+        NextTest();
+    }
+
+    CHIP_ERROR Test3a2DutUpdatesItsAttributes_14()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(2000);
+    }
+
+    CHIP_ERROR Test3bIfPaLfThReadsCurrentPositionLiftPercent100thsAttributeFromDut_15()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo>(
+                this, OnSuccessCallback_15, OnFailureCallback_15));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_15(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_15(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionLiftPercent100ths)
+    {
+        VerifyOrReturn(CheckConstraintType("currentPositionLiftPercent100ths", "", "uint16"));
+        VerifyOrReturn(
+            CheckConstraintMinValue<chip::Percent100ths>("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 1U));
+        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("currentPositionLiftPercent100ths",
+                                                                    currentPositionLiftPercent100ths, 10000U));
+        NextTest();
+    }
+
+    CHIP_ERROR Test3cIfPaLfThReadsCurrentPositionLiftPercentageOptionalAttributeFromDut_16()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::TypeInfo>(
+                this, OnSuccessCallback_16, OnFailureCallback_16));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_16(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_16(const chip::app::DataModel::Nullable<chip::Percent> & currentPositionLiftPercentage)
+    {
+        VerifyOrReturn(CheckConstraintType("currentPositionLiftPercentage", "", "uint8"));
+        VerifyOrReturn(CheckConstraintMinValue<chip::Percent>("currentPositionLiftPercentage", currentPositionLiftPercentage, 1));
+        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent>("currentPositionLiftPercentage", currentPositionLiftPercentage, 100));
+        NextTest();
+    }
+
+    CHIP_ERROR Test3dIfPaTlThReadsCurrentPositionTiltPercent100thsAttributeFromDut_17()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo>(
+                this, OnSuccessCallback_17, OnFailureCallback_17));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_17(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_17(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionTiltPercent100ths)
+    {
+        VerifyOrReturn(CheckConstraintType("currentPositionTiltPercent100ths", "", "uint16"));
+        VerifyOrReturn(
+            CheckConstraintMinValue<chip::Percent100ths>("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 1U));
+        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("currentPositionTiltPercent100ths",
+                                                                    currentPositionTiltPercent100ths, 10000U));
+        NextTest();
+    }
+
+    CHIP_ERROR Test3eIfPaLfThReadsCurrentPositionTiltPercentageOptionalAttributeFromDut_18()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::TypeInfo>(
+                this, OnSuccessCallback_18, OnFailureCallback_18));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_18(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_18(const chip::app::DataModel::Nullable<chip::Percent> & currentPositionTiltPercentage)
+    {
+        VerifyOrReturn(CheckConstraintType("currentPositionTiltPercentage", "", "uint8"));
+        VerifyOrReturn(CheckConstraintMinValue<chip::Percent>("currentPositionTiltPercentage", currentPositionTiltPercentage, 1));
+        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent>("currentPositionTiltPercentage", currentPositionTiltPercentage, 100));
+        NextTest();
+    }
+
+    CHIP_ERROR Test4aThSendsAStopMotionCommandToDut_19()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::WindowCovering::Commands::StopMotion::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_WNCV_3_2 *>(context))->OnSuccessResponse_19();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<Test_TC_WNCV_3_2 *>(context))->OnFailureResponse_19(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_19(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_19() { NextTest(); }
+
+    CHIP_ERROR Test4bThWaitsFor3SecondsTheEndOfInertialMovementsOnTheDevice_20()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(3000);
+    }
+
+    CHIP_ERROR Test4cVerifyDutUpdateOperationalStatusAttributeToThAfterAStopMotion_21()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
+            this, OnSuccessCallback_21, OnFailureCallback_21));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_21(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_21(uint8_t operationalStatus)
     {
         VerifyOrReturn(CheckValue("operationalStatus", operationalStatus, 0));
 
+        NextTest();
+    }
+
+    CHIP_ERROR Test5aThWaitsForXSecondsAttributesUpdateOnTheDevice_22()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(1000);
+    }
+
+    CHIP_ERROR Test5bIfPaLfThReadsTargetPositionLiftPercent100thsAttributeFromDut_23()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionLiftPercent100ths::TypeInfo>(
+                this, OnSuccessCallback_23, OnFailureCallback_23));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_23(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_23(const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionLiftPercent100ths)
+    {
+        VerifyOrReturn(CheckConstraintType("targetPositionLiftPercent100ths", "", "uint16"));
+        VerifyOrReturn(
+            CheckConstraintMinValue<chip::Percent100ths>("targetPositionLiftPercent100ths", targetPositionLiftPercent100ths, 1U));
+        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("targetPositionLiftPercent100ths",
+                                                                    targetPositionLiftPercent100ths, 10000U));
+        NextTest();
+    }
+
+    CHIP_ERROR Test5cIfPaTlThReadsTargetPositionTiltPercent100thsAttributeFromDut_24()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionTiltPercent100ths::TypeInfo>(
+                this, OnSuccessCallback_24, OnFailureCallback_24));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_24(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_24(const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionTiltPercent100ths)
+    {
+        VerifyOrReturn(CheckConstraintType("targetPositionTiltPercent100ths", "", "uint16"));
+        VerifyOrReturn(
+            CheckConstraintMinValue<chip::Percent100ths>("targetPositionTiltPercent100ths", targetPositionTiltPercent100ths, 1U));
+        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("targetPositionTiltPercent100ths",
+                                                                    targetPositionTiltPercent100ths, 10000U));
         NextTest();
     }
 };
@@ -46362,20 +47905,101 @@ public:
         switch (mTestIndex++)
         {
         case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
-            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            ChipLogProgress(chipTool, " ***** Test Step 0 : 0: Wait for the commissioned device to be retrieved\n");
+            err = Test0WaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : 1a: TH adjusts the the DUT to a non-open position\n");
-            err = Test1aThAdjustsTheTheDutToANonOpenPosition_1();
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 1 : 1a: TH sends DownOrClose command to preposition the DUT in the opposite direction\n");
+            err = Test1aThSendsDownOrCloseCommandToPrepositionTheDutInTheOppositeDirection_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : 2a: TH sends StopMotion command to DUT\n");
-            err = Test2aThSendsStopMotionCommandToDut_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : 1b: TH Waits for 6-8 seconds movement(s) on the device\n");
+            err = Test1bThWaitsFor68SecondsMovementsOnTheDevice_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : 2b: TH reads OperationalStatus attribute from DUT\n");
-            err = Test2bThReadsOperationalStatusAttributeFromDut_3();
+            ChipLogProgress(
+                chipTool, " ***** Test Step 3 : 1c: TH sends UpOrOpen command to preposition the DUT in the opposite direction\n");
+            err = Test1cThSendsUpOrOpenCommandToPrepositionTheDutInTheOppositeDirection_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : 1d: TH Waits for 2 seconds movement(s) on the device\n");
+            err = Test1dThWaitsFor2SecondsMovementsOnTheDevice_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Report: 2: Subscribe to DUT reports on OperationalStatus attribute\n");
+            err = TestReport2SubscribeToDutReportsOnOperationalStatusAttribute_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : 2: Subscribe to DUT reports on OperationalStatus attribute\n");
+            err = Test2SubscribeToDutReportsOnOperationalStatusAttribute_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : 2a: TH sends a StopMotion command to DUT\n");
+            err = Test2aThSendsAStopMotionCommandToDut_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 8 : 2b: TH waits for 3 seconds the end of inertial movement(s) on the device\n");
+            err = Test2bThWaitsFor3SecondsTheEndOfInertialMovementsOnTheDevice_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 9 : 2c: Verify DUT reports OperationalStatus attribute to TH after a StopMotion\n");
+            err = Test2cVerifyDutReportsOperationalStatusAttributeToThAfterAStopMotion_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : 2d: TH waits for 100ms - 3s attributes update on the device\n");
+            err = Test2dThWaitsFor100ms3sAttributesUpdateOnTheDevice_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : 2e: TH reads OperationalStatus attribute from DUT\n");
+            err = Test2eThReadsOperationalStatusAttributeFromDut_11();
+            break;
+        case 12:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 12 : 3a: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT\n");
+            if (ShouldSkip("WNCV_LF && WNCV_PA_LF"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test3aIfPaLfThReadsCurrentPositionLiftPercent100thsAttributeFromDut_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 13 : 3b: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute 3c: it Must "
+                            "be equal with CurrentPositionLiftPercent100ths from DUT\n");
+            if (ShouldSkip("WNCV_LF && WNCV_PA_LF"))
+            {
+                NextTest();
+                return;
+            }
+            err =
+                Test3bIfPaLfThReadsTargetPositionLiftPercent100thsAttribute3cItMustBeEqualWithCurrentPositionLiftPercent100thsFromDut_13();
+            break;
+        case 14:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 14 : 4a: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT\n");
+            if (ShouldSkip("WNCV_TL && WNCV_PA_TL"))
+            {
+                NextTest();
+                return;
+            }
+            err = Test4aIfPaTlThReadsCurrentPositionTiltPercent100thsAttributeFromDut_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 15 : 4b: If (PA & TL) TH reads TargetPositionTiltPercent100ths attribute 4c: it Must "
+                            "be equal with CurrentPositionTiltPercent100ths from DUT\n");
+            if (ShouldSkip("WNCV_TL && WNCV_PA_TL"))
+            {
+                NextTest();
+                return;
+            }
+            err =
+                Test4bIfPaTlThReadsTargetPositionTiltPercent100thsAttribute4cItMustBeEqualWithCurrentPositionTiltPercent100thsFromDut_15();
             break;
         }
 
@@ -46388,10 +48012,13 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 4;
+    const uint16_t mTestCount = 16;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
+
+    chip::app::DataModel::Nullable<chip::Percent100ths> attrCurrentPositionLift;
+    chip::app::DataModel::Nullable<chip::Percent100ths> attrCurrentPositionTilt;
 
     void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
     {
@@ -46401,30 +48028,116 @@ private:
         NextTest();
     }
 
-    static void OnFailureCallback_3(void * context, CHIP_ERROR error)
+    typedef void (*Test_Test_TC_WNCV_3_3_OperationalStatus_ReportCallback)(void * context, uint8_t value);
+    Test_Test_TC_WNCV_3_3_OperationalStatus_ReportCallback mTest_Test_TC_WNCV_3_3_OperationalStatus_Reported = nullptr;
+
+    static void OnFailureCallback_5(void * context, CHIP_ERROR error)
     {
-        (static_cast<Test_TC_WNCV_3_3 *>(context))->OnFailureResponse_3(error);
+        (static_cast<Test_TC_WNCV_3_3 *>(context))->OnFailureResponse_5(error);
     }
 
-    static void OnSuccessCallback_3(void * context, uint8_t operationalStatus)
+    static void OnSuccessCallback_5(void * context, uint8_t operationalStatus)
     {
-        (static_cast<Test_TC_WNCV_3_3 *>(context))->OnSuccessResponse_3(operationalStatus);
+        (static_cast<Test_TC_WNCV_3_3 *>(context))->OnSuccessResponse_5(operationalStatus);
+    }
+
+    bool mReceivedReport_5 = false;
+
+    static void OnFailureCallback_6(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_3 *>(context))->OnFailureResponse_6(error);
+    }
+
+    static void OnSuccessCallback_6(void * context, uint8_t operationalStatus)
+    {
+        (static_cast<Test_TC_WNCV_3_3 *>(context))->OnSuccessResponse_6(operationalStatus);
+    }
+
+    static void OnSubscriptionEstablished_6(void * context)
+    {
+        (static_cast<Test_TC_WNCV_3_3 *>(context))->OnSubscriptionEstablishedResponse_6();
+    }
+
+    static void OnFailureCallback_9(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_3 *>(context))->OnFailureResponse_9(error);
+    }
+
+    static void OnSuccessCallback_9(void * context, uint8_t operationalStatus)
+    {
+        (static_cast<Test_TC_WNCV_3_3 *>(context))->OnSuccessResponse_9(operationalStatus);
+    }
+
+    bool mReceivedReport_9 = false;
+
+    static void OnFailureCallback_11(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_3 *>(context))->OnFailureResponse_11(error);
+    }
+
+    static void OnSuccessCallback_11(void * context, uint8_t operationalStatus)
+    {
+        (static_cast<Test_TC_WNCV_3_3 *>(context))->OnSuccessResponse_11(operationalStatus);
+    }
+
+    static void OnFailureCallback_12(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_3 *>(context))->OnFailureResponse_12(error);
+    }
+
+    static void OnSuccessCallback_12(void * context,
+                                     const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionLiftPercent100ths)
+    {
+        (static_cast<Test_TC_WNCV_3_3 *>(context))->OnSuccessResponse_12(currentPositionLiftPercent100ths);
+    }
+
+    static void OnFailureCallback_13(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_3 *>(context))->OnFailureResponse_13(error);
+    }
+
+    static void OnSuccessCallback_13(void * context,
+                                     const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionLiftPercent100ths)
+    {
+        (static_cast<Test_TC_WNCV_3_3 *>(context))->OnSuccessResponse_13(targetPositionLiftPercent100ths);
+    }
+
+    static void OnFailureCallback_14(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_3 *>(context))->OnFailureResponse_14(error);
+    }
+
+    static void OnSuccessCallback_14(void * context,
+                                     const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionTiltPercent100ths)
+    {
+        (static_cast<Test_TC_WNCV_3_3 *>(context))->OnSuccessResponse_14(currentPositionTiltPercent100ths);
+    }
+
+    static void OnFailureCallback_15(void * context, CHIP_ERROR error)
+    {
+        (static_cast<Test_TC_WNCV_3_3 *>(context))->OnFailureResponse_15(error);
+    }
+
+    static void OnSuccessCallback_15(void * context,
+                                     const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionTiltPercent100ths)
+    {
+        (static_cast<Test_TC_WNCV_3_3 *>(context))->OnSuccessResponse_15(targetPositionTiltPercent100ths);
     }
 
     //
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    CHIP_ERROR Test0WaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
         return WaitForCommissionee();
     }
 
-    CHIP_ERROR Test1aThAdjustsTheTheDutToANonOpenPosition_1()
+    CHIP_ERROR Test1aThSendsDownOrCloseCommandToPrepositionTheDutInTheOppositeDirection_1()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type;
+        using RequestType               = chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type;
 
         RequestType request;
 
@@ -46448,41 +48161,28 @@ private:
 
     void OnSuccessResponse_1() { NextTest(); }
 
-    CHIP_ERROR Test2aThSendsStopMotionCommandToDut_2()
+    CHIP_ERROR Test1bThWaitsFor68SecondsMovementsOnTheDevice_2()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(6000);
+    }
+
+    CHIP_ERROR Test1cThSendsUpOrOpenCommandToPrepositionTheDutInTheOppositeDirection_3()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::WindowCovering::Commands::StopMotion::Type;
+        using RequestType               = chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type;
 
         RequestType request;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<Test_TC_WNCV_3_3 *>(context))->OnSuccessResponse_2();
+            (static_cast<Test_TC_WNCV_3_3 *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<Test_TC_WNCV_3_3 *>(context))->OnFailureResponse_2(error);
+            (static_cast<Test_TC_WNCV_3_3 *>(context))->OnFailureResponse_3(error);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_2(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_2() { NextTest(); }
-
-    CHIP_ERROR Test2bThReadsOperationalStatusAttributeFromDut_3()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
         return CHIP_NO_ERROR;
     }
 
@@ -46492,9 +48192,287 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3(uint8_t operationalStatus)
+    void OnSuccessResponse_3() { NextTest(); }
+
+    CHIP_ERROR Test1dThWaitsFor2SecondsMovementsOnTheDevice_4()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(2000);
+    }
+
+    CHIP_ERROR TestReport2SubscribeToDutReportsOnOperationalStatusAttribute_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        mTest_Test_TC_WNCV_3_3_OperationalStatus_Reported = OnSuccessCallback_5;
+        return WaitForMs(0);
+    }
+
+    void OnFailureResponse_5(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_5(uint8_t operationalStatus)
+    {
+        mReceivedReport_5 = true;
+
+        VerifyOrReturn(CheckConstraintType("operationalStatus", "", "map8"));
+    }
+
+    CHIP_ERROR Test2SubscribeToDutReportsOnOperationalStatusAttribute_6()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        uint16_t minIntervalArgument;
+        minIntervalArgument = 4U;
+        uint16_t maxIntervalArgument;
+        maxIntervalArgument = 5U;
+
+        ReturnErrorOnFailure(
+            cluster.SubscribeAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
+                this, OnSuccessCallback_6, OnFailureCallback_6, minIntervalArgument, maxIntervalArgument,
+                OnSubscriptionEstablished_6));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_6(uint8_t value)
+    {
+        if (mTest_Test_TC_WNCV_3_3_OperationalStatus_Reported)
+        {
+            auto callback                                     = mTest_Test_TC_WNCV_3_3_OperationalStatus_Reported;
+            mTest_Test_TC_WNCV_3_3_OperationalStatus_Reported = nullptr;
+            callback(this, value);
+        }
+    }
+
+    void OnSubscriptionEstablishedResponse_6()
+    {
+        VerifyOrReturn(mReceivedReport_5, Exit("Initial report not received!"));
+        NextTest();
+    }
+
+    CHIP_ERROR Test2aThSendsAStopMotionCommandToDut_7()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::WindowCovering::Commands::StopMotion::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_WNCV_3_3 *>(context))->OnSuccessResponse_7();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<Test_TC_WNCV_3_3 *>(context))->OnFailureResponse_7(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_7(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_7() { NextTest(); }
+
+    CHIP_ERROR Test2bThWaitsFor3SecondsTheEndOfInertialMovementsOnTheDevice_8()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(3000);
+    }
+
+    CHIP_ERROR Test2cVerifyDutReportsOperationalStatusAttributeToThAfterAStopMotion_9()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        mTest_Test_TC_WNCV_3_3_OperationalStatus_Reported = OnSuccessCallback_9;
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_9(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_9(uint8_t operationalStatus)
+    {
+        mReceivedReport_9 = true;
+
+        VerifyOrReturn(CheckValue("operationalStatus", operationalStatus, 0));
+
+        NextTest();
+    }
+
+    CHIP_ERROR Test2dThWaitsFor100ms3sAttributesUpdateOnTheDevice_10()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(2000);
+    }
+
+    CHIP_ERROR Test2eThReadsOperationalStatusAttributeFromDut_11()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
+            this, OnSuccessCallback_11, OnFailureCallback_11));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_11(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_11(uint8_t operationalStatus)
     {
         VerifyOrReturn(CheckValue("operationalStatus", operationalStatus, 0));
+
+        NextTest();
+    }
+
+    CHIP_ERROR Test3aIfPaLfThReadsCurrentPositionLiftPercent100thsAttributeFromDut_12()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo>(
+                this, OnSuccessCallback_12, OnFailureCallback_12));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_12(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_12(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionLiftPercent100ths)
+    {
+        VerifyOrReturn(
+            CheckConstraintMinValue<chip::Percent100ths>("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("currentPositionLiftPercent100ths",
+                                                                    currentPositionLiftPercent100ths, 10000U));
+        attrCurrentPositionLift = currentPositionLiftPercent100ths;
+        NextTest();
+    }
+
+    CHIP_ERROR
+    Test3bIfPaLfThReadsTargetPositionLiftPercent100thsAttribute3cItMustBeEqualWithCurrentPositionLiftPercent100thsFromDut_13()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionLiftPercent100ths::TypeInfo>(
+                this, OnSuccessCallback_13, OnFailureCallback_13));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_13(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_13(const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionLiftPercent100ths)
+    {
+        if (attrCurrentPositionLift.IsNull())
+        {
+            VerifyOrReturn(CheckValueNull("targetPositionLiftPercent100ths", targetPositionLiftPercent100ths));
+        }
+        else
+        {
+            VerifyOrReturn(CheckValueNonNull("targetPositionLiftPercent100ths", targetPositionLiftPercent100ths));
+            VerifyOrReturn(CheckValue("targetPositionLiftPercent100ths.Value()", targetPositionLiftPercent100ths.Value(),
+                                      attrCurrentPositionLift.Value()));
+        }
+
+        NextTest();
+    }
+
+    CHIP_ERROR Test4aIfPaTlThReadsCurrentPositionTiltPercent100thsAttributeFromDut_14()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo>(
+                this, OnSuccessCallback_14, OnFailureCallback_14));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_14(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_14(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionTiltPercent100ths)
+    {
+        VerifyOrReturn(
+            CheckConstraintMinValue<chip::Percent100ths>("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 0U));
+        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("currentPositionTiltPercent100ths",
+                                                                    currentPositionTiltPercent100ths, 10000U));
+        attrCurrentPositionTilt = currentPositionTiltPercent100ths;
+        NextTest();
+    }
+
+    CHIP_ERROR
+    Test4bIfPaTlThReadsTargetPositionTiltPercent100thsAttribute4cItMustBeEqualWithCurrentPositionTiltPercent100thsFromDut_15()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionTiltPercent100ths::TypeInfo>(
+                this, OnSuccessCallback_15, OnFailureCallback_15));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_15(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_15(const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionTiltPercent100ths)
+    {
+        if (attrCurrentPositionTilt.IsNull())
+        {
+            VerifyOrReturn(CheckValueNull("targetPositionTiltPercent100ths", targetPositionTiltPercent100ths));
+        }
+        else
+        {
+            VerifyOrReturn(CheckValueNonNull("targetPositionTiltPercent100ths", targetPositionTiltPercent100ths));
+            VerifyOrReturn(CheckValue("targetPositionTiltPercent100ths.Value()", targetPositionTiltPercent100ths.Value(),
+                                      attrCurrentPositionTilt.Value()));
+        }
 
         NextTest();
     }
@@ -46679,7 +48657,8 @@ private:
 
         RequestType request;
         request.target = 1;
-        request.data   = chip::Span<const char>("1garbage: not in length on purpose", 1);
+        request.data.Emplace();
+        request.data.Value() = chip::Span<const char>("1garbage: not in length on purpose", 1);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_TargetNavigatorCluster *>(context))->OnSuccessResponse_3(data.status, data.data);
@@ -46699,11 +48678,12 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3(chip::app::Clusters::TargetNavigator::StatusEnum status, chip::CharSpan data)
+    void OnSuccessResponse_3(chip::app::Clusters::TargetNavigator::StatusEnum status, const chip::Optional<chip::CharSpan> & data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
-        VerifyOrReturn(CheckValueAsString("data", data, chip::CharSpan("data response", 13)));
+        VerifyOrReturn(CheckValuePresent("data", data));
+        VerifyOrReturn(CheckValueAsString("data.Value()", data.Value(), chip::CharSpan("data response", 13)));
 
         NextTest();
     }
@@ -47092,7 +49072,8 @@ private:
         request.application.catalogVendorId = 123U;
         request.application.applicationId   = chip::Span<const char>("applicationIdgarbage: not in length on purpose", 13);
 
-        request.data = chip::ByteSpan(chip::Uint8::from_const_char("datagarbage: not in length on purpose"), 4);
+        request.data.Emplace();
+        request.data.Value() = chip::ByteSpan(chip::Uint8::from_const_char("datagarbage: not in length on purpose"), 4);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_2(data.status, data.data);
@@ -48055,7 +50036,7 @@ private:
         (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_2(error);
     }
 
-    static void OnSuccessCallback_2(void * context, uint64_t startTime)
+    static void OnSuccessCallback_2(void * context, const chip::app::DataModel::Nullable<uint64_t> & startTime)
     {
         (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_2(startTime);
     }
@@ -48065,7 +50046,7 @@ private:
         (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_3(error);
     }
 
-    static void OnSuccessCallback_3(void * context, uint64_t duration)
+    static void OnSuccessCallback_3(void * context, const chip::app::DataModel::Nullable<uint64_t> & duration)
     {
         (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_3(duration);
     }
@@ -48085,7 +50066,7 @@ private:
         (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_5(error);
     }
 
-    static void OnSuccessCallback_5(void * context, uint64_t seekRangeEnd)
+    static void OnSuccessCallback_5(void * context, const chip::app::DataModel::Nullable<uint64_t> & seekRangeEnd)
     {
         (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_5(seekRangeEnd);
     }
@@ -48095,7 +50076,7 @@ private:
         (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_6(error);
     }
 
-    static void OnSuccessCallback_6(void * context, uint64_t seekRangeStart)
+    static void OnSuccessCallback_6(void * context, const chip::app::DataModel::Nullable<uint64_t> & seekRangeStart)
     {
         (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_6(seekRangeStart);
     }
@@ -48151,9 +50132,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_2(uint64_t startTime)
+    void OnSuccessResponse_2(const chip::app::DataModel::Nullable<uint64_t> & startTime)
     {
-        VerifyOrReturn(CheckValue("startTime", startTime, 0ULL));
+        VerifyOrReturn(CheckValueNonNull("startTime", startTime));
+        VerifyOrReturn(CheckValue("startTime.Value()", startTime.Value(), 0ULL));
 
         NextTest();
     }
@@ -48175,9 +50157,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3(uint64_t duration)
+    void OnSuccessResponse_3(const chip::app::DataModel::Nullable<uint64_t> & duration)
     {
-        VerifyOrReturn(CheckValue("duration", duration, 0ULL));
+        VerifyOrReturn(CheckValueNonNull("duration", duration));
+        VerifyOrReturn(CheckValue("duration.Value()", duration.Value(), 0ULL));
 
         NextTest();
     }
@@ -48223,9 +50206,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_5(uint64_t seekRangeEnd)
+    void OnSuccessResponse_5(const chip::app::DataModel::Nullable<uint64_t> & seekRangeEnd)
     {
-        VerifyOrReturn(CheckValue("seekRangeEnd", seekRangeEnd, 0ULL));
+        VerifyOrReturn(CheckValueNonNull("seekRangeEnd", seekRangeEnd));
+        VerifyOrReturn(CheckValue("seekRangeEnd.Value()", seekRangeEnd.Value(), 0ULL));
 
         NextTest();
     }
@@ -48247,9 +50231,10 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_6(uint64_t seekRangeStart)
+    void OnSuccessResponse_6(const chip::app::DataModel::Nullable<uint64_t> & seekRangeStart)
     {
-        VerifyOrReturn(CheckValue("seekRangeStart", seekRangeStart, 0ULL));
+        VerifyOrReturn(CheckValueNonNull("seekRangeStart", seekRangeStart));
+        VerifyOrReturn(CheckValue("seekRangeStart.Value()", seekRangeStart.Value(), 0ULL));
 
         NextTest();
     }
@@ -48738,19 +50723,27 @@ private:
             VerifyOrReturn(CheckNextListItemDecodes<decltype(channelList)>("channelList", iter_0, 0));
             VerifyOrReturn(CheckValue("channelList[0].majorNumber", iter_0.GetValue().majorNumber, 1U));
             VerifyOrReturn(CheckValue("channelList[0].minorNumber", iter_0.GetValue().minorNumber, 2U));
-            VerifyOrReturn(CheckValueAsString("channelList[0].name", iter_0.GetValue().name, chip::CharSpan("exampleName", 11)));
-            VerifyOrReturn(
-                CheckValueAsString("channelList[0].callSign", iter_0.GetValue().callSign, chip::CharSpan("exampleCSign", 12)));
-            VerifyOrReturn(CheckValueAsString("channelList[0].affiliateCallSign", iter_0.GetValue().affiliateCallSign,
-                                              chip::CharSpan("exampleASign", 12)));
+            VerifyOrReturn(CheckValuePresent("channelList[0].name", iter_0.GetValue().name));
+            VerifyOrReturn(CheckValueAsString("channelList[0].name.Value()", iter_0.GetValue().name.Value(),
+                                              chip::CharSpan("exampleName", 11)));
+            VerifyOrReturn(CheckValuePresent("channelList[0].callSign", iter_0.GetValue().callSign));
+            VerifyOrReturn(CheckValueAsString("channelList[0].callSign.Value()", iter_0.GetValue().callSign.Value(),
+                                              chip::CharSpan("exampleCSign", 12)));
+            VerifyOrReturn(CheckValuePresent("channelList[0].affiliateCallSign", iter_0.GetValue().affiliateCallSign));
+            VerifyOrReturn(CheckValueAsString("channelList[0].affiliateCallSign.Value()",
+                                              iter_0.GetValue().affiliateCallSign.Value(), chip::CharSpan("exampleASign", 12)));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(channelList)>("channelList", iter_0, 1));
             VerifyOrReturn(CheckValue("channelList[1].majorNumber", iter_0.GetValue().majorNumber, 2U));
             VerifyOrReturn(CheckValue("channelList[1].minorNumber", iter_0.GetValue().minorNumber, 3U));
-            VerifyOrReturn(CheckValueAsString("channelList[1].name", iter_0.GetValue().name, chip::CharSpan("exampleName", 11)));
-            VerifyOrReturn(
-                CheckValueAsString("channelList[1].callSign", iter_0.GetValue().callSign, chip::CharSpan("exampleCSign", 12)));
-            VerifyOrReturn(CheckValueAsString("channelList[1].affiliateCallSign", iter_0.GetValue().affiliateCallSign,
-                                              chip::CharSpan("exampleASign", 12)));
+            VerifyOrReturn(CheckValuePresent("channelList[1].name", iter_0.GetValue().name));
+            VerifyOrReturn(CheckValueAsString("channelList[1].name.Value()", iter_0.GetValue().name.Value(),
+                                              chip::CharSpan("exampleName", 11)));
+            VerifyOrReturn(CheckValuePresent("channelList[1].callSign", iter_0.GetValue().callSign));
+            VerifyOrReturn(CheckValueAsString("channelList[1].callSign.Value()", iter_0.GetValue().callSign.Value(),
+                                              chip::CharSpan("exampleCSign", 12)));
+            VerifyOrReturn(CheckValuePresent("channelList[1].affiliateCallSign", iter_0.GetValue().affiliateCallSign));
+            VerifyOrReturn(CheckValueAsString("channelList[1].affiliateCallSign.Value()",
+                                              iter_0.GetValue().affiliateCallSign.Value(), chip::CharSpan("exampleASign", 12)));
             VerifyOrReturn(CheckNoMoreListItems<decltype(channelList)>("channelList", iter_0, 2));
         }
 
@@ -48788,9 +50781,13 @@ private:
     {
         VerifyOrReturn(CheckValue("channelMatch.majorNumber", channelMatch.majorNumber, 1U));
         VerifyOrReturn(CheckValue("channelMatch.minorNumber", channelMatch.minorNumber, 0U));
-        VerifyOrReturn(CheckValueAsString("channelMatch.name", channelMatch.name, chip::CharSpan("name", 4)));
-        VerifyOrReturn(CheckValueAsString("channelMatch.callSign", channelMatch.callSign, chip::CharSpan("callSign", 8)));
-        VerifyOrReturn(CheckValueAsString("channelMatch.affiliateCallSign", channelMatch.affiliateCallSign,
+        VerifyOrReturn(CheckValuePresent("channelMatch.name", channelMatch.name));
+        VerifyOrReturn(CheckValueAsString("channelMatch.name.Value()", channelMatch.name.Value(), chip::CharSpan("name", 4)));
+        VerifyOrReturn(CheckValuePresent("channelMatch.callSign", channelMatch.callSign));
+        VerifyOrReturn(
+            CheckValueAsString("channelMatch.callSign.Value()", channelMatch.callSign.Value(), chip::CharSpan("callSign", 8)));
+        VerifyOrReturn(CheckValuePresent("channelMatch.affiliateCallSign", channelMatch.affiliateCallSign));
+        VerifyOrReturn(CheckValueAsString("channelMatch.affiliateCallSign.Value()", channelMatch.affiliateCallSign.Value(),
                                           chip::CharSpan("affiliateCallSign", 17)));
 
         VerifyOrReturn(CheckValue("errorType", errorType, 0));
@@ -49136,10 +51133,11 @@ private:
         using RequestType               = chip::app::Clusters::ContentLauncher::Commands::LaunchContentRequest::Type;
 
         RequestType request;
-        request.autoPlay = true;
-        request.data     = chip::Span<const char>("exampleDatagarbage: not in length on purpose", 11);
 
-        request.search = chip::app::DataModel::List<chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type>();
+        request.search   = chip::app::DataModel::List<chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type>();
+        request.autoPlay = true;
+        request.data.Emplace();
+        request.data.Value() = chip::Span<const char>("exampleDatagarbage: not in length on purpose", 11);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_ContentLauncherCluster *>(context))->OnSuccessResponse_3(data.status, data.data);
@@ -49159,11 +51157,12 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_3(chip::app::Clusters::ContentLauncher::StatusEnum status, chip::CharSpan data)
+    void OnSuccessResponse_3(chip::app::Clusters::ContentLauncher::StatusEnum status, const chip::Optional<chip::CharSpan> & data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
-        VerifyOrReturn(CheckValueAsString("data", data, chip::CharSpan("exampleData", 11)));
+        VerifyOrReturn(CheckValuePresent("data", data));
+        VerifyOrReturn(CheckValueAsString("data.Value()", data.Value(), chip::CharSpan("exampleData", 11)));
 
         NextTest();
     }
@@ -49174,46 +51173,87 @@ private:
         using RequestType               = chip::app::Clusters::ContentLauncher::Commands::LaunchURLRequest::Type;
 
         RequestType request;
-        request.contentURL    = chip::Span<const char>("exampleUrlgarbage: not in length on purpose", 10);
-        request.displayString = chip::Span<const char>("exampleDisplayStringgarbage: not in length on purpose", 20);
+        request.contentURL = chip::Span<const char>("exampleUrlgarbage: not in length on purpose", 10);
+        request.displayString.Emplace();
+        request.displayString.Value() = chip::Span<const char>("exampleDisplayStringgarbage: not in length on purpose", 20);
+        request.brandingInformation.Emplace();
 
-        request.brandingInformation.providerName = chip::Span<const char>("exampleNamegarbage: not in length on purpose", 11);
+        request.brandingInformation.Value().providerName =
+            chip::Span<const char>("exampleNamegarbage: not in length on purpose", 11);
+        request.brandingInformation.Value().background.Emplace();
 
-        request.brandingInformation.background.imageUrl = chip::Span<const char>("exampleUrlgarbage: not in length on purpose", 10);
-        request.brandingInformation.background.color = chip::Span<const char>("exampleColorgarbage: not in length on purpose", 12);
-
-        request.brandingInformation.background.size.width  = 0;
-        request.brandingInformation.background.size.height = 0;
-        request.brandingInformation.background.size.metric = static_cast<chip::app::Clusters::ContentLauncher::MetricTypeEnum>(0);
-
-        request.brandingInformation.logo.imageUrl = chip::Span<const char>("exampleUrlgarbage: not in length on purpose", 10);
-        request.brandingInformation.logo.color    = chip::Span<const char>("exampleColorgarbage: not in length on purpose", 12);
-
-        request.brandingInformation.logo.size.width  = 0;
-        request.brandingInformation.logo.size.height = 0;
-        request.brandingInformation.logo.size.metric = static_cast<chip::app::Clusters::ContentLauncher::MetricTypeEnum>(0);
-
-        request.brandingInformation.progressBar.imageUrl =
+        request.brandingInformation.Value().background.Value().imageUrl.Emplace();
+        request.brandingInformation.Value().background.Value().imageUrl.Value() =
             chip::Span<const char>("exampleUrlgarbage: not in length on purpose", 10);
-        request.brandingInformation.progressBar.color = chip::Span<const char>("exampleColorgarbage: not in length on purpose", 12);
+        request.brandingInformation.Value().background.Value().color.Emplace();
+        request.brandingInformation.Value().background.Value().color.Value() =
+            chip::Span<const char>("exampleColorgarbage: not in length on purpose", 12);
+        request.brandingInformation.Value().background.Value().size.Emplace();
 
-        request.brandingInformation.progressBar.size.width  = 0;
-        request.brandingInformation.progressBar.size.height = 0;
-        request.brandingInformation.progressBar.size.metric = static_cast<chip::app::Clusters::ContentLauncher::MetricTypeEnum>(0);
+        request.brandingInformation.Value().background.Value().size.Value().width  = 0;
+        request.brandingInformation.Value().background.Value().size.Value().height = 0;
+        request.brandingInformation.Value().background.Value().size.Value().metric =
+            static_cast<chip::app::Clusters::ContentLauncher::MetricTypeEnum>(0);
 
-        request.brandingInformation.splash.imageUrl = chip::Span<const char>("exampleUrlgarbage: not in length on purpose", 10);
-        request.brandingInformation.splash.color    = chip::Span<const char>("exampleColorgarbage: not in length on purpose", 12);
+        request.brandingInformation.Value().logo.Emplace();
 
-        request.brandingInformation.splash.size.width  = 0;
-        request.brandingInformation.splash.size.height = 0;
-        request.brandingInformation.splash.size.metric = static_cast<chip::app::Clusters::ContentLauncher::MetricTypeEnum>(0);
+        request.brandingInformation.Value().logo.Value().imageUrl.Emplace();
+        request.brandingInformation.Value().logo.Value().imageUrl.Value() =
+            chip::Span<const char>("exampleUrlgarbage: not in length on purpose", 10);
+        request.brandingInformation.Value().logo.Value().color.Emplace();
+        request.brandingInformation.Value().logo.Value().color.Value() =
+            chip::Span<const char>("exampleColorgarbage: not in length on purpose", 12);
+        request.brandingInformation.Value().logo.Value().size.Emplace();
 
-        request.brandingInformation.waterMark.imageUrl = chip::Span<const char>("exampleUrlgarbage: not in length on purpose", 10);
-        request.brandingInformation.waterMark.color = chip::Span<const char>("exampleColorgarbage: not in length on purpose", 12);
+        request.brandingInformation.Value().logo.Value().size.Value().width  = 0;
+        request.brandingInformation.Value().logo.Value().size.Value().height = 0;
+        request.brandingInformation.Value().logo.Value().size.Value().metric =
+            static_cast<chip::app::Clusters::ContentLauncher::MetricTypeEnum>(0);
 
-        request.brandingInformation.waterMark.size.width  = 0;
-        request.brandingInformation.waterMark.size.height = 0;
-        request.brandingInformation.waterMark.size.metric = static_cast<chip::app::Clusters::ContentLauncher::MetricTypeEnum>(0);
+        request.brandingInformation.Value().progressBar.Emplace();
+
+        request.brandingInformation.Value().progressBar.Value().imageUrl.Emplace();
+        request.brandingInformation.Value().progressBar.Value().imageUrl.Value() =
+            chip::Span<const char>("exampleUrlgarbage: not in length on purpose", 10);
+        request.brandingInformation.Value().progressBar.Value().color.Emplace();
+        request.brandingInformation.Value().progressBar.Value().color.Value() =
+            chip::Span<const char>("exampleColorgarbage: not in length on purpose", 12);
+        request.brandingInformation.Value().progressBar.Value().size.Emplace();
+
+        request.brandingInformation.Value().progressBar.Value().size.Value().width  = 0;
+        request.brandingInformation.Value().progressBar.Value().size.Value().height = 0;
+        request.brandingInformation.Value().progressBar.Value().size.Value().metric =
+            static_cast<chip::app::Clusters::ContentLauncher::MetricTypeEnum>(0);
+
+        request.brandingInformation.Value().splash.Emplace();
+
+        request.brandingInformation.Value().splash.Value().imageUrl.Emplace();
+        request.brandingInformation.Value().splash.Value().imageUrl.Value() =
+            chip::Span<const char>("exampleUrlgarbage: not in length on purpose", 10);
+        request.brandingInformation.Value().splash.Value().color.Emplace();
+        request.brandingInformation.Value().splash.Value().color.Value() =
+            chip::Span<const char>("exampleColorgarbage: not in length on purpose", 12);
+        request.brandingInformation.Value().splash.Value().size.Emplace();
+
+        request.brandingInformation.Value().splash.Value().size.Value().width  = 0;
+        request.brandingInformation.Value().splash.Value().size.Value().height = 0;
+        request.brandingInformation.Value().splash.Value().size.Value().metric =
+            static_cast<chip::app::Clusters::ContentLauncher::MetricTypeEnum>(0);
+
+        request.brandingInformation.Value().waterMark.Emplace();
+
+        request.brandingInformation.Value().waterMark.Value().imageUrl.Emplace();
+        request.brandingInformation.Value().waterMark.Value().imageUrl.Value() =
+            chip::Span<const char>("exampleUrlgarbage: not in length on purpose", 10);
+        request.brandingInformation.Value().waterMark.Value().color.Emplace();
+        request.brandingInformation.Value().waterMark.Value().color.Value() =
+            chip::Span<const char>("exampleColorgarbage: not in length on purpose", 12);
+        request.brandingInformation.Value().waterMark.Value().size.Emplace();
+
+        request.brandingInformation.Value().waterMark.Value().size.Value().width  = 0;
+        request.brandingInformation.Value().waterMark.Value().size.Value().height = 0;
+        request.brandingInformation.Value().waterMark.Value().size.Value().metric =
+            static_cast<chip::app::Clusters::ContentLauncher::MetricTypeEnum>(0);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_ContentLauncherCluster *>(context))->OnSuccessResponse_4(data.status, data.data);
@@ -49233,11 +51273,12 @@ private:
         ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_4(chip::app::Clusters::ContentLauncher::StatusEnum status, chip::CharSpan data)
+    void OnSuccessResponse_4(chip::app::Clusters::ContentLauncher::StatusEnum status, const chip::Optional<chip::CharSpan> & data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
-        VerifyOrReturn(CheckValueAsString("data", data, chip::CharSpan("exampleData", 11)));
+        VerifyOrReturn(CheckValuePresent("data", data));
+        VerifyOrReturn(CheckValueAsString("data.Value()", data.Value(), chip::CharSpan("exampleData", 11)));
 
         NextTest();
     }
@@ -88351,7 +90392,7 @@ private:
 
     CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_1()
     {
-        const chip::GroupId groupId = 4660;
+        const chip::GroupId groupId = 257;
         using RequestType           = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -88389,7 +90430,7 @@ private:
 
     CHIP_ERROR TestTurnOffTheLightToSeeAttributeChange_3()
     {
-        const chip::GroupId groupId = 4660;
+        const chip::GroupId groupId = 257;
         using RequestType           = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -88427,7 +90468,7 @@ private:
 
     CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_5()
     {
-        const chip::GroupId groupId = 4660;
+        const chip::GroupId groupId = 257;
         using RequestType           = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -88465,7 +90506,7 @@ private:
 
     CHIP_ERROR TestTurnOffTheLightToSeeAttributeChange_7()
     {
-        const chip::GroupId groupId = 4660;
+        const chip::GroupId groupId = 257;
         using RequestType           = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -88503,7 +90544,7 @@ private:
 
     CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_9()
     {
-        const chip::GroupId groupId = 4660;
+        const chip::GroupId groupId = 257;
         using RequestType           = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -88541,7 +90582,7 @@ private:
 
     CHIP_ERROR TestTurnOffTheLightToSeeAttributeChange_11()
     {
-        const chip::GroupId groupId = 4660;
+        const chip::GroupId groupId = 257;
         using RequestType           = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -88579,7 +90620,7 @@ private:
 
     CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_13()
     {
-        const chip::GroupId groupId = 4660;
+        const chip::GroupId groupId = 257;
         using RequestType           = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -88617,7 +90658,7 @@ private:
 
     CHIP_ERROR TestTurnOffTheLightToSeeAttributeChange_15()
     {
-        const chip::GroupId groupId = 4660;
+        const chip::GroupId groupId = 257;
         using RequestType           = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -88655,7 +90696,7 @@ private:
 
     CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_17()
     {
-        const chip::GroupId groupId = 4660;
+        const chip::GroupId groupId = 257;
         using RequestType           = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -88693,7 +90734,7 @@ private:
 
     CHIP_ERROR TestTurnOffTheLightToSeeAttributeChange_19()
     {
-        const chip::GroupId groupId = 4660;
+        const chip::GroupId groupId = 257;
         using RequestType           = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -88775,6 +90816,14 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 1 : Add Group 1 - endpoint 1\n");
             err = TestAddGroup1Endpoint1_1();
             break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : KeySet Write 1\n");
+            err = TestKeySetWrite1_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Map Group Key Set to group ID on a given fabric\n");
+            err = TestMapGroupKeySetToGroupIdOnAGivenFabric_3();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -88786,7 +90835,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 2;
+    const uint16_t mTestCount = 4;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
@@ -88798,6 +90847,13 @@ private:
         VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
         NextTest();
     }
+
+    static void OnFailureCallback_3(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestGroupDemoConfig *>(context))->OnFailureResponse_3(error);
+    }
+
+    static void OnSuccessCallback_3(void * context) { (static_cast<TestGroupDemoConfig *>(context))->OnSuccessResponse_3(); }
 
     //
     // Tests methods
@@ -88815,7 +90871,7 @@ private:
         using RequestType               = chip::app::Clusters::Groups::Commands::AddGroup::Type;
 
         RequestType request;
-        request.groupId   = 4660U;
+        request.groupId   = 257U;
         request.groupName = chip::Span<const char>("Group #1garbage: not in length on purpose", 8);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
@@ -88840,10 +90896,92 @@ private:
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
-        VerifyOrReturn(CheckValue("groupId", groupId, 4660U));
+        VerifyOrReturn(CheckValue("groupId", groupId, 257U));
 
         NextTest();
     }
+
+    CHIP_ERROR TestKeySetWrite1_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        using RequestType               = chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::Type;
+
+        RequestType request;
+
+        request.groupKeySet.groupKeySetID = 417U;
+        request.groupKeySet.groupKeySecurityPolicy =
+            static_cast<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy>(0);
+        request.groupKeySet.epochKey0.SetNonNull();
+        request.groupKeySet.epochKey0.Value() =
+            chip::ByteSpan(chip::Uint8::from_const_char(
+                               "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xafgarbage: not in length on purpose"),
+                           16);
+        request.groupKeySet.epochStartTime0.SetNonNull();
+        request.groupKeySet.epochStartTime0.Value() = 1110000ULL;
+        request.groupKeySet.epochKey1.SetNonNull();
+        request.groupKeySet.epochKey1.Value() =
+            chip::ByteSpan(chip::Uint8::from_const_char(
+                               "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbfgarbage: not in length on purpose"),
+                           16);
+        request.groupKeySet.epochStartTime1.SetNonNull();
+        request.groupKeySet.epochStartTime1.Value() = 1110001ULL;
+        request.groupKeySet.epochKey2.SetNonNull();
+        request.groupKeySet.epochKey2.Value() =
+            chip::ByteSpan(chip::Uint8::from_const_char(
+                               "\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcfgarbage: not in length on purpose"),
+                           16);
+        request.groupKeySet.epochStartTime2.SetNonNull();
+        request.groupKeySet.epochStartTime2.Value() = 1110002ULL;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupDemoConfig *>(context))->OnSuccessResponse_2();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestGroupDemoConfig *>(context))->OnFailureResponse_2(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_2() { NextTest(); }
+
+    CHIP_ERROR TestMapGroupKeySetToGroupIdOnAGivenFabric_3()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::GroupKeyManagementClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type>
+            groupKeyMapArgument;
+
+        chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type groupKeyMapList_0[1];
+
+        groupKeyMapList_0[0].fabricIndex   = 1;
+        groupKeyMapList_0[0].groupId       = 257U;
+        groupKeyMapList_0[0].groupKeySetID = 417U;
+
+        groupKeyMapArgument = groupKeyMapList_0;
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::GroupKeyManagement::Attributes::GroupKeyMap::TypeInfo>(
+            groupKeyMapArgument, this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_3() { NextTest(); }
 };
 
 void registerCommandsTests(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)

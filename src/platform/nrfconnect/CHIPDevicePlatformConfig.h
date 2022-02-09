@@ -62,6 +62,11 @@
 #define CHIP_DEVICE_CONFIG_SETTINGS_KEY "mt"
 #endif // CHIP_DEVICE_CONFIG_SETTINGS_KEY
 
+#ifndef CHIP_DEVICE_CONFIG_OTA_REQUESTOR_REBOOT_DELAY_MS
+/// Delay between completing a firmware update download and reboot to apply the update
+#define CHIP_DEVICE_CONFIG_OTA_REQUESTOR_REBOOT_DELAY_MS 1000
+#endif // CHIP_DEVICE_CONFIG_OTA_REQUESTOR_REBOOT_DELAY_MS
+
 // ========== Platform-specific Configuration Overrides =========
 
 #ifndef CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY

@@ -619,6 +619,72 @@ server cluster GeneralDiagnostics = 51 {
   readonly global attribute int16u clusterRevision = 65533;
 }
 
+server cluster GroupKeyManagement = 63 {
+  enum GroupKeySecurityPolicy : ENUM8 {
+    kStandard = 0;
+    kLowLatency = 1;
+  }
+
+  struct GroupKeyMapStruct {
+    fabric_idx fabricIndex = 0;
+    group_id groupId = 1;
+    INT16U groupKeySetID = 2;
+  }
+
+  struct GroupInfoMapStruct {
+    fabric_idx fabricIndex = 0;
+    group_id groupId = 1;
+    endpoint_no endpoints[] = 2;
+    optional CHAR_STRING<16> groupName = 3;
+  }
+
+  struct GroupKeySetStruct {
+    INT16U groupKeySetID = 0;
+    GroupKeySecurityPolicy groupKeySecurityPolicy = 1;
+    nullable OCTET_STRING<16> epochKey0 = 2;
+    nullable epoch_us epochStartTime0 = 3;
+    nullable OCTET_STRING<16> epochKey1 = 4;
+    nullable epoch_us epochStartTime1 = 5;
+    nullable OCTET_STRING<16> epochKey2 = 6;
+    nullable epoch_us epochStartTime2 = 7;
+  }
+
+  attribute GroupKeyMapStruct groupKeyMap[] = 0;
+  readonly attribute GroupInfoMapStruct groupTable[] = 1;
+  readonly attribute int16u maxGroupsPerFabric = 2;
+  readonly attribute int16u maxGroupKeysPerFabric = 3;
+  readonly global attribute int16u clusterRevision = 65533;
+
+  request struct KeySetReadRequest {
+    INT16U groupKeySetID = 0;
+  }
+
+  request struct KeySetReadAllIndicesRequest {
+    INT16U groupKeySetIDs[] = 0;
+  }
+
+  request struct KeySetRemoveRequest {
+    INT16U groupKeySetID = 0;
+  }
+
+  request struct KeySetWriteRequest {
+    GroupKeySetStruct groupKeySet = 0;
+  }
+
+  response struct KeySetReadAllIndicesResponse {
+    INT16U groupKeySetIDs[] = 0;
+  }
+
+  response struct KeySetReadResponse {
+    GroupKeySetStruct groupKeySet = 0;
+  }
+
+  command KeySetRead(KeySetReadRequest): KeySetReadResponse = 1;
+  command KeySetReadAllIndices(KeySetReadAllIndicesRequest): KeySetReadAllIndicesResponse = 4;
+  command KeySetRemove(KeySetRemoveRequest): DefaultSuccess = 3;
+  command KeySetWrite(KeySetWriteRequest): DefaultSuccess = 0;
+}
+
 server cluster Groups = 4 {
   readonly attribute bitmap8 nameSupport = 0;
   readonly global attribute int16u clusterRevision = 65533;
@@ -1602,6 +1668,7 @@ endpoint 0 {
   server  cluster FixedLabel;
   server  cluster GeneralCommissioning;
   server  cluster GeneralDiagnostics;
+  server  cluster GroupKeyManagement;
   server  cluster Groups;
   server  cluster LocalizationConfiguration;
   server  cluster NetworkCommissioning;

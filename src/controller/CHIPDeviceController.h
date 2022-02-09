@@ -533,6 +533,16 @@ public:
 
     /**
      * @brief
+     *   This function returns the attestation challenge for the secure session of the device being commissioned.
+     *
+     * @param[out] attestationChallenge The output for the attestationChallenge
+     *
+     * @return CHIP_ERROR               CHIP_NO_ERROR on success, or CHIP_ERROR_INVALID_ARGUMENT if no secure session is active
+     */
+    CHIP_ERROR GetAttestationChallenge(ByteSpan & attestationChallenge);
+
+    /**
+     * @brief
      *   This function stops a pairing process that's in progress. It does not delete the pairing of a previously
      *   paired device.
      *
@@ -570,11 +580,13 @@ public:
      * @param[in] attestationNonce    Attestation nonce
      * @param[in] pai                 PAI certificate
      * @param[in] dac                 DAC certificates
+     * @param[in] remoteVendorId      vendor ID read from the device Basic Information cluster
+     * @param[in] remoteProductId     product ID read from the device Basic Information cluster
      * @param[in] proxy               device proxy that is being attested.
      */
     CHIP_ERROR ValidateAttestationInfo(const ByteSpan & attestationElements, const ByteSpan & signature,
                                        const ByteSpan & attestationNonce, const ByteSpan & pai, const ByteSpan & dac,
-                                       DeviceProxy * proxy);
+                                       VendorId remoteVendorId, uint16_t remoteProductId, DeviceProxy * proxy);
 
     /**
      * @brief

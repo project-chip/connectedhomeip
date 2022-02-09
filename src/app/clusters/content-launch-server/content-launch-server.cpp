@@ -129,8 +129,7 @@ class ContentLauncherAttrAccess : public app::AttributeAccessInterface
 public:
     ContentLauncherAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), ContentLauncher::Id) {}
 
-    CHIP_ERROR Read(FabricIndex fabricIndex, const app::ConcreteReadAttributePath & aPath,
-                    app::AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
 
 private:
     CHIP_ERROR ReadAcceptHeaderAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
@@ -139,8 +138,7 @@ private:
 
 ContentLauncherAttrAccess gContentLauncherAttrAccess;
 
-CHIP_ERROR ContentLauncherAttrAccess::Read(FabricIndex fabricIndex, const app::ConcreteReadAttributePath & aPath,
-                                           app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR ContentLauncherAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder)
 {
     EndpointId endpoint = aPath.mEndpointId;
     Delegate * delegate = GetDelegate(endpoint);
@@ -206,7 +204,7 @@ bool emberAfContentLauncherClusterLaunchContentRequestCallback(
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
     {
-        delegate->HandleLaunchContent(responder, parameterList, autoplay, data);
+        delegate->HandleLaunchContent(responder, parameterList, autoplay, data.HasValue() ? data.Value() : CharSpan());
     }
 
 exit:
@@ -242,7 +240,8 @@ bool emberAfContentLauncherClusterLaunchURLRequestCallback(
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
     {
-        delegate->HandleLaunchUrl(responder, contentUrl, displayString, brandingInformationList);
+        delegate->HandleLaunchUrl(responder, contentUrl, displayString.HasValue() ? displayString.Value() : CharSpan(),
+                                  brandingInformationList);
     }
 
 exit:

@@ -54,6 +54,10 @@
 #include "matter_shell.h"
 #endif
 
+#ifdef EFR32_OTA_ENABLED
+#include "OTAConfig.h"
+#endif // EFR32_OTA_ENABLED
+
 #define BLE_DEV_NAME "EFR32_WINDOW"
 using namespace ::chip::DeviceLayer;
 
@@ -167,7 +171,9 @@ int main(void)
 #ifdef ENABLE_CHIP_SHELL
     chip::startShellTask();
 #endif
-
+#ifdef EFR32_OTA_ENABLED
+    OTAConfig::Init();
+#endif // EFR32_OTA_ENABLED
     WindowApp & app = WindowApp::Instance();
 
     EFR32_LOG("Starting App");
