@@ -46,7 +46,7 @@ public:
     // Register for the Time Format Localization cluster on all endpoints.
     TimeFormatLocalizationAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), TimeFormatLocalization::Id) {}
 
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(FabricIndex fabricIndex, const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
     CHIP_ERROR ReadSupportedCalendarTypes(AttributeValueEncoder & aEncoder);
@@ -78,7 +78,8 @@ CHIP_ERROR TimeFormatLocalizationAttrAccess::ReadSupportedCalendarTypes(Attribut
     return err;
 }
 
-CHIP_ERROR TimeFormatLocalizationAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR TimeFormatLocalizationAttrAccess::Read(FabricIndex fabricIndex, const ConcreteReadAttributePath & aPath,
+                                                  AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == TimeFormatLocalization::Id);
 

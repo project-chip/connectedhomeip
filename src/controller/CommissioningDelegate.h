@@ -30,10 +30,7 @@ enum CommissioningStage : uint8_t
 {
     kError,
     kSecurePairing,
-    kReadVendorId,
-    kReadProductId,
-    kReadSoftwareVersion,
-    kGetNetworkTechnology,
+    kReadCommissioningInfo,
     kArmFailsafe,
     // kConfigTime,  // NOT YET IMPLEMENTED
     // kConfigTimeZone,  // NOT YET IMPLEMENTED
@@ -70,16 +67,16 @@ struct NOCChainGenerationParameters
     ByteSpan nocsrElements;
     ByteSpan signature;
 };
-struct NOCerts
-{
-};
+
+constexpr uint16_t kDefaultFailsafeTimeout = 60;
 class CommissioningParameters
 {
 public:
     static constexpr size_t kMaxThreadDatasetLen = 254;
     static constexpr size_t kMaxSsidLen          = 32;
     static constexpr size_t kMaxCredentialsLen   = 64;
-    uint16_t GetFailsafeTimerSeconds() const { return mFailsafeTimerSeconds; }
+
+    const Optional<uint16_t> GetFailsafeTimerSeconds() const { return mFailsafeTimerSeconds; }
     const Optional<ByteSpan> GetCSRNonce() const { return mCSRNonce; }
     const Optional<ByteSpan> GetAttestationNonce() const { return mAttestationNonce; }
     const Optional<WiFiCredentials> GetWiFiCredentials() const { return mWiFiCreds; }
@@ -101,7 +98,7 @@ public:
 
     CommissioningParameters & SetFailsafeTimerSeconds(uint16_t seconds)
     {
-        mFailsafeTimerSeconds = seconds;
+        mFailsafeTimerSeconds.SetValue(seconds);
         return *this;
     }
 
@@ -188,7 +185,7 @@ public:
     void SetCompletionStatus(CHIP_ERROR err) { completionStatus = err; }
 
 private:
-    uint16_t mFailsafeTimerSeconds = 60;
+    Optional<uint16_t> mFailsafeTimerSeconds;
     Optional<ByteSpan> mCSRNonce;         ///< CSR Nonce passed by the commissioner
     Optional<ByteSpan> mAttestationNonce; ///< Attestation Nonce passed by the commissioner
     Optional<WiFiCredentials> mWiFiCreds;
@@ -239,37 +236,36 @@ struct OperationalNodeFoundData
     OperationalDeviceProxy * operationalProxy;
 };
 
-struct BasicVendor
-{
-    BasicVendor(VendorId id) : vendorId(id) {}
-    VendorId vendorId;
-};
-
-struct BasicProduct
-{
-    BasicProduct(uint16_t id) : productId(id) {}
-    uint16_t productId;
-};
-
-struct BasicSoftware
-{
-    BasicSoftware(uint32_t version) : softwareVersion(version) {}
-    uint32_t softwareVersion;
-};
-
 struct NetworkClusters
 {
     EndpointId wifi   = kInvalidEndpointId;
     EndpointId thread = kInvalidEndpointId;
     EndpointId eth    = kInvalidEndpointId;
 };
+struct BasicClusterInfo
+{
+    VendorId vendorId        = VendorId::Common;
+    uint16_t productId       = 0;
+    uint32_t softwareVersion = 0;
+};
+struct GeneralCommissioningInfo
+{
+    uint16_t recommendedFailsafe = 0;
+};
+
+struct ReadCommissioningInfo
+{
+    NetworkClusters network;
+    BasicClusterInfo basic;
+    GeneralCommissioningInfo general;
+};
 
 class CommissioningDelegate
 {
 public:
     virtual ~CommissioningDelegate(){};
-    struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, NocChain, OperationalNodeFoundData, BasicVendor,
-                                         BasicProduct, BasicSoftware, NetworkClusters>
+    struct CommissioningReport
+        : Variant<RequestedCertificate, AttestationResponse, NocChain, OperationalNodeFoundData, ReadCommissioningInfo>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;

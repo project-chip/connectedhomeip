@@ -540,6 +540,12 @@ void SetupPretendDevices()
     AddCluster("Humidity Sensor");
     AddAttribute("MeasuredValue", "30");
     app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(30 * 100));
+
+    AddDevice("Light Sensor");
+    AddEndpoint("External");
+    AddCluster("Illuminance Measurement");
+    AddAttribute("MeasuredValue", "1000");
+    app::Clusters::IlluminanceMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(1000));
 }
 
 WiFiWidget pairingWindowLED;

@@ -190,6 +190,16 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         uint32_t messageCounter  = counter.Value();
         ReturnErrorOnFailure(counter.Advance());
         packetHeader.SetMessageCounter(messageCounter);
+        Transport::UnauthenticatedSession * session = sessionHandle->AsUnauthenticatedSession();
+        switch (session->GetSessionRole())
+        {
+        case Transport::UnauthenticatedSession::SessionRole::kInitiator:
+            packetHeader.SetSourceNodeId(session->GetEphemeralInitiatorNodeID());
+            break;
+        case Transport::UnauthenticatedSession::SessionRole::kResponder:
+            packetHeader.SetDestinationNodeId(session->GetEphemeralInitiatorNodeID());
+            break;
+        }
 
         // Trace after all headers are settled.
         CHIP_TRACE_MESSAGE_SENT(payloadHeader, packetHeader, message->Start(), message->TotalLength());
@@ -401,7 +411,7 @@ void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::
     }
     else
     {
-        MessageDispatch(packetHeader, peerAddress, std::move(msg));
+        UnauthenticatedMessageDispatch(packetHeader, peerAddress, std::move(msg));
     }
 }
 
@@ -437,18 +447,45 @@ void SessionManager::RefreshSessionOperationalData(const SessionHandle & session
     });
 }
 
-void SessionManager::MessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                     System::PacketBufferHandle && msg)
+void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                                    System::PacketBufferHandle && msg)
 {
-    Optional<SessionHandle> optionalSession = mUnauthenticatedSessions.FindOrAllocateEntry(peerAddress, GetLocalMRPConfig());
-    if (!optionalSession.HasValue())
+    Optional<NodeId> source      = packetHeader.GetSourceNodeId();
+    Optional<NodeId> destination = packetHeader.GetDestinationNodeId();
+    if ((source.HasValue() && destination.HasValue()) || (!source.HasValue() && !destination.HasValue()))
     {
-        ChipLogError(Inet, "UnauthenticatedSession exhausted");
-        return;
+        ChipLogProgress(Inet,
+                        "Received malformed unsecure packet with source 0x" ChipLogFormatX64 " destination 0x" ChipLogFormatX64,
+                        ChipLogValueX64(source.ValueOr(kUndefinedNodeId)), ChipLogValueX64(destination.ValueOr(kUndefinedNodeId)));
+        return; // ephemeral node id is only assigned to the initiator, there should be one and only one node id exists.
+    }
+
+    Optional<SessionHandle> optionalSession;
+    if (source.HasValue())
+    {
+        // Assume peer is the initiator, we are the responder.
+        optionalSession = mUnauthenticatedSessions.FindOrAllocateResponder(source.Value(), GetLocalMRPConfig());
+        if (!optionalSession.HasValue())
+        {
+            ChipLogError(Inet, "UnauthenticatedSession exhausted");
+            return;
+        }
+    }
+    else
+    {
+        // Assume peer is the responder, we are the initiator.
+        optionalSession = mUnauthenticatedSessions.FindInitiator(destination.Value());
+        if (!optionalSession.HasValue())
+        {
+            ChipLogProgress(Inet, "Received unknown unsecure packet for initiator 0x" ChipLogFormatX64,
+                            ChipLogValueX64(destination.Value()));
+            return;
+        }
     }
 
     const SessionHandle & session                        = optionalSession.Value();
     Transport::UnauthenticatedSession * unsecuredSession = session->AsUnauthenticatedSession();
+    unsecuredSession->SetPeerAddress(peerAddress);
     SessionMessageDelegate::DuplicateMessage isDuplicate = SessionMessageDelegate::DuplicateMessage::No;
 
     // Verify message counter

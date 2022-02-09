@@ -262,6 +262,22 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
 
     TestContext & ctx = *static_cast<TestContext *>(apContext);
 
+    //
+    // We have to enable async dispatch here to ensure that the exchange
+    // gets correctly closed out in the test below. Otherwise, the following happens:
+    //
+    // 1. WriteHandler generates a response upon OnWriteRequest being called.
+    // 2. Since there is no matching active client-side exchange for that request, the IM engine
+    //    handles it incorrectly and treats it like an unsolicited message.
+    // 3. It is invalid to receive a WriteResponse as an unsolicited message so it correctly sends back
+    //    a StatusResponse containing an error to that message.
+    // 4. Without unwinding the existing call stack, a response is received on the same exchange that the handler
+    //    generated a WriteResponse on. This exchange should have been closed in a normal execution model, but in
+    //    a synchronous model, the exchange is still open, and the status response is sent to the WriteHandler.
+    // 5. WriteHandler::OnMessageReceived is invoked, and it correctly asserts.
+    //
+    ctx.EnableAsyncDispatch();
+
     constexpr bool allBooleans[] = { true, false };
     for (auto messageIsTimed : allBooleans)
     {
@@ -278,27 +294,35 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
 
             TestExchangeDelegate delegate;
             Messaging::ExchangeContext * exchange = ctx.NewExchangeToBob(&delegate);
-            Status status                         = writeHandler.OnWriteRequest(exchange, std::move(buf), transactionIsTimed);
+
+            Status status = writeHandler.OnWriteRequest(exchange, std::move(buf), transactionIsTimed);
             if (messageIsTimed == transactionIsTimed)
             {
                 NL_TEST_ASSERT(apSuite, status == Status::Success);
             }
             else
             {
-                NL_TEST_ASSERT(apSuite, status == Status::UnsupportedAccess);
-                // In the normal code flow, the exchange would now get closed
-                // when we send the error status on it (of if that fails when
-                // the stack unwinds).  In the success case it's been closed
-                // already by the WriteHandler sending the response on it, but
-                // if we are in the error case we need to make sure it gets
-                // closed.
+                //
+                // In a normal execution flow, the exchange manager would have closed out the exchange after the
+                // message dispatch call path had unwound. In this test however, we've manually allocated the exchange
+                // ourselves (as opposed to the exchange manager), so we need to take ownership of closing out the exchange.
+                //
+                // Note that this doesn't happen in the success case above, since that results in a call to send a message through
+                // the exchange context, which results in the exchange manager correctly closing it.
+                //
                 exchange->Close();
+                NL_TEST_ASSERT(apSuite, status == Status::UnsupportedAccess);
             }
+
+            ctx.DrainAndServiceIO();
+            ctx.DrainAndServiceIO();
 
             Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
             NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
         }
     }
+
+    ctx.DisableAsyncDispatch();
 }
 
 CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,

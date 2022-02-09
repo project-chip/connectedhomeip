@@ -16,27 +16,22 @@ limitations under the License.
 -->
 <configurator>
   <domain name="CHIP" />
+
+  <struct name="BindingEntry">
+    <cluster code="0x001e"/>
+    <item name="nodeId" type="NODE_ID"/>
+    <item name="groupId" type="GROUP_ID"/>
+    <item name="endpointId" type="ENDPOINT_NO" />
+    <item name="clusterId" type="CLUSTER_ID" />
+  </struct>
+
   <cluster>
     <domain>General</domain>
     <name>Binding</name>
     <code>0x001e</code>
     <define>BINDING_CLUSTER</define>
-    <client init="false" tick="false">true</client>
-    <server init="false" tick="false">true</server>
     <description>The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table.</description>
-    <command source="client" code="0x00" name="Bind" optional="false">
-      <description>Add a binding</description>
-      <arg name="nodeId" type="NODE_ID" />
-      <arg name="groupId" type="GROUP_ID" />
-      <arg name="endpointId" type="ENDPOINT_NO" />
-      <arg name="clusterId" type="CLUSTER_ID" />
-    </command>
-    <command source="client" code="0x01" name="Unbind" optional="false">
-      <description>Remove a binding</description>
-      <arg name="nodeId" type="NODE_ID" />
-      <arg name="groupId" type="GROUP_ID" />
-      <arg name="endpointId" type="ENDPOINT_NO" />
-      <arg name="clusterId" type="CLUSTER_ID" />
-    </command>
+    <attribute side="server" code="0x0000" define="BINDING_LIST" type="ARRAY" entryType="BindingEntry" length="254" writable="true" optional="false">binding list</attribute>
   </cluster>
+
 </configurator>

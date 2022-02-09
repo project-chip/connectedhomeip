@@ -112,7 +112,7 @@ public:
     // Register for the GroupKeyManagement cluster on all endpoints.
     GroupKeyManagementAttributeAccess() : AttributeAccessInterface(Optional<EndpointId>(0), GroupKeyManagement::Id) {}
 
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override
+    CHIP_ERROR Read(FabricIndex fabricIndex, const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override
     {
         VerifyOrDie(aPath.mClusterId == GroupKeyManagement::Id);
 
@@ -134,7 +134,7 @@ public:
         return CHIP_ERROR_READ_FAILED;
     }
 
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override
+    CHIP_ERROR Write(FabricIndex fabricIndex, const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override
     {
 
         if (GroupKeyManagement::Attributes::GroupKeyMap::Id == aPath.mAttributeId)
