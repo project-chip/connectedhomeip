@@ -192,8 +192,8 @@ public:
             return false;
         }
 
-        // NOTE: we do NOT try to oder IP addresses here, we check that the valid
-        // IP addresses are identical only.
+        // NOTE: we do NOT try to order/treat as a set all destinations here.
+        // Check that the valid destinations are identical only, including order.
         for (unsigned i = 0; i < mNumValidDestinations; i++)
         {
             if (mDestinations[i] != other.mDestinations[i])
