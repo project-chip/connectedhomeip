@@ -33,6 +33,7 @@
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #include <app/data-model/Encode.h>
 #include <app/util/attribute-storage.h>
+#include <platform/CHIPDeviceConfig.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;
@@ -41,12 +42,8 @@ using namespace chip::app::Clusters::TargetNavigator;
 using namespace chip::AppPlatform;
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
-#ifdef CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
 #define TARGET_NAVIGATOR_DELEGATE_TABLE_SIZE                                                                                       \
     (EMBER_AF_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
-#else
-#define TARGET_NAVIGATOR_DELEGATE_TABLE_SIZE EMBER_AF_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT
-#endif
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation

@@ -29,17 +29,14 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/Encode.h>
 #include <app/util/attribute-storage.h>
+#include <platform/CHIPDeviceConfig.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::MediaInput;
 
-#ifdef CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
 #define MEDIA_INPUT_DELEGATE_TABLE_SIZE                                                                                            \
     (EMBER_AF_MEDIA_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
-#else
-#define MEDIA_INPUT_DELEGATE_TABLE_SIZE EMBER_AF_MEDIA_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT
-#endif
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation

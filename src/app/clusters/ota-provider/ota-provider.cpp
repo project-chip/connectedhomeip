@@ -21,6 +21,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
+#include <platform/CHIPDeviceConfig.h>
 
 #include <lib/support/Span.h>
 
@@ -32,12 +33,8 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider;
 using chip::app::Clusters::OTAProviderDelegate;
 
-#ifdef CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
 #define OTA_PROVIDER_DELEGATE_TABLE_SIZE                                                                                           \
     (EMBER_AF_OTA_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
-#else
-#define OTA_PROVIDER_DELEGATE_TABLE_SIZE EMBER_AF_OTA_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT
-#endif
 
 namespace {
 constexpr size_t kLocationLen          = 2;   // The expected length of the location parameter in QueryImage

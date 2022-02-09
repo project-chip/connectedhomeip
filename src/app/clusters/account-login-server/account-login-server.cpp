@@ -28,6 +28,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
+#include <platform/CHIPDeviceConfig.h>
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #include <app/app-platform/ContentAppPlatform.h>
@@ -41,12 +42,8 @@ using namespace chip::AppPlatform;
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 using chip::app::Clusters::AccountLogin::Delegate;
 
-#ifdef CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
 #define ACCOUNT_LOGIN_DELEGATE_TABLE_SIZE                                                                                          \
     (EMBER_AF_ACCOUNT_LOGIN_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
-#else
-#define ACCOUNT_LOGIN_DELEGATE_TABLE_SIZE EMBER_AF_ACCOUNT_LOGIN_CLUSTER_SERVER_ENDPOINT_COUNT
-#endif
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation

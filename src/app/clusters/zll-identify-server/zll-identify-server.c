@@ -57,6 +57,7 @@
 #include "app/framework/include/af.h"
 #include "app/framework/util/common.h"
 #include <app/CommandHandler.h>
+#include <platform/CHIPDeviceConfig.h>
 
 #ifndef EZSP_HOST
 #include "hal/hal.h"
@@ -64,11 +65,7 @@
 
 using namespace chip;
 
-#ifdef CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
 #define IDENTIFY_STATE_TABLE_SIZE (EMBER_AF_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
-#else
-#define IDENTIFY_STATE_TABLE_SIZE EMBER_AF_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT
-#endif
 
 typedef struct
 {

@@ -30,16 +30,13 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/Encode.h>
 #include <app/util/attribute-storage.h>
+#include <platform/CHIPDeviceConfig.h>
 
 using namespace chip;
 using namespace chip::app::Clusters::AudioOutput;
 
-#ifdef CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
 #define AUDIO_OUTPUT_DELEGATE_TABLE_SIZE                                                                                           \
     (EMBER_AF_AUDIO_OUTPUT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
-#else
-#define AUDIO_OUTPUT_DELEGATE_TABLE_SIZE EMBER_AF_AUDIO_OUTPUT_CLUSTER_SERVER_ENDPOINT_COUNT
-#endif
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
