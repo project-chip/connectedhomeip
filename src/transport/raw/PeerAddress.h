@@ -118,7 +118,7 @@ public:
     /// addresses
     CHIP_ERROR AppendDestination(const Inet::IPAddress & addr, const Inet::InterfaceId & interface)
     {
-        if (mNumValidDestinations < kMaxPeerDestinations)
+        if (mNumValidDestinations >= kMaxPeerDestinations)
         {
             return CHIP_ERROR_NO_MEMORY;
         }
