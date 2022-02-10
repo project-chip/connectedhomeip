@@ -26160,8 +26160,8 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
 
     uint16_t minIntervalArgument = 4U;
     uint16_t maxIntervalArgument = 5U;
-    [cluster subscribeAttributeOperationalStatusWithMinInterval:minIntervalArgument
-        maxInterval:maxIntervalArgument
+    [cluster subscribeAttributeOperationalStatusWithMinInterval:@(minIntervalArgument)
+        maxInterval:@(maxIntervalArgument)
         subscriptionEstablished:^{
             XCTAssertEqual(testSendClusterTest_TC_WNCV_3_1_000007_WaitForReport_Fulfilled, true);
             [expectation fulfill];
@@ -26751,8 +26751,8 @@ ResponseHandler test_Test_TC_WNCV_3_2_OperationalStatus_Reported = nil;
 
     uint16_t minIntervalArgument = 4U;
     uint16_t maxIntervalArgument = 5U;
-    [cluster subscribeAttributeOperationalStatusWithMinInterval:minIntervalArgument
-        maxInterval:maxIntervalArgument
+    [cluster subscribeAttributeOperationalStatusWithMinInterval:@(minIntervalArgument)
+        maxInterval:@(maxIntervalArgument)
         subscriptionEstablished:^{
             XCTAssertEqual(testSendClusterTest_TC_WNCV_3_2_000007_WaitForReport_Fulfilled, true);
             [expectation fulfill];
@@ -27234,8 +27234,8 @@ ResponseHandler test_Test_TC_WNCV_3_3_OperationalStatus_Reported = nil;
 
     uint16_t minIntervalArgument = 4U;
     uint16_t maxIntervalArgument = 5U;
-    [cluster subscribeAttributeOperationalStatusWithMinInterval:minIntervalArgument
-        maxInterval:maxIntervalArgument
+    [cluster subscribeAttributeOperationalStatusWithMinInterval:@(minIntervalArgument)
+        maxInterval:@(maxIntervalArgument)
         subscriptionEstablished:^{
             XCTAssertEqual(testSendClusterTest_TC_WNCV_3_3_000005_WaitForReport_Fulfilled, true);
             [expectation fulfill];
@@ -36981,8 +36981,8 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     uint16_t minIntervalArgument = 2U;
     uint16_t maxIntervalArgument = 10U;
-    [cluster subscribeAttributeListInt8uWithMinInterval:minIntervalArgument
-        maxInterval:maxIntervalArgument
+    [cluster subscribeAttributeListInt8uWithMinInterval:@(minIntervalArgument)
+        maxInterval:@(maxIntervalArgument)
         subscriptionEstablished:^{
             XCTAssertEqual(testSendClusterTestCluster_000366_WaitForReport_Fulfilled, true);
             [expectation fulfill];
@@ -45123,8 +45123,8 @@ ResponseHandler test_TestSubscribe_OnOff_OnOff_Reported = nil;
 
     uint16_t minIntervalArgument = 2U;
     uint16_t maxIntervalArgument = 10U;
-    [cluster subscribeAttributeOnOffWithMinInterval:minIntervalArgument
-        maxInterval:maxIntervalArgument
+    [cluster subscribeAttributeOnOffWithMinInterval:@(minIntervalArgument)
+        maxInterval:@(maxIntervalArgument)
         subscriptionEstablished:^{
             XCTAssertEqual(testSendClusterTestSubscribe_OnOff_000002_WaitForReport_Fulfilled, true);
             [expectation fulfill];

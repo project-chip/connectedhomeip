@@ -126,7 +126,7 @@ using namespace chip::app::Clusters;
 
 {{/if}}
 {{#if isReportableAttribute}}
-- (void) subscribe{{>attribute}}WithMinInterval:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))reportHandler
+- (void) subscribe{{>attribute}}WithMinInterval:(NSNumber * _Nonnull)minInterval  maxInterval:(NSNumber * _Nonnull)maxInterval subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))reportHandler
 {
     new CHIP{{>attribute_data_callback_name}}CallbackSubscriptionBridge(self.callbackQueue,
       {{! This treats reportHandler as taking an id for the data.  This is
@@ -136,7 +136,7 @@ using namespace chip::app::Clusters;
           using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
           auto successFn = Callback<{{>attribute_data_callback_name}}Callback>::FromCancelable(success);
           auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-          return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall, minInterval, maxInterval, CHIP{{>attribute_data_callback_name}}CallbackSubscriptionBridge::OnSubscriptionEstablished);
+          return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall, [minInterval unsignedShortValue], [maxInterval unsignedShortValue], CHIP{{>attribute_data_callback_name}}CallbackSubscriptionBridge::OnSubscriptionEstablished);
       }, subscriptionEstablishedHandler);
 }
 
