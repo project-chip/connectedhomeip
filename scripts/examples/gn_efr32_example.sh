@@ -72,8 +72,6 @@ if [ "$#" == "0" ]; then
             Build wifi example with extension board rs911x. (Default false)
         use_wf200
             Build wifi example with extension board wf200. (Default false)
-        OTA_periodic_query_timeout
-
         'import("//with_pw_rpc.gni")'
             Use to build the example with pigweed RPC
 
@@ -125,10 +123,7 @@ else
                 if [ "$1" =~ *"use_rs911x=true"* ] || [ "$1" =~ *"use_wf200=true"* ]; then
                     USE_WIFI=true
                 fi
-                if [ "$1" =~ *"OTA_periodic_query_timeout"* ]; then
-                    USE_OTA_TIMEOUT=true
-                    echo "$OTA_periodic_query_timeout"
-                fi
+                
                 optArgs+=$1" "
                 shift
                 ;;
