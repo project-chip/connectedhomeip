@@ -46,6 +46,7 @@ static_library("mbed") {
   if (chip_enable_wifi) {
     sources += [
       "NetworkCommissioningWiFiDriver.cpp",
+      "ConnectivityManagerImpl_WiFi.cpp",
     ]
   }
 }

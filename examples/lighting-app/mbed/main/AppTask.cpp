@@ -114,8 +114,6 @@ int AppTask::Init()
     LightingMgr().Init(MBED_CONF_APP_LIGHTING_STATE_LED);
     LightingMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
-    ConnectivityMgrImpl().StartWiFiManagement();
-
     // Init ZCL Data Model and start server
     error = Server::GetInstance().Init();
     if (error != CHIP_NO_ERROR)
