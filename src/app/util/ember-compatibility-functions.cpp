@@ -24,6 +24,7 @@
 #include <access/AccessControl.h>
 #include <app/ClusterInfo.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/GlobalAttributes.h>
 #include <app/InteractionModelEngine.h>
 #include <app/RequiredPrivilege.h>
 #include <app/reporting/Engine.h>
@@ -346,29 +347,39 @@ public:
 CHIP_ERROR GlobalAttributeReader::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     using namespace Clusters::Globals::Attributes;
-    // The id of the attributes below is not in the attribute metadata.
-    // TODO: This does not play nicely with wildcard reads.  Need to fix ZAP to
-    // put it in the metadata, or fix wildcard expansion to add it.
     switch (aPath.mAttributeId)
     {
     case AttributeList::Id:
         return aEncoder.EncodeList([this](const auto & encoder) {
-            constexpr AttributeId ourId = Clusters::Globals::Attributes::AttributeList::Id;
-            const size_t count          = mCluster->attributeCount;
-            bool addedOurId             = false;
+            const size_t count     = mCluster->attributeCount;
+            bool addedExtraGlobals = false;
             for (size_t i = 0; i < count; ++i)
             {
-                AttributeId id = mCluster->attributes[i].attributeId;
-                if (!addedOurId && id > ourId)
+                AttributeId id              = mCluster->attributes[i].attributeId;
+                constexpr auto lastGlobalId = GlobalAttributesNotInMetadata[ArraySize(GlobalAttributesNotInMetadata) - 1];
+                // We are relying on GlobalAttributesNotInMetadata not having
+                // any gaps in their ids here, but for now they do because we
+                // have no EventList support.  So this assert is not quite
+                // right.  There should be a "- 1" on the right-hand side of the
+                // equals sign.
+                static_assert(lastGlobalId - GlobalAttributesNotInMetadata[0] == ArraySize(GlobalAttributesNotInMetadata),
+                              "Ids in GlobalAttributesNotInMetadata not consecutive (except EventList)");
+                if (!addedExtraGlobals && id > lastGlobalId)
                 {
-                    ReturnErrorOnFailure(encoder.Encode(ourId));
-                    addedOurId = true;
+                    for (const auto & globalId : GlobalAttributesNotInMetadata)
+                    {
+                        ReturnErrorOnFailure(encoder.Encode(globalId));
+                    }
+                    addedExtraGlobals = true;
                 }
                 ReturnErrorOnFailure(encoder.Encode(id));
             }
-            if (!addedOurId)
+            if (!addedExtraGlobals)
             {
-                ReturnErrorOnFailure(encoder.Encode(ourId));
+                for (const auto & globalId : GlobalAttributesNotInMetadata)
+                {
+                    ReturnErrorOnFailure(encoder.Encode(globalId));
+                }
             }
             return CHIP_NO_ERROR;
         });

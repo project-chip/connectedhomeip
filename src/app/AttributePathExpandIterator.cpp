@@ -22,6 +22,7 @@
 #include <app/ClusterInfo.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/EventManagement.h>
+#include <app/GlobalAttributes.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/support/CodeUtils.h>
@@ -59,6 +60,10 @@ AttributePathExpandIterator::AttributePathExpandIterator(ClusterInfo * aClusterI
     mEndpointIndex  = UINT16_MAX;
     mClusterIndex   = UINT8_MAX;
     mAttributeIndex = UINT16_MAX;
+
+    static_assert(std::numeric_limits<decltype(mGlobalAttributeIndex)>::max() >= ArraySize(GlobalAttributesNotInMetadata),
+                  "Our index won't be able to hold the value we need to hold.");
+    mGlobalAttributeIndex = ArraySize(GlobalAttributesNotInMetadata);
 
     // Make the iterator ready to emit the first valid path in the list.
     Next();
@@ -101,15 +106,17 @@ void AttributePathExpandIterator::PrepareAttributeIndexRange(const ClusterInfo &
 {
     if (aClusterInfo.HasWildcardAttributeId())
     {
-        mAttributeIndex    = 0;
-        mEndAttributeIndex = emberAfGetServerAttributeCount(aEndpointId, aClusterId);
+        mAttributeIndex       = 0;
+        mEndAttributeIndex    = emberAfGetServerAttributeCount(aEndpointId, aClusterId);
+        mGlobalAttributeIndex = 0;
     }
     else
     {
         mAttributeIndex = emberAfGetServerAttributeIndexByAttributeId(aEndpointId, aClusterId, aClusterInfo.mAttributeId);
         // If the given attribute id does not exist on the given endpoint, it will return uint16(0xFFFF), then endAttributeIndex
         // will be 0, means we should iterate a null attribute set (skip it).
-        mEndAttributeIndex = static_cast<uint16_t>(mAttributeIndex + 1);
+        mEndAttributeIndex    = static_cast<uint16_t>(mAttributeIndex + 1);
+        mGlobalAttributeIndex = ArraySize(GlobalAttributesNotInMetadata);
     }
 }
 
@@ -137,7 +144,9 @@ bool AttributePathExpandIterator::Next()
             mClusterIndex = UINT8_MAX;
         }
 
-        for (; mEndpointIndex < mEndEndpointIndex; (mEndpointIndex++, mClusterIndex = UINT8_MAX, mAttributeIndex = UINT16_MAX))
+        for (; mEndpointIndex < mEndEndpointIndex;
+             (mEndpointIndex++, mClusterIndex = UINT8_MAX, mAttributeIndex = UINT16_MAX,
+                                mGlobalAttributeIndex = ArraySize(GlobalAttributesNotInMetadata)))
         {
             if (!emberAfEndpointIndexIsEnabled(mEndpointIndex))
             {
@@ -150,10 +159,12 @@ bool AttributePathExpandIterator::Next()
             if (mClusterIndex == UINT8_MAX)
             {
                 PrepareClusterIndexRange(*mpClusterInfo, endpointId);
-                mAttributeIndex = UINT16_MAX;
+                mAttributeIndex       = UINT16_MAX;
+                mGlobalAttributeIndex = ArraySize(GlobalAttributesNotInMetadata);
             }
 
-            for (; mClusterIndex < mEndClusterIndex; (mClusterIndex++, mAttributeIndex = UINT16_MAX))
+            for (; mClusterIndex < mEndClusterIndex;
+                 (mClusterIndex++, mAttributeIndex = UINT16_MAX, mGlobalAttributeIndex = ArraySize(GlobalAttributesNotInMetadata)))
             {
                 // emberAfGetNthClusterId must return a valid cluster id here since we have verified the mClusterIndex does
                 // not exceed the mEndClusterIndex.
@@ -173,6 +184,15 @@ bool AttributePathExpandIterator::Next()
                     mAttributeIndex++;
                     // We found a valid attribute path, now return and increase the attribute index for next iteration.
                     // Return true will skip the increment of mClusterIndex, mEndpointIndex and mpClusterInfo.
+                    return true;
+                }
+                else if (mGlobalAttributeIndex < ArraySize(GlobalAttributesNotInMetadata))
+                {
+                    // Return a path pointing to the next global attribute.
+                    mOutputPath.mAttributeId = GlobalAttributesNotInMetadata[mGlobalAttributeIndex];
+                    mOutputPath.mClusterId   = clusterId;
+                    mOutputPath.mEndpointId  = endpointId;
+                    mGlobalAttributeIndex++;
                     return true;
                 }
                 // We have exhausted all attributes of this cluster, continue iterating over attributes of next cluster.

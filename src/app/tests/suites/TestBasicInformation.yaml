@@ -51,8 +51,7 @@ tests:
       command: "readAttribute"
       attribute: "AttributeList"
       response:
-          value:
-              [
+          value: [
                   0,
                   1,
                   2,
@@ -72,6 +71,8 @@ tests:
                   16,
                   17,
                   18,
-                  0xFFFB,
-                  0xFFFD,
+                  0xFFF8, # ServerGeneratedCommandList
+                  0xFFF9, # ClientGeneratedCommandList
+                  0xFFFB, # AttributeList
+                  0xFFFD, # ClusterRevision
               ]
