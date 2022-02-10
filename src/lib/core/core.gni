@@ -32,7 +32,7 @@ declare_args() {
 
   # Enable automation logging.
   chip_automation_logging = chip_logging
-  
+
   # Enable pigweed tokenizer logging.
   chip_pw_tokenizer_logging = false
 
