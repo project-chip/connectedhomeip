@@ -163,17 +163,19 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         stateParams.caseServer = chip::Platform::New<CASEServer>();
 
         ReturnErrorOnFailure(stateParams.caseServer->ListenForSessionEstablishment(
-            stateParams.exchangeMgr, stateParams.transportMgr, DeviceLayer::ConnectivityMgr().GetBleLayer(), stateParams.sessionMgr,
-            stateParams.fabricTable, stateParams.sessionIDAllocator));
+            stateParams.exchangeMgr, stateParams.transportMgr, nullptr, stateParams.sessionMgr, stateParams.fabricTable,
+            stateParams.sessionIDAllocator));
 
         //
-        // We need to advertise the port that we're listening to for unsolicited messages over UDP. However, we have both a IPv6
-        // and IPv6 endpoint to pick from. Since IPv6 is POR for Matter, let's go ahead and pick that port.
+        // We need to advertise the port that we're listening to for unsolicited messages over UDP. However, we have both a IPv4
+        // and IPv6 endpoint to pick from. Given that the listen port passed in may be set to 0 (which then has the kernel select
+        // a valid port at bind time), that will result in two possible ports being provided back from the resultant endpoint
+        // initializations. Since IPv6 is POR for Matter, let's go ahead and pick that port.
         //
         app::DnssdServer::Instance().SetSecuredPort(stateParams.transportMgr->GetTransport().GetImplAtIndex<0>().GetBoundPort());
 
         //
-        // TODO: This is a hack to workaround the fact that we have a bi-polar stack that have controller and server modalities that
+        // TODO: This is a hack to workaround the fact that we have a bi-polar stack that has controller and server modalities that
         // are mutually exclusive in terms of initialization of key stack singletons. Consequently, DnssdServer accesses
         // Server::GetInstance().GetFabricTable() to access the fabric table, but we don't want to do that when we're initializing
         // the controller logic since the factory here has its own fabric table.
@@ -312,6 +314,18 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
     mSystemLayer        = nullptr;
     mUDPEndPointManager = nullptr;
 
+    if (mSessionIDAllocator != nullptr)
+    {
+        chip::Platform::Delete(mSessionIDAllocator);
+        mSessionIDAllocator = nullptr;
+    }
+
+    if (mCASEServer != nullptr)
+    {
+        chip::Platform::Delete(mCASEServer);
+        mCASEServer = nullptr;
+    }
+
     if (mMessageCounterManager != nullptr)
     {
         chip::Platform::Delete(mMessageCounterManager);
@@ -334,18 +348,6 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
     {
         chip::Platform::Delete(mFabrics);
         mFabrics = nullptr;
-    }
-
-    if (mCASEServer != nullptr)
-    {
-        chip::Platform::Delete(mCASEServer);
-        mCASEServer = nullptr;
-    }
-
-    if (mSessionIDAllocator != nullptr)
-    {
-        chip::Platform::Delete(mSessionIDAllocator);
-        mSessionIDAllocator = nullptr;
     }
 
     return CHIP_NO_ERROR;
