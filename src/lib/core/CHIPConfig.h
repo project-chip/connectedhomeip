@@ -1769,6 +1769,20 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #define CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE 1003
 #endif // CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE
 
+/*
+ * @def CHIP_CONFIG_PEER_ADDRESS_MULTI_DESTINATION_SIZE
+ *
+ * @brief Number of separate addresses that is kept for a single Peer address.
+ *
+ * As nodes are discovered via DNSSD, the address records will likely contain
+ * more than a single address (like GUA or LLA or ULA). This setting allows
+ * Peer address objects to know of more than one available address and fall
+ * back to a different address if the first one fails.
+ */
+#ifndef CHIP_CONFIG_PEER_ADDRESS_MULTI_DESTINATION_SIZE
+#define CHIP_CONFIG_PEER_ADDRESS_MULTI_DESTINATION_SIZE 3
+#endif // CHIP_CONFIG_PEER_ADDRESS_MULTI_DESTINATION_SIZE
+
 /**
  * @}
  */
