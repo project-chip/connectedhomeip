@@ -38,7 +38,8 @@ public:
     enum OTATriggerResult
     {
         kTriggerSuccessful = 0,
-        kNoProviderKnown   = 1
+        kNoProviderKnown   = 1,
+        kWrongState        = 2
     };
 
     // Handler for the AnnounceOTAProvider command
@@ -70,9 +71,12 @@ public:
     // Get image update progress in percents unit
     virtual CHIP_ERROR GetUpdateProgress(EndpointId endpointId, chip::app::DataModel::Nullable<uint8_t> & progress) = 0;
 
-    // Get requestor state
+    // Get the value of the UpdateState attribute of the OTA Software Update Requestor Cluster on the given endpoint
     virtual CHIP_ERROR GetState(EndpointId endpointId,
                                 chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum & state) = 0;
+
+    // Getter for the value of the UpdateState cached by the object 
+    virtual app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum GetCurrentUpdateState() = 0;
 
     // Manually set OTA Provider parameters
     virtual void TestModeSetProviderParameters(NodeId nodeId, FabricIndex fabIndex, EndpointId endpointId) = 0;

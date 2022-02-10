@@ -53,7 +53,7 @@ public:
     void UpdateSuspended(System::Clock::Seconds32 delay) override;
     void UpdateDiscontinued() override;
     void UpdateCancelled() override;
-
+    OTARequestorAction GetRequestorAction(OTARequestorIncomingEvent input) override;
 private:
     void ScheduleDelayedAction(UpdateFailureState state, System::Clock::Seconds32 delay, System::TimerCompleteCallback action);
 

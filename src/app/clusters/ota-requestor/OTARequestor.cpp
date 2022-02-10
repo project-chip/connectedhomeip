@@ -250,6 +250,17 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
     }
     ChipLogDetail(SoftwareUpdate, "  Endpoint: %" PRIu16, commandData.endpoint);
 
+    // Determine whether our current state allows us to proceed
+    OTARequestorAction action = mOtaRequestorDriver->GetRequestorAction(OTARequestorIncomingEvent::AnnouncedOTAProviderReceived);
+    if(action == OTARequestorAction::DoNotProceed) {
+        ChipLogProgress(SoftwareUpdate, "Wrong UpdateState, ignoring command");
+        return EMBER_ZCL_STATUS_SUCCESS;
+    } else if(action == OTARequestorAction::CancelCurrentUpdateAndProceed) {
+        CancelImageUpdate();
+    } else if(action == OTARequestorAction::Proceed) {
+        // Fall through
+    }
+
     // If reason is URGENT_UPDATE_AVAILABLE, we start OTA immediately. Otherwise, respect the timer value set in mOtaStartDelayMs.
     // This is done to exemplify what a real-world OTA Requestor might do while also being configurable enough to use as a test app.
     uint32_t msToStart = 0;
@@ -292,7 +303,7 @@ void OTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
                    ChipLogError(SoftwareUpdate, "Cannot establish connection to provider: %" CHIP_ERROR_FORMAT, err.Format()));
 }
 
-// Application directs the Requestor to cancel image update in progress. All the Requestor state is
+// Requestor is directed to cancel image update in progress. All the Requestor state is
 // cleared, UpdateState is reset to Idle
 void OTARequestor::CancelImageUpdate()
 {
@@ -303,10 +314,13 @@ void OTARequestor::CancelImageUpdate()
     mProviderFabricIndex = kUndefinedFabricIndex;
     mProviderEndpointId  = kRootEndpointId;
 
-    RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kUnknown);
-
     // Notify the platform, it might choose to take additional actions
     mOtaRequestorDriver->UpdateCancelled();
+
+    RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kUnknown);
+
+    // The periodic provider query timer must be restarted whenever the requestor enters the kIdle state
+
 }
 
 CHIP_ERROR OTARequestor::GetUpdateProgress(EndpointId endpointId, app::DataModel::Nullable<uint8_t> & progress)
@@ -415,6 +429,17 @@ void OTARequestor::OnConnectionFailure(void * context, PeerId peerId, CHIP_ERROR
 
 OTARequestorInterface::OTATriggerResult OTARequestor::TriggerImmediateQuery()
 {
+    // Determine whether our current state allows us to proceed
+    OTARequestorAction action = mOtaRequestorDriver->GetRequestorAction(OTARequestorIncomingEvent::TriggerImmediateQueryInvoked);
+    if(action == OTARequestorAction::DoNotProceed) {
+        ChipLogProgress(SoftwareUpdate, "Wrong UpdateState, ignoring command");
+        return kWrongState;
+    } else if(action == OTARequestorAction::CancelCurrentUpdateAndProceed) {
+        CancelImageUpdate();
+    } else if(action == OTARequestorAction::Proceed) {
+        // Fall through
+    }
+
     if (mProviderNodeId != kUndefinedNodeId)
     {
         ConnectToProvider(kQueryImage);
@@ -656,5 +681,22 @@ CHIP_ERROR OTARequestor::SendNotifyUpdateAppliedRequest(OperationalDeviceProxy &
 
     return cluster.InvokeCommand(args, this, OnNotifyUpdateAppliedResponse, OnNotifyUpdateAppliedFailure);
 }
+
+/*
+void OTARequestor::DefaultOTAProvidersUpdated()
+{
+
+    // Determine whether our current state allows us to proceed
+    OTARequestorAction action = mOtaRequestorDriver->GetRequestorAction(OTARequestorIncomingEvent::DefaultProvidersAttrSet);
+    if(action == OTARequestorAction::DoNotProceed) {
+        ChipLogProgress(SoftwareUpdate, "Wrong UpdateState, ignoring command");
+        return EMBER_ZCL_STATUS_SUCCESS;
+    } else if(action == OTARequestorAction::CancelCurrentUpdateAndProceed) {
+        CancelImageUpdate();
+    } else if(action == OTARequestorAction::Proceed) {
+        // Fall through
+    }
+}
+*/
 
 } // namespace chip

@@ -56,6 +56,21 @@ enum class UpdateNotFoundReason
     UpToDate
 };
 
+enum class OTARequestorIncomingEvent
+{
+    AnnouncedOTAProviderReceived,
+    TriggerImmediateQueryInvoked,
+    DefaultProvidersAttrSet,
+    DefaultProvidersTimerExpiry,
+};
+
+enum class OTARequestorAction 
+{
+    DoNotProceed,
+    CancelCurrentUpdateAndProceed,
+    Proceed,
+};
+
 // Interface class to abstract the OTA-related business logic. Each application
 // must implement this interface. All calls must be non-blocking unless stated otherwise
 class OTARequestorDriver
@@ -92,6 +107,9 @@ public:
 
     /// Called when the current software update has been cancelled by the local application
     virtual void UpdateCancelled() = 0;
+
+    /// Called at various stages of OTA update process to determine whether to proceed
+    virtual OTARequestorAction GetRequestorAction(OTARequestorIncomingEvent input) = 0;
 };
 
 } // namespace chip

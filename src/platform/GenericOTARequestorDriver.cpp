@@ -119,5 +119,57 @@ void GenericOTARequestorDriver::ScheduleDelayedAction(UpdateFailureState state, 
     }
 }
 
+OTARequestorAction GenericOTARequestorDriver::GetRequestorAction(OTARequestorIncomingEvent input)
+{
+
+    OTAUpdateStateEnum state  = mRequestor->GetCurrentUpdateState();
+    OTARequestorAction action = OTARequestorAction::DoNotProceed;
+
+    switch(input)
+        {
+            case OTARequestorIncomingEvent::AnnouncedOTAProviderReceived:
+                {
+                    if(state != OTAUpdateStateEnum::kIdle) {
+                        action = OTARequestorAction::DoNotProceed;
+                    } else {
+                        action = OTARequestorAction::Proceed;
+                    }
+
+                    break;
+                }
+            case OTARequestorIncomingEvent::TriggerImmediateQueryInvoked:
+                {
+                    if(state != OTAUpdateStateEnum::kIdle) {
+                        action = OTARequestorAction::DoNotProceed;
+                    } else {
+                        action = OTARequestorAction::Proceed;
+                    }
+                    break;
+                }
+            case OTARequestorIncomingEvent::DefaultProvidersAttrSet:
+                {
+                    if(state != OTAUpdateStateEnum::kIdle) {
+                        action = OTARequestorAction::CancelCurrentUpdateAndProceed;
+                    } else {
+                        action = OTARequestorAction::Proceed;
+                    }
+                    break;
+                }
+            case OTARequestorIncomingEvent::DefaultProvidersTimerExpiry:
+                {
+                    action = OTARequestorAction:: Proceed;
+                    break;
+                }
+            default:
+                {
+                    action = OTARequestorAction::Proceed;
+                }
+        }
+
+    return action;
+}
+
+
+
 } // namespace DeviceLayer
 } // namespace chip
