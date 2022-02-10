@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -118,6 +118,12 @@ public:
         mProviderNodeId      = nodeId;
         mProviderFabricIndex = fabIndex;
         mProviderEndpointId  = endpointId;
+    }
+
+    // Called to set optional RequestorCanConsent value provided by Requestor.
+    void SetProviderParameters(bool RequestorCanConsent) override
+    {
+        mRequestorCanConsent.SetValue(RequestorCanConsent);
     }
 
     // Application directs the Requestor to cancel image update in progress. All the Requestor state is
@@ -278,10 +284,11 @@ private:
     BDXMessenger mBdxMessenger;                          // TODO: ideally this is held by the application
     uint8_t mUpdateTokenBuffer[kMaxUpdateTokenLen];
     ByteSpan mUpdateToken;
-    uint32_t mCurrentVersion               = 0;
-    uint32_t mTargetVersion                = 0;
-    OTAUpdateStateEnum mCurrentUpdateState = OTAUpdateStateEnum::kIdle;
-    Server * mServer                       = nullptr;
+    uint32_t mCurrentVersion                  = 0;
+    uint32_t mTargetVersion                   = 0;
+    OTAUpdateStateEnum mCurrentUpdateState    = OTAUpdateStateEnum::kIdle;
+    Server * mServer                          = nullptr;
+    chip::Optional<bool> mRequestorCanConsent;
 };
 
 } // namespace chip

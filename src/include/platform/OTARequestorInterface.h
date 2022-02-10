@@ -77,6 +77,9 @@ public:
     // Manually set OTA Provider parameters
     virtual void TestModeSetProviderParameters(NodeId nodeId, FabricIndex fabIndex, EndpointId endpointId) = 0;
 
+    // Called to set optional RequestorCanConsent value provided by Requestor.
+    virtual void SetProviderParameters(bool RequestorCanConsent) = 0;
+
     // Application directs the Requestor to cancel image update in progress. All the Requestor state is
     // cleared, UpdateState is reset to Idle
     virtual void CancelImageUpdate() = 0;
