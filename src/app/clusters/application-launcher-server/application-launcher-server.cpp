@@ -201,9 +201,8 @@ CHIP_ERROR ApplicationLauncherAttrAccess::ReadCurrentAppAttribute(app::Attribute
 // -----------------------------------------------------------------------------
 // Matter Framework Callbacks Implementation
 
-bool emberAfApplicationLauncherClusterLaunchAppCallback(app::CommandHandler * command,
-                                                               const app::ConcreteCommandPath & commandPath,
-                                                               const Commands::LaunchApp::DecodableType & commandData)
+bool emberAfApplicationLauncherClusterLaunchAppCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                        const Commands::LaunchApp::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
@@ -292,9 +291,8 @@ exit:
 /**
  * @brief Application Launcher Cluster StopApp Command callback (from client)
  */
-bool emberAfApplicationLauncherClusterStopAppCallback(app::CommandHandler * command,
-                                                             const app::ConcreteCommandPath & commandPath,
-                                                             const Commands::StopApp::DecodableType & commandData)
+bool emberAfApplicationLauncherClusterStopAppCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                      const Commands::StopApp::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
@@ -376,9 +374,8 @@ exit:
 /**
  * @brief Application Launcher Cluster HideApp Command callback (from client)
  */
-bool emberAfApplicationLauncherClusterHideAppCallback(app::CommandHandler * command,
-                                                             const app::ConcreteCommandPath & commandPath,
-                                                             const Commands::HideApp::DecodableType & commandData)
+bool emberAfApplicationLauncherClusterHideAppCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                      const Commands::HideApp::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;

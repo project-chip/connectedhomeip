@@ -129,7 +129,7 @@ void MediaPlaybackManager::HandleSkipForward(CommandResponseHelper<Commands::Pla
 }
 
 void MediaPlaybackManager::HandleSeek(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
-                                             const uint64_t & positionMilliseconds)
+                                      const uint64_t & positionMilliseconds)
 {
     helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_SEEK, positionMilliseconds));
 }

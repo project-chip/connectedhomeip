@@ -1610,13 +1610,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-<<<<<<< HEAD
-@interface CHIPContentLauncherClusterLaunchContentRequestParams : NSObject
-@property (strong, nonatomic) CHIPContentLauncherClusterContentSearch * _Nonnull search;
-=======
 @interface CHIPContentLauncherClusterLaunchContentParams : NSObject
-@property (strong, nonatomic) NSArray * _Nonnull search;
->>>>>>> feed37d1c6 (Run zap regen script)
+@property (strong, nonatomic) CHIPContentLauncherClusterContentSearch * _Nonnull search;
 @property (strong, nonatomic) NSNumber * _Nonnull autoPlay;
 @property (strong, nonatomic) NSString * _Nullable data;
 - (instancetype)init;
