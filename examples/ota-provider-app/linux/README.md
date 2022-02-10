@@ -1,10 +1,12 @@
 # ota-provider-app
 
-This is a reference application that implements an example of an OTA Provider Cluster Server.
+This is a reference application that implements an example of an OTA Provider
+Cluster Server.
 
 ## Building
 
 Suggest doing the following:
+
 ```
 scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug chip_config_network_layer_ble=false
 ```
@@ -25,9 +27,14 @@ scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug c
 **Using `--filepath` and `--otaImageList`**
 
 -   The two options cannot be supplied together
--   If neither option is supplied, the application will respond with `NotAvailable` status
--   If `--filepath` is supplied, the application will automatically serve that file to the OTA Requestor (SoftwareVersion will be requester software version + 1)
--   If `--otaImageList` is supplied, the application will parse the JSON file and extract all required data. The most recent/valid software version will be selected and the corresponding OTA file will be sent to the OTA Requestor
+-   If neither option is supplied, the application will respond with
+    `NotAvailable` status
+-   If `--filepath` is supplied, the application will automatically serve that
+    file to the OTA Requestor (SoftwareVersion will be requester software
+    version + 1)
+-   If `--otaImageList` is supplied, the application will parse the JSON file
+    and extract all required data. The most recent/valid software version will
+    be selected and the corresponding OTA file will be sent to the OTA Requestor
 
 An example of the `--otaImageList` file contents:
 
