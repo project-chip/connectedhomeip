@@ -167,8 +167,8 @@ CHIP_ERROR TargetNavigatorAttrAccess::ReadCurrentTargetAttribute(app::AttributeV
 // Matter Framework Callbacks Implementation
 
 bool emberAfTargetNavigatorClusterNavigateTargetCallback(app::CommandHandler * command,
-                                                                const app::ConcreteCommandPath & commandPath,
-                                                                const Commands::NavigateTarget::DecodableType & commandData)
+                                                         const app::ConcreteCommandPath & commandPath,
+                                                         const Commands::NavigateTarget::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
