@@ -119,7 +119,7 @@ public:
                 if ((it.GetAddress(addr) == CHIP_NO_ERROR) && addr.IsIPv4())
                 {
                     char buf[Inet::IPAddress::kMaxStringLength];
-                    addr.ToString(buf, sizeof(buf));
+                    addr.ToString(buf);
                     itemString = std::string(buf);
                     break; // Only print first IPv4 address for now
                 }
@@ -134,7 +134,7 @@ public:
                 if ((it.GetAddress(addr) == CHIP_NO_ERROR) && addr.IsIPv6LinkLocal())
                 {
                     char buf[Inet::IPAddress::kMaxStringLength];
-                    addr.ToString(buf, sizeof(buf));
+                    addr.ToString(buf);
                     itemString = std::string(buf);
                     if (itemString.length() < MAX_LENGTH_SMALL_FONT)
                     {
@@ -157,7 +157,7 @@ public:
                 if ((it.GetAddress(addr) == CHIP_NO_ERROR) && addr.IsIPv6ULA())
                 {
                     char buf[Inet::IPAddress::kMaxStringLength];
-                    addr.ToString(buf, sizeof(buf));
+                    addr.ToString(buf);
                     itemString = std::string(buf);
                     if (itemString.length() < MAX_LENGTH_SMALL_FONT)
                     {
