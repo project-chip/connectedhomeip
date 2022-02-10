@@ -118,6 +118,10 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     err = mFabrics.Init(&mDeviceStorage);
     SuccessOrExit(err);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
+    app::DnssdServer::Instance().SetFabricTable(&mFabrics);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
+
     // Group data provider must be initialized after mDeviceStorage
     err = mGroupsProvider.Init();
     SuccessOrExit(err);
@@ -226,7 +230,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 #endif
 
     err = mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mTransports, chip::DeviceLayer::ConnectivityMgr().GetBleLayer(),
-                                                    &mSessions, &mFabrics, &mSessionIDAllocator);
+                                                    &mSessions, &mFabrics);
     SuccessOrExit(err);
 
     err = mCASESessionManager.Init();

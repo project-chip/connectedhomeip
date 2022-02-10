@@ -103,8 +103,6 @@ public:
     CHIP_ERROR GetCommissionableInstanceName(char * buffer, size_t bufferLen);
 
 private:
-    DnssdServer();
-
     /// Overloaded utility method for commissioner and commissionable advertisement
     /// This method is used for both commissioner discovery and commissionable node discovery since
     /// they share many fields.
@@ -134,7 +132,7 @@ private:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     }
 
-    FabricTable * mFabricTable;
+    FabricTable * mFabricTable = nullptr;
 
     // Helper for StartServer.
     void StartServer(Optional<Dnssd::CommissioningMode> mode);

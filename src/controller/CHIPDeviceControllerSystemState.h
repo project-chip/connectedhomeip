@@ -75,7 +75,6 @@ struct DeviceControllerSystemStateParams
     secure_channel::MessageCounterManager * messageCounterManager = nullptr;
     FabricTable * fabricTable                                     = nullptr;
     CASEServer * caseServer                                       = nullptr;
-    SessionIDAllocator * sessionIDAllocator                       = nullptr;
 };
 
 // A representation of the internal state maintained by the DeviceControllerFactory
@@ -89,7 +88,7 @@ public:
         mSystemLayer(params.systemLayer), mTCPEndPointManager(params.tcpEndPointManager),
         mUDPEndPointManager(params.udpEndPointManager), mTransportMgr(params.transportMgr), mSessionMgr(params.sessionMgr),
         mExchangeMgr(params.exchangeMgr), mMessageCounterManager(params.messageCounterManager), mFabrics(params.fabricTable),
-        mCASEServer(params.caseServer), mSessionIDAllocator(params.sessionIDAllocator)
+        mCASEServer(params.caseServer)
     {
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
@@ -151,7 +150,6 @@ private:
     secure_channel::MessageCounterManager * mMessageCounterManager = nullptr;
     FabricTable * mFabrics                                         = nullptr;
     CASEServer * mCASEServer                                       = nullptr;
-    SessionIDAllocator * mSessionIDAllocator                       = nullptr;
 
     std::atomic<uint32_t> mRefCount{ 1 };
 

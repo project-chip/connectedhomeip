@@ -63,13 +63,10 @@ void OnPlatformEventWrapper(const DeviceLayer::ChipDeviceEvent * event, intptr_t
 
 constexpr System::Clock::Timestamp DnssdServer::kTimeoutCleared;
 
-DnssdServer::DnssdServer()
-{
-    mFabricTable = &Server::GetInstance().GetFabricTable();
-}
-
 bool DnssdServer::HaveOperationalCredentials()
 {
+    VerifyOrDie(mFabricTable != nullptr);
+
     // Look for any fabric info that has a useful operational identity.
     for (const FabricInfo & fabricInfo : *mFabricTable)
     {
@@ -255,6 +252,8 @@ CHIP_ERROR DnssdServer::GetCommissionableInstanceName(char * buffer, size_t buff
 /// Set MDNS operational advertisement
 CHIP_ERROR DnssdServer::AdvertiseOperational()
 {
+    VerifyOrDie(mFabricTable != nullptr);
+
     for (const FabricInfo & fabricInfo : *mFabricTable)
     {
         if (fabricInfo.IsInitialized())

@@ -142,7 +142,6 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.sessionMgr            = chip::Platform::New<SessionManager>();
     stateParams.exchangeMgr           = chip::Platform::New<Messaging::ExchangeManager>();
     stateParams.messageCounterManager = chip::Platform::New<secure_channel::MessageCounterManager>();
-    stateParams.sessionIDAllocator    = chip::Platform::New<SessionIDAllocator>();
 
     ReturnErrorOnFailure(stateParams.fabricTable->Init(mFabricStorage));
     ReturnErrorOnFailure(
@@ -163,8 +162,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         stateParams.caseServer = chip::Platform::New<CASEServer>();
 
         ReturnErrorOnFailure(stateParams.caseServer->ListenForSessionEstablishment(
-            stateParams.exchangeMgr, stateParams.transportMgr, nullptr, stateParams.sessionMgr, stateParams.fabricTable,
-            stateParams.sessionIDAllocator));
+            stateParams.exchangeMgr, stateParams.transportMgr, nullptr, stateParams.sessionMgr, stateParams.fabricTable));
 
         //
         // We need to advertise the port that we're listening to for unsolicited messages over UDP. However, we have both a IPv4
@@ -313,12 +311,6 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
 
     mSystemLayer        = nullptr;
     mUDPEndPointManager = nullptr;
-
-    if (mSessionIDAllocator != nullptr)
-    {
-        chip::Platform::Delete(mSessionIDAllocator);
-        mSessionIDAllocator = nullptr;
-    }
 
     if (mCASEServer != nullptr)
     {
