@@ -137,6 +137,9 @@ static const nlTest sTests[] = { NL_TEST_DEF_FN(TestCreate), NL_TEST_DEF_FN(Test
 
 static int TestSetup(void * inContext)
 {
+    CHIP_ERROR error = chip::Platform::MemoryInit();
+    if (error != CHIP_NO_ERROR)
+        return FAILURE;
     realClock = &System::SystemClock();
     System::Clock::Internal::SetSystemClockForTesting(&fakeClock);
     return SUCCESS;
