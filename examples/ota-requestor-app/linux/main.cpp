@@ -54,12 +54,12 @@ OTAImageProcessorImpl gImageProcessor;
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue);
 void OnStartDelayTimerHandler(Layer * systemLayer, void * appState);
 
-constexpr uint16_t kOptionProviderNodeId         = 'n';
-constexpr uint16_t kOptionProviderFabricIndex    = 'f';
-constexpr uint16_t kOptionUdpPort                = 'u';
-constexpr uint16_t kOptionDiscriminator          = 'd';
-constexpr uint16_t kOptionDelayQuery             = 'q';
-constexpr uint16_t kOptionRequestorCanConsent    = 'c';
+constexpr uint16_t kOptionProviderNodeId      = 'n';
+constexpr uint16_t kOptionProviderFabricIndex = 'f';
+constexpr uint16_t kOptionUdpPort             = 'u';
+constexpr uint16_t kOptionDiscriminator       = 'd';
+constexpr uint16_t kOptionDelayQuery          = 'q';
+constexpr uint16_t kOptionRequestorCanConsent = 'c';
 
 NodeId providerNodeId           = 0x0;
 FabricIndex providerFabricIndex = 1;
@@ -94,7 +94,7 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "        From boot up, the amount of time to wait before triggering the QueryImage\n"
                              "        command. If none or zero is supplied, QueryImage will not be triggered.\n"
                              "  -c/--RequestorCanConsent\n"
-                             "        If provided, the RequestorCanConsent field of the Query Image request is set to true.\n"};
+                             "        If provided, the RequestorCanConsent field of the Query Image request is set to true.\n" };
 
 HelpOptions helpOptions("ota-requestor-app", "Usage: ota-requestor-app [options]", "1.0");
 
@@ -182,7 +182,7 @@ void ApplicationInit()
     if (gRequestorCanConsent.HasValue())
     {
         gRequestorCore.SetProviderParameters(gRequestorCanConsent.Value());
-        ChipLogProgress(SoftwareUpdate, "Setting RequestorCanConsent to %d", gRequestorCanConsent.Value() );
+        ChipLogProgress(SoftwareUpdate, "Setting RequestorCanConsent to %d", gRequestorCanConsent.Value());
     }
 
     // Initialize all OTA download components
