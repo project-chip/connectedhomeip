@@ -75,14 +75,7 @@
 //
 #define CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS 16
 
-//
-// Set this to a value greater than the value for CHIP_IM_MAX_NUM_READ_HANDLER
-// to ensure some of the tests for validating resource exhaustion and heap allocation
-// pass correctly.
-//
-// TODO: Once we fix ReadClients to be heap allocated, we no longer need this override.
-//
-#define CHIP_IM_MAX_NUM_READ_CLIENT 6
+#define CHIP_IM_MAX_NUM_READ_HANDLER 5
 
 #define CONFIG_IM_BUILD_FOR_UNIT_TEST 1
 
