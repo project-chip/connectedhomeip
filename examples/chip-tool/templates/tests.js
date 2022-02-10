@@ -41,7 +41,7 @@ function getManualTests()
   const tests = [
     DeviceDiscovery, //
     Groups, //
-    BulkDataExchangeProtocol , //
+    BulkDataExchangeProtocol, //
 
   ];
   return tests.flat(1);
