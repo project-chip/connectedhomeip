@@ -15,8 +15,6 @@
  *    limitations under the License.
  */
 
-#include <lib/support/ErrorStr.h>
-#include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #include "DeviceNetworkProvisioningDelegateImpl.h"

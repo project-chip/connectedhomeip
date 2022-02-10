@@ -20,7 +20,6 @@
 #include <platform/CHIPDeviceConfig.h>
 
 #include <platform/ConnectivityManager.h>
-#include <platform/internal/DeviceNetworkInfo.h>
 #include <platform/internal/GenericConnectivityManagerImpl.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI

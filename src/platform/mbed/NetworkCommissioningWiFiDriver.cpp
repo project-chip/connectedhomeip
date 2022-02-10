@@ -15,16 +15,11 @@
  *    limitations under the License.
  */
 
-#include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/mbed/NetworkCommissioningDriver.h>
 
 #include <net_common.h>
 #include <netsocket/WiFiInterface.h>
-
-#include <limits>
-#include <string>
 
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;

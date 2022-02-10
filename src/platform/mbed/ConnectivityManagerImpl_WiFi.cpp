@@ -84,9 +84,11 @@ void ConnectivityManagerImpl::OnWiFiPlatformEvent(const ChipDeviceEvent * event)
             mWiFiStationState = kWiFiStationState_Connecting;
             break;
         case kConnectivity_Established:
+            ChipLogProgress(DeviceLayer, "WiFi station connected");
             mWiFiStationState = kWiFiStationState_Connected;
             break;
         case kConnectivity_Lost:
+            ChipLogProgress(DeviceLayer, "WiFi station disconnected");
             mWiFiStationState = kWiFiStationState_NotConnected;
             break;
         }
@@ -101,8 +103,8 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(WiFiStationMode val)
 
     if (mWiFiStationMode != val)
     {
-        ChipLogDetail(DeviceLayer, "WiFi station mode change: %s -> %s", WiFiStationModeToStr(mWiFiStationMode),
-                      WiFiStationModeToStr(val));
+        ChipLogProgress(DeviceLayer, "WiFi station mode change: %s -> %s", WiFiStationModeToStr(mWiFiStationMode),
+                        WiFiStationModeToStr(val));
 
         mWiFiStationMode = val;
 
