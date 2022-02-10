@@ -163,21 +163,16 @@ function chip_server_global_responses(options)
   return asBlocks.call(this, getServerGlobalAttributeResponses(this), options);
 }
 
-async function if_in_global_responses(options)
+async function if_basic_global_response(options)
 {
   const attribute          = this.response.arguments[0];
   const globalResponses    = await getServerGlobalAttributeResponses(this);
-  const responseTypeExists = globalResponses.find(
-      // Some fields of item/attribute here may be undefined.
-      item => item.isArray == attribute.isArray && item.isStruct == attribute.isStruct && item.chipType == attribute.chipType
-          && item.isNullable == attribute.isNullable && item.isOptional == attribute.isOptional)
+  const complexType        = attribute.isNullable || attribute.isOptional || attribute.isStruct || attribute.isArray;
+  const responseTypeExists = globalResponses.find(item => item.chipType == attribute.chipType);
 
-  if (responseTypeExists)
-  {
+  if (!complexType && responseTypeExists) {
     return options.fn(this);
-  }
-  else
-  {
+  } else {
     return options.inverse(this);
   }
 }
@@ -522,6 +517,6 @@ exports.chip_endpoints                                       = chip_endpoints;
 exports.chip_endpoint_clusters                               = chip_endpoint_clusters;
 exports.if_chip_enum                                         = if_chip_enum;
 exports.if_chip_complex                                      = if_chip_complex;
-exports.if_in_global_responses                               = if_in_global_responses;
+exports.if_basic_global_response                             = if_basic_global_response;
 exports.chip_cluster_specific_structs                        = chip_cluster_specific_structs;
 exports.chip_shared_structs                                  = chip_shared_structs;

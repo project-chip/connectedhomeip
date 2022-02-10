@@ -97,11 +97,11 @@ JNI_METHOD(void, {{asCamelCased ../name false}}Cluster, subscribe{{asCamelCased 
 {
     chip::DeviceLayer::StackLock lock;
     {{~#*inline "callbackName"~}}
-    {{~#if_in_global_responses~}}
+    {{~#if_basic_global_response~}}
     CHIP{{chipCallback.name}}AttributeCallback
     {{~else~}}
     CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallback
-    {{~/if_in_global_responses~}}
+    {{~/if_basic_global_response~}}
     {{~/inline}}
 
     std::unique_ptr<{{>callbackName}}, void (*)({{>callbackName}} *)> onSuccess(Platform::New<{{>callbackName}}>(callback, true), chip::Platform::Delete<{{>callbackName}}>);
