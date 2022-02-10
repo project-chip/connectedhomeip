@@ -449,13 +449,8 @@ server cluster ContentLauncher = 1290 {
   attribute bitmap32 supportedStreamingProtocols = 1;
   readonly global attribute int16u clusterRevision = 65533;
 
-<<<<<<< HEAD
-  request struct LaunchContentRequestRequest {
-    ContentSearch search = 0;
-=======
   request struct LaunchContentRequest {
-    ContentSearch search[] = 0;
->>>>>>> feed37d1c6 (Run zap regen script)
+    ContentSearch search = 0;
     BOOLEAN autoPlay = 1;
     optional CHAR_STRING data = 2;
   }

@@ -2259,14 +2259,8 @@ public:
     }
 
 private:
-<<<<<<< HEAD
-    chip::app::Clusters::ContentLauncher::Commands::LaunchContentRequest::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type> mComplex_Search;
-=======
     chip::app::Clusters::ContentLauncher::Commands::LaunchContent::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type>>
-        mComplex_Search;
->>>>>>> feed37d1c6 (Run zap regen script)
+    TypedComplexArgument<chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type> mComplex_Search;
 };
 
 /*
