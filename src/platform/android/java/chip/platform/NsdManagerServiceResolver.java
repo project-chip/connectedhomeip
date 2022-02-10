@@ -130,12 +130,12 @@ public class NsdManagerServiceResolver implements ServiceResolver {
 
     StringBuilder sb = new StringBuilder(type);
     for (String subType : subTypes) {
-      sb.append("," + subType);
+      sb.append(",").append(subType);
     }
     serviceInfo.setServiceType(sb.toString());
 
     serviceInfo.setPort(port);
-    Log.i(TAG, "publish serviceName=" + serviceName + " type=" + type + " port=" + port);
+    Log.i(TAG, "publish serviceName=" + serviceName + " type=" + sb.toString() + " port=" + port);
     int cnt = Math.min(textEntriesDatas.length, textEntriesKeys.length);
     for (int i = 0; i < cnt; i++) {
       String value = new String(textEntriesDatas[i]);
