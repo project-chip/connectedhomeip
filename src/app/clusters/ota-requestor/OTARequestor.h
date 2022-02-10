@@ -121,10 +121,7 @@ public:
     }
 
     // Called to set optional RequestorCanConsent value provided by Requestor.
-    void SetProviderParameters(bool RequestorCanConsent) override
-    {
-        mRequestorCanConsent.SetValue(RequestorCanConsent);
-    }
+    void SetProviderParameters(bool RequestorCanConsent) override { mRequestorCanConsent.SetValue(RequestorCanConsent); }
 
     // Application directs the Requestor to cancel image update in progress. All the Requestor state is
     // cleared, UpdateState is reset to Idle
@@ -284,10 +281,10 @@ private:
     BDXMessenger mBdxMessenger;                          // TODO: ideally this is held by the application
     uint8_t mUpdateTokenBuffer[kMaxUpdateTokenLen];
     ByteSpan mUpdateToken;
-    uint32_t mCurrentVersion                  = 0;
-    uint32_t mTargetVersion                   = 0;
-    OTAUpdateStateEnum mCurrentUpdateState    = OTAUpdateStateEnum::kIdle;
-    Server * mServer                          = nullptr;
+    uint32_t mCurrentVersion               = 0;
+    uint32_t mTargetVersion                = 0;
+    OTAUpdateStateEnum mCurrentUpdateState = OTAUpdateStateEnum::kIdle;
+    Server * mServer                       = nullptr;
     chip::Optional<bool> mRequestorCanConsent;
 };
 
