@@ -185,11 +185,12 @@
  * The unique id assigned by the device vendor to identify the product or device type.  This
  * number is scoped to the device vendor id.
  *
- * Un-overridden default must match the default test DAC
+ * Un-overridden default must either match one of the given development certs
+ * or have a DeviceAttestationCredentialsProvider implemented.
  * (see src/credentials/examples/DeviceAttestationCredsExample.cpp)
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
-#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8000
+#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8001
 #endif
 
 /**
@@ -743,7 +744,7 @@
  * Amount of services available for advertising using SRP.
  */
 #ifndef CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES
-#define CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES (CHIP_CONFIG_MAX_DEVICE_ADMINS + 1)
+#define CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES (CHIP_CONFIG_MAX_FABRICS + 1)
 #endif
 
 /**

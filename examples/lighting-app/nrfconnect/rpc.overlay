@@ -26,9 +26,6 @@ CONFIG_CHIP_PW_RPC=y
 CONFIG_STD_CPP14=n
 CONFIG_STD_CPP17=y
 
-# Disable HW floating point, as libprotobuf nano doesn't support building with it
-CONFIG_FPU=n
-
 # Add support for Zephyr console component to use it for Pigweed console purposes
 CONFIG_CONSOLE_SUBSYS=y
 CONFIG_CONSOLE_GETCHAR=y

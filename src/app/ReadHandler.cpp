@@ -261,7 +261,7 @@ bool ReadHandler::IsFromSubscriber(Messaging::ExchangeContext & apExchangeContex
 {
     return (IsType(InteractionType::Subscribe) &&
             GetInitiatorNodeId() == apExchangeContext.GetSessionHandle()->AsSecureSession()->GetPeerNodeId() &&
-            GetAccessingFabricIndex() == apExchangeContext.GetSessionHandle()->AsSecureSession()->GetFabricIndex());
+            GetAccessingFabricIndex() == apExchangeContext.GetSessionHandle()->GetFabricIndex());
 }
 
 CHIP_ERROR ReadHandler::OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,

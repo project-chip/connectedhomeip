@@ -274,5 +274,27 @@ Test Plans:
                 - name: Global attributes with server as DUT
             2:
                 - name: Attributes with server as DUT
-                - name: Primary functionality with server as DUT
-                - name: Secondary functionality with server as DUT
+                - name: ConfigStatus Attribute with server as DUT
+                - name: Mode Attribute with server as DUT
+                - name: Type Attribute with server as DUT
+                - name: EndProductType Attribute with server as DUT
+            3:
+                - name:
+                      UpOrOpen Command & Report Verification with server as DUT
+                - name:
+                      DownOrClose Command & Report Verification with server as
+                      DUT
+                - name: StopMotion Verification with server as DUT
+                - name: UpOrOpen Long-Run Verification with server as DUT
+                - name: DownOrClose Long-Run Verification with server as DUT
+            4:
+                - name:
+                      GoToLiftPercentage Long-Run Verification with server as
+                      DUT
+                - name:
+                      GoToTiltPercentage Long-Run Verification with server as
+                      DUT
+                - name:
+                      GoToLiftPercentage Limits Verification with server as DUT
+                - name:
+                      GoToTiltPercentage Limits Verification with server as DUT

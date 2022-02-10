@@ -28,6 +28,7 @@
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::MediaPlayback;
 
 /** @brief Media PlayBack Cluster Init
@@ -258,7 +259,7 @@ CHIP_ERROR MediaPlaybackManager::HandleGetSampledPosition(AttributeValueEncoder 
 {
     Structs::PlaybackPosition::Type response;
     response.updatedAt = 0;
-    response.position  = 0;
+    response.position  = Nullable<uint64_t>(0);
 
     jobject positionObj;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -283,7 +284,7 @@ CHIP_ERROR MediaPlaybackManager::HandleGetSampledPosition(AttributeValueEncoder 
         jclass inputClass    = env->GetObjectClass(positionObj);
         jfieldID positionId  = env->GetFieldID(inputClass, "position", "J");
         jfieldID updatedAtId = env->GetFieldID(inputClass, "updatedAt", "J");
-        response.position    = static_cast<uint64_t>(env->GetIntField(positionObj, positionId));
+        response.position    = Nullable<uint64_t>(static_cast<uint64_t>(env->GetIntField(positionObj, positionId)));
         response.updatedAt   = static_cast<uint64_t>(env->GetIntField(positionObj, updatedAtId));
     }
 

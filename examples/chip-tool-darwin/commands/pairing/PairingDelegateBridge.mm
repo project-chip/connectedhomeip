@@ -20,34 +20,30 @@
 #import <CHIP/CHIPError_Internal.h>
 
 @interface CHIPToolPairingDelegate ()
-@property (nonatomic, strong) CHIPBasic * cluster;
-@property (nonatomic, strong) ResponseHandler responseHandler;
 @end
+
 @implementation CHIPToolPairingDelegate
 - (void)onPairingComplete:(NSError *)error
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:error];
+    ChipLogProgress(chipTool, "Pairing Complete: %s", chip::ErrorStr(err));
 
-    NSLog(@"Pairing Complete: %@", error);
-    err = [CHIPError errorToCHIPErrorCode:error];
     _commandBridge->SetCommandExitStatus(err);
 }
 
 - (void)onPairingDeleted:(NSError *)error
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:error];
+    ChipLogProgress(chipTool, "Pairing Delete: %s", chip::ErrorStr(err));
 
-    NSLog(@"Pairing Deleted: %@", error);
-    err = [CHIPError errorToCHIPErrorCode:error];
     _commandBridge->SetCommandExitStatus(err);
 }
 
 - (void)onCommissioningComplete:(NSError *)error
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:error];
+    ChipLogProgress(chipTool, "Pairing Commissioning Complete: %s", chip::ErrorStr(err));
 
-    NSLog(@"Pairing Commissioning Complete: %@", error);
-    err = [CHIPError errorToCHIPErrorCode:error];
     _commandBridge->SetCommandExitStatus(err);
 }
 

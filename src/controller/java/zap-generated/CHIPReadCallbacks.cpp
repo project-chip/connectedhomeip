@@ -4405,12 +4405,34 @@ void CHIPChannelChannelListAttributeCallback::CallbackFn(
                                                                        newElement_0_minorNumberCtorSignature.c_str(),
                                                                        entry_0.minorNumber, newElement_0_minorNumber);
         jobject newElement_0_name;
-        newElement_0_name = env->NewStringUTF(std::string(entry_0.name.data(), entry_0.name.size()).c_str());
+        if (!entry_0.name.HasValue())
+        {
+            chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_name);
+        }
+        else
+        {
+            newElement_0_name = env->NewStringUTF(std::string(entry_0.name.Value().data(), entry_0.name.Value().size()).c_str());
+        }
         jobject newElement_0_callSign;
-        newElement_0_callSign = env->NewStringUTF(std::string(entry_0.callSign.data(), entry_0.callSign.size()).c_str());
+        if (!entry_0.callSign.HasValue())
+        {
+            chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_callSign);
+        }
+        else
+        {
+            newElement_0_callSign =
+                env->NewStringUTF(std::string(entry_0.callSign.Value().data(), entry_0.callSign.Value().size()).c_str());
+        }
         jobject newElement_0_affiliateCallSign;
-        newElement_0_affiliateCallSign =
-            env->NewStringUTF(std::string(entry_0.affiliateCallSign.data(), entry_0.affiliateCallSign.size()).c_str());
+        if (!entry_0.affiliateCallSign.HasValue())
+        {
+            chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_affiliateCallSign);
+        }
+        else
+        {
+            newElement_0_affiliateCallSign = env->NewStringUTF(
+                std::string(entry_0.affiliateCallSign.Value().data(), entry_0.affiliateCallSign.Value().size()).c_str());
+        }
 
         jclass channelInfoStructClass;
         err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$ChannelClusterChannelInfo",
@@ -4420,9 +4442,9 @@ void CHIPChannelChannelListAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$ChannelClusterChannelInfo");
             return;
         }
-        jmethodID channelInfoStructCtor =
-            env->GetMethodID(channelInfoStructClass, "<init>",
-                             "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
+        jmethodID channelInfoStructCtor = env->GetMethodID(
+            channelInfoStructClass, "<init>",
+            "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V");
         if (channelInfoStructCtor == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$ChannelClusterChannelInfo constructor");
@@ -10977,6 +10999,268 @@ void CHIPMediaInputAttributeListAttributeCallback::CallbackFn(void * context,
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
+}
+
+CHIPMediaPlaybackStartTimeAttributeCallback::CHIPMediaPlaybackStartTimeAttributeCallback(jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPMediaPlaybackClusterStartTimeAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPMediaPlaybackStartTimeAttributeCallback::~CHIPMediaPlaybackStartTimeAttributeCallback()
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+}
+
+void CHIPMediaPlaybackStartTimeAttributeCallback::CallbackFn(void * context, const chip::app::DataModel::Nullable<uint64_t> & value)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+    std::unique_ptr<CHIPMediaPlaybackStartTimeAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPMediaPlaybackStartTimeAttributeCallback *>(context), maybeDestroy);
+
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    VerifyOrReturn(javaCallbackRef != nullptr,
+                   ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+    jmethodID javaMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Long;)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+    jobject javaValue;
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Long";
+        std::string javaValueCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                       value.Value(), javaValue);
+    }
+
+    env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
+}
+
+CHIPMediaPlaybackDurationAttributeCallback::CHIPMediaPlaybackDurationAttributeCallback(jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPMediaPlaybackClusterDurationAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPMediaPlaybackDurationAttributeCallback::~CHIPMediaPlaybackDurationAttributeCallback()
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+}
+
+void CHIPMediaPlaybackDurationAttributeCallback::CallbackFn(void * context, const chip::app::DataModel::Nullable<uint64_t> & value)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+    std::unique_ptr<CHIPMediaPlaybackDurationAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPMediaPlaybackDurationAttributeCallback *>(context), maybeDestroy);
+
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    VerifyOrReturn(javaCallbackRef != nullptr,
+                   ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+    jmethodID javaMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Long;)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+    jobject javaValue;
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Long";
+        std::string javaValueCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                       value.Value(), javaValue);
+    }
+
+    env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
+}
+
+CHIPMediaPlaybackSeekRangeEndAttributeCallback::CHIPMediaPlaybackSeekRangeEndAttributeCallback(jobject javaCallback,
+                                                                                               bool keepAlive) :
+    chip::Callback::Callback<CHIPMediaPlaybackClusterSeekRangeEndAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPMediaPlaybackSeekRangeEndAttributeCallback::~CHIPMediaPlaybackSeekRangeEndAttributeCallback()
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+}
+
+void CHIPMediaPlaybackSeekRangeEndAttributeCallback::CallbackFn(void * context,
+                                                                const chip::app::DataModel::Nullable<uint64_t> & value)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+    std::unique_ptr<CHIPMediaPlaybackSeekRangeEndAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPMediaPlaybackSeekRangeEndAttributeCallback *>(context), maybeDestroy);
+
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    VerifyOrReturn(javaCallbackRef != nullptr,
+                   ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+    jmethodID javaMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Long;)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+    jobject javaValue;
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Long";
+        std::string javaValueCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                       value.Value(), javaValue);
+    }
+
+    env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
+}
+
+CHIPMediaPlaybackSeekRangeStartAttributeCallback::CHIPMediaPlaybackSeekRangeStartAttributeCallback(jobject javaCallback,
+                                                                                                   bool keepAlive) :
+    chip::Callback::Callback<CHIPMediaPlaybackClusterSeekRangeStartAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPMediaPlaybackSeekRangeStartAttributeCallback::~CHIPMediaPlaybackSeekRangeStartAttributeCallback()
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+}
+
+void CHIPMediaPlaybackSeekRangeStartAttributeCallback::CallbackFn(void * context,
+                                                                  const chip::app::DataModel::Nullable<uint64_t> & value)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+    std::unique_ptr<CHIPMediaPlaybackSeekRangeStartAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPMediaPlaybackSeekRangeStartAttributeCallback *>(context), maybeDestroy);
+
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    VerifyOrReturn(javaCallbackRef != nullptr,
+                   ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+    jmethodID javaMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Long;)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+    jobject javaValue;
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        std::string javaValueClassName     = "java/lang/Long";
+        std::string javaValueCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                       value.Value(), javaValue);
+    }
+
+    env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
 CHIPMediaPlaybackServerGeneratedCommandListAttributeCallback::CHIPMediaPlaybackServerGeneratedCommandListAttributeCallback(

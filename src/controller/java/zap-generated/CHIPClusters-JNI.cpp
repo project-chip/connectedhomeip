@@ -1514,7 +1514,7 @@ JNI_METHOD(void, ApplicationLauncherCluster, hideAppRequest)
     onFailure.release();
 }
 JNI_METHOD(void, ApplicationLauncherCluster, launchAppRequest)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject application, jbyteArray data, jobject timedInvokeTimeoutMs)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject application, jobject data, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1536,8 +1536,14 @@ JNI_METHOD(void, ApplicationLauncherCluster, launchAppRequest)
     cleanupStrings.push_back(
         chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(application_applicationIdItem_0)));
     request.application.applicationId = cleanupStrings.back()->charSpan();
-    cleanupByteArrays.push_back(chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(data)));
-    request.data = cleanupByteArrays.back()->byteSpan();
+    if (data != nullptr)
+    {
+        jobject optionalValue_0;
+        chip::JniReferences::GetInstance().GetOptionalValue(data, optionalValue_0);
+        auto & definedValue_0 = request.data.Emplace();
+        cleanupByteArrays.push_back(chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(optionalValue_0)));
+        definedValue_0 = cleanupByteArrays.back()->byteSpan();
+    }
 
     std::unique_ptr<CHIPApplicationLauncherClusterLauncherResponseCallback,
                     void (*)(CHIPApplicationLauncherClusterLauncherResponseCallback *)>
@@ -9451,7 +9457,7 @@ JNI_METHOD(jlong, ContentLauncherCluster, initWithDevice)(JNIEnv * env, jobject 
 }
 
 JNI_METHOD(void, ContentLauncherCluster, launchContentRequest)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject autoPlay, jstring data, jobject search,
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject search, jobject autoPlay, jobject data,
  jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
@@ -9463,109 +9469,91 @@ JNI_METHOD(void, ContentLauncherCluster, launchContentRequest)
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
-    request.autoPlay = static_cast<std::remove_reference_t<decltype(request.autoPlay)>>(
-        chip::JniReferences::GetInstance().BooleanToPrimitive(autoPlay));
-    cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(data)));
-    request.data = cleanupStrings.back()->charSpan();
+    jobject search_parameterListItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(search, "parameterList", "Ljava/util/ArrayList;", search_parameterListItem_0);
     {
-        using ListType_0       = std::remove_reference_t<decltype(request.search)>;
-        using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-        jint searchSize;
-        chip::JniReferences::GetInstance().GetArrayListSize(search, searchSize);
-        if (searchSize != 0)
+        using ListType_1       = std::remove_reference_t<decltype(request.search.parameterList)>;
+        using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+        jint search_parameterListItem_0Size;
+        chip::JniReferences::GetInstance().GetArrayListSize(search_parameterListItem_0, search_parameterListItem_0Size);
+        if (search_parameterListItem_0Size != 0)
         {
-            auto * listHolder_0 = new ListHolder<ListMemberType_0>(searchSize);
-            listFreer.add(listHolder_0);
+            auto * listHolder_1 = new ListHolder<ListMemberType_1>(search_parameterListItem_0Size);
+            listFreer.add(listHolder_1);
 
-            for (size_t i_0 = 0; i_0 < static_cast<size_t>(searchSize); ++i_0)
+            for (size_t i_1 = 0; i_1 < static_cast<size_t>(search_parameterListItem_0Size); ++i_1)
             {
-                jobject element_0;
-                chip::JniReferences::GetInstance().GetArrayListItem(search, i_0, element_0);
-                jobject element_0_parameterListItem_1;
-                chip::JniReferences::GetInstance().GetObjectField(element_0, "parameterList", "Ljava/util/ArrayList;",
-                                                                  element_0_parameterListItem_1);
+                jobject element_1;
+                chip::JniReferences::GetInstance().GetArrayListItem(search_parameterListItem_0, i_1, element_1);
+                jobject element_1_typeItem_2;
+                chip::JniReferences::GetInstance().GetObjectField(element_1, "type", "Ljava/lang/Integer;", element_1_typeItem_2);
+                listHolder_1->mList[i_1].type = static_cast<std::remove_reference_t<decltype(listHolder_1->mList[i_1].type)>>(
+                    chip::JniReferences::GetInstance().IntegerToPrimitive(element_1_typeItem_2));
+                jobject element_1_valueItem_2;
+                chip::JniReferences::GetInstance().GetObjectField(element_1, "value", "Ljava/lang/String;", element_1_valueItem_2);
+                cleanupStrings.push_back(
+                    chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(element_1_valueItem_2)));
+                listHolder_1->mList[i_1].value = cleanupStrings.back()->charSpan();
+                jobject element_1_externalIDListItem_2;
+                chip::JniReferences::GetInstance().GetObjectField(element_1, "externalIDList", "Ljava/util/Optional;",
+                                                                  element_1_externalIDListItem_2);
+                if (element_1_externalIDListItem_2 != nullptr)
                 {
-                    using ListType_2       = std::remove_reference_t<decltype(listHolder_0->mList[i_0].parameterList)>;
-                    using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
-                    jint element_0_parameterListItem_1Size;
-                    chip::JniReferences::GetInstance().GetArrayListSize(element_0_parameterListItem_1,
-                                                                        element_0_parameterListItem_1Size);
-                    if (element_0_parameterListItem_1Size != 0)
+                    jobject optionalValue_3;
+                    chip::JniReferences::GetInstance().GetOptionalValue(element_1_externalIDListItem_2, optionalValue_3);
+                    auto & definedValue_3 = listHolder_1->mList[i_1].externalIDList.Emplace();
                     {
-                        auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0_parameterListItem_1Size);
-                        listFreer.add(listHolder_2);
-
-                        for (size_t i_2 = 0; i_2 < static_cast<size_t>(element_0_parameterListItem_1Size); ++i_2)
+                        using ListType_4       = std::remove_reference_t<decltype(definedValue_3)>;
+                        using ListMemberType_4 = ListMemberTypeGetter<ListType_4>::Type;
+                        jint optionalValue_3Size;
+                        chip::JniReferences::GetInstance().GetArrayListSize(optionalValue_3, optionalValue_3Size);
+                        if (optionalValue_3Size != 0)
                         {
-                            jobject element_2;
-                            chip::JniReferences::GetInstance().GetArrayListItem(element_0_parameterListItem_1, i_2, element_2);
-                            jobject element_2_typeItem_3;
-                            chip::JniReferences::GetInstance().GetObjectField(element_2, "type", "Ljava/lang/Integer;",
-                                                                              element_2_typeItem_3);
-                            listHolder_2->mList[i_2].type =
-                                static_cast<std::remove_reference_t<decltype(listHolder_2->mList[i_2].type)>>(
-                                    chip::JniReferences::GetInstance().IntegerToPrimitive(element_2_typeItem_3));
-                            jobject element_2_valueItem_3;
-                            chip::JniReferences::GetInstance().GetObjectField(element_2, "value", "Ljava/lang/String;",
-                                                                              element_2_valueItem_3);
-                            cleanupStrings.push_back(
-                                chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(element_2_valueItem_3)));
-                            listHolder_2->mList[i_2].value = cleanupStrings.back()->charSpan();
-                            jobject element_2_externalIDListItem_3;
-                            chip::JniReferences::GetInstance().GetObjectField(element_2, "externalIDList", "Ljava/util/ArrayList;",
-                                                                              element_2_externalIDListItem_3);
-                            {
-                                using ListType_4       = std::remove_reference_t<decltype(listHolder_2->mList[i_2].externalIDList)>;
-                                using ListMemberType_4 = ListMemberTypeGetter<ListType_4>::Type;
-                                jint element_2_externalIDListItem_3Size;
-                                chip::JniReferences::GetInstance().GetArrayListSize(element_2_externalIDListItem_3,
-                                                                                    element_2_externalIDListItem_3Size);
-                                if (element_2_externalIDListItem_3Size != 0)
-                                {
-                                    auto * listHolder_4 = new ListHolder<ListMemberType_4>(element_2_externalIDListItem_3Size);
-                                    listFreer.add(listHolder_4);
+                            auto * listHolder_4 = new ListHolder<ListMemberType_4>(optionalValue_3Size);
+                            listFreer.add(listHolder_4);
 
-                                    for (size_t i_4 = 0; i_4 < static_cast<size_t>(element_2_externalIDListItem_3Size); ++i_4)
-                                    {
-                                        jobject element_4;
-                                        chip::JniReferences::GetInstance().GetArrayListItem(element_2_externalIDListItem_3, i_4,
-                                                                                            element_4);
-                                        jobject element_4_nameItem_5;
-                                        chip::JniReferences::GetInstance().GetObjectField(element_4, "name", "Ljava/lang/String;",
-                                                                                          element_4_nameItem_5);
-                                        cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(
-                                            env, static_cast<jstring>(element_4_nameItem_5)));
-                                        listHolder_4->mList[i_4].name = cleanupStrings.back()->charSpan();
-                                        jobject element_4_valueItem_5;
-                                        chip::JniReferences::GetInstance().GetObjectField(element_4, "value", "Ljava/lang/String;",
-                                                                                          element_4_valueItem_5);
-                                        cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(
-                                            env, static_cast<jstring>(element_4_valueItem_5)));
-                                        listHolder_4->mList[i_4].value = cleanupStrings.back()->charSpan();
-                                    }
-                                    listHolder_2->mList[i_2].externalIDList =
-                                        ListType_4(listHolder_4->mList, element_2_externalIDListItem_3Size);
-                                }
-                                else
-                                {
-                                    listHolder_2->mList[i_2].externalIDList = ListType_4();
-                                }
+                            for (size_t i_4 = 0; i_4 < static_cast<size_t>(optionalValue_3Size); ++i_4)
+                            {
+                                jobject element_4;
+                                chip::JniReferences::GetInstance().GetArrayListItem(optionalValue_3, i_4, element_4);
+                                jobject element_4_nameItem_5;
+                                chip::JniReferences::GetInstance().GetObjectField(element_4, "name", "Ljava/lang/String;",
+                                                                                  element_4_nameItem_5);
+                                cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(
+                                    env, static_cast<jstring>(element_4_nameItem_5)));
+                                listHolder_4->mList[i_4].name = cleanupStrings.back()->charSpan();
+                                jobject element_4_valueItem_5;
+                                chip::JniReferences::GetInstance().GetObjectField(element_4, "value", "Ljava/lang/String;",
+                                                                                  element_4_valueItem_5);
+                                cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(
+                                    env, static_cast<jstring>(element_4_valueItem_5)));
+                                listHolder_4->mList[i_4].value = cleanupStrings.back()->charSpan();
                             }
+                            definedValue_3 = ListType_4(listHolder_4->mList, optionalValue_3Size);
                         }
-                        listHolder_0->mList[i_0].parameterList = ListType_2(listHolder_2->mList, element_0_parameterListItem_1Size);
-                    }
-                    else
-                    {
-                        listHolder_0->mList[i_0].parameterList = ListType_2();
+                        else
+                        {
+                            definedValue_3 = ListType_4();
+                        }
                     }
                 }
             }
-            request.search = ListType_0(listHolder_0->mList, searchSize);
+            request.search.parameterList = ListType_1(listHolder_1->mList, search_parameterListItem_0Size);
         }
         else
         {
-            request.search = ListType_0();
+            request.search.parameterList = ListType_1();
         }
+    }
+    request.autoPlay = static_cast<std::remove_reference_t<decltype(request.autoPlay)>>(
+        chip::JniReferences::GetInstance().BooleanToPrimitive(autoPlay));
+    if (data != nullptr)
+    {
+        jobject optionalValue_0;
+        chip::JniReferences::GetInstance().GetOptionalValue(data, optionalValue_0);
+        auto & definedValue_0 = request.data.Emplace();
+        cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(optionalValue_0)));
+        definedValue_0 = cleanupStrings.back()->charSpan();
     }
 
     std::unique_ptr<CHIPContentLauncherClusterLaunchResponseCallback, void (*)(CHIPContentLauncherClusterLaunchResponseCallback *)>
@@ -9606,7 +9594,7 @@ JNI_METHOD(void, ContentLauncherCluster, launchContentRequest)
     onFailure.release();
 }
 JNI_METHOD(void, ContentLauncherCluster, launchURLRequest)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring contentURL, jstring displayString,
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring contentURL, jobject displayString,
  jobject brandingInformation, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
@@ -9620,212 +9608,311 @@ JNI_METHOD(void, ContentLauncherCluster, launchURLRequest)
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
     cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(contentURL)));
     request.contentURL = cleanupStrings.back()->charSpan();
-    cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(displayString)));
-    request.displayString = cleanupStrings.back()->charSpan();
-    jobject brandingInformation_providerNameItem_0;
-    chip::JniReferences::GetInstance().GetObjectField(brandingInformation, "providerName", "Ljava/lang/String;",
-                                                      brandingInformation_providerNameItem_0);
-    cleanupStrings.push_back(
-        chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(brandingInformation_providerNameItem_0)));
-    request.brandingInformation.providerName = cleanupStrings.back()->charSpan();
-    jobject brandingInformation_backgroundItem_0;
-    chip::JniReferences::GetInstance().GetObjectField(brandingInformation, "background",
-                                                      "Lchip/devicecontroller/ChipStructs$ContentLauncherClusterStyleInformation;",
-                                                      brandingInformation_backgroundItem_0);
-    jobject brandingInformation_backgroundItem_0_imageUrlItem_1;
-    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_backgroundItem_0, "imageUrl", "Ljava/lang/String;",
-                                                      brandingInformation_backgroundItem_0_imageUrlItem_1);
-    cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(
-        env, static_cast<jstring>(brandingInformation_backgroundItem_0_imageUrlItem_1)));
-    request.brandingInformation.background.imageUrl = cleanupStrings.back()->charSpan();
-    jobject brandingInformation_backgroundItem_0_colorItem_1;
-    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_backgroundItem_0, "color", "Ljava/lang/String;",
-                                                      brandingInformation_backgroundItem_0_colorItem_1);
-    cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(
-        env, static_cast<jstring>(brandingInformation_backgroundItem_0_colorItem_1)));
-    request.brandingInformation.background.color = cleanupStrings.back()->charSpan();
-    jobject brandingInformation_backgroundItem_0_sizeItem_1;
-    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_backgroundItem_0, "size",
-                                                      "Lchip/devicecontroller/ChipStructs$ContentLauncherClusterDimension;",
-                                                      brandingInformation_backgroundItem_0_sizeItem_1);
-    jobject brandingInformation_backgroundItem_0_sizeItem_1_widthItem_2;
-    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_backgroundItem_0_sizeItem_1, "width",
-                                                      "Ljava/lang/Double;",
-                                                      brandingInformation_backgroundItem_0_sizeItem_1_widthItem_2);
-    request.brandingInformation.background.size.width =
-        static_cast<std::remove_reference_t<decltype(request.brandingInformation.background.size.width)>>(
-            chip::JniReferences::GetInstance().DoubleToPrimitive(brandingInformation_backgroundItem_0_sizeItem_1_widthItem_2));
-    jobject brandingInformation_backgroundItem_0_sizeItem_1_heightItem_2;
-    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_backgroundItem_0_sizeItem_1, "height",
-                                                      "Ljava/lang/Double;",
-                                                      brandingInformation_backgroundItem_0_sizeItem_1_heightItem_2);
-    request.brandingInformation.background.size.height =
-        static_cast<std::remove_reference_t<decltype(request.brandingInformation.background.size.height)>>(
-            chip::JniReferences::GetInstance().DoubleToPrimitive(brandingInformation_backgroundItem_0_sizeItem_1_heightItem_2));
-    jobject brandingInformation_backgroundItem_0_sizeItem_1_metricItem_2;
-    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_backgroundItem_0_sizeItem_1, "metric",
-                                                      "Ljava/lang/Integer;",
-                                                      brandingInformation_backgroundItem_0_sizeItem_1_metricItem_2);
-    request.brandingInformation.background.size.metric =
-        static_cast<std::remove_reference_t<decltype(request.brandingInformation.background.size.metric)>>(
-            chip::JniReferences::GetInstance().IntegerToPrimitive(brandingInformation_backgroundItem_0_sizeItem_1_metricItem_2));
-    jobject brandingInformation_logoItem_0;
-    chip::JniReferences::GetInstance().GetObjectField(brandingInformation, "logo",
-                                                      "Lchip/devicecontroller/ChipStructs$ContentLauncherClusterStyleInformation;",
-                                                      brandingInformation_logoItem_0);
-    jobject brandingInformation_logoItem_0_imageUrlItem_1;
-    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_logoItem_0, "imageUrl", "Ljava/lang/String;",
-                                                      brandingInformation_logoItem_0_imageUrlItem_1);
-    cleanupStrings.push_back(
-        chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(brandingInformation_logoItem_0_imageUrlItem_1)));
-    request.brandingInformation.logo.imageUrl = cleanupStrings.back()->charSpan();
-    jobject brandingInformation_logoItem_0_colorItem_1;
-    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_logoItem_0, "color", "Ljava/lang/String;",
-                                                      brandingInformation_logoItem_0_colorItem_1);
-    cleanupStrings.push_back(
-        chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(brandingInformation_logoItem_0_colorItem_1)));
-    request.brandingInformation.logo.color = cleanupStrings.back()->charSpan();
-    jobject brandingInformation_logoItem_0_sizeItem_1;
-    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_logoItem_0, "size",
-                                                      "Lchip/devicecontroller/ChipStructs$ContentLauncherClusterDimension;",
-                                                      brandingInformation_logoItem_0_sizeItem_1);
-    jobject brandingInformation_logoItem_0_sizeItem_1_widthItem_2;
-    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_logoItem_0_sizeItem_1, "width", "Ljava/lang/Double;",
-                                                      brandingInformation_logoItem_0_sizeItem_1_widthItem_2);
-    request.brandingInformation.logo.size.width =
-        static_cast<std::remove_reference_t<decltype(request.brandingInformation.logo.size.width)>>(
-            chip::JniReferences::GetInstance().DoubleToPrimitive(brandingInformation_logoItem_0_sizeItem_1_widthItem_2));
-    jobject brandingInformation_logoItem_0_sizeItem_1_heightItem_2;
-    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_logoItem_0_sizeItem_1, "height", "Ljava/lang/Double;",
-                                                      brandingInformation_logoItem_0_sizeItem_1_heightItem_2);
-    request.brandingInformation.logo.size.height =
-        static_cast<std::remove_reference_t<decltype(request.brandingInformation.logo.size.height)>>(
-            chip::JniReferences::GetInstance().DoubleToPrimitive(brandingInformation_logoItem_0_sizeItem_1_heightItem_2));
-    jobject brandingInformation_logoItem_0_sizeItem_1_metricItem_2;
-    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_logoItem_0_sizeItem_1, "metric", "Ljava/lang/Integer;",
-                                                      brandingInformation_logoItem_0_sizeItem_1_metricItem_2);
-    request.brandingInformation.logo.size.metric =
-        static_cast<std::remove_reference_t<decltype(request.brandingInformation.logo.size.metric)>>(
-            chip::JniReferences::GetInstance().IntegerToPrimitive(brandingInformation_logoItem_0_sizeItem_1_metricItem_2));
-    jobject brandingInformation_progressBarItem_0;
-    chip::JniReferences::GetInstance().GetObjectField(brandingInformation, "progressBar",
-                                                      "Lchip/devicecontroller/ChipStructs$ContentLauncherClusterStyleInformation;",
-                                                      brandingInformation_progressBarItem_0);
-    jobject brandingInformation_progressBarItem_0_imageUrlItem_1;
-    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_progressBarItem_0, "imageUrl", "Ljava/lang/String;",
-                                                      brandingInformation_progressBarItem_0_imageUrlItem_1);
-    cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(
-        env, static_cast<jstring>(brandingInformation_progressBarItem_0_imageUrlItem_1)));
-    request.brandingInformation.progressBar.imageUrl = cleanupStrings.back()->charSpan();
-    jobject brandingInformation_progressBarItem_0_colorItem_1;
-    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_progressBarItem_0, "color", "Ljava/lang/String;",
-                                                      brandingInformation_progressBarItem_0_colorItem_1);
-    cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(
-        env, static_cast<jstring>(brandingInformation_progressBarItem_0_colorItem_1)));
-    request.brandingInformation.progressBar.color = cleanupStrings.back()->charSpan();
-    jobject brandingInformation_progressBarItem_0_sizeItem_1;
-    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_progressBarItem_0, "size",
-                                                      "Lchip/devicecontroller/ChipStructs$ContentLauncherClusterDimension;",
-                                                      brandingInformation_progressBarItem_0_sizeItem_1);
-    jobject brandingInformation_progressBarItem_0_sizeItem_1_widthItem_2;
-    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_progressBarItem_0_sizeItem_1, "width",
-                                                      "Ljava/lang/Double;",
-                                                      brandingInformation_progressBarItem_0_sizeItem_1_widthItem_2);
-    request.brandingInformation.progressBar.size.width =
-        static_cast<std::remove_reference_t<decltype(request.brandingInformation.progressBar.size.width)>>(
-            chip::JniReferences::GetInstance().DoubleToPrimitive(brandingInformation_progressBarItem_0_sizeItem_1_widthItem_2));
-    jobject brandingInformation_progressBarItem_0_sizeItem_1_heightItem_2;
-    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_progressBarItem_0_sizeItem_1, "height",
-                                                      "Ljava/lang/Double;",
-                                                      brandingInformation_progressBarItem_0_sizeItem_1_heightItem_2);
-    request.brandingInformation.progressBar.size.height =
-        static_cast<std::remove_reference_t<decltype(request.brandingInformation.progressBar.size.height)>>(
-            chip::JniReferences::GetInstance().DoubleToPrimitive(brandingInformation_progressBarItem_0_sizeItem_1_heightItem_2));
-    jobject brandingInformation_progressBarItem_0_sizeItem_1_metricItem_2;
-    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_progressBarItem_0_sizeItem_1, "metric",
-                                                      "Ljava/lang/Integer;",
-                                                      brandingInformation_progressBarItem_0_sizeItem_1_metricItem_2);
-    request.brandingInformation.progressBar.size.metric =
-        static_cast<std::remove_reference_t<decltype(request.brandingInformation.progressBar.size.metric)>>(
-            chip::JniReferences::GetInstance().IntegerToPrimitive(brandingInformation_progressBarItem_0_sizeItem_1_metricItem_2));
-    jobject brandingInformation_splashItem_0;
-    chip::JniReferences::GetInstance().GetObjectField(brandingInformation, "splash",
-                                                      "Lchip/devicecontroller/ChipStructs$ContentLauncherClusterStyleInformation;",
-                                                      brandingInformation_splashItem_0);
-    jobject brandingInformation_splashItem_0_imageUrlItem_1;
-    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_splashItem_0, "imageUrl", "Ljava/lang/String;",
-                                                      brandingInformation_splashItem_0_imageUrlItem_1);
-    cleanupStrings.push_back(
-        chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(brandingInformation_splashItem_0_imageUrlItem_1)));
-    request.brandingInformation.splash.imageUrl = cleanupStrings.back()->charSpan();
-    jobject brandingInformation_splashItem_0_colorItem_1;
-    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_splashItem_0, "color", "Ljava/lang/String;",
-                                                      brandingInformation_splashItem_0_colorItem_1);
-    cleanupStrings.push_back(
-        chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(brandingInformation_splashItem_0_colorItem_1)));
-    request.brandingInformation.splash.color = cleanupStrings.back()->charSpan();
-    jobject brandingInformation_splashItem_0_sizeItem_1;
-    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_splashItem_0, "size",
-                                                      "Lchip/devicecontroller/ChipStructs$ContentLauncherClusterDimension;",
-                                                      brandingInformation_splashItem_0_sizeItem_1);
-    jobject brandingInformation_splashItem_0_sizeItem_1_widthItem_2;
-    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_splashItem_0_sizeItem_1, "width", "Ljava/lang/Double;",
-                                                      brandingInformation_splashItem_0_sizeItem_1_widthItem_2);
-    request.brandingInformation.splash.size.width =
-        static_cast<std::remove_reference_t<decltype(request.brandingInformation.splash.size.width)>>(
-            chip::JniReferences::GetInstance().DoubleToPrimitive(brandingInformation_splashItem_0_sizeItem_1_widthItem_2));
-    jobject brandingInformation_splashItem_0_sizeItem_1_heightItem_2;
-    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_splashItem_0_sizeItem_1, "height", "Ljava/lang/Double;",
-                                                      brandingInformation_splashItem_0_sizeItem_1_heightItem_2);
-    request.brandingInformation.splash.size.height =
-        static_cast<std::remove_reference_t<decltype(request.brandingInformation.splash.size.height)>>(
-            chip::JniReferences::GetInstance().DoubleToPrimitive(brandingInformation_splashItem_0_sizeItem_1_heightItem_2));
-    jobject brandingInformation_splashItem_0_sizeItem_1_metricItem_2;
-    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_splashItem_0_sizeItem_1, "metric", "Ljava/lang/Integer;",
-                                                      brandingInformation_splashItem_0_sizeItem_1_metricItem_2);
-    request.brandingInformation.splash.size.metric =
-        static_cast<std::remove_reference_t<decltype(request.brandingInformation.splash.size.metric)>>(
-            chip::JniReferences::GetInstance().IntegerToPrimitive(brandingInformation_splashItem_0_sizeItem_1_metricItem_2));
-    jobject brandingInformation_waterMarkItem_0;
-    chip::JniReferences::GetInstance().GetObjectField(brandingInformation, "waterMark",
-                                                      "Lchip/devicecontroller/ChipStructs$ContentLauncherClusterStyleInformation;",
-                                                      brandingInformation_waterMarkItem_0);
-    jobject brandingInformation_waterMarkItem_0_imageUrlItem_1;
-    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_waterMarkItem_0, "imageUrl", "Ljava/lang/String;",
-                                                      brandingInformation_waterMarkItem_0_imageUrlItem_1);
-    cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(
-        env, static_cast<jstring>(brandingInformation_waterMarkItem_0_imageUrlItem_1)));
-    request.brandingInformation.waterMark.imageUrl = cleanupStrings.back()->charSpan();
-    jobject brandingInformation_waterMarkItem_0_colorItem_1;
-    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_waterMarkItem_0, "color", "Ljava/lang/String;",
-                                                      brandingInformation_waterMarkItem_0_colorItem_1);
-    cleanupStrings.push_back(
-        chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(brandingInformation_waterMarkItem_0_colorItem_1)));
-    request.brandingInformation.waterMark.color = cleanupStrings.back()->charSpan();
-    jobject brandingInformation_waterMarkItem_0_sizeItem_1;
-    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_waterMarkItem_0, "size",
-                                                      "Lchip/devicecontroller/ChipStructs$ContentLauncherClusterDimension;",
-                                                      brandingInformation_waterMarkItem_0_sizeItem_1);
-    jobject brandingInformation_waterMarkItem_0_sizeItem_1_widthItem_2;
-    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_waterMarkItem_0_sizeItem_1, "width", "Ljava/lang/Double;",
-                                                      brandingInformation_waterMarkItem_0_sizeItem_1_widthItem_2);
-    request.brandingInformation.waterMark.size.width =
-        static_cast<std::remove_reference_t<decltype(request.brandingInformation.waterMark.size.width)>>(
-            chip::JniReferences::GetInstance().DoubleToPrimitive(brandingInformation_waterMarkItem_0_sizeItem_1_widthItem_2));
-    jobject brandingInformation_waterMarkItem_0_sizeItem_1_heightItem_2;
-    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_waterMarkItem_0_sizeItem_1, "height",
-                                                      "Ljava/lang/Double;",
-                                                      brandingInformation_waterMarkItem_0_sizeItem_1_heightItem_2);
-    request.brandingInformation.waterMark.size.height =
-        static_cast<std::remove_reference_t<decltype(request.brandingInformation.waterMark.size.height)>>(
-            chip::JniReferences::GetInstance().DoubleToPrimitive(brandingInformation_waterMarkItem_0_sizeItem_1_heightItem_2));
-    jobject brandingInformation_waterMarkItem_0_sizeItem_1_metricItem_2;
-    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_waterMarkItem_0_sizeItem_1, "metric",
-                                                      "Ljava/lang/Integer;",
-                                                      brandingInformation_waterMarkItem_0_sizeItem_1_metricItem_2);
-    request.brandingInformation.waterMark.size.metric =
-        static_cast<std::remove_reference_t<decltype(request.brandingInformation.waterMark.size.metric)>>(
-            chip::JniReferences::GetInstance().IntegerToPrimitive(brandingInformation_waterMarkItem_0_sizeItem_1_metricItem_2));
+    if (displayString != nullptr)
+    {
+        jobject optionalValue_0;
+        chip::JniReferences::GetInstance().GetOptionalValue(displayString, optionalValue_0);
+        auto & definedValue_0 = request.displayString.Emplace();
+        cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(optionalValue_0)));
+        definedValue_0 = cleanupStrings.back()->charSpan();
+    }
+    if (brandingInformation != nullptr)
+    {
+        jobject optionalValue_0;
+        chip::JniReferences::GetInstance().GetOptionalValue(brandingInformation, optionalValue_0);
+        auto & definedValue_0 = request.brandingInformation.Emplace();
+        jobject optionalValue_0_providerNameItem_1;
+        chip::JniReferences::GetInstance().GetObjectField(optionalValue_0, "providerName", "Ljava/lang/String;",
+                                                          optionalValue_0_providerNameItem_1);
+        cleanupStrings.push_back(
+            chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(optionalValue_0_providerNameItem_1)));
+        definedValue_0.providerName = cleanupStrings.back()->charSpan();
+        jobject optionalValue_0_backgroundItem_1;
+        chip::JniReferences::GetInstance().GetObjectField(optionalValue_0, "background", "Ljava/util/Optional;",
+                                                          optionalValue_0_backgroundItem_1);
+        if (optionalValue_0_backgroundItem_1 != nullptr)
+        {
+            jobject optionalValue_2;
+            chip::JniReferences::GetInstance().GetOptionalValue(optionalValue_0_backgroundItem_1, optionalValue_2);
+            auto & definedValue_2 = definedValue_0.background.Emplace();
+            jobject optionalValue_2_imageUrlItem_3;
+            chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "imageUrl", "Ljava/util/Optional;",
+                                                              optionalValue_2_imageUrlItem_3);
+            if (optionalValue_2_imageUrlItem_3 != nullptr)
+            {
+                jobject optionalValue_4;
+                chip::JniReferences::GetInstance().GetOptionalValue(optionalValue_2_imageUrlItem_3, optionalValue_4);
+                auto & definedValue_4 = definedValue_2.imageUrl.Emplace();
+                cleanupStrings.push_back(
+                    chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(optionalValue_4)));
+                definedValue_4 = cleanupStrings.back()->charSpan();
+            }
+            jobject optionalValue_2_colorItem_3;
+            chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "color", "Ljava/util/Optional;",
+                                                              optionalValue_2_colorItem_3);
+            if (optionalValue_2_colorItem_3 != nullptr)
+            {
+                jobject optionalValue_4;
+                chip::JniReferences::GetInstance().GetOptionalValue(optionalValue_2_colorItem_3, optionalValue_4);
+                auto & definedValue_4 = definedValue_2.color.Emplace();
+                cleanupStrings.push_back(
+                    chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(optionalValue_4)));
+                definedValue_4 = cleanupStrings.back()->charSpan();
+            }
+            jobject optionalValue_2_sizeItem_3;
+            chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "size", "Ljava/util/Optional;",
+                                                              optionalValue_2_sizeItem_3);
+            if (optionalValue_2_sizeItem_3 != nullptr)
+            {
+                jobject optionalValue_4;
+                chip::JniReferences::GetInstance().GetOptionalValue(optionalValue_2_sizeItem_3, optionalValue_4);
+                auto & definedValue_4 = definedValue_2.size.Emplace();
+                jobject optionalValue_4_widthItem_5;
+                chip::JniReferences::GetInstance().GetObjectField(optionalValue_4, "width", "Ljava/lang/Double;",
+                                                                  optionalValue_4_widthItem_5);
+                definedValue_4.width = static_cast<std::remove_reference_t<decltype(definedValue_4.width)>>(
+                    chip::JniReferences::GetInstance().DoubleToPrimitive(optionalValue_4_widthItem_5));
+                jobject optionalValue_4_heightItem_5;
+                chip::JniReferences::GetInstance().GetObjectField(optionalValue_4, "height", "Ljava/lang/Double;",
+                                                                  optionalValue_4_heightItem_5);
+                definedValue_4.height = static_cast<std::remove_reference_t<decltype(definedValue_4.height)>>(
+                    chip::JniReferences::GetInstance().DoubleToPrimitive(optionalValue_4_heightItem_5));
+                jobject optionalValue_4_metricItem_5;
+                chip::JniReferences::GetInstance().GetObjectField(optionalValue_4, "metric", "Ljava/lang/Integer;",
+                                                                  optionalValue_4_metricItem_5);
+                definedValue_4.metric = static_cast<std::remove_reference_t<decltype(definedValue_4.metric)>>(
+                    chip::JniReferences::GetInstance().IntegerToPrimitive(optionalValue_4_metricItem_5));
+            }
+        }
+        jobject optionalValue_0_logoItem_1;
+        chip::JniReferences::GetInstance().GetObjectField(optionalValue_0, "logo", "Ljava/util/Optional;",
+                                                          optionalValue_0_logoItem_1);
+        if (optionalValue_0_logoItem_1 != nullptr)
+        {
+            jobject optionalValue_2;
+            chip::JniReferences::GetInstance().GetOptionalValue(optionalValue_0_logoItem_1, optionalValue_2);
+            auto & definedValue_2 = definedValue_0.logo.Emplace();
+            jobject optionalValue_2_imageUrlItem_3;
+            chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "imageUrl", "Ljava/util/Optional;",
+                                                              optionalValue_2_imageUrlItem_3);
+            if (optionalValue_2_imageUrlItem_3 != nullptr)
+            {
+                jobject optionalValue_4;
+                chip::JniReferences::GetInstance().GetOptionalValue(optionalValue_2_imageUrlItem_3, optionalValue_4);
+                auto & definedValue_4 = definedValue_2.imageUrl.Emplace();
+                cleanupStrings.push_back(
+                    chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(optionalValue_4)));
+                definedValue_4 = cleanupStrings.back()->charSpan();
+            }
+            jobject optionalValue_2_colorItem_3;
+            chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "color", "Ljava/util/Optional;",
+                                                              optionalValue_2_colorItem_3);
+            if (optionalValue_2_colorItem_3 != nullptr)
+            {
+                jobject optionalValue_4;
+                chip::JniReferences::GetInstance().GetOptionalValue(optionalValue_2_colorItem_3, optionalValue_4);
+                auto & definedValue_4 = definedValue_2.color.Emplace();
+                cleanupStrings.push_back(
+                    chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(optionalValue_4)));
+                definedValue_4 = cleanupStrings.back()->charSpan();
+            }
+            jobject optionalValue_2_sizeItem_3;
+            chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "size", "Ljava/util/Optional;",
+                                                              optionalValue_2_sizeItem_3);
+            if (optionalValue_2_sizeItem_3 != nullptr)
+            {
+                jobject optionalValue_4;
+                chip::JniReferences::GetInstance().GetOptionalValue(optionalValue_2_sizeItem_3, optionalValue_4);
+                auto & definedValue_4 = definedValue_2.size.Emplace();
+                jobject optionalValue_4_widthItem_5;
+                chip::JniReferences::GetInstance().GetObjectField(optionalValue_4, "width", "Ljava/lang/Double;",
+                                                                  optionalValue_4_widthItem_5);
+                definedValue_4.width = static_cast<std::remove_reference_t<decltype(definedValue_4.width)>>(
+                    chip::JniReferences::GetInstance().DoubleToPrimitive(optionalValue_4_widthItem_5));
+                jobject optionalValue_4_heightItem_5;
+                chip::JniReferences::GetInstance().GetObjectField(optionalValue_4, "height", "Ljava/lang/Double;",
+                                                                  optionalValue_4_heightItem_5);
+                definedValue_4.height = static_cast<std::remove_reference_t<decltype(definedValue_4.height)>>(
+                    chip::JniReferences::GetInstance().DoubleToPrimitive(optionalValue_4_heightItem_5));
+                jobject optionalValue_4_metricItem_5;
+                chip::JniReferences::GetInstance().GetObjectField(optionalValue_4, "metric", "Ljava/lang/Integer;",
+                                                                  optionalValue_4_metricItem_5);
+                definedValue_4.metric = static_cast<std::remove_reference_t<decltype(definedValue_4.metric)>>(
+                    chip::JniReferences::GetInstance().IntegerToPrimitive(optionalValue_4_metricItem_5));
+            }
+        }
+        jobject optionalValue_0_progressBarItem_1;
+        chip::JniReferences::GetInstance().GetObjectField(optionalValue_0, "progressBar", "Ljava/util/Optional;",
+                                                          optionalValue_0_progressBarItem_1);
+        if (optionalValue_0_progressBarItem_1 != nullptr)
+        {
+            jobject optionalValue_2;
+            chip::JniReferences::GetInstance().GetOptionalValue(optionalValue_0_progressBarItem_1, optionalValue_2);
+            auto & definedValue_2 = definedValue_0.progressBar.Emplace();
+            jobject optionalValue_2_imageUrlItem_3;
+            chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "imageUrl", "Ljava/util/Optional;",
+                                                              optionalValue_2_imageUrlItem_3);
+            if (optionalValue_2_imageUrlItem_3 != nullptr)
+            {
+                jobject optionalValue_4;
+                chip::JniReferences::GetInstance().GetOptionalValue(optionalValue_2_imageUrlItem_3, optionalValue_4);
+                auto & definedValue_4 = definedValue_2.imageUrl.Emplace();
+                cleanupStrings.push_back(
+                    chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(optionalValue_4)));
+                definedValue_4 = cleanupStrings.back()->charSpan();
+            }
+            jobject optionalValue_2_colorItem_3;
+            chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "color", "Ljava/util/Optional;",
+                                                              optionalValue_2_colorItem_3);
+            if (optionalValue_2_colorItem_3 != nullptr)
+            {
+                jobject optionalValue_4;
+                chip::JniReferences::GetInstance().GetOptionalValue(optionalValue_2_colorItem_3, optionalValue_4);
+                auto & definedValue_4 = definedValue_2.color.Emplace();
+                cleanupStrings.push_back(
+                    chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(optionalValue_4)));
+                definedValue_4 = cleanupStrings.back()->charSpan();
+            }
+            jobject optionalValue_2_sizeItem_3;
+            chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "size", "Ljava/util/Optional;",
+                                                              optionalValue_2_sizeItem_3);
+            if (optionalValue_2_sizeItem_3 != nullptr)
+            {
+                jobject optionalValue_4;
+                chip::JniReferences::GetInstance().GetOptionalValue(optionalValue_2_sizeItem_3, optionalValue_4);
+                auto & definedValue_4 = definedValue_2.size.Emplace();
+                jobject optionalValue_4_widthItem_5;
+                chip::JniReferences::GetInstance().GetObjectField(optionalValue_4, "width", "Ljava/lang/Double;",
+                                                                  optionalValue_4_widthItem_5);
+                definedValue_4.width = static_cast<std::remove_reference_t<decltype(definedValue_4.width)>>(
+                    chip::JniReferences::GetInstance().DoubleToPrimitive(optionalValue_4_widthItem_5));
+                jobject optionalValue_4_heightItem_5;
+                chip::JniReferences::GetInstance().GetObjectField(optionalValue_4, "height", "Ljava/lang/Double;",
+                                                                  optionalValue_4_heightItem_5);
+                definedValue_4.height = static_cast<std::remove_reference_t<decltype(definedValue_4.height)>>(
+                    chip::JniReferences::GetInstance().DoubleToPrimitive(optionalValue_4_heightItem_5));
+                jobject optionalValue_4_metricItem_5;
+                chip::JniReferences::GetInstance().GetObjectField(optionalValue_4, "metric", "Ljava/lang/Integer;",
+                                                                  optionalValue_4_metricItem_5);
+                definedValue_4.metric = static_cast<std::remove_reference_t<decltype(definedValue_4.metric)>>(
+                    chip::JniReferences::GetInstance().IntegerToPrimitive(optionalValue_4_metricItem_5));
+            }
+        }
+        jobject optionalValue_0_splashItem_1;
+        chip::JniReferences::GetInstance().GetObjectField(optionalValue_0, "splash", "Ljava/util/Optional;",
+                                                          optionalValue_0_splashItem_1);
+        if (optionalValue_0_splashItem_1 != nullptr)
+        {
+            jobject optionalValue_2;
+            chip::JniReferences::GetInstance().GetOptionalValue(optionalValue_0_splashItem_1, optionalValue_2);
+            auto & definedValue_2 = definedValue_0.splash.Emplace();
+            jobject optionalValue_2_imageUrlItem_3;
+            chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "imageUrl", "Ljava/util/Optional;",
+                                                              optionalValue_2_imageUrlItem_3);
+            if (optionalValue_2_imageUrlItem_3 != nullptr)
+            {
+                jobject optionalValue_4;
+                chip::JniReferences::GetInstance().GetOptionalValue(optionalValue_2_imageUrlItem_3, optionalValue_4);
+                auto & definedValue_4 = definedValue_2.imageUrl.Emplace();
+                cleanupStrings.push_back(
+                    chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(optionalValue_4)));
+                definedValue_4 = cleanupStrings.back()->charSpan();
+            }
+            jobject optionalValue_2_colorItem_3;
+            chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "color", "Ljava/util/Optional;",
+                                                              optionalValue_2_colorItem_3);
+            if (optionalValue_2_colorItem_3 != nullptr)
+            {
+                jobject optionalValue_4;
+                chip::JniReferences::GetInstance().GetOptionalValue(optionalValue_2_colorItem_3, optionalValue_4);
+                auto & definedValue_4 = definedValue_2.color.Emplace();
+                cleanupStrings.push_back(
+                    chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(optionalValue_4)));
+                definedValue_4 = cleanupStrings.back()->charSpan();
+            }
+            jobject optionalValue_2_sizeItem_3;
+            chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "size", "Ljava/util/Optional;",
+                                                              optionalValue_2_sizeItem_3);
+            if (optionalValue_2_sizeItem_3 != nullptr)
+            {
+                jobject optionalValue_4;
+                chip::JniReferences::GetInstance().GetOptionalValue(optionalValue_2_sizeItem_3, optionalValue_4);
+                auto & definedValue_4 = definedValue_2.size.Emplace();
+                jobject optionalValue_4_widthItem_5;
+                chip::JniReferences::GetInstance().GetObjectField(optionalValue_4, "width", "Ljava/lang/Double;",
+                                                                  optionalValue_4_widthItem_5);
+                definedValue_4.width = static_cast<std::remove_reference_t<decltype(definedValue_4.width)>>(
+                    chip::JniReferences::GetInstance().DoubleToPrimitive(optionalValue_4_widthItem_5));
+                jobject optionalValue_4_heightItem_5;
+                chip::JniReferences::GetInstance().GetObjectField(optionalValue_4, "height", "Ljava/lang/Double;",
+                                                                  optionalValue_4_heightItem_5);
+                definedValue_4.height = static_cast<std::remove_reference_t<decltype(definedValue_4.height)>>(
+                    chip::JniReferences::GetInstance().DoubleToPrimitive(optionalValue_4_heightItem_5));
+                jobject optionalValue_4_metricItem_5;
+                chip::JniReferences::GetInstance().GetObjectField(optionalValue_4, "metric", "Ljava/lang/Integer;",
+                                                                  optionalValue_4_metricItem_5);
+                definedValue_4.metric = static_cast<std::remove_reference_t<decltype(definedValue_4.metric)>>(
+                    chip::JniReferences::GetInstance().IntegerToPrimitive(optionalValue_4_metricItem_5));
+            }
+        }
+        jobject optionalValue_0_waterMarkItem_1;
+        chip::JniReferences::GetInstance().GetObjectField(optionalValue_0, "waterMark", "Ljava/util/Optional;",
+                                                          optionalValue_0_waterMarkItem_1);
+        if (optionalValue_0_waterMarkItem_1 != nullptr)
+        {
+            jobject optionalValue_2;
+            chip::JniReferences::GetInstance().GetOptionalValue(optionalValue_0_waterMarkItem_1, optionalValue_2);
+            auto & definedValue_2 = definedValue_0.waterMark.Emplace();
+            jobject optionalValue_2_imageUrlItem_3;
+            chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "imageUrl", "Ljava/util/Optional;",
+                                                              optionalValue_2_imageUrlItem_3);
+            if (optionalValue_2_imageUrlItem_3 != nullptr)
+            {
+                jobject optionalValue_4;
+                chip::JniReferences::GetInstance().GetOptionalValue(optionalValue_2_imageUrlItem_3, optionalValue_4);
+                auto & definedValue_4 = definedValue_2.imageUrl.Emplace();
+                cleanupStrings.push_back(
+                    chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(optionalValue_4)));
+                definedValue_4 = cleanupStrings.back()->charSpan();
+            }
+            jobject optionalValue_2_colorItem_3;
+            chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "color", "Ljava/util/Optional;",
+                                                              optionalValue_2_colorItem_3);
+            if (optionalValue_2_colorItem_3 != nullptr)
+            {
+                jobject optionalValue_4;
+                chip::JniReferences::GetInstance().GetOptionalValue(optionalValue_2_colorItem_3, optionalValue_4);
+                auto & definedValue_4 = definedValue_2.color.Emplace();
+                cleanupStrings.push_back(
+                    chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(optionalValue_4)));
+                definedValue_4 = cleanupStrings.back()->charSpan();
+            }
+            jobject optionalValue_2_sizeItem_3;
+            chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "size", "Ljava/util/Optional;",
+                                                              optionalValue_2_sizeItem_3);
+            if (optionalValue_2_sizeItem_3 != nullptr)
+            {
+                jobject optionalValue_4;
+                chip::JniReferences::GetInstance().GetOptionalValue(optionalValue_2_sizeItem_3, optionalValue_4);
+                auto & definedValue_4 = definedValue_2.size.Emplace();
+                jobject optionalValue_4_widthItem_5;
+                chip::JniReferences::GetInstance().GetObjectField(optionalValue_4, "width", "Ljava/lang/Double;",
+                                                                  optionalValue_4_widthItem_5);
+                definedValue_4.width = static_cast<std::remove_reference_t<decltype(definedValue_4.width)>>(
+                    chip::JniReferences::GetInstance().DoubleToPrimitive(optionalValue_4_widthItem_5));
+                jobject optionalValue_4_heightItem_5;
+                chip::JniReferences::GetInstance().GetObjectField(optionalValue_4, "height", "Ljava/lang/Double;",
+                                                                  optionalValue_4_heightItem_5);
+                definedValue_4.height = static_cast<std::remove_reference_t<decltype(definedValue_4.height)>>(
+                    chip::JniReferences::GetInstance().DoubleToPrimitive(optionalValue_4_heightItem_5));
+                jobject optionalValue_4_metricItem_5;
+                chip::JniReferences::GetInstance().GetObjectField(optionalValue_4, "metric", "Ljava/lang/Integer;",
+                                                                  optionalValue_4_metricItem_5);
+                definedValue_4.metric = static_cast<std::remove_reference_t<decltype(definedValue_4.metric)>>(
+                    chip::JniReferences::GetInstance().IntegerToPrimitive(optionalValue_4_metricItem_5));
+            }
+        }
+    }
 
     std::unique_ptr<CHIPContentLauncherClusterLaunchResponseCallback, void (*)(CHIPContentLauncherClusterLaunchResponseCallback *)>
         onSuccess(Platform::New<CHIPContentLauncherClusterLaunchResponseCallback>(callback),
@@ -19795,8 +19882,9 @@ JNI_METHOD(void, MediaPlaybackCluster, subscribeStartTimeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
     chip::DeviceLayer::StackLock lock;
-    std::unique_ptr<CHIPInt64uAttributeCallback, void (*)(CHIPInt64uAttributeCallback *)> onSuccess(
-        Platform::New<CHIPInt64uAttributeCallback>(callback, true), chip::Platform::Delete<CHIPInt64uAttributeCallback>);
+    std::unique_ptr<CHIPMediaPlaybackStartTimeAttributeCallback, void (*)(CHIPMediaPlaybackStartTimeAttributeCallback *)> onSuccess(
+        Platform::New<CHIPMediaPlaybackStartTimeAttributeCallback>(callback, true),
+        chip::Platform::Delete<CHIPMediaPlaybackStartTimeAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -19820,7 +19908,7 @@ JNI_METHOD(void, MediaPlaybackCluster, subscribeStartTimeAttribute)
 
     err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-                                                   CHIPInt64uAttributeCallback::OnSubscriptionEstablished);
+                                                   CHIPMediaPlaybackStartTimeAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -19832,8 +19920,9 @@ JNI_METHOD(void, MediaPlaybackCluster, subscribeDurationAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
     chip::DeviceLayer::StackLock lock;
-    std::unique_ptr<CHIPInt64uAttributeCallback, void (*)(CHIPInt64uAttributeCallback *)> onSuccess(
-        Platform::New<CHIPInt64uAttributeCallback>(callback, true), chip::Platform::Delete<CHIPInt64uAttributeCallback>);
+    std::unique_ptr<CHIPMediaPlaybackDurationAttributeCallback, void (*)(CHIPMediaPlaybackDurationAttributeCallback *)> onSuccess(
+        Platform::New<CHIPMediaPlaybackDurationAttributeCallback>(callback, true),
+        chip::Platform::Delete<CHIPMediaPlaybackDurationAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -19857,7 +19946,7 @@ JNI_METHOD(void, MediaPlaybackCluster, subscribeDurationAttribute)
 
     err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-                                                   CHIPInt64uAttributeCallback::OnSubscriptionEstablished);
+                                                   CHIPMediaPlaybackDurationAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -19906,8 +19995,9 @@ JNI_METHOD(void, MediaPlaybackCluster, subscribeSeekRangeEndAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
     chip::DeviceLayer::StackLock lock;
-    std::unique_ptr<CHIPInt64uAttributeCallback, void (*)(CHIPInt64uAttributeCallback *)> onSuccess(
-        Platform::New<CHIPInt64uAttributeCallback>(callback, true), chip::Platform::Delete<CHIPInt64uAttributeCallback>);
+    std::unique_ptr<CHIPMediaPlaybackSeekRangeEndAttributeCallback, void (*)(CHIPMediaPlaybackSeekRangeEndAttributeCallback *)>
+        onSuccess(Platform::New<CHIPMediaPlaybackSeekRangeEndAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPMediaPlaybackSeekRangeEndAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -19931,7 +20021,7 @@ JNI_METHOD(void, MediaPlaybackCluster, subscribeSeekRangeEndAttribute)
 
     err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-                                                   CHIPInt64uAttributeCallback::OnSubscriptionEstablished);
+                                                   CHIPMediaPlaybackSeekRangeEndAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -19943,8 +20033,9 @@ JNI_METHOD(void, MediaPlaybackCluster, subscribeSeekRangeStartAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
     chip::DeviceLayer::StackLock lock;
-    std::unique_ptr<CHIPInt64uAttributeCallback, void (*)(CHIPInt64uAttributeCallback *)> onSuccess(
-        Platform::New<CHIPInt64uAttributeCallback>(callback, true), chip::Platform::Delete<CHIPInt64uAttributeCallback>);
+    std::unique_ptr<CHIPMediaPlaybackSeekRangeStartAttributeCallback, void (*)(CHIPMediaPlaybackSeekRangeStartAttributeCallback *)>
+        onSuccess(Platform::New<CHIPMediaPlaybackSeekRangeStartAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPMediaPlaybackSeekRangeStartAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -19968,7 +20059,7 @@ JNI_METHOD(void, MediaPlaybackCluster, subscribeSeekRangeStartAttribute)
 
     err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-                                                   CHIPInt64uAttributeCallback::OnSubscriptionEstablished);
+                                                   CHIPMediaPlaybackSeekRangeStartAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -27918,7 +28009,7 @@ JNI_METHOD(jlong, TargetNavigatorCluster, initWithDevice)(JNIEnv * env, jobject 
 }
 
 JNI_METHOD(void, TargetNavigatorCluster, navigateTargetRequest)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject target, jstring data, jobject timedInvokeTimeoutMs)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject target, jobject data, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -27931,8 +28022,14 @@ JNI_METHOD(void, TargetNavigatorCluster, navigateTargetRequest)
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
     request.target = static_cast<std::remove_reference_t<decltype(request.target)>>(
         chip::JniReferences::GetInstance().IntegerToPrimitive(target));
-    cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(data)));
-    request.data = cleanupStrings.back()->charSpan();
+    if (data != nullptr)
+    {
+        jobject optionalValue_0;
+        chip::JniReferences::GetInstance().GetOptionalValue(data, optionalValue_0);
+        auto & definedValue_0 = request.data.Emplace();
+        cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(optionalValue_0)));
+        definedValue_0 = cleanupStrings.back()->charSpan();
+    }
 
     std::unique_ptr<CHIPTargetNavigatorClusterNavigateTargetResponseCallback,
                     void (*)(CHIPTargetNavigatorClusterNavigateTargetResponseCallback *)>

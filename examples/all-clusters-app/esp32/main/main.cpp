@@ -540,6 +540,12 @@ void SetupPretendDevices()
     AddCluster("Humidity Sensor");
     AddAttribute("MeasuredValue", "30");
     app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(30 * 100));
+
+    AddDevice("Light Sensor");
+    AddEndpoint("External");
+    AddCluster("Illuminance Measurement");
+    AddAttribute("MeasuredValue", "1000");
+    app::Clusters::IlluminanceMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(1000));
 }
 
 WiFiWidget pairingWindowLED;
@@ -692,17 +698,7 @@ extern "C" void app_main()
             ->Item("QR Code",
                    [=]() {
                        ESP_LOGI(TAG, "Opening QR code screen");
-                       ESP_LOGI(TAG, "QR CODE Text: '%s'", qrCodeText.c_str());
-                       uint16_t discriminator;
-                       if (ConfigurationMgr().GetSetupDiscriminator(discriminator) == CHIP_NO_ERROR)
-                       {
-                           ESP_LOGI(TAG, "Setup discriminator: %u (0x%x)", discriminator, discriminator);
-                       }
-                       uint32_t setupPINCode;
-                       if (ConfigurationMgr().GetSetupPinCode(setupPINCode) == CHIP_NO_ERROR)
-                       {
-                           ESP_LOGI(TAG, "Setup PIN code: %u (0x%x)", setupPINCode, setupPINCode);
-                       }
+                       PrintOnboardingCodes(chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
                        ScreenManager::PushScreen(chip::Platform::New<QRCodeScreen>(qrCodeText));
                    })
             ->Item("Setup",

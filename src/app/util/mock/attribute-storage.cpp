@@ -212,6 +212,11 @@ uint8_t emberAfClusterIndex(chip::EndpointId endpoint, chip::ClusterId cluster, 
     return UINT8_MAX;
 }
 
+bool emberAfEndpointIndexIsEnabled(uint16_t index)
+{
+    return index < ArraySize(endpoints);
+}
+
 // This duplication of basic utilities is really unfortunate, but we can't link
 // to the normal attribute-storage.cpp because we redefine some of its symbols
 // above.

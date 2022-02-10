@@ -1265,9 +1265,9 @@
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Channel (server) */                                                                           \
             { 0x00000000, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(875) }, /* channel list */                              \
-            { 0x00000001, ZAP_TYPE(STRUCT), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(WRITABLE),                \
+            { 0x00000001, ZAP_TYPE(STRUCT), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                \
               ZAP_EMPTY_DEFAULT() }, /* channel lineup */                                                                          \
-            { 0x00000002, ZAP_TYPE(STRUCT), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(WRITABLE),                \
+            { 0x00000002, ZAP_TYPE(STRUCT), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                \
               ZAP_EMPTY_DEFAULT() },                                            /* current channel */                              \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */                              \
                                                                                                                                    \
@@ -1295,7 +1295,8 @@
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Application Launcher (server) */                                                              \
             { 0x00000000, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(1895) }, /* application launcher list */                \
-            { 0x00000001, ZAP_TYPE(STRUCT), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(WRITABLE),                \
+            { 0x00000001, ZAP_TYPE(STRUCT), 0,                                                                                     \
+              ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                  \
               ZAP_EMPTY_DEFAULT() },                                            /* application launcher app */                     \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */                              \
                                                                                                                                    \
@@ -1349,15 +1350,15 @@
             { 0x0000FFFD, ZAP_TYPE(INT16U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* ClusterRevision */  \
                                                                                                                                    \
             /* Endpoint: 3, Cluster: Media Playback (server) */                                                                    \
-            { 0x00000000, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },         /* playback state */                          \
-            { 0x00000001, ZAP_TYPE(EPOCH_US), 8, 0, ZAP_LONG_DEFAULTS_INDEX(2407) }, /* start time */                              \
-            { 0x00000002, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(2415) },   /* duration */                                \
-            { 0x00000003, ZAP_TYPE(STRUCT), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(WRITABLE),                \
-              ZAP_EMPTY_DEFAULT() },                                               /* position */                                  \
-            { 0x00000004, ZAP_TYPE(SINGLE), 4, 0, ZAP_LONG_DEFAULTS_INDEX(2423) }, /* playback speed */                            \
-            { 0x00000005, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(2427) }, /* seek range end */                            \
-            { 0x00000006, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(2435) }, /* seek range start */                          \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },    /* ClusterRevision */                           \
+            { 0x00000000, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) }, /* playback state */                                  \
+            { 0x00000001, ZAP_TYPE(EPOCH_US), 8, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_LONG_DEFAULTS_INDEX(2407) }, /* start time */   \
+            { 0x00000002, ZAP_TYPE(INT64U), 8, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_LONG_DEFAULTS_INDEX(2415) },   /* duration */     \
+            { 0x00000003, ZAP_TYPE(STRUCT), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },     /* position */     \
+            { 0x00000004, ZAP_TYPE(SINGLE), 4, 0, ZAP_LONG_DEFAULTS_INDEX(2423) },                            /* playback speed */ \
+            { 0x00000005, ZAP_TYPE(INT64U), 8, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_LONG_DEFAULTS_INDEX(2427) }, /* seek range end */ \
+            { 0x00000006, ZAP_TYPE(INT64U), 8, ZAP_ATTRIBUTE_MASK(NULLABLE),                                                       \
+              ZAP_LONG_DEFAULTS_INDEX(2435) },                                  /* seek range start */                             \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */                              \
                                                                                                                                    \
             /* Endpoint: 3, Cluster: Content Launcher (server) */                                                                  \
             { 0x00000000, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(2443) }, /* accept header list */                       \

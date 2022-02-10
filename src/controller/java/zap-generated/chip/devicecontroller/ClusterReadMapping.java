@@ -4942,7 +4942,8 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.MediaPlaybackCluster) cluster)
-                  .readStartTimeAttribute((ChipClusters.LongAttributeCallback) callback);
+                  .readStartTimeAttribute(
+                      (ChipClusters.MediaPlaybackCluster.StartTimeAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readMediaPlaybackStartTimeCommandParams);
@@ -4954,7 +4955,8 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.MediaPlaybackCluster) cluster)
-                  .readDurationAttribute((ChipClusters.LongAttributeCallback) callback);
+                  .readDurationAttribute(
+                      (ChipClusters.MediaPlaybackCluster.DurationAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readMediaPlaybackDurationCommandParams);
@@ -4978,7 +4980,8 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.MediaPlaybackCluster) cluster)
-                  .readSeekRangeEndAttribute((ChipClusters.LongAttributeCallback) callback);
+                  .readSeekRangeEndAttribute(
+                      (ChipClusters.MediaPlaybackCluster.SeekRangeEndAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readMediaPlaybackSeekRangeEndCommandParams);
@@ -4990,7 +4993,8 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.MediaPlaybackCluster) cluster)
-                  .readSeekRangeStartAttribute((ChipClusters.LongAttributeCallback) callback);
+                  .readSeekRangeStartAttribute(
+                      (ChipClusters.MediaPlaybackCluster.SeekRangeStartAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readMediaPlaybackSeekRangeStartCommandParams);

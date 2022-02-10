@@ -20,6 +20,7 @@
 #include <type_traits>
 
 #include <app/BufferedReadCallback.h>
+#include <app/ChunkedWriteCallback.h>
 #include <app/DeviceProxy.h>
 #include <app/ReadClient.h>
 #include <app/WriteClient.h>
@@ -215,9 +216,11 @@ OnWriteDoneCallback gOnWriteDoneCallback         = nullptr;
 class WriteClientCallback : public WriteClient::Callback
 {
 public:
-    WriteClientCallback(PyObject * appContext) : mAppContext(appContext) {}
+    WriteClientCallback(PyObject * appContext) : mCallback(this), mAppContext(appContext) {}
 
-    void OnResponse(const WriteClient * apWriteClient, const ConcreteAttributePath & aPath, app::StatusIB aStatus) override
+    WriteClient::Callback * GetChunkedCallback() { return &mCallback; }
+
+    void OnResponse(const WriteClient * apWriteClient, const ConcreteDataAttributePath & aPath, app::StatusIB aStatus) override
     {
         gOnWriteResponseCallback(mAppContext, aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId,
                                  to_underlying(aStatus.mStatus));
@@ -236,6 +239,7 @@ public:
     };
 
 private:
+    ChunkedWriteCallback mCallback;
     PyObject * mAppContext = nullptr;
 };
 
@@ -275,7 +279,7 @@ chip::ChipError::StorageType pychip_WriteClient_WriteAttributes(void * appContex
 
     std::unique_ptr<WriteClientCallback> callback = std::make_unique<WriteClientCallback>(appContext);
     std::unique_ptr<WriteClient> client           = std::make_unique<WriteClient>(
-        app::InteractionModelEngine::GetInstance()->GetExchangeManager(), callback.get(),
+        app::InteractionModelEngine::GetInstance()->GetExchangeManager(), callback->GetChunkedCallback(),
         timedWriteTimeoutMs != 0 ? Optional<uint16_t>(timedWriteTimeoutMs) : Optional<uint16_t>::Missing());
 
     va_list args;
@@ -294,19 +298,13 @@ chip::ChipError::StorageType pychip_WriteClient_WriteAttributes(void * appContex
             memcpy(&pathObj, path, sizeof(python::AttributePath));
             uint8_t * tlvBuffer = reinterpret_cast<uint8_t *>(tlv);
 
-            TLV::TLVWriter * writer;
             TLV::TLVReader reader;
-
-            SuccessOrExit(err = client->PrepareAttribute(
-                              chip::app::AttributePathParams(pathObj.endpointId, pathObj.clusterId, pathObj.attributeId)));
-            VerifyOrExit((writer = client->GetAttributeDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
             reader.Init(tlvBuffer, static_cast<uint32_t>(length));
             reader.Next();
-            SuccessOrExit(
-                err = writer->CopyElement(chip::TLV::ContextTag(to_underlying(chip::app::AttributeDataIB::Tag::kData)), reader));
 
-            SuccessOrExit(err = client->FinishAttribute());
+            SuccessOrExit(
+                err = client->PutPreencodedAttribute(
+                    chip::app::ConcreteDataAttributePath(pathObj.endpointId, pathObj.clusterId, pathObj.attributeId), reader));
         }
     }
 

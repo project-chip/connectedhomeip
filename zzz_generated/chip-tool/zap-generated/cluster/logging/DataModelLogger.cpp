@@ -4082,7 +4082,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("application launcher list", 1, value);
         }
         case ApplicationLauncher::Attributes::ApplicationLauncherApp::Id: {
-            chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType value;
+            chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("application launcher app", 1, value);
         }
@@ -4557,12 +4557,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("channel list", 1, value);
         }
         case Channel::Attributes::ChannelLineup::Id: {
-            chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType value;
+            chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("channel lineup", 1, value);
         }
         case Channel::Attributes::CurrentChannel::Id: {
-            chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType value;
+            chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("current channel", 1, value);
         }
@@ -5852,12 +5852,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("playback state", 1, value);
         }
         case MediaPlayback::Attributes::StartTime::Id: {
-            uint64_t value;
+            chip::app::DataModel::Nullable<uint64_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("start time", 1, value);
         }
         case MediaPlayback::Attributes::Duration::Id: {
-            uint64_t value;
+            chip::app::DataModel::Nullable<uint64_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("duration", 1, value);
         }
@@ -5872,12 +5872,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("playback speed", 1, value);
         }
         case MediaPlayback::Attributes::SeekRangeEnd::Id: {
-            uint64_t value;
+            chip::app::DataModel::Nullable<uint64_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("seek range end", 1, value);
         }
         case MediaPlayback::Attributes::SeekRangeStart::Id: {
-            uint64_t value;
+            chip::app::DataModel::Nullable<uint64_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("seek range start", 1, value);
         }

@@ -30,7 +30,7 @@
 
 // ==================== General Platform Adaptations ====================
 
-#define CHIP_CONFIG_ABORT() assert()
+#define CHIP_CONFIG_ABORT() abort()
 
 #define CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE uint16_t
 #define CHIP_CONFIG_PERSISTED_STORAGE_ENC_MSG_CNTR_ID 1
@@ -80,6 +80,6 @@
 #endif // CHIP_CONFIG_MAX_LOCAL_ADDR_UDP_ENDPOINTS
 
 // Limit the number of device admins to ensure enough ressources for handling them
-#ifndef CHIP_CONFIG_MAX_DEVICE_ADMINS
-#define CHIP_CONFIG_MAX_DEVICE_ADMINS 5
-#endif // CHIP_CONFIG_MAX_DEVICE_ADMINS
+#ifndef CHIP_CONFIG_MAX_FABRICS
+#define CHIP_CONFIG_MAX_FABRICS 5
+#endif // CHIP_CONFIG_MAX_FABRICS

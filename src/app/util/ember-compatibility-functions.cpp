@@ -904,14 +904,9 @@ CHIP_ERROR prepareWriteData(const EmberAfAttributeMetadata * attributeMetadata, 
 }
 } // namespace
 
-// TODO: Refactor WriteSingleClusterData and all dependent functions to take ConcreteAttributePath instead of ClusterInfo
-// as the input argument.
-CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
+CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
                                   TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
 {
-    // Named aPath for now to reduce the amount of code change that needs to
-    // happen when the above TODO is resolved.
-    ConcreteDataAttributePath aPath(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId);
     const EmberAfAttributeMetadata * attributeMetadata =
         emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, CLUSTER_MASK_SERVER);
 
@@ -928,7 +923,11 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
     {
         Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
         Access::Privilege requestPrivilege = RequiredPrivilege::ForWriteAttribute(aPath);
-        CHIP_ERROR err                     = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requestPrivilege);
+        CHIP_ERROR err                     = CHIP_NO_ERROR;
+        if (!apWriteHandler->ACLCheckCacheHit({ aPath, requestPrivilege }))
+        {
+            err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requestPrivilege);
+        }
         if (err != CHIP_NO_ERROR)
         {
             // Grace period until ACLs are in place
@@ -941,6 +940,7 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
             // TODO: when wildcard/group writes are supported, handle them to discard rather than fail with status
             return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::UnsupportedAccess);
         }
+        apWriteHandler->CacheACLCheckResult({ aPath, requestPrivilege });
     }
 
     if (attributeMetadata->MustUseTimedWrite() && !apWriteHandler->IsTimedWrite())
@@ -948,7 +948,7 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
         return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::NeedsTimedInteraction);
     }
 
-    if (auto * attrOverride = findAttributeAccessOverride(aClusterInfo.mEndpointId, aClusterInfo.mClusterId))
+    if (auto * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId))
     {
         AttributeValueDecoder valueDecoder(aReader, aSubjectDescriptor);
         ReturnErrorOnFailure(attrOverride->Write(aPath, valueDecoder));

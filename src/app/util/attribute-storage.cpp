@@ -702,35 +702,17 @@ const EmberAfCluster * emberAfFindClusterInType(const EmberAfEndpointType * endp
     return NULL;
 }
 
-uint8_t emberAfClusterIndexInMatchingEndpoints(EndpointId endpoint, ClusterId clusterId, EmberAfClusterMask mask)
-{
-    uint8_t ep;
-    uint8_t index = 0xFF;
-    for (ep = 0; ep < emberAfEndpointCount(); ep++)
-    {
-        const EmberAfEndpointType * endpointType = emAfEndpoints[ep].endpointType;
-        if (emberAfFindClusterInType(endpointType, clusterId, mask) != NULL)
-        {
-            index++;
-            if (emAfEndpoints[ep].endpoint == endpoint)
-            {
-                return index;
-            }
-        }
-    }
-    return 0xFF;
-}
-
 uint8_t emberAfClusterIndex(EndpointId endpoint, ClusterId clusterId, EmberAfClusterMask mask)
 {
-    uint8_t ep;
-    uint8_t index = 0xFF;
-    for (ep = 0; ep < emberAfEndpointCount(); ep++)
+    for (uint8_t ep = 0; ep < emberAfEndpointCount(); ep++)
     {
-        const EmberAfEndpointType * endpointType = emAfEndpoints[ep].endpointType;
-        if (emberAfFindClusterInType(endpointType, clusterId, mask, &index) != NULL)
+        // Check the endpoint id first, because that way we avoid examining the
+        // endpoint type for endpoints that are not actually defined.
+        if (emAfEndpoints[ep].endpoint == endpoint)
         {
-            if (emAfEndpoints[ep].endpoint == endpoint)
+            const EmberAfEndpointType * endpointType = emAfEndpoints[ep].endpointType;
+            uint8_t index                            = 0xFF;
+            if (emberAfFindClusterInType(endpointType, clusterId, mask, &index) != NULL)
             {
                 return index;
             }

@@ -36,7 +36,7 @@ if CHIP
 
 config CHIP_DEVICE_VENDOR_ID
 	int "Device vendor ID"
-	default 9050 # 0x235A
+	default 65521 # 0xFFF1
 	range 0 65535
 	help
 	  Identifier of the device manufacturer, assigned by Connectivity Standards
@@ -45,7 +45,7 @@ config CHIP_DEVICE_VENDOR_ID
 
 config CHIP_DEVICE_PRODUCT_ID
 	int "Device product ID"
-	default 0
+	default 32768 # 0x8000
 	range 0 65535
 	help
 	  Identifier of the product, assigned by the device manufacturer. It is used

@@ -4589,6 +4589,126 @@ private:
     bool keepAlive;
 };
 
+class CHIPMediaPlaybackStartTimeAttributeCallback
+    : public chip::Callback::Callback<CHIPMediaPlaybackClusterStartTimeAttributeCallbackType>
+{
+public:
+    CHIPMediaPlaybackStartTimeAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPMediaPlaybackStartTimeAttributeCallback();
+
+    static void maybeDestroy(CHIPMediaPlaybackStartTimeAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPMediaPlaybackStartTimeAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint64_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPMediaPlaybackStartTimeAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPMediaPlaybackDurationAttributeCallback
+    : public chip::Callback::Callback<CHIPMediaPlaybackClusterDurationAttributeCallbackType>
+{
+public:
+    CHIPMediaPlaybackDurationAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPMediaPlaybackDurationAttributeCallback();
+
+    static void maybeDestroy(CHIPMediaPlaybackDurationAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPMediaPlaybackDurationAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint64_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPMediaPlaybackDurationAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPMediaPlaybackSeekRangeEndAttributeCallback
+    : public chip::Callback::Callback<CHIPMediaPlaybackClusterSeekRangeEndAttributeCallbackType>
+{
+public:
+    CHIPMediaPlaybackSeekRangeEndAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPMediaPlaybackSeekRangeEndAttributeCallback();
+
+    static void maybeDestroy(CHIPMediaPlaybackSeekRangeEndAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPMediaPlaybackSeekRangeEndAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint64_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPMediaPlaybackSeekRangeEndAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPMediaPlaybackSeekRangeStartAttributeCallback
+    : public chip::Callback::Callback<CHIPMediaPlaybackClusterSeekRangeStartAttributeCallbackType>
+{
+public:
+    CHIPMediaPlaybackSeekRangeStartAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPMediaPlaybackSeekRangeStartAttributeCallback();
+
+    static void maybeDestroy(CHIPMediaPlaybackSeekRangeStartAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPMediaPlaybackSeekRangeStartAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint64_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPMediaPlaybackSeekRangeStartAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPMediaPlaybackServerGeneratedCommandListAttributeCallback
     : public chip::Callback::Callback<CHIPMediaPlaybackClusterServerGeneratedCommandListAttributeCallbackType>
 {

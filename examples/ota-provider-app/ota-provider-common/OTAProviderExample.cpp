@@ -180,9 +180,16 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
                 newSoftwareVersion = mSoftwareVersion.Value();
             }
 
+            // If software version string is provided using command line then use it.
+            // Otherwise, use default string.
             newSoftwareVersionString = "Example-Image-V0.1";
-            otaFilePath              = mOTAFilePath;
-            queryStatus              = OTAQueryStatus::kUpdateAvailable;
+            if (mSoftwareVersionString)
+            {
+                newSoftwareVersionString = mSoftwareVersionString;
+            }
+
+            otaFilePath = mOTAFilePath;
+            queryStatus = OTAQueryStatus::kUpdateAvailable;
         }
         else if (!mCandidates.empty()) // If list of OTA candidates is supplied instead
         {

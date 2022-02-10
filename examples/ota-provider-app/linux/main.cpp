@@ -16,23 +16,16 @@
  *    limitations under the License.
  */
 
-#include <platform/CHIPDeviceLayer.h>
-#include <platform/PlatformManager.h>
-
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
 #include <app/clusters/ota-provider/ota-provider.h>
 #include <app/server/Server.h>
 #include <app/util/util.h>
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <json/json.h>
-#include <lib/core/CHIPError.h>
-#include <lib/support/CHIPArgParser.hpp>
-#include <lib/support/CHIPMem.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <ota-provider-common/BdxOtaSender.h>
 #include <ota-provider-common/DefaultUserConsentProvider.h>
 #include <ota-provider-common/OTAProviderExample.h>
+
+#include "AppMain.h"
 
 #include <fstream>
 #include <iostream>
@@ -57,9 +50,12 @@ constexpr uint16_t kOptionUserConsentState     = 'u';
 constexpr uint16_t kOptionDelayedActionTimeSec = 't';
 constexpr uint16_t kOptionDiscriminator        = 'd';
 constexpr uint16_t kOptionSoftwareVersion      = 's';
+constexpr uint16_t kOptionSoftwareVersionStr   = 'S';
 constexpr uint16_t kOptionUserConsentNeeded    = 'c';
 
 static constexpr uint16_t kMaximumDiscriminatorValue = 0xFFF;
+
+OTAProviderExample gOtaProvider;
 
 // Global variables used for passing the CLI arguments to the OTAProviderExample object
 static OTAProviderExample::QueryImageBehaviorType gQueryImageBehavior = OTAProviderExample::kRespondWithUnknown;
@@ -70,6 +66,7 @@ static chip::ota::UserConsentState gUserConsentState                  = chip::ot
 static bool gUserConsentNeeded                                        = false;
 static chip::Optional<uint16_t> gSetupDiscriminator;
 static chip::Optional<uint32_t> gSoftwareVersion;
+static const char * gSoftwareVersionString = nullptr;
 
 // Parses the JSON filepath and extracts DeviceSoftwareVersionModel parameters
 static bool ParseJsonFileAndPopulateCandidates(const char * filepath,
@@ -233,6 +230,22 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
     case kOptionUserConsentNeeded:
         gUserConsentNeeded = true;
         break;
+    case kOptionSoftwareVersionStr:
+        if (aValue == NULL)
+        {
+            PrintArgError("%s: ERROR: NULL SoftwareVersionStr parameter\n", aProgram);
+            retval = false;
+        }
+        else if ((strlen(aValue) < 1 || strlen(aValue) > 64))
+        {
+            PrintArgError("%s: ERROR: SoftwareVersionStr parameter length is out of range \n", aProgram);
+            retval = false;
+        }
+        else
+        {
+            gSoftwareVersionString = aValue;
+        }
+        break;
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
         retval = false;
@@ -250,6 +263,7 @@ OptionDef cmdLineOptionsDef[] = {
     { "UserConsentState", chip::ArgParser::kArgumentRequired, kOptionUserConsentState },
     { "discriminator", chip::ArgParser::kArgumentRequired, kOptionDiscriminator },
     { "softwareVersion", chip::ArgParser::kArgumentRequired, kOptionSoftwareVersion },
+    { "softwareVersionStr", chip::ArgParser::kArgumentRequired, kOptionSoftwareVersionStr },
     { "UserConsentNeeded", chip::ArgParser::kNoArgument, kOptionUserConsentNeeded },
     {},
 };
@@ -277,6 +291,11 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "        If ota image list is present along with this option\n"
                              "        then value from ota image list is used.\n"
                              "        Otherwise, this value will be used is then value from that will be used\n"
+                             "  -S/--softwareVersionStr <version string>\n"
+                             "        Value of SoftwareVersionString in the Query Image Response\n"
+                             "        If ota image list is present along with this option\n"
+                             "        then value from ota image list is used.\n"
+                             "        Otherwise, this value will be used is then value from that will be used\n"
                              "  -c/--UserConsentNeeded\n"
                              "        If provided, value of UserConsentNeeded in the Query Image Response is set to true\n" };
 
@@ -284,81 +303,48 @@ HelpOptions helpOptions("ota-provider-app", "Usage: ota-provider-app [options]",
 
 OptionSet * allOptions[] = { &cmdLineOptions, &helpOptions, nullptr };
 
-int main(int argc, char * argv[])
+void ApplicationInit()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    OTAProviderExample otaProvider;
     chip::ota::DefaultUserConsentProvider userConsentProvider;
 
-    if (chip::Platform::MemoryInit() != CHIP_NO_ERROR)
-    {
-        fprintf(stderr, "FAILED to initialize memory\n");
-        return 1;
-    }
-
-    if (chip::DeviceLayer::PlatformMgr().InitChipStack() != CHIP_NO_ERROR)
-    {
-        fprintf(stderr, "FAILED to initialize chip stack\n");
-        return 1;
-    }
-
-    if (!chip::ArgParser::ParseArgs(argv[0], argc, argv, allOptions))
-    {
-        return 1;
-    }
-
-    chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
-
-    if (gSetupDiscriminator.HasValue())
-    {
-        // Set discriminator to user specified value
-        ChipLogProgress(SoftwareUpdate, "Setting discriminator to: %" PRIu16, gSetupDiscriminator.Value());
-        err = chip::DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(gSetupDiscriminator.Value());
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(SoftwareUpdate, "Setup discriminator setting failed with code: %" CHIP_ERROR_FORMAT, err.Format());
-            return 1;
-        }
-    }
-
-    chip::Server::GetInstance().Init();
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
-
-    BdxOtaSender * bdxOtaSender = otaProvider.GetBdxOtaSender();
-    VerifyOrReturnError(bdxOtaSender != nullptr, 1);
+    BdxOtaSender * bdxOtaSender = gOtaProvider.GetBdxOtaSender();
+    VerifyOrReturn(bdxOtaSender != nullptr);
     err = chip::Server::GetInstance().GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(chip::Protocols::BDX::Id,
                                                                                                         bdxOtaSender);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogDetail(SoftwareUpdate, "RegisterUnsolicitedMessageHandler failed: %s", chip::ErrorStr(err));
-        return 1;
+        return;
     }
 
-    ChipLogDetail(SoftwareUpdate, "using OTA file: %s", gOtaFilepath ? gOtaFilepath : "(none)");
+    ChipLogDetail(SoftwareUpdate, "Using OTA file: %s", gOtaFilepath ? gOtaFilepath : "(none)");
 
     if (gOtaFilepath != nullptr)
     {
-        otaProvider.SetOTAFilePath(gOtaFilepath);
+        gOtaProvider.SetOTAFilePath(gOtaFilepath);
     }
 
-    otaProvider.SetQueryImageBehavior(gQueryImageBehavior);
-    otaProvider.SetDelayedActionTimeSec(gDelayedActionTimeSec);
+    gOtaProvider.SetQueryImageBehavior(gQueryImageBehavior);
+    gOtaProvider.SetDelayedActionTimeSec(gDelayedActionTimeSec);
     if (gSoftwareVersion.HasValue())
     {
-        otaProvider.SetSoftwareVersion(gSoftwareVersion.Value());
+        gOtaProvider.SetSoftwareVersion(gSoftwareVersion.Value());
+    }
+    if (gSoftwareVersionString)
+    {
+        gOtaProvider.SetSoftwareVersionString(gSoftwareVersionString);
     }
 
     if (gUserConsentState != chip::ota::UserConsentState::kUnknown)
     {
         userConsentProvider.SetGlobalUserConsentState(gUserConsentState);
-        otaProvider.SetUserConsentDelegate(&userConsentProvider);
+        gOtaProvider.SetUserConsentDelegate(&userConsentProvider);
     }
 
     if (gUserConsentNeeded)
     {
-        otaProvider.SetUserConsentNeeded(true);
+        gOtaProvider.SetUserConsentNeeded(true);
     }
 
     ChipLogDetail(SoftwareUpdate, "Using ImageList file: %s", gOtaImageListFilepath ? gOtaImageListFilepath : "(none)");
@@ -368,12 +354,15 @@ int main(int argc, char * argv[])
         // Parse JSON file and load the ota candidates
         std::vector<OTAProviderExample::DeviceSoftwareVersionModel> candidates;
         ParseJsonFileAndPopulateCandidates(gOtaImageListFilepath, candidates);
-        otaProvider.SetOTACandidates(candidates);
+        gOtaProvider.SetOTACandidates(candidates);
     }
 
-    chip::app::Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, &otaProvider);
+    chip::app::Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, &gOtaProvider);
+}
 
-    chip::DeviceLayer::PlatformMgr().RunEventLoop();
-
+int main(int argc, char * argv[])
+{
+    VerifyOrDie(ChipLinuxAppInit(argc, argv, &cmdLineOptions) == 0);
+    ChipLinuxAppMainLoop();
     return 0;
 }

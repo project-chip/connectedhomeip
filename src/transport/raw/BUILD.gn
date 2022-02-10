@@ -22,6 +22,7 @@ static_library("raw") {
     "Base.h",
     "MessageHeader.cpp",
     "MessageHeader.h",
+    "PeerAddress.cpp",
     "PeerAddress.h",
     "TCP.cpp",
     "TCP.h",

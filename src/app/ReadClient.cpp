@@ -258,7 +258,7 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
                                                     Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse)));
 
     mPeerNodeId  = aReadPrepareParams.mSessionHolder->AsSecureSession()->GetPeerNodeId();
-    mFabricIndex = aReadPrepareParams.mSessionHolder->AsSecureSession()->GetFabricIndex();
+    mFabricIndex = aReadPrepareParams.mSessionHolder->GetFabricIndex();
 
     MoveToState(ClientState::AwaitingInitialReport);
 
@@ -533,22 +533,7 @@ CHIP_ERROR ReadClient::ProcessAttributePath(AttributePathIB::Parser & aAttribute
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
     err = aAttributePathParser.GetAttribute(&(aAttributePath.mAttributeId));
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
-
-    DataModel::Nullable<ListIndex> listIndex;
-    err = aAttributePathParser.GetListIndex(&(listIndex));
-    if (CHIP_END_OF_TLV == err)
-    {
-        err = CHIP_NO_ERROR;
-    }
-    else if (listIndex.IsNull())
-    {
-        aAttributePath.mListOp = ConcreteDataAttributePath::ListOperation::AppendItem;
-    }
-    else
-    {
-        // TODO: Add ListOperation::ReplaceItem support. (Attribute path with valid list index)
-        err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
-    }
+    err = aAttributePathParser.GetListIndex(aAttributePath);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
     return CHIP_NO_ERROR;
 }
@@ -801,7 +786,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
                                                     Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse)));
 
     mPeerNodeId  = aReadPrepareParams.mSessionHolder->AsSecureSession()->GetPeerNodeId();
-    mFabricIndex = aReadPrepareParams.mSessionHolder->AsSecureSession()->GetFabricIndex();
+    mFabricIndex = aReadPrepareParams.mSessionHolder->GetFabricIndex();
 
     MoveToState(ClientState::AwaitingInitialReport);
 

@@ -297,7 +297,7 @@ class BaseTestHelper:
             "VendorName": "TEST_VENDOR",
             "VendorID": 0xFFF1,
             "ProductName": "TEST_PRODUCT",
-            "ProductID": 0x8000,
+            "ProductID": 0x8001,
             "NodeLabel": "Test",
             "Location": "XX",
             "HardwareVersion": 0,
