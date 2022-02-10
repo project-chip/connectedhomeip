@@ -28,8 +28,8 @@ public:
     DelayCommands(){};
     virtual ~DelayCommands(){};
 
-    virtual CHIP_ERROR ContinueOnChipMainThread() = 0;
-    virtual void OnWaitForMs()                    = 0;
+    virtual CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err) = 0;
+    virtual void OnWaitForMs()                                  = 0;
 
     virtual CHIP_ERROR WaitForCommissionee() { return CHIP_ERROR_NOT_IMPLEMENTED; };
     virtual CHIP_ERROR WaitForCommissioning() { return CHIP_ERROR_NOT_IMPLEMENTED; };

@@ -69,7 +69,15 @@ protected:
     static void OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device);
     static void OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error);
 
-    CHIP_ERROR ContinueOnChipMainThread() override { return WaitForMs(0); };
+    CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err) override
+    {
+        if (CHIP_NO_ERROR == err)
+        {
+            return WaitForMs(0);
+        }
+        Exit(chip::ErrorStr(err));
+        return CHIP_NO_ERROR;
+    }
 
     void Exit(std::string message) override;
     void ThrowFailureResponse();
