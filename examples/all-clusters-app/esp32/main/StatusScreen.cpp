@@ -20,8 +20,13 @@
  * @file StatusScreen.cpp
  *
  * Screen which displays device state and status:
- *      - status : Operational | Commissionable
- *      - IP : IPv6 address, UDP port
+ *      - Fabric Index : none | #
+ *      - Fabric ID : none | #
+ *      - Node ID : none | #
+ *      - UDP Port : #
+ *      - IPv4 : none | addr
+ *      - IPv6 LL : none | addr
+ *      - IPv6 ULA : none | addr
  */
 
 #include "StatusScreen.h"
