@@ -1,8 +1,8 @@
 # Matter TV Casting Android App Example
 
-This is a Matter TV Casting Android app that can be used to cast content to a TV. This app
-discovers TVs on the local network that act as commissioners, lets the user
-select one, sends the TV a User Directed Commissioning request, enters
+This is a Matter TV Casting Android app that can be used to cast content to a
+TV. This app discovers TVs on the local network that act as commissioners, lets
+the user select one, sends the TV a User Directed Commissioning request, enters
 commissioning mode, advertises itself as a Commissionable Node and gets
 commissioned. Then it allows the user to send Matter ContentLauncher commands to
 the TV.
@@ -85,13 +85,13 @@ the top Matter directory:
 See the table above for other values of `TARGET_CPU`.
 
 The debug Android package `app-debug.apk` will be generated at
-`out/android-$TARGET_CPU-chip-tv-casting-app/outputs/apk/debug/`, and can be installed
-with
+`out/android-$TARGET_CPU-chip-tv-casting-app/outputs/apk/debug/`, and can be
+installed with
 
 ```shell
 adb install out/android-$TARGET_CPU-chip-tv-casting-app/outputs/apk/debug/app-debug.apk
 ```
 
-You can use Android Studio to edit the Android app itself and run it
-after build_examples.py, but you will not be able to edit Matter Android code
-from `src/controller/java`, or other Matter C++ code within Android Studio.
+You can use Android Studio to edit the Android app itself and run it after
+build_examples.py, but you will not be able to edit Matter Android code from
+`src/controller/java`, or other Matter C++ code within Android Studio.
