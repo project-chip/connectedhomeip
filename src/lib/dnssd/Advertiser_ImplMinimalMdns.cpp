@@ -420,6 +420,8 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
     // TODO - Don't announce records that haven't been updated.
     AdvertiseRecords();
 
+    ChipLogProgress(Discovery, "mDNS service published: %s.%s", instanceName.names[1], instanceName.names[2]);
+
     return CHIP_NO_ERROR;
 }
 
@@ -608,6 +610,8 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
     // Advertise the records we just added as required by RFC 6762.
     // TODO - Don't announce records that haven't been updated.
     AdvertiseRecords();
+
+    ChipLogProgress(Discovery, "mDNS service published: %s.%s", instanceName.names[1], instanceName.names[2]);
 
     return CHIP_NO_ERROR;
 }
