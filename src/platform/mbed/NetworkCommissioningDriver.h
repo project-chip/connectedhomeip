@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <inet/IPAddress.h>
 #include <platform/NetworkCommissioning.h>
 
 namespace chip {
@@ -65,20 +66,20 @@ private:
     size_t mIternum = 0;
 };
 
-class MbedWiFiDriver final : public WiFiDriver
+class WiFiDriverImpl final : public WiFiDriver
 {
 public:
     class WiFiNetworkIterator final : public NetworkIterator
     {
     public:
-        WiFiNetworkIterator(MbedWiFiDriver * aDriver) : mDriver(aDriver) {}
+        WiFiNetworkIterator(WiFiDriverImpl * aDriver) : mDriver(aDriver) {}
         size_t Count() override;
         bool Next(Network & item) override;
         void Release() override { delete this; }
         ~WiFiNetworkIterator() = default;
 
     private:
-        MbedWiFiDriver * mDriver;
+        WiFiDriverImpl * mDriver;
         bool mExhausted = false;
     };
 
@@ -106,17 +107,15 @@ public:
     Status RemoveNetwork(ByteSpan networkId) override;
     Status ReorderNetwork(ByteSpan networkId, uint8_t index) override;
     void ConnectNetwork(ByteSpan networkId, ConnectCallback * callback) override;
+    void DisconnectNetwork(ByteSpan networkId);
 
     // WiFiDriver
     Status AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials) override;
     void ScanNetworks(ByteSpan ssid, ScanCallback * callback) override;
 
-    CHIP_ERROR ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen);
-    void OnConnectWiFiNetwork();
-    void OnScanWiFiNetworkDone();
-    static MbedWiFiDriver & GetInstance()
+    static WiFiDriverImpl & GetInstance()
     {
-        static MbedWiFiDriver instance;
+        static WiFiDriverImpl instance;
         return instance;
     }
 
@@ -126,6 +125,18 @@ private:
     static void OnScanNetwork(intptr_t arg);
     void ExecuteScanNetwork(void);
 
+    static void OnConnectNetwork(intptr_t arg);
+    void ExecuteConnectNetwork(void);
+
+    static void OnWiFiInterfaceEvent(nsapi_event_t event, intptr_t data);
+    void ExecuteWiFiInterfaceChange(nsapi_connection_status_t new_status);
+
+    void OnNetworkConnected();
+    void OnNetworkDisconnected();
+    void OnNetworkConnecting();
+
+    chip::DeviceLayer::Internal::WiFiAuthSecurityType NsapiToNetworkSecurity(nsapi_security_t nsapi_security);
+
     WiFiNetworkIterator mWiFiIterator = WiFiNetworkIterator(this);
     WiFiNetwork mSavedNetwork;
     WiFiNetwork mStagingNetwork;
@@ -133,6 +144,11 @@ private:
     ConnectCallback * mConnectCallback;
     char mScanSSID[DeviceLayer::Internal::kMaxWiFiSSIDLength];
     bool mScanSpecific = false;
+
+    WiFiInterface * mWiFiInterface = nullptr;
+    nsapi_security_t mSecurityType = NSAPI_SECURITY_NONE;
+    Inet::IPAddress mIp4Address    = Inet::IPAddress::Any;
+    Inet::IPAddress mIp6Address    = Inet::IPAddress::Any;
 };
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 } // namespace NetworkCommissioning
