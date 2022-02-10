@@ -601,7 +601,6 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
     PayloadHeader payloadHeader;
     SessionMessageDelegate::DuplicateMessage isDuplicate = SessionMessageDelegate::DuplicateMessage::No;
     Credentials::GroupDataProvider * groups              = Credentials::GetGroupDataProvider();
-    GroupId groupId;
     VerifyOrReturn(nullptr != groups);
 
     if (!packetHeader.GetDestinationGroupId().HasValue())
@@ -609,7 +608,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
         return; // malformed packet
     }
 
-    groupId = packetHeader.GetDestinationGroupId().Value();
+    GroupId groupId = packetHeader.GetDestinationGroupId().Value();
 
     if (msg.IsNull())
     {
@@ -633,7 +632,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
     bool decrypted = false;
     while (!decrypted && iter->Next(groupContext))
     {
-        // Optimization to reduce number of decryption attempt
+        // Optimization to reduce number of decryption attempts
         if (groupId != groupContext.group_id)
         {
             continue;
