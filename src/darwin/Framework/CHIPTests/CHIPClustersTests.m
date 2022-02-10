@@ -2633,7 +2633,7 @@ CHIPDevice * GetConnectedDevice(void)
         readAttributeCoupleColorTempToLevelMinMiredsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"Read the optional attribute: CoupleColorTempToLevelMinMireds Error: %@", err);
 
-            if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+            if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                 [expectation fulfill];
                 return;
             }
@@ -2663,7 +2663,8 @@ CHIPDevice * GetConnectedDevice(void)
                                                             @"CoupleColorTempToLevelMinMireds Error: %@",
                                                           err);
 
-                                                      if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                                      if (err.domain == MatterInteractionErrorDomain
+                                                          && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                                           [expectation fulfill];
                                                           return;
                                                       }
@@ -2689,7 +2690,7 @@ CHIPDevice * GetConnectedDevice(void)
         readAttributeCoupleColorTempToLevelMinMiredsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"Reads back optional attribute: CoupleColorTempToLevelMinMireds Error: %@", err);
 
-            if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+            if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                 [expectation fulfill];
                 return;
             }
@@ -2720,7 +2721,7 @@ CHIPDevice * GetConnectedDevice(void)
         readAttributeStartUpColorTemperatureMiredsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"Read the optional attribute: StartUpColorTemperatureMireds Error: %@", err);
 
-            if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+            if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                 [expectation fulfill];
                 return;
             }
@@ -2763,7 +2764,8 @@ CHIPDevice * GetConnectedDevice(void)
                                                           @"StartUpColorTemperatureMireds Error: %@",
                                                         err);
 
-                                                    if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                                    if (err.domain == MatterInteractionErrorDomain
+                                                        && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                                         [expectation fulfill];
                                                         return;
                                                     }
@@ -2789,7 +2791,7 @@ CHIPDevice * GetConnectedDevice(void)
         readAttributeStartUpColorTemperatureMiredsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"Reads back optional attribute: StartUpColorTemperatureMireds Error: %@", err);
 
-            if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+            if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                 [expectation fulfill];
                 return;
             }
@@ -2818,7 +2820,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeRemainingTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the Optional attribute: RemainingTime Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -2847,7 +2849,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeRemainingTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Validate constraints of attribute: RemainingTime Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -2889,7 +2891,8 @@ CHIPDevice * GetConnectedDevice(void)
                            completionHandler:^(NSError * _Nullable err) {
                                NSLog(@"Write the default values to optional attribute: RemainingTime Error: %@", err);
 
-                               if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                               if (err.domain == MatterInteractionErrorDomain
+                                   && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                    [expectation fulfill];
                                    return;
                                }
@@ -2912,7 +2915,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeRemainingTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads back optional attribute: RemainingTime Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -2941,7 +2944,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeDriftCompensationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: DriftCompensation Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -2983,7 +2986,8 @@ CHIPDevice * GetConnectedDevice(void)
                                completionHandler:^(NSError * _Nullable err) {
                                    NSLog(@"Write the default values to optional attribute: DriftCompensation Error: %@", err);
 
-                                   if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                   if (err.domain == MatterInteractionErrorDomain
+                                       && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                        [expectation fulfill];
                                        return;
                                    }
@@ -3006,7 +3010,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeDriftCompensationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads back optional attribute: DriftCompensation Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -3035,7 +3039,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeCompensationTextWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: CompensationText Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -3069,7 +3073,8 @@ CHIPDevice * GetConnectedDevice(void)
                               completionHandler:^(NSError * _Nullable err) {
                                   NSLog(@"Write the default values to optional attribute: CompensationText Error: %@", err);
 
-                                  if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                  if (err.domain == MatterInteractionErrorDomain
+                                      && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                       [expectation fulfill];
                                       return;
                                   }
@@ -3092,7 +3097,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeCompensationTextWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads back optional attribute: CompensationText Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -4237,7 +4242,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeWhitePointXWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: WhitePointX Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -4277,7 +4282,8 @@ CHIPDevice * GetConnectedDevice(void)
                               completionHandler:^(NSError * _Nullable err) {
                                   NSLog(@"Write the default optional attribute: WhitePointX Error: %@", err);
 
-                                  if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                  if (err.domain == MatterInteractionErrorDomain
+                                      && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                       [expectation fulfill];
                                       return;
                                   }
@@ -4301,7 +4307,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeWhitePointXWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the optional attribute: WhitePointX Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -4330,7 +4336,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeWhitePointYWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: WhitePointY Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -4370,7 +4376,8 @@ CHIPDevice * GetConnectedDevice(void)
                               completionHandler:^(NSError * _Nullable err) {
                                   NSLog(@"Write the default optional attribute: WhitePointY Error: %@", err);
 
-                                  if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                  if (err.domain == MatterInteractionErrorDomain
+                                      && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                       [expectation fulfill];
                                       return;
                                   }
@@ -4394,7 +4401,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeWhitePointYWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the optional attribute: WhitePointY Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -4423,7 +4430,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeColorPointRXWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: ColorPointRX Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -4463,7 +4470,8 @@ CHIPDevice * GetConnectedDevice(void)
                                completionHandler:^(NSError * _Nullable err) {
                                    NSLog(@"Write the default optional attribute: ColorPointRX Error: %@", err);
 
-                                   if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                   if (err.domain == MatterInteractionErrorDomain
+                                       && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                        [expectation fulfill];
                                        return;
                                    }
@@ -4487,7 +4495,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeColorPointRXWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the optional attribute: ColorPointRX Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -4516,7 +4524,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeColorPointRYWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: ColorPointRY Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -4556,7 +4564,8 @@ CHIPDevice * GetConnectedDevice(void)
                                completionHandler:^(NSError * _Nullable err) {
                                    NSLog(@"Write the default optional attribute: ColorPointRY Error: %@", err);
 
-                                   if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                   if (err.domain == MatterInteractionErrorDomain
+                                       && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                        [expectation fulfill];
                                        return;
                                    }
@@ -4580,7 +4589,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeColorPointRYWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the optional attribute: ColorPointRY Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -4609,7 +4618,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeColorPointRIntensityWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: ColorPointRIntensity Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -4637,7 +4646,8 @@ CHIPDevice * GetConnectedDevice(void)
                                        completionHandler:^(NSError * _Nullable err) {
                                            NSLog(@"Write the default optional attribute: ColorPointRIntensity Error: %@", err);
 
-                                           if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                           if (err.domain == MatterInteractionErrorDomain
+                                               && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                                [expectation fulfill];
                                                return;
                                            }
@@ -4661,7 +4671,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeColorPointRIntensityWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the optional attribute: ColorPointRIntensity Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -4690,7 +4700,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeColorPointGXWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: ColorPointGX Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -4730,7 +4740,8 @@ CHIPDevice * GetConnectedDevice(void)
                                completionHandler:^(NSError * _Nullable err) {
                                    NSLog(@"Write the default optional attribute: ColorPointGX Error: %@", err);
 
-                                   if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                   if (err.domain == MatterInteractionErrorDomain
+                                       && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                        [expectation fulfill];
                                        return;
                                    }
@@ -4754,7 +4765,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeColorPointGXWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the optional attribute: ColorPointGX Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -4783,7 +4794,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeColorPointGYWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: ColorPointGY Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -4823,7 +4834,8 @@ CHIPDevice * GetConnectedDevice(void)
                                completionHandler:^(NSError * _Nullable err) {
                                    NSLog(@"Write the default optional attribute: ColorPointGY Error: %@", err);
 
-                                   if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                   if (err.domain == MatterInteractionErrorDomain
+                                       && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                        [expectation fulfill];
                                        return;
                                    }
@@ -4847,7 +4859,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeColorPointGYWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the optional attribute: ColorPointGY Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -4876,7 +4888,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeColorPointGIntensityWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: ColorPointGIntensity Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -4904,7 +4916,8 @@ CHIPDevice * GetConnectedDevice(void)
                                        completionHandler:^(NSError * _Nullable err) {
                                            NSLog(@"Write the default optional attribute: ColorPointGIntensity Error: %@", err);
 
-                                           if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                           if (err.domain == MatterInteractionErrorDomain
+                                               && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                                [expectation fulfill];
                                                return;
                                            }
@@ -4928,7 +4941,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeColorPointGIntensityWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the optional attribute: ColorPointGIntensity Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -4957,7 +4970,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeColorPointBXWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: ColorPointBX Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -4997,7 +5010,8 @@ CHIPDevice * GetConnectedDevice(void)
                                completionHandler:^(NSError * _Nullable err) {
                                    NSLog(@"Write the default optional attribute: ColorPointBX Error: %@", err);
 
-                                   if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                   if (err.domain == MatterInteractionErrorDomain
+                                       && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                        [expectation fulfill];
                                        return;
                                    }
@@ -5021,7 +5035,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeColorPointBXWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the optional attribute: ColorPointBX Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -5050,7 +5064,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeColorPointBYWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: ColorPointBY Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -5090,7 +5104,8 @@ CHIPDevice * GetConnectedDevice(void)
                                completionHandler:^(NSError * _Nullable err) {
                                    NSLog(@"Write the default optional attribute: ColorPointBY Error: %@", err);
 
-                                   if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                   if (err.domain == MatterInteractionErrorDomain
+                                       && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                        [expectation fulfill];
                                        return;
                                    }
@@ -5114,7 +5129,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeColorPointBYWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the optional attribute: ColorPointBY Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -5143,7 +5158,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeColorPointBIntensityWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: ColorPointBIntensity Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -5171,7 +5186,8 @@ CHIPDevice * GetConnectedDevice(void)
                                        completionHandler:^(NSError * _Nullable err) {
                                            NSLog(@"Write the default optional attribute: ColorPointBIntensity Error: %@", err);
 
-                                           if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                           if (err.domain == MatterInteractionErrorDomain
+                                               && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                                [expectation fulfill];
                                                return;
                                            }
@@ -5195,7 +5211,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeColorPointBIntensityWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the optional attribute: ColorPointBIntensity Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -11126,7 +11142,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     [cluster readAttributeManufacturingDateWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Query ManufacturingDate Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -11159,7 +11175,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     [cluster readAttributePartNumberWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Query PartNumber Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -11188,7 +11204,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     [cluster readAttributeProductURLWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Query ProductURL Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -11217,7 +11233,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     [cluster readAttributeProductLabelWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Query ProductLabel Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -11246,7 +11262,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     [cluster readAttributeSerialNumberWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Query SerialNumber Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -11275,7 +11291,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     [cluster readAttributeLocalConfigDisabledWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Query LocalConfigDisabled Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -11299,7 +11315,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     [cluster readAttributeReachableWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Query Reachable Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -11323,7 +11339,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     [cluster readAttributeUniqueIDWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Query UniqueID Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -11361,7 +11377,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     [cluster readAttributeMaxNetworksWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Query MaxNetworks Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -11385,7 +11401,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     [cluster readAttributeNetworksWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Query Networks Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -11807,7 +11823,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     [cluster readAttributeToleranceWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: Tolerance Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -11836,7 +11852,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     [cluster readAttributeToleranceWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: Tolerance Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -11876,7 +11892,8 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
                             completionHandler:^(NSError * _Nullable err) {
                                 NSLog(@"write the default value to optional attribute: Tolerance Error: %@", err);
 
-                                if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                if (err.domain == MatterInteractionErrorDomain
+                                    && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                     [expectation fulfill];
                                     return;
                                 }
@@ -11899,7 +11916,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     [cluster readAttributeToleranceWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: Tolerance Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -17954,7 +17971,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMinConstPressureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MinConstPressure Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -17980,7 +17997,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMaxConstPressureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MaxConstPressure Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18006,7 +18023,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMinCompPressureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MinCompPressure Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18032,7 +18049,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMaxCompPressureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MaxCompPressure Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18058,7 +18075,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMinConstSpeedWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MinConstSpeed Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18084,7 +18101,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMaxConstSpeedWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MaxConstSpeed Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18110,7 +18127,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMinConstFlowWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MinConstFlow Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18136,7 +18153,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMaxConstFlowWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MaxConstFlow Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18162,7 +18179,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMinConstTempWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MinConstTemp Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18195,7 +18212,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMaxConstTempWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MaxConstTemp Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18228,7 +18245,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributePumpStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: PumpStatus Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18259,7 +18276,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributePumpStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: PumpStatus Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18285,7 +18302,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeSpeedWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: Speed Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18311,7 +18328,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeLifetimeRunningHoursWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: LifetimeRunningHours Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18343,7 +18360,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeLifetimeRunningHoursWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: LifetimeRunningHours Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18369,7 +18386,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributePowerWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: Power Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18395,7 +18412,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeLifetimeEnergyConsumedWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: LifetimeEnergyConsumed Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18427,7 +18444,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeLifetimeEnergyConsumedWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: LifetimeEnergyConsumed Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18456,7 +18473,8 @@ NSNumber * _Nonnull currentTarget;
                                          completionHandler:^(NSError * _Nullable err) {
                                              NSLog(@"write to the optional attribute: LifetimeEnergyConsumed Error: %@", err);
 
-                                             if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                             if (err.domain == MatterInteractionErrorDomain
+                                                 && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                                  [expectation fulfill];
                                                  return;
                                              }
@@ -18482,7 +18500,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMinConstPressureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MinConstPressure Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18508,7 +18526,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMaxConstPressureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MaxConstPressure Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18534,7 +18552,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMinCompPressureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MinCompPressure Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18560,7 +18578,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMaxCompPressureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MaxCompPressure Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18586,7 +18604,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMinConstSpeedWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MinConstSpeed Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18612,7 +18630,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMaxConstSpeedWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MaxConstSpeed Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18638,7 +18656,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMinConstFlowWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MinConstFlow Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18664,7 +18682,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMaxConstFlowWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MaxConstFlow Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18690,7 +18708,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMinConstTempWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MinConstTemp Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18723,7 +18741,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMaxConstTempWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MaxConstTemp Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18756,7 +18774,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributePumpStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: PumpStatus Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18787,7 +18805,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributePumpStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: PumpStatus Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18813,7 +18831,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeSpeedWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: Speed Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18866,7 +18884,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeLifetimeRunningHoursWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: LifetimeRunningHours Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18892,7 +18910,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributePowerWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: Power Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18918,7 +18936,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeLifetimeEnergyConsumedWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: LifetimeEnergyConsumed Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18950,7 +18968,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeLifetimeEnergyConsumedWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: LifetimeEnergyConsumed Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -19429,7 +19447,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeToleranceWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads the optional attribute: Tolerance Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -19460,7 +19478,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeToleranceWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads constraints of attribute: Tolerance Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -20153,7 +20171,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeToleranceWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: Tolerance Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -21654,7 +21672,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMinSetpointDeadBandWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads optional attributes from DUT: MinSetpointDeadBand Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -21684,7 +21702,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMinSetpointDeadBandWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads constraints of optional attributes from DUT: MinSetpointDeadBand Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -21727,7 +21745,8 @@ NSNumber * _Nonnull currentTarget;
                                                 @"MinSetpointDeadBand Error: %@",
                                               err);
 
-                                          if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                          if (err.domain == MatterInteractionErrorDomain
+                                              && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                               [expectation fulfill];
                                               return;
                                           }
@@ -21752,7 +21771,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMinSetpointDeadBandWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back optional attributes from DUT: MinSetpointDeadBand Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -21782,7 +21801,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeStartOfWeekWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads constraints of optional attributes from DUT: StartOfWeek Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -21824,7 +21843,8 @@ NSNumber * _Nonnull currentTarget;
                                   NSLog(@"Writes the respective default value to optional attributes to DUT: StartOfWeek Error: %@",
                                       err);
 
-                                  if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                  if (err.domain == MatterInteractionErrorDomain
+                                      && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                       [expectation fulfill];
                                       return;
                                   }
@@ -21847,7 +21867,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeStartOfWeekWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back optional attributes from DUT: StartOfWeek Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -21877,7 +21897,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeNumberOfWeeklyTransitionsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads constraints of optional attributes from DUT: NumberOfWeeklyTransitions Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -21907,7 +21927,8 @@ NSNumber * _Nonnull currentTarget;
                                                       @"NumberOfWeeklyTransitions Error: %@",
                                                     err);
 
-                                                if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                                if (err.domain == MatterInteractionErrorDomain
+                                                    && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                                     [expectation fulfill];
                                                     return;
                                                 }
@@ -21932,7 +21953,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeNumberOfDailyTransitionsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads constraints of optional attributes from DUT: NumberOfDailyTransitions Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -21962,7 +21983,8 @@ NSNumber * _Nonnull currentTarget;
                                                      @"NumberOfDailyTransitions Error: %@",
                                                    err);
 
-                                               if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                               if (err.domain == MatterInteractionErrorDomain
+                                                   && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                                    [expectation fulfill];
                                                    return;
                                                }
@@ -30936,7 +30958,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
     [cluster readAttributeUnsupportedWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute UNSUPPORTED Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -30968,7 +30990,8 @@ NSNumber * _Nullable attrCurrentPositionTilt;
                               completionHandler:^(NSError * _Nullable err) {
                                   NSLog(@"Writeattribute UNSUPPORTED Error: %@", err);
 
-                                  if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                  if (err.domain == MatterInteractionErrorDomain
+                                      && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                       [expectation fulfill];
                                       return;
                                   }
@@ -44890,7 +44913,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     [cluster readAttributeCurrentHeapFreeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads CurrentHeapFree non-global attribute value from DUT Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -44915,7 +44938,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     [cluster readAttributeCurrentHeapUsedWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads CurrentHeapUsed non-global attribute value from DUT Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -44940,7 +44963,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     [cluster readAttributeCurrentHeapHighWatermarkWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads CurrentHeapHighWaterMark non-global attribute value from DUT Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -44992,7 +45015,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     [cluster readAttributeCurrentHeapUsedWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads CurrentHeapUsed attribute value from DUT Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -45021,7 +45044,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     [cluster readAttributeCurrentHeapHighWatermarkWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads CurrentHeapHighWaterMark attribute value from DUT Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
