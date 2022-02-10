@@ -608,6 +608,8 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
         return; // malformed packet
     }
 
+    GroupId groupId = packetHeader.GetDestinationGroupId().Value();
+
     if (msg.IsNull())
     {
         ChipLogError(Inet, "Secure transport received Groupcast NULL packet, discarding");
@@ -634,6 +636,11 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
     bool decrypted = false;
     while (!decrypted && iter->Next(groupContext))
     {
+        // Optimization to reduce number of decryption attempts
+        if (groupId != groupContext.group_id)
+        {
+            continue;
+        }
         msgCopy = msg.CloneData();
         decrypted =
             (CHIP_NO_ERROR == SecureMessageCodec::Decrypt(CryptoContext(groupContext.key), payloadHeader, packetHeader, msgCopy));
