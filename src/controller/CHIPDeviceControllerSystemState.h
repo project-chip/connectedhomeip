@@ -30,7 +30,9 @@
 #pragma once
 
 #include <credentials/FabricTable.h>
+#include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
+
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
 #if CONFIG_DEVICE_LAYER
@@ -72,6 +74,8 @@ struct DeviceControllerSystemStateParams
     Messaging::ExchangeManager * exchangeMgr                      = nullptr;
     secure_channel::MessageCounterManager * messageCounterManager = nullptr;
     FabricTable * fabricTable                                     = nullptr;
+    CASEServer * caseServer                                       = nullptr;
+    SessionIDAllocator * sessionIDAllocator                       = nullptr;
 };
 
 // A representation of the internal state maintained by the DeviceControllerFactory
@@ -84,7 +88,8 @@ public:
     DeviceControllerSystemState(DeviceControllerSystemStateParams params) :
         mSystemLayer(params.systemLayer), mTCPEndPointManager(params.tcpEndPointManager),
         mUDPEndPointManager(params.udpEndPointManager), mTransportMgr(params.transportMgr), mSessionMgr(params.sessionMgr),
-        mExchangeMgr(params.exchangeMgr), mMessageCounterManager(params.messageCounterManager), mFabrics(params.fabricTable)
+        mExchangeMgr(params.exchangeMgr), mMessageCounterManager(params.messageCounterManager), mFabrics(params.fabricTable),
+        mCASEServer(params.caseServer), mSessionIDAllocator(params.sessionIDAllocator)
     {
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
@@ -145,6 +150,8 @@ private:
     Messaging::ExchangeManager * mExchangeMgr                      = nullptr;
     secure_channel::MessageCounterManager * mMessageCounterManager = nullptr;
     FabricTable * mFabrics                                         = nullptr;
+    CASEServer * mCASEServer                                       = nullptr;
+    SessionIDAllocator * mSessionIDAllocator                       = nullptr;
 
     std::atomic<uint32_t> mRefCount{ 1 };
 

@@ -173,6 +173,8 @@ ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * contex
     initParams.controllerRCAC                 = rcacSpan;
     initParams.controllerICAC                 = icacSpan;
     initParams.controllerNOC                  = nocSpan;
+    initParams.enableServerInteractions       = true;
+
     if (useTestCommissioner)
     {
         initParams.defaultCommissioner = &sTestCommissioner;
