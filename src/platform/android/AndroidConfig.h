@@ -54,7 +54,6 @@ public:
 
     // Key definitions for well-known keys.
     static const Key kConfigKey_SerialNum;
-    static const Key kConfigKey_UniqueId;
     static const Key kConfigKey_MfrDeviceId;
     static const Key kConfigKey_MfrDeviceCert;
     static const Key kConfigKey_MfrDeviceICACerts;
