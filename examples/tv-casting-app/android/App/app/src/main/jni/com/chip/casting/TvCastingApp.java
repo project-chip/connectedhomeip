@@ -37,9 +37,7 @@ public class TvCastingApp {
 
   public native void nativeInit();
 
-  /**
-   * TBD: Temp dummy function for testing
-   */
+  /** TBD: Temp dummy function for testing */
   public native void doSomethingInCpp(int endpoint);
 
   static {
