@@ -70,7 +70,7 @@ public class MatterServant {
             new PreferencesKeyValueStoreManager(applicationContext),
             new PreferencesConfigurationManager(applicationContext),
             new NsdManagerServiceResolver(applicationContext),
-            new NsdManagerServiceBrowser(applicationContext), 
+            new NsdManagerServiceBrowser(applicationContext),
             new ChipMdnsCallbackImpl());
 
     chipAppServer = new ChipAppServer();
