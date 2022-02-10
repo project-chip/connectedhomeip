@@ -202,15 +202,6 @@ typedef struct _BatFaultChangeType
     /* TYPE WARNING: array array defaults to */ uint8_t * previous;
 } BatFaultChangeType;
 
-// Struct for BindingEntry
-typedef struct _BindingEntry
-{
-    chip::NodeId nodeId;
-    chip::GroupId groupId;
-    chip::EndpointId endpointId;
-    chip::ClusterId clusterId;
-} BindingEntry;
-
 // Struct for ChannelInfo
 typedef struct _ChannelInfo
 {

@@ -74,7 +74,7 @@ ResponseHandler {{> subscribeDataCallback}} = nil;
         NSLog(@"{{label}} Error: %@", err);
 
         {{#if optional}}
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }

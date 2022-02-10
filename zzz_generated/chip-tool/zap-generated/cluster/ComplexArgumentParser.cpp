@@ -286,41 +286,6 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::PowerSource::Structs::
     ComplexArgumentParser::Finalize(request.current);
     ComplexArgumentParser::Finalize(request.previous);
 }
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::Binding::Structs::BindingEntry::Type & request,
-                                        Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("BindingEntry.nodeId", "nodeId", value.isMember("nodeId")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("BindingEntry.groupId", "groupId", value.isMember("groupId")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("BindingEntry.endpointId", "endpointId", value.isMember("endpointId")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("BindingEntry.clusterId", "clusterId", value.isMember("clusterId")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "nodeId");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.nodeId, value["nodeId"]));
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "groupId");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.groupId, value["groupId"]));
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "endpointId");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.endpointId, value["endpointId"]));
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "clusterId");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.clusterId, value["clusterId"]));
-
-    return CHIP_NO_ERROR;
-}
-
-void ComplexArgumentParser::Finalize(chip::app::Clusters::Binding::Structs::BindingEntry::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.nodeId);
-    ComplexArgumentParser::Finalize(request.groupId);
-    ComplexArgumentParser::Finalize(request.endpointId);
-    ComplexArgumentParser::Finalize(request.clusterId);
-}
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type & request,
                                         Json::Value & value)

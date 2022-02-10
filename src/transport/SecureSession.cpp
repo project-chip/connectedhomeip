@@ -28,13 +28,13 @@ Access::SubjectDescriptor SecureSession::GetSubjectDescriptor() const
         subjectDescriptor.authMode    = Access::AuthMode::kCase;
         subjectDescriptor.subject     = mPeerNodeId;
         subjectDescriptor.cats        = mPeerCATs;
-        subjectDescriptor.fabricIndex = mFabric;
+        subjectDescriptor.fabricIndex = GetFabricIndex();
     }
     else if (IsPAKEKeyId(mPeerNodeId))
     {
         subjectDescriptor.authMode    = Access::AuthMode::kPase;
         subjectDescriptor.subject     = mPeerNodeId;
-        subjectDescriptor.fabricIndex = mFabric;
+        subjectDescriptor.fabricIndex = GetFabricIndex();
     }
     else
     {

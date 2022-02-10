@@ -276,15 +276,24 @@ server cluster BinaryInputBasic = 15 {
 }
 
 server cluster Binding = 30 {
-  struct BindingEntry {
+  readonly global attribute int16u clusterRevision = 65533;
+
+  request struct BindRequest {
     NODE_ID nodeId = 0;
     GROUP_ID groupId = 1;
     ENDPOINT_NO endpointId = 2;
     CLUSTER_ID clusterId = 3;
   }
 
-  attribute BindingEntry bindingList[] = 0;
-  readonly global attribute int16u clusterRevision = 65533;
+  request struct UnbindRequest {
+    NODE_ID nodeId = 0;
+    GROUP_ID groupId = 1;
+    ENDPOINT_NO endpointId = 2;
+    CLUSTER_ID clusterId = 3;
+  }
+
+  command Bind(BindRequest): DefaultSuccess = 0;
+  command Unbind(UnbindRequest): DefaultSuccess = 1;
 }
 
 server cluster BridgedDeviceBasic = 57 {
@@ -683,7 +692,7 @@ client cluster ContentLauncher = 1290 {
   readonly global attribute int16u clusterRevision = 65533;
 
   request struct LaunchContentRequestRequest {
-    ContentSearch search[] = 0;
+    ContentSearch search = 0;
     BOOLEAN autoPlay = 1;
     optional CHAR_STRING data = 2;
   }

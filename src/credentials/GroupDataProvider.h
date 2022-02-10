@@ -31,6 +31,8 @@ namespace Credentials {
 class GroupDataProvider
 {
 public:
+    using SecurityPolicy = app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy;
+
     struct GroupInfo
     {
         static constexpr size_t kGroupNameMax = CHIP_CONFIG_MAX_GROUP_NAME_LENGTH;
@@ -108,6 +110,7 @@ public:
         GroupSession()   = default;
         GroupId group_id = kUndefinedGroupId;
         FabricIndex fabric_index;
+        SecurityPolicy security_policy;
         Crypto::SymmetricKeyContext * key = nullptr;
     };
 
@@ -126,7 +129,6 @@ public:
     struct KeySet
     {
         static constexpr size_t kEpochKeysMax = 3;
-        using SecurityPolicy                  = app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy;
 
         KeySet() = default;
         KeySet(uint16_t id, SecurityPolicy policy_id, uint8_t num_keys) : keyset_id(id), policy(policy_id), num_keys_used(num_keys)

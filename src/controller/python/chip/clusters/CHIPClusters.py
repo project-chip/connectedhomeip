@@ -686,15 +686,28 @@ class ChipClusters:
             "clusterName": "Binding",
             "clusterId": 0x0000001E,
             "commands": {
+            0x00000000: {
+                    "commandId": 0x00000000,
+                    "commandName": "Bind",
+                    "args": {
+                        "nodeId": "int",
+                        "groupId": "int",
+                        "endpointId": "int",
+                        "clusterId": "int",
+                    },
+                },
+            0x00000001: {
+                    "commandId": 0x00000001,
+                    "commandName": "Unbind",
+                    "args": {
+                        "nodeId": "int",
+                        "groupId": "int",
+                        "endpointId": "int",
+                        "clusterId": "int",
+                    },
+                },
             },
             "attributes": {
-                0x00000000: {
-                    "attributeName": "BindingList",
-                    "attributeId": 0x00000000,
-                    "type": "",
-                    "reportable": True,
-                    "writable": True,
-                },
                 0x0000FFF8: {
                     "attributeName": "ServerGeneratedCommandList",
                     "attributeId": 0x0000FFF8,
@@ -5267,6 +5280,7 @@ class ChipClusters:
                     "attributeId": 0x0000002A,
                     "type": "bytes",
                     "reportable": True,
+                    "writable": True,
                 },
                 0x00000030: {
                     "attributeName": "TimedWriteBoolean",

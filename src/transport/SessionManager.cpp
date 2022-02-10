@@ -624,7 +624,11 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
     // Trial decryption with GroupDataProvider
     Credentials::GroupDataProvider::GroupSession groupContext;
     auto iter = groups->IterateGroupSessions(packetHeader.GetSessionId());
-    VerifyOrReturn(nullptr != iter);
+    if (iter == nullptr)
+    {
+        ChipLogError(Inet, "Failed to retrieve Groups iterator. Discarding everything");
+        return;
+    }
 
     System::PacketBufferHandle msgCopy;
     bool decrypted = false;
@@ -635,7 +639,11 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
             (CHIP_NO_ERROR == SecureMessageCodec::Decrypt(CryptoContext(groupContext.key), payloadHeader, packetHeader, msgCopy));
     }
     iter->Release();
-    VerifyOrReturn(decrypted);
+    if (!decrypted)
+    {
+        ChipLogError(Inet, "Failed to retrieve Key. Discarding everything");
+        return;
+    }
     msg = std::move(msgCopy);
 
     // MCSP check

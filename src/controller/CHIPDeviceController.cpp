@@ -554,23 +554,6 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowInternal()
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-Transport::PeerAddress DeviceController::ToPeerAddress(const chip::Dnssd::ResolvedNodeData & nodeData) const
-{
-    Inet::InterfaceId interfaceId;
-
-    // Only use the mDNS resolution's InterfaceID for addresses that are IPv6 LLA.
-    // For all other addresses, we should rely on the device's routing table to route messages sent.
-    // Forcing messages down an InterfaceId might fail. For example, in bridged networks like Thread,
-    // mDNS advertisements are not usually received on the same interface the peer is reachable on.
-    // TODO: Right now, just use addr0, but we should really push all the addresses and interfaces to
-    // the device and allow it to make a proper decision about which addresses are preferred and reachable.
-    if (nodeData.mAddress[0].IsIPv6LinkLocal())
-    {
-        interfaceId = nodeData.mInterfaceId;
-    }
-
-    return Transport::PeerAddress::UDP(nodeData.mAddress[0], nodeData.mPort, interfaceId);
-}
 
 void DeviceController::OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & nodeData)
 {
@@ -932,6 +915,19 @@ CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId, CommissioningPa
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DeviceCommissioner::GetAttestationChallenge(ByteSpan & attestationChallenge)
+{
+    Optional<SessionHandle> secureSessionHandle;
+
+    VerifyOrReturnError(mDeviceBeingCommissioned != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    secureSessionHandle = mDeviceBeingCommissioned->GetSecureSession();
+    VerifyOrReturnError(secureSessionHandle.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+
+    attestationChallenge = secureSessionHandle.Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
 {
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
@@ -1093,12 +1089,14 @@ void DeviceCommissioner::OnDeviceAttestationInformationVerification(void * conte
 
     if (result != AttestationVerificationResult::kSuccess)
     {
+        CommissioningDelegate::CommissioningReport report;
+        report.Set<AdditionalErrorInfo>(result);
         if (result == AttestationVerificationResult::kNotImplemented)
         {
             ChipLogError(Controller,
                          "Failed in verifying 'Attestation Information' command received from the device due to default "
                          "DeviceAttestationVerifier Class not being overridden by a real implementation.");
-            commissioner->CommissioningStageComplete(CHIP_ERROR_NOT_IMPLEMENTED);
+            commissioner->CommissioningStageComplete(CHIP_ERROR_NOT_IMPLEMENTED, report);
             return;
         }
         else
@@ -1109,7 +1107,7 @@ void DeviceCommissioner::OnDeviceAttestationInformationVerification(void * conte
                          static_cast<uint16_t>(result));
             // Go look at AttestationVerificationResult enum in src/credentials/DeviceAttestationVerifier.h to understand the
             // errors.
-            commissioner->CommissioningStageComplete(CHIP_ERROR_INTERNAL);
+            commissioner->CommissioningStageComplete(CHIP_ERROR_INTERNAL, report);
             return;
         }
     }
@@ -1120,7 +1118,8 @@ void DeviceCommissioner::OnDeviceAttestationInformationVerification(void * conte
 
 CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const ByteSpan & attestationElements, const ByteSpan & signature,
                                                        const ByteSpan & attestationNonce, const ByteSpan & pai,
-                                                       const ByteSpan & dac, DeviceProxy * proxy)
+                                                       const ByteSpan & dac, VendorId remoteVendorId, uint16_t remoteProductId,
+                                                       DeviceProxy * proxy)
 {
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(proxy != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -1132,7 +1131,7 @@ CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const ByteSpan & attestat
         proxy->GetSecureSession().Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
 
     dac_verifier->VerifyAttestationInformation(attestationElements, attestationChallenge, signature, pai, dac, attestationNonce,
-                                               &mDeviceAttestationInformationVerificationCallback);
+                                               remoteVendorId, remoteProductId, &mDeviceAttestationInformationVerificationCallback);
 
     // TODO: Validate Firmware Information
 
@@ -1769,7 +1768,6 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
         mAttributeCache = std::move(attributeCache);
         mReadClient     = std::move(readClient);
-        return;
     }
     break;
     case CommissioningStage::kConfigRegulatory: {
@@ -1837,7 +1835,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     case CommissioningStage::kAttestationVerification:
         ChipLogProgress(Controller, "Verifying attestation");
         if (!params.GetAttestationElements().HasValue() || !params.GetAttestationSignature().HasValue() ||
-            !params.GetAttestationNonce().HasValue() || !params.GetDAC().HasValue() || !params.GetPAI().HasValue())
+            !params.GetAttestationNonce().HasValue() || !params.GetDAC().HasValue() || !params.GetPAI().HasValue() ||
+            !params.GetRemoteVendorId().HasValue() || !params.GetRemoteProductId().HasValue())
         {
             ChipLogError(Controller, "Missing attestation information");
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
@@ -1845,6 +1844,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
         if (ValidateAttestationInfo(params.GetAttestationElements().Value(), params.GetAttestationSignature().Value(),
                                     params.GetAttestationNonce().Value(), params.GetPAI().Value(), params.GetDAC().Value(),
+                                    params.GetRemoteVendorId().Value(), params.GetRemoteProductId().Value(),
                                     proxy) != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "Error validating attestation information");

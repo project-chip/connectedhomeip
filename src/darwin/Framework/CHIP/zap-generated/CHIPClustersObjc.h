@@ -792,13 +792,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPBinding : CHIPCluster
 
-- (void)readAttributeBindingListWithCompletionHandler:(void (^)(
-                                                          NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)writeAttributeBindingListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeBindingListWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
-                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
+- (void)bindWithParams:(CHIPBindingClusterBindParams *)params completionHandler:(StatusCompletion)completionHandler;
+- (void)unbindWithParams:(CHIPBindingClusterUnbindParams *)params completionHandler:(StatusCompletion)completionHandler;
 
 - (void)readAttributeServerGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
@@ -5428,6 +5423,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeListLongOctetStringWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
+- (void)writeAttributeListLongOctetStringWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeListLongOctetStringWithMinInterval:(uint16_t)minInterval
                                                  maxInterval:(uint16_t)maxInterval
                                      subscriptionEstablished:

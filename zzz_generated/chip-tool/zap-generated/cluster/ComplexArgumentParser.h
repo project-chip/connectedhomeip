@@ -55,10 +55,6 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::PowerSource::St
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::PowerSource::Structs::BatFaultChangeType::Type & request);
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Binding::Structs::BindingEntry::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::Binding::Structs::BindingEntry::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type & request,
                         Json::Value & value);
 

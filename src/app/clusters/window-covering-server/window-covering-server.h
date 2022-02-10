@@ -110,6 +110,8 @@ struct AbsoluteLimits
 };
 
 bool HasFeature(chip::EndpointId endpoint, WcFeature feature);
+bool HasFeaturePaLift(chip::EndpointId endpoint);
+bool HasFeaturePaTilt(chip::EndpointId endpoint);
 
 void TypeSet(chip::EndpointId endpoint, EmberAfWcType type);
 EmberAfWcType TypeGet(chip::EndpointId endpoint);

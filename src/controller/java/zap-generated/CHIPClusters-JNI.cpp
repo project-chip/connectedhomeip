@@ -3741,40 +3741,116 @@ JNI_METHOD(jlong, BindingCluster, initWithDevice)(JNIEnv * env, jobject self, jl
     return reinterpret_cast<jlong>(cppCluster);
 }
 
-JNI_METHOD(void, BindingCluster, subscribeBindingListAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+JNI_METHOD(void, BindingCluster, bind)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject nodeId, jobject groupId, jobject endpointId,
+ jobject clusterId, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
-    std::unique_ptr<CHIPBindingBindingListAttributeCallback, void (*)(CHIPBindingBindingListAttributeCallback *)> onSuccess(
-        Platform::New<CHIPBindingBindingListAttributeCallback>(callback, true),
-        chip::Platform::Delete<CHIPBindingBindingListAttributeCallback>);
-    VerifyOrReturn(onSuccess.get() != nullptr,
-                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    BindingCluster * cppCluster;
 
+    ListFreer listFreer;
+    chip::app::Clusters::Binding::Commands::Bind::Type request;
+
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+    request.nodeId =
+        static_cast<std::remove_reference_t<decltype(request.nodeId)>>(chip::JniReferences::GetInstance().LongToPrimitive(nodeId));
+    request.groupId = static_cast<std::remove_reference_t<decltype(request.groupId)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(groupId));
+    request.endpointId = static_cast<std::remove_reference_t<decltype(request.endpointId)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(endpointId));
+    request.clusterId = static_cast<std::remove_reference_t<decltype(request.clusterId)>>(
+        chip::JniReferences::GetInstance().LongToPrimitive(clusterId));
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
-        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
     VerifyOrReturn(onFailure.get() != nullptr,
-                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err              = CHIP_NO_ERROR;
-    BindingCluster * cppCluster = reinterpret_cast<BindingCluster *>(clusterPtr);
+    cppCluster = reinterpret_cast<BindingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
-                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    using TypeInfo = chip::app::Clusters::Binding::Attributes::BindingList::TypeInfo;
-    auto successFn =
-        chip::Callback::Callback<CHIPBindingClusterBindingListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
-                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-                                                   CHIPBindingBindingListAttributeCallback::OnSubscriptionEstablished);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
-                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error subscribing to attribute", err));
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
+                                                                                       CHIP_ERROR_INCORRECT_STATE));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, BindingCluster, unbind)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject nodeId, jobject groupId, jobject endpointId,
+ jobject clusterId, jobject timedInvokeTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    BindingCluster * cppCluster;
+
+    ListFreer listFreer;
+    chip::app::Clusters::Binding::Commands::Unbind::Type request;
+
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+    request.nodeId =
+        static_cast<std::remove_reference_t<decltype(request.nodeId)>>(chip::JniReferences::GetInstance().LongToPrimitive(nodeId));
+    request.groupId = static_cast<std::remove_reference_t<decltype(request.groupId)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(groupId));
+    request.endpointId = static_cast<std::remove_reference_t<decltype(request.endpointId)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(endpointId));
+    request.clusterId = static_cast<std::remove_reference_t<decltype(request.clusterId)>>(
+        chip::JniReferences::GetInstance().LongToPrimitive(clusterId));
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+
+    cppCluster = reinterpret_cast<BindingCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
+                                                                                       CHIP_ERROR_INCORRECT_STATE));
 
     onSuccess.release();
     onFailure.release();
@@ -9393,108 +9469,80 @@ JNI_METHOD(void, ContentLauncherCluster, launchContentRequest)
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+    jobject search_parameterListItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(search, "parameterList", "Ljava/util/ArrayList;", search_parameterListItem_0);
     {
-        using ListType_0       = std::remove_reference_t<decltype(request.search)>;
-        using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-        jint searchSize;
-        chip::JniReferences::GetInstance().GetArrayListSize(search, searchSize);
-        if (searchSize != 0)
+        using ListType_1       = std::remove_reference_t<decltype(request.search.parameterList)>;
+        using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+        jint search_parameterListItem_0Size;
+        chip::JniReferences::GetInstance().GetArrayListSize(search_parameterListItem_0, search_parameterListItem_0Size);
+        if (search_parameterListItem_0Size != 0)
         {
-            auto * listHolder_0 = new ListHolder<ListMemberType_0>(searchSize);
-            listFreer.add(listHolder_0);
+            auto * listHolder_1 = new ListHolder<ListMemberType_1>(search_parameterListItem_0Size);
+            listFreer.add(listHolder_1);
 
-            for (size_t i_0 = 0; i_0 < static_cast<size_t>(searchSize); ++i_0)
+            for (size_t i_1 = 0; i_1 < static_cast<size_t>(search_parameterListItem_0Size); ++i_1)
             {
-                jobject element_0;
-                chip::JniReferences::GetInstance().GetArrayListItem(search, i_0, element_0);
-                jobject element_0_parameterListItem_1;
-                chip::JniReferences::GetInstance().GetObjectField(element_0, "parameterList", "Ljava/util/ArrayList;",
-                                                                  element_0_parameterListItem_1);
+                jobject element_1;
+                chip::JniReferences::GetInstance().GetArrayListItem(search_parameterListItem_0, i_1, element_1);
+                jobject element_1_typeItem_2;
+                chip::JniReferences::GetInstance().GetObjectField(element_1, "type", "Ljava/lang/Integer;", element_1_typeItem_2);
+                listHolder_1->mList[i_1].type = static_cast<std::remove_reference_t<decltype(listHolder_1->mList[i_1].type)>>(
+                    chip::JniReferences::GetInstance().IntegerToPrimitive(element_1_typeItem_2));
+                jobject element_1_valueItem_2;
+                chip::JniReferences::GetInstance().GetObjectField(element_1, "value", "Ljava/lang/String;", element_1_valueItem_2);
+                cleanupStrings.push_back(
+                    chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(element_1_valueItem_2)));
+                listHolder_1->mList[i_1].value = cleanupStrings.back()->charSpan();
+                jobject element_1_externalIDListItem_2;
+                chip::JniReferences::GetInstance().GetObjectField(element_1, "externalIDList", "Ljava/util/Optional;",
+                                                                  element_1_externalIDListItem_2);
+                if (element_1_externalIDListItem_2 != nullptr)
                 {
-                    using ListType_2       = std::remove_reference_t<decltype(listHolder_0->mList[i_0].parameterList)>;
-                    using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
-                    jint element_0_parameterListItem_1Size;
-                    chip::JniReferences::GetInstance().GetArrayListSize(element_0_parameterListItem_1,
-                                                                        element_0_parameterListItem_1Size);
-                    if (element_0_parameterListItem_1Size != 0)
+                    jobject optionalValue_3;
+                    chip::JniReferences::GetInstance().GetOptionalValue(element_1_externalIDListItem_2, optionalValue_3);
+                    auto & definedValue_3 = listHolder_1->mList[i_1].externalIDList.Emplace();
                     {
-                        auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0_parameterListItem_1Size);
-                        listFreer.add(listHolder_2);
-
-                        for (size_t i_2 = 0; i_2 < static_cast<size_t>(element_0_parameterListItem_1Size); ++i_2)
+                        using ListType_4       = std::remove_reference_t<decltype(definedValue_3)>;
+                        using ListMemberType_4 = ListMemberTypeGetter<ListType_4>::Type;
+                        jint optionalValue_3Size;
+                        chip::JniReferences::GetInstance().GetArrayListSize(optionalValue_3, optionalValue_3Size);
+                        if (optionalValue_3Size != 0)
                         {
-                            jobject element_2;
-                            chip::JniReferences::GetInstance().GetArrayListItem(element_0_parameterListItem_1, i_2, element_2);
-                            jobject element_2_typeItem_3;
-                            chip::JniReferences::GetInstance().GetObjectField(element_2, "type", "Ljava/lang/Integer;",
-                                                                              element_2_typeItem_3);
-                            listHolder_2->mList[i_2].type =
-                                static_cast<std::remove_reference_t<decltype(listHolder_2->mList[i_2].type)>>(
-                                    chip::JniReferences::GetInstance().IntegerToPrimitive(element_2_typeItem_3));
-                            jobject element_2_valueItem_3;
-                            chip::JniReferences::GetInstance().GetObjectField(element_2, "value", "Ljava/lang/String;",
-                                                                              element_2_valueItem_3);
-                            cleanupStrings.push_back(
-                                chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(element_2_valueItem_3)));
-                            listHolder_2->mList[i_2].value = cleanupStrings.back()->charSpan();
-                            jobject element_2_externalIDListItem_3;
-                            chip::JniReferences::GetInstance().GetObjectField(element_2, "externalIDList", "Ljava/util/Optional;",
-                                                                              element_2_externalIDListItem_3);
-                            if (element_2_externalIDListItem_3 != nullptr)
-                            {
-                                jobject optionalValue_4;
-                                chip::JniReferences::GetInstance().GetOptionalValue(element_2_externalIDListItem_3,
-                                                                                    optionalValue_4);
-                                auto & definedValue_4 = listHolder_2->mList[i_2].externalIDList.Emplace();
-                                {
-                                    using ListType_5       = std::remove_reference_t<decltype(definedValue_4)>;
-                                    using ListMemberType_5 = ListMemberTypeGetter<ListType_5>::Type;
-                                    jint optionalValue_4Size;
-                                    chip::JniReferences::GetInstance().GetArrayListSize(optionalValue_4, optionalValue_4Size);
-                                    if (optionalValue_4Size != 0)
-                                    {
-                                        auto * listHolder_5 = new ListHolder<ListMemberType_5>(optionalValue_4Size);
-                                        listFreer.add(listHolder_5);
+                            auto * listHolder_4 = new ListHolder<ListMemberType_4>(optionalValue_3Size);
+                            listFreer.add(listHolder_4);
 
-                                        for (size_t i_5 = 0; i_5 < static_cast<size_t>(optionalValue_4Size); ++i_5)
-                                        {
-                                            jobject element_5;
-                                            chip::JniReferences::GetInstance().GetArrayListItem(optionalValue_4, i_5, element_5);
-                                            jobject element_5_nameItem_6;
-                                            chip::JniReferences::GetInstance().GetObjectField(
-                                                element_5, "name", "Ljava/lang/String;", element_5_nameItem_6);
-                                            cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(
-                                                env, static_cast<jstring>(element_5_nameItem_6)));
-                                            listHolder_5->mList[i_5].name = cleanupStrings.back()->charSpan();
-                                            jobject element_5_valueItem_6;
-                                            chip::JniReferences::GetInstance().GetObjectField(
-                                                element_5, "value", "Ljava/lang/String;", element_5_valueItem_6);
-                                            cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(
-                                                env, static_cast<jstring>(element_5_valueItem_6)));
-                                            listHolder_5->mList[i_5].value = cleanupStrings.back()->charSpan();
-                                        }
-                                        definedValue_4 = ListType_5(listHolder_5->mList, optionalValue_4Size);
-                                    }
-                                    else
-                                    {
-                                        definedValue_4 = ListType_5();
-                                    }
-                                }
+                            for (size_t i_4 = 0; i_4 < static_cast<size_t>(optionalValue_3Size); ++i_4)
+                            {
+                                jobject element_4;
+                                chip::JniReferences::GetInstance().GetArrayListItem(optionalValue_3, i_4, element_4);
+                                jobject element_4_nameItem_5;
+                                chip::JniReferences::GetInstance().GetObjectField(element_4, "name", "Ljava/lang/String;",
+                                                                                  element_4_nameItem_5);
+                                cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(
+                                    env, static_cast<jstring>(element_4_nameItem_5)));
+                                listHolder_4->mList[i_4].name = cleanupStrings.back()->charSpan();
+                                jobject element_4_valueItem_5;
+                                chip::JniReferences::GetInstance().GetObjectField(element_4, "value", "Ljava/lang/String;",
+                                                                                  element_4_valueItem_5);
+                                cleanupStrings.push_back(chip::Platform::MakeUnique<chip::JniUtfString>(
+                                    env, static_cast<jstring>(element_4_valueItem_5)));
+                                listHolder_4->mList[i_4].value = cleanupStrings.back()->charSpan();
                             }
+                            definedValue_3 = ListType_4(listHolder_4->mList, optionalValue_3Size);
                         }
-                        listHolder_0->mList[i_0].parameterList = ListType_2(listHolder_2->mList, element_0_parameterListItem_1Size);
-                    }
-                    else
-                    {
-                        listHolder_0->mList[i_0].parameterList = ListType_2();
+                        else
+                        {
+                            definedValue_3 = ListType_4();
+                        }
                     }
                 }
             }
-            request.search = ListType_0(listHolder_0->mList, searchSize);
+            request.search.parameterList = ListType_1(listHolder_1->mList, search_parameterListItem_0Size);
         }
         else
         {
-            request.search = ListType_0();
+            request.search.parameterList = ListType_1();
         }
     }
     request.autoPlay = static_cast<std::remove_reference_t<decltype(request.autoPlay)>>(
