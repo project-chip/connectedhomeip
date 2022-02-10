@@ -22,9 +22,9 @@ import("${chip_root}/build/chip/tools.gni")
 shared_library("jni") {
   output_name = "libTvCastingApp"
 
-  sources = [ 
+  sources = [
+    "${chip_root}/examples/tv-casting-app/tv-casting-common/include/CHIPProjectAppConfig.h",
     "App/app/src/main/jni/cpp/TvCastingApp-JNI.cpp",
-    "${chip_root}/examples/tv-casting-app/tv-casting-common/include/CHIPProjectAppConfig.h" 
   ]
 
   deps = [
@@ -54,9 +54,9 @@ android_library("java") {
     "${chip_root}/build/chip/java:shared_cpplib",
   ]
 
-  sources = [ 
+  sources = [
     "App/app/src/main/jni/com/chip/casting/TvCastingApp.java",
-    "App/app/src/main/jni/com/chip/casting/TvCastingAppCallback.java" 
+    "App/app/src/main/jni/com/chip/casting/TvCastingAppCallback.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]
