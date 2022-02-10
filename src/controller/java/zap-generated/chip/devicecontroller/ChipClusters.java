@@ -5359,7 +5359,7 @@ public class ChipClusters {
 
     public void launchContentRequest(
         LaunchResponseCallback callback,
-        ArrayList<ChipStructs.ContentLauncherClusterContentSearch> search,
+        ChipStructs.ContentLauncherClusterContentSearch search,
         Boolean autoPlay,
         Optional<String> data) {
       launchContentRequest(chipClusterPtr, callback, search, autoPlay, data, null);
@@ -5367,7 +5367,7 @@ public class ChipClusters {
 
     public void launchContentRequest(
         LaunchResponseCallback callback,
-        ArrayList<ChipStructs.ContentLauncherClusterContentSearch> search,
+        ChipStructs.ContentLauncherClusterContentSearch search,
         Boolean autoPlay,
         Optional<String> data,
         int timedInvokeTimeoutMs) {
@@ -5401,7 +5401,7 @@ public class ChipClusters {
     private native void launchContentRequest(
         long chipClusterPtr,
         LaunchResponseCallback Callback,
-        ArrayList<ChipStructs.ContentLauncherClusterContentSearch> search,
+        ChipStructs.ContentLauncherClusterContentSearch search,
         Boolean autoPlay,
         Optional<String> data,
         @Nullable Integer timedInvokeTimeoutMs);
@@ -16778,6 +16778,16 @@ public class ChipClusters {
       readListLongOctetStringAttribute(chipClusterPtr, callback);
     }
 
+    public void writeListLongOctetStringAttribute(
+        DefaultClusterCallback callback, ArrayList<byte[]> value) {
+      writeListLongOctetStringAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writeListLongOctetStringAttribute(
+        DefaultClusterCallback callback, ArrayList<byte[]> value, int timedWriteTimeoutMs) {
+      writeListLongOctetStringAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    }
+
     public void subscribeListLongOctetStringAttribute(
         ListLongOctetStringAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeListLongOctetStringAttribute(chipClusterPtr, callback, minInterval, maxInterval);
@@ -17976,6 +17986,12 @@ public class ChipClusters {
 
     private native void readListLongOctetStringAttribute(
         long chipClusterPtr, ListLongOctetStringAttributeCallback callback);
+
+    private native void writeListLongOctetStringAttribute(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        ArrayList<byte[]> value,
+        @Nullable Integer timedWriteTimeoutMs);
 
     private native void subscribeListLongOctetStringAttribute(
         long chipClusterPtr,

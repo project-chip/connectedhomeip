@@ -2385,22 +2385,13 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_MISSING_URI_SEPARATOR             CHIP_CORE_ERROR(0xd7)
 
 /**
- * @def CHIP_ERROR_IM_CONSTRAINT_ERROR
- *
- * @brief
- *   The equivalent of a CONSTRAINT_ERROR status: a value was out of the valid
- *   range.
- */
-#define CHIP_ERROR_IM_CONSTRAINT_ERROR               CHIP_CORE_ERROR(0xd8)
-
-/**
  * @def CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE
  *
  * @brief
  *   The Attribute DataElement is malformed: it either does not contain
  *   the required elements
  */
-#define CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE                    CHIP_CORE_ERROR(0xd9)
+#define CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE                    CHIP_CORE_ERROR(0xd8)
 
 /**
  * @def CHIP_ERROR_IM_MALFORMED_TIMED_REQUEST_MESSAGE
@@ -2409,7 +2400,7 @@ using CHIP_ERROR = ::chip::ChipError;
  *   The Attribute DataElement is malformed: it either does not contain
  *   the required elements
  */
-#define CHIP_ERROR_IM_MALFORMED_TIMED_REQUEST_MESSAGE                    CHIP_CORE_ERROR(0xda)
+#define CHIP_ERROR_IM_MALFORMED_TIMED_REQUEST_MESSAGE                    CHIP_CORE_ERROR(0xd9)
 
 /**
  * @def CHIP_ERROR_INVALID_FILE_IDENTIFIER
@@ -2418,7 +2409,7 @@ using CHIP_ERROR = ::chip::ChipError;
  *   The file identifier, encoded in the first few bytes of a processed file,
  *   has unexpected value.
  */
-#define CHIP_ERROR_INVALID_FILE_IDENTIFIER                     CHIP_CORE_ERROR(0xdb)
+#define CHIP_ERROR_INVALID_FILE_IDENTIFIER                     CHIP_CORE_ERROR(0xda)
 
 /**
  *  @}

@@ -353,8 +353,6 @@ protected:
 
     PersistentStorageDelegate * mStorageDelegate = nullptr;
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-    Transport::PeerAddress ToPeerAddress(const chip::Dnssd::ResolvedNodeData & nodeData) const;
-
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
     // TODO(cecille): Make this configuarable.
     static constexpr int kMaxCommissionableNodes = 10;
@@ -580,11 +578,13 @@ public:
      * @param[in] attestationNonce    Attestation nonce
      * @param[in] pai                 PAI certificate
      * @param[in] dac                 DAC certificates
+     * @param[in] remoteVendorId      vendor ID read from the device Basic Information cluster
+     * @param[in] remoteProductId     product ID read from the device Basic Information cluster
      * @param[in] proxy               device proxy that is being attested.
      */
     CHIP_ERROR ValidateAttestationInfo(const ByteSpan & attestationElements, const ByteSpan & signature,
                                        const ByteSpan & attestationNonce, const ByteSpan & pai, const ByteSpan & dac,
-                                       DeviceProxy * proxy);
+                                       VendorId remoteVendorId, uint16_t remoteProductId, DeviceProxy * proxy);
 
     /**
      * @brief

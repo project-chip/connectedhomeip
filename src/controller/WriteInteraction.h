@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <app/ChunkedWriteCallback.h>
 #include <app/InteractionModelEngine.h>
 #include <app/WriteClient.h>
 #include <controller/CommandSenderAllocator.h>
@@ -50,10 +51,13 @@ public:
     using OnDoneCallbackType  = std::function<void(app::WriteClient *)>;
 
     WriteCallback(OnSuccessCallbackType aOnSuccess, OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone) :
-        mOnSuccess(aOnSuccess), mOnError(aOnError), mOnDone(aOnDone)
+        mOnSuccess(aOnSuccess), mOnError(aOnError), mOnDone(aOnDone), mCallback(this)
     {}
 
-    void OnResponse(const app::WriteClient * apWriteClient, const app::ConcreteAttributePath & aPath, app::StatusIB status) override
+    app::WriteClient::Callback * GetChunkedCallback() { return &mCallback; }
+
+    void OnResponse(const app::WriteClient * apWriteClient, const app::ConcreteDataAttributePath & aPath,
+                    app::StatusIB status) override
     {
         if (status.IsSuccess())
         {
@@ -83,6 +87,8 @@ private:
     OnSuccessCallbackType mOnSuccess = nullptr;
     OnErrorCallbackType mOnError     = nullptr;
     OnDoneCallbackType mOnDone       = nullptr;
+
+    app::ChunkedWriteCallback mCallback;
 };
 
 /**
@@ -98,21 +104,20 @@ CHIP_ERROR WriteAttribute(const SessionHandle & sessionHandle, chip::EndpointId 
                           WriteCallback::OnDoneCallbackType onDoneCb = nullptr)
 {
     auto callback = Platform::MakeUnique<WriteCallback>(onSuccessCb, onErrorCb, onDoneCb);
-    auto client   = Platform::MakeUnique<app::WriteClient>(app::InteractionModelEngine::GetInstance()->GetExchangeManager(),
-                                                         callback.get(), aTimedWriteTimeoutMs);
-
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    auto client = Platform::MakeUnique<app::WriteClient>(app::InteractionModelEngine::GetInstance()->GetExchangeManager(),
+                                                         callback->GetChunkedCallback(), aTimedWriteTimeoutMs);
     VerifyOrReturnError(client != nullptr, CHIP_ERROR_NO_MEMORY);
 
     if (sessionHandle->IsGroupSession())
     {
-        ReturnErrorOnFailure(
-            client->EncodeAttributeWritePayload(chip::app::AttributePathParams(clusterId, attributeId), requestData));
+        ReturnErrorOnFailure(client->EncodeAttribute(chip::app::AttributePathParams(clusterId, attributeId), requestData));
     }
     else
     {
         ReturnErrorOnFailure(
-            client->EncodeAttributeWritePayload(chip::app::AttributePathParams(endpointId, clusterId, attributeId), requestData));
+            client->EncodeAttribute(chip::app::AttributePathParams(endpointId, clusterId, attributeId), requestData));
     }
 
     ReturnErrorOnFailure(client->SendWriteRequest(sessionHandle));

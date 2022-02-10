@@ -35545,7 +35545,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchContentRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
-    DataModel::List<const Structs::ContentSearch::Type> search;
+    Structs::ContentSearch::Type search;
     bool autoPlay = static_cast<bool>(0);
     Optional<chip::CharSpan> data;
 
@@ -35562,7 +35562,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchContentRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
-    DataModel::DecodableList<Structs::ContentSearch::DecodableType> search;
+    Structs::ContentSearch::DecodableType search;
     bool autoPlay = static_cast<bool>(0);
     Optional<chip::CharSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);

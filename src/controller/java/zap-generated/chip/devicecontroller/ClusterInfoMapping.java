@@ -9020,7 +9020,7 @@ public class ClusterInfoMapping {
               ((ChipClusters.ContentLauncherCluster) cluster)
                   .launchContentRequest(
                       (ChipClusters.ContentLauncherCluster.LaunchResponseCallback) callback,
-                      (ArrayList<ChipStructs.ContentLauncherClusterContentSearch>)
+                      (ChipStructs.ContentLauncherClusterContentSearch)
                           commandArguments.get("search"),
                       (Boolean) commandArguments.get("autoPlay"),
                       (Optional<String>) commandArguments.get("data"));
