@@ -902,13 +902,8 @@ using namespace chip::app::Clusters;
     });
 }
 
-<<<<<<< HEAD
-- (void)subscribeAttributeVendorIdWithMinInterval:(NSNumber * _Nonnull)minInterval
+- (void)subscribeAttributeVendorIDWithMinInterval:(NSNumber * _Nonnull)minInterval
                                       maxInterval:(NSNumber * _Nonnull)maxInterval
-=======
-- (void)subscribeAttributeVendorIDWithMinInterval:(uint16_t)minInterval
-                                      maxInterval:(uint16_t)maxInterval
->>>>>>> 208b919f18 (Run zap regen script)
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
@@ -966,13 +961,8 @@ using namespace chip::app::Clusters;
     });
 }
 
-<<<<<<< HEAD
-- (void)subscribeAttributeProductIdWithMinInterval:(NSNumber * _Nonnull)minInterval
+- (void)subscribeAttributeProductIDWithMinInterval:(NSNumber * _Nonnull)minInterval
                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-=======
-- (void)subscribeAttributeProductIDWithMinInterval:(uint16_t)minInterval
-                                       maxInterval:(uint16_t)maxInterval
->>>>>>> 208b919f18 (Run zap regen script)
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
@@ -1001,21 +991,12 @@ using namespace chip::app::Clusters;
         });
 }
 
-<<<<<<< HEAD
-- (void)subscribeAttributeApplicationAppWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                            maxInterval:(NSNumber * _Nonnull)maxInterval
-                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                          reportHandler:
-                                              (void (^)(CHIPApplicationBasicClusterApplicationBasicApplication * _Nullable value,
-                                                  NSError * _Nullable error))reportHandler
-=======
-- (void)subscribeAttributeApplicationWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeApplicationWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:
                                            (void (^)(CHIPApplicationBasicClusterApplicationBasicApplication * _Nullable value,
                                                NSError * _Nullable error))reportHandler
->>>>>>> 208b919f18 (Run zap regen script)
 {
     new CHIPApplicationBasicApplicationStructAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -1024,13 +1005,8 @@ using namespace chip::app::Clusters;
             auto successFn = Callback<ApplicationBasicApplicationStructAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-<<<<<<< HEAD
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPApplicationBasicApplicationAppStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
-=======
-                minInterval, maxInterval,
                 CHIPApplicationBasicApplicationStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
->>>>>>> 208b919f18 (Run zap regen script)
         },
         subscriptionEstablishedHandler);
 }
@@ -1046,18 +1022,10 @@ using namespace chip::app::Clusters;
         });
 }
 
-<<<<<<< HEAD
-- (void)subscribeAttributeApplicationStatusWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                               maxInterval:(NSNumber * _Nonnull)maxInterval
-                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                             reportHandler:
-                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
-=======
-- (void)subscribeAttributeStatusWithMinInterval:(uint16_t)minInterval
-                                    maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeStatusWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
->>>>>>> 208b919f18 (Run zap regen script)
 {
     new CHIPApplicationBasicClusterApplicationStatusEnumAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -1333,19 +1301,10 @@ using namespace chip::app::Clusters;
         });
 }
 
-<<<<<<< HEAD
-- (void)subscribeAttributeApplicationLauncherListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                     maxInterval:(NSNumber * _Nonnull)maxInterval
-                                         subscriptionEstablished:
-                                             (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                   reportHandler:
-                                                       (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
-=======
-- (void)subscribeAttributeCatalogListWithMinInterval:(uint16_t)minInterval
-                                         maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeCatalogListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
->>>>>>> 208b919f18 (Run zap regen script)
 {
     new CHIPApplicationLauncherCatalogListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -1354,13 +1313,8 @@ using namespace chip::app::Clusters;
             auto successFn = Callback<ApplicationLauncherCatalogListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-<<<<<<< HEAD
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPApplicationLauncherApplicationLauncherListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
-=======
-                minInterval, maxInterval,
                 CHIPApplicationLauncherCatalogListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
->>>>>>> 208b919f18 (Run zap regen script)
         },
         subscriptionEstablishedHandler);
 }
@@ -1406,20 +1360,11 @@ using namespace chip::app::Clusters;
         });
 }
 
-<<<<<<< HEAD
-- (void)
-    subscribeAttributeApplicationLauncherAppWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                maxInterval:(NSNumber * _Nonnull)maxInterval
-                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                              reportHandler:(void (^)(CHIPApplicationLauncherClusterApplicationEP * _Nullable value,
-                                                                NSError * _Nullable error))reportHandler
-=======
-- (void)subscribeAttributeCurrentAppWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeCurrentAppWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(CHIPApplicationLauncherClusterApplicationEP * _Nullable value,
                                                         NSError * _Nullable error))reportHandler
->>>>>>> 208b919f18 (Run zap regen script)
 {
     new CHIPApplicationLauncherCurrentAppStructAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -1428,13 +1373,8 @@ using namespace chip::app::Clusters;
             auto successFn = Callback<ApplicationLauncherCurrentAppStructAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-<<<<<<< HEAD
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPApplicationLauncherApplicationLauncherAppStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
-=======
-                minInterval, maxInterval,
                 CHIPApplicationLauncherCurrentAppStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
->>>>>>> 208b919f18 (Run zap regen script)
         },
         subscriptionEstablishedHandler);
 }
@@ -1625,18 +1565,10 @@ using namespace chip::app::Clusters;
         });
 }
 
-<<<<<<< HEAD
-- (void)subscribeAttributeAudioOutputListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                             maxInterval:(NSNumber * _Nonnull)maxInterval
-                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                           reportHandler:
-                                               (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
-=======
-- (void)subscribeAttributeOutputListWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeOutputListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
->>>>>>> 208b919f18 (Run zap regen script)
 {
     new CHIPAudioOutputOutputListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -1645,13 +1577,8 @@ using namespace chip::app::Clusters;
             auto successFn = Callback<AudioOutputOutputListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-<<<<<<< HEAD
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPAudioOutputAudioOutputListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
-=======
-                minInterval, maxInterval,
                 CHIPAudioOutputOutputListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
->>>>>>> 208b919f18 (Run zap regen script)
         },
         subscriptionEstablishedHandler);
 }
@@ -1667,19 +1594,11 @@ using namespace chip::app::Clusters;
     });
 }
 
-<<<<<<< HEAD
-- (void)subscribeAttributeCurrentAudioOutputWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                maxInterval:(NSNumber * _Nonnull)maxInterval
-                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                              reportHandler:
-                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
-=======
-- (void)subscribeAttributeCurrentOutputWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeCurrentOutputWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
->>>>>>> 208b919f18 (Run zap regen script)
 {
     new CHIPInt8uAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -4622,19 +4541,11 @@ using namespace chip::app::Clusters;
         });
 }
 
-<<<<<<< HEAD
-- (void)subscribeAttributeChannelLineupWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                           maxInterval:(NSNumber * _Nonnull)maxInterval
-                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                         reportHandler:(void (^)(CHIPChannelClusterLineupInfo * _Nullable value,
-                                                           NSError * _Nullable error))reportHandler
-=======
-- (void)subscribeAttributeLineupWithMinInterval:(uint16_t)minInterval
-                                    maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeLineupWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                    maxInterval:(NSNumber * _Nonnull)maxInterval
                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                   reportHandler:(void (^)(CHIPChannelClusterLineupInfo * _Nullable value,
                                                     NSError * _Nullable error))reportHandler
->>>>>>> 208b919f18 (Run zap regen script)
 {
     new CHIPChannelLineupStructAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -4643,12 +4554,8 @@ using namespace chip::app::Clusters;
             auto successFn = Callback<ChannelLineupStructAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-<<<<<<< HEAD
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPChannelChannelLineupStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
-=======
-                minInterval, maxInterval, CHIPChannelLineupStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
->>>>>>> 208b919f18 (Run zap regen script)
+                CHIPChannelLineupStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
         },
         subscriptionEstablishedHandler);
 }
@@ -7356,18 +7263,10 @@ using namespace chip::app::Clusters;
         });
 }
 
-<<<<<<< HEAD
-- (void)subscribeAttributeAcceptHeaderListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                              maxInterval:(NSNumber * _Nonnull)maxInterval
-                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                            reportHandler:
-                                                (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
-=======
-- (void)subscribeAttributeAcceptHeaderWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeAcceptHeaderWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
->>>>>>> 208b919f18 (Run zap regen script)
 {
     new CHIPContentLauncherAcceptHeaderListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -7376,13 +7275,8 @@ using namespace chip::app::Clusters;
             auto successFn = Callback<ContentLauncherAcceptHeaderListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-<<<<<<< HEAD
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPContentLauncherAcceptHeaderListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
-=======
-                minInterval, maxInterval,
                 CHIPContentLauncherAcceptHeaderListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
->>>>>>> 208b919f18 (Run zap regen script)
         },
         subscriptionEstablishedHandler);
 }
@@ -13973,18 +13867,10 @@ using namespace chip::app::Clusters;
         });
 }
 
-<<<<<<< HEAD
-- (void)subscribeAttributeMediaInputListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                            maxInterval:(NSNumber * _Nonnull)maxInterval
-                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                          reportHandler:
-                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
-=======
-- (void)subscribeAttributeInputListWithMinInterval:(uint16_t)minInterval
-                                       maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeInputListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
->>>>>>> 208b919f18 (Run zap regen script)
 {
     new CHIPMediaInputInputListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -13993,13 +13879,8 @@ using namespace chip::app::Clusters;
             auto successFn = Callback<MediaInputInputListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-<<<<<<< HEAD
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPMediaInputMediaInputListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
-=======
-                minInterval, maxInterval,
                 CHIPMediaInputInputListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
->>>>>>> 208b919f18 (Run zap regen script)
         },
         subscriptionEstablishedHandler);
 }
@@ -14015,18 +13896,10 @@ using namespace chip::app::Clusters;
     });
 }
 
-<<<<<<< HEAD
-- (void)subscribeAttributeCurrentMediaInputWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                               maxInterval:(NSNumber * _Nonnull)maxInterval
-                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                             reportHandler:
-                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
-=======
-- (void)subscribeAttributeCurrentInputWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeCurrentInputWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
->>>>>>> 208b919f18 (Run zap regen script)
 {
     new CHIPInt8uAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -14346,18 +14219,10 @@ using namespace chip::app::Clusters;
         });
 }
 
-<<<<<<< HEAD
-- (void)subscribeAttributePlaybackStateWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                           maxInterval:(NSNumber * _Nonnull)maxInterval
-                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                         reportHandler:
-                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
-=======
-- (void)subscribeAttributeCurrentStateWithMinInterval:(uint16_t)minInterval
-                                          maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeCurrentStateWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
->>>>>>> 208b919f18 (Run zap regen script)
 {
     new CHIPMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -14444,19 +14309,11 @@ using namespace chip::app::Clusters;
         });
 }
 
-<<<<<<< HEAD
-- (void)subscribeAttributePositionWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                      maxInterval:(NSNumber * _Nonnull)maxInterval
-                          subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                    reportHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackPosition * _Nullable value,
-                                                      NSError * _Nullable error))reportHandler
-=======
-- (void)subscribeAttributeSampledPositionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeSampledPositionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackPosition * _Nullable value,
                                                              NSError * _Nullable error))reportHandler
->>>>>>> 208b919f18 (Run zap regen script)
 {
     new CHIPMediaPlaybackSampledPositionStructAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -14465,13 +14322,8 @@ using namespace chip::app::Clusters;
             auto successFn = Callback<MediaPlaybackSampledPositionStructAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-<<<<<<< HEAD
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPMediaPlaybackPositionStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
-=======
-                minInterval, maxInterval,
                 CHIPMediaPlaybackSampledPositionStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
->>>>>>> 208b919f18 (Run zap regen script)
         },
         subscriptionEstablishedHandler);
 }
@@ -20328,19 +20180,10 @@ using namespace chip::app::Clusters;
         });
 }
 
-<<<<<<< HEAD
-- (void)subscribeAttributeTargetNavigatorListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
-                                     subscriptionEstablished:
-                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                               reportHandler:
-                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
-=======
-- (void)subscribeAttributeTargetListWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeTargetListWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
->>>>>>> 208b919f18 (Run zap regen script)
 {
     new CHIPTargetNavigatorTargetListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -20349,13 +20192,8 @@ using namespace chip::app::Clusters;
             auto successFn = Callback<TargetNavigatorTargetListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-<<<<<<< HEAD
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPTargetNavigatorTargetNavigatorListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
-=======
-                minInterval, maxInterval,
                 CHIPTargetNavigatorTargetListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
->>>>>>> 208b919f18 (Run zap regen script)
         },
         subscriptionEstablishedHandler);
 }
@@ -20371,20 +20209,11 @@ using namespace chip::app::Clusters;
     });
 }
 
-<<<<<<< HEAD
-- (void)subscribeAttributeCurrentNavigatorTargetWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
-                                        subscriptionEstablished:
-                                            (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                  reportHandler:
-                                                      (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
-=======
-- (void)subscribeAttributeCurrentTargetWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeCurrentTargetWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
->>>>>>> 208b919f18 (Run zap regen script)
 {
     new CHIPInt8uAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
@@ -29652,19 +29481,10 @@ using namespace chip::app::Clusters;
     });
 }
 
-<<<<<<< HEAD
-- (void)subscribeAttributeWakeOnLanMacAddressWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
-                                     subscriptionEstablished:
-                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                               reportHandler:
-                                                   (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
-=======
-- (void)subscribeAttributeMACAddressWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
+- (void)subscribeAttributeMACAddressWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
->>>>>>> 208b919f18 (Run zap regen script)
 {
     new CHIPCharStringAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
