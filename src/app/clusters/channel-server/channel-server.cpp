@@ -195,7 +195,7 @@ CHIP_ERROR ChannelAttrAccess::ReadCurrentChannelAttribute(app::AttributeValueEnc
 // Matter Framework Callbacks Implementation
 
 bool emberAfChannelClusterChangeChannelCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                       const Commands::ChangeChannel::DecodableType & commandData)
+                                                const Commands::ChangeChannel::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
@@ -225,9 +225,8 @@ exit:
     return true;
 }
 
-bool emberAfChannelClusterChangeChannelByNumberCallback(
-    app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-    const Commands::ChangeChannelByNumber::DecodableType & commandData)
+bool emberAfChannelClusterChangeChannelByNumberCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                        const Commands::ChangeChannelByNumber::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
@@ -252,7 +251,7 @@ exit:
 }
 
 bool emberAfChannelClusterSkipChannelCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                     const Commands::SkipChannel::DecodableType & commandData)
+                                              const Commands::SkipChannel::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;

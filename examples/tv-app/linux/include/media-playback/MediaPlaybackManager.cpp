@@ -127,7 +127,7 @@ void MediaPlaybackManager::HandleSkipForward(CommandResponseHelper<Commands::Pla
 }
 
 void MediaPlaybackManager::HandleSeek(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
-                                             const uint64_t & positionMilliseconds)
+                                      const uint64_t & positionMilliseconds)
 {
     // TODO: Insert code here
     Commands::PlaybackResponse::Type response;
