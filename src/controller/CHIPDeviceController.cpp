@@ -506,7 +506,10 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowInternal()
 
     if (mCommissioningWindowOption != CommissioningWindowOption::kOriginalSetupCode)
     {
-        ByteSpan salt(Uint8::from_const_char(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt));
+        // TODO: Salt should be provided as an input or it should be randomly generated when
+        // the PIN is randomly generated.
+        const char kSpake2pKeyExchangeSalt[] = "SPAKE2P Key Salt";
+        ByteSpan salt(Uint8::from_const_char(kSpake2pKeyExchangeSalt), sizeof(kSpake2pKeyExchangeSalt));
         bool randomSetupPIN = (mCommissioningWindowOption == CommissioningWindowOption::kTokenWithRandomPIN);
         PASEVerifier verifier;
 
