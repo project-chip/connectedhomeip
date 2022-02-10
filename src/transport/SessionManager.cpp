@@ -133,8 +133,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         packetHeader.SetDestinationGroupId(groupSession->GetGroupId());
         packetHeader.SetFlags(Header::SecFlagValues::kPrivacyFlag);
         packetHeader.SetSessionType(Header::SessionType::kGroupSession);
-        // TODO : Replace the PeerNodeId with Our nodeId
-        packetHeader.SetSourceNodeId(kUndefinedNodeId);
+        packetHeader.SetSourceNodeId(groupSession->GetSourceNodeId());
 
         if (!packetHeader.IsValidGroupMsg())
         {
@@ -693,7 +692,8 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
     if (mCB != nullptr)
     {
         // TODO : When MCSP is done, clean up session creation logique
-        Optional<SessionHandle> session = CreateGroupSession(groupContext.group_id, groupContext.fabric_index);
+        Optional<SessionHandle> session =
+            CreateGroupSession(groupContext.group_id, groupContext.fabric_index, packetHeader.GetSourceNodeId().Value());
 
         VerifyOrReturn(session.HasValue(), ChipLogError(Inet, "Error when creating group session handle."));
         Transport::GroupSession * groupSession = session.Value()->AsGroupSession();

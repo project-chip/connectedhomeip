@@ -27,7 +27,10 @@ namespace Transport {
 class GroupSession : public Session
 {
 public:
-    GroupSession(GroupId group, FabricIndex fabricIndex) : mGroupId(group) { SetFabricIndex(fabricIndex); }
+    GroupSession(GroupId group, FabricIndex fabricIndex, NodeId sourceNodeId) : mGroupId(group), mSourceNodeId(sourceNodeId)
+    {
+        SetFabricIndex(fabricIndex);
+    }
     ~GroupSession() { NotifySessionReleased(); }
 
     Session::SessionType GetSessionType() const override { return Session::SessionType::kGroup; }
@@ -60,8 +63,11 @@ public:
 
     GroupId GetGroupId() const { return mGroupId; }
 
+    NodeId GetSourceNodeId() { return mSourceNodeId; }
+
 private:
     const GroupId mGroupId;
+    const NodeId mSourceNodeId;
 };
 
 /*
@@ -80,9 +86,9 @@ public:
      * @return the session found or allocated, nullptr if not found and allocation failed.
      */
     CHECK_RETURN_VALUE
-    Optional<SessionHandle> AllocEntry(GroupId group, FabricIndex fabricIndex)
+    Optional<SessionHandle> AllocEntry(GroupId group, FabricIndex fabricIndex, NodeId sourceNodeId)
     {
-        GroupSession * entry = mEntries.CreateObject(group, fabricIndex);
+        GroupSession * entry = mEntries.CreateObject(group, fabricIndex, sourceNodeId);
         if (entry != nullptr)
         {
             return MakeOptional<SessionHandle>(*entry);
