@@ -665,7 +665,6 @@ CHIP_ERROR NewICAX509Cert(const X509CertRequestParams & requestParams, const Cry
  * @brief Generate a new X.509 DER encoded Node operational certificate
  *
  * @param requestParams   Certificate request parameters.
- * @param issuerLevel     Indicates if the issuer is a root CA or an intermediate CA
  * @param subjectPubkey   The public key of subject
  * @param issuerKeypair   The certificate signing key
  * @param x509Cert        Buffer to store signed certificate in X.509 DER format.
