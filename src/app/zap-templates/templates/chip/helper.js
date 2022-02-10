@@ -167,15 +167,12 @@ async function if_basic_global_response(options)
 {
   const attribute          = this.response.arguments[0];
   const globalResponses    = await getServerGlobalAttributeResponses(this);
-  const complexType = attribute.isNullable || attribute.isOptional || attribute.isStruct || attribute.isArray;
+  const complexType        = attribute.isNullable || attribute.isOptional || attribute.isStruct || attribute.isArray;
   const responseTypeExists = globalResponses.find(item => item.chipType == attribute.chipType);
 
-  if (!complexType && responseTypeExists)
-  {
+  if (!complexType && responseTypeExists) {
     return options.fn(this);
-  }
-  else
-  {
+  } else {
     return options.inverse(this);
   }
 }
