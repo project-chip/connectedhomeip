@@ -40,8 +40,6 @@
 #include <app/server/Server.h>
 #include <lib/core/DataModelTypes.h>
 
-#define MAX_IP4_ADDRESS_STRING 16
-#define MAX_IP6_ADDRESS_STRING 40
 #define MAX_LENGTH_SMALL_FONT 30
 
 using namespace chip;
@@ -115,7 +113,7 @@ public:
             {
                 if ((it.GetAddress(addr) == CHIP_NO_ERROR) && addr.IsIPv4())
                 {
-                    char buf[MAX_IP4_ADDRESS_STRING];
+                    char buf[Inet::IPAddress::kMaxStringLength];
                     addr.ToString(buf, sizeof(buf));
                     itemString = std::string(buf);
                     break; // Only print first IPv4 address for now
@@ -130,7 +128,7 @@ public:
             {
                 if ((it.GetAddress(addr) == CHIP_NO_ERROR) && addr.IsIPv6LinkLocal())
                 {
-                    char buf[MAX_IP6_ADDRESS_STRING];
+                    char buf[Inet::IPAddress::kMaxStringLength];
                     addr.ToString(buf, sizeof(buf));
                     itemString = std::string(buf);
                     if (itemString.length() < MAX_LENGTH_SMALL_FONT)
@@ -153,7 +151,7 @@ public:
             {
                 if ((it.GetAddress(addr) == CHIP_NO_ERROR) && addr.IsIPv6ULA())
                 {
-                    char buf[MAX_IP6_ADDRESS_STRING];
+                    char buf[Inet::IPAddress::kMaxStringLength];
                     addr.ToString(buf, sizeof(buf));
                     itemString = std::string(buf);
                     if (itemString.length() < MAX_LENGTH_SMALL_FONT)
