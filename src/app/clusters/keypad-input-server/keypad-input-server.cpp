@@ -101,7 +101,7 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 // Matter Framework Callbacks Implementation
 
 bool emberAfKeypadInputClusterSendKeyCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                     const Commands::SendKey::DecodableType & commandData)
+                                              const Commands::SendKey::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;

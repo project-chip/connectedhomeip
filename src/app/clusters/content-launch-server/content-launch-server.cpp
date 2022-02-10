@@ -186,9 +186,8 @@ CHIP_ERROR ContentLauncherAttrAccess::ReadSupportedStreamingProtocolsAttribute(a
 // -----------------------------------------------------------------------------
 // Matter Framework Callbacks Implementation
 
-bool emberAfContentLauncherClusterLaunchContentCallback(
-    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-    const ContentLauncher::Commands::LaunchContent::DecodableType & commandData)
+bool emberAfContentLauncherClusterLaunchContentCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                        const ContentLauncher::Commands::LaunchContent::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
@@ -222,9 +221,8 @@ exit:
     return true;
 }
 
-bool emberAfContentLauncherClusterLaunchURLCallback(
-    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-    const ContentLauncher::Commands::LaunchURL::DecodableType & commandData)
+bool emberAfContentLauncherClusterLaunchURLCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                    const ContentLauncher::Commands::LaunchURL::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;

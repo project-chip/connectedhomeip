@@ -149,7 +149,7 @@ CHIP_ERROR MediaInputAttrAccess::ReadCurrentInputAttribute(app::AttributeValueEn
 // Matter Framework Callbacks Implementation
 
 bool emberAfMediaInputClusterSelectInputCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                        const Commands::SelectInput::DecodableType & commandData)
+                                                 const Commands::SelectInput::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
@@ -172,9 +172,8 @@ exit:
     return true;
 }
 
-bool emberAfMediaInputClusterShowInputStatusCallback(app::CommandHandler * command,
-                                                            const app::ConcreteCommandPath & commandPath,
-                                                            const Commands::ShowInputStatus::DecodableType & commandData)
+bool emberAfMediaInputClusterShowInputStatusCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                     const Commands::ShowInputStatus::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
@@ -195,9 +194,8 @@ exit:
     return true;
 }
 
-bool emberAfMediaInputClusterHideInputStatusCallback(app::CommandHandler * command,
-                                                            const app::ConcreteCommandPath & commandPath,
-                                                            const Commands::HideInputStatus::DecodableType & commandData)
+bool emberAfMediaInputClusterHideInputStatusCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                     const Commands::HideInputStatus::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
@@ -219,7 +217,7 @@ exit:
 }
 
 bool emberAfMediaInputClusterRenameInputCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                        const Commands::RenameInput::DecodableType & commandData)
+                                                 const Commands::RenameInput::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;

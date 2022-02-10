@@ -212,7 +212,7 @@ CHIP_ERROR MediaPlaybackAttrAccess::ReadSeekRangeEndAttribute(app::AttributeValu
 // Matter Framework Callbacks Implementation
 
 bool emberAfMediaPlaybackClusterPlayCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                    const Commands::Play::DecodableType & commandData)
+                                             const Commands::Play::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
@@ -236,7 +236,7 @@ exit:
 }
 
 bool emberAfMediaPlaybackClusterPauseCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                     const Commands::Pause::DecodableType & commandData)
+                                              const Commands::Pause::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
@@ -260,7 +260,7 @@ exit:
 }
 
 bool emberAfMediaPlaybackClusterStopPlaybackCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                    const Commands::StopPlayback::DecodableType & commandData)
+                                                     const Commands::StopPlayback::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
@@ -283,9 +283,8 @@ exit:
     return true;
 }
 
-bool emberAfMediaPlaybackClusterFastForwardCallback(app::CommandHandler * command,
-                                                           const app::ConcreteCommandPath & commandPath,
-                                                           const Commands::FastForward::DecodableType & commandData)
+bool emberAfMediaPlaybackClusterFastForwardCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                    const Commands::FastForward::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
@@ -309,7 +308,7 @@ exit:
 }
 
 bool emberAfMediaPlaybackClusterPreviousCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                        const Commands::Previous::DecodableType & commandData)
+                                                 const Commands::Previous::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
@@ -333,7 +332,7 @@ exit:
 }
 
 bool emberAfMediaPlaybackClusterRewindCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                      const Commands::Rewind::DecodableType & commandData)
+                                               const Commands::Rewind::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
@@ -356,9 +355,8 @@ exit:
     return true;
 }
 
-bool emberAfMediaPlaybackClusterSkipBackwardCallback(app::CommandHandler * command,
-                                                            const app::ConcreteCommandPath & commandPath,
-                                                            const Commands::SkipBackward::DecodableType & commandData)
+bool emberAfMediaPlaybackClusterSkipBackwardCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                     const Commands::SkipBackward::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
@@ -383,9 +381,8 @@ exit:
     return true;
 }
 
-bool emberAfMediaPlaybackClusterSkipForwardCallback(app::CommandHandler * command,
-                                                           const app::ConcreteCommandPath & commandPath,
-                                                           const Commands::SkipForward::DecodableType & commandData)
+bool emberAfMediaPlaybackClusterSkipForwardCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                    const Commands::SkipForward::DecodableType & commandData)
 {
     CHIP_ERROR err                   = CHIP_NO_ERROR;
     EndpointId endpoint              = commandPath.mEndpointId;
@@ -410,7 +407,7 @@ exit:
 }
 
 bool emberAfMediaPlaybackClusterSeekCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                    const Commands::Seek::DecodableType & commandData)
+                                             const Commands::Seek::DecodableType & commandData)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     EndpointId endpoint         = commandPath.mEndpointId;
@@ -435,7 +432,7 @@ exit:
 }
 
 bool emberAfMediaPlaybackClusterNextCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                    const Commands::Next::DecodableType & commandData)
+                                             const Commands::Next::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
@@ -458,9 +455,8 @@ exit:
     return true;
 }
 
-bool emberAfMediaPlaybackClusterStartOverCallback(app::CommandHandler * command,
-                                                         const app::ConcreteCommandPath & commandPath,
-                                                         const Commands::StartOver::DecodableType & commandData)
+bool emberAfMediaPlaybackClusterStartOverCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                  const Commands::StartOver::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
