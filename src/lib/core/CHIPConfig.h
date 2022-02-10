@@ -1328,7 +1328,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *
  *      * #CHIP_IM_MAX_NUM_COMMAND_HANDLER
  *      * #CHIP_IM_MAX_NUM_READ_HANDLER
- *      * #CHIP_IM_MAX_NUM_READ_CLIENT
  *      * #CHIP_IM_MAX_REPORTS_IN_FLIGHT
  *      * #CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
  *      * #CHIP_IM_SERVER_MAX_NUM_DIRTY_SET
@@ -1355,15 +1354,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_IM_MAX_NUM_READ_HANDLER
 #define CHIP_IM_MAX_NUM_READ_HANDLER 4
-#endif
-
-/**
- * @def CHIP_IM_MAX_NUM_READ_CLIENT
- *
- * @brief Defines the maximum number of ReadClient, limits the number of active read transactions on client.
- */
-#ifndef CHIP_IM_MAX_NUM_READ_CLIENT
-#define CHIP_IM_MAX_NUM_READ_CLIENT 4
 #endif
 
 /**
