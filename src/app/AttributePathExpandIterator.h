@@ -103,7 +103,7 @@ private:
     uint16_t mAttributeIndex, mEndAttributeIndex;
     // For dealing with global attributes that are not part of the attribute
     // metadata.
-    uint8_t mGlobalAttributeIndex;
+    uint8_t mGlobalAttributeIndex, mGlobalAttributeEndIndex;
 
     ConcreteAttributePath mOutputPath;
 

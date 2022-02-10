@@ -63,7 +63,9 @@ AttributePathExpandIterator::AttributePathExpandIterator(ClusterInfo * aClusterI
 
     static_assert(std::numeric_limits<decltype(mGlobalAttributeIndex)>::max() >= ArraySize(GlobalAttributesNotInMetadata),
                   "Our index won't be able to hold the value we need to hold.");
-    mGlobalAttributeIndex = ArraySize(GlobalAttributesNotInMetadata);
+    static_assert(std::is_same<decltype(mGlobalAttributeIndex), uint8_t>::value,
+                  "If this changes audit all uses where we set to UINT8_MAX");
+    mGlobalAttributeIndex = UINT8_MAX;
 
     // Make the iterator ready to emit the first valid path in the list.
     Next();
@@ -106,17 +108,35 @@ void AttributePathExpandIterator::PrepareAttributeIndexRange(const ClusterInfo &
 {
     if (aClusterInfo.HasWildcardAttributeId())
     {
-        mAttributeIndex       = 0;
-        mEndAttributeIndex    = emberAfGetServerAttributeCount(aEndpointId, aClusterId);
-        mGlobalAttributeIndex = 0;
+        mAttributeIndex          = 0;
+        mEndAttributeIndex       = emberAfGetServerAttributeCount(aEndpointId, aClusterId);
+        mGlobalAttributeIndex    = 0;
+        mGlobalAttributeEndIndex = ArraySize(GlobalAttributesNotInMetadata);
     }
     else
     {
         mAttributeIndex = emberAfGetServerAttributeIndexByAttributeId(aEndpointId, aClusterId, aClusterInfo.mAttributeId);
         // If the given attribute id does not exist on the given endpoint, it will return uint16(0xFFFF), then endAttributeIndex
         // will be 0, means we should iterate a null attribute set (skip it).
-        mEndAttributeIndex    = static_cast<uint16_t>(mAttributeIndex + 1);
-        mGlobalAttributeIndex = ArraySize(GlobalAttributesNotInMetadata);
+        mEndAttributeIndex = static_cast<uint16_t>(mAttributeIndex + 1);
+        if (mAttributeIndex == UINT16_MAX)
+        {
+            // Check whether this is a non-metadata global attribute.
+            //
+            // Default to the max value, which will correspond (after we add 1
+            // and overflow to 0 for the max index) to us not going through
+            // non-metadata global attributes for this attribute.
+            mGlobalAttributeIndex = UINT8_MAX;
+            for (uint8_t idx = 0; idx < ArraySize(GlobalAttributesNotInMetadata); ++idx)
+            {
+                if (GlobalAttributesNotInMetadata[idx] == aClusterInfo.mAttributeId)
+                {
+                    mGlobalAttributeIndex = idx;
+                    break;
+                }
+            }
+            mGlobalAttributeEndIndex = static_cast<uint8_t>(mGlobalAttributeIndex + 1);
+        }
     }
 }
 
@@ -145,8 +165,7 @@ bool AttributePathExpandIterator::Next()
         }
 
         for (; mEndpointIndex < mEndEndpointIndex;
-             (mEndpointIndex++, mClusterIndex = UINT8_MAX, mAttributeIndex = UINT16_MAX,
-                                mGlobalAttributeIndex = ArraySize(GlobalAttributesNotInMetadata)))
+             (mEndpointIndex++, mClusterIndex = UINT8_MAX, mAttributeIndex = UINT16_MAX, mGlobalAttributeIndex = UINT8_MAX))
         {
             if (!emberAfEndpointIndexIsEnabled(mEndpointIndex))
             {
@@ -160,16 +179,16 @@ bool AttributePathExpandIterator::Next()
             {
                 PrepareClusterIndexRange(*mpClusterInfo, endpointId);
                 mAttributeIndex       = UINT16_MAX;
-                mGlobalAttributeIndex = ArraySize(GlobalAttributesNotInMetadata);
+                mGlobalAttributeIndex = UINT8_MAX;
             }
 
             for (; mClusterIndex < mEndClusterIndex;
-                 (mClusterIndex++, mAttributeIndex = UINT16_MAX, mGlobalAttributeIndex = ArraySize(GlobalAttributesNotInMetadata)))
+                 (mClusterIndex++, mAttributeIndex = UINT16_MAX, mGlobalAttributeIndex = UINT8_MAX))
             {
                 // emberAfGetNthClusterId must return a valid cluster id here since we have verified the mClusterIndex does
                 // not exceed the mEndClusterIndex.
                 ClusterId clusterId = emberAfGetNthClusterId(endpointId, mClusterIndex, true /* server */).Value();
-                if (mAttributeIndex == UINT16_MAX)
+                if (mAttributeIndex == UINT16_MAX && mGlobalAttributeIndex == UINT8_MAX)
                 {
                     PrepareAttributeIndexRange(*mpClusterInfo, endpointId, clusterId);
                 }
@@ -186,7 +205,7 @@ bool AttributePathExpandIterator::Next()
                     // Return true will skip the increment of mClusterIndex, mEndpointIndex and mpClusterInfo.
                     return true;
                 }
-                else if (mGlobalAttributeIndex < ArraySize(GlobalAttributesNotInMetadata))
+                else if (mGlobalAttributeIndex < mGlobalAttributeEndIndex)
                 {
                     // Return a path pointing to the next global attribute.
                     mOutputPath.mAttributeId = GlobalAttributesNotInMetadata[mGlobalAttributeIndex];

@@ -164,6 +164,32 @@ void TestWildcardCluster(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, index == ArraySize(paths));
 }
 
+void TestWildcardClusterGlobalAttributeNotInMetadata(nlTestSuite * apSuite, void * apContext)
+{
+    app::ClusterInfo clusInfo;
+    clusInfo.mEndpointId  = Test::kMockEndpoint3;
+    clusInfo.mAttributeId = app::Clusters::Globals::Attributes::AttributeList::Id;
+
+    app::ConcreteAttributePath path;
+    P paths[] = {
+        { kMockEndpoint3, MockClusterId(1), Clusters::Globals::Attributes::AttributeList::Id },
+        { kMockEndpoint3, MockClusterId(2), Clusters::Globals::Attributes::AttributeList::Id },
+        { kMockEndpoint3, MockClusterId(3), Clusters::Globals::Attributes::AttributeList::Id },
+        { kMockEndpoint3, MockClusterId(4), Clusters::Globals::Attributes::AttributeList::Id },
+    };
+
+    size_t index = 0;
+
+    for (app::AttributePathExpandIterator iter(&clusInfo); iter.Get(path); iter.Next())
+    {
+        ChipLogDetail(AppServer, "Visited Attribute: 0x%04" PRIX16 " / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
+                      ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
+        NL_TEST_ASSERT(apSuite, index < ArraySize(paths) && paths[index] == path);
+        index++;
+    }
+    NL_TEST_ASSERT(apSuite, index == ArraySize(paths));
+}
+
 void TestWildcardAttribute(nlTestSuite * apSuite, void * apContext)
 {
     app::ClusterInfo clusInfo;
@@ -354,6 +380,8 @@ const nlTest sTests[] =
         NL_TEST_DEF("TestAllWildcard", TestAllWildcard),
         NL_TEST_DEF("TestWildcardEndpoint", TestWildcardEndpoint),
         NL_TEST_DEF("TestWildcardCluster", TestWildcardCluster),
+        NL_TEST_DEF("TestWildcardClusterGlobalAttributeNotInMetadata",
+                    TestWildcardClusterGlobalAttributeNotInMetadata),
         NL_TEST_DEF("TestWildcardAttribute", TestWildcardAttribute),
         NL_TEST_DEF("TestNoWildcard", TestNoWildcard),
         NL_TEST_DEF("TestMultipleClusInfo", TestMultipleClusInfo),
