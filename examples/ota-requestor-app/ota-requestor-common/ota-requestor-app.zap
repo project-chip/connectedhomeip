@@ -4113,10 +4113,10 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": "0",
               "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
+              "minInterval": -27315,
+              "maxInterval": 32767,
               "reportableChange": 0
             },
             {
@@ -4128,10 +4128,10 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x8000",
+              "defaultValue": "",
               "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
+              "minInterval": -27315,
+              "maxInterval": 32766,
               "reportableChange": 0
             },
             {
@@ -4143,10 +4143,10 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x8000",
+              "defaultValue": "",
               "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
+              "minInterval": -27314,
+              "maxInterval": 32767,
               "reportableChange": 0
             },
             {
