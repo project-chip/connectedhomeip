@@ -28,75 +28,72 @@ namespace Minimal {
 
 constexpr chip::System::Clock::Timeout ActiveResolveAttempts::kMaxRetryDelay;
 
-void ActiveResolveAttempts::Reset()
-
+ActiveResolveAttempts::RetryEntry * ActiveResolveAttempts::FindEntry(const chip::PeerId & peerId)
 {
-    for (auto & item : mRetryQueue)
-    {
-        item.peerId.SetNodeId(kUndefinedNodeId);
-    }
+    RetryEntry * result = nullptr;
+    mRetryQueue.ForEachActiveObject([&](RetryEntry * item) {
+        if (item->peerId == peerId)
+        {
+            result = item;
+            return Loop::Break;
+        }
+        return Loop::Continue;
+    });
+    return result;
 }
 
 void ActiveResolveAttempts::Complete(const PeerId & peerId)
 {
-    for (auto & item : mRetryQueue)
+    RetryEntry * match = FindEntry(peerId);
+    if (match != nullptr)
     {
-        if (item.peerId == peerId)
-        {
-            item.peerId.SetNodeId(kUndefinedNodeId);
-            return;
-        }
+        mRetryQueue.ReleaseObject(match);
     }
-
-    // This may happen during boot time adverisements: nodes come online
-    // and advertise their IP without any explicit queries for them
-    ChipLogProgress(Discovery, "Discovered node without a pending query");
+    else
+    {
+        ChipLogProgress(Discovery, "Discovered node without a pending query");
+    }
 }
 
 void ActiveResolveAttempts::MarkPending(const PeerId & peerId)
 {
-    // Strategy when picking the peer id to use:
-    //   1 if a matching peer id is already found, use that one
+    // Strategy when picking the peer to use:
+    //   1 if a matching peer is already found, use that one
     //   2 if an 'unused' entry is found, use that
     //   3 otherwise expire the one with the largest nextRetryDelay
     //     or if equal nextRetryDelay, pick the one with the oldest
     //     queryDueTime
 
-    RetryEntry * entryToUse = &mRetryQueue[0];
-
-    for (size_t i = 1; i < kRetryQueueSize; i++)
+    // Rule 1: peer id match always matches
+    RetryEntry * entryToUse = FindEntry(peerId);
+    if (entryToUse != nullptr)
     {
-        if (entryToUse->peerId == peerId)
+        MarkPending(entryToUse);
+        return;
+    }
+
+    // Rule 2: select unused entries
+    if (mRetryQueue.Allocated() < kRetryQueueSize)
+    {
+        entryToUse = mRetryQueue.CreateObject(peerId);
+        if (entryToUse != nullptr)
         {
-            break; // best match possible
+            MarkPending(entryToUse);
+            return;
         }
+    }
 
-        RetryEntry * entry = mRetryQueue + i;
-
-        // Rule 1: peer id match always matches
-        if (entry->peerId == peerId)
+    // Rule 3: both choices are used (have a defined node id):
+    //    - try to find the one with the largest next delay (oldest request)
+    //    - on same delay, use queryDueTime to determine the oldest request
+    //      (the one with the smallest  due time was issued the longest time
+    //       ago)
+    mRetryQueue.ForEachActiveObject([&](RetryEntry * entry) {
+        if (entryToUse == nullptr)
         {
             entryToUse = entry;
-            continue;
         }
-
-        // Rule 2: select unused entries
-        if ((entryToUse->peerId.GetNodeId() != kUndefinedNodeId) && (entry->peerId.GetNodeId() == kUndefinedNodeId))
-        {
-            entryToUse = entry;
-            continue;
-        }
-        else if (entryToUse->peerId.GetNodeId() == kUndefinedNodeId)
-        {
-            continue;
-        }
-
-        // Rule 3: both choices are used (have a defined node id):
-        //    - try to find the one with the largest next delay (oldest request)
-        //    - on same delay, use queryDueTime to determine the oldest request
-        //      (the one with the smallest  due time was issued the longest time
-        //       ago)
-        if (entry->nextRetryDelay > entryToUse->nextRetryDelay)
+        else if (entry->nextRetryDelay > entryToUse->nextRetryDelay)
         {
             entryToUse = entry;
         }
@@ -104,10 +101,16 @@ void ActiveResolveAttempts::MarkPending(const PeerId & peerId)
         {
             entryToUse = entry;
         }
-    }
 
-    if ((entryToUse->peerId.GetNodeId() != kUndefinedNodeId) && (entryToUse->peerId != peerId))
+        return Loop::Continue;
+    });
+
+    if (entryToUse != nullptr)
     {
+        mRetryQueue.ReleaseObject(entryToUse);
+        entryToUse = mRetryQueue.CreateObject(peerId);
+        VerifyOrDie(entryToUse != nullptr);
+
         // TODO: node was evicted here, if/when resolution failures are
         // supported this could be a place for error callbacks
         //
@@ -116,9 +119,13 @@ void ActiveResolveAttempts::MarkPending(const PeerId & peerId)
         // still be received for this peer id (query was already sent on the
         // network)
         ChipLogError(Discovery, "Re-using pending resolve entry before reply was received.");
+        MarkPending(entryToUse);
+        return;
     }
+}
 
-    entryToUse->peerId         = peerId;
+void ActiveResolveAttempts::MarkPending(RetryEntry * entryToUse)
+{
     entryToUse->queryDueTime   = mClock->GetMonotonicTimestamp();
     entryToUse->nextRetryDelay = System::Clock::Seconds16(1);
 }
@@ -129,25 +136,22 @@ Optional<System::Clock::Timeout> ActiveResolveAttempts::GetTimeUntilNextExpected
 
     chip::System::Clock::Timestamp now = mClock->GetMonotonicTimestamp();
 
-    for (auto & entry : mRetryQueue)
-    {
-        if (entry.peerId.GetNodeId() == kUndefinedNodeId)
-        {
-            continue;
-        }
-
-        if (now >= entry.queryDueTime)
+    mRetryQueue.ForEachActiveObject([&](const RetryEntry * entry) {
+        if (now >= entry->queryDueTime)
         {
             // found an entry that needs processing right now
-            return Optional<System::Clock::Timeout>::Value(0);
+            minDelay = Optional<System::Clock::Timeout>::Value(0);
+            return Loop::Break;
         }
 
-        System::Clock::Timeout entryDelay = entry.queryDueTime - now;
+        System::Clock::Timeout entryDelay = entry->queryDueTime - now;
         if (!minDelay.HasValue() || (minDelay.Value() > entryDelay))
         {
             minDelay.SetValue(entryDelay);
         }
-    }
+
+        return Loop::Continue;
+    });
 
     return minDelay;
 }
@@ -156,32 +160,37 @@ Optional<PeerId> ActiveResolveAttempts::NextScheduledPeer()
 {
     chip::System::Clock::Timestamp now = mClock->GetMonotonicTimestamp();
 
-    for (auto & entry : mRetryQueue)
-    {
-        if (entry.peerId.GetNodeId() == kUndefinedNodeId)
+    RetryEntry * result = nullptr;
+    mRetryQueue.ForEachActiveObject([&](RetryEntry * entry) {
+        if (entry->queryDueTime > now)
         {
-            continue; // not a pending item
+            return Loop::Continue; // not yet due
         }
 
-        if (entry.queryDueTime > now)
-        {
-            continue; // not yet due
-        }
-
-        if (entry.nextRetryDelay > kMaxRetryDelay)
+        if (entry->nextRetryDelay > kMaxRetryDelay)
         {
             ChipLogError(Discovery, "Timeout waiting for mDNS resolution.");
-            entry.peerId.SetNodeId(kUndefinedNodeId);
-            continue;
+            mRetryQueue.ReleaseObject(entry);
+            return Loop::Continue;
         }
 
-        entry.queryDueTime = now + entry.nextRetryDelay;
-        entry.nextRetryDelay *= 2;
+        if (result == nullptr || entry->queryDueTime < result->queryDueTime)
+        {
+            result = entry;
+        }
+        return Loop::Continue;
+    });
 
-        return Optional<PeerId>::Value(entry.peerId);
+    if (result != nullptr)
+    {
+        result->queryDueTime = now + result->nextRetryDelay;
+        result->nextRetryDelay *= 2;
+        return Optional<PeerId>::Value(result->peerId);
     }
-
-    return Optional<PeerId>::Missing();
+    else
+    {
+        return Optional<PeerId>::Missing();
+    }
 }
 
 } // namespace Minimal

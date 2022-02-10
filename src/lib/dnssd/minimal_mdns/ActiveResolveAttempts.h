@@ -22,6 +22,7 @@
 
 #include <lib/core/Optional.h>
 #include <lib/core/PeerId.h>
+#include <lib/support/Pool.h>
 #include <system/SystemClock.h>
 
 namespace mdns {
@@ -41,10 +42,8 @@ public:
     static constexpr size_t kRetryQueueSize                      = 4;
     static constexpr chip::System::Clock::Timeout kMaxRetryDelay = chip::System::Clock::Seconds16(16);
 
-    ActiveResolveAttempts(chip::System::Clock::ClockBase * clock) : mClock(clock) { Reset(); }
-
-    /// Clear out the internal queue
-    void Reset();
+    ActiveResolveAttempts(chip::System::Clock::ClockBase * clock) : mClock(clock) {}
+    ~ActiveResolveAttempts() { mRetryQueue.ReleaseAll(); }
 
     /// Mark a resolution as a success, removing it from the internal list
     void Complete(const chip::PeerId & peerId);
@@ -73,10 +72,12 @@ public:
 private:
     struct RetryEntry
     {
+        RetryEntry(chip::PeerId aPeerId) : peerId(aPeerId), nextRetryDelay(chip::System::Clock::Seconds16(1)) {}
+
         // What peer id is pending resolution.
         //
         // Inactive entries are marked by having NodeId == kUndefinedNodeId
-        chip::PeerId peerId;
+        const chip::PeerId peerId;
 
         // When a reply is expected for this item
         chip::System::Clock::Timestamp queryDueTime;
@@ -89,11 +90,14 @@ private:
         //      one second
         //    - the intervals between successive queries MUST increase by at
         //      least a factor of two
-        chip::System::Clock::Timeout nextRetryDelay = chip::System::Clock::Seconds16(1);
+        chip::System::Clock::Timeout nextRetryDelay;
     };
 
+    RetryEntry * FindEntry(const chip::PeerId & peerId);
+    void MarkPending(RetryEntry * entryToUse);
+
     chip::System::Clock::ClockBase * mClock;
-    RetryEntry mRetryQueue[kRetryQueueSize];
+    chip::ObjectPool<RetryEntry, kRetryQueueSize> mRetryQueue;
 };
 
 } // namespace Minimal

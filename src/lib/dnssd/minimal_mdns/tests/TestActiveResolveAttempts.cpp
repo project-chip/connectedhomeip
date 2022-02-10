@@ -229,11 +229,10 @@ void TestNextPeerOrdering(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, attempts.GetTimeUntilNextExpectedResponse() == Optional<Timeout>(400_ms32));
     NL_TEST_ASSERT(inSuite, !attempts.NextScheduledPeer().HasValue());
 
-    // advancing the clock 'too long' will return both other entries, in  reverse order due to how
-    // the internal cache is built
+    // advancing the clock 'too long' will return both other entries, in FIFO order.
     mockClock.AdvanceMonotonic(500_ms32);
-    NL_TEST_ASSERT(inSuite, attempts.NextScheduledPeer() == Optional<PeerId>::Value(MakePeerId(3)));
     NL_TEST_ASSERT(inSuite, attempts.NextScheduledPeer() == Optional<PeerId>::Value(MakePeerId(2)));
+    NL_TEST_ASSERT(inSuite, attempts.NextScheduledPeer() == Optional<PeerId>::Value(MakePeerId(3)));
     NL_TEST_ASSERT(inSuite, !attempts.NextScheduledPeer().HasValue());
 }
 
@@ -249,8 +248,12 @@ const nlTest sTests[] = {
 
 int TestActiveResolveAttempts(void)
 {
+    CHIP_ERROR error = chip::Platform::MemoryInit();
+    if (error != CHIP_NO_ERROR)
+        return FAILURE;
     nlTestSuite theSuite = { "ActiveResolveAttempts", sTests, nullptr, nullptr };
     nlTestRunner(&theSuite, nullptr);
+    chip::Platform::MemoryShutdown();
     return nlTestRunnerStats(&theSuite);
 }
 
