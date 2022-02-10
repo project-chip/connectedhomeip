@@ -551,7 +551,6 @@ CHIP_ERROR OTARequestor::SendQueryImageRequest(OperationalDeviceProxy & devicePr
 
     args.protocolsSupported = kProtocolsSupported;
     args.requestorCanConsent.SetValue(mRequestorCanConsent.ValueOr(mOtaRequestorDriver->CanConsent()));
-    ChipLogProgress(SoftwareUpdate, "Setting requestorCanConsent to: %d", args.requestorCanConsent.Value());
 
     uint16_t hardwareVersion;
     if (DeviceLayer::ConfigurationMgr().GetHardwareVersion(hardwareVersion) == CHIP_NO_ERROR)
