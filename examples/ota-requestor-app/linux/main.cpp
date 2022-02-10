@@ -94,11 +94,10 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "        From boot up, the amount of time to wait before triggering the QueryImage\n"
                              "        command. If none or zero is supplied, QueryImage will not be triggered.\n"
                              "  -c/--RequestorCanConsent\n"
-                             "        If provided, the RequestorCanConsent field of the Query Image request is set to true.
-                             Else,
-                             it is set to false. \n " };
+                             "        If provided, the RequestorCanConsent field of the Query Image request is set to true.\n"
+                             "        Else, it is set to false.\n " };
 
-                             HelpOptions helpOptions("ota-requestor-app", "Usage: ota-requestor-app [options]", "1.0");
+HelpOptions helpOptions("ota-requestor-app", "Usage: ota-requestor-app [options]", "1.0");
 
 OptionSet * allOptions[] = { &cmdLineOptions, &helpOptions, nullptr };
 
@@ -183,7 +182,7 @@ void ApplicationInit()
 
     if (gRequestorCanConsent.HasValue())
     {
-        gRequestorCore.SetProviderParameters(gRequestorCanConsent.Value());
+        gRequestorCore.SetRequestorCanConsent(gRequestorCanConsent.Value());
     }
 
     // Initialize all OTA download components
