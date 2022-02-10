@@ -75,6 +75,7 @@ if [ "$#" == "0" ]; then
         'import("//with_pw_rpc.gni")'
             Use to build the example with pigweed RPC
         OTA_periodic_query_timeout
+            Periodic query timeout for OTA in seconds
         Presets
         --sed
             enable sleepy end device and set thread mtd
