@@ -27,8 +27,10 @@ namespace Transport {
 class GroupSession : public Session
 {
 public:
-
-    GroupSession(GroupId group, FabricIndex fabricIndex, NodeId sourceNodeId) : mGroupId(group), mSourceNodeId(sourceNodeId) { SetFabricIndex(fabricIndex); }
+    GroupSession(GroupId group, FabricIndex fabricIndex, NodeId sourceNodeId) : mGroupId(group), mSourceNodeId(sourceNodeId)
+    {
+        SetFabricIndex(fabricIndex);
+    }
     ~GroupSession() { NotifySessionReleased(); }
 
     Session::SessionType GetSessionType() const override { return Session::SessionType::kGroup; }
