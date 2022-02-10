@@ -714,8 +714,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
     ChipLogProgress(DeviceLayer,
                     "Extended Address: %02X%02X:%02X%02X:%02X%02X:%02X%02X\n"
                     "Instant RSSI:     %d\n",
-					extAddress->m8[0], extAddress->m8[1], extAddress->m8[2], extAddress->m8[3], extAddress->m8[4],
-					extAddress->m8[5], extAddress->m8[6], extAddress->m8[7], instantRssi);
+                    extAddress->m8[0], extAddress->m8[1], extAddress->m8[2], extAddress->m8[3], extAddress->m8[4],
+                    extAddress->m8[5], extAddress->m8[6], extAddress->m8[7], instantRssi);
 
 exit:
     Impl()->UnlockThreadStack();
@@ -810,10 +810,10 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
 
     memset(printBuf, 0x00, TELEM_PRINT_BUFFER_SIZE);
     snprintf(printBuf, TELEM_PRINT_BUFFER_SIZE, "%02X%02X:%02X%02X:%02X%02X:%02X%02X:%02X%02X:%02X%02X:%02X%02X:%02X%02X\n",
-    		leaderAddr->mFields.m8[0], leaderAddr->mFields.m8[1], leaderAddr->mFields.m8[2], leaderAddr->mFields.m8[3],
-			leaderAddr->mFields.m8[4], leaderAddr->mFields.m8[5], leaderAddr->mFields.m8[6], leaderAddr->mFields.m8[7],
-			leaderAddr->mFields.m8[8], leaderAddr->mFields.m8[9], leaderAddr->mFields.m8[10], leaderAddr->mFields.m8[11],
-			leaderAddr->mFields.m8[12], leaderAddr->mFields.m8[13], leaderAddr->mFields.m8[14], leaderAddr->mFields.m8[15]);
+             leaderAddr->mFields.m8[0], leaderAddr->mFields.m8[1], leaderAddr->mFields.m8[2], leaderAddr->mFields.m8[3],
+             leaderAddr->mFields.m8[4], leaderAddr->mFields.m8[5], leaderAddr->mFields.m8[6], leaderAddr->mFields.m8[7],
+             leaderAddr->mFields.m8[8], leaderAddr->mFields.m8[9], leaderAddr->mFields.m8[10], leaderAddr->mFields.m8[11],
+             leaderAddr->mFields.m8[12], leaderAddr->mFields.m8[13], leaderAddr->mFields.m8[14], leaderAddr->mFields.m8[15]);
 
     ChipLogProgress(DeviceLayer,
                     "Thread Topology:\n"
@@ -821,24 +821,25 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
                     "Router ID:                     %u\n"
                     "Leader Router ID:              %u\n"
                     "Leader Address:		        %s\n"
-					"Leader Weight:                 %d\n"
-					"Local Leader Weight:           %d\n"
-					"Network Data Len:              %d\n"
-					"Network Data Version:          %d\n"
-					"Stable Network Data Version:   %d\n",
-                    rloc16, routerId, leaderRouterId, printBuf, leaderWeight, leaderLocalWeight, networkDataLen,
-					networkDataVersion, stableNetworkDataVersion);
+                    "Leader Weight:                 %d\n"
+                    "Local Leader Weight:           %d\n"
+                    "Network Data Len:              %d\n"
+                    "Network Data Version:          %d\n"
+                    "Stable Network Data Version:   %d\n",
+                    rloc16, routerId, leaderRouterId, printBuf, leaderWeight, leaderLocalWeight, networkDataLen, networkDataVersion,
+                    stableNetworkDataVersion);
 
     memset(printBuf, 0x00, TELEM_PRINT_BUFFER_SIZE);
 
-	ChipLogProgress(DeviceLayer,
-					"Extended Address:              %02X%02X:%02X%02X:%02X%02X:%02X%02X\n"
-					"Partition ID:                  %" PRIx32 "\n"
-					"Instant RSSI:                  %d\n"
-					"Neighbor Table Length:         %d\n"
-					"Child Table Length:            %d\n",
-					extAddress->m8[0], extAddress->m8[1], extAddress->m8[2], extAddress->m8[3], extAddress->m8[4], extAddress->m8[5],
-					extAddress->m8[6], extAddress->m8[7], partitionId, instantRssi, neighborTableSize, childTableSize);
+    ChipLogProgress(DeviceLayer,
+                    "Extended Address:              %02X%02X:%02X%02X:%02X%02X:%02X%02X\n"
+                    "Partition ID:                  %" PRIx32 "\n"
+                    "Instant RSSI:                  %d\n"
+                    "Neighbor Table Length:         %d\n"
+                    "Child Table Length:            %d\n",
+                    extAddress->m8[0], extAddress->m8[1], extAddress->m8[2], extAddress->m8[3], extAddress->m8[4],
+                    extAddress->m8[5], extAddress->m8[6], extAddress->m8[7], partitionId, instantRssi, neighborTableSize,
+                    childTableSize);
 
     // Handle each neighbor event seperatly.
     for (uint32_t i = 0; i < neighborTableSize; i++)
