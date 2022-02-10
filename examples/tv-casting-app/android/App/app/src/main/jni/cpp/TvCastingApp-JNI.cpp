@@ -51,7 +51,8 @@ void TvCastingAppJNI::InitializeWithObjects(jobject app)
 void TvCastingAppJNI::PostClusterInit(chip::ClusterId clusterId, chip::EndpointId endpoint)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrReturn(env != nullptr, ChipLogError(AppServer, "Failed to GetEnvForCurrentThread for TvCastingAppJNI::PostClusterInit"));
+    VerifyOrReturn(env != nullptr,
+                   ChipLogError(AppServer, "Failed to GetEnvForCurrentThread for TvCastingAppJNI::PostClusterInit"));
     VerifyOrReturn(mTvCastingAppObject != nullptr, ChipLogError(AppServer, "TvCastingAppJNI::mTvCastingAppObject null"));
     VerifyOrReturn(mPostClusterInitMethod != nullptr, ChipLogError(AppServer, "TvCastingAppJNI::mPostClusterInitMethod null"));
 
