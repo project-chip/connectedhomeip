@@ -123,8 +123,7 @@ CHIP_ERROR Delegate::HandleGetCurrentApp(app::AttributeValueEncoder & aEncoder)
     }
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
-    ApplicationEPType currentApp;
-    return aEncoder.Encode(currentApp);
+    return aEncoder.EncodeNull();
 }
 
 } // namespace ApplicationLauncher
