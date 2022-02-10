@@ -470,6 +470,33 @@ async function if_chip_enum(type, options)
   return templateUtil.templatePromise(this.global, result);
 }
 
+async function if_chip_complex(options)
+{
+  // `zcl_command_arguments` has an `isArray` property and `type`
+  // contains the array element type.
+  if (this.isArray) {
+    return options.fn(this);
+  }
+
+  // zcl_attributes iterators does not expose an `isArray` property
+  // and `entryType` contains the array element type, while `type`
+  // contains the atomic type, which is array in this case.
+  // https://github.com/project-chip/zap/issues/412
+  if (this.type == 'array') {
+    return options.fn(this);
+  }
+
+  let pkgId       = await templateUtil.ensureZclPackageId(this);
+  let checkResult = await zclHelper.isStruct(this.global.db, this.type, pkgId);
+  let result;
+  if (checkResult != 'unknown') {
+    result = options.fn(this);
+  } else {
+    result = options.inverse(this);
+  }
+  return templateUtil.templatePromise(this.global, result);
+}
+
 //
 // Module exports
 //
@@ -494,6 +521,7 @@ exports.chip_available_cluster_commands                      = chip_available_cl
 exports.chip_endpoints                                       = chip_endpoints;
 exports.chip_endpoint_clusters                               = chip_endpoint_clusters;
 exports.if_chip_enum                                         = if_chip_enum;
+exports.if_chip_complex                                      = if_chip_complex;
 exports.if_in_global_responses                               = if_in_global_responses;
 exports.chip_cluster_specific_structs                        = chip_cluster_specific_structs;
 exports.chip_shared_structs                                  = chip_shared_structs;

@@ -478,6 +478,11 @@ function nsValueToNamespace(ns)
  */
 async function zapTypeToClusterObjectType(type, isDecodable, options)
 {
+  // Use the entryType as a type
+  if (type == 'array' && this.entryType) {
+    type = this.entryType;
+  }
+
   let passByReference = false;
   async function fn(pkgId)
   {
