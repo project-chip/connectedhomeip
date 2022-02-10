@@ -30,7 +30,7 @@ private:
     friend TvCastingAppJNI & TvCastingAppJNIMgr();
 
     static TvCastingAppJNI sInstance;
-    jobject mTvCastingAppObject             = nullptr;
+    jobject mTvCastingAppObject      = nullptr;
     jmethodID mPostClusterInitMethod = nullptr;
 };
 
