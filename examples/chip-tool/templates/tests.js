@@ -42,7 +42,7 @@ function getManualTests()
     DeviceDiscovery, //
     Groups, //
     BulkDataExchangeProtocol , //
-    
+
   ];
   return tests.flat(1);
 }
