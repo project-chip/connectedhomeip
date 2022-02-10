@@ -87,7 +87,6 @@ p6_sdk_sources("ota_requestor_app_sdk_sources") {
     "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/",
     "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/sysflash/",
     "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/bootutil/include",
-    "${chip_root}/third_party/p6/p6_sdk/libs/serial-flash/",
   ]
 
   defines = [
@@ -102,8 +101,6 @@ p6_sdk_sources("ota_requestor_app_sdk_sources") {
     "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/cy_flash_pal/cy_flash_psoc6.c",
     "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/cy_flash_pal/cy_smif_psoc6.c",
     "${chip_root}/third_party/p6/p6_sdk/libs/anycloud-ota/source/mcuboot/cy_flash_pal/mem_config/mem_config_sfdp.c",
-    "${chip_root}/third_party/p6/p6_sdk/libs/serial-flash/cy_serial_flash_prog.c",
-    "${chip_root}/third_party/p6/p6_sdk/libs/serial-flash/cy_serial_flash_qspi.c",
     "${p6_project_dir}/include/CHIPProjectConfig.h",
   ]
 
