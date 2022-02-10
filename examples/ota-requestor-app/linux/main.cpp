@@ -92,7 +92,7 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "        advertisements. If none is specified, default value is 3840.\n"
                              "  -q/--delayQuery <Time in seconds>\n"
                              "        From boot up, the amount of time to wait before triggering the QueryImage\n"
-                             "        command. If none or zero is supplied, QueryImage will not be triggered.\n" 
+                             "        command. If none or zero is supplied, QueryImage will not be triggered.\n"
                              "  -c/--RequestorCanConsent\n"
                              "        If provided, the RequestorCanConsent field of the Query Image request is set to true.\n"};
 
@@ -124,7 +124,7 @@ static void InitOTARequestor(void)
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
 {
     bool retval = true;
-    
+
     switch (aIdentifier)
     {
     case kOptionProviderNodeId:
