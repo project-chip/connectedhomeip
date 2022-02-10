@@ -1,0 +1,31 @@
+config:
+    exampleVariable:
+        type: INT16U
+        defaultValue: 110
+    coolVariables:
+        type: CHAR_STRING
+        defaultValue: "I am a super cool variable"
+    aBigNumber:
+        type: INT64U
+        defaultValue: 1.8446744e+19
+    aBool:
+        type: BOOLEAN
+        defaultValue: false
+
+tests:
+    - label: "Examples Test Step 1"
+      cluster: "ExampleCluster"
+      command: "ExamplesCommand"
+      disabled: false # Disables the test step if true
+      arguments: # User variable as arguments
+          values:
+              - name: "exampleVariable"
+                value: exampleVariable
+
+    - label: "Examples Test Step 2"
+      cluster: "ExampleCluster2"
+      command: "ExamplesCommand2"
+      response: # User variable as response value checks
+          values:
+              - name: "aBool"
+                value: aBool
