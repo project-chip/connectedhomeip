@@ -217,9 +217,9 @@ public:
     }
 
     // TODO: implements group sessions
-    Optional<SessionHandle> CreateGroupSession(GroupId group, chip::FabricIndex fabricIndex)
+    Optional<SessionHandle> CreateGroupSession(GroupId group, chip::FabricIndex fabricIndex, NodeId sourceNodeId)
     {
-        return mGroupSessions.AllocEntry(group, fabricIndex);
+        return mGroupSessions.AllocEntry(group, fabricIndex, sourceNodeId);
     }
     Optional<SessionHandle> FindGroupSession(GroupId group, chip::FabricIndex fabricIndex)
     {
