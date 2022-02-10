@@ -44,6 +44,9 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
+#include <app/clusters/network-commissioning/network-commissioning.h>
+#include <platform/P6/NetworkCommissioningDriver.h>
+
 extern "C" {
 #include "cy_smif_psoc6.h"
 }
@@ -66,9 +69,10 @@ using chip::OTARequestor;
 using chip::System::Layer;
 
 using namespace ::chip;
+using namespace chip::TLV;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
-using namespace ::chip::app::Clusters;
+using namespace ::chip::System;
 
 namespace {
 TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
@@ -93,9 +97,17 @@ OTARequestor gRequestorCore;
 GenericOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
+
+app::Clusters::NetworkCommissioning::Instance
+    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::P6WiFiDriver::GetInstance()));
 } // namespace
 
 AppTask AppTask::sAppTask;
+
+void NetWorkCommissioningInstInit()
+{
+    sWiFiNetworkCommissioningInstance.Init();
+}
 
 CHIP_ERROR AppTask::StartAppTask()
 {
@@ -119,13 +131,6 @@ CHIP_ERROR AppTask::Init()
     if (rc != 0)
     {
         P6_LOG("boot_set_confirmed failed");
-        appError(CHIP_ERROR_WELL_UNINITIALIZED);
-    }
-
-    rc = psoc6_qspi_init();
-    if (rc != 0)
-    {
-        P6_LOG("psoc6_qspi_init failed");
         appError(CHIP_ERROR_WELL_UNINITIALIZED);
     }
 
@@ -165,6 +170,8 @@ CHIP_ERROR AppTask::Init()
         appError(APP_ERROR_CREATE_TIMER_FAILED);
     }
 
+    NetWorkCommissioningInstInit();
+    P6_LOG("Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
     P6_LOG("Current Firmware Version: %s", CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING);
 
     // Initialize LEDs
@@ -199,24 +206,11 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     while (true)
     {
-        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, portMAX_DELAY);
-        if (eventReceived == pdTRUE)
+        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, pdMS_TO_TICKS(10));
+        while (eventReceived == pdTRUE)
         {
             sAppTask.DispatchEvent(&event);
-        }
-
-        // Collect connectivity and configuration state from the CHIP stack. Because
-        // the CHIP event loop is being run in a separate task, the stack must be
-        // locked while these values are queried.  However we use a non-blocking
-        // lock request (TryLockCHIPStack()) to avoid blocking other UI activities
-        // when the CHIP task is busy (e.g. with a long crypto operation).
-        if (PlatformMgr().TryLockChipStack())
-        {
-            sIsWiFiStationEnabled     = ConnectivityMgr().IsWiFiStationEnabled();
-            sIsWiFiStationConnected   = ConnectivityMgr().IsWiFiStationConnected();
-            sIsWiFiStationProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
-            sHaveBLEConnections       = (ConnectivityMgr().NumBLEConnections() != 0);
-            PlatformMgr().UnlockChipStack();
+            eventReceived = xQueueReceive(sAppEventQueue, &event, 0);
         }
 
         // Update the status LED if factory reset has not been initiated.
