@@ -33,7 +33,6 @@
 
 using chip::BitFlags;
 using chip::app::Clusters::OTAProviderDelegate;
-using chip::ArgParser::HelpOptions;
 using chip::ArgParser::OptionDef;
 using chip::ArgParser::OptionSet;
 using chip::ArgParser::PrintArgError;
@@ -45,17 +44,15 @@ constexpr chip::EndpointId kOtaProviderEndpoint = 0;
 
 constexpr uint16_t kOptionFilepath             = 'f';
 constexpr uint16_t kOptionOtaImageList         = 'o';
-constexpr uint16_t kOptionQueryImageBehavior   = 'q';
+constexpr uint16_t kOptionQueryImageStatus     = 'q';
 constexpr uint16_t kOptionUserConsentState     = 'u';
 constexpr uint16_t kOptionDelayedActionTimeSec = 't';
-constexpr uint16_t kOptionDiscriminator        = 'd';
 constexpr uint16_t kOptionSoftwareVersion      = 's';
 constexpr uint16_t kOptionSoftwareVersionStr   = 'S';
 constexpr uint16_t kOptionUserConsentNeeded    = 'c';
 
-static constexpr uint16_t kMaximumDiscriminatorValue = 0xFFF;
-
 OTAProviderExample gOtaProvider;
+chip::ota::DefaultUserConsentProvider gUserConsentProvider;
 
 // Global variables used for passing the CLI arguments to the OTAProviderExample object
 static OTAProviderExample::QueryImageBehaviorType gQueryImageBehavior = OTAProviderExample::kRespondWithUnknown;
@@ -64,7 +61,6 @@ static const char * gOtaFilepath                                      = nullptr;
 static const char * gOtaImageListFilepath                             = nullptr;
 static chip::ota::UserConsentState gUserConsentState                  = chip::ota::UserConsentState::kUnknown;
 static bool gUserConsentNeeded                                        = false;
-static chip::Optional<uint16_t> gSetupDiscriminator;
 static chip::Optional<uint32_t> gSoftwareVersion;
 static const char * gSoftwareVersionString = nullptr;
 
@@ -163,27 +159,27 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
             gOtaImageListFilepath = aValue;
         }
         break;
-    case kOptionQueryImageBehavior:
+    case kOptionQueryImageStatus:
         if (aValue == NULL)
         {
-            PrintArgError("%s: ERROR: NULL QueryImageBehavior parameter\n", aProgram);
+            PrintArgError("%s: ERROR: NULL queryImageStatus parameter\n", aProgram);
             retval = false;
         }
-        else if (strcmp(aValue, "UpdateAvailable") == 0)
+        else if (strcmp(aValue, "updateAvailable") == 0)
         {
             gQueryImageBehavior = OTAProviderExample::kRespondWithUpdateAvailable;
         }
-        else if (strcmp(aValue, "Busy") == 0)
+        else if (strcmp(aValue, "busy") == 0)
         {
             gQueryImageBehavior = OTAProviderExample::kRespondWithBusy;
         }
-        else if (strcmp(aValue, "UpdateNotAvailable") == 0)
+        else if (strcmp(aValue, "updateNotAvailable") == 0)
         {
             gQueryImageBehavior = OTAProviderExample::kRespondWithNotAvailable;
         }
         else
         {
-            PrintArgError("%s: ERROR: Invalid QueryImageBehavior parameter:  %s\n", aProgram, aValue);
+            PrintArgError("%s: ERROR: Invalid queryImageStatus parameter:  %s\n", aProgram, aValue);
             retval = false;
         }
         break;
@@ -214,16 +210,6 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
             retval = false;
         }
         break;
-    case kOptionDiscriminator: {
-        uint16_t discriminator = static_cast<uint16_t>(strtoul(aValue, NULL, 0));
-        if (discriminator > kMaximumDiscriminatorValue)
-        {
-            PrintArgError("%s: Input ERROR: setupDiscriminator value %s is out of range \n", aProgram, aValue);
-            retval = false;
-        }
-        gSetupDiscriminator.SetValue(discriminator);
-        break;
-    }
     case kOptionSoftwareVersion:
         gSoftwareVersion.SetValue(static_cast<uint32_t>(strtoul(aValue, NULL, 0)));
         break;
@@ -258,10 +244,9 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
 OptionDef cmdLineOptionsDef[] = {
     { "filepath", chip::ArgParser::kArgumentRequired, kOptionFilepath },
     { "otaImageList", chip::ArgParser::kArgumentRequired, kOptionOtaImageList },
-    { "QueryImageBehavior", chip::ArgParser::kArgumentRequired, kOptionQueryImageBehavior },
-    { "DelayedActionTimeSec", chip::ArgParser::kArgumentRequired, kOptionDelayedActionTimeSec },
-    { "UserConsentState", chip::ArgParser::kArgumentRequired, kOptionUserConsentState },
-    { "discriminator", chip::ArgParser::kArgumentRequired, kOptionDiscriminator },
+    { "queryImageStatus", chip::ArgParser::kArgumentRequired, kOptionQueryImageStatus },
+    { "delayedActionTimeSec", chip::ArgParser::kArgumentRequired, kOptionDelayedActionTimeSec },
+    { "userConsentState", chip::ArgParser::kArgumentRequired, kOptionUserConsentState },
     { "softwareVersion", chip::ArgParser::kArgumentRequired, kOptionSoftwareVersion },
     { "softwareVersionStr", chip::ArgParser::kArgumentRequired, kOptionSoftwareVersionStr },
     { "UserConsentNeeded", chip::ArgParser::kNoArgument, kOptionUserConsentNeeded },
@@ -270,43 +255,33 @@ OptionDef cmdLineOptionsDef[] = {
 
 OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",
                              "  -f/--filepath <file>\n"
-                             "        Path to a file containing an OTA image.\n"
+                             "        Path to a file containing an OTA image\n"
                              "  -o/--otaImageList <file>\n"
-                             "        Path to a file containing a list of OTA images.\n"
-                             "  -q/--QueryImageBehavior <UpdateAvailable | Busy | UpdateNotAvailable>\n"
-                             "        Status value in the Query Image Response\n"
-                             "  -t/--DelayedActionTimeSec <time>\n"
-                             "        Value in seconds for the DelayedActionTime in the Query Image Response\n"
-                             "        and Apply Update Response\n"
-                             "  -u/--UserConsentState <granted | denied | deferred>\n"
-                             "        granted: Status value in QueryImageResponse is set to UpdateAvailable\n"
-                             "        denied: Status value in QueryImageResponse is set to UpdateNotAvailable\n"
-                             "        deferred: Status value in QueryImageResponse is set to Busy\n"
-                             "        -q/--QueryImageBehavior overrides this option\n"
-                             "  -d/--discriminator <discriminator>\n"
-                             "        A 12-bit value used to discern between multiple commissionable CHIP device\n"
-                             "        advertisements. If none is specified, default value is 3840.\n"
+                             "        Path to a file containing a list of OTA images\n"
+                             "  -q/--queryImageStatus <updateAvailable | busy | updateNotAvailable>\n"
+                             "        Value for the Status field in the QueryImageResponse\n"
+                             "  -t/--delayedActionTimeSec <time>\n"
+                             "        Value in seconds for the DelayedActionTime field in the QueryImageResponse\n"
+                             "        and ApplyUpdateResponse\n"
+                             "  -u/--userConsentState <granted | denied | deferred>\n"
+                             "        granted: Status field in QueryImageResponse is set to updateAvailable\n"
+                             "        denied: Status field in QueryImageResponse is set to updateNotAvailable\n"
+                             "        deferred: Status field in QueryImageResponse is set to busy\n"
+                             "        -q/--queryImageStatus overrides this option\n"
                              "  -s/--softwareVersion <version>\n"
-                             "        Value of SoftwareVersion in the Query Image Response\n"
-                             "        If ota image list is present along with this option\n"
-                             "        then value from ota image list is used.\n"
-                             "        Otherwise, this value will be used is then value from that will be used\n"
+                             "        Value for the SoftwareVersion field in the QueryImageResponse\n"
+                             "        -o/--otaImageList overrides this option\n"
                              "  -S/--softwareVersionStr <version string>\n"
-                             "        Value of SoftwareVersionString in the Query Image Response\n"
-                             "        If ota image list is present along with this option\n"
-                             "        then value from ota image list is used.\n"
-                             "        Otherwise, this value will be used is then value from that will be used\n"
+                             "        Value for the SoftwareVersionString field in the QueryImageResponse\n"
+                             "        -o/--otaImageList overrides this option\n"
                              "  -c/--UserConsentNeeded\n"
                              "        If provided, value of UserConsentNeeded in the Query Image Response is set to true\n" };
 
-HelpOptions helpOptions("ota-provider-app", "Usage: ota-provider-app [options]", "1.0");
-
-OptionSet * allOptions[] = { &cmdLineOptions, &helpOptions, nullptr };
+OptionSet * allOptions[] = { &cmdLineOptions, nullptr };
 
 void ApplicationInit()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::ota::DefaultUserConsentProvider userConsentProvider;
 
     BdxOtaSender * bdxOtaSender = gOtaProvider.GetBdxOtaSender();
     VerifyOrReturn(bdxOtaSender != nullptr);
@@ -338,8 +313,8 @@ void ApplicationInit()
 
     if (gUserConsentState != chip::ota::UserConsentState::kUnknown)
     {
-        userConsentProvider.SetGlobalUserConsentState(gUserConsentState);
-        gOtaProvider.SetUserConsentDelegate(&userConsentProvider);
+        gUserConsentProvider.SetGlobalUserConsentState(gUserConsentState);
+        gOtaProvider.SetUserConsentDelegate(&gUserConsentProvider);
     }
 
     if (gUserConsentNeeded)
