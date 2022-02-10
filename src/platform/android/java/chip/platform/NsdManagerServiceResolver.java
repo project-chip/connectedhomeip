@@ -129,8 +129,8 @@ public class NsdManagerServiceResolver implements ServiceResolver {
     serviceInfo.setServiceName(serviceName);
 
     StringBuilder sb = new StringBuilder(type);
-    for (String subType:subTypes) {
-        sb.append(","+subType);
+    for (String subType : subTypes) {
+      sb.append("," + subType);
     }
     serviceInfo.setServiceType(sb.toString());
 
