@@ -29,9 +29,6 @@ else
     echo Provider not commissioned properly
 fi
 
-# TODO: This should be removed once chip_kvs is fixed
-rm /tmp/chip_kvs
-
 stdbuf -o0 ./out/ota_requestor_debug/chip-ota-requestor-app -u "$UDP_PORT" -d "$DISCRIMINATOR" | tee /tmp/ota/requestor-log.txt &
 requestor_pid=$!
 
@@ -49,14 +46,14 @@ echo "Sending announce-ota-provider"
 
 ./out/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0 | tee /tmp/ota/chip-tool-announce-ota.txt
 
-timeout 30 grep -q "OTA image downloaded to" <(tail -n0 -f /tmp/ota/chip-tool-announce-ota.txt)
+timeout 30 grep -q "OTA image downloaded to" <(tail -n0 -f /tmp/ota/requestor-log.txt
 
 echo "Exiting, logs are in tmp/ota/"
 
 kill "$provider_pid"
 kill "$requestor_pid"
 
-if grep "OTA image downloaded to" /tmp/ota/chip-tool-announce-ota.txt; then
+if grep "OTA image downloaded to" /tmp/ota/requestor-log.txt; then
     echo Test passed && exit 0
 else
     echo Test failed && exit 1
