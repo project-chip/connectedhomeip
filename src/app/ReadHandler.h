@@ -121,7 +121,7 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR SendReportData(System::PacketBufferHandle && aPayload, bool mMoreChunks);
+    CHIP_ERROR SendReportData(System::PacketBufferHandle && aPayload, bool aMoreChunks);
 
     /**
      *  Returns whether this ReadHandler represents a subscription that was created by the other side of the provided exchange.

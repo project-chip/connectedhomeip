@@ -122,7 +122,7 @@ public:
 
     /**
      *  @brief flag action as part of a timed write transaction
-     *  @param [in] aSuppressResponse true if client need to signal suppress response
+     *  @param [in] aTimedRequest true if client need to signal this is a timed request
      *  @return A reference to *this
      */
     WriteRequestMessage::Builder & TimedRequest(const bool aTimedRequest);

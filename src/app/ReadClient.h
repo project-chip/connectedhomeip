@@ -91,9 +91,9 @@ public:
          * This object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
          *
-         * @param[in] aEventHeader: The event header in report response.
-         * @param[in] apData: A TLVReader positioned right on the payload of the event.
-         * @param[in] apStatus: Event-specific status, containing an InteractionModel::Status code as well as an optional
+         * @param[in] aEventHeader The event header in report response.
+         * @param[in] apData A TLVReader positioned right on the payload of the event.
+         * @param[in] apStatus Event-specific status, containing an InteractionModel::Status code as well as an optional
          *                     cluster-specific status code.
          */
         virtual void OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus) {}

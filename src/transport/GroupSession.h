@@ -121,7 +121,7 @@ public:
     /**
      * @brief Deletes an entry from the object pool
      *
-     * @param entry
+     * @param entry The GroupSession entry to delete
      */
     void DeleteEntry(GroupSession * entry) { mEntries.ReleaseObject(entry); }
 
