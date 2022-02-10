@@ -17,8 +17,7 @@ CHIPTVServer offers the following features:
 For information about how to build the application, see the
 [Building Android CHIPTVServer](../../../docs/guides/android_building.md) guide.
 
+## Building
 
-## Building 
-
-./scripts/examples/gn_android_example.sh examples/tv-app/android out/debug is_debug=true
-
+./scripts/examples/gn_android_example.sh examples/tv-app/android out/debug
+is_debug=true
