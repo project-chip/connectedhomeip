@@ -1105,7 +1105,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPTestTestCluster : CHIPTestCluster
 
-- (void)writeAttributeListLongOctetStringWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
                                         completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeClientGeneratedCommandListWithValue:(NSArray * _Nonnull)value
