@@ -124,9 +124,13 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
     switch (sessionHandle->GetSessionType())
     {
     case Transport::Session::SessionType::kGroup: {
+        auto groupSession = sessionHandle->AsGroupSession();
+        auto * groups     = Credentials::GetGroupDataProvider();
+        VerifyOrReturnError(nullptr != groups, CHIP_ERROR_INTERNAL);
+
         // TODO : #11911
         // For now, just set the packetHeader with the correct data.
-        packetHeader.SetDestinationGroupId(sessionHandle->AsGroupSession()->GetGroupId());
+        packetHeader.SetDestinationGroupId(groupSession->GetGroupId());
         packetHeader.SetFlags(Header::SecFlagValues::kPrivacyFlag);
         packetHeader.SetSessionType(Header::SessionType::kGroupSession);
         // TODO : Replace the PeerNodeId with Our nodeId
@@ -140,8 +144,14 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         // Trace before any encryption
         CHIP_TRACE_MESSAGE_SENT(payloadHeader, packetHeader, message->Start(), message->TotalLength());
 
-        // TODO #11911 Update SecureMessageCodec::Encrypt for Group
-        ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(message));
+        Crypto::SymmetricKeyContext * keyContext =
+            groups->GetKeyContext(groupSession->GetFabricIndex(), groupSession->GetGroupId());
+        VerifyOrReturnError(nullptr != keyContext, CHIP_ERROR_INTERNAL);
+
+        packetHeader.SetSessionId(keyContext->GetKeyHash());
+        CHIP_ERROR err = SecureMessageCodec::Encrypt(CryptoContext(keyContext), payloadHeader, packetHeader, message);
+        keyContext->Release();
+        ReturnErrorOnFailure(err);
 
 #if CHIP_PROGRESS_LOGGING
         destination = kUndefinedNodeId;
@@ -166,7 +176,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         // Trace before any encryption
         CHIP_TRACE_MESSAGE_SENT(payloadHeader, packetHeader, message->Start(), message->TotalLength());
 
-        ReturnErrorOnFailure(SecureMessageCodec::Encrypt(session, payloadHeader, packetHeader, message));
+        ReturnErrorOnFailure(SecureMessageCodec::Encrypt(session->GetCryptoContext(), payloadHeader, packetHeader, message));
         ReturnErrorOnFailure(counter.Advance());
 
 #if CHIP_PROGRESS_LOGGING
@@ -180,6 +190,16 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         uint32_t messageCounter  = counter.Value();
         ReturnErrorOnFailure(counter.Advance());
         packetHeader.SetMessageCounter(messageCounter);
+        Transport::UnauthenticatedSession * session = sessionHandle->AsUnauthenticatedSession();
+        switch (session->GetSessionRole())
+        {
+        case Transport::UnauthenticatedSession::SessionRole::kInitiator:
+            packetHeader.SetSourceNodeId(session->GetEphemeralInitiatorNodeID());
+            break;
+        case Transport::UnauthenticatedSession::SessionRole::kResponder:
+            packetHeader.SetDestinationNodeId(session->GetEphemeralInitiatorNodeID());
+            break;
+        }
 
         // Trace after all headers are settled.
         CHIP_TRACE_MESSAGE_SENT(payloadHeader, packetHeader, message->Start(), message->TotalLength());
@@ -391,7 +411,7 @@ void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::
     }
     else
     {
-        MessageDispatch(packetHeader, peerAddress, std::move(msg));
+        UnauthenticatedMessageDispatch(packetHeader, peerAddress, std::move(msg));
     }
 }
 
@@ -427,18 +447,45 @@ void SessionManager::RefreshSessionOperationalData(const SessionHandle & session
     });
 }
 
-void SessionManager::MessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                     System::PacketBufferHandle && msg)
+void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                                    System::PacketBufferHandle && msg)
 {
-    Optional<SessionHandle> optionalSession = mUnauthenticatedSessions.FindOrAllocateEntry(peerAddress, gDefaultMRPConfig);
-    if (!optionalSession.HasValue())
+    Optional<NodeId> source      = packetHeader.GetSourceNodeId();
+    Optional<NodeId> destination = packetHeader.GetDestinationNodeId();
+    if ((source.HasValue() && destination.HasValue()) || (!source.HasValue() && !destination.HasValue()))
     {
-        ChipLogError(Inet, "UnauthenticatedSession exhausted");
-        return;
+        ChipLogProgress(Inet,
+                        "Received malformed unsecure packet with source 0x" ChipLogFormatX64 " destination 0x" ChipLogFormatX64,
+                        ChipLogValueX64(source.ValueOr(kUndefinedNodeId)), ChipLogValueX64(destination.ValueOr(kUndefinedNodeId)));
+        return; // ephemeral node id is only assigned to the initiator, there should be one and only one node id exists.
+    }
+
+    Optional<SessionHandle> optionalSession;
+    if (source.HasValue())
+    {
+        // Assume peer is the initiator, we are the responder.
+        optionalSession = mUnauthenticatedSessions.FindOrAllocateResponder(source.Value(), GetLocalMRPConfig());
+        if (!optionalSession.HasValue())
+        {
+            ChipLogError(Inet, "UnauthenticatedSession exhausted");
+            return;
+        }
+    }
+    else
+    {
+        // Assume peer is the responder, we are the initiator.
+        optionalSession = mUnauthenticatedSessions.FindInitiator(destination.Value());
+        if (!optionalSession.HasValue())
+        {
+            ChipLogProgress(Inet, "Received unknown unsecure packet for initiator 0x" ChipLogFormatX64,
+                            ChipLogValueX64(destination.Value()));
+            return;
+        }
     }
 
     const SessionHandle & session                        = optionalSession.Value();
     Transport::UnauthenticatedSession * unsecuredSession = session->AsUnauthenticatedSession();
+    unsecuredSession->SetPeerAddress(peerAddress);
     SessionMessageDelegate::DuplicateMessage isDuplicate = SessionMessageDelegate::DuplicateMessage::No;
 
     // Verify message counter
@@ -497,7 +544,7 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
 
     Transport::SecureSession * secureSession = session.Value()->AsSecureSession();
     // Decrypt and verify the message before message counter verification or any further processing.
-    if (SecureMessageCodec::Decrypt(secureSession, payloadHeader, packetHeader, msg) != CHIP_NO_ERROR)
+    if (SecureMessageCodec::Decrypt(secureSession->GetCryptoContext(), payloadHeader, packetHeader, msg) != CHIP_NO_ERROR)
     {
         ChipLogError(Inet, "Secure transport received message, but failed to decode/authenticate it, discarding");
         return;
@@ -553,7 +600,8 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
 {
     PayloadHeader payloadHeader;
     SessionMessageDelegate::DuplicateMessage isDuplicate = SessionMessageDelegate::DuplicateMessage::No;
-    // Credentials::GroupDataProvider * groups = Credentials::GetGroupDataProvider();
+    Credentials::GroupDataProvider * groups              = Credentials::GetGroupDataProvider();
+    VerifyOrReturn(nullptr != groups);
 
     if (!packetHeader.GetDestinationGroupId().HasValue())
     {
@@ -573,16 +621,36 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
         return;
     }
 
-    // Trial decryption with GroupDataProvider. TODO: Implement the GroupDataProvider Class
-    // TODO retrieve also the fabricIndex with the GroupDataProvider.
-    // VerifyOrExit(CHIP_NO_ERROR == groups->DecryptMessage(packetHeader, payloadHeader, msg),
-    //     ChipLogError(Inet, "Secure transport received group message, but failed to decode it, discarding"));
+    // Trial decryption with GroupDataProvider
+    Credentials::GroupDataProvider::GroupSession groupContext;
+    auto iter = groups->IterateGroupSessions(packetHeader.GetSessionId());
+    if (iter == nullptr)
+    {
+        ChipLogError(Inet, "Failed to retrieve Groups iterator. Discarding everything");
+        return;
+    }
 
-    ReturnOnFailure(payloadHeader.DecodeAndConsume(msg));
+    System::PacketBufferHandle msgCopy;
+    bool decrypted = false;
+    while (!decrypted && iter->Next(groupContext))
+    {
+        msgCopy = msg.CloneData();
+        decrypted =
+            (CHIP_NO_ERROR == SecureMessageCodec::Decrypt(CryptoContext(groupContext.key), payloadHeader, packetHeader, msgCopy));
+    }
+    iter->Release();
+    if (!decrypted)
+    {
+        ChipLogError(Inet, "Failed to retrieve Key. Discarding everything");
+        return;
+    }
+    msg = std::move(msgCopy);
 
     // MCSP check
     if (packetHeader.IsValidMCSPMsg())
     {
+        // TODO: When MCSP Msg, create Secure Session instead of a Group session
+
         // TODO
         // if (packetHeader.GetDestinationNodeId().Value() == ThisDeviceNodeID)
         // {
@@ -617,8 +685,8 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
 
     if (mCB != nullptr)
     {
-        // TODO : remove hard coded fabric index once GroupDataProvider->Decrypt is implemented
-        Optional<SessionHandle> session = CreateGroupSession(packetHeader.GetDestinationGroupId().Value(), 1);
+        // TODO : When MCSP is done, clean up session creation logique
+        Optional<SessionHandle> session = CreateGroupSession(groupContext.group_id, groupContext.fabric_index);
 
         VerifyOrReturn(session.HasValue(), ChipLogError(Inet, "Error when creating group session handle."));
         Transport::GroupSession * groupSession = session.Value()->AsGroupSession();

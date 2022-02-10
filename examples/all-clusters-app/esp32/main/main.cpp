@@ -26,6 +26,7 @@
 #include "OpenThreadLaunch.h"
 #include "QRCodeScreen.h"
 #include "ScreenManager.h"
+#include "ShellCommands.h"
 #include "WiFiWidget.h"
 #include "esp_heap_caps_init.h"
 #include "esp_log.h"
@@ -81,8 +82,6 @@
 #if CONFIG_OPENTHREAD_ENABLED
 #include <platform/ThreadStackManager.h>
 #endif
-
-#include <OnOffCommands.h>
 
 using namespace ::chip;
 using namespace ::chip::Shell;
@@ -523,6 +522,30 @@ void SetupPretendDevices()
     AddCluster("Contact Sensor");
     AddAttribute("BooleanState", "true");
     app::Clusters::BooleanState::Attributes::StateValue::Set(1, true);
+
+    AddDevice("Thermostat");
+    AddEndpoint("1");
+    AddCluster("Thermostat");
+    app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(21 * 100));
+    app::Clusters::Thermostat::Attributes::LocalTemperature::Set(1, static_cast<int16_t>(21 * 100));
+    AddAttribute("SystemMode", "4");
+    app::Clusters::Thermostat::Attributes::SystemMode::Set(1, 4);
+    AddAttribute("OccupiedCoolingSetpoint", "19");
+    app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::Set(1, static_cast<int16_t>(19 * 100));
+    AddAttribute("OccupiedHeatingSetpoint", "25");
+    app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::Set(1, static_cast<int16_t>(25 * 100));
+
+    AddDevice("Humidity Sensor");
+    AddEndpoint("External");
+    AddCluster("Humidity Sensor");
+    AddAttribute("MeasuredValue", "30");
+    app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(30 * 100));
+
+    AddDevice("Light Sensor");
+    AddEndpoint("External");
+    AddCluster("Illuminance Measurement");
+    AddAttribute("MeasuredValue", "1000");
+    app::Clusters::IlluminanceMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(1000));
 }
 
 WiFiWidget pairingWindowLED;
@@ -596,8 +619,8 @@ extern "C" void app_main()
 
 #if CONFIG_ENABLE_CHIP_SHELL
     chip::LaunchShell();
-    OnOffCommands & onOffCommands = OnOffCommands::GetInstance();
-    onOffCommands.Register();
+    OnOffCommands::GetInstance().Register();
+    CASECommands::GetInstance().Register();
 #endif // CONFIG_ENABLE_CHIP_SHELL
 
 #if CONFIG_OPENTHREAD_ENABLED
@@ -675,17 +698,7 @@ extern "C" void app_main()
             ->Item("QR Code",
                    [=]() {
                        ESP_LOGI(TAG, "Opening QR code screen");
-                       ESP_LOGI(TAG, "QR CODE Text: '%s'", qrCodeText.c_str());
-                       uint16_t discriminator;
-                       if (ConfigurationMgr().GetSetupDiscriminator(discriminator) == CHIP_NO_ERROR)
-                       {
-                           ESP_LOGI(TAG, "Setup discriminator: %u (0x%x)", discriminator, discriminator);
-                       }
-                       uint32_t setupPINCode;
-                       if (ConfigurationMgr().GetSetupPinCode(setupPINCode) == CHIP_NO_ERROR)
-                       {
-                           ESP_LOGI(TAG, "Setup PIN code: %u (0x%x)", setupPINCode, setupPINCode);
-                       }
+                       PrintOnboardingCodes(chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
                        ScreenManager::PushScreen(chip::Platform::New<QRCodeScreen>(qrCodeText));
                    })
             ->Item("Setup",

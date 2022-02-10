@@ -20,9 +20,9 @@
 
 #include <app/BufferedReadCallback.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/InteractionModelDelegate.h>
 #include <app/data-model/Decode.h>
 #include <functional>
+#include <lib/support/CHIPMem.h>
 
 namespace chip {
 namespace Controller {
@@ -30,11 +30,12 @@ namespace Controller {
 /*
  * This provides an adapter class that implements ReadClient::Callback and provides three additional
  * features:
- *  1. The ability to pass in std::function closures to permit more flexible programming scenarios than are provided by the strict
- *     delegate interface stipulated by by InteractionModelDelegate.
+ *  1. The ability to pass in std::function closures to permit more flexible
+ *     programming scenarios than are provided by the strict delegate interface
+ *     stipulated by ReadClient::Callback.
  *
- *  2. Automatic decoding of attribute data provided in the TLVReader by InteractionModelDelegate::OnReportData into a decoded
- *     cluster object.
+ *  2. Automatic decoding of attribute data provided in the TLVReader by
+ *     ReadClient::Callback::OnAttributeData into a decoded cluster object.
  *
  *  3. Automatically representing all errors as a CHIP_ERROR (which might
  *     encapsulate a StatusIB).  This could be a path-specific error or it
@@ -66,7 +67,7 @@ public:
     void AdoptReadClient(Platform::UniquePtr<app::ReadClient> aReadClient) { mReadClient = std::move(aReadClient); }
 
 private:
-    void OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
+    void OnAttributeData(const app::ConcreteDataAttributePath & aPath, DataVersion aVersion, TLV::TLVReader * apData,
                          const app::StatusIB & aStatus) override
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -82,8 +83,7 @@ private:
         VerifyOrExit(aPath.mClusterId == mClusterId && aPath.mAttributeId == mAttributeId, err = CHIP_ERROR_SCHEMA_MISMATCH);
         VerifyOrExit(apData != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-        err = app::DataModel::Decode(*apData, value);
-        SuccessOrExit(err);
+        SuccessOrExit(err = app::DataModel::Decode(*apData, value));
 
         mOnSuccess(aPath, value);
 
@@ -103,6 +103,17 @@ private:
         if (mOnSubscriptionEstablished)
         {
             mOnSubscriptionEstablished();
+        }
+    }
+
+    void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
+    {
+        if (aReadPrepareParams.mpAttributePathParamsList != nullptr)
+        {
+            for (size_t i = 0; i < aReadPrepareParams.mAttributePathParamsListSize; i++)
+            {
+                chip::Platform::Delete<app::AttributePathParams>(&aReadPrepareParams.mpAttributePathParamsList[i]);
+            }
         }
     }
 
@@ -158,6 +169,17 @@ private:
     void OnError(CHIP_ERROR aError) override { mOnError(nullptr, aError); }
 
     void OnDone() override { mOnDone(this); }
+
+    void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
+    {
+        if (aReadPrepareParams.mpEventPathParamsList != nullptr)
+        {
+            for (size_t i = 0; i < aReadPrepareParams.mEventPathParamsListSize; i++)
+            {
+                chip::Platform::Delete<app::EventPathParams>(&aReadPrepareParams.mpEventPathParamsList[i]);
+            }
+        }
+    }
 
     void OnSubscriptionEstablished(uint64_t aSubscriptionId) override
     {

@@ -262,7 +262,7 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
                                                  .SetPeerId(fabricInfo.GetPeerId())
                                                  .SetMac(mac)
                                                  .SetPort(GetSecuredPort())
-                                                 .SetMRPConfig(gDefaultMRPConfig)
+                                                 .SetMRPConfig(GetLocalMRPConfig())
                                                  .SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT))
                                                  .EnableIpV4(true);
 
@@ -341,7 +341,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
     advertiseParameters.SetRotatingDeviceId(chip::Optional<const char *>::Value(rotatingDeviceIdHexBuffer));
 #endif
 
-    advertiseParameters.SetMRPConfig(gDefaultMRPConfig).SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT));
+    advertiseParameters.SetMRPConfig(GetLocalMRPConfig()).SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT));
 
     if (mode != chip::Dnssd::CommissioningMode::kEnabledEnhanced)
     {

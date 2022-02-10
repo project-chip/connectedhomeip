@@ -29,8 +29,10 @@ config("darwin_config") {
 static_library("framework") {
   sources = [
     "CHIP.h",
+    "CHIPCluster.mm",
     "CHIPDevice.h",
     "CHIPDevice.mm",
+    "CHIPDeviceConnectionBridge.mm",
     "CHIPDeviceController.h",
     "CHIPDeviceController.mm",
     "CHIPDevicePairingDelegate.h",
@@ -45,6 +47,7 @@ static_library("framework") {
     "CHIPManualSetupPayloadParser.mm",
     "CHIPOnboardingPayloadParser.m",
     "CHIPOperationalCredentialsDelegate.mm",
+    "CHIPP256KeypairBridge.mm",
     "CHIPPersistentStorageDelegate.h",
     "CHIPPersistentStorageDelegateBridge.h",
     "CHIPPersistentStorageDelegateBridge.mm",
@@ -52,6 +55,8 @@ static_library("framework") {
     "CHIPQRCodeSetupPayloadParser.mm",
     "CHIPSetupPayload.h",
     "CHIPSetupPayload.mm",
+    "zap-generated/CHIPAttributeTLVValueDecoder.mm",
+    "zap-generated/CHIPCallbackBridge.mm",
     "zap-generated/CHIPClustersObjc.h",
     "zap-generated/CHIPClustersObjc.mm",
     "zap-generated/CHIPCommandPayloadsObjc.h",

@@ -23,6 +23,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 
+#include <app/tests/suites/commands/discovery/DiscoveryCommands.h>
 #include <app/tests/suites/commands/log/LogCommands.h>
 #include <app/tests/suites/include/PICSChecker.h>
 
@@ -34,14 +35,18 @@ constexpr const char kIdentityAlpha[] = "";
 constexpr const char kIdentityBeta[]  = "";
 constexpr const char kIdentityGamma[] = "";
 
-class TestCommand : public PICSChecker, public LogCommands
+class TestCommand : public PICSChecker, public LogCommands, public DiscoveryCommands
 {
 public:
     TestCommand(const char * commandName) : mCommandPath(0, 0, 0), mAttributePath(0, 0, 0) {}
     virtual ~TestCommand() {}
 
     virtual void NextTest() = 0;
-    void Wait() {}
+    CHIP_ERROR WaitMS(chip::System::Clock::Timeout ms)
+    {
+        return chip::DeviceLayer::SystemLayer().StartTimer(ms, OnWaitForMsFn, this);
+    }
+    CHIP_ERROR WaitForMs(uint16_t ms) { return WaitMS(chip::System::Clock::Milliseconds32(ms)); }
     void SetCommandExitStatus(CHIP_ERROR status)
     {
         chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
@@ -64,6 +69,12 @@ public:
     {
         NextTest();
         return CHIP_NO_ERROR;
+    }
+
+    void Exit(std::string message)
+    {
+        ChipLogError(chipTool, " ***** Test Failure: %s\n", message.c_str());
+        SetCommandExitStatus(CHIP_ERROR_INTERNAL);
     }
 
     static void ScheduleNextTest(intptr_t context)
@@ -120,6 +131,11 @@ public:
         mCommandPath   = chip::app::ConcreteCommandPath(0, 0, 0);
         mAttributePath = chip::app::ConcreteAttributePath(0, 0, 0);
     }
+    static void OnWaitForMsFn(chip::System::Layer * systemLayer, void * context)
+    {
+        auto * command = static_cast<TestCommand *>(context);
+        command->NextTest();
+    }
 
     std::atomic_bool isRunning{ true };
 
@@ -128,4 +144,5 @@ protected:
     chip::app::ConcreteAttributePath mAttributePath;
     chip::Optional<chip::EndpointId> mEndpointId;
     void SetIdentity(const char * name){};
+    void Wait(){};
 };

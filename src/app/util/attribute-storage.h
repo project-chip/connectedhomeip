@@ -78,9 +78,10 @@
 
 #define DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(clusterListName) EmberAfCluster clusterListName[] = {
 
-#define DECLARE_DYNAMIC_CLUSTER(clusterId, clusterAttrs)                                                                           \
+#define DECLARE_DYNAMIC_CLUSTER(clusterId, clusterAttrs, incomingCommands, outgoingCommands)                                       \
     {                                                                                                                              \
-        clusterId, clusterAttrs, sizeof(clusterAttrs) / sizeof(EmberAfAttributeMetadata), 0, ZAP_CLUSTER_MASK(SERVER), NULL        \
+        clusterId, clusterAttrs, sizeof(clusterAttrs) / sizeof(EmberAfAttributeMetadata), 0, ZAP_CLUSTER_MASK(SERVER), NULL,       \
+            incomingCommands, outgoingCommands                                                                                     \
     }
 
 #define DECLARE_DYNAMIC_CLUSTER_LIST_END }
@@ -121,11 +122,16 @@ void emAfCallInits(void);
 // Initial configuration
 void emberAfEndpointConfigure(void);
 
-EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord, EmberAfAttributeMetadata ** metadata,
+EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord, const EmberAfAttributeMetadata ** metadata,
                                        uint8_t * buffer, uint16_t readLength, bool write);
 
-bool emAfMatchCluster(EmberAfCluster * cluster, EmberAfAttributeSearchRecord * attRecord);
-bool emAfMatchAttribute(EmberAfCluster * cluster, EmberAfAttributeMetadata * am, EmberAfAttributeSearchRecord * attRecord);
+bool emAfMatchCluster(const EmberAfCluster * cluster, EmberAfAttributeSearchRecord * attRecord);
+bool emAfMatchAttribute(const EmberAfCluster * cluster, const EmberAfAttributeMetadata * am,
+                        EmberAfAttributeSearchRecord * attRecord);
+
+// Returns endpoint type for the given endpoint id if there is an enabled
+// endpoint with that endpoint id.  Otherwise returns null.
+const EmberAfEndpointType * emberAfFindEndpointType(chip::EndpointId endpointId);
 
 // Check if a cluster is implemented or not. If yes, the cluster is returned.
 //
@@ -136,22 +142,8 @@ bool emAfMatchAttribute(EmberAfCluster * cluster, EmberAfAttributeMetadata * am,
 // If a pointer to an index is provided, it will be updated to point to the relative index of the cluster
 // within the set of clusters that match the mask criteria.
 //
-EmberAfCluster * emberAfFindClusterInType(EmberAfEndpointType * endpointType, chip::ClusterId clusterId, EmberAfClusterMask mask,
-                                          uint8_t * index = nullptr);
-
-// For a given cluster and mask, retrieves the list of endpoints sorted by endpoint that contain the matching cluster and returns
-// the index within that list that matches the given endpoint.
-//
-// Mask is either CLUSTER_MASK_CLIENT or CLUSTER_MASK_SERVER
-// For example, if you have 3 endpoints, 10, 11, 12, and cluster X server is
-// located on 11 and 12, and cluster Y server is located only on 10 then
-//    clusterIndex(X,11,CLUSTER_MASK_SERVER) returns 0,
-//    clusterIndex(X,12,CLUSTER_MASK_SERVER) returns 1,
-//    clusterIndex(X,10,CLUSTER_MASK_SERVER) returns 0xFF
-//    clusterIndex(Y,10,CLUSTER_MASK_SERVER) returns 0
-//    clusterIndex(Y,11,CLUSTER_MASK_SERVER) returns 0xFF
-//    clusterIndex(Y,12,CLUSTER_MASK_SERVER) returns 0xFF
-uint8_t emberAfClusterIndexInMatchingEndpoints(chip::EndpointId endpoint, chip::ClusterId clusterId, EmberAfClusterMask mask);
+const EmberAfCluster * emberAfFindClusterInType(const EmberAfEndpointType * endpointType, chip::ClusterId clusterId,
+                                                EmberAfClusterMask mask, uint8_t * index = nullptr);
 
 //
 // Given a cluster ID, endpoint ID and a cluster mask, finds a matching cluster within that endpoint
@@ -164,9 +156,17 @@ uint8_t emberAfClusterIndex(chip::EndpointId endpoint, chip::ClusterId clusterId
 // otherwise number of client clusters on this endpoint
 uint8_t emberAfClusterCount(chip::EndpointId endpoint, bool server);
 
+// If server == true, returns the number of server clusters,
+// otherwise number of client clusters on the endpoint at the given index.
+uint8_t emberAfClusterCountByIndex(uint16_t endpointIndex, bool server);
+
+// If server == true, returns the number of server clusters,
+// otherwise number of client clusters on the endpoint at the given index.
+uint8_t emberAfClusterCountForEndpointType(const EmberAfEndpointType * endpointType, bool server);
+
 // Returns the cluster of Nth server or client cluster,
 // depending on server toggle.
-EmberAfCluster * emberAfGetNthCluster(chip::EndpointId endpoint, uint8_t n, bool server);
+const EmberAfCluster * emberAfGetNthCluster(chip::EndpointId endpoint, uint8_t n, bool server);
 
 // Returns the clusterId of Nth server or client cluster,
 // depending on server toggle.
@@ -178,17 +178,17 @@ chip::Optional<chip::ClusterId> emberAfGetNthClusterId(chip::EndpointId endpoint
 uint8_t emberAfGetClustersFromEndpoint(chip::EndpointId endpoint, chip::ClusterId * clusterList, uint8_t listLen, bool server);
 
 // Returns cluster within the endpoint, or NULL if it isn't there
-EmberAfCluster * emberAfFindCluster(chip::EndpointId endpoint, chip::ClusterId clusterId, EmberAfClusterMask mask);
+const EmberAfCluster * emberAfFindCluster(chip::EndpointId endpoint, chip::ClusterId clusterId, EmberAfClusterMask mask);
 
 // Returns cluster within the endpoint; Does not ignore disabled endpoints
-EmberAfCluster * emberAfFindClusterIncludingDisabledEndpoints(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                              EmberAfClusterMask mask);
+const EmberAfCluster * emberAfFindClusterIncludingDisabledEndpoints(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                    EmberAfClusterMask mask);
 
 // Function mask must contain one of the CLUSTER_MASK function macros,
 // then this method either returns the function pointer or null if
 // function doesn't exist. Before you call the function, you must
 // cast it.
-EmberAfGenericClusterFunction emberAfFindClusterFunction(EmberAfCluster * cluster, EmberAfClusterMask functionMask);
+EmberAfGenericClusterFunction emberAfFindClusterFunction(const EmberAfCluster * cluster, EmberAfClusterMask functionMask);
 
 // Public APIs for loading attributes
 void emberAfInitializeAttributes(chip::EndpointId endpoint);
@@ -202,7 +202,7 @@ void emAfLoadAttributeDefaults(chip::EndpointId endpoint, bool ignoreStorage, ch
 // After the RAM value has changed, code should call this function. If this
 // attribute has been tagged as non-volatile, its value will be stored.
 void emAfSaveAttributeToStorageIfNeeded(uint8_t * data, chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                        EmberAfAttributeMetadata * metadata);
+                                        const EmberAfAttributeMetadata * metadata);
 
 // Calls the attribute changed callback
 void emAfClusterAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t clientServerMask);
@@ -225,6 +225,8 @@ void emberAfClusterMessageSentCallback(const chip::MessageSendDestination & dest
 // returns true if the mask matches a passed interval
 bool emberAfCheckTick(EmberAfClusterMask mask, uint8_t passedMask);
 
+// Check whether there is an endpoint defined with the given endpoint id that is
+// enabled.
 bool emberAfEndpointIsEnabled(chip::EndpointId endpoint);
 
 // Note the difference in implementation from emberAfGetNthCluster().
@@ -237,11 +239,17 @@ bool emberAfEndpointIsEnabled(chip::EndpointId endpoint);
 //
 // Don't mix them.
 uint8_t emberAfGetClusterCountForEndpoint(chip::EndpointId endpoint);
-EmberAfCluster * emberAfGetClusterByIndex(chip::EndpointId endpoint, uint8_t clusterIndex);
+const EmberAfCluster * emberAfGetClusterByIndex(chip::EndpointId endpoint, uint8_t clusterIndex);
 
 uint16_t emberAfGetDeviceIdForEndpoint(chip::EndpointId endpoint);
+// dataVersionStorage.size() needs to be at least as large as the number of
+// server clusters on this endpoint.  If it's not, the endpoint will not be able
+// to store data versions, which may break consumers.
+//
+// The memory backing dataVersionStorage needs to stay alive until this dynamic
+// endpoint is cleared.
 EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, chip::EndpointId id, EmberAfEndpointType * ep, uint16_t deviceId,
-                                        uint8_t deviceVersion);
+                                        uint8_t deviceVersion, const chip::Span<chip::DataVersion> & dataVersionStorage);
 chip::EndpointId emberAfClearDynamicEndpoint(uint16_t index);
 uint16_t emberAfGetDynamicIndexFromEndpoint(chip::EndpointId id);
 

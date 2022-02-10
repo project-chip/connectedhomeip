@@ -27,6 +27,7 @@
 
 #pragma once
 
+#include <transport/CryptoContext.h>
 #include <transport/SecureSession.h>
 
 namespace chip {
@@ -48,7 +49,7 @@ namespace SecureMessageCodec {
  *                      the encrypted message.
  * @return A CHIP_ERROR value consistent with the result of the encryption operation
  */
-CHIP_ERROR Encrypt(Transport::SecureSession * session, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
+CHIP_ERROR Encrypt(const CryptoContext & context, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
                    System::PacketBufferHandle & msgBuf);
 
 /**
@@ -65,7 +66,7 @@ CHIP_ERROR Encrypt(Transport::SecureSession * session, PayloadHeader & payloadHe
  *                      the decrypted message.
  * @return A CHIP_ERROR value consistent with the result of the decryption operation
  */
-CHIP_ERROR Decrypt(Transport::SecureSession * session, PayloadHeader & payloadHeader, const PacketHeader & packetHeader,
+CHIP_ERROR Decrypt(const CryptoContext & context, PayloadHeader & payloadHeader, const PacketHeader & packetHeader,
                    System::PacketBufferHandle & msgBuf);
 
 } // namespace SecureMessageCodec

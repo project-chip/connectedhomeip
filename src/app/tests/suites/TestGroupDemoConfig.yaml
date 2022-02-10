@@ -1,0 +1,76 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# !!!!!!!!!! DO NOT RUN IN CI - ONLY USED IN MANUAL GROUP MESSAGING DEMONSTRATION !!!!!!!!!!
+
+# This test file is used in the group messaging demonstration to configure light-apps
+# Run this test on a commisionned device to add it to the group.
+# This file is used in tandem with TestGroupDemoCommand that sends the actual commands.
+#
+# To run this test file : chip-tool tests TestGroupDemoConfig <nodeid>
+#
+# Full test procedure :
+#   chip-tool tests TestGroupDemoConfig <nodeid>  - Run this command for every light app nodeid that will be used for the demonstration
+#   chip-tool tests TestGroupDemoCommand <nodeid>
+name: Group Messaging Demo - Configuration
+
+config:
+    cluster: "Groups"
+    endpoint: 0
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
+    - label: "Add Group 1 - endpoint 1"
+      command: "AddGroup"
+      endpoint: 1
+      arguments:
+          values:
+              - name: "groupId"
+                value: 0x0101
+              - name: "groupName"
+                value: "Group #1"
+      response:
+          values:
+              - name: "status"
+                value: 0
+              - name: "groupId"
+                value: 0x0101
+
+    - label: "KeySet Write 1"
+      cluster: "Group Key Management"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 1110000,
+                        EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+                        EpochStartTime1: 1110001,
+                        EpochKey2: "\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf",
+                        EpochStartTime2: 1110002,
+                    }
+
+    - label: "Map Group Key Set to group ID on a given fabric"
+      cluster: "Group Key Management"
+      command: "writeAttribute"
+      attribute: "GroupKeyMap"
+      arguments:
+          value: [{ FabricIndex: 1, GroupId: 0x0101, GroupKeySetID: 0x01a1 }]

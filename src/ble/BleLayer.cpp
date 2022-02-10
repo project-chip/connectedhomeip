@@ -288,7 +288,6 @@ CHIP_ERROR BleLayer::Init(BlePlatformDelegate * platformDelegate, BleConnectionD
 #if CHIP_ENABLE_CHIPOBLE_TEST
     mTestBleEndPoint = NULL;
 #endif
-    mBleEndPoint = NULL;
 
     return CHIP_NO_ERROR;
 }
@@ -427,7 +426,6 @@ CHIP_ERROR BleLayer::NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_O
 #if CHIP_ENABLE_CHIPOBLE_TEST
     mTestBleEndPoint = *retEndPoint;
 #endif
-    mBleEndPoint = *retEndPoint;
 
     return CHIP_NO_ERROR;
 }

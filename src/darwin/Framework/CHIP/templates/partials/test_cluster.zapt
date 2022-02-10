@@ -5,7 +5,7 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
 {{/if}}
 {{#chip_tests_item_response_parameters}}
 {{#if saveAs}}
-{{asObjectiveCBasicType type is_mutable=true}} {{saveAs}};
+{{asObjectiveCType type ../cluster}} {{saveAs}};
 {{/if}}
 {{/chip_tests_item_response_parameters}}
 
@@ -53,8 +53,8 @@ ResponseHandler {{> subscribeDataCallback}} = nil;
     {{#chip_tests_item_parameters}}
     {{asObjectiveCBasicType type}} {{asLowerCamelCase name}}Argument = {{asTypedLiteral definedValue type}};
     {{/chip_tests_item_parameters}}
-    [cluster subscribeAttribute{{asUpperCamelCase attribute}}WithMinInterval:minIntervalArgument
-                                                                 maxInterval:maxIntervalArgument
+    [cluster subscribeAttribute{{asUpperCamelCase attribute}}WithMinInterval:@(minIntervalArgument)
+                                                                 maxInterval:@(maxIntervalArgument)
                                                      subscriptionEstablished:^{
         XCTAssertEqual(testSendCluster{{parent.filename}}_{{asTestIndex waitForReport.index}}_{{asUpperCamelCase waitForReport.command}}_Fulfilled, true);
         [expectation fulfill];
@@ -74,7 +74,7 @@ ResponseHandler {{> subscribeDataCallback}} = nil;
         NSLog(@"{{label}} Error: %@", err);
 
         {{#if optional}}
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -173,13 +173,17 @@ ResponseHandler {{> subscribeDataCallback}} = nil;
         {{#if (isLiteralNull expectedConstraints.notValue)}}
           XCTAssertFalse(actualValue == nil);
         {{else}}
-          if (actualValue != nil) {
-            {{#if (isString type)}}
+          {{#if (chip_tests_variables_has expectedConstraints.notValue)}}
             XCTAssertNotEqualObjects(actualValue, {{expectedConstraints.notValue}});
-            {{else}}
-            XCTAssertNotEqual([actualValue {{asObjectiveCNumberType "" type true}}Value], {{asTypedLiteral expectedConstraints.notValue type}});
-            {{/if}}
-          }
+          {{else}}
+            if (actualValue != nil) {
+              {{#if (isString type)}}
+              XCTAssertNotEqualObjects(actualValue, {{expectedConstraints.notValue}});
+              {{else}}
+              XCTAssertNotEqual([actualValue {{asObjectiveCNumberType "" type true}}Value], {{asTypedLiteral expectedConstraints.notValue type}});
+             {{/if}}
+            }
+          {{/if}}
         {{/if}}
         }
         {{/if}}
@@ -187,13 +191,7 @@ ResponseHandler {{> subscribeDataCallback}} = nil;
         {{#if saveAs}}
         {
           {{> actualValue}}
-          {{#if (isOctetString type)}}
-        {{saveAs}} = [NSMutableData dataWithData:actualValue];
-          {{else if (isCharString type)}}
-        {{saveAs}} = [NSMutableString stringWithString:actualValue];
-          {{else}}
-        {{saveAs}} = [actualValue {{asObjectiveCNumberType "" type true}}Value];
-          {{/if}}
+          {{saveAs}} = actualValue;
         }
         {{/if}}
         {{/chip_tests_item_response_parameters}}

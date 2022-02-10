@@ -39,10 +39,16 @@ jobs:
       # to fail (exit nonzero) on match.  And we wasnt to exclude this file,
       # to avoid our grep regexp matching itself.
       - name: Check for incorrect error use in VerifyOrExit
+        if: always()
         run: |
           git grep -n "VerifyOrExit(.*, [A-Za-z]*_ERROR" -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
 
       # Comments like '{{! ... }}' should be used in zap files
       - name: Do not allow TODO in generated files
+        if: always()
         run: |
           git grep -n 'TODO:' -- ./zzz_generated './*/zap-generated/*' && exit 1 || exit 0
+
+      - name: Check for disallowed include files
+        if: always()
+        run: scripts/tools/check_includes.sh

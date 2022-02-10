@@ -39,6 +39,10 @@
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
  *
- * 0x4E53: nrfconnect shell
+ * 0x8012: example shell
  */
-#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x4E53
+#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8012
+
+// shell app uses openthread but does not have the NETWORK_COMMISSIONING cluster or zap config
+// Do not instantiate the NETWORK_COMMISSIONING thread driver
+#define _NO_NETWORK_COMMISSIONING_DRIVER_

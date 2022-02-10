@@ -16,9 +16,16 @@ namespace {{asUpperCamelCase name}} {
         {{#unless struct_contains_array}}
         CHIP_ERROR Decode(TLV::TLVReader &reader);
         {{/unless}}
+
+        static constexpr bool kIsFabricScoped = {{struct_is_fabric_scoped}};
+
         {{#if struct_is_fabric_scoped}}
         auto GetFabricIndex() const {
             return {{ asLowerCamelCase struct_fabric_idx_field }};
+        }
+
+        void SetFabricIndex(chip::FabricIndex fabricIndex_) {
+            {{ asLowerCamelCase struct_fabric_idx_field }} = fabricIndex_;
         }
         {{/if}}
     };
@@ -29,7 +36,20 @@ namespace {{asUpperCamelCase name}} {
         {{#zcl_struct_items}}
         {{zapTypeToDecodableClusterObjectType type}} {{asLowerCamelCase label}}{{> cluster_objects_field_init}};
         {{/zcl_struct_items}}
+
         CHIP_ERROR Decode(TLV::TLVReader &reader);
+
+        static constexpr bool kIsFabricScoped = {{struct_is_fabric_scoped}};
+
+        {{#if struct_is_fabric_scoped}}
+        auto GetFabricIndex() const {
+            return {{ asLowerCamelCase struct_fabric_idx_field }};
+        }
+
+        void SetFabricIndex(chip::FabricIndex fabricIndex_) {
+            {{ asLowerCamelCase struct_fabric_idx_field }} = fabricIndex_;
+        }
+        {{/if}}
     };
     {{else}}
     using DecodableType = Type;
@@ -70,6 +90,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 

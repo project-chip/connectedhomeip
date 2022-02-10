@@ -26,6 +26,8 @@
 from __future__ import absolute_import
 from __future__ import print_function
 from chip import ChipDeviceCtrl
+from chip import FabricAdmin
+from chip import ChipStack
 from chip import ChipCommissionableNodeCtrl
 from chip import exceptions
 import argparse
@@ -43,6 +45,14 @@ import string
 import traceback
 from cmd import Cmd
 from chip.setup_payload import SetupPayload
+import deprecation
+import warnings
+import logging
+from rich import print
+from rich.pretty import pprint
+from rich import pretty
+import coloredlogs
+import chip.logging
 
 # Extend sys.path with one or more directories, relative to the location of the
 # running script, in which the chip package might be found .  This makes it
@@ -137,9 +147,23 @@ def FormatZCLArguments(args, command):
     return commandArgs
 
 
+def ShowColoredWarnings(message, category, filename, lineno, file=None, line=None):
+    logging.warning(' %s:%s: %s:%s' %
+                    (filename, lineno, category.__name__, message))
+    return
+
+
 class DeviceMgrCmd(Cmd):
-    def __init__(self, rendezvousAddr=None, controllerNodeId=0, bluetoothAdapter=None):
+    def __init__(self, rendezvousAddr=None, controllerNodeId=1, bluetoothAdapter=None):
         self.lastNetworkId = None
+
+        pretty.install(indent_guides=True, expand_all=True)
+
+        coloredlogs.install(level='DEBUG')
+        chip.logging.RedirectToPythonLogging()
+
+        logging.getLogger().setLevel(logging.DEBUG)
+        warnings.showwarning = ShowColoredWarnings
 
         Cmd.__init__(self)
 
@@ -155,10 +179,13 @@ class DeviceMgrCmd(Cmd):
 
         self.bleMgr = None
 
-        self.devCtrl = ChipDeviceCtrl.ChipDeviceController(
-            controllerNodeId=controllerNodeId, bluetoothAdapter=bluetoothAdapter)
+        self.chipStack = ChipStack.ChipStack(
+            bluetoothAdapter=bluetoothAdapter, persistentStoragePath='/tmp/chip-device-ctrl-storage.json')
+        self.fabricAdmin = FabricAdmin.FabricAdmin()
+        self.devCtrl = self.fabricAdmin.NewController(controllerNodeId, True)
 
-        self.commissionableNodeCtrl = ChipCommissionableNodeCtrl.ChipCommissionableNodeController()
+        self.commissionableNodeCtrl = ChipCommissionableNodeCtrl.ChipCommissionableNodeController(
+            self.chipStack)
 
         # If we are on Linux and user selects non-default bluetooth adapter.
         if sys.platform.startswith("linux") and (bluetoothAdapter is not None):
@@ -280,6 +307,9 @@ class DeviceMgrCmd(Cmd):
         Close the ble connection to the device.
         """
 
+        warnings.warn(
+            "This method is being deprecated. Please use the DeviceController.CloseBLEConnection method directly in the REPL", DeprecationWarning)
+
         args = shlex.split(line)
 
         if len(args) != 0:
@@ -298,6 +328,9 @@ class DeviceMgrCmd(Cmd):
 
         Set the level of Chip logging output.
         """
+
+        warnings.warn(
+            "This method is being deprecated. Please use the DeviceController.SetLogFilter method directly in the REPL", DeprecationWarning)
 
         args = shlex.split(line)
 
@@ -344,6 +377,10 @@ class DeviceMgrCmd(Cmd):
         setup-payload parse-manual <manual-pairing-code>
         setup-payload parse-qr <qr-code-payload>
         """
+
+        warnings.warn(
+            "This method is being deprecated. Please use the SetupPayload function in the chip.setup_payload package directly", DeprecationWarning)
+
         try:
             arglist = shlex.split(line)
             if arglist[0] not in ("generate", "parse-manual", "parse-qr"):
@@ -471,7 +508,7 @@ class DeviceMgrCmd(Cmd):
             pincode = ctypes.c_uint32(
                 int(setupPayload.attributes['SetUpPINCode']))
             try:
-                self.devCtrl.ConnectIP(addrStrStorage, pincode, nodeid)
+                self.devCtrl.CommissionIP(addrStrStorage, pincode, nodeid)
                 print("Connected")
                 return 0
             except Exception as ex:
@@ -560,6 +597,9 @@ class DeviceMgrCmd(Cmd):
               for connection)
         """
 
+        warnings.warn(
+            "This method is being deprecated. Please use the DeviceController.[ConnectBLE|CommissionIP] methods directly in the REPL", DeprecationWarning)
+
         try:
             args = shlex.split(line)
             if len(args) <= 1:
@@ -573,7 +613,7 @@ class DeviceMgrCmd(Cmd):
             print("Device is assigned with nodeid = {}".format(nodeid))
 
             if args[0] == "-ip" and len(args) >= 3:
-                self.devCtrl.ConnectIP(args[1].encode(
+                self.devCtrl.CommissionIP(args[1].encode(
                     "utf-8"), int(args[2]), nodeid)
             elif args[0] == "-ble" and len(args) >= 3:
                 self.devCtrl.ConnectBLE(int(args[1]), int(args[2]), nodeid)
@@ -1048,7 +1088,7 @@ def main():
         "--controller-nodeid",
         action="store",
         dest="controllerNodeId",
-        default=0,
+        default=1,
         type='int',
         help="Controller node ID",
         metavar="<nodeid>",

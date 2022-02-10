@@ -96,7 +96,8 @@ private:
 
     void OnReportEnd() override;
 
-    void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
+    void OnAttributeData(
+        const ConcreteDataAttributePath & aPath, DataVersion aVersion, TLV::TLVReader * apData, const StatusIB & aStatus) override;
 
     void OnError(CHIP_ERROR aError) override;
 
@@ -105,7 +106,7 @@ private:
     void OnSubscriptionEstablished(uint64_t aSubscriptionId) override;
 
     void ReportError(CHIP_ERROR err);
-    void ReportError(EmberAfStatus status);
+    void ReportError(const StatusIB & status);
     void ReportError(NSError * _Nullable err);
 
 private:
@@ -214,7 +215,7 @@ void SubscriptionCallback::OnReportEnd()
 }
 
 void SubscriptionCallback::OnAttributeData(
-    const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus)
+    const ConcreteDataAttributePath & aPath, DataVersion aVersion, TLV::TLVReader * apData, const StatusIB & aStatus)
 {
     if (aPath.IsListItemOperation()) {
         ReportError(CHIP_ERROR_INCORRECT_STATE);
@@ -222,7 +223,7 @@ void SubscriptionCallback::OnAttributeData(
     }
 
     if (aStatus.mStatus != Status::Success) {
-        ReportError(ToEmberAfStatus(aStatus.mStatus));
+        ReportError(aStatus);
         return;
     }
 
@@ -273,7 +274,7 @@ void SubscriptionCallback::OnSubscriptionEstablished(uint64_t aSubscriptionId)
 
 void SubscriptionCallback::ReportError(CHIP_ERROR err) { ReportError([CHIPError errorForCHIPErrorCode:err]); }
 
-void SubscriptionCallback::ReportError(EmberAfStatus status) { ReportError([CHIPError errorForZCLErrorCode:status]); }
+void SubscriptionCallback::ReportError(const StatusIB & status) { ReportError([CHIPError errorForIMStatus:status]); }
 
 void SubscriptionCallback::ReportError(NSError * _Nullable err)
 {

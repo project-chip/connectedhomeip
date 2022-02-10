@@ -23,8 +23,8 @@
 #pragma once
 
 #include "AttributeDataIBs.h"
-#include "StructBuilder.h"
-#include "StructParser.h"
+#include "MessageBuilder.h"
+#include "MessageParser.h"
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
@@ -43,7 +43,7 @@ enum class Tag : uint8_t
     kIsFabricFiltered    = 4,
 };
 
-class Parser : public StructParser
+class Parser : public MessageParser
 {
 public:
     /**
@@ -110,7 +110,7 @@ public:
     CHIP_ERROR GetIsFabricFiltered(bool * const apIsFabricFiltered) const;
 };
 
-class Builder : public StructBuilder
+class Builder : public MessageBuilder
 {
 public:
     /**

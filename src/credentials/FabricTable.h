@@ -43,8 +43,10 @@
 namespace chip {
 
 static constexpr FabricIndex kMinValidFabricIndex     = 1;
-static constexpr FabricIndex kMaxValidFabricIndex     = std::min<FabricIndex>(UINT8_MAX - 1, CHIP_CONFIG_MAX_DEVICE_ADMINS);
+static constexpr FabricIndex kMaxValidFabricIndex     = std::min<FabricIndex>(UINT8_MAX - 1, CHIP_CONFIG_MAX_FABRICS);
 static constexpr uint8_t kFabricLabelMaxLengthInBytes = 32;
+
+static_assert(kUndefinedFabricIndex < chip::kMinValidFabricIndex, "Undefined fabric index should not be valid");
 
 // KVS store is sensitive to length of key strings, based on the underlying
 // platform. Keeping them short.
@@ -313,12 +315,14 @@ private:
 // TODO: Reimplement FabricTable to only have one backing store.
 class DLL_EXPORT FabricTableDelegate
 {
+    friend class FabricTable;
+
 public:
     virtual ~FabricTableDelegate() {}
     /**
      * Gets called when a fabric is deleted from KVS store.
      **/
-    virtual void OnFabricDeletedFromStorage(FabricIndex fabricIndex) = 0;
+    virtual void OnFabricDeletedFromStorage(CompressedFabricId compressedId, FabricIndex fabricIndex) = 0;
 
     /**
      * Gets called when a fabric is loaded into Fabric Table from KVS store.
@@ -329,6 +333,9 @@ public:
      * Gets called when a fabric in Fabric Table is persisted to KVS store.
      **/
     virtual void OnFabricPersistedToStorage(FabricInfo * fabricInfo) = 0;
+
+private:
+    FabricTableDelegate * mNext = nullptr;
 };
 
 /**
@@ -402,10 +409,11 @@ class DLL_EXPORT FabricTable
 {
 public:
     FabricTable() { Reset(); }
-    CHIP_ERROR Store(FabricIndex id);
+    CHIP_ERROR Store(FabricIndex index);
     CHIP_ERROR LoadFromStorage(FabricInfo * info);
 
-    CHIP_ERROR Delete(FabricIndex id);
+    // Returns CHIP_ERROR_NOT_FOUND if there is no fabric for that index.
+    CHIP_ERROR Delete(FabricIndex index);
     void DeleteAllFabrics();
 
     /**
@@ -421,6 +429,7 @@ public:
 
     void ReleaseFabricIndex(FabricIndex fabricIndex);
 
+    FabricInfo * FindFabric(Credentials::P256PublicKeySpan rootPubKey, FabricId fabricId);
     FabricInfo * FindFabricWithIndex(FabricIndex fabricIndex);
     FabricInfo * FindFabricWithCompressedId(CompressedFabricId fabricId);
 
@@ -430,23 +439,19 @@ public:
     void Reset();
 
     CHIP_ERROR Init(FabricStorage * storage);
-    CHIP_ERROR SetFabricDelegate(FabricTableDelegate * delegate);
+    CHIP_ERROR AddFabricDelegate(FabricTableDelegate * delegate);
 
     uint8_t FabricCount() const { return mFabricCount; }
 
-    ConstFabricIterator cbegin() const { return ConstFabricIterator(mStates, 0, CHIP_CONFIG_MAX_DEVICE_ADMINS); }
-    ConstFabricIterator cend() const
-    {
-        return ConstFabricIterator(mStates, CHIP_CONFIG_MAX_DEVICE_ADMINS, CHIP_CONFIG_MAX_DEVICE_ADMINS);
-    }
+    ConstFabricIterator cbegin() const { return ConstFabricIterator(mStates, 0, CHIP_CONFIG_MAX_FABRICS); }
+    ConstFabricIterator cend() const { return ConstFabricIterator(mStates, CHIP_CONFIG_MAX_FABRICS, CHIP_CONFIG_MAX_FABRICS); }
     ConstFabricIterator begin() const { return cbegin(); }
     ConstFabricIterator end() const { return cend(); }
 
 private:
-    FabricInfo mStates[CHIP_CONFIG_MAX_DEVICE_ADMINS];
+    FabricInfo mStates[CHIP_CONFIG_MAX_FABRICS];
     FabricStorage * mStorage = nullptr;
 
-    // TODO: Fabric table should be backed by a single backing store (attribute store), remove delegate callbacks #6419
     FabricTableDelegate * mDelegate = nullptr;
 
     FabricIndex mNextAvailableFabricIndex = kMinValidFabricIndex;

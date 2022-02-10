@@ -28,10 +28,8 @@
 
 #include <app/CommandSender.h>
 #include <app/DeviceProxy.h>
-#include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/attribute-filter.h>
 #include <app/util/basic-types.h>
-#include <controller-clusters/zap-generated/CHIPClientCallbacks.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
 #include <controller/OperationalCredentialsDelegate.h>
 #include <lib/core/CHIPCallback.h>
@@ -76,8 +74,6 @@ struct ControllerDeviceInitParams
     Ble::BleLayer * bleLayer = nullptr;
 #endif
     FabricTable * fabricsTable = nullptr;
-
-    Controller::DeviceControllerInteractionModelDelegate * imDelegate = nullptr;
 };
 
 class CommissioneeDeviceProxy : public DeviceProxy, public SessionReleaseDelegate
@@ -125,7 +121,6 @@ public:
         mUDPEndPointManager = params.udpEndPointManager;
         mFabricIndex        = fabric;
         mIDAllocator        = params.idAllocator;
-        mpIMDelegate        = params.imDelegate;
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
 #endif
@@ -221,7 +216,7 @@ public:
 
     Messaging::ExchangeManager * GetExchangeManager() const override { return mExchangeMgr; }
 
-    void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceAddress.SetIPAddress(deviceAddr); }
+    void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceAddress.SetSingleIPAddress(deviceAddr); }
 
     PASESession & GetPairing() { return mPairing; }
 
@@ -232,8 +227,6 @@ public:
         bool loadedSecureSession = false;
         return LoadSecureSessionParametersIfNeeded(loadedSecureSession);
     };
-
-    Controller::DeviceControllerInteractionModelDelegate * GetInteractionModelDelegate() override { return mpIMDelegate; };
 
 private:
     enum class ConnectionState
@@ -272,8 +265,6 @@ private:
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
 
     SessionHolderWithDelegate mSecureSession;
-
-    Controller::DeviceControllerInteractionModelDelegate * mpIMDelegate = nullptr;
 
     uint8_t mSequenceNumber = 0;
 

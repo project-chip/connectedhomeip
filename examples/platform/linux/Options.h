@@ -27,6 +27,7 @@
 #include <cstdint>
 
 #include <lib/core/CHIPError.h>
+#include <lib/support/CHIPArgParser.hpp>
 #include <setup_payload/SetupPayload.h>
 
 struct LinuxDeviceOptions
@@ -40,8 +41,9 @@ struct LinuxDeviceOptions
     uint32_t unsecuredCommissionerPort = CHIP_UDC_PORT;
     const char * command               = nullptr;
     const char * PICS                  = nullptr;
+    const char * KVS                   = nullptr;
 
     static LinuxDeviceOptions & GetInstance();
 };
 
-CHIP_ERROR ParseArguments(int argc, char * argv[]);
+CHIP_ERROR ParseArguments(int argc, char * argv[], chip::ArgParser::OptionSet * customOptions = nullptr);

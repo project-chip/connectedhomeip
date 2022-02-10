@@ -24,6 +24,7 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
 #include <app-common/zap-generated/ids/Events.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/EventLoggingTypes.h>
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/Decode.h>
@@ -56,6 +57,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -755,6 +758,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Battery3AlarmState
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -859,6 +886,8 @@ struct TypeInfo
         Attributes::Battery3PercentageThreshold2::TypeInfo::DecodableType battery3PercentageThreshold2 = static_cast<uint8_t>(0);
         Attributes::Battery3PercentageThreshold3::TypeInfo::DecodableType battery3PercentageThreshold3 = static_cast<uint8_t>(0);
         Attributes::Battery3AlarmState::TypeInfo::DecodableType battery3AlarmState                     = static_cast<uint32_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -978,6 +1007,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace HighTempDwellTripPoint
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -1032,6 +1085,8 @@ struct TypeInfo
         Attributes::HighTempThreshold::TypeInfo::DecodableType highTempThreshold           = static_cast<int16_t>(0);
         Attributes::LowTempDwellTripPoint::TypeInfo::DecodableType lowTempDwellTripPoint   = static_cast<uint32_t>(0);
         Attributes::HighTempDwellTripPoint::TypeInfo::DecodableType highTempDwellTripPoint = static_cast<uint32_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -1265,6 +1320,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace IdentifyType
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -1312,6 +1391,8 @@ struct TypeInfo
 
         Attributes::IdentifyTime::TypeInfo::DecodableType identifyTime = static_cast<uint16_t>(0);
         Attributes::IdentifyType::TypeInfo::DecodableType identifyType = static_cast<uint8_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -1730,6 +1811,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NameSupport
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -1776,6 +1881,8 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::NameSupport::TypeInfo::DecodableType nameSupport = static_cast<uint8_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -1809,6 +1916,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -2730,6 +2839,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LastConfiguredBy
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -2781,6 +2914,8 @@ struct TypeInfo
         Attributes::SceneValid::TypeInfo::DecodableType sceneValid             = static_cast<bool>(0);
         Attributes::NameSupport::TypeInfo::DecodableType nameSupport           = static_cast<uint8_t>(0);
         Attributes::LastConfiguredBy::TypeInfo::DecodableType lastConfiguredBy = static_cast<chip::NodeId>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -3117,6 +3252,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace StartUpOnOff
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -3167,6 +3326,8 @@ struct TypeInfo
         Attributes::OnTime::TypeInfo::DecodableType onTime                         = static_cast<uint16_t>(0);
         Attributes::OffWaitTime::TypeInfo::DecodableType offWaitTime               = static_cast<uint16_t>(0);
         Attributes::StartUpOnOff::TypeInfo::DecodableType startUpOnOff             = static_cast<uint8_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -3202,6 +3363,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SwitchActions
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOffSwitchConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OnOffSwitchConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -3249,6 +3434,8 @@ struct TypeInfo
 
         Attributes::SwitchType::TypeInfo::DecodableType switchType       = static_cast<uint8_t>(0);
         Attributes::SwitchActions::TypeInfo::DecodableType switchActions = static_cast<uint8_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -3805,6 +3992,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace StartUpCurrentLevel
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -3864,6 +4075,8 @@ struct TypeInfo
         Attributes::OffTransitionTime::TypeInfo::DecodableType offTransitionTime;
         Attributes::DefaultMoveRate::TypeInfo::DecodableType defaultMoveRate;
         Attributes::StartUpCurrentLevel::TypeInfo::DecodableType startUpCurrentLevel;
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -4120,6 +4333,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AlarmCount
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -4166,6 +4403,8 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::AlarmCount::TypeInfo::DecodableType alarmCount = static_cast<uint16_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -4297,6 +4536,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ValidUntilTime
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -4352,6 +4615,8 @@ struct TypeInfo
         Attributes::LocalTime::TypeInfo::DecodableType localTime           = static_cast<uint32_t>(0);
         Attributes::LastSetTime::TypeInfo::DecodableType lastSetTime       = static_cast<uint32_t>(0);
         Attributes::ValidUntilTime::TypeInfo::DecodableType validUntilTime = static_cast<uint32_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -4474,6 +4739,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ApplicationType
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -4528,6 +4817,8 @@ struct TypeInfo
         Attributes::Reliability::TypeInfo::DecodableType reliability         = static_cast<uint8_t>(0);
         Attributes::StatusFlags::TypeInfo::DecodableType statusFlags         = static_cast<uint8_t>(0);
         Attributes::ApplicationType::TypeInfo::DecodableType applicationType = static_cast<uint32_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -4557,6 +4848,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -4577,6 +4870,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -4605,6 +4900,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -5541,6 +5838,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ScheduleMode
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -5591,6 +5912,8 @@ struct TypeInfo
         Attributes::EnergyFormatting::TypeInfo::DecodableType energyFormatting     = static_cast<uint8_t>(0);
         Attributes::EnergyRemote::TypeInfo::DecodableType energyRemote             = static_cast<bool>(0);
         Attributes::ScheduleMode::TypeInfo::DecodableType scheduleMode             = static_cast<uint8_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -6002,6 +6325,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RemainingTime
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -6050,6 +6397,8 @@ struct TypeInfo
         Attributes::StartTime::TypeInfo::DecodableType startTime         = static_cast<uint16_t>(0);
         Attributes::FinishTime::TypeInfo::DecodableType finishTime       = static_cast<uint16_t>(0);
         Attributes::RemainingTime::TypeInfo::DecodableType remainingTime = static_cast<uint16_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -6061,6 +6410,30 @@ namespace PulseWidthModulation {
 
 namespace Attributes {
 
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PulseWidthModulation::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PulseWidthModulation::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -6106,6 +6479,8 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -6131,6 +6506,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -6189,6 +6566,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PartsList
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -6238,6 +6639,8 @@ struct TypeInfo
         Attributes::ServerList::TypeInfo::DecodableType serverList;
         Attributes::ClientList::TypeInfo::DecodableType clientList;
         Attributes::PartsList::TypeInfo::DecodableType partsList;
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -6349,6 +6752,30 @@ public:
 
 namespace Attributes {
 
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Binding::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Binding::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -6394,6 +6821,8 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -6444,6 +6873,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -6469,7 +6900,12 @@ public:
     DataModel::Nullable<DataModel::List<const Structs::Target::Type>> targets;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    static constexpr bool kIsFabricScoped = true;
+
     auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
 };
 
 struct DecodableType
@@ -6480,7 +6916,14 @@ public:
     AuthMode authMode             = static_cast<AuthMode>(0);
     DataModel::Nullable<DataModel::DecodableList<uint64_t>> subjects;
     DataModel::Nullable<DataModel::DecodableList<Structs::Target::DecodableType>> targets;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = true;
+
+    auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
 };
 
 } // namespace AccessControlEntry
@@ -6499,7 +6942,12 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = true;
+
     auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
 };
 
 using DecodableType = Type;
@@ -6537,6 +6985,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Extension
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -6584,6 +7056,8 @@ struct TypeInfo
 
         Attributes::Acl::TypeInfo::DecodableType acl;
         Attributes::Extension::TypeInfo::DecodableType extension;
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -6609,6 +7083,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::AccessControlEntryChanged::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     chip::FabricIndex adminFabricIndex = static_cast<chip::FabricIndex>(0);
     DataModel::Nullable<chip::NodeId> adminNodeID;
@@ -6655,6 +7130,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::AccessControlExtensionChanged::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     chip::FabricIndex adminFabricIndex = static_cast<chip::FabricIndex>(0);
     DataModel::Nullable<chip::NodeId> adminNodeID;
@@ -6961,6 +7437,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FastPollTimeoutMax
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -7013,6 +7513,8 @@ struct TypeInfo
         Attributes::CheckInIntervalMin::TypeInfo::DecodableType checkInIntervalMin   = static_cast<uint32_t>(0);
         Attributes::LongPollIntervalMin::TypeInfo::DecodableType longPollIntervalMin = static_cast<uint32_t>(0);
         Attributes::FastPollTimeoutMax::TypeInfo::DecodableType fastPollTimeoutMax   = static_cast<uint16_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -7095,6 +7597,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -7118,6 +7622,8 @@ public:
     DataModel::List<const chip::EndpointId> endpoints;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 struct DecodableType
@@ -7127,7 +7633,10 @@ public:
     chip::CharSpan name;
     EndpointListTypeEnum type = static_cast<EndpointListTypeEnum>(0);
     DataModel::DecodableList<chip::EndpointId> endpoints;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 } // namespace EndpointListStruct
@@ -7679,6 +8188,30 @@ struct TypeInfo
     static constexpr size_t MaxLength() { return 512; }
 };
 } // namespace SetupUrl
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -7727,6 +8260,8 @@ struct TypeInfo
         Attributes::ActionList::TypeInfo::DecodableType actionList;
         Attributes::EndpointList::TypeInfo::DecodableType endpointList;
         Attributes::SetupUrl::TypeInfo::DecodableType setupUrl;
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -7750,6 +8285,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::StateChanged::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID        = static_cast<uint16_t>(0);
     uint32_t invokeID        = static_cast<uint32_t>(0);
@@ -7789,6 +8325,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::ActionFailed::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t actionID        = static_cast<uint16_t>(0);
     uint32_t invokeID        = static_cast<uint32_t>(0);
@@ -7860,7 +8397,7 @@ public:
 
 namespace Attributes {
 
-namespace InteractionModelVersion {
+namespace DataModelRevision {
 struct TypeInfo
 {
     using Type             = uint16_t;
@@ -7868,10 +8405,10 @@ struct TypeInfo
     using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::InteractionModelVersion::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DataModelRevision::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace InteractionModelVersion
+} // namespace DataModelRevision
 namespace VendorName {
 struct TypeInfo
 {
@@ -8100,6 +8637,30 @@ struct TypeInfo
     static constexpr size_t MaxLength() { return 32; }
 };
 } // namespace UniqueID
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -8145,7 +8706,7 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::InteractionModelVersion::TypeInfo::DecodableType interactionModelVersion = static_cast<uint16_t>(0);
+        Attributes::DataModelRevision::TypeInfo::DecodableType dataModelRevision = static_cast<uint16_t>(0);
         Attributes::VendorName::TypeInfo::DecodableType vendorName;
         Attributes::VendorID::TypeInfo::DecodableType vendorID = static_cast<chip::VendorId>(0);
         Attributes::ProductName::TypeInfo::DecodableType productName;
@@ -8164,6 +8725,8 @@ struct TypeInfo
         Attributes::LocalConfigDisabled::TypeInfo::DecodableType localConfigDisabled = static_cast<bool>(0);
         Attributes::Reachable::TypeInfo::DecodableType reachable                     = static_cast<bool>(0);
         Attributes::UniqueID::TypeInfo::DecodableType uniqueID;
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -8185,6 +8748,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::StartUp::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint32_t softwareVersion = static_cast<uint32_t>(0);
 
@@ -8216,6 +8780,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::ShutDown::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -8243,6 +8808,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::Leave::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -8271,6 +8837,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::ReachableChanged::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     bool reachableNewValue = static_cast<bool>(0);
 
@@ -8562,6 +9129,30 @@ public:
 
 namespace Attributes {
 
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -8607,6 +9198,8 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -8663,7 +9256,12 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = true;
+
     auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
 };
 
 using DecodableType = Type;
@@ -8780,6 +9378,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace UpdateStateProgress
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -8830,6 +9452,8 @@ struct TypeInfo
         Attributes::UpdateState::TypeInfo::DecodableType updateState =
             static_cast<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum>(0);
         Attributes::UpdateStateProgress::TypeInfo::DecodableType updateStateProgress;
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -8854,6 +9478,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::StateTransition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DataModel::Nullable<OTAUpdateStateEnum> previousState;
     OTAUpdateStateEnum newState = static_cast<OTAUpdateStateEnum>(0);
@@ -8893,6 +9518,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::VersionApplied::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint32_t softwareVersion = static_cast<uint32_t>(0);
     uint16_t productID       = static_cast<uint16_t>(0);
@@ -8930,6 +9556,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::DownloadError::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint32_t softwareVersion = static_cast<uint32_t>(0);
     uint64_t bytesDownloaded = static_cast<uint64_t>(0);
@@ -8985,6 +9612,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SupportedLocales
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -9032,6 +9683,8 @@ struct TypeInfo
 
         Attributes::ActiveLocale::TypeInfo::DecodableType activeLocale;
         Attributes::SupportedLocales::TypeInfo::DecodableType supportedLocales;
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -9101,6 +9754,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SupportedCalendarTypes
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeFormatLocalization::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeFormatLocalization::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -9151,6 +9828,8 @@ struct TypeInfo
         Attributes::ActiveCalendarType::TypeInfo::DecodableType activeCalendarType =
             static_cast<chip::app::Clusters::TimeFormatLocalization::CalendarType>(0);
         Attributes::SupportedCalendarTypes::TypeInfo::DecodableType supportedCalendarTypes;
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -9187,6 +9866,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TemperatureUnit
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitLocalization::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitLocalization::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -9234,6 +9937,8 @@ struct TypeInfo
 
         Attributes::TemperatureUnit::TypeInfo::DecodableType temperatureUnit =
             static_cast<chip::app::Clusters::UnitLocalization::TempUnit>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -9257,6 +9962,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Sources
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSourceConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSourceConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -9303,6 +10032,8 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::Sources::TypeInfo::DecodableType sources;
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -9402,6 +10133,8 @@ public:
     DataModel::List<const BatChargeFaultType> previous;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 struct DecodableType
@@ -9409,7 +10142,10 @@ struct DecodableType
 public:
     DataModel::DecodableList<BatChargeFaultType> current;
     DataModel::DecodableList<BatChargeFaultType> previous;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 } // namespace BatChargeFaultChangeType
@@ -9427,6 +10163,8 @@ public:
     DataModel::List<const BatFaultType> previous;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 struct DecodableType
@@ -9434,7 +10172,10 @@ struct DecodableType
 public:
     DataModel::DecodableList<BatFaultType> current;
     DataModel::DecodableList<BatFaultType> previous;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 } // namespace BatFaultChangeType
@@ -9452,6 +10193,8 @@ public:
     DataModel::List<const WiredFaultType> previous;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 struct DecodableType
@@ -9459,7 +10202,10 @@ struct DecodableType
 public:
     DataModel::DecodableList<WiredFaultType> current;
     DataModel::DecodableList<WiredFaultType> previous;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 } // namespace WiredFaultChangeType
@@ -9843,6 +10589,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ActiveBatteryChargeFaults
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -9919,6 +10689,8 @@ struct TypeInfo
         Attributes::BatteryFunctionalWhileCharging::TypeInfo::DecodableType batteryFunctionalWhileCharging = static_cast<bool>(0);
         Attributes::BatteryChargingCurrent::TypeInfo::DecodableType batteryChargingCurrent = static_cast<uint32_t>(0);
         Attributes::ActiveBatteryChargeFaults::TypeInfo::DecodableType activeBatteryChargeFaults;
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -9927,8 +10699,8 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace PowerSource
 namespace GeneralCommissioning {
-// Enum for GeneralCommissioningError
-enum class GeneralCommissioningError : uint8_t
+// Enum for CommissioningError
+enum class CommissioningError : uint8_t
 {
     kOk                    = 0x00,
     kValueOutsideRange     = 0x01,
@@ -9944,24 +10716,26 @@ enum class RegulatoryLocationType : uint8_t
 };
 
 namespace Structs {
-namespace BasicCommissioningInfoType {
+namespace BasicCommissioningInfo {
 enum class Fields
 {
-    kFailSafeExpiryLengthMs = 0,
+    kFailSafeExpiryLengthSeconds = 0,
 };
 
 struct Type
 {
 public:
-    uint32_t failSafeExpiryLengthMs = static_cast<uint32_t>(0);
+    uint16_t failSafeExpiryLengthSeconds = static_cast<uint16_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
 
-} // namespace BasicCommissioningInfoType
+} // namespace BasicCommissioningInfo
 } // namespace Structs
 
 namespace Commands {
@@ -10052,7 +10826,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ArmFailSafeResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
-    GeneralCommissioningError errorCode = static_cast<GeneralCommissioningError>(0);
+    CommissioningError errorCode = static_cast<CommissioningError>(0);
     chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -10068,7 +10842,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ArmFailSafeResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
-    GeneralCommissioningError errorCode = static_cast<GeneralCommissioningError>(0);
+    CommissioningError errorCode = static_cast<CommissioningError>(0);
     chip::CharSpan debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -10128,7 +10902,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetRegulatoryConfigResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
-    GeneralCommissioningError errorCode = static_cast<GeneralCommissioningError>(0);
+    CommissioningError errorCode = static_cast<CommissioningError>(0);
     chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -10144,7 +10918,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetRegulatoryConfigResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
-    GeneralCommissioningError errorCode = static_cast<GeneralCommissioningError>(0);
+    CommissioningError errorCode = static_cast<CommissioningError>(0);
     chip::CharSpan debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -10191,7 +10965,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::CommissioningCompleteResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
-    GeneralCommissioningError errorCode = static_cast<GeneralCommissioningError>(0);
+    CommissioningError errorCode = static_cast<CommissioningError>(0);
     chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -10207,7 +10981,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::CommissioningCompleteResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
-    GeneralCommissioningError errorCode = static_cast<GeneralCommissioningError>(0);
+    CommissioningError errorCode = static_cast<CommissioningError>(0);
     chip::CharSpan debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -10228,21 +11002,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Breadcrumb
-namespace BasicCommissioningInfoList {
+namespace BasicCommissioningInfo {
 struct TypeInfo
 {
-    using Type =
-        chip::app::DataModel::List<const chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::Type>;
-    using DecodableType = chip::app::DataModel::DecodableList<
-        chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType> &;
+    using Type             = chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfo::Type;
+    using DecodableType    = chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfo::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfo::DecodableType &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::BasicCommissioningInfoList::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BasicCommissioningInfo::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace BasicCommissioningInfoList
+} // namespace BasicCommissioningInfo
 namespace RegulatoryConfig {
 struct TypeInfo
 {
@@ -10267,6 +11038,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LocationCapability
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -10313,9 +11108,11 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::Breadcrumb::TypeInfo::DecodableType breadcrumb = static_cast<uint64_t>(0);
-        Attributes::BasicCommissioningInfoList::TypeInfo::DecodableType basicCommissioningInfoList;
+        Attributes::BasicCommissioningInfo::TypeInfo::DecodableType basicCommissioningInfo;
         Attributes::RegulatoryConfig::TypeInfo::DecodableType regulatoryConfig     = static_cast<uint8_t>(0);
         Attributes::LocationCapability::TypeInfo::DecodableType locationCapability = static_cast<uint8_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -10375,6 +11172,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -10407,6 +11206,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -10435,6 +11236,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -10926,6 +11729,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LastConnectErrorValue
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -10980,6 +11807,8 @@ struct TypeInfo
             static_cast<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus>(0);
         Attributes::LastNetworkID::TypeInfo::DecodableType lastNetworkID;
         Attributes::LastConnectErrorValue::TypeInfo::DecodableType lastConnectErrorValue = static_cast<uint32_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -11110,6 +11939,30 @@ public:
 
 namespace Attributes {
 
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DiagnosticLogs::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DiagnosticLogs::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -11155,6 +12008,8 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -11264,14 +12119,16 @@ struct Type
 {
 public:
     chip::CharSpan name;
-    bool fabricConnected                 = static_cast<bool>(0);
-    bool offPremiseServicesReachableIPv4 = static_cast<bool>(0);
-    bool offPremiseServicesReachableIPv6 = static_cast<bool>(0);
+    bool fabricConnected = static_cast<bool>(0);
+    DataModel::Nullable<bool> offPremiseServicesReachableIPv4;
+    DataModel::Nullable<bool> offPremiseServicesReachableIPv6;
     chip::ByteSpan hardwareAddress;
     InterfaceType type = static_cast<InterfaceType>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -11379,6 +12236,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ActiveNetworkFaults
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -11432,6 +12313,8 @@ struct TypeInfo
         Attributes::ActiveHardwareFaults::TypeInfo::DecodableType activeHardwareFaults;
         Attributes::ActiveRadioFaults::TypeInfo::DecodableType activeRadioFaults;
         Attributes::ActiveNetworkFaults::TypeInfo::DecodableType activeNetworkFaults;
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -11454,6 +12337,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::HardwareFaultChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DataModel::List<const HardwareFaultType> current;
     DataModel::List<const HardwareFaultType> previous;
@@ -11489,6 +12373,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::RadioFaultChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DataModel::List<const RadioFaultType> current;
     DataModel::List<const RadioFaultType> previous;
@@ -11524,6 +12409,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::NetworkFaultChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DataModel::List<const NetworkFaultType> current;
     DataModel::List<const NetworkFaultType> previous;
@@ -11558,6 +12444,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::BootReason::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     BootReasonType bootReason = static_cast<BootReasonType>(0);
 
@@ -11598,6 +12485,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -11624,6 +12513,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -11724,6 +12615,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentHeapHighWatermark
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -11773,6 +12688,8 @@ struct TypeInfo
         Attributes::CurrentHeapFree::TypeInfo::DecodableType currentHeapFree                   = static_cast<uint64_t>(0);
         Attributes::CurrentHeapUsed::TypeInfo::DecodableType currentHeapUsed                   = static_cast<uint64_t>(0);
         Attributes::CurrentHeapHighWatermark::TypeInfo::DecodableType currentHeapHighWatermark = static_cast<uint64_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -11794,6 +12711,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::SoftwareFault::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     Structs::SoftwareFaultStruct::Type softwareFault;
 
@@ -11847,6 +12765,15 @@ enum class ThreadConnectionStatus : uint8_t
     kNotConnected = 0x01,
 };
 
+// Bitmap for ThreadNetworkDiagnosticsFeature
+enum class ThreadNetworkDiagnosticsFeature : uint32_t
+{
+    kPacketCounts = 0x1,
+    kErrorCounts  = 0x2,
+    kMLECounts    = 0x4,
+    kMACCounts    = 0x8,
+};
+
 namespace Structs {
 namespace NeighborTable {
 enum class Fields
@@ -11887,6 +12814,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -11927,6 +12856,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -11963,6 +12894,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -11983,6 +12916,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -12060,9 +12995,9 @@ struct TypeInfo
 namespace NetworkName {
 struct TypeInfo
 {
-    using Type             = chip::ByteSpan;
-    using DecodableType    = chip::ByteSpan;
-    using DecodableArgType = chip::ByteSpan;
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NetworkName::Id; }
@@ -12802,6 +13737,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ActiveNetworkFaultsList
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -12911,6 +13870,8 @@ struct TypeInfo
         Attributes::ChannelMask::TypeInfo::DecodableType channelMask;
         Attributes::OperationalDatasetComponents::TypeInfo::DecodableType operationalDatasetComponents;
         Attributes::ActiveNetworkFaultsList::TypeInfo::DecodableType activeNetworkFaultsList;
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -12932,6 +13893,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::ConnectionStatus::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     ThreadConnectionStatus connectionStatus = static_cast<ThreadConnectionStatus>(0);
 
@@ -13200,6 +14162,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OverrunCount
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -13258,6 +14244,8 @@ struct TypeInfo
         Attributes::PacketUnicastTxCount::TypeInfo::DecodableType packetUnicastTxCount     = static_cast<uint32_t>(0);
         Attributes::CurrentMaxRate::TypeInfo::DecodableType currentMaxRate                 = static_cast<uint64_t>(0);
         Attributes::OverrunCount::TypeInfo::DecodableType overrunCount                     = static_cast<uint64_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -13279,6 +14267,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::Disconnection::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint16_t reasonCode = static_cast<uint16_t>(0);
 
@@ -13312,6 +14301,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::AssociationFailure::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     AssociationFailureCause associationFailure = static_cast<AssociationFailureCause>(0);
     uint16_t status                            = static_cast<uint16_t>(0);
@@ -13346,6 +14336,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::ConnectionStatus::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     WiFiConnectionStatus connectionStatus = static_cast<WiFiConnectionStatus>(0);
 
@@ -13434,9 +14425,9 @@ namespace Attributes {
 namespace PHYRate {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PHYRate::Id; }
@@ -13446,9 +14437,9 @@ struct TypeInfo
 namespace FullDuplex {
 struct TypeInfo
 {
-    using Type             = bool;
-    using DecodableType    = bool;
-    using DecodableArgType = bool;
+    using Type             = chip::app::DataModel::Nullable<bool>;
+    using DecodableType    = chip::app::DataModel::Nullable<bool>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<bool> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FullDuplex::Id; }
@@ -13518,9 +14509,9 @@ struct TypeInfo
 namespace CarrierDetect {
 struct TypeInfo
 {
-    using Type             = bool;
-    using DecodableType    = bool;
-    using DecodableArgType = bool;
+    using Type             = chip::app::DataModel::Nullable<bool>;
+    using DecodableType    = chip::app::DataModel::Nullable<bool>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<bool> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CarrierDetect::Id; }
@@ -13539,6 +14530,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TimeSinceReset
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -13584,15 +14599,17 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::PHYRate::TypeInfo::DecodableType PHYRate               = static_cast<uint8_t>(0);
-        Attributes::FullDuplex::TypeInfo::DecodableType fullDuplex         = static_cast<bool>(0);
+        Attributes::PHYRate::TypeInfo::DecodableType PHYRate;
+        Attributes::FullDuplex::TypeInfo::DecodableType fullDuplex;
         Attributes::PacketRxCount::TypeInfo::DecodableType packetRxCount   = static_cast<uint64_t>(0);
         Attributes::PacketTxCount::TypeInfo::DecodableType packetTxCount   = static_cast<uint64_t>(0);
         Attributes::TxErrCount::TypeInfo::DecodableType txErrCount         = static_cast<uint64_t>(0);
         Attributes::CollisionCount::TypeInfo::DecodableType collisionCount = static_cast<uint64_t>(0);
         Attributes::OverrunCount::TypeInfo::DecodableType overrunCount     = static_cast<uint64_t>(0);
-        Attributes::CarrierDetect::TypeInfo::DecodableType carrierDetect   = static_cast<bool>(0);
+        Attributes::CarrierDetect::TypeInfo::DecodableType carrierDetect;
         Attributes::TimeSinceReset::TypeInfo::DecodableType timeSinceReset = static_cast<uint64_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -13604,6 +14621,30 @@ namespace TimeSynchronization {
 
 namespace Attributes {
 
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -13649,6 +14690,8 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -13657,146 +14700,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace TimeSynchronization
 namespace BridgedDeviceBasic {
-
-namespace Commands {
-// Forward-declarations so we can reference these later.
-
-namespace StartUp {
-struct Type;
-struct DecodableType;
-} // namespace StartUp
-
-namespace ShutDown {
-struct Type;
-struct DecodableType;
-} // namespace ShutDown
-
-namespace Leave {
-struct Type;
-struct DecodableType;
-} // namespace Leave
-
-namespace ReachableChanged {
-struct Type;
-struct DecodableType;
-} // namespace ReachableChanged
-
-} // namespace Commands
-
-namespace Commands {
-namespace StartUp {
-enum class Fields
-{
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::StartUp::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::StartUp::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace StartUp
-namespace ShutDown {
-enum class Fields
-{
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ShutDown::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ShutDown::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ShutDown
-namespace Leave {
-enum class Fields
-{
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::Leave::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::Leave::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace Leave
-namespace ReachableChanged {
-enum class Fields
-{
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ReachableChanged::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ReachableChanged::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ReachableChanged
-} // namespace Commands
 
 namespace Attributes {
 
@@ -13991,6 +14894,30 @@ struct TypeInfo
     static constexpr size_t MaxLength() { return 32; }
 };
 } // namespace UniqueID
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -14051,12 +14978,138 @@ struct TypeInfo
         Attributes::SerialNumber::TypeInfo::DecodableType serialNumber;
         Attributes::Reachable::TypeInfo::DecodableType reachable = static_cast<bool>(0);
         Attributes::UniqueID::TypeInfo::DecodableType uniqueID;
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
     };
 };
 } // namespace Attributes
+namespace Events {
+namespace StartUp {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
+
+enum class Fields
+{
+    kSoftwareVersion = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::StartUp::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint32_t softwareVersion = static_cast<uint32_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::StartUp::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+
+    uint32_t softwareVersion = static_cast<uint32_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace StartUp
+namespace ShutDown {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
+
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::ShutDown::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::ShutDown::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace ShutDown
+namespace Leave {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::Leave::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::Leave::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace Leave
+namespace ReachableChanged {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields
+{
+    kReachableNewValue = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::ReachableChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    bool reachableNewValue = static_cast<bool>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::ReachableChanged::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
+
+    bool reachableNewValue = static_cast<bool>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace ReachableChanged
+} // namespace Events
 } // namespace BridgedDeviceBasic
 namespace Switch {
 
@@ -14098,6 +15151,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MultiPressMax
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -14146,6 +15223,8 @@ struct TypeInfo
         Attributes::NumberOfPositions::TypeInfo::DecodableType numberOfPositions = static_cast<uint8_t>(0);
         Attributes::CurrentPosition::TypeInfo::DecodableType currentPosition     = static_cast<uint8_t>(0);
         Attributes::MultiPressMax::TypeInfo::DecodableType multiPressMax         = static_cast<uint8_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -14167,6 +15246,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::SwitchLatched::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t newPosition = static_cast<uint8_t>(0);
 
@@ -14199,6 +15279,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::InitialPress::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t newPosition = static_cast<uint8_t>(0);
 
@@ -14231,6 +15312,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::LongPress::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t newPosition = static_cast<uint8_t>(0);
 
@@ -14263,6 +15345,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::ShortRelease::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t previousPosition = static_cast<uint8_t>(0);
 
@@ -14295,6 +15378,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::LongRelease::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t previousPosition = static_cast<uint8_t>(0);
 
@@ -14328,6 +15412,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::MultiPressOngoing::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t newPosition                   = static_cast<uint8_t>(0);
     uint8_t currentNumberOfPressesCounted = static_cast<uint8_t>(0);
@@ -14363,6 +15448,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::MultiPressComplete::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t newPosition                 = static_cast<uint8_t>(0);
     uint8_t totalNumberOfPressesCounted = static_cast<uint8_t>(0);
@@ -14457,7 +15543,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -14494,7 +15580,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -14523,7 +15609,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -14575,6 +15661,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AdminVendorId
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -14623,6 +15733,8 @@ struct TypeInfo
         Attributes::WindowStatus::TypeInfo::DecodableType windowStatus         = static_cast<uint8_t>(0);
         Attributes::AdminFabricIndex::TypeInfo::DecodableType adminFabricIndex = static_cast<chip::FabricIndex>(0);
         Attributes::AdminVendorId::TypeInfo::DecodableType adminVendorId       = static_cast<uint16_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -14631,11 +15743,8 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace AdministratorCommissioning
 namespace OperationalCredentials {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for NodeOperationalCertStatus
-enum class NodeOperationalCertStatus : uint8_t
+// Enum for OperationalCertStatus
+enum class OperationalCertStatus : uint8_t
 {
     kSuccess               = 0x00,
     kInvalidPublicKey      = 0x01,
@@ -14648,9 +15757,6 @@ enum class NodeOperationalCertStatus : uint8_t
     kLabelConflict         = 0x0A,
     kInvalidFabricIndex    = 0x0B,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using NodeOperationalCertStatus       = EmberAfNodeOperationalCertStatus;
-#endif
 
 namespace Structs {
 namespace FabricDescriptor {
@@ -14676,7 +15782,12 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = true;
+
     auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
 };
 
 using DecodableType = Type;
@@ -14695,11 +15806,16 @@ struct Type
 public:
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
     chip::ByteSpan noc;
-    chip::ByteSpan icac;
+    DataModel::Nullable<chip::ByteSpan> icac;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = true;
+
     auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
 };
 
 using DecodableType = Type;
@@ -14730,15 +15846,15 @@ struct Type;
 struct DecodableType;
 } // namespace CertificateChainResponse
 
-namespace OpCSRRequest {
+namespace CSRRequest {
 struct Type;
 struct DecodableType;
-} // namespace OpCSRRequest
+} // namespace CSRRequest
 
-namespace OpCSRResponse {
+namespace CSRResponse {
 struct Type;
 struct DecodableType;
-} // namespace OpCSRResponse
+} // namespace CSRResponse
 
 namespace AddNOC {
 struct Type;
@@ -14909,7 +16025,7 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace CertificateChainResponse
-namespace OpCSRRequest {
+namespace CSRRequest {
 enum class Fields
 {
     kCSRNonce = 0,
@@ -14919,14 +16035,14 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::OpCSRRequest::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CSRRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::ByteSpan CSRNonce;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::OperationalCredentials::Commands::OpCSRResponse::DecodableType;
+    using ResponseType = Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -14934,14 +16050,14 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::OpCSRRequest::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CSRRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::ByteSpan CSRNonce;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace OpCSRRequest
-namespace OpCSRResponse {
+}; // namespace CSRRequest
+namespace CSRResponse {
 enum class Fields
 {
     kNOCSRElements        = 0,
@@ -14952,7 +16068,7 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::OpCSRResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CSRResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::ByteSpan NOCSRElements;
@@ -14968,14 +16084,14 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::OpCSRResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::CSRResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::ByteSpan NOCSRElements;
     chip::ByteSpan attestationSignature;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace OpCSRResponse
+}; // namespace CSRResponse
 namespace AddNOC {
 enum class Fields
 {
@@ -15070,9 +16186,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::NOCResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
-    uint8_t statusCode  = static_cast<uint8_t>(0);
-    uint8_t fabricIndex = static_cast<uint8_t>(0);
-    chip::CharSpan debugText;
+    OperationalCertStatus statusCode = static_cast<OperationalCertStatus>(0);
+    Optional<chip::FabricIndex> fabricIndex;
+    Optional<chip::CharSpan> debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -15087,9 +16203,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::NOCResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
-    uint8_t statusCode  = static_cast<uint8_t>(0);
-    uint8_t fabricIndex = static_cast<uint8_t>(0);
-    chip::CharSpan debugText;
+    OperationalCertStatus statusCode = static_cast<OperationalCertStatus>(0);
+    Optional<chip::FabricIndex> fabricIndex;
+    Optional<chip::CharSpan> debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace NOCResponse
@@ -15138,7 +16254,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::RemoveFabric::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
-    uint8_t fabricIndex = static_cast<uint8_t>(0);
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -15153,7 +16269,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::RemoveFabric::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
-    uint8_t fabricIndex = static_cast<uint8_t>(0);
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace RemoveFabric
@@ -15301,6 +16417,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentFabricIndex
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -15352,6 +16492,8 @@ struct TypeInfo
         Attributes::CommissionedFabrics::TypeInfo::DecodableType commissionedFabrics = static_cast<uint8_t>(0);
         Attributes::TrustedRootCertificates::TypeInfo::DecodableType trustedRootCertificates;
         Attributes::CurrentFabricIndex::TypeInfo::DecodableType currentFabricIndex = static_cast<chip::FabricIndex>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -15368,7 +16510,7 @@ enum class GroupKeySecurityPolicy : uint8_t
 };
 
 namespace Structs {
-namespace GroupInfo {
+namespace GroupInfoMapStruct {
 enum class Fields
 {
     kFabricIndex = 0,
@@ -15380,26 +16522,39 @@ enum class Fields
 struct Type
 {
 public:
-    uint16_t fabricIndex = static_cast<uint16_t>(0);
-    uint16_t groupId     = static_cast<uint16_t>(0);
-    DataModel::List<const uint16_t> endpoints;
-    chip::CharSpan groupName;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+    chip::GroupId groupId         = static_cast<chip::GroupId>(0);
+    DataModel::List<const chip::EndpointId> endpoints;
+    Optional<chip::CharSpan> groupName;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    static constexpr bool kIsFabricScoped = true;
+
+    auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
 };
 
 struct DecodableType
 {
 public:
-    uint16_t fabricIndex = static_cast<uint16_t>(0);
-    uint16_t groupId     = static_cast<uint16_t>(0);
-    DataModel::DecodableList<uint16_t> endpoints;
-    chip::CharSpan groupName;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+    chip::GroupId groupId         = static_cast<chip::GroupId>(0);
+    DataModel::DecodableList<chip::EndpointId> endpoints;
+    Optional<chip::CharSpan> groupName;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = true;
+
+    auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
 };
 
-} // namespace GroupInfo
-namespace GroupKey {
+} // namespace GroupInfoMapStruct
+namespace GroupKeyMapStruct {
 enum class Fields
 {
     kFabricIndex   = 0,
@@ -15411,49 +16566,56 @@ struct Type
 {
 public:
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
-    uint16_t groupId              = static_cast<uint16_t>(0);
+    chip::GroupId groupId         = static_cast<chip::GroupId>(0);
     uint16_t groupKeySetID        = static_cast<uint16_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = true;
+
     auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
 };
 
 using DecodableType = Type;
 
-} // namespace GroupKey
-namespace GroupKeySet {
+} // namespace GroupKeyMapStruct
+namespace GroupKeySetStruct {
 enum class Fields
 {
-    kGroupKeySetID   = 0,
-    kSecurityPolicy  = 1,
-    kEpochKey0       = 2,
-    kEpochStartTime0 = 3,
-    kEpochKey1       = 4,
-    kEpochStartTime1 = 5,
-    kEpochKey2       = 6,
-    kEpochStartTime2 = 7,
+    kGroupKeySetID          = 0,
+    kGroupKeySecurityPolicy = 1,
+    kEpochKey0              = 2,
+    kEpochStartTime0        = 3,
+    kEpochKey1              = 4,
+    kEpochStartTime1        = 5,
+    kEpochKey2              = 6,
+    kEpochStartTime2        = 7,
 };
 
 struct Type
 {
 public:
-    uint16_t groupKeySetID                = static_cast<uint16_t>(0);
-    GroupKeySecurityPolicy securityPolicy = static_cast<GroupKeySecurityPolicy>(0);
-    chip::ByteSpan epochKey0;
-    uint64_t epochStartTime0 = static_cast<uint64_t>(0);
-    chip::ByteSpan epochKey1;
-    uint64_t epochStartTime1 = static_cast<uint64_t>(0);
-    chip::ByteSpan epochKey2;
-    uint64_t epochStartTime2 = static_cast<uint64_t>(0);
+    uint16_t groupKeySetID                        = static_cast<uint16_t>(0);
+    GroupKeySecurityPolicy groupKeySecurityPolicy = static_cast<GroupKeySecurityPolicy>(0);
+    DataModel::Nullable<chip::ByteSpan> epochKey0;
+    DataModel::Nullable<uint64_t> epochStartTime0;
+    DataModel::Nullable<chip::ByteSpan> epochKey1;
+    DataModel::Nullable<uint64_t> epochStartTime1;
+    DataModel::Nullable<chip::ByteSpan> epochKey2;
+    DataModel::Nullable<uint64_t> epochStartTime2;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
 
-} // namespace GroupKeySet
+} // namespace GroupKeySetStruct
 } // namespace Structs
 
 namespace Commands {
@@ -15505,7 +16667,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::KeySetWrite::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
 
-    Structs::GroupKeySet::Type groupKeySet;
+    Structs::GroupKeySetStruct::Type groupKeySet;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -15520,7 +16682,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::KeySetWrite::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
 
-    Structs::GroupKeySet::DecodableType groupKeySet;
+    Structs::GroupKeySetStruct::DecodableType groupKeySet;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace KeySetWrite
@@ -15569,7 +16731,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::KeySetReadResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
 
-    Structs::GroupKeySet::Type groupKeySet;
+    Structs::GroupKeySetStruct::Type groupKeySet;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -15584,7 +16746,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::KeySetReadResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
 
-    Structs::GroupKeySet::DecodableType groupKeySet;
+    Structs::GroupKeySetStruct::DecodableType groupKeySet;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace KeySetReadResponse
@@ -15691,11 +16853,11 @@ namespace Attributes {
 namespace GroupKeyMap {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::Type>;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type>;
     using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType>;
-    using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> &;
+        chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::GroupKeyMap::Id; }
@@ -15705,11 +16867,11 @@ struct TypeInfo
 namespace GroupTable {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::Type>;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::Type>;
     using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::DecodableType>;
-    using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::DecodableType> &;
+        chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::GroupTable::Id; }
@@ -15740,6 +16902,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxGroupKeysPerFabric
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -15789,6 +16975,8 @@ struct TypeInfo
         Attributes::GroupTable::TypeInfo::DecodableType groupTable;
         Attributes::MaxGroupsPerFabric::TypeInfo::DecodableType maxGroupsPerFabric       = static_cast<uint16_t>(0);
         Attributes::MaxGroupKeysPerFabric::TypeInfo::DecodableType maxGroupKeysPerFabric = static_cast<uint16_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -15817,6 +17005,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LabelList
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FixedLabel::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FixedLabel::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -15863,6 +17075,8 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::LabelList::TypeInfo::DecodableType labelList;
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -15891,6 +17105,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LabelList
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::UserLabel::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::UserLabel::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -15937,6 +17175,8 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::LabelList::TypeInfo::DecodableType labelList;
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -15948,6 +17188,30 @@ namespace ProxyConfiguration {
 
 namespace Attributes {
 
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ProxyConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ProxyConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -15993,6 +17257,8 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -16004,6 +17270,30 @@ namespace ProxyDiscovery {
 
 namespace Attributes {
 
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ProxyDiscovery::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ProxyDiscovery::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -16049,6 +17339,8 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -16060,6 +17352,30 @@ namespace ProxyValid {
 
 namespace Attributes {
 
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ProxyValid::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ProxyValid::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -16105,6 +17421,8 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -16128,6 +17446,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace StateValue
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BooleanState::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BooleanState::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -16174,6 +17516,8 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::StateValue::TypeInfo::DecodableType stateValue = static_cast<bool>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -16195,6 +17539,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::StateChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::BooleanState::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     bool stateValue = static_cast<bool>(0);
 
@@ -16235,6 +17580,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -16255,6 +17602,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -16372,6 +17721,30 @@ struct TypeInfo
     static constexpr size_t MaxLength() { return 32; }
 };
 } // namespace Description
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -16422,6 +17795,8 @@ struct TypeInfo
         Attributes::OnMode::TypeInfo::DecodableType onMode           = static_cast<uint8_t>(0);
         Attributes::StartUpMode::TypeInfo::DecodableType startUpMode = static_cast<uint8_t>(0);
         Attributes::Description::TypeInfo::DecodableType description;
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -16493,6 +17868,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Mode
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ShadeConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ShadeConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -16543,6 +17942,8 @@ struct TypeInfo
         Attributes::Status::TypeInfo::DecodableType status                           = static_cast<uint8_t>(0);
         Attributes::ClosedLimit::TypeInfo::DecodableType closedLimit                 = static_cast<uint16_t>(0);
         Attributes::Mode::TypeInfo::DecodableType mode                               = static_cast<uint8_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -16972,6 +18373,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -17224,7 +18627,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -17256,7 +18659,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -17290,7 +18693,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -17411,7 +18814,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -17519,7 +18922,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -17548,7 +18951,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -17767,14 +19170,14 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GetWeekDayScheduleResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t weekDayIndex                   = static_cast<uint8_t>(0);
-    uint16_t userIndex                     = static_cast<uint16_t>(0);
-    DlStatus status                        = static_cast<DlStatus>(0);
-    chip::BitFlags<DlDaysMaskMap> daysMask = static_cast<chip::BitFlags<DlDaysMaskMap>>(0);
-    uint8_t startHour                      = static_cast<uint8_t>(0);
-    uint8_t startMinute                    = static_cast<uint8_t>(0);
-    uint8_t endHour                        = static_cast<uint8_t>(0);
-    uint8_t endMinute                      = static_cast<uint8_t>(0);
+    uint8_t weekDayIndex = static_cast<uint8_t>(0);
+    uint16_t userIndex   = static_cast<uint16_t>(0);
+    DlStatus status      = static_cast<DlStatus>(0);
+    Optional<chip::BitFlags<DlDaysMaskMap>> daysMask;
+    Optional<uint8_t> startHour;
+    Optional<uint8_t> startMinute;
+    Optional<uint8_t> endHour;
+    Optional<uint8_t> endMinute;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -17789,14 +19192,14 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GetWeekDayScheduleResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t weekDayIndex                   = static_cast<uint8_t>(0);
-    uint16_t userIndex                     = static_cast<uint16_t>(0);
-    DlStatus status                        = static_cast<DlStatus>(0);
-    chip::BitFlags<DlDaysMaskMap> daysMask = static_cast<chip::BitFlags<DlDaysMaskMap>>(0);
-    uint8_t startHour                      = static_cast<uint8_t>(0);
-    uint8_t startMinute                    = static_cast<uint8_t>(0);
-    uint8_t endHour                        = static_cast<uint8_t>(0);
-    uint8_t endMinute                      = static_cast<uint8_t>(0);
+    uint8_t weekDayIndex = static_cast<uint8_t>(0);
+    uint16_t userIndex   = static_cast<uint16_t>(0);
+    DlStatus status      = static_cast<DlStatus>(0);
+    Optional<chip::BitFlags<DlDaysMaskMap>> daysMask;
+    Optional<uint8_t> startHour;
+    Optional<uint8_t> startMinute;
+    Optional<uint8_t> endHour;
+    Optional<uint8_t> endMinute;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetWeekDayScheduleResponse
@@ -17928,11 +19331,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GetYearDayScheduleResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t yearDayIndex    = static_cast<uint8_t>(0);
-    uint16_t userIndex      = static_cast<uint16_t>(0);
-    DlStatus status         = static_cast<DlStatus>(0);
-    uint32_t localStartTime = static_cast<uint32_t>(0);
-    uint32_t localEndTime   = static_cast<uint32_t>(0);
+    uint8_t yearDayIndex = static_cast<uint8_t>(0);
+    uint16_t userIndex   = static_cast<uint16_t>(0);
+    DlStatus status      = static_cast<DlStatus>(0);
+    Optional<uint32_t> localStartTime;
+    Optional<uint32_t> localEndTime;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -17947,11 +19350,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GetYearDayScheduleResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t yearDayIndex    = static_cast<uint8_t>(0);
-    uint16_t userIndex      = static_cast<uint16_t>(0);
-    DlStatus status         = static_cast<DlStatus>(0);
-    uint32_t localStartTime = static_cast<uint32_t>(0);
-    uint32_t localEndTime   = static_cast<uint32_t>(0);
+    uint8_t yearDayIndex = static_cast<uint8_t>(0);
+    uint16_t userIndex   = static_cast<uint16_t>(0);
+    DlStatus status      = static_cast<DlStatus>(0);
+    Optional<uint32_t> localStartTime;
+    Optional<uint32_t> localEndTime;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetYearDayScheduleResponse
@@ -18080,11 +19483,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GetHolidayScheduleResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t holidayIndex          = static_cast<uint8_t>(0);
-    DlStatus status               = static_cast<DlStatus>(0);
-    uint32_t localStartTime       = static_cast<uint32_t>(0);
-    uint32_t localEndTime         = static_cast<uint32_t>(0);
-    DlOperatingMode operatingMode = static_cast<DlOperatingMode>(0);
+    uint8_t holidayIndex = static_cast<uint8_t>(0);
+    DlStatus status      = static_cast<DlStatus>(0);
+    Optional<uint32_t> localStartTime;
+    Optional<uint32_t> localEndTime;
+    Optional<DlOperatingMode> operatingMode;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -18099,11 +19502,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GetHolidayScheduleResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t holidayIndex          = static_cast<uint8_t>(0);
-    DlStatus status               = static_cast<DlStatus>(0);
-    uint32_t localStartTime       = static_cast<uint32_t>(0);
-    uint32_t localEndTime         = static_cast<uint32_t>(0);
-    DlOperatingMode operatingMode = static_cast<DlOperatingMode>(0);
+    uint8_t holidayIndex = static_cast<uint8_t>(0);
+    DlStatus status      = static_cast<DlStatus>(0);
+    Optional<uint32_t> localStartTime;
+    Optional<uint32_t> localEndTime;
+    Optional<DlOperatingMode> operatingMode;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetHolidayScheduleResponse
@@ -18266,7 +19669,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -18374,7 +19777,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -18403,7 +19806,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -18446,7 +19849,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -18575,7 +19978,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -18717,7 +20120,7 @@ public:
 
     using ResponseType = Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -18862,7 +20265,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -19014,9 +20417,9 @@ struct TypeInfo
 namespace NumberOfWeekDaySchedulesSupportedPerUser {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfWeekDaySchedulesSupportedPerUser::Id; }
@@ -19026,9 +20429,9 @@ struct TypeInfo
 namespace NumberOfYearDaySchedulesSupportedPerUser {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfYearDaySchedulesSupportedPerUser::Id; }
@@ -19038,9 +20441,9 @@ struct TypeInfo
 namespace NumberOfHolidaySchedulesSupported {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfHolidaySchedulesSupported::Id; }
@@ -19420,6 +20823,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RFIDProgrammingEventMask
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -19477,11 +20904,11 @@ struct TypeInfo
         Attributes::NumberOfPINUsersSupported::TypeInfo::DecodableType numberOfPINUsersSupported     = static_cast<uint16_t>(0);
         Attributes::NumberOfRFIDUsersSupported::TypeInfo::DecodableType numberOfRFIDUsersSupported   = static_cast<uint16_t>(0);
         Attributes::NumberOfWeekDaySchedulesSupportedPerUser::TypeInfo::DecodableType numberOfWeekDaySchedulesSupportedPerUser =
-            static_cast<uint16_t>(0);
+            static_cast<uint8_t>(0);
         Attributes::NumberOfYearDaySchedulesSupportedPerUser::TypeInfo::DecodableType numberOfYearDaySchedulesSupportedPerUser =
-            static_cast<uint16_t>(0);
+            static_cast<uint8_t>(0);
         Attributes::NumberOfHolidaySchedulesSupported::TypeInfo::DecodableType numberOfHolidaySchedulesSupported =
-            static_cast<uint16_t>(0);
+            static_cast<uint8_t>(0);
         Attributes::MaxPINCodeLength::TypeInfo::DecodableType maxPINCodeLength             = static_cast<uint8_t>(0);
         Attributes::MinPINCodeLength::TypeInfo::DecodableType minPINCodeLength             = static_cast<uint8_t>(0);
         Attributes::MaxRFIDCodeLength::TypeInfo::DecodableType maxRFIDCodeLength           = static_cast<uint8_t>(0);
@@ -19514,6 +20941,8 @@ struct TypeInfo
         Attributes::KeypadProgrammingEventMask::TypeInfo::DecodableType keypadProgrammingEventMask     = static_cast<uint16_t>(0);
         Attributes::RemoteProgrammingEventMask::TypeInfo::DecodableType remoteProgrammingEventMask     = static_cast<uint16_t>(0);
         Attributes::RFIDProgrammingEventMask::TypeInfo::DecodableType RFIDProgrammingEventMask         = static_cast<uint16_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -19535,6 +20964,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::DoorLockAlarm::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DlAlarmCode alarmCode = static_cast<DlAlarmCode>(0);
 
@@ -19567,6 +20997,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::DoorStateChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DlDoorState doorState = static_cast<DlDoorState>(0);
 
@@ -19604,6 +21035,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::LockOperation::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DlLockOperationType lockOperationType = static_cast<DlLockOperationType>(0);
     DlOperationSource operationSource     = static_cast<DlOperationSource>(0);
@@ -19652,6 +21084,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::LockOperationError::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DlLockOperationType lockOperationType = static_cast<DlLockOperationType>(0);
     DlOperationSource operationSource     = static_cast<DlOperationSource>(0);
@@ -19702,6 +21135,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::LockUserChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     DlLockDataType lockDataType           = static_cast<DlLockDataType>(0);
     DlDataOperationType dataOperationType = static_cast<DlDataOperationType>(0);
@@ -20319,6 +21753,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SafetyStatus
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -20386,6 +21844,8 @@ struct TypeInfo
         Attributes::InstalledClosedLimitTilt::TypeInfo::DecodableType installedClosedLimitTilt = static_cast<uint16_t>(0);
         Attributes::Mode::TypeInfo::DecodableType mode                                         = static_cast<uint8_t>(0);
         Attributes::SafetyStatus::TypeInfo::DecodableType safetyStatus                         = static_cast<uint16_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -20595,6 +22055,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BarrierPosition
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -20650,6 +22134,8 @@ struct TypeInfo
         Attributes::BarrierOpenPeriod::TypeInfo::DecodableType barrierOpenPeriod                 = static_cast<uint16_t>(0);
         Attributes::BarrierClosePeriod::TypeInfo::DecodableType barrierClosePeriod               = static_cast<uint16_t>(0);
         Attributes::BarrierPosition::TypeInfo::DecodableType barrierPosition                     = static_cast<uint8_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -20981,6 +22467,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AlarmMask
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -21050,6 +22560,8 @@ struct TypeInfo
         Attributes::OperationMode::TypeInfo::DecodableType operationMode = static_cast<uint8_t>(0);
         Attributes::ControlMode::TypeInfo::DecodableType controlMode     = static_cast<uint8_t>(0);
         Attributes::AlarmMask::TypeInfo::DecodableType alarmMask         = static_cast<uint16_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -21070,6 +22582,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::SupplyVoltageLow::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21097,6 +22610,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::SupplyVoltageHigh::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21124,6 +22638,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::PowerMissingPhase::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21151,6 +22666,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::SystemPressureLow::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21178,6 +22694,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::SystemPressureHigh::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21205,6 +22722,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::DryRunning::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21232,6 +22750,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::MotorTemperatureHigh::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21259,6 +22778,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::PumpMotorFatalFailure::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21286,6 +22806,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::ElectronicTemperatureHigh::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21313,6 +22834,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::PumpBlocked::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21340,6 +22862,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::SensorFailure::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21367,6 +22890,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::ElectronicNonFatalFailure::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21394,6 +22918,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::ElectronicFatalFailure::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21421,6 +22946,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::GeneralFault::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21448,6 +22974,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::Leakage::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21475,6 +23002,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::AirDetection::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -21502,6 +23030,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::TurbineOperation::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -22380,6 +23909,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcCapacityFormat
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -22470,6 +24023,8 @@ struct TypeInfo
         Attributes::AcLouverPosition::TypeInfo::DecodableType acLouverPosition                           = static_cast<uint8_t>(0);
         Attributes::AcCoilTemperature::TypeInfo::DecodableType acCoilTemperature                         = static_cast<int16_t>(0);
         Attributes::AcCapacityFormat::TypeInfo::DecodableType acCapacityFormat                           = static_cast<uint8_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -22505,6 +24060,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FanModeSequence
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -22552,6 +24131,8 @@ struct TypeInfo
 
         Attributes::FanMode::TypeInfo::DecodableType fanMode                 = static_cast<uint8_t>(0);
         Attributes::FanModeSequence::TypeInfo::DecodableType fanModeSequence = static_cast<uint8_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -22659,6 +24240,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RelativeHumidityDisplay
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -22712,6 +24317,8 @@ struct TypeInfo
         Attributes::DehumidificationHysteresis::TypeInfo::DecodableType dehumidificationHysteresis = static_cast<uint8_t>(0);
         Attributes::DehumidificationMaxCool::TypeInfo::DecodableType dehumidificationMaxCool       = static_cast<uint8_t>(0);
         Attributes::RelativeHumidityDisplay::TypeInfo::DecodableType relativeHumidityDisplay       = static_cast<uint8_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -22759,6 +24366,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ScheduleProgrammingVisibility
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThermostatUserInterfaceConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThermostatUserInterfaceConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -22807,6 +24438,8 @@ struct TypeInfo
         Attributes::TemperatureDisplayMode::TypeInfo::DecodableType temperatureDisplayMode               = static_cast<uint8_t>(0);
         Attributes::KeypadLockout::TypeInfo::DecodableType keypadLockout                                 = static_cast<uint8_t>(0);
         Attributes::ScheduleProgrammingVisibility::TypeInfo::DecodableType scheduleProgrammingVisibility = static_cast<uint8_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -24491,6 +26124,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace StartUpColorTemperatureMireds
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -24589,6 +26246,8 @@ struct TypeInfo
         Attributes::CoupleColorTempToLevelMinMireds::TypeInfo::DecodableType coupleColorTempToLevelMinMireds =
             static_cast<uint16_t>(0);
         Attributes::StartUpColorTemperatureMireds::TypeInfo::DecodableType startUpColorTemperatureMireds = static_cast<uint16_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -24794,6 +26453,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LampBurnHoursTripPoint
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -24855,6 +26538,8 @@ struct TypeInfo
         Attributes::LampBurnHours::TypeInfo::DecodableType lampBurnHours                   = static_cast<uint32_t>(0);
         Attributes::LampAlarmMode::TypeInfo::DecodableType lampAlarmMode                   = static_cast<uint8_t>(0);
         Attributes::LampBurnHoursTripPoint::TypeInfo::DecodableType lampBurnHoursTripPoint = static_cast<uint32_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -24932,6 +26617,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LightSensorType
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -24982,6 +26691,8 @@ struct TypeInfo
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
         Attributes::Tolerance::TypeInfo::DecodableType tolerance = static_cast<uint16_t>(0);
         Attributes::LightSensorType::TypeInfo::DecodableType lightSensorType;
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -25041,6 +26752,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TemperatureMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TemperatureMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -25090,6 +26825,8 @@ struct TypeInfo
         Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue = static_cast<int16_t>(0);
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue = static_cast<int16_t>(0);
         Attributes::Tolerance::TypeInfo::DecodableType tolerance               = static_cast<uint16_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -25209,6 +26946,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Scale
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -25263,6 +27024,8 @@ struct TypeInfo
         Attributes::MaxScaledValue::TypeInfo::DecodableType maxScaledValue     = static_cast<int16_t>(0);
         Attributes::ScaledTolerance::TypeInfo::DecodableType scaledTolerance   = static_cast<uint16_t>(0);
         Attributes::Scale::TypeInfo::DecodableType scale                       = static_cast<int8_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -25322,6 +27085,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FlowMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FlowMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -25371,6 +27158,8 @@ struct TypeInfo
         Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue = static_cast<int16_t>(0);
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue = static_cast<int16_t>(0);
         Attributes::Tolerance::TypeInfo::DecodableType tolerance               = static_cast<uint16_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -25430,6 +27219,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::RelativeHumidityMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::RelativeHumidityMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -25479,6 +27292,8 @@ struct TypeInfo
         Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue = static_cast<uint16_t>(0);
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue = static_cast<uint16_t>(0);
         Attributes::Tolerance::TypeInfo::DecodableType tolerance               = static_cast<uint16_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -25634,6 +27449,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PhysicalContactUnoccupiedToOccupiedThreshold
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -25698,6 +27537,8 @@ struct TypeInfo
             static_cast<uint16_t>(0);
         Attributes::PhysicalContactUnoccupiedToOccupiedThreshold::TypeInfo::DecodableType
             physicalContactUnoccupiedToOccupiedThreshold = static_cast<uint8_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -25757,6 +27598,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -25806,6 +27671,8 @@ struct TypeInfo
         Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue = static_cast<float>(0);
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue = static_cast<float>(0);
         Attributes::Tolerance::TypeInfo::DecodableType tolerance               = static_cast<float>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -25865,6 +27732,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -25914,6 +27805,8 @@ struct TypeInfo
         Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue = static_cast<float>(0);
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue = static_cast<float>(0);
         Attributes::Tolerance::TypeInfo::DecodableType tolerance               = static_cast<float>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -25973,6 +27866,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -26022,6 +27939,8 @@ struct TypeInfo
         Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue = static_cast<float>(0);
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue = static_cast<float>(0);
         Attributes::Tolerance::TypeInfo::DecodableType tolerance               = static_cast<float>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -26081,6 +28000,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -26130,6 +28073,8 @@ struct TypeInfo
         Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue = static_cast<float>(0);
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue = static_cast<float>(0);
         Attributes::Tolerance::TypeInfo::DecodableType tolerance               = static_cast<float>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -26189,6 +28134,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -26238,6 +28207,8 @@ struct TypeInfo
         Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue = static_cast<float>(0);
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue = static_cast<float>(0);
         Attributes::Tolerance::TypeInfo::DecodableType tolerance               = static_cast<float>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -26297,6 +28268,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulphideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulphideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -26346,6 +28341,8 @@ struct TypeInfo
         Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue = static_cast<float>(0);
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue = static_cast<float>(0);
         Attributes::Tolerance::TypeInfo::DecodableType tolerance               = static_cast<float>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -26405,6 +28402,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -26454,6 +28475,8 @@ struct TypeInfo
         Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue = static_cast<float>(0);
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue = static_cast<float>(0);
         Attributes::Tolerance::TypeInfo::DecodableType tolerance               = static_cast<float>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -26513,6 +28536,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -26562,6 +28609,8 @@ struct TypeInfo
         Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue = static_cast<float>(0);
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue = static_cast<float>(0);
         Attributes::Tolerance::TypeInfo::DecodableType tolerance               = static_cast<float>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -26621,6 +28670,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -26670,6 +28743,8 @@ struct TypeInfo
         Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue = static_cast<float>(0);
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue = static_cast<float>(0);
         Attributes::Tolerance::TypeInfo::DecodableType tolerance               = static_cast<float>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -26729,6 +28804,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -26778,6 +28877,8 @@ struct TypeInfo
         Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue = static_cast<float>(0);
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue = static_cast<float>(0);
         Attributes::Tolerance::TypeInfo::DecodableType tolerance               = static_cast<float>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -26837,6 +28938,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -26886,6 +29011,8 @@ struct TypeInfo
         Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue = static_cast<float>(0);
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue = static_cast<float>(0);
         Attributes::Tolerance::TypeInfo::DecodableType tolerance               = static_cast<float>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -26945,6 +29072,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -26994,6 +29145,8 @@ struct TypeInfo
         Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue = static_cast<float>(0);
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue = static_cast<float>(0);
         Attributes::Tolerance::TypeInfo::DecodableType tolerance               = static_cast<float>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -27053,6 +29206,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -27102,6 +29279,8 @@ struct TypeInfo
         Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue = static_cast<float>(0);
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue = static_cast<float>(0);
         Attributes::Tolerance::TypeInfo::DecodableType tolerance               = static_cast<float>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -27161,6 +29340,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -27210,6 +29413,8 @@ struct TypeInfo
         Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue = static_cast<float>(0);
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue = static_cast<float>(0);
         Attributes::Tolerance::TypeInfo::DecodableType tolerance               = static_cast<float>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -27269,6 +29474,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -27318,6 +29547,8 @@ struct TypeInfo
         Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue = static_cast<float>(0);
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue = static_cast<float>(0);
         Attributes::Tolerance::TypeInfo::DecodableType tolerance               = static_cast<float>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -27377,6 +29608,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformAndEColiConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformAndEColiConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -27426,6 +29681,8 @@ struct TypeInfo
         Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue = static_cast<float>(0);
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue = static_cast<float>(0);
         Attributes::Tolerance::TypeInfo::DecodableType tolerance               = static_cast<float>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -27485,6 +29742,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -27534,6 +29815,8 @@ struct TypeInfo
         Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue = static_cast<float>(0);
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue = static_cast<float>(0);
         Attributes::Tolerance::TypeInfo::DecodableType tolerance               = static_cast<float>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -27593,6 +29876,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -27642,6 +29949,8 @@ struct TypeInfo
         Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue = static_cast<float>(0);
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue = static_cast<float>(0);
         Attributes::Tolerance::TypeInfo::DecodableType tolerance               = static_cast<float>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -27701,6 +30010,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -27750,6 +30083,8 @@ struct TypeInfo
         Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue = static_cast<float>(0);
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue = static_cast<float>(0);
         Attributes::Tolerance::TypeInfo::DecodableType tolerance               = static_cast<float>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -27809,6 +30144,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -27858,6 +30217,8 @@ struct TypeInfo
         Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue = static_cast<float>(0);
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue = static_cast<float>(0);
         Attributes::Tolerance::TypeInfo::DecodableType tolerance               = static_cast<float>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -27917,6 +30278,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -27966,6 +30351,8 @@ struct TypeInfo
         Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue = static_cast<float>(0);
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue = static_cast<float>(0);
         Attributes::Tolerance::TypeInfo::DecodableType tolerance               = static_cast<float>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -28025,6 +30412,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -28074,6 +30485,8 @@ struct TypeInfo
         Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue = static_cast<float>(0);
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue = static_cast<float>(0);
         Attributes::Tolerance::TypeInfo::DecodableType tolerance               = static_cast<float>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -28133,6 +30546,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -28182,6 +30619,8 @@ struct TypeInfo
         Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue = static_cast<float>(0);
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue = static_cast<float>(0);
         Attributes::Tolerance::TypeInfo::DecodableType tolerance               = static_cast<float>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -28241,6 +30680,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -28290,6 +30753,8 @@ struct TypeInfo
         Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue = static_cast<float>(0);
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue = static_cast<float>(0);
         Attributes::Tolerance::TypeInfo::DecodableType tolerance               = static_cast<float>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -28349,6 +30814,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -28398,6 +30887,8 @@ struct TypeInfo
         Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue = static_cast<float>(0);
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue = static_cast<float>(0);
         Attributes::Tolerance::TypeInfo::DecodableType tolerance               = static_cast<float>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -28457,6 +30948,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -28506,6 +31021,8 @@ struct TypeInfo
         Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue = static_cast<float>(0);
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue = static_cast<float>(0);
         Attributes::Tolerance::TypeInfo::DecodableType tolerance               = static_cast<float>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -28565,6 +31082,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -28614,6 +31155,8 @@ struct TypeInfo
         Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue = static_cast<float>(0);
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue = static_cast<float>(0);
         Attributes::Tolerance::TypeInfo::DecodableType tolerance               = static_cast<float>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -28673,6 +31216,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -28722,6 +31289,8 @@ struct TypeInfo
         Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue = static_cast<float>(0);
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue = static_cast<float>(0);
         Attributes::Tolerance::TypeInfo::DecodableType tolerance               = static_cast<float>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -28781,6 +31350,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -28830,6 +31423,8 @@ struct TypeInfo
         Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue = static_cast<float>(0);
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue = static_cast<float>(0);
         Attributes::Tolerance::TypeInfo::DecodableType tolerance               = static_cast<float>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -28889,6 +31484,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -28938,6 +31557,8 @@ struct TypeInfo
         Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue = static_cast<float>(0);
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue = static_cast<float>(0);
         Attributes::Tolerance::TypeInfo::DecodableType tolerance               = static_cast<float>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -29361,6 +31982,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentZoneSensitivityLevel
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -29414,6 +32059,8 @@ struct TypeInfo
         Attributes::NumberOfZoneSensitivityLevelsSupported::TypeInfo::DecodableType numberOfZoneSensitivityLevelsSupported =
             static_cast<uint8_t>(0);
         Attributes::CurrentZoneSensitivityLevel::TypeInfo::DecodableType currentZoneSensitivityLevel = static_cast<uint8_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -29541,6 +32188,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -30351,6 +33000,30 @@ public:
 
 namespace Attributes {
 
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -30396,6 +33069,8 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -30526,6 +33201,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxDuration
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IasWd::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IasWd::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -30572,6 +33271,8 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::MaxDuration::TypeInfo::DecodableType maxDuration = static_cast<uint16_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -30596,6 +33297,30 @@ struct TypeInfo
     static constexpr size_t MaxLength() { return 32; }
 };
 } // namespace WakeOnLanMacAddress
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WakeOnLan::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WakeOnLan::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -30642,6 +33367,8 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::WakeOnLanMacAddress::TypeInfo::DecodableType wakeOnLanMacAddress;
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -30678,12 +33405,14 @@ struct Type
 public:
     uint16_t majorNumber = static_cast<uint16_t>(0);
     uint16_t minorNumber = static_cast<uint16_t>(0);
-    chip::CharSpan name;
-    chip::CharSpan callSign;
-    chip::CharSpan affiliateCallSign;
+    Optional<chip::CharSpan> name;
+    Optional<chip::CharSpan> callSign;
+    Optional<chip::CharSpan> affiliateCallSign;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -30702,12 +33431,14 @@ struct Type
 {
 public:
     chip::CharSpan operatorName;
-    chip::CharSpan lineupName;
-    chip::CharSpan postalCode;
+    Optional<chip::CharSpan> lineupName;
+    Optional<chip::CharSpan> postalCode;
     LineupInfoTypeEnum lineupInfoType = static_cast<LineupInfoTypeEnum>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -30895,9 +33626,10 @@ struct TypeInfo
 namespace ChannelLineup {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::Channel::Structs::LineupInfo::Type;
-    using DecodableType    = chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType;
-    using DecodableArgType = const chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType &;
+    using Type          = chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfo::Type>;
+    using DecodableType = chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ChannelLineup::Id; }
@@ -30907,15 +33639,40 @@ struct TypeInfo
 namespace CurrentChannel {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::Channel::Structs::ChannelInfo::Type;
-    using DecodableType    = chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType;
-    using DecodableArgType = const chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType &;
+    using Type          = chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfo::Type>;
+    using DecodableType = chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentChannel::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentChannel
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -30964,6 +33721,8 @@ struct TypeInfo
         Attributes::ChannelList::TypeInfo::DecodableType channelList;
         Attributes::ChannelLineup::TypeInfo::DecodableType channelLineup;
         Attributes::CurrentChannel::TypeInfo::DecodableType currentChannel;
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -30975,9 +33734,9 @@ namespace TargetNavigator {
 // Enum for StatusEnum
 enum class StatusEnum : uint8_t
 {
-    kSuccess         = 0x00,
-    kAppNotAvailable = 0x01,
-    kSystemBusy      = 0x02,
+    kSuccess        = 0x00,
+    kTargetNotFound = 0x01,
+    kNotAllowed     = 0x02,
 };
 
 namespace Structs {
@@ -30996,6 +33755,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -31034,7 +33795,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
 
     uint8_t target = static_cast<uint8_t>(0);
-    chip::CharSpan data;
+    Optional<chip::CharSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -31050,7 +33811,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
 
     uint8_t target = static_cast<uint8_t>(0);
-    chip::CharSpan data;
+    Optional<chip::CharSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace NavigateTargetRequest
@@ -31069,7 +33830,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
 
     StatusEnum status = static_cast<StatusEnum>(0);
-    chip::CharSpan data;
+    Optional<chip::CharSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -31085,7 +33846,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
 
     StatusEnum status = static_cast<StatusEnum>(0);
-    chip::CharSpan data;
+    Optional<chip::CharSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace NavigateTargetResponse
@@ -31119,6 +33880,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentNavigatorTarget
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -31166,6 +33951,8 @@ struct TypeInfo
 
         Attributes::TargetNavigatorList::TypeInfo::DecodableType targetNavigatorList;
         Attributes::CurrentNavigatorTarget::TypeInfo::DecodableType currentNavigatorTarget = static_cast<uint8_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -31205,10 +33992,12 @@ struct Type
 {
 public:
     uint64_t updatedAt = static_cast<uint64_t>(0);
-    uint64_t position  = static_cast<uint64_t>(0);
+    DataModel::Nullable<uint64_t> position;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -31653,9 +34442,9 @@ struct TypeInfo
 namespace StartTime {
 struct TypeInfo
 {
-    using Type             = uint64_t;
-    using DecodableType    = uint64_t;
-    using DecodableArgType = uint64_t;
+    using Type             = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint64_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StartTime::Id; }
@@ -31665,9 +34454,9 @@ struct TypeInfo
 namespace Duration {
 struct TypeInfo
 {
-    using Type             = uint64_t;
-    using DecodableType    = uint64_t;
-    using DecodableArgType = uint64_t;
+    using Type             = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint64_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Duration::Id; }
@@ -31701,9 +34490,9 @@ struct TypeInfo
 namespace SeekRangeEnd {
 struct TypeInfo
 {
-    using Type             = uint64_t;
-    using DecodableType    = uint64_t;
-    using DecodableArgType = uint64_t;
+    using Type             = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint64_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SeekRangeEnd::Id; }
@@ -31713,15 +34502,39 @@ struct TypeInfo
 namespace SeekRangeStart {
 struct TypeInfo
 {
-    using Type             = uint64_t;
-    using DecodableType    = uint64_t;
-    using DecodableArgType = uint64_t;
+    using Type             = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint64_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SeekRangeStart::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SeekRangeStart
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -31769,12 +34582,14 @@ struct TypeInfo
 
         Attributes::PlaybackState::TypeInfo::DecodableType playbackState =
             static_cast<chip::app::Clusters::MediaPlayback::PlaybackStateEnum>(0);
-        Attributes::StartTime::TypeInfo::DecodableType startTime = static_cast<uint64_t>(0);
-        Attributes::Duration::TypeInfo::DecodableType duration   = static_cast<uint64_t>(0);
+        Attributes::StartTime::TypeInfo::DecodableType startTime;
+        Attributes::Duration::TypeInfo::DecodableType duration;
         Attributes::Position::TypeInfo::DecodableType position;
-        Attributes::PlaybackSpeed::TypeInfo::DecodableType playbackSpeed   = static_cast<float>(0);
-        Attributes::SeekRangeEnd::TypeInfo::DecodableType seekRangeEnd     = static_cast<uint64_t>(0);
-        Attributes::SeekRangeStart::TypeInfo::DecodableType seekRangeStart = static_cast<uint64_t>(0);
+        Attributes::PlaybackSpeed::TypeInfo::DecodableType playbackSpeed = static_cast<float>(0);
+        Attributes::SeekRangeEnd::TypeInfo::DecodableType seekRangeEnd;
+        Attributes::SeekRangeStart::TypeInfo::DecodableType seekRangeStart;
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -31826,6 +34641,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -32011,6 +34828,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentMediaInput
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -32058,6 +34899,8 @@ struct TypeInfo
 
         Attributes::MediaInputList::TypeInfo::DecodableType mediaInputList;
         Attributes::CurrentMediaInput::TypeInfo::DecodableType currentMediaInput = static_cast<uint8_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -32110,6 +34953,30 @@ public:
 
 namespace Attributes {
 
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LowPower::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LowPower::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -32155,6 +35022,8 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -32353,6 +35222,30 @@ public:
 
 namespace Attributes {
 
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -32398,6 +35291,8 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -32469,6 +35364,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -32489,6 +35386,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -32507,9 +35406,11 @@ struct Type
 public:
     ParameterEnum type = static_cast<ParameterEnum>(0);
     chip::CharSpan value;
-    DataModel::List<const Structs::AdditionalInfo::Type> externalIDList;
+    Optional<DataModel::List<const Structs::AdditionalInfo::Type>> externalIDList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 struct DecodableType
@@ -32517,8 +35418,11 @@ struct DecodableType
 public:
     ParameterEnum type = static_cast<ParameterEnum>(0);
     chip::CharSpan value;
-    DataModel::DecodableList<Structs::AdditionalInfo::DecodableType> externalIDList;
+    Optional<DataModel::DecodableList<Structs::AdditionalInfo::DecodableType>> externalIDList;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 } // namespace Parameter
@@ -32534,13 +35438,18 @@ public:
     DataModel::List<const Structs::Parameter::Type> parameterList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 struct DecodableType
 {
 public:
     DataModel::DecodableList<Structs::Parameter::DecodableType> parameterList;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 } // namespace ContentSearch
@@ -32555,12 +35464,14 @@ enum class Fields
 struct Type
 {
 public:
-    chip::CharSpan imageUrl;
-    chip::CharSpan color;
-    Structs::Dimension::Type size;
+    Optional<chip::CharSpan> imageUrl;
+    Optional<chip::CharSpan> color;
+    Optional<Structs::Dimension::Type> size;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -32581,14 +35492,16 @@ struct Type
 {
 public:
     chip::CharSpan providerName;
-    Structs::StyleInformation::Type background;
-    Structs::StyleInformation::Type logo;
-    Structs::StyleInformation::Type progressBar;
-    Structs::StyleInformation::Type splash;
-    Structs::StyleInformation::Type waterMark;
+    Optional<Structs::StyleInformation::Type> background;
+    Optional<Structs::StyleInformation::Type> logo;
+    Optional<Structs::StyleInformation::Type> progressBar;
+    Optional<Structs::StyleInformation::Type> splash;
+    Optional<Structs::StyleInformation::Type> waterMark;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -32620,9 +35533,9 @@ namespace Commands {
 namespace LaunchContentRequest {
 enum class Fields
 {
-    kAutoPlay = 0,
-    kData     = 1,
-    kSearch   = 2,
+    kSearch   = 0,
+    kAutoPlay = 1,
+    kData     = 2,
 };
 
 struct Type
@@ -32632,9 +35545,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchContentRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
+    Structs::ContentSearch::Type search;
     bool autoPlay = static_cast<bool>(0);
-    chip::CharSpan data;
-    DataModel::List<const Structs::ContentSearch::Type> search;
+    Optional<chip::CharSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -32649,9 +35562,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchContentRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
+    Structs::ContentSearch::DecodableType search;
     bool autoPlay = static_cast<bool>(0);
-    chip::CharSpan data;
-    DataModel::DecodableList<Structs::ContentSearch::DecodableType> search;
+    Optional<chip::CharSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LaunchContentRequest
@@ -32671,8 +35584,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
     chip::CharSpan contentURL;
-    chip::CharSpan displayString;
-    Structs::BrandingInformation::Type brandingInformation;
+    Optional<chip::CharSpan> displayString;
+    Optional<Structs::BrandingInformation::Type> brandingInformation;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -32688,8 +35601,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
     chip::CharSpan contentURL;
-    chip::CharSpan displayString;
-    Structs::BrandingInformation::DecodableType brandingInformation;
+    Optional<chip::CharSpan> displayString;
+    Optional<Structs::BrandingInformation::DecodableType> brandingInformation;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LaunchURLRequest
@@ -32708,7 +35621,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
     StatusEnum status = static_cast<StatusEnum>(0);
-    chip::CharSpan data;
+    Optional<chip::CharSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -32724,7 +35637,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
     StatusEnum status = static_cast<StatusEnum>(0);
-    chip::CharSpan data;
+    Optional<chip::CharSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LaunchResponse
@@ -32756,6 +35669,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SupportedStreamingProtocols
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -32803,6 +35740,8 @@ struct TypeInfo
 
         Attributes::AcceptHeaderList::TypeInfo::DecodableType acceptHeaderList;
         Attributes::SupportedStreamingProtocols::TypeInfo::DecodableType supportedStreamingProtocols = static_cast<uint32_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -32846,6 +35785,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -32965,6 +35906,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentAudioOutput
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -33012,6 +35977,8 @@ struct TypeInfo
 
         Attributes::AudioOutputList::TypeInfo::DecodableType audioOutputList;
         Attributes::CurrentAudioOutput::TypeInfo::DecodableType currentAudioOutput = static_cast<uint8_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -33042,7 +36009,7 @@ enum class ChannelFeature : uint32_t
 };
 
 namespace Structs {
-namespace ApplicationLauncherApplication {
+namespace Application {
 enum class Fields
 {
     kCatalogVendorId = 0,
@@ -33057,11 +36024,13 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
 
-} // namespace ApplicationLauncherApplication
+} // namespace Application
 namespace ApplicationEP {
 enum class Fields
 {
@@ -33072,11 +36041,13 @@ enum class Fields
 struct Type
 {
 public:
-    Structs::ApplicationLauncherApplication::Type application;
-    chip::CharSpan endpoint;
+    Structs::Application::Type application;
+    Optional<chip::EndpointId> endpoint;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -33113,8 +36084,8 @@ namespace Commands {
 namespace LaunchAppRequest {
 enum class Fields
 {
-    kData        = 0,
-    kApplication = 1,
+    kApplication = 0,
+    kData        = 1,
 };
 
 struct Type
@@ -33124,8 +36095,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    chip::CharSpan data;
-    Structs::ApplicationLauncherApplication::Type application;
+    Structs::Application::Type application;
+    Optional<chip::ByteSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -33140,8 +36111,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    chip::CharSpan data;
-    Structs::ApplicationLauncherApplication::DecodableType application;
+    Structs::Application::DecodableType application;
+    Optional<chip::ByteSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LaunchAppRequest
@@ -33158,7 +36129,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StopAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::ApplicationLauncherApplication::Type application;
+    Structs::Application::Type application;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -33173,7 +36144,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StopAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::ApplicationLauncherApplication::DecodableType application;
+    Structs::Application::DecodableType application;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace StopAppRequest
@@ -33190,7 +36161,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::HideAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::ApplicationLauncherApplication::Type application;
+    Structs::Application::Type application;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -33205,7 +36176,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::HideAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::ApplicationLauncherApplication::DecodableType application;
+    Structs::Application::DecodableType application;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace HideAppRequest
@@ -33224,7 +36195,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
     StatusEnum status = static_cast<StatusEnum>(0);
-    chip::CharSpan data;
+    chip::ByteSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -33240,7 +36211,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
     StatusEnum status = static_cast<StatusEnum>(0);
-    chip::CharSpan data;
+    chip::ByteSpan data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LauncherResponse
@@ -33263,15 +36234,41 @@ struct TypeInfo
 namespace ApplicationLauncherApp {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type;
-    using DecodableType    = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType;
-    using DecodableArgType = const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType &;
+    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type>;
+    using DecodableType =
+        chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationLauncherApp::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ApplicationLauncherApp
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -33319,6 +36316,8 @@ struct TypeInfo
 
         Attributes::ApplicationLauncherList::TypeInfo::DecodableType applicationLauncherList;
         Attributes::ApplicationLauncherApp::TypeInfo::DecodableType applicationLauncherApp;
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -33352,6 +36351,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -33460,6 +36461,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AllowedVendorList
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -33514,6 +36539,8 @@ struct TypeInfo
             static_cast<chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum>(0);
         Attributes::ApplicationVersion::TypeInfo::DecodableType applicationVersion;
         Attributes::AllowedVendorList::TypeInfo::DecodableType allowedVendorList;
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -33600,7 +36627,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return true; }
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -33634,7 +36661,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -33680,6 +36707,30 @@ public:
 
 namespace Attributes {
 
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -33725,6 +36776,8 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -33778,6 +36831,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -33817,6 +36872,8 @@ public:
     Optional<DataModel::Nullable<DataModel::List<const SimpleEnum>>> nullableOptionalList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 struct DecodableType
@@ -33834,7 +36891,10 @@ public:
     DataModel::Nullable<DataModel::DecodableList<SimpleEnum>> nullableList;
     Optional<DataModel::DecodableList<SimpleEnum>> optionalList;
     Optional<DataModel::Nullable<DataModel::DecodableList<SimpleEnum>>> nullableOptionalList;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 } // namespace NullablesAndOptionalsStruct
@@ -33855,6 +36915,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -33884,6 +36946,8 @@ public:
     DataModel::List<const uint8_t> g;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 struct DecodableType
@@ -33896,7 +36960,10 @@ public:
     DataModel::DecodableList<uint32_t> e;
     DataModel::DecodableList<chip::ByteSpan> f;
     DataModel::DecodableList<uint8_t> g;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 } // namespace NestedStructList
@@ -33912,13 +36979,18 @@ public:
     DataModel::List<const Structs::NestedStructList::Type> a;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 struct DecodableType
 {
 public:
     DataModel::DecodableList<Structs::NestedStructList::DecodableType> a;
+
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 } // namespace DoubleNestedStructList
@@ -33935,7 +37007,12 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = true;
+
     auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
 };
 
 using DecodableType = Type;
@@ -33956,6 +37033,8 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 using DecodableType = Type;
@@ -36364,6 +39443,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NullableRangeRestrictedInt16s
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -36490,6 +39593,8 @@ struct TypeInfo
         Attributes::NullableRangeRestrictedInt8s::TypeInfo::DecodableType nullableRangeRestrictedInt8s;
         Attributes::NullableRangeRestrictedInt16u::TypeInfo::DecodableType nullableRangeRestrictedInt16u;
         Attributes::NullableRangeRestrictedInt16s::TypeInfo::DecodableType nullableRangeRestrictedInt16s;
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -36516,6 +39621,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::TestEvent::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     uint8_t arg1    = static_cast<uint8_t>(0);
     SimpleEnum arg2 = static_cast<SimpleEnum>(0);
@@ -36558,6 +39664,7 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::TestFabricScopedEvent::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr bool kIsFabricScoped = true;
 
     chip::FabricIndex arg1 = static_cast<chip::FabricIndex>(0);
 
@@ -37028,6 +40135,30 @@ public:
 
 namespace Attributes {
 
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -37073,6 +40204,8 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -37235,6 +40368,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CecedSpecificationVersion
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -37292,6 +40449,8 @@ struct TypeInfo
         Attributes::ProductTypeName::TypeInfo::DecodableType productTypeName;
         Attributes::ProductTypeId::TypeInfo::DecodableType productTypeId                         = static_cast<uint16_t>(0);
         Attributes::CecedSpecificationVersion::TypeInfo::DecodableType cecedSpecificationVersion = static_cast<uint8_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -37455,6 +40614,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PowerThreshold
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -37512,6 +40695,8 @@ struct TypeInfo
         Attributes::Pod::TypeInfo::DecodableType pod;
         Attributes::AvailablePower::TypeInfo::DecodableType availablePower = static_cast<int32_t>(0);
         Attributes::PowerThreshold::TypeInfo::DecodableType powerThreshold = static_cast<int32_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -37708,6 +40893,30 @@ public:
 
 namespace Attributes {
 
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceEventsAndAlert::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceEventsAndAlert::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -37753,6 +40962,8 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -38038,6 +41249,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LogQueueMaxSize
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -38085,6 +41320,8 @@ struct TypeInfo
 
         Attributes::LogMaxSize::TypeInfo::DecodableType logMaxSize           = static_cast<uint32_t>(0);
         Attributes::LogQueueMaxSize::TypeInfo::DecodableType logQueueMaxSize = static_cast<uint8_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -39814,6 +43051,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RmsVoltageSwellPeriodPhaseC
+namespace ServerGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ServerGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ServerGeneratedCommandList
+namespace ClientGeneratedCommandList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CommandId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CommandId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CommandId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientGeneratedCommandList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientGeneratedCommandList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -40004,6 +43265,8 @@ struct TypeInfo
             static_cast<uint16_t>(0);
         Attributes::RmsVoltageSagPeriodPhaseC::TypeInfo::DecodableType rmsVoltageSagPeriodPhaseC     = static_cast<uint16_t>(0);
         Attributes::RmsVoltageSwellPeriodPhaseC::TypeInfo::DecodableType rmsVoltageSwellPeriodPhaseC = static_cast<uint16_t>(0);
+        Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
+        Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -40013,5 +43276,8 @@ struct TypeInfo
 } // namespace ElectricalMeasurement
 
 } // namespace Clusters
+
+bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand);
+
 } // namespace app
 } // namespace chip

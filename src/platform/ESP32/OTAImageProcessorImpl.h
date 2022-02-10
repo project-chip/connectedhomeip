@@ -19,6 +19,7 @@
 
 #include "esp_ota_ops.h"
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <lib/core/OTAImageHeader.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/OTAImageProcessor.h>
 
@@ -44,11 +45,13 @@ private:
 
     CHIP_ERROR SetBlock(ByteSpan & block);
     CHIP_ERROR ReleaseBlock();
+    CHIP_ERROR ProcessHeader(ByteSpan & block);
 
     OTADownloader * mDownloader = nullptr;
     MutableByteSpan mBlock;
     const esp_partition_t * mOTAUpdatePartition = nullptr;
     esp_ota_handle_t mOTAUpdateHandle;
+    OTAImageHeaderParser mHeaderParser;
 };
 
 } // namespace chip

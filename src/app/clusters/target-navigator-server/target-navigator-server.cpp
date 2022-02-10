@@ -28,12 +28,18 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#include <app/app-platform/ContentAppPlatform.h>
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #include <app/data-model/Encode.h>
 #include <app/util/attribute-storage.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::TargetNavigator;
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+using namespace chip::AppPlatform;
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -46,8 +52,18 @@ Delegate * gDelegateTable[EMBER_AF_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUN
 
 Delegate * GetDelegate(EndpointId endpoint)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::TargetNavigator::Id);
-    return (ep == 0xFFFF ? NULL : gDelegateTable[ep]);
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(endpoint);
+    if (app != nullptr)
+    {
+        ChipLogError(Zcl, "TargetNavigator returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
+        return app->GetTargetNavigatorDelegate();
+    }
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    ChipLogError(Zcl, "TargetNavigator NOT returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
+
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, TargetNavigator::Id);
+    return ((ep == 0xFFFF || ep >= EMBER_AF_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT) ? nullptr : gDelegateTable[ep]);
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
@@ -68,8 +84,9 @@ namespace TargetNavigator {
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::TargetNavigator::Id);
-    if (ep != 0xFFFF)
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, TargetNavigator::Id);
+    // if endpoint is found and is not a dynamic endpoint
+    if (ep != 0xFFFF && ep < EMBER_AF_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
         gDelegateTable[ep] = delegate;
     }
@@ -91,9 +108,7 @@ namespace {
 class TargetNavigatorAttrAccess : public app::AttributeAccessInterface
 {
 public:
-    TargetNavigatorAttrAccess() :
-        app::AttributeAccessInterface(Optional<EndpointId>::Missing(), chip::app::Clusters::TargetNavigator::Id)
-    {}
+    TargetNavigatorAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), TargetNavigator::Id) {}
 
     CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
 
@@ -137,14 +152,7 @@ CHIP_ERROR TargetNavigatorAttrAccess::Read(const app::ConcreteReadAttributePath 
 
 CHIP_ERROR TargetNavigatorAttrAccess::ReadTargetListAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
-    std::list<Structs::TargetInfo::Type> targetList = delegate->HandleGetTargetList();
-    return aEncoder.EncodeList([targetList](const auto & encoder) -> CHIP_ERROR {
-        for (const auto & target : targetList)
-        {
-            ReturnErrorOnFailure(encoder.Encode(target));
-        }
-        return CHIP_NO_ERROR;
-    });
+    return delegate->HandleGetTargetList(aEncoder);
 }
 
 CHIP_ERROR TargetNavigatorAttrAccess::ReadCurrentTargetAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
@@ -166,14 +174,13 @@ bool emberAfTargetNavigatorClusterNavigateTargetRequestCallback(app::CommandHand
     EndpointId endpoint = commandPath.mEndpointId;
     auto & target       = commandData.target;
     auto & data         = commandData.data;
+    app::CommandResponseHelper<Commands::NavigateTargetResponse::Type> responder(command, commandPath);
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
 
     {
-        Commands::NavigateTargetResponse::Type response = delegate->HandleNavigateTarget(target, data);
-        err                                             = command->AddResponseData(commandPath, response);
-        SuccessOrExit(err);
+        delegate->HandleNavigateTarget(responder, target, data.HasValue() ? data.Value() : CharSpan());
     }
 
 exit:

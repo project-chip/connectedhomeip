@@ -143,8 +143,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
                 ifp->type = EMBER_ZCL_INTERFACE_TYPE_ETHERNET;
             else
                 ifp->type = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
-            ifp->offPremiseServicesReachableIPv4 = false;
-            ifp->offPremiseServicesReachableIPv6 = false;
+            ifp->offPremiseServicesReachableIPv4.SetNonNull(false);
+            ifp->offPremiseServicesReachableIPv6.SetNonNull(false);
 
             memcpy(ifp->MacAddress, ifa->hwaddr, sizeof(ifa->hwaddr));
 

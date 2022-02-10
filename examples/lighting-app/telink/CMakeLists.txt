@@ -54,12 +54,10 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/zzz_generated/app-common/app-common/zap-generated/cluster-objects.cpp
                ${CHIP_ROOT}/src/app/util/DataModelHandler.cpp
                ${CHIP_ROOT}/src/app/util/af-event.cpp
-               ${CHIP_ROOT}/src/app/util/af-main-common.cpp
                ${CHIP_ROOT}/src/app/util/attribute-size-util.cpp
                ${CHIP_ROOT}/src/app/util/attribute-storage.cpp
                ${CHIP_ROOT}/src/app/util/attribute-table.cpp
                ${CHIP_ROOT}/src/app/util/binding-table.cpp
-               ${CHIP_ROOT}/src/app/util/chip-message-send.cpp
                ${CHIP_ROOT}/src/app/util/client-api.cpp
                ${CHIP_ROOT}/src/app/util/ember-compatibility-functions.cpp
                ${CHIP_ROOT}/src/app/util/ember-print.cpp
@@ -71,17 +69,18 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/server/OnboardingCodesUtil.cpp
                ${CHIP_ROOT}/src/app/server/Server.cpp
                ${CHIP_ROOT}/src/app/server/CommissioningWindowManager.cpp
+               ${CHIP_ROOT}/src/app/clusters/access-control-server/access-control-server.cpp
                ${CHIP_ROOT}/src/app/clusters/administrator-commissioning-server/administrator-commissioning-server.cpp
                ${CHIP_ROOT}/src/app/clusters/basic/basic.cpp
                ${CHIP_ROOT}/src/app/clusters/bindings/BindingManager.cpp
                ${CHIP_ROOT}/src/app/clusters/bindings/bindings.cpp
+               ${CHIP_ROOT}/src/app/clusters/bindings/PendingNotificationMap.cpp
                ${CHIP_ROOT}/src/app/clusters/descriptor/descriptor.cpp
                ${CHIP_ROOT}/src/app/clusters/identify-server/identify-server.cpp
                ${CHIP_ROOT}/src/app/clusters/diagnostic-logs-server/diagnostic-logs-server.cpp
                ${CHIP_ROOT}/src/app/clusters/ethernet-network-diagnostics-server/ethernet-network-diagnostics-server.cpp
                ${CHIP_ROOT}/src/app/clusters/localization-configuration-server/localization-configuration-server.cpp
                ${CHIP_ROOT}/src/app/clusters/time-format-localization-server/time-format-localization-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/unit-localization-server/unit-localization-server.cpp
                ${CHIP_ROOT}/src/app/clusters/fixed-label-server/fixed-label-server.cpp
                ${CHIP_ROOT}/src/app/clusters/user-label-server/user-label-server.cpp               
                ${CHIP_ROOT}/src/app/clusters/thread-network-diagnostics-server/thread-network-diagnostics-server.cpp
@@ -96,6 +95,7 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/clusters/level-control/level-control.cpp
                ${CHIP_ROOT}/src/app/clusters/color-control-server/color-control-server.cpp
                ${CHIP_ROOT}/src/app/clusters/occupancy-sensor-server/occupancy-sensor-server.cpp
+               ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning.cpp
                ${CHIP_ROOT}/src/app/clusters/network-commissioning-old/network-commissioning-ember.cpp
                ${CHIP_ROOT}/src/app/clusters/network-commissioning-old/network-commissioning-old.cpp
                ${CHIP_ROOT}/src/app/clusters/ota-requestor/ota-requestor-server.cpp

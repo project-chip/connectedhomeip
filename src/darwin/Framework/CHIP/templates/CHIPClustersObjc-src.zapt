@@ -82,34 +82,16 @@ using namespace chip::app::Clusters;
 {{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
-{{! TODO: Need to add support for struct-type attibutes here.  And remove the callbackName
-          inline duplication with subscribe. }}
-{{#unless (isStrEqual chipCallback.name "Unsupported")}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
-{{#*inline "callbackName"}}
-  {{~#if isArray~}}
-    {{asUpperCamelCase ../name}}{{asUpperCamelCase name}}List
-  {{~else~}}
-    {{~#if isNullable}}Nullable{{/if~}}
-    {{~#if (isStrEqual (asUpperCamelCase type) (asUpperCamelCase "vendor_id"))~}}
-      VendorId
-    {{~else if isEnum~}}
-      {{asUpperCamelCase ../name}}Cluster{{asUpperCamelCase type}}
-    {{~else~}}
-      {{chipCallback.name}}
-    {{~/if~}}
-  {{~/if~}}
-  Attribute
-{{~/inline}}
 - (void)read{{>attribute}}WithCompletionHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completionHandler
 {
-    new CHIP{{>callbackName}}CallbackBridge(self.callbackQueue,
+    new CHIP{{>attribute_data_callback_name}}CallbackBridge(self.callbackQueue,
       {{! This treats completionHandler as taking an id for the data.  This is
           not great from a type-safety perspective, of course. }}
       completionHandler,
       ^(Cancelable * success, Cancelable * failure) {
           using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
-          auto successFn = Callback<{{>callbackName}}Callback>::FromCancelable(success);
+          auto successFn = Callback<{{>attribute_data_callback_name}}Callback>::FromCancelable(success);
           auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
           return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
       });
@@ -144,38 +126,21 @@ using namespace chip::app::Clusters;
 
 {{/if}}
 {{#if isReportableAttribute}}
-{{! This callbackName bit is duplicated with the readAttribute code above. }}
-{{#*inline "callbackName"}}
-  {{~#if isArray~}}
-    {{asUpperCamelCase ../name}}{{asUpperCamelCase name}}List
-  {{~else~}}
-    {{~#if isNullable}}Nullable{{/if~}}
-    {{~#if (isStrEqual (asUpperCamelCase type) (asUpperCamelCase "vendor_id"))~}}
-      VendorId
-    {{~else if isEnum~}}
-      {{asUpperCamelCase ../name}}Cluster{{asUpperCamelCase type}}
-    {{~else~}}
-      {{chipCallback.name}}
-    {{~/if~}}
-  {{~/if~}}
-  Attribute
-{{~/inline}}
-- (void) subscribe{{>attribute}}WithMinInterval:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))reportHandler
+- (void) subscribe{{>attribute}}WithMinInterval:(NSNumber * _Nonnull)minInterval  maxInterval:(NSNumber * _Nonnull)maxInterval subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    new CHIP{{>callbackName}}CallbackSubscriptionBridge(self.callbackQueue,
+    new CHIP{{>attribute_data_callback_name}}CallbackSubscriptionBridge(self.callbackQueue,
       {{! This treats reportHandler as taking an id for the data.  This is
           not great from a type-safety perspective, of course. }}
       reportHandler,
       ^(Cancelable * success, Cancelable * failure) {
           using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
-          auto successFn = Callback<{{>callbackName}}Callback>::FromCancelable(success);
+          auto successFn = Callback<{{>attribute_data_callback_name}}Callback>::FromCancelable(success);
           auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-          return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall, minInterval, maxInterval, CHIP{{>callbackName}}CallbackSubscriptionBridge::OnSubscriptionEstablished);
+          return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall, [minInterval unsignedShortValue], [maxInterval unsignedShortValue], CHIP{{>attribute_data_callback_name}}CallbackSubscriptionBridge::OnSubscriptionEstablished);
       }, subscriptionEstablishedHandler);
 }
 
 {{/if}}
-{{/unless}}
 {{/chip_server_cluster_attributes}}
 
 @end

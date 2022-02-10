@@ -30,9 +30,9 @@
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
  *
- * 0x4E4C: nrfconnect lighting-app
+ * 0x8005: example lighting-app
  */
-#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x4E4C
+#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8005
 
 // Use a default pairing code if one hasn't been provisioned in flash.
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021

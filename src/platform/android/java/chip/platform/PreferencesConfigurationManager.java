@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2021 Project CHIP Authors
+ *   Copyright (c) 2021-2022 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -91,6 +91,9 @@ public class PreferencesConfigurationManager implements ConfigurationManager {
 
       case kConfigNamespace_ChipFactory + ":" + kConfigKey_SetupDiscriminator:
         return 0xF00;
+
+      case kConfigNamespace_ChipFactory + ":" + kConfigKey_Spake2pIterationCount:
+        return 100;
     }
 
     if (preferences.contains(key)) {

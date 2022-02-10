@@ -44,13 +44,21 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#include <app/app-platform/ContentAppPlatform.h>
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #include <app/data-model/Encode.h>
+#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <list>
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ContentLauncher;
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+using namespace chip::AppPlatform;
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -63,8 +71,18 @@ Delegate * gDelegateTable[EMBER_AF_CONTENT_LAUNCH_CLUSTER_SERVER_ENDPOINT_COUNT]
 
 Delegate * GetDelegate(EndpointId endpoint)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::ContentLauncher::Id);
-    return (ep == 0xFFFF ? NULL : gDelegateTable[ep]);
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(endpoint);
+    if (app != nullptr)
+    {
+        ChipLogError(Zcl, "Content Launcher returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
+        return app->GetContentLauncherDelegate();
+    }
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    ChipLogError(Zcl, "Content Launcher NOT returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
+
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ContentLauncher::Id);
+    return ((ep == 0xFFFF || ep >= EMBER_AF_CONTENT_LAUNCH_CLUSTER_SERVER_ENDPOINT_COUNT) ? nullptr : gDelegateTable[ep]);
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
@@ -83,10 +101,11 @@ namespace app {
 namespace Clusters {
 namespace ContentLauncher {
 
-void SetDelegate(EndpointId endpoint, Delegate * delegate)
+void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::ContentLauncher::Id);
-    if (ep != 0xFFFF)
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ContentLauncher::Id);
+    // if endpoint is found and is not a dynamic endpoint
+    if (ep != 0xFFFF && ep < EMBER_AF_CONTENT_LAUNCH_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
         gDelegateTable[ep] = delegate;
     }
@@ -108,9 +127,7 @@ namespace {
 class ContentLauncherAttrAccess : public app::AttributeAccessInterface
 {
 public:
-    ContentLauncherAttrAccess() :
-        app::AttributeAccessInterface(Optional<EndpointId>::Missing(), chip::app::Clusters::ContentLauncher::Id)
-    {}
+    ContentLauncherAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), ContentLauncher::Id) {}
 
     CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
 
@@ -170,24 +187,22 @@ CHIP_ERROR ContentLauncherAttrAccess::ReadSupportedStreamingProtocolsAttribute(a
 // Matter Framework Callbacks Implementation
 
 bool emberAfContentLauncherClusterLaunchContentRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ContentLauncher::Commands::LaunchContentRequest::DecodableType & commandData)
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const ContentLauncher::Commands::LaunchContentRequest::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
 
-    auto & autoplay = commandData.autoPlay;
-    auto & data     = commandData.data;
-    // TODO: Decode the parameter and pass it to delegate
-    // auto searchIterator = commandData.search.begin();
-    std::list<Parameter> parameterList;
+    auto & autoplay               = commandData.autoPlay;
+    auto & data                   = commandData.data;
+    auto & decodableParameterList = commandData.search.parameterList;
 
     app::CommandResponseHelper<Commands::LaunchResponse::Type> responder(commandObj, commandPath);
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
     {
-        delegate->HandleLaunchContent(parameterList, autoplay, data, responder);
+        delegate->HandleLaunchContent(responder, decodableParameterList, autoplay, data.HasValue() ? data.Value() : CharSpan());
     }
 
 exit:
@@ -206,24 +221,24 @@ exit:
 }
 
 bool emberAfContentLauncherClusterLaunchURLRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ContentLauncher::Commands::LaunchURLRequest::DecodableType & commandData)
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const ContentLauncher::Commands::LaunchURLRequest::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
 
-    auto & contentUrl    = commandData.contentURL;
-    auto & displayString = commandData.displayString;
-    // TODO: Decode the parameter and pass it to delegate
-    // auto brandingInformationIterator = commandData.brandingInformation.begin();
-    std::list<BrandingInformation> brandingInformationList;
+    auto & contentUrl          = commandData.contentURL;
+    auto & displayString       = commandData.displayString;
+    auto & brandingInformation = commandData.brandingInformation;
 
     app::CommandResponseHelper<Commands::LaunchResponse::Type> responder(commandObj, commandPath);
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
     {
-        delegate->HandleLaunchUrl(contentUrl, displayString, brandingInformationList, responder);
+        delegate->HandleLaunchUrl(responder, contentUrl, displayString.HasValue() ? displayString.Value() : CharSpan(),
+                                  brandingInformation.HasValue() ? brandingInformation.Value()
+                                                                 : chip::app::Clusters::ContentLauncher::BrandingInformation());
     }
 
 exit:

@@ -20,19 +20,23 @@
 #include <app/clusters/channel-server/channel-server.h>
 #include <jni.h>
 
-class ChannelManager : public chip::app::Clusters::Channel::Delegate
+using chip::CharSpan;
+using chip::app::AttributeValueEncoder;
+using chip::app::CommandResponseHelper;
+using ChannelDelegate           = chip::app::Clusters::Channel::Delegate;
+using ChangeChannelResponseType = chip::app::Clusters::Channel::Commands::ChangeChannelResponse::Type;
+
+class ChannelManager : public ChannelDelegate
 {
 public:
     static void NewManager(jint endpoint, jobject manager);
     void InitializeWithObjects(jobject managerObject);
 
-    virtual CHIP_ERROR HandleGetChannelList(chip::app::AttributeValueEncoder & aEncoder) override;
-    virtual CHIP_ERROR HandleGetLineup(chip::app::AttributeValueEncoder & aEncoder) override;
-    virtual CHIP_ERROR HandleGetCurrentChannel(chip::app::AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR HandleGetChannelList(AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR HandleGetLineup(AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR HandleGetCurrentChannel(AttributeValueEncoder & aEncoder) override;
 
-    virtual void HandleChangeChannel(
-        const chip::CharSpan & match,
-        chip::app::CommandResponseHelper<chip::app::Clusters::Channel::Commands::ChangeChannelResponse::Type> & responser) override;
+    void HandleChangeChannel(CommandResponseHelper<ChangeChannelResponseType> & helper, const CharSpan & match) override;
     bool HandleChangeChannelByNumber(const uint16_t & majorNumber, const uint16_t & minorNumber) override;
     bool HandleSkipChannel(const uint16_t & count) override;
 

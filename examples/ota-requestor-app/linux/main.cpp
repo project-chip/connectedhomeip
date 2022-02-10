@@ -16,12 +16,7 @@
  *    limitations under the License.
  */
 
-#include <app/server/Server.h>
-#include <controller/ExampleOperationalCredentialsIssuer.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <lib/support/CHIPArgParser.hpp>
-#include <platform/CHIPDeviceLayer.h>
-
+#include "AppMain.h"
 #include "app/clusters/ota-requestor/BDXDownloader.h"
 #include "app/clusters/ota-requestor/OTARequestor.h"
 #include "platform/GenericOTARequestorDriver.h"
@@ -172,46 +167,9 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
     return (retval);
 }
 
-int main(int argc, char * argv[])
+void ApplicationInit()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    if (chip::Platform::MemoryInit() != CHIP_NO_ERROR)
-    {
-
-        ChipLogError(SoftwareUpdate, "FAILED to initialize memory");
-        return 1;
-    }
-
-    if (chip::DeviceLayer::PlatformMgr().InitChipStack() != CHIP_NO_ERROR)
-    {
-        ChipLogError(SoftwareUpdate, "FAILED to initialize chip stack");
-        return 1;
-    }
-
-    if (!chip::ArgParser::ParseArgs(argv[0], argc, argv, allOptions))
-    {
-        return 1;
-    }
-
-    chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
-
-    // Set discriminator to user specified value
-    ChipLogProgress(SoftwareUpdate, "Setting discriminator to: %d", setupDiscriminator);
-    err = chip::DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(setupDiscriminator);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(SoftwareUpdate, "Setup discriminator setting failed with code: %" CHIP_ERROR_FORMAT, err.Format());
-        return 1;
-    }
-
-    // Init Data Model and CHIP App Server with user specified UDP port
-    Server::GetInstance().Init(nullptr, requestorSecurePort);
     chip::Dnssd::Resolver::Instance().Init(chip::DeviceLayer::UDPEndPointManager());
-    ChipLogProgress(SoftwareUpdate, "Initializing the Application Server. Listening on UDP port %d", requestorSecurePort);
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
 
     // Initialize all OTA download components
     InitOTARequestor();
@@ -225,9 +183,12 @@ int main(int argc, char * argv[])
         chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayQueryTimeInSec * 1000),
                                                     OnStartDelayTimerHandler, nullptr);
     }
+}
 
-    chip::DeviceLayer::PlatformMgr().RunEventLoop();
-
+int main(int argc, char * argv[])
+{
+    VerifyOrDie(ChipLinuxAppInit(argc, argv, &cmdLineOptions) == 0);
+    ChipLinuxAppMainLoop();
     return 0;
 }
 

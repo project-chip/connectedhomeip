@@ -67,8 +67,10 @@ public:
                   FabricIndex fabric, const ReliableMessageProtocolConfig & config) :
         mSecureSessionType(secureSessionType),
         mPeerNodeId(peerNodeId), mPeerCATs(peerCATs), mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId),
-        mFabric(fabric), mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()), mMRPConfig(config)
-    {}
+        mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()), mMRPConfig(config)
+    {
+        SetFabricIndex(fabric);
+    }
     ~SecureSession() { NotifySessionReleased(); }
 
     SecureSession(SecureSession &&)      = delete;
@@ -112,7 +114,6 @@ public:
 
     uint16_t GetLocalSessionId() const { return mLocalSessionId; }
     uint16_t GetPeerSessionId() const { return mPeerSessionId; }
-    FabricIndex GetFabricIndex() const { return mFabric; }
 
     // Should only be called for PASE sessions, which start with undefined fabric,
     // to migrate to a newly commissioned fabric after successful
@@ -123,10 +124,10 @@ public:
         // TODO(#13711): this check won't work until the issue is addressed
         if (mSecureSessionType == Type::kPASE)
         {
-            mFabric = fabricIndex;
+            SetFabricIndex(fabricIndex);
         }
 #else
-        mFabric = fabricIndex;
+        SetFabricIndex(fabricIndex);
 #endif
         return CHIP_NO_ERROR;
     }
@@ -136,18 +137,6 @@ public:
 
     CryptoContext & GetCryptoContext() { return mCryptoContext; }
 
-    CHIP_ERROR EncryptBeforeSend(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
-                                 MessageAuthenticationCode & mac) const
-    {
-        return mCryptoContext.Encrypt(input, input_length, output, header, mac);
-    }
-
-    CHIP_ERROR DecryptOnReceive(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
-                                const MessageAuthenticationCode & mac) const
-    {
-        return mCryptoContext.Decrypt(input, input_length, output, header, mac);
-    }
-
     SessionMessageCounter & GetSessionMessageCounter() { return mSessionMessageCounter; }
 
 private:
@@ -156,10 +145,6 @@ private:
     const CATValues mPeerCATs;
     const uint16_t mLocalSessionId;
     const uint16_t mPeerSessionId;
-
-    // PASE sessions start with undefined fabric, but are migrated to a newly
-    // commissioned fabric after successful OperationalCredentialsCluster::AddNOC
-    FabricIndex mFabric;
 
     PeerAddress mPeerAddress;
     System::Clock::Timestamp mLastActivityTime;

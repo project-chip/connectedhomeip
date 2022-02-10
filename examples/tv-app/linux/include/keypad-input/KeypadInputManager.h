@@ -20,9 +20,13 @@
 
 #include <app/clusters/keypad-input-server/keypad-input-server.h>
 
-class KeypadInputManager : public chip::app::Clusters::KeypadInput::Delegate
+using chip::app::CommandResponseHelper;
+using KeypadInputDelegate = chip::app::Clusters::KeypadInput::Delegate;
+using SendKeyResponseType = chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::Type;
+
+class KeypadInputManager : public KeypadInputDelegate
 {
 public:
-    chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::Type
-    HandleSendKey(const chip::app::Clusters::KeypadInput::CecKeyCode & keyCode) override;
+    void HandleSendKey(CommandResponseHelper<SendKeyResponseType> & helper,
+                       const chip::app::Clusters::KeypadInput::CecKeyCode & keyCode) override;
 };

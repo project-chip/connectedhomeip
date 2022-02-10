@@ -160,9 +160,14 @@
  * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
  *
  * The CHIP-assigned vendor id for the organization responsible for producing the device.
+ *
+ * Default is the Test VendorID of 0xFFF1.
+ *
+ * Un-overridden default must match the default test DAC
+ * (see src/credentials/examples/DeviceAttestationCredsExample.cpp).
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
-#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 9050
+#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0xFFF1
 #endif
 
 /**
@@ -179,9 +184,13 @@
  *
  * The unique id assigned by the device vendor to identify the product or device type.  This
  * number is scoped to the device vendor id.
+ *
+ * Un-overridden default must either match one of the given development certs
+ * or have a DeviceAttestationCredentialsProvider implemented.
+ * (see src/credentials/examples/DeviceAttestationCredsExample.cpp)
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
-#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 65279
+#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8001
 #endif
 
 /**
@@ -237,6 +246,16 @@
 #ifndef CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
 #define CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER "TEST_SN"
 #endif
+
+/**
+ * CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC
+ *
+ * The default conservative initial duration (in seconds) to set in the FailSafe for the commissioning
+ * flow to complete successfully. This may vary depending on the speed or sleepiness of the Commissionee.
+ */
+#ifndef CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC
+#define CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC 60
+#endif // CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC
 
 /**
  * CHIP_DEVICE_CONFIG_USER_SELECTED_MODE_TIMEOUT_SEC
@@ -725,7 +744,7 @@
  * Amount of services available for advertising using SRP.
  */
 #ifndef CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES
-#define CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES (CHIP_CONFIG_MAX_DEVICE_ADMINS + 1)
+#define CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES (CHIP_CONFIG_MAX_FABRICS + 1)
 #endif
 
 /**

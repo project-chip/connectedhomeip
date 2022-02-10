@@ -33,7 +33,7 @@ typedef void (*OnNOCChainGeneration)(void * context, CHIP_ERROR status, const By
                                      const ByteSpan & rcac, Optional<Crypto::AesCcm128KeySpan> ipk, Optional<NodeId> adminSubject);
 
 constexpr uint32_t kMaxCHIPDERCertLength = 600;
-constexpr size_t kOpCSRNonceLength       = 32;
+constexpr size_t kCSRNonceLength         = 32;
 
 /// Callbacks for CHIP operational credentials generation
 class DLL_EXPORT OperationalCredentialsDelegate
@@ -43,7 +43,7 @@ public:
 
     /**
      * @brief
-     *   This function generates an operational certificate chain for the device.
+     *   This function generates an operational certificate chain for a remote device that is being commissioned.
      *   The API generates the certificate in X.509 DER format.
      *
      *   The delegate is expected to use the certificate authority whose certificate
@@ -80,7 +80,7 @@ public:
 
     virtual CHIP_ERROR ObtainCsrNonce(MutableByteSpan & csrNonce)
     {
-        VerifyOrReturnError(csrNonce.size() == kOpCSRNonceLength, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(csrNonce.size() == kCSRNonceLength, CHIP_ERROR_INVALID_ARGUMENT);
         ReturnErrorOnFailure(Crypto::DRBG_get_bytes(csrNonce.data(), csrNonce.size()));
         return CHIP_NO_ERROR;
     }

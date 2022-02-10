@@ -26,12 +26,36 @@
 class ClusterCommand : public ModelCommand, public chip::app::CommandSender::Callback
 {
 public:
-    ClusterCommand(const char * commandName) : ModelCommand(commandName)
+    ClusterCommand(CredentialIssuerCommands * credsIssuerConfig) : ModelCommand("command-by-id", credsIssuerConfig)
+    {
+        AddArgument("cluster-id", 0, UINT32_MAX, &mClusterId);
+        AddArgument("command-id", 0, UINT32_MAX, &mCommandId);
+        AddArgument("payload", &mPayload);
+        AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
+        ModelCommand::AddArguments();
+    }
+
+    ClusterCommand(chip::ClusterId clusterId, CredentialIssuerCommands * credsIssuerConfig) :
+        ModelCommand("command-by-id", credsIssuerConfig), mClusterId(clusterId)
+    {
+        AddArgument("command-id", 0, UINT32_MAX, &mCommandId);
+        AddArgument("payload", &mPayload);
+        AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
+        ModelCommand::AddArguments();
+    }
+
+    ClusterCommand(const char * commandName, CredentialIssuerCommands * credsIssuerConfig) :
+        ModelCommand(commandName, credsIssuerConfig)
     {
         AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
     }
 
     ~ClusterCommand() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
+    {
+        return ClusterCommand::SendCommand(device, endpointId, mClusterId, mCommandId, mPayload);
+    }
 
     /////////// CommandSender Callback Interface /////////
     virtual void OnResponse(chip::app::CommandSender * client, const chip::app::ConcreteCommandPath & path,
@@ -84,7 +108,10 @@ public:
     }
 
 private:
+    chip::ClusterId mClusterId;
+    chip::CommandId mCommandId;
     chip::Optional<uint16_t> mTimedInteractionTimeoutMs;
 
+    CustomArgument mPayload;
     std::unique_ptr<chip::app::CommandSender> mCommandSender;
 };

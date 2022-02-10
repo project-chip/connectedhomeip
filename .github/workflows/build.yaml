@@ -162,6 +162,23 @@ jobs:
                       scripts/run_in_build_env.sh "ninja -C ./out"
                       scripts/tests/gn_tests.sh
                   done
+            - name: Run Tests with sanitizers
+              timeout-minutes: 30
+              env:
+                  LSAN_OPTIONS: detect_leaks=0
+              run: |
+                # for BUILD_TYPE in asan msan tsan ubsan; do
+                  for BUILD_TYPE in asan tsan ubsan; do
+                      case $BUILD_TYPE in
+                          "asan") GN_ARGS='is_clang=true is_asan=true';;
+                          "msan") GN_ARGS='is_clang=true is_msan=true';;
+                          "tsan") GN_ARGS='is_clang=true is_tsan=true chip_enable_wifi=false';;
+                          "ubsan") GN_ARGS='is_clang=true is_ubsan=true';;
+                      esac
+
+                      scripts/build/gn_gen.sh --args="$GN_ARGS"
+                      scripts/tests/gn_tests.sh
+                  done
             - name: Build using build_examples.py
               timeout-minutes: 40
               run: |

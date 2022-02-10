@@ -26,11 +26,15 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/tests/MessagingContext.h>
 #include <nlunit-test.h>
+#include <protocols/interaction_model/Constants.h>
 
 using TestContext = chip::Test::AppContext;
 
 using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::TestCluster;
+using namespace chip::Protocols;
 
 namespace {
 
@@ -53,10 +57,22 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
                                   CommandHandler * apCommandObj)
 {}
 
-bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
+InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
 {
-    // Mock cluster catalog, only support one command on one cluster on one endpoint.
-    return (aCommandPath.mEndpointId == kTestEndpointId && aCommandPath.mClusterId == TestCluster::Id);
+    // Mock cluster catalog, only support commands on one cluster on one endpoint.
+    using InteractionModel::Status;
+
+    if (aCommandPath.mEndpointId != kTestEndpointId)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+
+    if (aCommandPath.mClusterId != TestCluster::Id)
+    {
+        return Status::UnsupportedCluster;
+    }
+
+    return Status::Success;
 }
 
 CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
@@ -66,37 +82,50 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
+CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
                                   TLV::TLVReader & aReader, WriteHandler * aWriteHandler)
 {
-    if (aClusterInfo.mClusterId == TestCluster::Id &&
-        aClusterInfo.mAttributeId == TestCluster::Attributes::ListStructOctetString::TypeInfo::GetAttributeId())
+    static ListIndex listStructOctetStringElementCount = 0;
+    if (aPath.mClusterId == TestCluster::Id && aPath.mAttributeId == Attributes::ListStructOctetString::TypeInfo::GetAttributeId())
     {
         if (responseDirective == kSendAttributeSuccess)
         {
-            TestCluster::Attributes::ListStructOctetString::TypeInfo::DecodableType value;
-
-            ReturnErrorOnFailure(DataModel::Decode(aReader, value));
-
-            auto iter = value.begin();
-            uint8_t i = 0;
-            while (iter.Next())
+            if (!aPath.IsListOperation() || aPath.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
             {
-                auto & item = iter.GetValue();
 
-                VerifyOrReturnError(item.fabricIndex == i, CHIP_ERROR_INVALID_ARGUMENT);
-                i++;
+                Attributes::ListStructOctetString::TypeInfo::DecodableType value;
+
+                ReturnErrorOnFailure(DataModel::Decode(aReader, value));
+
+                auto iter                         = value.begin();
+                listStructOctetStringElementCount = 0;
+                while (iter.Next())
+                {
+                    auto & item = iter.GetValue();
+
+                    VerifyOrReturnError(item.fabricIndex == listStructOctetStringElementCount, CHIP_ERROR_INVALID_ARGUMENT);
+                    listStructOctetStringElementCount++;
+                }
+
+                aWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::Success);
             }
+            else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+            {
+                Structs::TestListStructOctet::DecodableType item;
+                ReturnErrorOnFailure(DataModel::Decode(aReader, item));
+                VerifyOrReturnError(item.fabricIndex == listStructOctetStringElementCount, CHIP_ERROR_INVALID_ARGUMENT);
+                listStructOctetStringElementCount++;
 
-            VerifyOrReturnError(i == 4, CHIP_ERROR_INVALID_ARGUMENT);
-
-            ConcreteAttributePath attributePath(aClusterInfo.mClusterId, aClusterInfo.mEndpointId, aClusterInfo.mAttributeId);
-            aWriteHandler->AddStatus(attributePath, Protocols::InteractionModel::Status::Success);
+                aWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::Success);
+            }
+            else
+            {
+                return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+            }
         }
         else
         {
-            ConcreteAttributePath attributePath(aClusterInfo.mClusterId, aClusterInfo.mEndpointId, aClusterInfo.mAttributeId);
-            aWriteHandler->AddStatus(attributePath, Protocols::InteractionModel::Status::Failure);
+            aWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::Failure);
         }
 
         return CHIP_NO_ERROR;
@@ -143,11 +172,11 @@ void TestWriteInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCont
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&onSuccessCbInvoked](const app::ConcreteAttributePath & attributePath) { onSuccessCbInvoked = true; };
+    auto onSuccessCb = [&onSuccessCbInvoked](const ConcreteAttributePath & attributePath) { onSuccessCbInvoked = true; };
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteAttributePath * attributePath, CHIP_ERROR aError) {
+    auto onFailureCb = [&onFailureCbInvoked](const ConcreteAttributePath * attributePath, CHIP_ERROR aError) {
         onFailureCbInvoked = true;
     };
 
@@ -166,8 +195,8 @@ void TestWriteInteraction::TestAttributeError(nlTestSuite * apSuite, void * apCo
     TestContext & ctx       = *static_cast<TestContext *>(apContext);
     auto sessionHandle      = ctx.GetSessionBobToAlice();
     bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
-    TestCluster::Attributes::ListStructOctetString::TypeInfo::Type value;
-    TestCluster::Structs::TestListStructOctet::Type valueBuf[4];
+    Attributes::ListStructOctetString::TypeInfo::Type value;
+    Structs::TestListStructOctet::Type valueBuf[4];
 
     value = valueBuf;
 
@@ -182,22 +211,22 @@ void TestWriteInteraction::TestAttributeError(nlTestSuite * apSuite, void * apCo
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&onSuccessCbInvoked](const app::ConcreteAttributePath & attributePath) { onSuccessCbInvoked = true; };
+    auto onSuccessCb = [&onSuccessCbInvoked](const ConcreteAttributePath & attributePath) { onSuccessCbInvoked = true; };
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [apSuite, &onFailureCbInvoked](const app::ConcreteAttributePath * attributePath, CHIP_ERROR aError) {
+    auto onFailureCb = [apSuite, &onFailureCbInvoked](const ConcreteAttributePath * attributePath, CHIP_ERROR aError) {
         NL_TEST_ASSERT(apSuite, attributePath != nullptr);
         onFailureCbInvoked = true;
     };
 
-    chip::Controller::WriteAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(sessionHandle, kTestEndpointId,
-                                                                                               value, onSuccessCb, onFailureCb);
+    Controller::WriteAttribute<Attributes::ListStructOctetString::TypeInfo>(sessionHandle, kTestEndpointId, value, onSuccessCb,
+                                                                            onFailureCb);
 
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite, !onSuccessCbInvoked && onFailureCbInvoked);
-    NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers() == 0);
+    NL_TEST_ASSERT(apSuite, InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers() == 0);
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
