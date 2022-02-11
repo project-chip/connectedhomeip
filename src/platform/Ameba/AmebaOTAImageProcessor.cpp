@@ -18,6 +18,7 @@
 
 #include <app/clusters/ota-requestor/OTADownloader.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/OTARequestorInterface.h>
 
 #include <platform/Ameba/AmebaOTAImageProcessor.h>
 
@@ -91,6 +92,8 @@ void AmebaOTAImageProcessor::HandlePrepareDownload(intptr_t context)
         ChipLogError(SoftwareUpdate, "mDownloader is null");
         return;
     }
+
+    imageProcessor->mHeaderParser.Init();
 
     // Get OTA update partition
 #if defined(CONFIG_PLATFORM_8721D)
@@ -173,13 +176,16 @@ void AmebaOTAImageProcessor::HandleProcessBlock(intptr_t context)
         return;
     }
 
+    ByteSpan block   = imageProcessor->mBlock;
+    CHIP_ERROR error = imageProcessor->ProcessHeader(block);
+
 #if defined(CONFIG_PLATFORM_8721D)
     if (!imageProcessor->readHeader) // First block received, process header
     {
         uint8_t * tempBuf          = (uint8_t *) ota_update_malloc(32);
         imageProcessor->pOtaTgtHdr = (update_ota_target_hdr *) ota_update_malloc(sizeof(update_ota_target_hdr));
 
-        memcpy(tempBuf, imageProcessor->mBlock.data(), 32);
+        memcpy(tempBuf, block.data(), 32);
         memcpy(imageProcessor->pOtaTgtHdr, tempBuf, 8); // Store FwVer, HdrNum
         memcpy(&(imageProcessor->pOtaTgtHdr->FileImgHdr[0].ImgHdrLen), tempBuf + 12,
                16);                                                                 // Store ImgHdrLen, Checksum, ImgLen, Offset
@@ -224,12 +230,12 @@ void AmebaOTAImageProcessor::HandleProcessBlock(intptr_t context)
         imageProcessor->signature = &(imageProcessor->pOtaTgtHdr->Sign[0][0]);
 
         // Store the signature temporarily
-        uint8_t * tempbufptr = imageProcessor->mBlock.data() + imageProcessor->pOtaTgtHdr->FileImgHdr[0].Offset;
+        uint8_t * tempbufptr = const_cast <uint8_t*> (block.data() + imageProcessor->pOtaTgtHdr->FileImgHdr[0].Offset);
         memcpy(imageProcessor->signature, tempbufptr, 8);
         tempbufptr += 8;
 
         // Write remaining downloaded bytes to flash_addr
-        uint32_t tempsize = imageProcessor->mBlock.size() - imageProcessor->pOtaTgtHdr->FileImgHdr[0].Offset - 8;
+        uint32_t tempsize = block.size() - imageProcessor->pOtaTgtHdr->FileImgHdr[0].Offset - 8;
         device_mutex_lock(RT_DEV_LOCK_FLASH);
         if (ota_writestream_user(imageProcessor->flash_addr + imageProcessor->size, tempsize, tempbufptr) < 0)
         {
@@ -248,8 +254,8 @@ void AmebaOTAImageProcessor::HandleProcessBlock(intptr_t context)
     else // received subsequent blocks
     {
         device_mutex_lock(RT_DEV_LOCK_FLASH);
-        if (ota_writestream_user(imageProcessor->flash_addr + imageProcessor->size, imageProcessor->mBlock.size(),
-                                 imageProcessor->mBlock.data()) < 0)
+        if (ota_writestream_user(imageProcessor->flash_addr + imageProcessor->size, block.size(),
+                                 block.data()) < 0)
         {
             ChipLogError(SoftwareUpdate, "Write to flash failed");
             device_mutex_unlock(RT_DEV_LOCK_FLASH);
@@ -258,16 +264,16 @@ void AmebaOTAImageProcessor::HandleProcessBlock(intptr_t context)
         }
         device_mutex_unlock(RT_DEV_LOCK_FLASH);
 
-        imageProcessor->size += imageProcessor->mBlock.size();
-        imageProcessor->RemainBytes -= imageProcessor->mBlock.size();
+        imageProcessor->size += block.size();
+        imageProcessor->RemainBytes -= block.size();
     }
 #elif defined(CONFIG_PLATFORM_8710C)
     if (!imageProcessor->readHeader) // First block received, process 32bytes signature
     {
         // Store signature temporarily
-        memcpy(imageProcessor->signature, imageProcessor->mBlock.data(), 32);
+        memcpy(imageProcessor->signature, block.data(), 32);
 
-        imageProcessor->block_len = imageProcessor->mBlock.size() - 32; // minus 32 to account for signature
+        imageProcessor->block_len = block.size() - 32; // minus 32 to account for signature
 
         // Erase target partition
         ChipLogProgress(SoftwareUpdate, "Erasing partition");
@@ -283,10 +289,11 @@ void AmebaOTAImageProcessor::HandleProcessBlock(intptr_t context)
         {
             device_mutex_lock(RT_DEV_LOCK_FLASH);
             if (flash_burst_write(&flash_ota, imageProcessor->flash_addr + 32, imageProcessor->block_len,
-                                  imageProcessor->mBlock.data() + 32) < 0)
+                                  block.data() + 32) < 0)
             {
                 device_mutex_unlock(RT_DEV_LOCK_FLASH);
                 ChipLogError(SoftwareUpdate, "Write to flash failed");
+                imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
                 return;
             }
             else
@@ -298,6 +305,7 @@ void AmebaOTAImageProcessor::HandleProcessBlock(intptr_t context)
         else
         {
             ChipLogError(SoftwareUpdate, "Invalid size");
+            imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
             return;
         }
 
@@ -305,17 +313,17 @@ void AmebaOTAImageProcessor::HandleProcessBlock(intptr_t context)
     }
     else // received subsequent blocks
     {
-        imageProcessor->block_len = imageProcessor->mBlock.size();
+        imageProcessor->block_len = block.size();
 
-        // Write first block to target flash
         if (imageProcessor->block_len > 0)
         {
             device_mutex_lock(RT_DEV_LOCK_FLASH);
             if (flash_burst_write(&flash_ota, imageProcessor->flash_addr + 32 + imageProcessor->size, imageProcessor->block_len,
-                                  imageProcessor->mBlock.data()) < 0)
+                                  block.data()) < 0)
             {
                 device_mutex_unlock(RT_DEV_LOCK_FLASH);
                 ChipLogError(SoftwareUpdate, "Write to flash failed");
+                imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
                 return;
             }
             else
@@ -327,26 +335,62 @@ void AmebaOTAImageProcessor::HandleProcessBlock(intptr_t context)
         else
         {
             ChipLogError(SoftwareUpdate, "Invalid size");
+            imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
             return;
         }
     }
 #endif
-    imageProcessor->mParams.downloadedBytes += imageProcessor->mBlock.size();
+    imageProcessor->mParams.downloadedBytes += block.size();
     imageProcessor->mDownloader->FetchNextData();
 }
 
 void AmebaOTAImageProcessor::HandleApply(intptr_t context)
 {
     auto * imageProcessor = reinterpret_cast<AmebaOTAImageProcessor *>(context);
+    if (imageProcessor == nullptr)
+    {
+        return;
+    }
+
+    OTARequestorInterface * requestor = chip::GetRequestorInstance();
+    if (requestor != nullptr)
+    {
+        // TODO: Use software version from Configuration Manager
+        requestor->NotifyUpdateApplied(imageProcessor->mSoftwareVersion);
+    }
 
     // Reboot
     ota_platform_reset();
 }
 
+CHIP_ERROR AmebaOTAImageProcessor::ProcessHeader(ByteSpan & block)
+{
+    if (mHeaderParser.IsInitialized())
+    {
+        OTAImageHeader header;
+        CHIP_ERROR error = mHeaderParser.AccumulateAndDecode(block, header);
+
+        // Needs more data to decode the header
+        ReturnErrorCodeIf(error == CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(error);
+
+        // We save the software version to be used in the next NotifyUpdateApplied, but it's a non-standard
+        // behavior of the Linux implementation and the pattern should not be blindly followed by real-life
+        // products. In general, it's up to the implementation to decide which header fields will be
+        // validated or presented to the user.
+        mSoftwareVersion       = header.mSoftwareVersion;
+        mParams.totalFileBytes = header.mPayloadSize;
+        mHeaderParser.Clear();
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR AmebaOTAImageProcessor::SetBlock(ByteSpan & block)
 {
-    if ((block.data() == nullptr) || block.empty())
+    if (!IsSpanUsable(block))
     {
+        ReleaseBlock();
         return CHIP_NO_ERROR;
     }
 
@@ -364,24 +408,28 @@ CHIP_ERROR AmebaOTAImageProcessor::SetBlock(ByteSpan & block)
         mBlock = MutableByteSpan(mBlock_ptr, block.size());
     }
 
-    // Allocate memory for block data if it has not been done yet
-    if (mBlock.empty())
+    if (mBlock.size() < block.size())
     {
-        mBlock = MutableByteSpan(static_cast<uint8_t *>(chip::Platform::MemoryAlloc(block.size())), block.size());
-        if (mBlock.data() == nullptr)
+        if (!mBlock.empty())
+        {
+            ReleaseBlock();
+        }
+
+        uint8_t * mBlock_ptr = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(block.size()));
+
+        if (mBlock_ptr == nullptr)
         {
             return CHIP_ERROR_NO_MEMORY;
         }
+        mBlock = MutableByteSpan(mBlock_ptr, block.size());
     }
 
-    // Store the actual block data
     CHIP_ERROR err = CopySpanToMutableSpan(block, mBlock);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(SoftwareUpdate, "Cannot copy block data: %" CHIP_ERROR_FORMAT, err.Format());
         return err;
     }
-
     return CHIP_NO_ERROR;
 }
 
