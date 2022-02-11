@@ -54,6 +54,7 @@ ApplicationId
 ApplicationIdentifier
 ApplicationLauncher
 ApplyUpdateRequest
+ApplyUpdateResponse
 approver
 appspot
 aps
@@ -280,6 +281,7 @@ debianutils
 DEDEDEDE
 deepnote
 DelayedActionTime
+delayedActionTimeSec
 demangle
 deployable
 depottools
@@ -855,6 +857,7 @@ QRCodeUrl
 QSPI
 QueryImage
 QueryImageResponse
+queryImageStatus
 qvCHIP
 RADVD
 raspberryPi
@@ -966,6 +969,7 @@ SoftDevice
 softmmu
 SoftwareDiagnostics
 SoftwareVersion
+softwareVersionStr
 SoftwareVersionString
 softwareVersionValid
 SPI
@@ -1085,12 +1089,16 @@ UniFlash
 unpair
 unprovisioned
 untrusted
+updateAvailable
+updateNotAvailable
 UpdateTokens
 upstreamed
 URI
 usbmodem
 USBtoUART
 uscif
+UserConsentNeeded
+userConsentState
 userguide
 USERINTERFACE
 UserLabel
