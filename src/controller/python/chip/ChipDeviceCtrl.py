@@ -539,7 +539,7 @@ class ChipDeviceController():
             future.set_exception(self._ChipStack.ErrorToException(res))
         return await future
 
-    async def WriteAttribute(self, nodeid: int, attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor]], timedRequestTimeoutMs: int = None):
+    async def WriteAttribute(self, nodeid: int, attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]], timedRequestTimeoutMs: int = None):
         '''
         Write a list of attributes on a target node.
 
@@ -560,7 +560,7 @@ class ChipDeviceController():
         attrs = []
         for v in attributes:
             attrs.append(ClusterAttribute.AttributeWriteRequest(
-                v[0], v[1], v[1].value))
+                v[0], v[1], v[2], v[1].value))
 
         res = self._ChipStack.Call(
             lambda: ClusterAttribute.WriteAttributes(
@@ -774,7 +774,7 @@ class ChipDeviceController():
             EndpointId=endpoint, Attribute=attributeType)
         return im.AttributeReadResult(path=im.AttributePath(nodeId=nodeid, endpointId=path.EndpointId, clusterId=path.ClusterId, attributeId=path.AttributeId), status=0, value=result[0][endpoint][clusterType][attributeType])
 
-    def ZCLWriteAttribute(self, cluster: str, attribute: str, nodeid, endpoint, groupid, value, blocking=True):
+    def ZCLWriteAttribute(self, cluster: str, attribute: str, nodeid, endpoint, groupid, value, dataVersion=0, blocking=True):
         req = None
         try:
             req = eval(
@@ -782,7 +782,7 @@ class ChipDeviceController():
         except:
             raise UnknownAttribute(cluster, attribute)
 
-        return asyncio.run(self.WriteAttribute(nodeid, [(endpoint, req)]))
+        return asyncio.run(self.WriteAttribute(nodeid, [(endpoint, req, dataVersion)]))
 
     def ZCLSubscribeAttribute(self, cluster, attribute, nodeid, endpoint, minInterval, maxInterval, blocking=True):
         self.CheckIsActive()

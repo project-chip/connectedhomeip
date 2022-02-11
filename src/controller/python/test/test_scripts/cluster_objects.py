@@ -397,7 +397,7 @@ class ClusterObjectTests:
         req = [
             (0, Clusters.Basic.Attributes.VendorName),
         ]
-        res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req, dataVersionFilters=[(0, Clusters.Basic, data_version)])
+        res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req, dataVersionFilters=[(0, Clusters.Basic)])
         VerifyDecodeSuccess(res)
         new_data_version = res[1][0][40][1]
         if (data_version + 1) != new_data_version:
@@ -405,6 +405,42 @@ class ClusterObjectTests:
 
         res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req, dataVersionFilters=[(0, Clusters.Basic, new_data_version)])
         VerifyDecodeSuccess(res)
+
+        res = await devCtrl.WriteAttribute(nodeid=NODE_ID,
+                                           attributes=[
+                                               (0, Clusters.Basic.Attributes.NodeLabel(
+                                                   "Test"), new_data_version)
+                                           ])
+
+        expectedRes = [
+            AttributeStatus(Path=AttributePath(EndpointId=0, ClusterId=40,
+                                               AttributeId=5), Status=chip.interaction_model.Status.Success),
+        ]
+
+        if res != expectedRes:
+            for i in range(len(res)):
+                if res[i] != expectedRes[i]:
+                    logger.error(
+                        f"Item {i} is not expected, expect {expectedRes[i]} got {res[i]}")
+            raise AssertionError("Write returned unexpected result.")
+
+        res = await devCtrl.WriteAttribute(nodeid=NODE_ID,
+                                           attributes=[
+                                               (0, Clusters.Basic.Attributes.NodeLabel(
+                                                   "Test"), new_data_version)
+                                           ])
+
+        expectedRes = [
+            AttributeStatus(Path=AttributePath(EndpointId=0, ClusterId=40,
+                                               AttributeId=5), Status=chip.interaction_model.Status.DataVersionMismatch),
+        ]
+
+        if res != expectedRes:
+            for i in range(len(res)):
+                if res[i] != expectedRes[i]:
+                    logger.error(
+                        f"Item {i} is not expected, expect {expectedRes[i]} got {res[i]}")
+            raise AssertionError("Write returned unexpected result.")
 
     @classmethod
     async def RunTest(cls, devCtrl):

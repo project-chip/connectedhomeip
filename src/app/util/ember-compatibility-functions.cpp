@@ -948,6 +948,16 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
         return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::NeedsTimedInteraction);
     }
 
+    if (aPath.mDataVersion.HasValue() &&
+        !IsClusterDataVersionEqual(aPath.mEndpointId, aPath.mClusterId, aPath.mDataVersion.Value()))
+    {
+        ChipLogError(DataManagement,
+                     "Write Version mismatch for Endpoint %" PRIx16 ", Cluster " ChipLogFormatMEI,
+                     aPath.mEndpointId,
+                     ChipLogValueMEI(aPath.mClusterId));
+        return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::DataVersionMismatch);
+    }
+
     if (auto * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId))
     {
         AttributeValueDecoder valueDecoder(aReader, aSubjectDescriptor);

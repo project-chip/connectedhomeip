@@ -115,7 +115,16 @@ public:
             size = writer.GetLengthWritten();
         }
 
-        gOnReadAttributeDataCallback(mAppContext, aPath.mDataVersion, aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId,
+        DataVersion version = 0;
+        if (aPath.mDataVersion.HasValue())
+        {
+            version = aPath.mDataVersion.Value();
+        }
+        else
+        {
+            ChipLogError(DataManagement, "expect aPath has valid mDataVersion");
+        }
+        gOnReadAttributeDataCallback(mAppContext, version, aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId,
                                      to_underlying(aStatus.mStatus), buffer.get(), size);
     }
 
@@ -313,10 +322,11 @@ chip::ChipError::StorageType pychip_WriteClient_WriteAttributes(void * appContex
             TLV::TLVReader reader;
             reader.Init(tlvBuffer, static_cast<uint32_t>(length));
             reader.Next();
-
+            Optional<chip::DataVersion> dataVersion(pathObj.dataVersion);
             SuccessOrExit(
                 err = client->PutPreencodedAttribute(
-                    chip::app::ConcreteDataAttributePath(pathObj.endpointId, pathObj.clusterId, pathObj.attributeId), reader));
+                    chip::app::ConcreteDataAttributePath(pathObj.endpointId, pathObj.clusterId, pathObj.attributeId, dataVersion),
+                    reader));
         }
     }
 
