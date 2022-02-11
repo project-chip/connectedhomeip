@@ -29,11 +29,12 @@
 #pragma once
 
 // Use a default setup PIN code if one hasn't been provisioned in flash.
+#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
+#endif
+#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
-
-// Use a default pairing code if one hasn't been provisioned in flash.
-#define CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE "CHIPUS"
+#endif
 
 // For convenience, enable Chip Security Test Mode and disable the requirement for
 // authentication in various protocols.
@@ -42,19 +43,19 @@
 //    including message encryption. Because of this they MUST NEVER BE ENABLED IN PRODUCTION BUILDS.
 //
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
-#define CHIP_CONFIG_REQUIRE_AUTH 0
+#define CHIP_CONFIG_REQUIRE_AUTH 1
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
  *
- * 0xFFF1: Test vendor
+ * 0xFFF1: Test vendor.
  */
 #define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0xFFF1
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
  *
- * 0x8005: example lighting-app
+ * 0x8005: example lighting app
  */
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8005
 
