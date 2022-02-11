@@ -143,7 +143,11 @@ int main(void)
 #endif
 
     P6_LOG("==================================================\r\n");
+#ifdef UPDATE_IMAGE
+    P6_LOG("UPDATED chip-p6-ota-requestor-example starting\r\n");
+#else
     P6_LOG("chip-p6-ota-requestor-example starting\r\n");
+#endif
     P6_LOG("==================================================\r\n");
 
     /* Start the FreeRTOS scheduler */

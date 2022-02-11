@@ -34,6 +34,9 @@ declare_args() {
 
   # Monitor & log memory usage at runtime.
   enable_heap_monitoring = false
+
+  # Build update app
+  build_update_image = false
 }
 
 config("p6_ota_config") {
@@ -69,6 +72,11 @@ config("p6_ota_config") {
     "MCUBOOT_OVERWRITE_ONLY",
     "CY_ENABLE_XIP_PROGRAM",
   ]
+
+  if(build_update_image)
+  {
+    defines += ["UPDATE_IMAGE"]
+  }
 }
 
 # Warning: Don't change the name of this target without also modifying
