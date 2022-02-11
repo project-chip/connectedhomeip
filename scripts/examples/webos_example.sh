@@ -18,6 +18,10 @@
 # Activating connectedhomeip build environment
 source scripts/activate.sh
 
+# Clone webos_sdk
+echo "##### Cloning webOS OSE SDK #####"
+git clone https://github.com/cabin15/webos-ose-ndk third_party/webos_sdk
+
 # Extract webOS SDK
 cat third_party/webos_sdk/v2.14.1/webos_sdk.tar* | (
     cd third_party/webos_sdk/v2.14.1/

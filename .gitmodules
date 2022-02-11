@@ -190,6 +190,3 @@
 [submodule "p6/serial-flash"]
 	path = third_party/p6/p6_sdk/libs/serial-flash
 	url = https://github.com/Infineon/serial-flash
-[submodule "third_party/webos_sdk"]
-	path = third_party/webos_sdk
-	url = https://github.com/cabin15/webos-ose-ndk
