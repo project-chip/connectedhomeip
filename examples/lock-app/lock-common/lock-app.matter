@@ -1107,11 +1107,11 @@ server cluster WiFiNetworkDiagnostics = 54 {
     WiFiConnectionStatus connectionStatus = 0;
   }
 
-  readonly attribute octet_string<6> bssid = 0;
-  readonly attribute enum8 securityType = 1;
-  readonly attribute enum8 wiFiVersion = 2;
-  readonly attribute int16u channelNumber = 3;
-  readonly attribute int8s rssi = 4;
+  readonly attribute nullable octet_string<6> bssid = 0;
+  readonly attribute nullable SecurityType securityType = 1;
+  readonly attribute nullable WiFiVersionType wiFiVersion = 2;
+  readonly attribute nullable int16u channelNumber = 3;
+  readonly attribute nullable int8s rssi = 4;
   readonly attribute int32u beaconLostCount = 5;
   readonly attribute int32u beaconRxCount = 6;
   readonly attribute int32u packetMulticastRxCount = 7;
