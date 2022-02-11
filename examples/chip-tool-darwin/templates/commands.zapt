@@ -221,7 +221,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) ReportAttribute ({{asHex code 8}}) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIP{{asUpperCamelCase parent.name}} * cluster = [[CHIP{{asUpperCamelCase parent.name}} alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribe{{>attribute}}WithMinInterval: mMinInterval maxInterval:mMaxInterval subscriptionEstablished: NULL reportHandler:^({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error) {
+        [cluster subscribe{{>attribute}}WithMinInterval: [NSNumber numberWithUnsignedShort:mMinInterval] maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval] subscriptionEstablished: NULL reportHandler:^({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error) {
         NSLog(@"{{asUpperCamelCase parent.name}}.{{asUpperCamelCase name}} response %@", [value description]);
         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
          }];
