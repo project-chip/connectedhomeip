@@ -200,7 +200,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
     auto protocolIter = protocolsSupported.begin();
     while (protocolIter.Next())
     {
-        ChipLogDetail(Zcl, "    %" PRIu8, to_underlying(protocolIter.GetValue()));
+        ChipLogDetail(Zcl, "    %u", to_underlying(protocolIter.GetValue()));
     }
     ChipLogDetail(Zcl, "  ]");
     if (hardwareVersion.HasValue())
@@ -213,7 +213,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
     }
     if (requestorCanConsent.HasValue())
     {
-        ChipLogDetail(Zcl, "  RequestorCanConsent: %" PRIu8, requestorCanConsent.Value());
+        ChipLogDetail(Zcl, "  RequestorCanConsent: %u", requestorCanConsent.Value());
     }
     if (metadataForProvider.HasValue())
     {
