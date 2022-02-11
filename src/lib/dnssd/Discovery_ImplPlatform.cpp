@@ -559,7 +559,8 @@ CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId, Inet::IPA
 
 bool DiscoveryImplPlatform::ResolveNodeIdFromInternalCache(const PeerId & peerId, Inet::IPAddressType type) override
 {
-    if (InitImpl() != CHIP_NO_ERROR) {
+    if (InitImpl() != CHIP_NO_ERROR)
+    {
         return false;
     }
     return mResolverProxy.ResolveNodeIdFromInternalCache(peerId, type);
