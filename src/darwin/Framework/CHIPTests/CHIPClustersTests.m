@@ -37,7 +37,7 @@ const uint16_t kPairingTimeoutInSeconds = 10;
 const uint16_t kAddressResolveTimeoutInSeconds = 10;
 const uint16_t kCASESetupTimeoutInSeconds = 30;
 const uint16_t kTimeoutInSeconds = 5;
-const uint64_t kDeviceId = 1;
+const uint64_t nodeId = 0x12344321;
 const uint16_t kDiscriminator = 3840;
 const uint32_t kSetupPINCode = 20202021;
 const uint16_t kRemotePort = 5540;
@@ -65,12 +65,12 @@ void Log(XCTestExpectation * expectation, dispatch_queue_t queue, NSString * mes
 // Stub for User Prompts for XCTests to run.
 void UserPrompt(XCTestExpectation * expectation, dispatch_queue_t queue, NSString * message) { [expectation fulfill]; }
 
-void WaitForCommissionee(XCTestExpectation * expectation, dispatch_queue_t queue)
+void WaitForCommissionee(XCTestExpectation * expectation, dispatch_queue_t queue, uint64_t deviceId)
 {
     CHIPDeviceController * controller = [CHIPDeviceController sharedController];
     XCTAssertNotNil(controller);
 
-    [controller getConnectedDevice:kDeviceId
+    [controller getConnectedDevice:deviceId
                              queue:dispatch_get_main_queue()
                  completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
                      XCTAssertEqual(error.code, 0);
@@ -149,7 +149,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTAssertTrue(started);
 
     NSError * error;
-    [controller pairDevice:kDeviceId
+    [controller pairDevice:nodeId
                    address:kAddress
                       port:kRemotePort
              discriminator:kDiscriminator
@@ -160,7 +160,7 @@ CHIPDevice * GetConnectedDevice(void)
     [self waitForExpectationsWithTimeout:kPairingTimeoutInSeconds handler:nil];
 
     __block XCTestExpectation * connectionExpectation = [self expectationWithDescription:@"CASE established"];
-    [controller getConnectedDevice:kDeviceId
+    [controller getConnectedDevice:nodeId
                              queue:dispatch_get_main_queue()
                  completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
                      XCTAssertEqual(error.code, 0);
@@ -176,7 +176,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTAssertNotNil(controller);
 
     NSError * error;
-    [controller unpairDevice:kDeviceId error:&error];
+    [controller unpairDevice:nodeId error:&error];
     XCTAssertEqual(error.code, 0);
 
     BOOL stopped = [controller shutdown];
@@ -190,7 +190,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     __block CHIPDevice * device;
     __block XCTestExpectation * connectionExpectation = [self expectationWithDescription:@"CASE established"];
-    [controller getConnectedDevice:kDeviceId
+    [controller getConnectedDevice:nodeId
                              queue:dispatch_get_main_queue()
                  completionHandler:^(CHIPDevice * _Nullable retrievedDevice, NSError * _Nullable error) {
                      XCTAssertEqual(error.code, 0);
@@ -232,7 +232,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_BI_1_1_000001_ReadAttribute
@@ -350,7 +350,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_BI_2_1_000001_ReadAttribute
@@ -625,7 +625,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_BI_2_2_000001_ReadAttribute
@@ -826,7 +826,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_BOOL_1_1_000001_ReadAttribute
@@ -944,7 +944,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_BOOL_2_1_000001_ReadAttribute
@@ -1044,7 +1044,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_BRAC_1_1_000001_ReadAttribute
@@ -1096,7 +1096,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_1_1_000001_ReadAttribute
@@ -1166,7 +1166,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_2_1_000001_ReadAttribute
@@ -5234,7 +5234,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_3_1_000001_On
@@ -5465,7 +5465,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_3_2_000001_On
@@ -5660,7 +5660,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_3_3_000001_On
@@ -5807,7 +5807,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_4_1_000001_On
@@ -5927,7 +5927,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_4_2_000001_On
@@ -6172,7 +6172,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_4_3_000001_On
@@ -6319,7 +6319,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_4_4_000001_On
@@ -6440,7 +6440,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_5_1_000001_On
@@ -6561,7 +6561,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_5_2_000001_On
@@ -6704,7 +6704,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_5_3_000001_On
@@ -6825,7 +6825,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_6_1_000001_On
@@ -6945,7 +6945,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_6_2_000001_On
@@ -7234,7 +7234,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_6_3_000001_On
@@ -7385,7 +7385,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_7_1_000001_On
@@ -7610,7 +7610,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_7_2_000001_On
@@ -7837,7 +7837,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_7_3_000001_On
@@ -7984,7 +7984,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_7_4_000001_On
@@ -8105,7 +8105,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_8_1_000001_On
@@ -8505,7 +8505,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_9_1_000001_On
@@ -9830,7 +9830,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHue4;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_9_2_000001_On
@@ -10304,7 +10304,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_9_3_000001_On
@@ -10880,7 +10880,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_DM_1_1_000001_ReadAttribute
@@ -11362,7 +11362,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_DM_3_1_000001_ReadAttribute
@@ -11419,7 +11419,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_EMR_1_1_000001_ReadAttribute
@@ -11537,7 +11537,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -11546,7 +11546,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -11555,7 +11555,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_FLW_1_1_000001_ReadAttribute
@@ -11625,7 +11625,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_FLW_2_1_000001_ReadAttribute
@@ -11939,7 +11939,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_FLW_2_2_000001_ReadAttribute
@@ -11986,7 +11986,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_ILL_1_1_000001_ReadAttribute
@@ -12114,7 +12114,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_1_1_000001_ReadAttribute
@@ -12273,7 +12273,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_2_1_000001_MoveToLevel
@@ -12602,7 +12602,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_2_2_000001_ReadAttribute
@@ -12963,7 +12963,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_3_1_000001_ReadAttribute
@@ -13272,7 +13272,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_4_1_000001_ReadAttribute
@@ -13614,7 +13614,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_5_1_000001_On
@@ -13868,7 +13868,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_6_1_000001_On
@@ -14101,7 +14101,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_MC_1_1_000001_ReadAttribute
@@ -14219,7 +14219,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_MC_2_1_000001_Sleep
@@ -14247,7 +14247,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14256,7 +14256,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14265,7 +14265,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14274,7 +14274,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14283,7 +14283,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14292,7 +14292,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14301,7 +14301,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14310,7 +14310,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14319,7 +14319,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14328,7 +14328,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14337,7 +14337,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14346,7 +14346,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_MC_5_1_000001_ReadAttribute
@@ -14374,7 +14374,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_MC_5_2_000001_UserPrompt
@@ -14391,7 +14391,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_MC_5_3_000001_UserPrompt
@@ -14408,7 +14408,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_MC_6_1_000001_UserPrompt
@@ -14473,7 +14473,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_MC_6_2_000001_UserPrompt
@@ -14562,7 +14562,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_MC_6_3_000001_UserPrompt
@@ -14595,7 +14595,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_MC_6_4_000001_UserPrompt
@@ -14724,7 +14724,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14733,7 +14733,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14742,7 +14742,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 NSNumber * _Nonnull currentTarget;
@@ -14795,7 +14795,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_MC_9_1_000001_Log
@@ -14946,7 +14946,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_OCC_1_1_000001_ReadAttribute
@@ -15016,7 +15016,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_OCC_2_1_000001_ReadAttribute
@@ -15268,7 +15268,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_OCC_2_2_000001_ReadAttribute
@@ -15315,7 +15315,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_OO_1_1_000001_ReadAttribute
@@ -15522,7 +15522,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_OO_2_1_000001_ReadAttribute
@@ -15881,7 +15881,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_OO_2_2_000001_Off
@@ -16193,7 +16193,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_OO_2_3_000001_On
@@ -17208,7 +17208,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_PS_1_1_000001_ReadAttribute
@@ -17326,7 +17326,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_PRS_1_1_000001_ReadAttribute
@@ -17396,7 +17396,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_PRS_2_1_000001_ReadAttribute
@@ -17605,7 +17605,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_PCC_1_1_000001_ReadAttribute
@@ -17702,7 +17702,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_PCC_2_1_000001_ReadAttribute
@@ -18986,7 +18986,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_PCC_2_2_000001_WriteAttribute
@@ -19070,7 +19070,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_PCC_2_3_000001_WriteAttribute
@@ -19299,7 +19299,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_RH_1_1_000001_ReadAttribute
@@ -19375,7 +19375,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_RH_2_1_000001_ReadAttribute
@@ -19509,7 +19509,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_RH_2_2_000001_ReadAttribute
@@ -19560,7 +19560,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_SWTCH_2_1_000001_ReadAttribute
@@ -19719,7 +19719,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_SWTCH_2_2_000001_UserPrompt
@@ -20057,7 +20057,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_TM_1_1_000001_ReadAttribute
@@ -20133,7 +20133,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_TM_2_1_000001_ReadAttribute
@@ -20202,7 +20202,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_TM_2_2_000001_ReadAttribute
@@ -20253,7 +20253,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_TSTAT_1_1_000001_ReadAttribute
@@ -20343,7 +20343,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_TSTAT_2_1_000001_ReadAttribute
@@ -22002,7 +22002,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_TSTAT_2_2_000001_ReadAttribute
@@ -23303,7 +23303,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_TSUIC_1_1_000001_ReadAttribute
@@ -23376,7 +23376,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_TSUIC_2_1_000001_ReadAttribute
@@ -23735,7 +23735,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_TSUIC_2_2_000001_WriteAttribute
@@ -23984,7 +23984,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_DIAG_TH_NW_1_1_000001_ResetCounts
@@ -24040,7 +24040,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WIFIDIAG_1_1_000001_ReadAttribute
@@ -24068,7 +24068,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -24077,7 +24077,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WNCV_1_1_000001_ReadAttribute
@@ -24266,7 +24266,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WNCV_2_1_000001_ReadAttribute
@@ -25824,7 +25824,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -25833,7 +25833,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WNCV_2_4_000001_ReadAttribute
@@ -25898,7 +25898,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WNCV_2_5_000001_ReadAttribute
@@ -25963,7 +25963,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"0: Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WNCV_3_1_000001_DownOrClose
@@ -26554,7 +26554,7 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
     XCTestExpectation * expectation = [self expectationWithDescription:@"0: Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WNCV_3_2_000001_UpOrOpen
@@ -27145,7 +27145,7 @@ ResponseHandler test_Test_TC_WNCV_3_2_OperationalStatus_Reported = nil;
     XCTestExpectation * expectation = [self expectationWithDescription:@"0: Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WNCV_3_3_000001_DownOrClose
@@ -27491,7 +27491,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestCluster_000001_Test
@@ -39884,7 +39884,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 NSNumber * _Nonnull TestAddArgumentDefaultValue;
@@ -42579,7 +42579,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestConstraints_000001_WriteAttribute
@@ -43105,7 +43105,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestDelayCommands_000001_WaitForMs
@@ -43122,7 +43122,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestDescriptorCluster_000001_ReadAttribute
@@ -43257,7 +43257,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestBasicInformation_000001_ReadAttribute
@@ -43403,7 +43403,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestGroupsCluster_000001_ViewGroup
@@ -43994,7 +43994,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestGroupKeyManagementCluster_000001_ReadAttribute
@@ -44493,7 +44493,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestIdentifyCluster_000001_Identify
@@ -44524,7 +44524,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestLogCommands_000001_Log
@@ -44549,7 +44549,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestOperationalCredentialsCluster_000001_ReadAttribute
@@ -44672,7 +44672,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestModeSelectCluster_000001_ReadAttribute
@@ -44877,7 +44877,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_SWDIAG_1_1_000001_ReadAttribute
@@ -44981,7 +44981,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_SWDIAG_3_1_000001_ResetWatermarks
@@ -45067,7 +45067,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestSubscribe_OnOff_000001_Off
