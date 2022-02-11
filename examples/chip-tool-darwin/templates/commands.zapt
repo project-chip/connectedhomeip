@@ -117,7 +117,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) ReadAttribute ({{asHex code 8}}) on endpoint %" PRIu16, endpointId);
 
-        {{! TODO: Various types (floats, structs) not supported here. }}
+        {{! TODO: Various types (structs) not supported here. }}
         {{#if (isStrEqual chipCallback.name "Unsupported")}}
         return CHIP_ERROR_NOT_IMPLEMENTED;
         {{else}}
@@ -191,7 +191,7 @@ private:
     {{else if (isOctetString type)}}
     chip::ByteSpan mValue;
     {{else if (isCharString type)}}
-    chip::ByteSpan mValue;
+    chip::CharSpan mValue;
     {{else}}
     {{chipType}} mValue;
     {{/if}}
