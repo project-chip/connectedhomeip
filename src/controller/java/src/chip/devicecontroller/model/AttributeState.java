@@ -1,3 +1,4 @@
+
 /*
  *   Copyright (c) 2022 Project CHIP Authors
  *   All rights reserved.
@@ -15,14 +16,27 @@
  *   limitations under the License.
  *
  */
-package chip.devicecontroller;
+package chip.devicecontroller.model;
 
-import chip.devicecontroller.model.ChipAttributePath;
-import chip.devicecontroller.model.NodeState;
+/** Represents the reported value of an attribute in object form AND TLV. */
+public final class AttributeState {
+  private Object valueObject;
+  private byte[] tlv;
 
-/** An interface for receiving read/subscribe CHIP reports. */
-public interface ReportCallback {
-  void onError(ChipAttributePath attributePath, Exception e);
+  public AttributeState(Object valueObject, byte[] tlv) {
+    this.valueObject = valueObject;
+    this.tlv = tlv;
+  }
 
-  void onReport(NodeState nodeState);
+  public Object getValue() {
+    return valueObject;
+  }
+
+  /** 
+   * Return a byte array containing the TLV for an attribute, wrapped within an 
+   * anonymous TLV tag.
+   */
+  public byte[] getTlv() {
+    return tlv;
+  }
 }
