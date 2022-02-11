@@ -168,7 +168,7 @@ int main(int argc, char * argv[])
                                      .SetAddressType(chip::Inet::IPAddressType::kIPv6));
     SuccessOrExit(err);
 
-    err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gTransportManager, &gMessageCounterManager);
+    err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gTransportManager, &gMessageCounterManager, &gStorage);
     SuccessOrExit(err);
 
     err = gExchangeManager.Init(&gSessionManager);
