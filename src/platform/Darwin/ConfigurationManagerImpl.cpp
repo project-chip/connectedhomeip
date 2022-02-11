@@ -194,20 +194,6 @@ CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform
     return WriteConfigValue(configKey, value);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::StoreCountryCode(const char * code, size_t codeLen)
-{
-    Platform::CopyString(mCountryCode, kCountryCodeLength + 1, code);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConfigurationManagerImpl::GetCountryCode(char * buf, size_t bufSize, size_t & codeLen)
-{
-    Platform::CopyString(buf, kCountryCodeLength + 1, mCountryCode);
-    codeLen = strlen(mCountryCode);
-
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, bool & val)
 {
     return PosixConfig::ReadConfigValue(key, val);
