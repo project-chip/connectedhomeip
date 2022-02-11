@@ -282,6 +282,7 @@ DEDEDEDE
 deepnote
 DelayedActionTime
 delayedActionTimeSec
+delayQuery
 demangle
 deployable
 depottools
@@ -828,6 +829,7 @@ protobuf
 protos
 Prover
 providerNodeId
+providerFabricIndex
 PRs
 PSCAN
 PSK
@@ -889,6 +891,7 @@ req
 Requestor
 Requestor's
 Requestors
+RequestorCanConsent
 responder
 retargeting
 reusability

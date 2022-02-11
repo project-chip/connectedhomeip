@@ -56,25 +56,19 @@ void OnStartDelayTimerHandler(Layer * systemLayer, void * appState);
 
 constexpr uint16_t kOptionProviderNodeId      = 'n';
 constexpr uint16_t kOptionProviderFabricIndex = 'f';
-constexpr uint16_t kOptionUdpPort             = 'u';
-constexpr uint16_t kOptionDiscriminator       = 'd';
 constexpr uint16_t kOptionDelayQuery          = 'q';
 constexpr uint16_t kOptionRequestorCanConsent = 'c';
 
 NodeId providerNodeId           = 0x0;
 FabricIndex providerFabricIndex = 1;
-uint16_t requestorSecurePort    = 0;
-uint16_t setupDiscriminator     = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR;
 uint16_t delayQueryTimeInSec    = 0;
 chip::Optional<bool> gRequestorCanConsent;
 
 OptionDef cmdLineOptionsDef[] = {
     { "providerNodeId", chip::ArgParser::kArgumentRequired, kOptionProviderNodeId },
     { "providerFabricIndex", chip::ArgParser::kArgumentRequired, kOptionProviderFabricIndex },
-    { "udpPort", chip::ArgParser::kArgumentRequired, kOptionUdpPort },
-    { "discriminator", chip::ArgParser::kArgumentRequired, kOptionDiscriminator },
     { "delayQuery", chip::ArgParser::kArgumentRequired, kOptionDelayQuery },
-    { "RequestorCanConsent", chip::ArgParser::kNoArgument, kOptionRequestorCanConsent },
+    { "requestorCanConsent", chip::ArgParser::kNoArgument, kOptionRequestorCanConsent },
     {},
 };
 
@@ -85,21 +79,14 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "  -f/--providerFabricIndex <fabric index>\n"
                              "        Fabric index of the OTA Provider to connect to. If none is specified, default value is 1.\n\n"
                              "        This assumes that you've already commissioned the OTA Provider node with chip-tool.\n"
-                             "  -u/--udpPort <UDP port number>\n"
-                             "        UDP Port that the OTA Requestor listens on for secure connections.\n"
-                             "  -d/--discriminator <discriminator>\n"
-                             "        A 12-bit value used to discern between multiple commissionable CHIP device\n"
-                             "        advertisements. If none is specified, default value is 3840.\n"
                              "  -q/--delayQuery <Time in seconds>\n"
                              "        From boot up, the amount of time to wait before triggering the QueryImage\n"
-                             "        command. If none or zero is supplied, QueryImage will not be triggered.\n"
-                             "  -c/--RequestorCanConsent\n"
-                             "        If provided, the RequestorCanConsent field of the QueryImage command is set to true.\n"
-                             "        Else, the value is determined by the driver.\n " };
+                             "        command. If none or zero is supplied, QueryImage will not be triggered automatically.\n"
+                             "  -c/--requestorCanConsent\n"
+                             "        If supplied, the RequestorCanConsent field of the QueryImage command is set to true.\n"
+                             "        Otherwise, the value is determined by the driver.\n " };
 
-HelpOptions helpOptions("ota-requestor-app", "Usage: ota-requestor-app [options]", "1.0");
-
-OptionSet * allOptions[] = { &cmdLineOptions, &helpOptions, nullptr };
+OptionSet * allOptions[] = { &cmdLineOptions, nullptr };
 
 static void InitOTARequestor(void)
 {
@@ -140,24 +127,6 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         if (kOptionProviderFabricIndex == 0)
         {
             PrintArgError("%s: Input ERROR: Fabric Index may not be zero\n", aProgram);
-            retval = false;
-        }
-        break;
-    case kOptionUdpPort:
-        requestorSecurePort = static_cast<uint16_t>(strtol(aValue, NULL, 0));
-
-        if (requestorSecurePort == 0)
-        {
-            PrintArgError("%s: Input ERROR: udpPort may not be zero\n", aProgram);
-            retval = false;
-        }
-        break;
-    case kOptionDiscriminator:
-        setupDiscriminator = static_cast<uint16_t>(strtol(aValue, NULL, 0));
-
-        if (setupDiscriminator > 0xFFF)
-        {
-            PrintArgError("%s: Input ERROR: setupDiscriminator value %s is out of range \n", aProgram, aValue);
             retval = false;
         }
         break;
