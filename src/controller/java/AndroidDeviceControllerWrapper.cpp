@@ -238,7 +238,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     setupParams.pairingDelegate                = wrapper.get();
     setupParams.operationalCredentialsDelegate = wrapper.get();
 
-    initParams.storageDelegate = setupParams.storageDelegate;
+    initParams.fabricIndependentStorage = setupParams.storageDelegate;
 
     wrapper->InitializeOperationalCredentialsIssuer();
 

@@ -50,9 +50,9 @@ CHIP_ERROR DeviceControllerFactory::Init(FactoryInitParams params)
         return CHIP_NO_ERROR;
     }
 
-    mListenPort    = params.listenPort;
-    mFabricStorage = params.fabricStorage;
-    mStorage       = params.storageDelegate;
+    mListenPort               = params.listenPort;
+    mFabricStorage            = params.fabricStorage;
+    mFabricIndependentStorage = params.fabricIndependentStorage;
 
     CHIP_ERROR err = InitSystemState(params);
 
@@ -72,7 +72,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState()
 #endif
     }
 
-    params.storageDelegate = mStorage;
+    params.fabricIndependentStorage = mFabricIndependentStorage;
 
     return InitSystemState(params);
 }
@@ -142,7 +142,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     ReturnErrorOnFailure(stateParams.fabricTable->Init(mFabricStorage));
 
     ReturnErrorOnFailure(stateParams.sessionMgr->Init(stateParams.systemLayer, stateParams.transportMgr,
-                                                      stateParams.messageCounterManager, params.storageDelegate));
+                                                      stateParams.messageCounterManager, params.fabricIndependentStorage));
     ReturnErrorOnFailure(stateParams.exchangeMgr->Init(stateParams.sessionMgr));
     ReturnErrorOnFailure(stateParams.messageCounterManager->Init(stateParams.exchangeMgr));
 
@@ -179,7 +179,6 @@ void DeviceControllerFactory::PopulateInitParams(ControllerInitParams & controll
 CHIP_ERROR DeviceControllerFactory::SetupController(SetupParams params, DeviceController & controller)
 {
     VerifyOrReturnError(mSystemState != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    mStorage = params.storageDelegate;
     ReturnErrorOnFailure(InitSystemState());
 
     ControllerInitParams controllerParams;
@@ -192,7 +191,6 @@ CHIP_ERROR DeviceControllerFactory::SetupController(SetupParams params, DeviceCo
 CHIP_ERROR DeviceControllerFactory::SetupCommissioner(SetupParams params, DeviceCommissioner & commissioner)
 {
     VerifyOrReturnError(mSystemState != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    mStorage = params.storageDelegate;
     ReturnErrorOnFailure(InitSystemState());
 
     CommissionerInitParams commissionerParams;
@@ -228,8 +226,8 @@ void DeviceControllerFactory::Shutdown()
         chip::Platform::Delete(mSystemState);
         mSystemState = nullptr;
     }
-    mFabricStorage = nullptr;
-    mStorage       = nullptr;
+    mFabricStorage            = nullptr;
+    mFabricIndependentStorage = nullptr;
 }
 
 CHIP_ERROR DeviceControllerSystemState::Shutdown()
