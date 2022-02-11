@@ -76,6 +76,14 @@ jobs:
                     qpg qpg6105+debug lighting-app \
                     out/lighting_app_debug/chip-qpg6105-lighting-example.out \
                     /tmp/bloat_reports/
+            - name: Build example QPG6105 Shell App
+              timeout-minutes: 5
+              run: |
+                  scripts/examples/gn_build_example.sh examples/shell/qpg out/shell_app_debug qpg_target_ic=\"qpg6105\"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    qpg qpg6105+debug shell-app \
+                    out/shell_app_debug/chip-qpg6105-shell-example.out \
+                    /tmp/bloat_reports/
             - name: Build example QPG6105 persistent-storage
               timeout-minutes: 5
               run: |
