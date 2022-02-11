@@ -196,6 +196,7 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier(testingRootStore));
 
         params.fabricStorage = _fabricStorage;
+        params.storageDelegate = _persistentStorageDelegateBridge;
         commissionerParams.storageDelegate = _persistentStorageDelegateBridge;
         commissionerParams.deviceAddressUpdateDelegate = _pairingDelegateBridge;
         commissionerParams.pairingDelegate = _pairingDelegateBridge;
