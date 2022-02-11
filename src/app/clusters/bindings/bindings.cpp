@@ -197,7 +197,6 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (!path.IsListOperation() || path.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
     {
-        printf("replace all\n");
         DecodableBindingListType newBindingList;
 
         ReturnErrorOnFailure(decoder.Decode(newBindingList));
@@ -257,7 +256,6 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
     }
     else if (path.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
-        printf("append\n");
         DecodableBindingListType newBindingList;
         TargetStructType target;
         ReturnErrorOnFailure(decoder.Decode(target));
