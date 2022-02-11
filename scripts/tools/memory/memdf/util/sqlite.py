@@ -20,6 +20,8 @@ import sqlite3
 
 from typing import List, Optional
 
+import pandas as pd  # type: ignore
+
 from memdf import Config, ConfigDescription
 
 CONFIG: ConfigDescription = {
@@ -29,7 +31,7 @@ CONFIG: ConfigDescription = {
     'database.file': {
         'help': 'Sqlite3 file',
         'metavar': 'FILENAME',
-        'default': ':memory:',
+        'default': None,
         'argparse': {
             'alias': ['--db'],
         },
@@ -112,3 +114,12 @@ class Database:
     def store_and_return_id(self, table: str, **kwargs) -> Optional[int]:
         self.store(table, **kwargs)
         return self.get_matching_id(table, **kwargs)
+
+    def data_frame(self, query, parameters=None) -> pd.DataFrame:
+        """Return the results of a query as a DataFrame."""
+        cur = self.execute(query, parameters)
+        columns = [i[0] for i in cur.description]
+        df = pd.DataFrame(cur.fetchall(), columns=columns)
+        self.commit()
+        df.attrs = {'title': query}
+        return df
