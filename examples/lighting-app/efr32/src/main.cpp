@@ -74,10 +74,6 @@
 #include "matter_shell.h"
 #endif
 
-#ifdef OTA_PERIODIC_TIMEOUT
-#define TIMEOUT OTA_PERIODIC_TIMEOUT
-#endif
-
 #define BLE_DEV_NAME "SiLabs-Light"
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -128,7 +124,6 @@ int main(void)
 #ifdef HEAP_MONITORING
     MemMonitoring::startHeapMonitoring();
 #endif
-    EFR32_LOG("timeout: %d", TIMEOUT);
     EFR32_LOG("==================================================");
     EFR32_LOG("chip-efr32-lighting-example starting");
     EFR32_LOG("==================================================");
