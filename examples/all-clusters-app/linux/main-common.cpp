@@ -19,12 +19,14 @@
 #include "include/tv-callbacks.h"
 #include <app-common/zap-generated/att-storage.h>
 #include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <lib/support/CHIPMem.h>
+#include <new>
 #include <platform/Linux/NetworkCommissioningDriver.h>
 #include <platform/PlatformManager.h>
 #include <system/SystemPacketBuffer.h>
@@ -92,17 +94,18 @@ namespace {
 // This file is being used by platforms other than Linux, so we need this check to disable related features since we only
 // implemented them on linux.
 #if CHIP_DEVICE_LAYER_TARGET_LINUX
-constexpr EndpointId kNetworkCommissioningEndpointForThread = 0;
-constexpr EndpointId kNetworkCommissioningEndpointForWiFi   = 1;
+constexpr EndpointId kNetworkCommissioningEndpointMain      = 0;
+constexpr EndpointId kNetworkCommissioningEndpointSecondary = 1;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 NetworkCommissioning::LinuxThreadDriver sLinuxThreadDriver;
-Clusters::NetworkCommissioning::Instance sThreadNetworkCommissioningInstance(kNetworkCommissioningEndpointForThread,
+Clusters::NetworkCommissioning::Instance sThreadNetworkCommissioningInstance(kNetworkCommissioningEndpointMain,
                                                                              &sLinuxThreadDriver);
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 NetworkCommissioning::LinuxWiFiDriver sLinuxWiFiDriver;
-Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(kNetworkCommissioningEndpointForWiFi, &sLinuxWiFiDriver);
+Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(kNetworkCommissioningEndpointSecondary,
+                                                                           &sLinuxWiFiDriver);
 #endif
 #endif // CHIP_DEVICE_LAYER_TARGET_LINUX
 } // namespace
@@ -110,32 +113,35 @@ Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(kNetw
 void ApplicationInit()
 {
 #if CHIP_DEVICE_LAYER_TARGET_LINUX && defined(ZCL_USING_LEVEL_CONTROL_CLUSTER_SERVER)
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_DEVICE_CONFIG_ENABLE_WPA
+    if (LinuxDeviceOptions::GetInstance().mThread && LinuxDeviceOptions::GetInstance().mWiFi)
+    {
+        sThreadNetworkCommissioningInstance.Init();
+        sWiFiNetworkCommissioningInstance.Init();
+    }
+    else
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    if (LinuxDeviceOptions::GetInstance().mThread)
+        if (LinuxDeviceOptions::GetInstance().mThread)
     {
         sThreadNetworkCommissioningInstance.Init();
     }
     else
 #endif
-    {
-        uint32_t nullFeatureMapValue = 0;
-        emberAfWriteAttribute(kNetworkCommissioningEndpointForThread, Clusters::NetworkCommissioning::Id,
-                              Clusters::NetworkCommissioning::Attributes::FeatureMap::Id, CLUSTER_MASK_SERVER,
-                              reinterpret_cast<uint8_t *>(&nullFeatureMapValue), ZCL_INT32U_ATTRIBUTE_TYPE);
-    }
-
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    if (LinuxDeviceOptions::GetInstance().mWiFi)
+        if (LinuxDeviceOptions::GetInstance().mWiFi)
     {
+        // If we only enable WiFi on this device, "move" WiFi instance to main NetworkCommissioning cluster endpoint.
+        sWiFiNetworkCommissioningInstance.~Instance();
+        new (&sWiFiNetworkCommissioningInstance)
+            Clusters::NetworkCommissioning::Instance(kNetworkCommissioningEndpointMain, &sLinuxWiFiDriver);
         sWiFiNetworkCommissioningInstance.Init();
     }
     else
 #endif
     {
-        uint32_t nullFeatureMapValue = 0;
-        emberAfWriteAttribute(kNetworkCommissioningEndpointForWiFi, Clusters::NetworkCommissioning::Id,
-                              Clusters::NetworkCommissioning::Attributes::FeatureMap::Id, CLUSTER_MASK_SERVER,
-                              reinterpret_cast<uint8_t *>(&nullFeatureMapValue), ZCL_INT32U_ATTRIBUTE_TYPE);
+        Clusters::NetworkCommissioning::Attributes::FeatureMap::Set(kNetworkCommissioningEndpointMain, 0);
+        Clusters::NetworkCommissioning::Attributes::FeatureMap::Set(kNetworkCommissioningEndpointSecondary, 0);
     }
 #endif // CHIP_DEVICE_LAYER_TARGET_LINUX
 }
