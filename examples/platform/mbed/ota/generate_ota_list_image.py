@@ -52,9 +52,9 @@ def CreateOtaListFile(config, imagePath):
     data = json.loads(FILE_DATA_TEMPLATE)
 
     data["deviceSoftwareVersionModel"][0]["vendorId"] = int(
-        config["config"]["vendor-id"]["value"])
+        config["config"]["vendor-id"]["value"], base=16)
     data["deviceSoftwareVersionModel"][0]["productId"] = int(
-        config["config"]["product-id"]["value"])
+        config["config"]["product-id"]["value"], base=16)
     data["deviceSoftwareVersionModel"][0]["softwareVersion"] = int(
         config["config"]["version-number"]["value"])
     data["deviceSoftwareVersionModel"][0]["softwareVersionString"] = config[
