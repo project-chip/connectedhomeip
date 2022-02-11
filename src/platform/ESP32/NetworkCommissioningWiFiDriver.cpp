@@ -161,7 +161,8 @@ void ESPWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callbac
 
     VerifyOrExit(NetworkMatch(mStagingNetwork, networkId), networkingStatus = Status::kNetworkIDNotFound);
     VerifyOrExit(mpConnectCallback == nullptr, networkingStatus = Status::kUnknownError);
-    ChipLogProgress(NetworkProvisioning, "ESP NetworkCommissioningDelegate: SSID: %s", networkId.data());
+    ChipLogProgress(NetworkProvisioning, "ESP NetworkCommissioningDelegate: SSID: %.*s", static_cast<int>(networkId.size()),
+                    networkId.data());
 
     err               = ConnectWiFiNetwork(reinterpret_cast<const char *>(mStagingNetwork.ssid), mStagingNetwork.ssidLen,
                              reinterpret_cast<const char *>(mStagingNetwork.credentials), mStagingNetwork.credentialsLen);
