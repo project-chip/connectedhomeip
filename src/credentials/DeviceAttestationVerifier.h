@@ -198,23 +198,35 @@ public:
     DeviceAttestationVerifier(const DeviceAttestationVerifier &) = delete;
     DeviceAttestationVerifier & operator=(const DeviceAttestationVerifier &) = delete;
 
+    struct AttestationInfo
+    {
+        AttestationInfo(const ByteSpan & attestationElementsBuffer, const ByteSpan & attestationChallengeBuffer,
+                        const ByteSpan & attestationSignatureBuffer, const ByteSpan & paiDerBuffer, const ByteSpan & dacDerBuffer,
+                        const ByteSpan & attestationNonce, VendorId vendorId, uint16_t productId) :
+            mAttestationElementsBuffer(attestationElementsBuffer),
+            mAttestationChallengeBuffer(attestationChallengeBuffer), mAttestationSignatureBuffer(attestationSignatureBuffer),
+            mPaiDerBuffer(paiDerBuffer), mDacDerBuffer(dacDerBuffer), mAttestationNonce(attestationNonce), mVendorId(vendorId),
+            mProductId(productId)
+        {}
+        const ByteSpan &
+            mAttestationElementsBuffer; // Buffer containing attestation elements portion of Attestation Response (raw TLV)
+        const ByteSpan & mAttestationChallengeBuffer; // Buffer containing the attestation challenge from the secure session
+        const ByteSpan & mAttestationSignatureBuffer; // Buffer the signature portion of Attestation Response
+        const ByteSpan & mPaiDerBuffer;               // Buffer containing the PAI certificate from device in DER format.
+        const ByteSpan & mDacDerBuffer;               // Buffer containing the DAC certificate from device in DER format.
+        const ByteSpan & mAttestationNonce;           // Buffer containing attestation nonce.
+        VendorId mVendorId;
+        uint16_t mProductId;
+    };
+
     /**
      * @brief Verify an attestation information payload against a DAC/PAI chain.
      *
-     * @param[in] attestationInfoBuffer Buffer containing attestation information portion of Attestation Response (raw TLV)
-     * @param[in] attestationChallengeBuffer Buffer containing the attestation challenge from the secure session
-     * @param[in] attestationSignatureBuffer Buffer the signature portion of Attestation Response
-     * @param[in] paiDerBuffer Buffer containing the PAI certificate from device in DER format.
-     *                                If length zero, there was no PAI certificate.
-     * @param[in] dacDerBuffer Buffer containing the DAC certificate from device in DER format.
-     * @param[in] attestationNonce Buffer containing attestation nonce.
+     * @param[in] attestationInfo All of the information required to verify the attestation.
      * @param[in] onCompletion Callback handler to provide Attestation Information Verification result to the caller of
      *                         VerifyAttestationInformation()
      */
-    virtual void VerifyAttestationInformation(const ByteSpan & attestationInfoBuffer, const ByteSpan & attestationChallengeBuffer,
-                                              const ByteSpan & attestationSignatureBuffer, const ByteSpan & paiDerBuffer,
-                                              const ByteSpan & dacDerBuffer, const ByteSpan & attestationNonce, VendorId vendorId,
-                                              uint16_t productId,
+    virtual void VerifyAttestationInformation(const AttestationInfo & info,
                                               Callback::Callback<OnAttestationInformationVerification> * onCompletion) = 0;
 
     /**
