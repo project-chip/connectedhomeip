@@ -75,8 +75,7 @@ void CASESessionManager::ReleaseSessionForFabric(CompressedFabricId compressedFa
 CHIP_ERROR CASESessionManager::ResolveDeviceAddress(FabricInfo * fabric, NodeId nodeId)
 {
     VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    return mConfig.dnsResolver->ResolveNodeId(fabric->GetPeerIdForNode(nodeId), Inet::IPAddressType::kAny,
-                                              Dnssd::Resolver::CacheBypass::On);
+    return mConfig.dnsResolver->ResolveNodeId(fabric->GetPeerIdForNode(nodeId), Inet::IPAddressType::kAny);
 }
 
 void CASESessionManager::OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeData)

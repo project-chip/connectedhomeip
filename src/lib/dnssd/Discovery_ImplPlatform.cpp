@@ -550,11 +550,10 @@ CHIP_ERROR DiscoveryImplPlatform::FinalizeServiceUpdate()
     return ChipDnssdFinalizeServiceUpdate();
 }
 
-CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type,
-                                                Resolver::CacheBypass dnssdCacheBypass)
+CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
 {
     ReturnErrorOnFailure(InitImpl());
-    return mResolverProxy.ResolveNodeId(peerId, type, dnssdCacheBypass);
+    return mResolverProxy.ResolveNodeId(peerId, type);
 }
 
 bool DiscoveryImplPlatform::ResolveNodeIdFromInternalCache(const PeerId & peerId, Inet::IPAddressType type)
@@ -593,7 +592,7 @@ Resolver & chip::Dnssd::Resolver::Instance()
     return DiscoveryImplPlatform::GetInstance();
 }
 
-CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type, Resolver::CacheBypass dnssdCacheBypass)
+CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
 {
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     mDelegate->Retain();

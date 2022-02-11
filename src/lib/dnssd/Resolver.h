@@ -321,11 +321,6 @@ public:
 class Resolver
 {
 public:
-    enum class CacheBypass
-    {
-        On, // TEMPORARY migration helper: the only option for cache bypass is ON, used in many places
-    };
-
     virtual ~Resolver() {}
 
     /**
@@ -356,7 +351,7 @@ public:
      * the result of the operation is passed to the delegate's `OnNodeIdResolved` or
      * `OnNodeIdResolutionFailed` method, respectively.
      */
-    virtual CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type, Resolver::CacheBypass dnssdCacheBypass) = 0;
+    virtual CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) = 0;
 
     /**
      * Explicit attempt to resolve a NodeID without performing network operations.
