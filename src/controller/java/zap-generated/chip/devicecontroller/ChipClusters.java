@@ -21048,6 +21048,46 @@ public class ChipClusters {
         DefaultClusterCallback Callback,
         @Nullable Integer timedInvokeTimeoutMs);
 
+    public interface BssidAttributeCallback {
+      void onSuccess(@Nullable byte[] value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface SecurityTypeAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface WiFiVersionAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface ChannelNumberAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface RssiAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
     public interface ServerGeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
@@ -21072,48 +21112,48 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public void readBssidAttribute(OctetStringAttributeCallback callback) {
+    public void readBssidAttribute(BssidAttributeCallback callback) {
       readBssidAttribute(chipClusterPtr, callback);
     }
 
     public void subscribeBssidAttribute(
-        OctetStringAttributeCallback callback, int minInterval, int maxInterval) {
+        BssidAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeBssidAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readSecurityTypeAttribute(IntegerAttributeCallback callback) {
+    public void readSecurityTypeAttribute(SecurityTypeAttributeCallback callback) {
       readSecurityTypeAttribute(chipClusterPtr, callback);
     }
 
     public void subscribeSecurityTypeAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        SecurityTypeAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeSecurityTypeAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readWiFiVersionAttribute(IntegerAttributeCallback callback) {
+    public void readWiFiVersionAttribute(WiFiVersionAttributeCallback callback) {
       readWiFiVersionAttribute(chipClusterPtr, callback);
     }
 
     public void subscribeWiFiVersionAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        WiFiVersionAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeWiFiVersionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readChannelNumberAttribute(IntegerAttributeCallback callback) {
+    public void readChannelNumberAttribute(ChannelNumberAttributeCallback callback) {
       readChannelNumberAttribute(chipClusterPtr, callback);
     }
 
     public void subscribeChannelNumberAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        ChannelNumberAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeChannelNumberAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readRssiAttribute(IntegerAttributeCallback callback) {
+    public void readRssiAttribute(RssiAttributeCallback callback) {
       readRssiAttribute(chipClusterPtr, callback);
     }
 
     public void subscribeRssiAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        RssiAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeRssiAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -21238,37 +21278,42 @@ public class ChipClusters {
       subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    private native void readBssidAttribute(
-        long chipClusterPtr, OctetStringAttributeCallback callback);
+    private native void readBssidAttribute(long chipClusterPtr, BssidAttributeCallback callback);
 
     private native void subscribeBssidAttribute(
+        long chipClusterPtr, BssidAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readSecurityTypeAttribute(
+        long chipClusterPtr, SecurityTypeAttributeCallback callback);
+
+    private native void subscribeSecurityTypeAttribute(
         long chipClusterPtr,
-        OctetStringAttributeCallback callback,
+        SecurityTypeAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readSecurityTypeAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
-
-    private native void subscribeSecurityTypeAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
-
     private native void readWiFiVersionAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, WiFiVersionAttributeCallback callback);
 
     private native void subscribeWiFiVersionAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr,
+        WiFiVersionAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
     private native void readChannelNumberAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, ChannelNumberAttributeCallback callback);
 
     private native void subscribeChannelNumberAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr,
+        ChannelNumberAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
-    private native void readRssiAttribute(long chipClusterPtr, IntegerAttributeCallback callback);
+    private native void readRssiAttribute(long chipClusterPtr, RssiAttributeCallback callback);
 
     private native void subscribeRssiAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr, RssiAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readBeaconLostCountAttribute(
         long chipClusterPtr, LongAttributeCallback callback);

@@ -12380,8 +12380,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSData * _Nonnull value;
-            value = [NSData dataWithBytes:cppValue.data() length:cppValue.size()];
+            NSData * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSData dataWithBytes:cppValue.Value().data() length:cppValue.Value().size()];
+            }
             return value;
         }
         case Attributes::SecurityType::Id: {
@@ -12391,8 +12395,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value())];
+            }
             return value;
         }
         case Attributes::WiFiVersion::Id: {
@@ -12402,8 +12410,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value())];
+            }
             return value;
         }
         case Attributes::ChannelNumber::Id: {
@@ -12413,8 +12425,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::Rssi::Id: {
@@ -12424,8 +12440,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithChar:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithChar:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::BeaconLostCount::Id: {

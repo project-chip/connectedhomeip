@@ -15710,7 +15710,7 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)writeAttributeBssidWithValue:(NSData * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeBssidWithValue:(NSData * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -15721,14 +15721,19 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = WiFiNetworkDiagnostics::Attributes::Bssid::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = [self asByteSpan:value];
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = [self asByteSpan:value];
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)writeAttributeSecurityTypeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeSecurityTypeWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -15739,14 +15744,19 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = WiFiNetworkDiagnostics::Attributes::SecurityType::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedCharValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(value.unsignedCharValue);
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)writeAttributeWiFiVersionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeWiFiVersionWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -15757,14 +15767,19 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = WiFiNetworkDiagnostics::Attributes::WiFiVersion::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedCharValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(value.unsignedCharValue);
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)writeAttributeChannelNumberWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeChannelNumberWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -15775,14 +15790,19 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = WiFiNetworkDiagnostics::Attributes::ChannelNumber::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.unsignedShortValue;
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)writeAttributeRssiWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeRssiWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -15793,7 +15813,12 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = WiFiNetworkDiagnostics::Attributes::Rssi::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.charValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.charValue;
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);

@@ -15536,10 +15536,17 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            jbyteArray valueByteArray = env->NewByteArray(static_cast<jsize>(cppValue.size()));
-            env->SetByteArrayRegion(valueByteArray, 0, static_cast<jsize>(cppValue.size()),
-                                    reinterpret_cast<const jbyte *>(cppValue.data()));
-            value = valueByteArray;
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                jbyteArray valueByteArray = env->NewByteArray(static_cast<jsize>(cppValue.Value().size()));
+                env->SetByteArrayRegion(valueByteArray, 0, static_cast<jsize>(cppValue.Value().size()),
+                                        reinterpret_cast<const jbyte *>(cppValue.Value().data()));
+                value = valueByteArray;
+            }
             return value;
         }
         case Attributes::SecurityType::Id: {
@@ -15551,10 +15558,17 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            std::string valueClassName     = "java/lang/Integer";
-            std::string valueCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue, value);
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Integer";
+                std::string valueCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                              static_cast<uint8_t>(cppValue.Value()), value);
+            }
             return value;
         }
         case Attributes::WiFiVersion::Id: {
@@ -15566,10 +15580,17 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            std::string valueClassName     = "java/lang/Integer";
-            std::string valueCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue, value);
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Integer";
+                std::string valueCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                              static_cast<uint8_t>(cppValue.Value()), value);
+            }
             return value;
         }
         case Attributes::ChannelNumber::Id: {
@@ -15581,10 +15602,17 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            std::string valueClassName     = "java/lang/Integer";
-            std::string valueCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue, value);
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Integer";
+                std::string valueCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                               cppValue.Value(), value);
+            }
             return value;
         }
         case Attributes::Rssi::Id: {
@@ -15596,10 +15624,17 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            std::string valueClassName     = "java/lang/Integer";
-            std::string valueCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<int8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                         cppValue, value);
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Integer";
+                std::string valueCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<int8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                             cppValue.Value(), value);
+            }
             return value;
         }
         case Attributes::BeaconLostCount::Id: {

@@ -1884,28 +1884,42 @@ namespace WiFiNetworkDiagnostics {
 namespace Attributes {
 
 namespace Bssid {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan value); // octet_string
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableByteSpan> & value); // octet_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value);
 } // namespace Bssid
 
 namespace SecurityType {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::SecurityType> & value); // SecurityType
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::WiFiNetworkDiagnostics::SecurityType value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint,
+                  const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::SecurityType> & value);
 } // namespace SecurityType
 
 namespace WiFiVersion {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionType> & value); // WiFiVersionType
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionType value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint,
+                  const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionType> & value);
 } // namespace WiFiVersion
 
 namespace ChannelNumber {
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value);
 } // namespace ChannelNumber
 
 namespace Rssi {
-EmberAfStatus Get(chip::EndpointId endpoint, int8_t * value); // int8s
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int8_t> & value); // int8s
 EmberAfStatus Set(chip::EndpointId endpoint, int8_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int8_t> & value);
 } // namespace Rssi
 
 namespace BeaconLostCount {

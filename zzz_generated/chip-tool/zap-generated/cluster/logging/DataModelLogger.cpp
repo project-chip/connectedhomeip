@@ -9528,27 +9528,27 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case WiFiNetworkDiagnostics::Attributes::Bssid::Id: {
-            chip::ByteSpan value;
+            chip::app::DataModel::Nullable<chip::ByteSpan> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("bssid", 1, value);
         }
         case WiFiNetworkDiagnostics::Attributes::SecurityType::Id: {
-            uint8_t value;
+            chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::SecurityType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SecurityType", 1, value);
         }
         case WiFiNetworkDiagnostics::Attributes::WiFiVersion::Id: {
-            uint8_t value;
+            chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("WiFiVersion", 1, value);
         }
         case WiFiNetworkDiagnostics::Attributes::ChannelNumber::Id: {
-            uint16_t value;
+            chip::app::DataModel::Nullable<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ChannelNumber", 1, value);
         }
         case WiFiNetworkDiagnostics::Attributes::Rssi::Id: {
-            int8_t value;
+            chip::app::DataModel::Nullable<int8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Rssi", 1, value);
         }

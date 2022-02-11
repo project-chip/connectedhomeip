@@ -118,6 +118,7 @@ CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, const Nullable<X> & x)
     {
         return writer.PutNull(tag);
     }
+
     // Allow sending invalid values for nullables when
     // CONFIG_IM_BUILD_FOR_UNIT_TEST is true, so we can test how the other side
     // responds.
@@ -127,7 +128,16 @@ CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, const Nullable<X> & x)
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
 #endif // !CONFIG_IM_BUILD_FOR_UNIT_TEST
+
+    // The -Wmaybe-uninitialized warning gets confused about the fact
+    // that x.mValue is always initialized if x.IsNull() is not
+    // true, so suppress it for our access to x.Value().
+#pragma GCC diagnostic push
+#if !defined(__clang__)
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif // !defined(__clang__)
     return Encode(writer, tag, x.Value());
+#pragma GCC diagnostic pop
 }
 
 } // namespace DataModel
