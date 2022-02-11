@@ -59,12 +59,14 @@ constexpr uint16_t kOptionProviderFabricIndex = 'f';
 constexpr uint16_t kOptionUdpPort             = 'u';
 constexpr uint16_t kOptionDiscriminator       = 'd';
 constexpr uint16_t kOptionDelayQuery          = 'q';
+constexpr uint16_t kOptionRequestorCanConsent = 'c';
 
 NodeId providerNodeId           = 0x0;
 FabricIndex providerFabricIndex = 1;
 uint16_t requestorSecurePort    = 0;
 uint16_t setupDiscriminator     = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR;
 uint16_t delayQueryTimeInSec    = 0;
+chip::Optional<bool> gRequestorCanConsent;
 
 OptionDef cmdLineOptionsDef[] = {
     { "providerNodeId", chip::ArgParser::kArgumentRequired, kOptionProviderNodeId },
@@ -72,6 +74,7 @@ OptionDef cmdLineOptionsDef[] = {
     { "udpPort", chip::ArgParser::kArgumentRequired, kOptionUdpPort },
     { "discriminator", chip::ArgParser::kArgumentRequired, kOptionDiscriminator },
     { "delayQuery", chip::ArgParser::kArgumentRequired, kOptionDelayQuery },
+    { "RequestorCanConsent", chip::ArgParser::kNoArgument, kOptionRequestorCanConsent },
     {},
 };
 
@@ -89,7 +92,10 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "        advertisements. If none is specified, default value is 3840.\n"
                              "  -q/--delayQuery <Time in seconds>\n"
                              "        From boot up, the amount of time to wait before triggering the QueryImage\n"
-                             "        command. If none or zero is supplied, QueryImage will not be triggered.\n" };
+                             "        command. If none or zero is supplied, QueryImage will not be triggered.\n"
+                             "  -c/--RequestorCanConsent\n"
+                             "        If provided, the RequestorCanConsent field of the QueryImage command is set to true.\n"
+                             "        Else, the value is determined by the driver.\n " };
 
 HelpOptions helpOptions("ota-requestor-app", "Usage: ota-requestor-app [options]", "1.0");
 
@@ -158,6 +164,9 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
     case kOptionDelayQuery:
         delayQueryTimeInSec = static_cast<uint16_t>(strtol(aValue, NULL, 0));
         break;
+    case kOptionRequestorCanConsent:
+        gRequestorCanConsent.SetValue(true);
+        break;
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
         retval = false;
@@ -170,6 +179,11 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
 void ApplicationInit()
 {
     chip::Dnssd::Resolver::Instance().Init(chip::DeviceLayer::UDPEndPointManager());
+
+    if (gRequestorCanConsent.HasValue())
+    {
+        gRequestorCore.SetRequestorCanConsent(gRequestorCanConsent.Value());
+    }
 
     // Initialize all OTA download components
     InitOTARequestor();
