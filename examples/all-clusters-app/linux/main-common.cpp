@@ -17,6 +17,8 @@
  */
 
 #include "include/tv-callbacks.h"
+#include <app-common/zap-generated/att-storage.h>
+#include <app-common/zap-generated/attribute-type.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
@@ -28,6 +30,8 @@
 #include <system/SystemPacketBuffer.h>
 #include <transport/SessionManager.h>
 #include <transport/raw/PeerAddress.h>
+
+#include <Options.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -88,27 +92,52 @@ namespace {
 // This file is being used by platforms other than Linux, so we need this check to disable related features since we only
 // implemented them on linux.
 #if CHIP_DEVICE_LAYER_TARGET_LINUX
+constexpr EndpointId kNetworkCommissioningEndpointForThread = 0;
+constexpr EndpointId kNetworkCommissioningEndpointForWiFi   = 1;
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 NetworkCommissioning::LinuxThreadDriver sLinuxThreadDriver;
-Clusters::NetworkCommissioning::Instance sThreadNetworkCommissioningInstance(0 /* Endpoint Id */, &sLinuxThreadDriver);
+Clusters::NetworkCommissioning::Instance sThreadNetworkCommissioningInstance(kNetworkCommissioningEndpointForThread,
+                                                                             &sLinuxThreadDriver);
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 NetworkCommissioning::LinuxWiFiDriver sLinuxWiFiDriver;
-Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(1 /* Endpoint Id */, &sLinuxWiFiDriver);
+Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(kNetworkCommissioningEndpointForWiFi, &sLinuxWiFiDriver);
 #endif
-#endif
+#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
 } // namespace
 
 void ApplicationInit()
 {
 #if CHIP_DEVICE_LAYER_TARGET_LINUX && defined(ZCL_USING_LEVEL_CONTROL_CLUSTER_SERVER)
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    sThreadNetworkCommissioningInstance.Init();
+    if (LinuxDeviceOptions::GetInstance().mThread)
+    {
+        sThreadNetworkCommissioningInstance.Init();
+    }
+    else
 #endif
+    {
+        uint32_t nullFeatureMapValue = 0;
+        emberAfWriteAttribute(kNetworkCommissioningEndpointForThread, Clusters::NetworkCommissioning::Id,
+                              Clusters::NetworkCommissioning::Attributes::FeatureMap::Id, CLUSTER_MASK_SERVER,
+                              reinterpret_cast<uint8_t *>(&nullFeatureMapValue), ZCL_INT32U_ATTRIBUTE_TYPE);
+    }
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    sWiFiNetworkCommissioningInstance.Init();
+    if (LinuxDeviceOptions::GetInstance().mWiFi)
+    {
+        sWiFiNetworkCommissioningInstance.Init();
+    }
+    else
 #endif
-#endif
+    {
+        uint32_t nullFeatureMapValue = 0;
+        emberAfWriteAttribute(kNetworkCommissioningEndpointForWiFi, Clusters::NetworkCommissioning::Id,
+                              Clusters::NetworkCommissioning::Attributes::FeatureMap::Id, CLUSTER_MASK_SERVER,
+                              reinterpret_cast<uint8_t *>(&nullFeatureMapValue), ZCL_INT32U_ATTRIBUTE_TYPE);
+    }
+#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
 }
 
 void emberAfLowPowerClusterInitCallback(EndpointId endpoint)
