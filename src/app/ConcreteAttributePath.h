@@ -111,6 +111,10 @@ struct ConcreteDataAttributePath : public ConcreteAttributePath
         ConcreteAttributePath(aEndpointId, aClusterId, aAttributeId)
     {}
 
+    ConcreteDataAttributePath(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId, DataVersion aDataVersion) :
+        ConcreteAttributePath(aEndpointId, aClusterId, aAttributeId), mDataVersion(aDataVersion)
+    {}
+
     ConcreteDataAttributePath(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId, ListOperation aListOp,
                               uint16_t aListIndex) :
         ConcreteAttributePath(aEndpointId, aClusterId, aAttributeId)
@@ -126,8 +130,9 @@ struct ConcreteDataAttributePath : public ConcreteAttributePath
     // This index is only valid if `mListOp` is set to a list item operation, i.e
     // ReplaceItem, DeleteItem or AppendItem. Otherwise, it is to be ignored.
     //
-    uint16_t mListIndex   = 0;
-    ListOperation mListOp = ListOperation::NotList;
+    uint16_t mListIndex      = 0;
+    ListOperation mListOp    = ListOperation::NotList;
+    DataVersion mDataVersion = 0;
 };
 
 } // namespace app

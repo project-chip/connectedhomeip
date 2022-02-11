@@ -39,7 +39,7 @@ private:
 {{#chip_client_clusters}}
 {{#chip_server_cluster_attributes}}
 {{#unless (isStrEqual chipCallback.name "Unsupported")}}
-{{#if_in_global_responses}}
+{{#if_basic_global_response}}
 {{else}}
 class CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback : public chip::Callback::Callback<CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallbackType>
 {
@@ -65,7 +65,7 @@ private:
     jobject javaCallbackRef;
     bool keepAlive;
 };
-{{/if_in_global_responses}}
+{{/if_basic_global_response}}
 
 {{/unless}}
 {{/chip_server_cluster_attributes}}

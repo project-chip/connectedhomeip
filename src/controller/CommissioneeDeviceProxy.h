@@ -156,8 +156,6 @@ public:
      *   Called when the associated session is released
      *
      *   The receiver should release all resources associated with the connection.
-     *
-     * @param session A handle to the secure session
      */
     void OnSessionReleased() override;
 

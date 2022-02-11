@@ -72,7 +72,7 @@ class NetworkCommissioningTests:
             (endpointId, Clusters.NetworkCommissioning.Attributes.FeatureMap)],
             returnClusterObject=True)
         self.log_interface_basic_info(
-            res[endpointId][Clusters.NetworkCommissioning])
+            res[0][endpointId][Clusters.NetworkCommissioning])
         logger.info(f"Finished getting basic information of the endpoint")
 
         # Scan networks
@@ -87,7 +87,7 @@ class NetworkCommissioningTests:
         # Remove existing network
         logger.info(f"Check network list")
         res = await self._devCtrl.ReadAttribute(nodeid=self._nodeid, attributes=[(endpointId, Clusters.NetworkCommissioning.Attributes.Networks)], returnClusterObject=True)
-        networkList = res[endpointId][Clusters.NetworkCommissioning].networks
+        networkList = res[0][endpointId][Clusters.NetworkCommissioning].networks
         logger.info(f"Got network list: {networkList}")
         if len(networkList) != 0:
             logger.info(f"Removing existing network")
@@ -110,7 +110,7 @@ class NetworkCommissioningTests:
 
         logger.info(f"Check network list")
         res = await self._devCtrl.ReadAttribute(nodeid=self._nodeid, attributes=[(endpointId, Clusters.NetworkCommissioning.Attributes.Networks)], returnClusterObject=True)
-        networkList = res[endpointId][Clusters.NetworkCommissioning].networks
+        networkList = res[0][endpointId][Clusters.NetworkCommissioning].networks
         logger.info(f"Got network list: {networkList}")
         if len(networkList) != 1:
             raise AssertionError(
@@ -133,7 +133,7 @@ class NetworkCommissioningTests:
 
         logger.info(f"Check network is connected")
         res = await self._devCtrl.ReadAttribute(nodeid=self._nodeid, attributes=[(endpointId, Clusters.NetworkCommissioning.Attributes.Networks)], returnClusterObject=True)
-        networkList = res[endpointId][Clusters.NetworkCommissioning].networks
+        networkList = res[0][endpointId][Clusters.NetworkCommissioning].networks
         logger.info(f"Got network list: {networkList}")
         if len(networkList) != 1:
             raise AssertionError(
@@ -156,7 +156,7 @@ class NetworkCommissioningTests:
             (endpointId, Clusters.NetworkCommissioning.Attributes.FeatureMap)],
             returnClusterObject=True)
         self.log_interface_basic_info(
-            res[endpointId][Clusters.NetworkCommissioning])
+            res[0][endpointId][Clusters.NetworkCommissioning])
         logger.info(f"Finished getting basic information of the endpoint")
 
         # Scan networks
@@ -171,7 +171,7 @@ class NetworkCommissioningTests:
         # Remove existing network
         logger.info(f"Check network list")
         res = await self._devCtrl.ReadAttribute(nodeid=self._nodeid, attributes=[(endpointId, Clusters.NetworkCommissioning.Attributes.Networks)], returnClusterObject=True)
-        networkList = res[endpointId][Clusters.NetworkCommissioning].networks
+        networkList = res[0][endpointId][Clusters.NetworkCommissioning].networks
         logger.info(f"Got network list: {networkList}")
         if len(networkList) != 0:
             logger.info(f"Removing existing network")
@@ -194,7 +194,7 @@ class NetworkCommissioningTests:
 
         logger.info(f"Check network list")
         res = await self._devCtrl.ReadAttribute(nodeid=self._nodeid, attributes=[(endpointId, Clusters.NetworkCommissioning.Attributes.Networks)], returnClusterObject=True)
-        networkList = res[endpointId][Clusters.NetworkCommissioning].networks
+        networkList = res[0][endpointId][Clusters.NetworkCommissioning].networks
         logger.info(f"Got network list: {networkList}")
         if len(networkList) != 1:
             raise AssertionError(
@@ -233,6 +233,7 @@ class NetworkCommissioningTests:
         try:
             endpoints = await self._devCtrl.ReadAttribute(nodeid=self._nodeid, attributes=[(Clusters.NetworkCommissioning.Attributes.FeatureMap)], returnClusterObject=True)
             logger.info(endpoints)
+            endpoints = endpoints[0]
             for endpoint, obj in endpoints.items():
                 clus = obj[Clusters.NetworkCommissioning]
                 if clus.featureMap == WIFI_NETWORK_FEATURE_MAP:

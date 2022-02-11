@@ -47,10 +47,8 @@ namespace chip {
 
 extern const char * kSpake2pI2RSessionInfo;
 extern const char * kSpake2pR2ISessionInfo;
-extern const char * kSpake2pKeyExchangeSalt;
 
 constexpr uint16_t kPBKDFParamRandomNumberSize = 32;
-constexpr uint32_t kSpake2p_Iteration_Count    = 100;
 
 // Specifications section 3.9. Password-Based Key Derivation Function
 constexpr uint32_t kPBKDFMinimumIterations = 1000;
@@ -59,7 +57,8 @@ constexpr uint32_t kPBKDFMinimumSaltLen    = 16;
 constexpr uint32_t kPBKDFMaximumSaltLen    = 32;
 
 // Specifications section 5.1.1.6
-constexpr uint32_t kSetupPINCodeMaximumValue = 99999998;
+constexpr uint32_t kSetupPINCodeMaximumValue   = 99999998;
+constexpr uint32_t kSetupPINCodeUndefinedValue = 0;
 
 using namespace Crypto;
 
@@ -109,21 +108,6 @@ public:
     // TODO: The SetPeerNodeId method should not be exposed; PASE sessions
     // should not need to be told their peer node ID
     using PairingSession::SetPeerNodeId;
-
-    /**
-     * @brief
-     *   Initialize using setup PIN code and wait for pairing requests.
-     *
-     * @param mySetUpPINCode  Setup PIN code of the local device
-     * @param pbkdf2IterCount Iteration count for PBKDF2 function
-     * @param salt            Salt to be used for SPAKE2P operation
-     * @param mySessionId     Session ID to be assigned to the secure session on the peer node
-     * @param delegate        Callback object
-     *
-     * @return CHIP_ERROR     The result of initialization
-     */
-    CHIP_ERROR WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const ByteSpan & salt, uint16_t mySessionId,
-                              Optional<ReliableMessageProtocolConfig> mrpConfig, SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief

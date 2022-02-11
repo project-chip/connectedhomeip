@@ -56,17 +56,6 @@ void TestCommand::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHI
     command->ContinueOnChipMainThread();
 }
 
-void TestCommand::OnWaitForMsFn(chip::System::Layer * systemLayer, void * context)
-{
-    auto * command = static_cast<TestCommand *>(context);
-    command->NextTest();
-}
-
-CHIP_ERROR TestCommand::Wait(chip::System::Clock::Timeout duration)
-{
-    return chip::DeviceLayer::SystemLayer().StartTimer(duration, OnWaitForMsFn, this);
-}
-
 void TestCommand::Exit(std::string message)
 {
     ChipLogError(chipTool, " ***** Test Failure: %s\n", message.c_str());

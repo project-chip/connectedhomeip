@@ -42,8 +42,21 @@ const WaitForCommissionee = {
   response : { arguments : [] }
 };
 
-const name     = 'DelayCommands';
-const commands = [ WaitForMs, WaitForCommissioning, WaitForCommissionee ];
+const WaitForCommissionableAdvertisement = {
+  name : 'WaitForCommissionableAdvertisement',
+  arguments : [],
+  response : { arguments : [] }
+};
+
+const WaitForOperationalAdvertisement = {
+  name : 'WaitForOperationalAdvertisement',
+  arguments : [],
+  response : { arguments : [] }
+};
+
+const name = 'DelayCommands';
+const commands =
+    [ WaitForMs, WaitForCommissioning, WaitForCommissionee, WaitForCommissionableAdvertisement, WaitForOperationalAdvertisement ];
 
 const DelayCommands = {
   name,

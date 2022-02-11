@@ -133,7 +133,6 @@
  *
  *      * #CHIP_IM_MAX_NUM_COMMAND_HANDLER
  *      * #CHIP_IM_MAX_NUM_READ_HANDLER
- *      * #CHIP_IM_MAX_NUM_READ_CLIENT
  *      * #CHIP_IM_MAX_REPORTS_IN_FLIGHT
  *      * #CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
  *      * #CHIP_IM_MAX_NUM_WRITE_HANDLER
@@ -155,13 +154,6 @@
  * @brief Defines the maximum number of ReadHandler, limits the number of active read transactions on server.
  */
 #define CHIP_IM_MAX_NUM_READ_HANDLER 3
-
-/**
- * @def CHIP_IM_MAX_NUM_READ_CLIENT
- *
- * @brief Defines the maximum number of ReadClient, limits the number of active read transactions on client.
- */
-#define CHIP_IM_MAX_NUM_READ_CLIENT 2
 
 /**
  * @def CHIP_IM_MAX_REPORTS_IN_FLIGHT

@@ -453,7 +453,7 @@ void MdnsAvahi::HandleGroupState(AvahiEntryGroup * group, AvahiEntryGroupState s
     }
 }
 
-CHIP_ERROR MdnsAvahi::PublishService(const DnssdService & service)
+CHIP_ERROR MdnsAvahi::PublishService(const DnssdService & service, DnssdPublishCallback callback, void * context)
 {
     std::ostringstream keyBuilder;
     std::string key;
@@ -505,9 +505,18 @@ exit:
     {
         avahi_string_list_free(text);
     }
-    if (error != CHIP_NO_ERROR)
+
+    // Ideally the callback would be called from `HandleGroupState` when the `AVAHI_ENTRY_GROUP_ESTABLISHED` state
+    // is received. But the current code use the `userdata` field to pass a pointer to the current MdnsAvahi instance
+    // and this is all comes from MdnsAvahi::Init that does not have any clue about the `type` that *will* be published.
+    // The code needs to be updated to support that callback properly.
+    if (CHIP_NO_ERROR == error)
     {
-        ChipLogError(DeviceLayer, "Avahi publish service failed: %" CHIP_ERROR_FORMAT, error.Format());
+        callback(context, type.c_str(), CHIP_NO_ERROR);
+    }
+    else
+    {
+        callback(context, nullptr, error);
     }
 
     return error;
@@ -811,13 +820,16 @@ CHIP_ERROR ChipDnssdShutdown()
     return MdnsAvahi::GetInstance().Shutdown();
 }
 
-CHIP_ERROR ChipDnssdPublishService(const DnssdService * service)
+CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
 {
+    VerifyOrReturnError(service != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(callback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     if (strcmp(service->mHostName, "") != 0)
     {
         ReturnErrorOnFailure(MdnsAvahi::GetInstance().SetHostname(service->mHostName));
     }
-    return MdnsAvahi::GetInstance().PublishService(*service);
+
+    return MdnsAvahi::GetInstance().PublishService(*service, callback, context);
 }
 
 CHIP_ERROR ChipDnssdRemoveServices()

@@ -212,8 +212,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             ifp->name                                          = CharSpan::fromCharString(ifp->Name);
             ifp->fabricConnected                               = true;
             ifp->type                                          = GetInterfaceType(esp_netif_get_desc(ifa));
-            ifp->offPremiseServicesReachableIPv4.SetNonNull(false);
-            ifp->offPremiseServicesReachableIPv6.SetNonNull(false);
+            ifp->offPremiseServicesReachableIPv4.SetNull();
+            ifp->offPremiseServicesReachableIPv6.SetNull();
             if (esp_netif_get_mac(ifa, ifp->MacAddress) != ESP_OK)
             {
                 ChipLogError(DeviceLayer, "Failed to get network hardware address");
