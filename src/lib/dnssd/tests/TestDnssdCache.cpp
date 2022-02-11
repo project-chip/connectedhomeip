@@ -148,6 +148,7 @@ static int TestSetup(void * inContext)
 static int TestTeardown(void * inContext)
 {
     System::Clock::Internal::SetSystemClockForTesting(realClock);
+    Platform::MemoryShutdown();
     return SUCCESS;
 }
 

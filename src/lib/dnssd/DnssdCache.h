@@ -59,8 +59,9 @@ public:
             return CHIP_NO_ERROR;
         }
 
-        if (mLookupTable.Allocated() >= CACHE_SIZE)
+        if (mLookupTable.Allocated() >= mLookupTable.Capacity())
         {
+            // This happens when CHIP_SYSTEM_CONFIG_POOL_USE_HEAP is true, we manually limit the cache size here
             return CHIP_ERROR_TOO_MANY_KEYS;
         }
 
