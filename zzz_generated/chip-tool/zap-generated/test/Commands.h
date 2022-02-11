@@ -210,6 +210,7 @@ class Test_TC_BI_1_1 : public TestCommand
 public:
     Test_TC_BI_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_BI_1_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -279,6 +280,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 6;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -344,7 +346,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
@@ -470,6 +472,7 @@ class Test_TC_BI_2_1 : public TestCommand
 public:
     Test_TC_BI_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_BI_2_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -565,6 +568,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 12;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -684,7 +688,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadMandatoryNonGlobalAttributeOutOfService_1()
@@ -951,6 +955,7 @@ class Test_TC_BI_2_2 : public TestCommand
 public:
     Test_TC_BI_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_BI_2_2", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -1071,6 +1076,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 9;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -1169,7 +1175,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadsPresentValueAttributeFromDut_1()
@@ -1371,6 +1377,7 @@ public:
     Test_TC_BOOL_1_1(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("Test_TC_BOOL_1_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -1440,6 +1447,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 6;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -1505,7 +1513,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
@@ -1632,6 +1640,7 @@ public:
     Test_TC_BOOL_2_1(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("Test_TC_BOOL_2_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -1697,6 +1706,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 5;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -1752,7 +1762,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadMandatoryNonGlobalAttributeStateValue_1()
@@ -1856,6 +1866,7 @@ public:
     Test_TC_BRAC_1_1(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("Test_TC_BRAC_1_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -1912,6 +1923,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 3;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -1950,7 +1962,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
@@ -2006,6 +2018,7 @@ class Test_TC_CC_1_1 : public TestCommand
 public:
     Test_TC_CC_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_1_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -2067,6 +2080,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 4;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -2112,7 +2126,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_1()
@@ -2190,6 +2204,7 @@ class Test_TC_CC_2_1 : public TestCommand
 public:
     Test_TC_CC_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_2_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -2859,6 +2874,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 154;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -4278,7 +4294,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadsMandatoryAttributeCurrentHue_1()
@@ -7932,6 +7948,7 @@ class Test_TC_CC_3_1 : public TestCommand
 public:
     Test_TC_CC_3_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_3_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -8016,6 +8033,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 10;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -8064,7 +8082,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
@@ -8328,6 +8346,7 @@ class Test_TC_CC_3_2 : public TestCommand
 public:
     Test_TC_CC_3_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_3_2", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -8408,6 +8427,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 9;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -8446,7 +8466,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
@@ -8681,6 +8701,7 @@ class Test_TC_CC_3_3 : public TestCommand
 public:
     Test_TC_CC_3_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_3_3", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -8753,6 +8774,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 7;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -8791,7 +8813,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
@@ -8966,6 +8988,7 @@ class Test_TC_CC_4_1 : public TestCommand
 public:
     Test_TC_CC_4_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_4_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -9034,6 +9057,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 6;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -9072,7 +9096,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
@@ -9214,6 +9238,7 @@ class Test_TC_CC_4_2 : public TestCommand
 public:
     Test_TC_CC_4_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_4_2", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -9302,6 +9327,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 11;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -9340,7 +9366,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
@@ -9637,6 +9663,7 @@ class Test_TC_CC_4_3 : public TestCommand
 public:
     Test_TC_CC_4_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_4_3", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -9709,6 +9736,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 7;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -9747,7 +9775,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
@@ -9922,6 +9950,7 @@ class Test_TC_CC_4_4 : public TestCommand
 public:
     Test_TC_CC_4_4(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_4_4", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -9990,6 +10019,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 6;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -10028,7 +10058,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
@@ -10171,6 +10201,7 @@ class Test_TC_CC_5_1 : public TestCommand
 public:
     Test_TC_CC_5_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_5_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -10239,6 +10270,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 6;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -10277,7 +10309,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
@@ -10420,6 +10452,7 @@ class Test_TC_CC_5_2 : public TestCommand
 public:
     Test_TC_CC_5_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_5_2", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -10492,6 +10525,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 7;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -10530,7 +10564,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
@@ -10701,6 +10735,7 @@ class Test_TC_CC_5_3 : public TestCommand
 public:
     Test_TC_CC_5_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_5_3", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -10769,6 +10804,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 6;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -10807,7 +10843,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
@@ -10950,6 +10986,7 @@ class Test_TC_CC_6_1 : public TestCommand
 public:
     Test_TC_CC_6_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_6_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -11018,6 +11055,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 6;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -11056,7 +11094,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
@@ -11198,6 +11236,7 @@ class Test_TC_CC_6_2 : public TestCommand
 public:
     Test_TC_CC_6_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_6_2", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -11290,6 +11329,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 12;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -11338,7 +11378,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
@@ -11672,6 +11712,7 @@ class Test_TC_CC_6_3 : public TestCommand
 public:
     Test_TC_CC_6_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_6_3", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -11744,6 +11785,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 7;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -11782,7 +11824,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
@@ -11961,6 +12003,7 @@ class Test_TC_CC_7_1 : public TestCommand
 public:
     Test_TC_CC_7_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_7_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -12045,6 +12088,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 10;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -12083,7 +12127,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
@@ -12354,6 +12398,7 @@ class Test_TC_CC_7_2 : public TestCommand
 public:
     Test_TC_CC_7_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_7_2", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -12438,6 +12483,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 10;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -12486,7 +12532,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
@@ -12746,6 +12792,7 @@ class Test_TC_CC_7_3 : public TestCommand
 public:
     Test_TC_CC_7_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_7_3", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -12818,6 +12865,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 7;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -12856,7 +12904,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
@@ -13031,6 +13079,7 @@ class Test_TC_CC_7_4 : public TestCommand
 public:
     Test_TC_CC_7_4(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_7_4", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -13099,6 +13148,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 6;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -13137,7 +13187,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
@@ -13280,6 +13330,7 @@ class Test_TC_CC_8_1 : public TestCommand
 public:
     Test_TC_CC_8_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_8_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -13392,6 +13443,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 17;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -13510,7 +13562,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
@@ -13950,6 +14002,7 @@ class Test_TC_CC_9_1 : public TestCommand
 public:
     Test_TC_CC_9_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_9_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -14450,6 +14503,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 54;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -14817,7 +14871,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestPreconditionTurnOnLightForColorControlTests_1()
@@ -16253,6 +16307,7 @@ class Test_TC_CC_9_2 : public TestCommand
 public:
     Test_TC_CC_9_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_9_2", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -16452,6 +16507,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 20;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -16603,7 +16659,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestPreconditionTurnOnLightForColorControlTests_1()
@@ -17117,6 +17173,7 @@ class Test_TC_CC_9_3 : public TestCommand
 public:
     Test_TC_CC_9_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_9_3", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -17316,6 +17373,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 20;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -17467,7 +17525,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestPreconditionTurnOnLightForColorControlTests_1()
@@ -17981,6 +18039,7 @@ class Test_TC_DM_1_1 : public TestCommand
 public:
     Test_TC_DM_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DM_1_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -18115,6 +18174,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 20;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -18323,7 +18383,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestQueryDataModelRevision_1()
@@ -18788,6 +18848,7 @@ class Test_TC_DM_3_1 : public TestCommand
 public:
     Test_TC_DM_3_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DM_3_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -18844,6 +18905,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 3;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -18885,7 +18947,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestQueryMaxNetworks_1()
@@ -18942,6 +19004,7 @@ class Test_TC_DM_2_2 : public TestCommand
 public:
     Test_TC_DM_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DM_2_2", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -19006,6 +19069,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 5;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -19068,7 +19132,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestQueryFabricsList_1()
@@ -19181,6 +19245,7 @@ class Test_TC_EMR_1_1 : public TestCommand
 public:
     Test_TC_EMR_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_EMR_1_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -19250,6 +19315,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 6;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -19315,7 +19381,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
@@ -19446,6 +19512,7 @@ public:
     Test_TC_ETHDIAG_1_1(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("Test_TC_ETHDIAG_1_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -19494,6 +19561,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 1;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -19512,7 +19580,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 };
 
@@ -19522,6 +19590,7 @@ public:
     Test_TC_ETHDIAG_2_1(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("Test_TC_ETHDIAG_2_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -19570,6 +19639,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 1;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -19588,7 +19658,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 };
 
@@ -19597,6 +19667,7 @@ class Test_TC_FLW_1_1 : public TestCommand
 public:
     Test_TC_FLW_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_FLW_1_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -19658,6 +19729,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 4;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -19703,7 +19775,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_1()
@@ -19781,6 +19853,7 @@ class Test_TC_FLW_2_1 : public TestCommand
 public:
     Test_TC_FLW_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_FLW_2_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -19881,6 +19954,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 14;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -20017,7 +20091,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadTheMandatoryAttributeMeasuredValue_1()
@@ -20329,6 +20403,7 @@ class Test_TC_FLW_2_2 : public TestCommand
 public:
     Test_TC_FLW_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_FLW_2_2", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -20385,6 +20460,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 3;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -20423,7 +20499,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadTheMandatoryAttributeMeasuredValue_1()
@@ -20478,6 +20554,7 @@ class Test_TC_ILL_1_1 : public TestCommand
 public:
     Test_TC_ILL_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ILL_1_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -20547,6 +20624,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 6;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -20612,7 +20690,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
@@ -20743,6 +20821,7 @@ class Test_TC_LVL_1_1 : public TestCommand
 public:
     Test_TC_LVL_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LVL_1_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -20820,6 +20899,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 8;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -20902,7 +20982,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
@@ -21074,6 +21154,7 @@ class Test_TC_LVL_2_1 : public TestCommand
 public:
     Test_TC_LVL_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LVL_2_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -21182,6 +21263,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 16;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -21330,7 +21412,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestResetLevelTo254_1()
@@ -21683,6 +21765,7 @@ class Test_TC_LVL_2_2 : public TestCommand
 public:
     Test_TC_LVL_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LVL_2_2", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -21791,6 +21874,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 16;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -21938,7 +22022,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadsTheOnOffTransitionTimeAttributeFromTheDut_1()
@@ -22304,6 +22388,7 @@ class Test_TC_LVL_3_1 : public TestCommand
 public:
     Test_TC_LVL_3_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LVL_3_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -22412,6 +22497,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 16;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -22500,7 +22586,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_1()
@@ -22825,6 +22911,7 @@ class Test_TC_LVL_4_1 : public TestCommand
 public:
     Test_TC_LVL_4_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LVL_4_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -22937,6 +23024,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 17;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -23032,7 +23120,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_1()
@@ -23381,6 +23469,7 @@ class Test_TC_LVL_5_1 : public TestCommand
 public:
     Test_TC_LVL_5_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LVL_5_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -23481,6 +23570,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 14;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -23529,7 +23619,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestSendingOnCommand_1()
@@ -23815,6 +23905,7 @@ class Test_TC_LVL_6_1 : public TestCommand
 public:
     Test_TC_LVL_6_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LVL_6_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -23907,6 +23998,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 12;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -23945,7 +24037,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestSendingOnCommand_1()
@@ -24196,6 +24288,7 @@ class Test_TC_MC_1_1 : public TestCommand
 public:
     Test_TC_MC_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -24265,6 +24358,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 6;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -24330,7 +24424,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
@@ -24456,6 +24550,7 @@ class Test_TC_MC_2_1 : public TestCommand
 public:
     Test_TC_MC_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_2_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -24508,6 +24603,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 2;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -24526,7 +24622,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestPutTheDeviceIntoLowPowerMode_1()
@@ -24562,6 +24658,7 @@ class Test_TC_MC_3_1 : public TestCommand
 public:
     Test_TC_MC_3_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -24610,6 +24707,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 1;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -24628,7 +24726,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 };
 
@@ -24637,6 +24735,7 @@ class Test_TC_MC_3_2 : public TestCommand
 public:
     Test_TC_MC_3_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_2", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -24685,6 +24784,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 1;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -24703,7 +24803,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 };
 
@@ -24712,6 +24812,7 @@ class Test_TC_MC_3_3 : public TestCommand
 public:
     Test_TC_MC_3_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_3", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -24760,6 +24861,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 1;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -24778,7 +24880,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 };
 
@@ -24787,6 +24889,7 @@ class Test_TC_MC_3_4 : public TestCommand
 public:
     Test_TC_MC_3_4(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_4", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -24835,6 +24938,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 1;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -24853,7 +24957,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 };
 
@@ -24862,6 +24966,7 @@ class Test_TC_MC_3_5 : public TestCommand
 public:
     Test_TC_MC_3_5(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_5", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -24910,6 +25015,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 1;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -24928,7 +25034,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 };
 
@@ -24937,6 +25043,7 @@ class Test_TC_MC_3_6 : public TestCommand
 public:
     Test_TC_MC_3_6(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_6", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -24985,6 +25092,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 1;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -25003,7 +25111,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 };
 
@@ -25012,6 +25120,7 @@ class Test_TC_MC_3_7 : public TestCommand
 public:
     Test_TC_MC_3_7(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_7", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -25060,6 +25169,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 1;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -25078,7 +25188,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 };
 
@@ -25087,6 +25197,7 @@ class Test_TC_MC_3_8 : public TestCommand
 public:
     Test_TC_MC_3_8(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_8", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -25135,6 +25246,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 1;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -25153,7 +25265,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 };
 
@@ -25162,6 +25274,7 @@ class Test_TC_MC_3_9 : public TestCommand
 public:
     Test_TC_MC_3_9(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_9", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -25210,6 +25323,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 1;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -25228,7 +25342,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 };
 
@@ -25237,6 +25351,7 @@ class Test_TC_MC_3_10 : public TestCommand
 public:
     Test_TC_MC_3_10(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_10", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -25285,6 +25400,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 1;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -25303,7 +25419,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 };
 
@@ -25312,6 +25428,7 @@ class Test_TC_MC_3_11 : public TestCommand
 public:
     Test_TC_MC_3_11(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_11", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -25360,6 +25477,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 1;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -25378,7 +25496,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 };
 
@@ -25387,6 +25505,7 @@ class Test_TC_MC_5_1 : public TestCommand
 public:
     Test_TC_MC_5_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_5_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -25439,6 +25558,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 2;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -25469,7 +25589,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadsTheChannelListAttributeFromTheDut_1()
@@ -25502,6 +25622,7 @@ class Test_TC_MC_5_2 : public TestCommand
 public:
     Test_TC_MC_5_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_5_2", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -25554,6 +25675,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 2;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -25572,7 +25694,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestLogACommand_1()
@@ -25587,6 +25709,7 @@ class Test_TC_MC_5_3 : public TestCommand
 public:
     Test_TC_MC_5_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_5_3", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -25639,6 +25762,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 2;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -25657,7 +25781,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestLogACommand_1()
@@ -25672,6 +25796,7 @@ class Test_TC_MC_6_1 : public TestCommand
 public:
     Test_TC_MC_6_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_6_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -25740,6 +25865,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 6;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -25768,7 +25894,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestLogACommand_1()
@@ -25825,6 +25951,7 @@ class Test_TC_MC_6_2 : public TestCommand
 public:
     Test_TC_MC_6_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_6_2", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -25905,6 +26032,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 9;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -25933,7 +26061,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestLogACommand_1()
@@ -26008,6 +26136,7 @@ class Test_TC_MC_6_3 : public TestCommand
 public:
     Test_TC_MC_6_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_6_3", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -26068,6 +26197,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 4;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -26086,7 +26216,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestLogACommand_1()
@@ -26113,6 +26243,7 @@ class Test_TC_MC_6_4 : public TestCommand
 public:
     Test_TC_MC_6_4(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_6_4", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -26197,6 +26328,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 10;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -26245,7 +26377,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestLogACommand_1()
@@ -26362,6 +26494,7 @@ class Test_TC_MC_7_1 : public TestCommand
 public:
     Test_TC_MC_7_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_7_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -26410,6 +26543,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 1;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -26428,7 +26562,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 };
 
@@ -26437,6 +26571,7 @@ class Test_TC_MC_7_2 : public TestCommand
 public:
     Test_TC_MC_7_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_7_2", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -26485,6 +26620,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 1;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -26503,7 +26639,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 };
 
@@ -26512,6 +26648,7 @@ class Test_TC_MC_8_1 : public TestCommand
 public:
     Test_TC_MC_8_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_8_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -26568,6 +26705,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 3;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -26611,7 +26749,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadsTheCurrentTargetAttribute_1()
@@ -26670,6 +26808,7 @@ class Test_TC_MC_9_1 : public TestCommand
 public:
     Test_TC_MC_9_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_9_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -26746,6 +26885,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 8;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -26824,7 +26964,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestPrecondition_1()
@@ -26981,6 +27121,7 @@ class Test_TC_OCC_1_1 : public TestCommand
 public:
     Test_TC_OCC_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OCC_1_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -27042,6 +27183,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 4;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -27087,7 +27229,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_1()
@@ -27165,6 +27307,7 @@ class Test_TC_OCC_2_1 : public TestCommand
 public:
     Test_TC_OCC_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OCC_2_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -27253,6 +27396,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 10;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -27352,7 +27496,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadsMandatoryAttributeConstrainsOccupancy_1()
@@ -27583,6 +27727,7 @@ class Test_TC_OCC_2_2 : public TestCommand
 public:
     Test_TC_OCC_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OCC_2_2", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -27649,6 +27794,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 3;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -27687,7 +27833,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadsOccupancyAttributeFromDut_1()
@@ -27742,6 +27888,7 @@ class Test_TC_OO_1_1 : public TestCommand
 public:
     Test_TC_OO_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OO_1_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -27827,6 +27974,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 10;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -27929,7 +28077,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
@@ -28149,6 +28297,7 @@ class Test_TC_OO_2_1 : public TestCommand
 public:
     Test_TC_OO_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OO_2_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -28257,6 +28406,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 16;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -28410,7 +28560,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadTheMandatoryAttributeOnOff_1()
@@ -28771,6 +28921,7 @@ class Test_TC_OO_2_2 : public TestCommand
 public:
     Test_TC_OO_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OO_2_2", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -28875,6 +29026,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 15;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -28963,7 +29115,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestSendOffCommand_1()
@@ -29329,6 +29481,7 @@ class Test_TC_OO_2_3 : public TestCommand
 public:
     Test_TC_OO_2_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OO_2_3", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -29776,6 +29929,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 47;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -30124,7 +30278,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestSendOnCommand_1()
@@ -31213,6 +31367,7 @@ class Test_TC_PS_1_1 : public TestCommand
 public:
     Test_TC_PS_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_PS_1_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -31282,6 +31437,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 6;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -31347,7 +31503,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
@@ -31473,6 +31629,7 @@ class Test_TC_PRS_1_1 : public TestCommand
 public:
     Test_TC_PRS_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_PRS_1_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -31534,6 +31691,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 4;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -31579,7 +31737,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_1()
@@ -31658,6 +31816,7 @@ class Test_TC_PRS_2_1 : public TestCommand
 public:
     Test_TC_PRS_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_PRS_2_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -31742,6 +31901,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 10;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -31841,7 +32001,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadTheMandatoryAttributeConstraintsMeasuredValue_1()
@@ -32066,6 +32226,7 @@ class Test_TC_PCC_1_1 : public TestCommand
 public:
     Test_TC_PCC_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_PCC_1_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -32131,6 +32292,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 5;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -32186,7 +32348,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_1()
@@ -32291,6 +32453,7 @@ class Test_TC_PCC_2_1 : public TestCommand
 public:
     Test_TC_PCC_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_PCC_2_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -32535,6 +32698,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 50;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -33040,7 +33204,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadTheMandatoryAttributeMaxPressure_1()
@@ -34233,6 +34397,7 @@ class Test_TC_PCC_2_2 : public TestCommand
 public:
     Test_TC_PCC_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_PCC_2_2", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -34308,6 +34473,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 4;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -34347,7 +34513,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestWrite1ToTheOperationModeAttributeToDutOperationMode_1()
@@ -34425,6 +34591,7 @@ class Test_TC_PCC_2_3 : public TestCommand
 public:
     Test_TC_PCC_2_3(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_PCC_2_3", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -34554,6 +34721,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 10;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -34641,7 +34809,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestWrite0ToTheOperationModeAttributeToDut_1()
@@ -34861,6 +35029,7 @@ class Test_TC_RH_1_1 : public TestCommand
 public:
     Test_TC_RH_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_RH_1_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -34922,6 +35091,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 4;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -34967,7 +35137,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_1()
@@ -35048,6 +35218,7 @@ class Test_TC_RH_2_1 : public TestCommand
 public:
     Test_TC_RH_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_RH_2_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -35112,6 +35283,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 5;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -35170,7 +35342,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadsConstraintsOfAttributeMeasuredValue_1()
@@ -35280,6 +35452,7 @@ class Test_TC_RH_2_2 : public TestCommand
 public:
     Test_TC_RH_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_RH_2_2", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -35346,6 +35519,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 3;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -35384,7 +35558,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadsMeasuredValueAttributeFromDut_1()
@@ -35442,6 +35616,7 @@ public:
     Test_TC_SWTCH_2_1(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("Test_TC_SWTCH_2_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -35514,6 +35689,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 7;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -35592,7 +35768,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadNumberOfPositionsAttribute_1()
@@ -35746,6 +35922,7 @@ public:
     Test_TC_SWTCH_2_2(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("Test_TC_SWTCH_2_2", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -35942,6 +36119,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 38;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -35980,7 +36158,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestUserInteractionNeeded_1()
@@ -36248,6 +36426,7 @@ class Test_TC_TM_1_1 : public TestCommand
 public:
     Test_TC_TM_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TM_1_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -36309,6 +36488,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 4;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -36354,7 +36534,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_1()
@@ -36435,6 +36615,7 @@ class Test_TC_TM_2_1 : public TestCommand
 public:
     Test_TC_TM_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TM_2_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -36491,6 +36672,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 3;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -36529,7 +36711,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadTheMandatoryAttributeMeasuredValue_1()
@@ -36587,6 +36769,7 @@ class Test_TC_TM_2_2 : public TestCommand
 public:
     Test_TC_TM_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TM_2_2", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -36653,6 +36836,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 3;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -36691,7 +36875,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadsMeasuredValueAttributeFromDut_1()
@@ -36749,6 +36933,7 @@ public:
     Test_TC_TSTAT_1_1(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("Test_TC_TSTAT_1_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -36814,6 +36999,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 5;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -36869,7 +37055,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_1()
@@ -36971,6 +37157,7 @@ public:
     Test_TC_TSTAT_2_1(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("Test_TC_TSTAT_2_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -37305,6 +37492,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 61;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -37875,7 +38063,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutLocalTemperature_1()
@@ -39318,6 +39506,7 @@ public:
     Test_TC_TSTAT_2_2(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("Test_TC_TSTAT_2_2", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -39874,6 +40063,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 50;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -40277,7 +40467,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadsOccupiedCoolingSetpointAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_1()
@@ -41410,6 +41600,7 @@ public:
     Test_TC_TSUIC_1_1(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("Test_TC_TSUIC_1_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -41471,6 +41662,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 4;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -41516,7 +41708,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_1()
@@ -41599,6 +41791,7 @@ public:
     Test_TC_TSUIC_2_1(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("Test_TC_TSUIC_2_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -41707,6 +41900,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 16;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -41866,7 +42060,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadTheMandatoryAttributeTemperatureDisplayMode_1()
@@ -42249,6 +42443,7 @@ public:
     Test_TC_TSUIC_2_2(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("Test_TC_TSUIC_2_2", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -42389,6 +42584,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 11;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -42477,7 +42673,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestWritesAValueOf0ToTemperatureDisplayModeAttributeOfDut_1()
@@ -42721,6 +42917,7 @@ public:
     Test_TC_DIAG_TH_NW_1_1(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("Test_TC_DIAG_TH_NW_1_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -42777,6 +42974,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 3;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -42805,7 +43003,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestSendsResetCountsCommand_1()
@@ -42867,6 +43065,7 @@ public:
     Test_TC_WIFIDIAG_1_1(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("Test_TC_WIFIDIAG_1_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -42919,6 +43118,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 2;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -42950,7 +43150,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadsNetworkInterfaceStructureAttributeFromDut_1()
@@ -42986,6 +43186,7 @@ public:
     Test_TC_WIFIDIAG_3_1(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("Test_TC_WIFIDIAG_3_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -43034,6 +43235,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 1;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -43052,7 +43254,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 };
 
@@ -43062,6 +43264,7 @@ public:
     Test_TC_WNCV_1_1(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("Test_TC_WNCV_1_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -43140,6 +43343,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 8;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -43222,7 +43426,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR Test2ReadTheGlobalAttributeClusterRevision_1()
@@ -43401,6 +43605,7 @@ public:
     Test_TC_WNCV_2_1(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("Test_TC_WNCV_2_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -43698,6 +43903,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 55;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -44214,7 +44420,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR Test2ReadTheRoMandatoryAttributeDefaultType_1()
@@ -45582,6 +45788,7 @@ public:
     Test_TC_WNCV_2_2(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("Test_TC_WNCV_2_2", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -45630,6 +45837,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 1;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -45648,7 +45856,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 };
 
@@ -45658,6 +45866,7 @@ public:
     Test_TC_WNCV_2_4(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("Test_TC_WNCV_2_4", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -45724,6 +45933,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 3;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -45762,7 +45972,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadsTypeAttributeFromDut_1()
@@ -45821,6 +46031,7 @@ public:
     Test_TC_WNCV_2_5(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("Test_TC_WNCV_2_5", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -45887,6 +46098,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 3;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -45925,7 +46137,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadsEndProductTypeAttributeFromDut_1()
@@ -45984,6 +46196,7 @@ public:
     Test_TC_WNCV_3_1(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("Test_TC_WNCV_3_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -46203,6 +46416,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 25;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -46394,7 +46608,7 @@ private:
     CHIP_ERROR Test0WaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR Test1aThSendsDownOrCloseCommandToPrepositionTheDutInTheOppositeDirection_1()
@@ -46932,6 +47146,7 @@ public:
     Test_TC_WNCV_3_2(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("Test_TC_WNCV_3_2", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -47150,6 +47365,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 25;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -47341,7 +47557,7 @@ private:
     CHIP_ERROR Test0WaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR Test1aThSendsUpOrOpenCommandToPrepositionTheDutInTheOppositeDirection_1()
@@ -47879,6 +48095,7 @@ public:
     Test_TC_WNCV_3_3(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("Test_TC_WNCV_3_3", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -48020,6 +48237,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 16;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -48137,7 +48355,7 @@ private:
     CHIP_ERROR Test0WaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR Test1aThSendsDownOrCloseCommandToPrepositionTheDutInTheOppositeDirection_1()
@@ -48490,6 +48708,7 @@ public:
     TV_TargetNavigatorCluster(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("TV_TargetNavigatorCluster", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -48550,6 +48769,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 4;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -48591,7 +48811,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadAttributeTargetNavigatorList_1()
@@ -48701,6 +48921,7 @@ public:
     TV_AudioOutputCluster(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("TV_AudioOutputCluster", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -48765,6 +48986,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 5;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -48806,7 +49028,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadAttributeAudioOutputList_1()
@@ -48941,6 +49163,7 @@ public:
     TV_ApplicationLauncherCluster(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("TV_ApplicationLauncherCluster", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -49005,6 +49228,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 5;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -49033,7 +49257,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadAttributeApplicationLauncherList_1()
@@ -49189,6 +49413,7 @@ public:
     TV_KeypadInputCluster(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("TV_KeypadInputCluster", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -49241,6 +49466,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 2;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -49259,7 +49485,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestSendKeyCommand_1()
@@ -49302,6 +49528,7 @@ public:
     TV_AccountLoginCluster(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("TV_AccountLoginCluster", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -49362,6 +49589,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 4;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -49380,7 +49608,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestGetSetupPinCommand_1()
@@ -49482,6 +49710,7 @@ public:
     TV_WakeOnLanCluster(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("TV_WakeOnLanCluster", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -49534,6 +49763,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 2;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -49562,7 +49792,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadMacAddress_1()
@@ -49596,6 +49826,7 @@ public:
     TV_ApplicationBasicCluster(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("TV_ApplicationBasicCluster", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -49668,6 +49899,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 7;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -49746,7 +49978,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadAttributeVendorName_1()
@@ -49900,6 +50132,7 @@ public:
     TV_MediaPlaybackCluster(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("TV_MediaPlaybackCluster", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -50016,6 +50249,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 18;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -50094,7 +50328,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadAttributePlaybackState_1()
@@ -50607,6 +50841,7 @@ public:
     TV_ChannelCluster(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("TV_ChannelCluster", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -50671,6 +50906,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 5;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -50701,7 +50937,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadAttributeChannelList_1()
@@ -50865,6 +51101,7 @@ public:
     TV_LowPowerCluster(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("TV_LowPowerCluster", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -50917,6 +51154,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 2;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -50935,7 +51173,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestSleepInputStatusCommand_1()
@@ -50972,6 +51210,7 @@ public:
     TV_ContentLauncherCluster(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("TV_ContentLauncherCluster", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -51036,6 +51275,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 5;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -51074,7 +51314,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadAttributeAcceptHeaderList_1()
@@ -51310,6 +51550,7 @@ public:
     TV_MediaInputCluster(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("TV_MediaInputCluster", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -51382,6 +51623,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 7;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -51423,7 +51665,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadAttributeMediaInputList_1()
@@ -51608,6 +51850,7 @@ class TestCluster : public TestCommand
 public:
     TestCluster(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestCluster", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -53696,6 +53939,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 482;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -57671,7 +57915,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestSendTestCommand_1()
@@ -70077,6 +70321,7 @@ public:
     TestClusterComplexTypes(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("TestClusterComplexTypes", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -70210,6 +70455,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 21;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -70347,7 +70593,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestSendTestCommandWithOptionalArgSetToNull_1()
@@ -70898,6 +71144,7 @@ class TestConstraints : public TestCommand
 public:
     TestConstraints(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestConstraints", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -71033,6 +71280,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 22;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -71234,7 +71482,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestWriteAttributeInt32uValue_1()
@@ -71722,6 +71970,7 @@ public:
     TestDelayCommands(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("TestDelayCommands", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -71774,6 +72023,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 2;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -71792,7 +72042,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestWait100ms_1()
@@ -71807,6 +72057,7 @@ class TestDiscovery : public TestCommand
 public:
     TestDiscovery(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestDiscovery", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("discriminator", 0, UINT16_MAX, &mDiscriminator);
         AddArgument("vendorId", 0, UINT16_MAX, &mVendorId);
@@ -72006,6 +72257,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 25;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mDiscriminator;
     chip::Optional<uint16_t> mVendorId;
@@ -72150,7 +72402,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_1()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestOpenCommissioningWindow_2()
@@ -72294,7 +72546,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_21()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestOpenCommissioningWindow_22()
@@ -72344,6 +72596,7 @@ class TestLogCommands : public TestCommand
 public:
     TestLogCommands(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestLogCommands", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -72400,6 +72653,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 3;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -72418,7 +72672,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestLogASimpleMessage_1()
@@ -72439,6 +72693,7 @@ class TestSaveAs : public TestCommand
 public:
     TestSaveAs(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestSaveAs", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -72951,6 +73206,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 110;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -73931,7 +74187,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestSendTestAddArgumentsCommand_1()
@@ -76550,6 +76806,7 @@ public:
     TestConfigVariables(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("TestConfigVariables", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("arg1", 0, UINT8_MAX, &mArg1);
@@ -76608,6 +76865,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 3;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint8_t> mArg1;
@@ -76630,7 +76888,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestSendTestAddArgumentsCommand_1()
@@ -76709,6 +76967,7 @@ public:
     TestDescriptorCluster(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("TestDescriptorCluster", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -76773,6 +77032,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 5;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -76833,7 +77093,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadAttributeDeviceList_1()
@@ -77011,6 +77271,7 @@ public:
     TestBasicInformation(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("TestBasicInformation", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -77079,6 +77340,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 6;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -77141,7 +77403,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadLocation_1()
@@ -77312,6 +77574,7 @@ public:
     TestIdentifyCluster(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("TestIdentifyCluster", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -77364,6 +77627,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 2;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -77382,7 +77646,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestSendIdentifyCommandAndExpectSuccessResponse_1()
@@ -77420,6 +77684,7 @@ public:
     TestOperationalCredentialsCluster(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("TestOperationalCredentialsCluster", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -77484,6 +77749,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 5;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -77532,7 +77798,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadNumberOfSupportedFabrics_1()
@@ -77653,6 +77919,7 @@ public:
     TestModeSelectCluster(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("TestModeSelectCluster", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -77733,6 +78000,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 9;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -77814,7 +78082,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadCurrentMode_1()
@@ -78043,6 +78311,7 @@ public:
     TestSystemCommands(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("TestSystemCommands", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -78107,6 +78376,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 5;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -78125,7 +78395,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestStopTheAccessory_1()
@@ -78159,6 +78429,7 @@ public:
     Test_TC_SWDIAG_1_1(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("Test_TC_SWDIAG_1_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -78238,6 +78509,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 5;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -78299,7 +78571,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadsAListOfThreadMetricsStructNonGlobalAttributeFromDut_1()
@@ -78404,6 +78676,7 @@ public:
     Test_TC_SWDIAG_2_1(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("Test_TC_SWDIAG_2_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -78448,6 +78721,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 0;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -78470,6 +78744,7 @@ public:
     Test_TC_SWDIAG_3_1(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("Test_TC_SWDIAG_3_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -78545,6 +78820,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 4;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -78583,7 +78859,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestSendsResetWatermarksToDut_1()
@@ -78669,6 +78945,7 @@ public:
     TestSubscribe_OnOff(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("TestSubscribe_OnOff", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -78745,6 +79022,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 8;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -78817,7 +79095,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestSetOnOffAttributeToFalse_1()
@@ -79019,6 +79297,7 @@ public:
     DL_UsersAndCredentials(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("DL_UsersAndCredentials", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -79479,6 +79758,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 102;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -79531,7 +79811,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadAvailableUserSlotAndVerifyResponseFields_1()
@@ -84406,6 +84686,7 @@ class DL_LockUnlock : public TestCommand
 public:
     DL_LockUnlock(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("DL_LockUnlock", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -84494,6 +84775,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 11;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -84556,7 +84838,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestCreateNewPinCredentialAndLockUnlockUser_1()
@@ -84869,6 +85151,7 @@ class DL_Schedules : public TestCommand
 public:
     DL_Schedules(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("DL_Schedules", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -85254,6 +85537,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 84;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -85306,7 +85590,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestCreateNewPinCredentialAndScheduleUser_1()
@@ -88419,6 +88703,7 @@ public:
     TestGroupMessaging(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("TestGroupMessaging", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -88512,6 +88797,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 12;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -88585,7 +88871,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestAddGroup1Endpoint1_1()
@@ -88957,6 +89243,7 @@ public:
     TestGroupsCluster(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("TestGroupsCluster", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -89077,6 +89364,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 19;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -89095,7 +89383,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestViewGroup0Invalid_1()
@@ -89761,6 +90049,7 @@ public:
     TestGroupKeyManagementCluster(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("TestGroupKeyManagementCluster", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -89873,6 +90162,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 17;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -89947,7 +90237,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestReadMaxGroupsPerFabric_1()
@@ -90527,6 +90817,7 @@ class Test_TC_DD_1_5 : public TestCommand
 public:
     Test_TC_DD_1_5(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_5", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -90575,6 +90866,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 1;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -90603,6 +90895,7 @@ class Test_TC_DD_1_6 : public TestCommand
 public:
     Test_TC_DD_1_6(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_6", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -90659,6 +90952,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 3;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -90700,6 +90994,7 @@ class Test_TC_DD_1_7 : public TestCommand
 public:
     Test_TC_DD_1_7(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_7", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -90752,6 +91047,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 2;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -90786,6 +91082,7 @@ class Test_TC_DD_1_8 : public TestCommand
 public:
     Test_TC_DD_1_8(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_8", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -90838,6 +91135,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 2;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -90872,6 +91170,7 @@ class Test_TC_DD_1_9 : public TestCommand
 public:
     Test_TC_DD_1_9(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_9", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -90928,6 +91227,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 3;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -90969,6 +91269,7 @@ class Test_TC_DD_1_10 : public TestCommand
 public:
     Test_TC_DD_1_10(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_10", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -91013,6 +91314,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 0;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -91035,6 +91337,7 @@ public:
     TestGroupDemoCommand(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("TestGroupDemoCommand", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -91163,6 +91466,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 21;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -91181,7 +91485,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_1()
@@ -91571,6 +91875,7 @@ public:
     TestGroupDemoConfig(CredentialIssuerCommands * credsIssuerConfig) :
         TestCommand("TestGroupDemoConfig", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -91631,6 +91936,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 4;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -91656,7 +91962,7 @@ private:
     CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee();
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
     }
 
     CHIP_ERROR TestAddGroup1Endpoint1_1()
@@ -91783,6 +92089,7 @@ class Test_TC_BDX_1_1 : public TestCommand
 public:
     Test_TC_BDX_1_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_BDX_1_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -91827,6 +92134,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 0;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -91848,6 +92156,7 @@ class Test_TC_BDX_1_2 : public TestCommand
 public:
     Test_TC_BDX_1_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_BDX_1_2", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -91892,6 +92201,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 0;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -91913,6 +92223,7 @@ class Test_TC_BDX_2_1 : public TestCommand
 public:
     Test_TC_BDX_2_1(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_BDX_2_1", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -91957,6 +92268,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 0;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
@@ -91978,6 +92290,7 @@ class Test_TC_BDX_2_2 : public TestCommand
 public:
     Test_TC_BDX_2_2(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_BDX_2_2", credsIssuerConfig), mTestIndex(0)
     {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
@@ -92022,6 +92335,7 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 0;
 
+    chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 

@@ -15,6 +15,7 @@
 name: 12.2.1. [TC-TSUIC-2.1] Attributes with server as DUT
 
 config:
+    nodeId: 0x12344321
     cluster: "Thermostat User Interface Configuration"
     endpoint: 1
 
@@ -22,6 +23,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "read the mandatory attribute: TemperatureDisplayMode"
       command: "readAttribute"

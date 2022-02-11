@@ -15,6 +15,7 @@
 name: Account Login Cluster Tests
 
 config:
+    nodeId: 0x12344321
     cluster: "Account Login"
     endpoint: 3
 
@@ -22,6 +23,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Get Setup PIN Command"
       command: "getSetupPINRequest"
