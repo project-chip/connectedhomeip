@@ -26836,6 +26836,12 @@ struct TypeInfo
 } // namespace TemperatureMeasurement
 namespace PressureMeasurement {
 
+// Bitmap for PressureFeature
+enum class PressureFeature : uint32_t
+{
+    kExt = 0x1,
+};
+
 namespace Attributes {
 
 namespace MeasuredValue {
