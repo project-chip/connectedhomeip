@@ -45,7 +45,7 @@ CHIP_ERROR TimedRequestMessage::Parser::CheckSchemaValidity() const
             {
                 uint16_t timeout;
                 ReturnErrorOnFailure(reader.Get(timeout));
-                PRETTY_PRINT("\tTimeoutMs = 0x%" PRIx8 ",", timeout);
+                PRETTY_PRINT("\tTimeoutMs = 0x%x,", timeout);
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
