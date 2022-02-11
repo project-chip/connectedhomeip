@@ -68,6 +68,8 @@ static CHIP_ERROR N2J_PaseVerifierParams(JNIEnv * env, jlong setupPincode, jint 
                                          jobject & outParams);
 static CHIP_ERROR N2J_NetworkLocation(JNIEnv * env, jstring ipAddress, jint port, jobject & outLocation);
 static CHIP_ERROR GetChipPathIdValue(jobject chipPathId, uint32_t wildcardValue, uint32_t & outValue);
+static CHIP_ERROR ParseAttributePathList(jobject attributePathList,
+                                         std::list<app::AttributePathParams> & outAttributePathParamsList);
 static CHIP_ERROR ParseAttributePath(jobject attributePath, EndpointId & outEndpointId, ClusterId & outClusterId,
                                      AttributeId & outAttributeId);
 static CHIP_ERROR IsWildcardChipPathId(jobject chipPathId, bool & isWildcard);
@@ -79,6 +81,8 @@ JavaVM * sJVM;
 pthread_t sIOThread = PTHREAD_NULL;
 
 jclass sChipDeviceControllerExceptionCls = NULL;
+
+constexpr size_t kMaxAttributePaths = 20;
 
 } // namespace
 
@@ -659,7 +663,7 @@ exit:
 }
 
 JNI_METHOD(void, subscribeToPath)
-(JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePath, jint minInterval,
+(JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jint minInterval,
  jint maxInterval)
 {
     chip::DeviceLayer::StackLock lock;
@@ -672,18 +676,18 @@ JNI_METHOD(void, subscribeToPath)
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, CHIP_ERROR_INCORRECT_STATE);
     }
 
-    EndpointId endpointId;
-    ClusterId clusterId;
-    AttributeId attributeId;
-    err = ParseAttributePath(attributePath, endpointId, clusterId, attributeId);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error parsing Java attribute path"));
+    std::list<app::AttributePathParams> attributePathParamsList;
+    err = ParseAttributePathList(attributePathList, attributePathParamsList);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error parsing Java attribute paths: %s", ErrorStr(err)));
 
-    app::AttributePathParams attributePathParams(endpointId, clusterId, attributeId);
+    app::AttributePathParams attributePathParams[kMaxAttributePaths] = {};
+    std::copy(attributePathParamsList.begin(), attributePathParamsList.end(), attributePathParams);
+
     app::ReadPrepareParams params(device->GetSecureSession().Value());
     params.mMinIntervalFloorSeconds     = minInterval;
     params.mMaxIntervalCeilingSeconds   = maxInterval;
-    params.mpAttributePathParamsList    = &attributePathParams;
-    params.mAttributePathParamsListSize = 1;
+    params.mpAttributePathParamsList    = attributePathParams;
+    params.mAttributePathParamsListSize = attributePathParamsList.size();
 
     auto callback = reinterpret_cast<ReportCallback *>(callbackHandle);
 
@@ -705,7 +709,7 @@ JNI_METHOD(void, subscribeToPath)
 }
 
 JNI_METHOD(void, readPath)
-(JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePath)
+(JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -717,16 +721,16 @@ JNI_METHOD(void, readPath)
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, CHIP_ERROR_INCORRECT_STATE);
     }
 
-    EndpointId endpointId;
-    ClusterId clusterId;
-    AttributeId attributeId;
-    err = ParseAttributePath(attributePath, endpointId, clusterId, attributeId);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error parsing Java attribute path"));
+    std::list<app::AttributePathParams> attributePathParamsList;
+    err = ParseAttributePathList(attributePathList, attributePathParamsList);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error parsing Java attribute paths: %s", ErrorStr(err)));
 
-    app::AttributePathParams attributePathParams(endpointId, clusterId, attributeId);
+    app::AttributePathParams attributePathParams[kMaxAttributePaths] = {};
+    std::copy(attributePathParamsList.begin(), attributePathParamsList.end(), attributePathParams);
+
     app::ReadPrepareParams params(device->GetSecureSession().Value());
-    params.mpAttributePathParamsList    = &attributePathParams;
-    params.mAttributePathParamsListSize = 1;
+    params.mpAttributePathParamsList    = attributePathParams;
+    params.mAttributePathParamsListSize = 2;
 
     auto callback = reinterpret_cast<ReportCallback *>(callbackHandle);
 
@@ -745,6 +749,39 @@ JNI_METHOD(void, readPath)
     }
 
     callback->mReadClient = readClient;
+}
+
+/**
+ * Takes objects in attributePathList, converts them to app:AttributePathParams, and appends them to outAttributePathParamsList.
+ */
+CHIP_ERROR ParseAttributePathList(jobject attributePathList, std::list<app::AttributePathParams> & outAttributePathParamsList)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    jint listSize;
+    err = JniReferences::GetInstance().GetListSize(attributePathList, listSize);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+    if (static_cast<size_t>(listSize) >= kMaxAttributePaths)
+    {
+        ChipLogError(Controller, "Exceeded maximum attribute paths");
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
+
+    for (uint8_t i = 0; i < listSize; i++)
+    {
+        jobject attributePathItem = nullptr;
+        err                       = JniReferences::GetInstance().GetListItem(attributePathList, i, attributePathItem);
+        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+
+        EndpointId endpointId;
+        ClusterId clusterId;
+        AttributeId attributeId;
+        err = ParseAttributePath(attributePathItem, endpointId, clusterId, attributeId);
+        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+        outAttributePathParamsList.push_back(app::AttributePathParams(endpointId, clusterId, attributeId));
+    }
+
+    return err;
 }
 
 CHIP_ERROR ParseAttributePath(jobject attributePath, EndpointId & outEndpointId, ClusterId & outClusterId,
@@ -808,7 +845,7 @@ CHIP_ERROR GetChipPathIdValue(jobject chipPathId, uint32_t wildcardValue, uint32
     jmethodID getIdMethod = nullptr;
     err                   = JniReferences::GetInstance().FindMethod(env, chipPathId, "getId", "()J", &getIdMethod);
     outValue              = env->CallLongMethod(chipPathId, getIdMethod);
-    VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
+    VerifyOrReturnError(err == CHIP_NO_ERROR && !env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
     return err;
 }
@@ -833,7 +870,7 @@ CHIP_ERROR IsWildcardChipPathId(jobject chipPathId, bool & isWildcard)
     VerifyOrReturnError(idType != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
     JniUtfString typeNameJniString(env, typeNameString);
 
-    isWildcard = strncmp(typeNameJniString.c_str(), "WILDCARD", 8);
+    isWildcard = strncmp(typeNameJniString.c_str(), "WILDCARD", 8) == 0;
 
     return err;
 }

@@ -22,6 +22,7 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback;
 import chip.devicecontroller.model.ChipAttributePath;
+import java.util.List;
 
 /** Controller to interact with the CHIP device. */
 public class ChipDeviceController {
@@ -311,12 +312,15 @@ public class ChipDeviceController {
     return getAttestationChallenge(deviceControllerPtr, devicePtr);
   }
 
-  /** Subscribe to the given attribute path. */
+  /**
+   * Subscribe to the given attribute path. The size of {@code attributePaths} should be less than
+   * or equal to 20 (kMaxAttributePaths), defined in the native code.
+   */
   public void subscribeToPath(
       SubscriptionEstablishedCallback subscriptionEstablishedCallback,
       ReportCallback reportCallback,
       long devicePtr,
-      ChipAttributePath attributePath,
+      List<ChipAttributePath> attributePaths,
       int minInterval,
       int maxInterval) {
     ReportCallbackJni jniCallback =
@@ -325,15 +329,19 @@ public class ChipDeviceController {
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
         devicePtr,
-        attributePath,
+        attributePaths,
         minInterval,
         maxInterval);
   }
 
-  /** Read the given attribute path. */
-  public void readPath(ReportCallback callback, long devicePtr, ChipAttributePath attributePath) {
+  /**
+   * Read the given attribute path. The size of {@code attributePaths} should be less than or equal
+   * to 20 (kMaxAttributePaths), defined in the native code.
+   */
+  public void readPath(
+      ReportCallback callback, long devicePtr, List<ChipAttributePath> attributePaths) {
     ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback);
-    readPath(deviceControllerPtr, jniCallback.getCallbackHandle(), devicePtr, attributePath);
+    readPath(deviceControllerPtr, jniCallback.getCallbackHandle(), devicePtr, attributePaths);
   }
 
   /**
@@ -356,7 +364,7 @@ public class ChipDeviceController {
       long deviceControllerPtr,
       long callbackHandle,
       long devicePtr,
-      ChipAttributePath attributePath,
+      List<ChipAttributePath> attributePaths,
       int minInterval,
       int maxInterval);
 
@@ -364,7 +372,7 @@ public class ChipDeviceController {
       long deviceControllerPtr,
       long callbackHandle,
       long devicePtr,
-      ChipAttributePath attributePath);
+      List<ChipAttributePath> attributePaths);
 
   private native long newDeviceController();
 
