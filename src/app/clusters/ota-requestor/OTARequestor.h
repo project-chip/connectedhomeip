@@ -93,6 +93,8 @@ public:
         app::DataModel::Nullable<uint8_t> percent;
         percent.SetNull();
         OtaRequestorServerSetUpdateStateProgress(percent);
+
+        chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(OnCommissioningCompleteRequestor, reinterpret_cast<intptr_t>(this));
     }
 
     /**
@@ -268,6 +270,12 @@ private:
      */
     static void OnNotifyUpdateAppliedResponse(void * context, const app::DataModel::NullObjectType & response);
     static void OnNotifyUpdateAppliedFailure(void * context, CHIP_ERROR error);
+
+    /**
+     * Commissioning callback 
+     */
+    static void OnCommissioningCompleteRequestor(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+
 
     OTARequestorDriver * mOtaRequestorDriver  = nullptr;
     NodeId mProviderNodeId                    = kUndefinedNodeId;      // Only valid for the current update in progress

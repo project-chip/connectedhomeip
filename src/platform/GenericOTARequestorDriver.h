@@ -55,6 +55,7 @@ public:
     void UpdateCancelled() override;
     OTARequestorAction GetRequestorAction(OTARequestorIncomingEvent input) override;
     void ScheduleDelayedAction(UpdateFailureState state, System::Clock::Seconds32 delay, System::TimerCompleteCallback action, void * aAppState) override;
+    void CancelDelayedAction(System::TimerCompleteCallback action, void * aAppState) override;
 private:
     OTARequestorInterface * mRequestor           = nullptr;
     OTAImageProcessorInterface * mImageProcessor = nullptr;

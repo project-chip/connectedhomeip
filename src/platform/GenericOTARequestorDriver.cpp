@@ -119,6 +119,12 @@ void GenericOTARequestorDriver::ScheduleDelayedAction(UpdateFailureState state, 
     }
 }
 
+void GenericOTARequestorDriver::CancelDelayedAction(System::TimerCompleteCallback action, void * aAppState)
+{
+    SystemLayer().CancelTimer(action, aAppState);
+}
+
+
 OTARequestorAction GenericOTARequestorDriver::GetRequestorAction(OTARequestorIncomingEvent input)
 {
 

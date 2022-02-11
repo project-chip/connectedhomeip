@@ -697,6 +697,24 @@ void OTARequestor::DefaultOTAProvidersUpdated()
         // Fall through
     }
 }
+
+
+void OTARequestor::StartDefaultProvidersTimer()
+{
+
+
+
+   mOtaRequestorDriver->ScheduleDelayedAction(UpdateFailureState::kIdle, System::Clock::Seconds32(), StartDelayTimerHandler, this);
+
+}
 */
+
+void OTARequestor::OnCommissioningCompleteRequestor(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+{
+    ChipLogProgress(SoftwareUpdate, "Device commissioned, query the default provider if present and start a timer");
+
+    
+
+}
 
 } // namespace chip
