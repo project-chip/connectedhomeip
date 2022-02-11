@@ -37,7 +37,7 @@ const PairWithManualCode = {
 };
 
 const Unpair = {
-  name : 'PairWithManualCode',
+  name : 'Unpair',
   arguments : [ { type : 'NODE_ID', name : 'nodeId' } ],
   response : { arguments : [] }
 };
