@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
@@ -145,7 +146,8 @@ private:
     Messaging::ExchangeManager mExchangeManager;
     secure_channel::MessageCounterManager mMessageCounterManager;
     IOContext * mIOContext;
-    TransportMgrBase * mTransport; // Only needed for InitFromExisting.
+    TransportMgrBase * mTransport;                // Only needed for InitFromExisting.
+    chip::TestPersistentStorageDelegate mStorage; // for SessionManagerInit
 
     NodeId mBobNodeId       = 123654;
     NodeId mAliceNodeId     = 111222333;

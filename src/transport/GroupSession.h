@@ -40,10 +40,11 @@ public:
 
     Access::SubjectDescriptor GetSubjectDescriptor() const override
     {
-        Access::SubjectDescriptor isd;
-        isd.authMode = Access::AuthMode::kGroup;
-        // TODO: fill other group subjects fields
-        return isd; // return an empty ISD for unauthenticated session.
+        Access::SubjectDescriptor subjectDescriptor;
+        subjectDescriptor.authMode    = Access::AuthMode::kGroup;
+        subjectDescriptor.subject     = NodeIdFromGroupId(mGroupId);
+        subjectDescriptor.fabricIndex = GetFabricIndex();
+        return subjectDescriptor;
     }
 
     bool RequireMRP() const override { return false; }

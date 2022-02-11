@@ -157,7 +157,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 #endif
     SuccessOrExit(err);
 
-    err = mSessions.Init(&DeviceLayer::SystemLayer(), &mTransports, &mMessageCounterManager);
+    err = mSessions.Init(&DeviceLayer::SystemLayer(), &mTransports, &mMessageCounterManager, &mDeviceStorage);
     SuccessOrExit(err);
 
     err = mExchangeMgr.Init(&mSessions);

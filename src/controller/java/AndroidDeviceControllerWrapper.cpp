@@ -119,6 +119,7 @@ AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControlle
     initParams.tcpEndPointManager = tcpEndPointManager;
     initParams.udpEndPointManager = udpEndPointManager;
     initParams.fabricStorage      = wrapper.get();
+
     // move bleLayer into platform/android to share with app server
 #if CONFIG_NETWORK_LAYER_BLE
     initParams.bleLayer = DeviceLayer::ConnectivityMgr().GetBleLayer();
@@ -127,6 +128,7 @@ AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControlle
     setupParams.storageDelegate                = wrapper.get();
     setupParams.pairingDelegate                = wrapper.get();
     setupParams.operationalCredentialsDelegate = opCredsIssuer;
+    initParams.fabricIndependentStorage        = setupParams.storageDelegate;
 
     opCredsIssuer->Initialize(*wrapper.get(), wrapper.get()->mJavaObjectRef);
 

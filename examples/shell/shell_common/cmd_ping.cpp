@@ -306,7 +306,7 @@ void StartPinging(streamer_t * stream, char * destination)
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (gPingArguments.IsUsingTCP())
     {
-        err = gSessionManager.Init(&DeviceLayer::SystemLayer(), &gTCPManager, &gMessageCounterManager);
+        err = gSessionManager.Init(&DeviceLayer::SystemLayer(), &gTCPManager, &gMessageCounterManager, &gStorage);
         SuccessOrExit(err);
 
         err = gExchangeManager.Init(&gSessionManager);
@@ -315,7 +315,7 @@ void StartPinging(streamer_t * stream, char * destination)
     else
 #endif
     {
-        err = gSessionManager.Init(&DeviceLayer::SystemLayer(), &gUDPManager, &gMessageCounterManager);
+        err = gSessionManager.Init(&DeviceLayer::SystemLayer(), &gUDPManager, &gMessageCounterManager, &gStorage);
         SuccessOrExit(err);
 
         err = gExchangeManager.Init(&gSessionManager);

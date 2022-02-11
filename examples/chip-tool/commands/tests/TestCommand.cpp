@@ -30,10 +30,10 @@ CHIP_ERROR TestCommand::RunCommand()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TestCommand::WaitForCommissionee()
+CHIP_ERROR TestCommand::WaitForCommissionee(chip::NodeId nodeId)
 {
-    CurrentCommissioner().ReleaseOperationalDevice(mNodeId);
-    return CurrentCommissioner().GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    CurrentCommissioner().ReleaseOperationalDevice(nodeId);
+    return CurrentCommissioner().GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }
 
 void TestCommand::OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device)

@@ -17,6 +17,7 @@ name:
     Commissioner]
 
 config:
+    nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 

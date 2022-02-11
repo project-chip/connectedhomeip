@@ -26,6 +26,7 @@
 name: Group Messaging Demo - Configuration
 
 config:
+    nodeId: 0x12344321
     cluster: "Groups"
     endpoint: 0
 
@@ -33,6 +34,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Add Group 1 - endpoint 1"
       command: "AddGroup"

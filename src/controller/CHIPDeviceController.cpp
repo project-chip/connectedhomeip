@@ -1794,7 +1794,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
 
         static constexpr size_t kMaxCountryCodeSize = 3;
-        char countryCodeStr[kMaxCountryCodeSize]    = "WW";
+        char countryCodeStr[kMaxCountryCodeSize]    = "XX";
         size_t actualCountryCodeSize                = 2;
 
 #if CONFIG_DEVICE_LAYER
@@ -1804,7 +1804,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
 #endif
         if (status != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "Unable to find country code, defaulting to WW");
+            ChipLogError(Controller, "Unable to find country code, defaulting to XX");
         }
         chip::CharSpan countryCode(countryCodeStr, actualCountryCodeSize);
 
