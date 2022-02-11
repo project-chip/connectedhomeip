@@ -85,7 +85,8 @@ private:
         }
 
         dispatch_async(callbackBridge->mQueue, ^{
-            ChipLogDetail(Controller, "%s %f seconds", callbackBridge->mCookie.UTF8String, -[callbackBridge->mResponseTime timeIntervalSinceNow]);
+            ChipLogDetail(Controller, "%s %f seconds", callbackBridge->mCookie.UTF8String,
+                -[callbackBridge->mResponseTime timeIntervalSinceNow]);
             callbackBridge->mHandler(value, error);
 
             if (!callbackBridge->mKeepAlive) {
@@ -101,6 +102,6 @@ private:
     chip::Callback::Callback<CHIPDefaultFailureCallbackType> mFailure;
 
     // Measure the time it took for the callback to trigger
-    NSDate *mResponseTime;
-    NSString *mCookie;
+    NSDate * mResponseTime;
+    NSString * mCookie;
 };
