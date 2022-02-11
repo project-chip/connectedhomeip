@@ -32,69 +32,123 @@
 /*----------------------------------------------------------------------------*\
 | Cluster Name                                                        |   ID   |
 |---------------------------------------------------------------------+--------|
-| AccessControl                                                       | 0x001F |
-| AccountLogin                                                        | 0x050E |
-| AdministratorCommissioning                                          | 0x003C |
-| ApplicationBasic                                                    | 0x050D |
-| ApplicationLauncher                                                 | 0x050C |
-| AudioOutput                                                         | 0x050B |
-| BarrierControl                                                      | 0x0103 |
-| Basic                                                               | 0x0028 |
-| BinaryInputBasic                                                    | 0x000F |
-| Binding                                                             | 0x001E |
-| BooleanState                                                        | 0x0045 |
-| BridgedActions                                                      | 0x0025 |
-| BridgedDeviceBasic                                                  | 0x0039 |
-| Channel                                                             | 0x0504 |
-| ColorControl                                                        | 0x0300 |
-| ContentLauncher                                                     | 0x050A |
-| Descriptor                                                          | 0x001D |
-| DiagnosticLogs                                                      | 0x0032 |
-| DoorLock                                                            | 0x0101 |
-| ElectricalMeasurement                                               | 0x0B04 |
-| EthernetNetworkDiagnostics                                          | 0x0037 |
-| FixedLabel                                                          | 0x0040 |
-| FlowMeasurement                                                     | 0x0404 |
-| GeneralCommissioning                                                | 0x0030 |
-| GeneralDiagnostics                                                  | 0x0033 |
-| GroupKeyManagement                                                  | 0x003F |
-| Groups                                                              | 0x0004 |
+| PowerConfiguration                                                  | 0x0001 |
+| DeviceTemperatureConfiguration                                      | 0x0002 |
 | Identify                                                            | 0x0003 |
-| IlluminanceMeasurement                                              | 0x0400 |
-| KeypadInput                                                         | 0x0509 |
-| LevelControl                                                        | 0x0008 |
-| LocalizationConfiguration                                           | 0x002B |
-| LowPower                                                            | 0x0508 |
-| MediaInput                                                          | 0x0507 |
-| MediaPlayback                                                       | 0x0506 |
-| ModeSelect                                                          | 0x0050 |
-| NetworkCommissioning                                                | 0x0031 |
-| OtaSoftwareUpdateProvider                                           | 0x0029 |
-| OtaSoftwareUpdateRequestor                                          | 0x002A |
-| OccupancySensing                                                    | 0x0406 |
+| Groups                                                              | 0x0004 |
+| Scenes                                                              | 0x0005 |
 | OnOff                                                               | 0x0006 |
 | OnOffSwitchConfiguration                                            | 0x0007 |
-| OperationalCredentials                                              | 0x003E |
-| PowerSource                                                         | 0x002F |
-| PowerSourceConfiguration                                            | 0x002E |
-| PressureMeasurement                                                 | 0x0403 |
-| PumpConfigurationAndControl                                         | 0x0200 |
-| RelativeHumidityMeasurement                                         | 0x0405 |
-| Scenes                                                              | 0x0005 |
-| SoftwareDiagnostics                                                 | 0x0034 |
-| Switch                                                              | 0x003B |
-| TargetNavigator                                                     | 0x0505 |
-| TemperatureMeasurement                                              | 0x0402 |
-| TestCluster                                                         | 0x050F |
-| Thermostat                                                          | 0x0201 |
-| ThermostatUserInterfaceConfiguration                                | 0x0204 |
-| ThreadNetworkDiagnostics                                            | 0x0035 |
+| LevelControl                                                        | 0x0008 |
+| Alarms                                                              | 0x0009 |
+| Time                                                                | 0x000A |
+| BinaryInputBasic                                                    | 0x000F |
+| PowerProfile                                                        | 0x001A |
+| ApplianceControl                                                    | 0x001B |
+| PulseWidthModulation                                                | 0x001C |
+| Descriptor                                                          | 0x001D |
+| Binding                                                             | 0x001E |
+| AccessControl                                                       | 0x001F |
+| PollControl                                                         | 0x0020 |
+| BridgedActions                                                      | 0x0025 |
+| Basic                                                               | 0x0028 |
+| OtaSoftwareUpdateProvider                                           | 0x0029 |
+| OtaSoftwareUpdateRequestor                                          | 0x002A |
+| LocalizationConfiguration                                           | 0x002B |
 | TimeFormatLocalization                                              | 0x002C |
 | UnitLocalization                                                    | 0x002D |
-| UserLabel                                                           | 0x0041 |
-| WakeOnLan                                                           | 0x0503 |
+| PowerSourceConfiguration                                            | 0x002E |
+| PowerSource                                                         | 0x002F |
+| GeneralCommissioning                                                | 0x0030 |
+| NetworkCommissioning                                                | 0x0031 |
+| DiagnosticLogs                                                      | 0x0032 |
+| GeneralDiagnostics                                                  | 0x0033 |
+| SoftwareDiagnostics                                                 | 0x0034 |
+| ThreadNetworkDiagnostics                                            | 0x0035 |
 | WiFiNetworkDiagnostics                                              | 0x0036 |
+| EthernetNetworkDiagnostics                                          | 0x0037 |
+| TimeSynchronization                                                 | 0x0038 |
+| BridgedDeviceBasic                                                  | 0x0039 |
+| Switch                                                              | 0x003B |
+| AdministratorCommissioning                                          | 0x003C |
+| OperationalCredentials                                              | 0x003E |
+| GroupKeyManagement                                                  | 0x003F |
+| FixedLabel                                                          | 0x0040 |
+| UserLabel                                                           | 0x0041 |
+| ProxyConfiguration                                                  | 0x0042 |
+| ProxyDiscovery                                                      | 0x0043 |
+| ProxyValid                                                          | 0x0044 |
+| BooleanState                                                        | 0x0045 |
+| ModeSelect                                                          | 0x0050 |
+| ShadeConfiguration                                                  | 0x0100 |
+| DoorLock                                                            | 0x0101 |
 | WindowCovering                                                      | 0x0102 |
+| BarrierControl                                                      | 0x0103 |
+| PumpConfigurationAndControl                                         | 0x0200 |
+| Thermostat                                                          | 0x0201 |
+| FanControl                                                          | 0x0202 |
+| DehumidificationControl                                             | 0x0203 |
+| ThermostatUserInterfaceConfiguration                                | 0x0204 |
+| ColorControl                                                        | 0x0300 |
+| BallastConfiguration                                                | 0x0301 |
+| IlluminanceMeasurement                                              | 0x0400 |
+| TemperatureMeasurement                                              | 0x0402 |
+| PressureMeasurement                                                 | 0x0403 |
+| FlowMeasurement                                                     | 0x0404 |
+| RelativeHumidityMeasurement                                         | 0x0405 |
+| OccupancySensing                                                    | 0x0406 |
+| CarbonMonoxideConcentrationMeasurement                              | 0x040C |
+| CarbonDioxideConcentrationMeasurement                               | 0x040D |
+| EthyleneConcentrationMeasurement                                    | 0x040E |
+| EthyleneOxideConcentrationMeasurement                               | 0x040F |
+| HydrogenConcentrationMeasurement                                    | 0x0410 |
+| HydrogenSulphideConcentrationMeasurement                            | 0x0411 |
+| NitricOxideConcentrationMeasurement                                 | 0x0412 |
+| NitrogenDioxideConcentrationMeasurement                             | 0x0413 |
+| OxygenConcentrationMeasurement                                      | 0x0414 |
+| OzoneConcentrationMeasurement                                       | 0x0415 |
+| SulfurDioxideConcentrationMeasurement                               | 0x0416 |
+| DissolvedOxygenConcentrationMeasurement                             | 0x0417 |
+| BromateConcentrationMeasurement                                     | 0x0418 |
+| ChloraminesConcentrationMeasurement                                 | 0x0419 |
+| ChlorineConcentrationMeasurement                                    | 0x041A |
+| FecalColiformAndEColiConcentrationMeasurement                       | 0x041B |
+| FluorideConcentrationMeasurement                                    | 0x041C |
+| HaloaceticAcidsConcentrationMeasurement                             | 0x041D |
+| TotalTrihalomethanesConcentrationMeasurement                        | 0x041E |
+| TotalColiformBacteriaConcentrationMeasurement                       | 0x041F |
+| TurbidityConcentrationMeasurement                                   | 0x0420 |
+| CopperConcentrationMeasurement                                      | 0x0421 |
+| LeadConcentrationMeasurement                                        | 0x0422 |
+| ManganeseConcentrationMeasurement                                   | 0x0423 |
+| SulfateConcentrationMeasurement                                     | 0x0424 |
+| BromodichloromethaneConcentrationMeasurement                        | 0x0425 |
+| BromoformConcentrationMeasurement                                   | 0x0426 |
+| ChlorodibromomethaneConcentrationMeasurement                        | 0x0427 |
+| ChloroformConcentrationMeasurement                                  | 0x0428 |
+| SodiumConcentrationMeasurement                                      | 0x0429 |
+| IasZone                                                             | 0x0500 |
+| IasAce                                                              | 0x0501 |
+| IasWd                                                               | 0x0502 |
+| WakeOnLan                                                           | 0x0503 |
+| Channel                                                             | 0x0504 |
+| TargetNavigator                                                     | 0x0505 |
+| MediaPlayback                                                       | 0x0506 |
+| MediaInput                                                          | 0x0507 |
+| LowPower                                                            | 0x0508 |
+| KeypadInput                                                         | 0x0509 |
+| ContentLauncher                                                     | 0x050A |
+| AudioOutput                                                         | 0x050B |
+| ApplicationLauncher                                                 | 0x050C |
+| ApplicationBasic                                                    | 0x050D |
+| AccountLogin                                                        | 0x050E |
+| TestCluster                                                         | 0x050F |
+| Messaging                                                           | 0x0703 |
+| ApplianceIdentification                                             | 0x0B00 |
+| MeterIdentification                                                 | 0x0B01 |
+| ApplianceEventsAndAlert                                             | 0x0B02 |
+| ApplianceStatistics                                                 | 0x0B03 |
+| ElectricalMeasurement                                               | 0x0B04 |
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
@@ -108,6 +162,7 @@
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -185,8 +240,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000001F) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAclWithMinInterval:mMinInterval
-                                          maxInterval:mMaxInterval
+        [cluster subscribeAttributeAclWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                          maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                               subscriptionEstablished:NULL
                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                             NSLog(@"AccessControl.Acl response %@", [value description]);
@@ -277,8 +332,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000001F) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeExtensionWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+        [cluster subscribeAttributeExtensionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"AccessControl.Extension response %@", [value description]);
@@ -349,8 +404,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"AccessControl.ServerGeneratedCommandList response %@",
@@ -422,8 +477,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"AccessControl.ClientGeneratedCommandList response %@",
@@ -493,8 +548,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000001F) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"AccessControl.AttributeList response %@", [value description]);
@@ -563,8 +618,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000001F) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"AccessControl.ClusterRevision response %@", [value description]);
@@ -597,6 +652,7 @@ private:
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -755,8 +811,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPAccountLogin * cluster = [[CHIPAccountLogin alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"AccountLogin.ServerGeneratedCommandList response %@",
@@ -828,8 +884,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPAccountLogin * cluster = [[CHIPAccountLogin alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"AccountLogin.ClientGeneratedCommandList response %@",
@@ -899,8 +955,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050E) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPAccountLogin * cluster = [[CHIPAccountLogin alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"AccountLogin.AttributeList response %@", [value description]);
@@ -969,8 +1025,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050E) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPAccountLogin * cluster = [[CHIPAccountLogin alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"AccountLogin.ClusterRevision response %@", [value description]);
@@ -995,8 +1051,8 @@ private:
 | Cluster AdministratorCommissioning                                  | 0x003C |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * OpenBasicCommissioningWindow                                      |   0x01 |
 | * OpenCommissioningWindow                                           |   0x00 |
+| * OpenBasicCommissioningWindow                                      |   0x01 |
 | * RevokeCommissioning                                               |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
@@ -1006,6 +1062,7 @@ private:
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -1177,8 +1234,8 @@ public:
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
         [cluster
-            subscribeAttributeWindowStatusWithMinInterval:mMinInterval
-                                              maxInterval:mMaxInterval
+            subscribeAttributeWindowStatusWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"AdministratorCommissioning.WindowStatus response %@", [value description]);
@@ -1251,8 +1308,8 @@ public:
         CHIPAdministratorCommissioning * cluster = [[CHIPAdministratorCommissioning alloc] initWithDevice:device
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeAdminFabricIndexWithMinInterval:mMinInterval
-                                                       maxInterval:mMaxInterval
+        [cluster subscribeAttributeAdminFabricIndexWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                       maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"AdministratorCommissioning.AdminFabricIndex response %@",
@@ -1326,8 +1383,8 @@ public:
         CHIPAdministratorCommissioning * cluster = [[CHIPAdministratorCommissioning alloc] initWithDevice:device
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeAdminVendorIdWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAdminVendorIdWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"AdministratorCommissioning.AdminVendorId response %@",
@@ -1403,8 +1460,8 @@ public:
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"AdministratorCommissioning.ServerGeneratedCommandList "
@@ -1481,8 +1538,8 @@ public:
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"AdministratorCommissioning.ClientGeneratedCommandList "
@@ -1557,8 +1614,8 @@ public:
         CHIPAdministratorCommissioning * cluster = [[CHIPAdministratorCommissioning alloc] initWithDevice:device
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"AdministratorCommissioning.AttributeList response %@",
@@ -1632,8 +1689,8 @@ public:
         CHIPAdministratorCommissioning * cluster = [[CHIPAdministratorCommissioning alloc] initWithDevice:device
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"AdministratorCommissioning.ClusterRevision response %@",
@@ -1672,6 +1729,7 @@ private:
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -1729,8 +1787,8 @@ public:
         CHIPApplicationBasic * cluster = [[CHIPApplicationBasic alloc] initWithDevice:device
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeVendorNameWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributeVendorNameWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"ApplicationBasic.VendorName response %@", [value description]);
@@ -1803,8 +1861,8 @@ public:
         CHIPApplicationBasic * cluster = [[CHIPApplicationBasic alloc] initWithDevice:device
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeVendorIdWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+        [cluster subscribeAttributeVendorIdWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ApplicationBasic.VendorId response %@", [value description]);
@@ -1877,8 +1935,8 @@ public:
         CHIPApplicationBasic * cluster = [[CHIPApplicationBasic alloc] initWithDevice:device
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeApplicationNameWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeApplicationNameWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ApplicationBasic.ApplicationName response %@", [value description]);
@@ -1951,8 +2009,8 @@ public:
         CHIPApplicationBasic * cluster = [[CHIPApplicationBasic alloc] initWithDevice:device
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeProductIdWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+        [cluster subscribeAttributeProductIdWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ApplicationBasic.ProductId response %@", [value description]);
@@ -2048,8 +2106,8 @@ public:
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeApplicationStatusWithMinInterval:mMinInterval
-                                                   maxInterval:mMaxInterval
+            subscribeAttributeApplicationStatusWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                   maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"ApplicationBasic.ApplicationStatus response %@", [value description]);
@@ -2122,8 +2180,8 @@ public:
         CHIPApplicationBasic * cluster = [[CHIPApplicationBasic alloc] initWithDevice:device
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeApplicationVersionWithMinInterval:mMinInterval
-                                                         maxInterval:mMaxInterval
+        [cluster subscribeAttributeApplicationVersionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                         maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                              subscriptionEstablished:NULL
                                                        reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                            NSLog(@"ApplicationBasic.ApplicationVersion response %@",
@@ -2198,8 +2256,8 @@ public:
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeAllowedVendorListWithMinInterval:mMinInterval
-                                                   maxInterval:mMaxInterval
+            subscribeAttributeAllowedVendorListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                   maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"ApplicationBasic.AllowedVendorList response %@", [value description]);
@@ -2274,8 +2332,8 @@ public:
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"ApplicationBasic.ServerGeneratedCommandList response %@",
@@ -2351,8 +2409,8 @@ public:
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"ApplicationBasic.ClientGeneratedCommandList response %@",
@@ -2426,8 +2484,8 @@ public:
         CHIPApplicationBasic * cluster = [[CHIPApplicationBasic alloc] initWithDevice:device
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"ApplicationBasic.AttributeList response %@", [value description]);
@@ -2500,8 +2558,8 @@ public:
         CHIPApplicationBasic * cluster = [[CHIPApplicationBasic alloc] initWithDevice:device
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ApplicationBasic.ClusterRevision response %@", [value description]);
@@ -2526,9 +2584,9 @@ private:
 | Cluster ApplicationLauncher                                         | 0x050C |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * HideAppRequest                                                    |   0x02 |
 | * LaunchAppRequest                                                  |   0x00 |
 | * StopAppRequest                                                    |   0x01 |
+| * HideAppRequest                                                    |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * ApplicationLauncherList                                           | 0x0000 |
@@ -2536,6 +2594,7 @@ private:
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -2700,8 +2759,8 @@ public:
         CHIPApplicationLauncher * cluster = [[CHIPApplicationLauncher alloc] initWithDevice:device
                                                                                    endpoint:endpointId
                                                                                       queue:callbackQueue];
-        [cluster subscribeAttributeApplicationLauncherListWithMinInterval:mMinInterval
-                                                              maxInterval:mMaxInterval
+        [cluster subscribeAttributeApplicationLauncherListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                   subscriptionEstablished:NULL
                                                             reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"ApplicationLauncher.ApplicationLauncherList response %@",
@@ -2821,8 +2880,8 @@ public:
                                                                                    endpoint:endpointId
                                                                                       queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"ApplicationLauncher.ServerGeneratedCommandList response %@",
@@ -2898,8 +2957,8 @@ public:
                                                                                    endpoint:endpointId
                                                                                       queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"ApplicationLauncher.ClientGeneratedCommandList response %@",
@@ -2973,8 +3032,8 @@ public:
         CHIPApplicationLauncher * cluster = [[CHIPApplicationLauncher alloc] initWithDevice:device
                                                                                    endpoint:endpointId
                                                                                       queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"ApplicationLauncher.AttributeList response %@", [value description]);
@@ -3048,8 +3107,8 @@ public:
                                                                                    endpoint:endpointId
                                                                                       queue:callbackQueue];
         [cluster
-            subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+            subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"ApplicationLauncher.ClusterRevision response %@", [value description]);
@@ -3074,8 +3133,8 @@ private:
 | Cluster AudioOutput                                                 | 0x050B |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * RenameOutputRequest                                               |   0x01 |
 | * SelectOutputRequest                                               |   0x00 |
+| * RenameOutputRequest                                               |   0x01 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * AudioOutputList                                                   | 0x0000 |
@@ -3083,6 +3142,7 @@ private:
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -3205,8 +3265,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050B) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPAudioOutput * cluster = [[CHIPAudioOutput alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAudioOutputListWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeAudioOutputListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"AudioOutput.AudioOutputList response %@", [value description]);
@@ -3276,8 +3336,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPAudioOutput * cluster = [[CHIPAudioOutput alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeCurrentAudioOutputWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+            subscribeAttributeCurrentAudioOutputWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"AudioOutput.CurrentAudioOutput response %@", [value description]);
@@ -3348,8 +3408,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPAudioOutput * cluster = [[CHIPAudioOutput alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"AudioOutput.ServerGeneratedCommandList response %@",
@@ -3421,8 +3481,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPAudioOutput * cluster = [[CHIPAudioOutput alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"AudioOutput.ClientGeneratedCommandList response %@",
@@ -3492,8 +3552,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050B) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPAudioOutput * cluster = [[CHIPAudioOutput alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"AudioOutput.AttributeList response %@", [value description]);
@@ -3562,8 +3622,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050B) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPAudioOutput * cluster = [[CHIPAudioOutput alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"AudioOutput.ClusterRevision response %@", [value description]);
@@ -3595,10 +3655,17 @@ private:
 | * BarrierMovingState                                                | 0x0001 |
 | * BarrierSafetyStatus                                               | 0x0002 |
 | * BarrierCapabilities                                               | 0x0003 |
+| * BarrierOpenEvents                                                 | 0x0004 |
+| * BarrierCloseEvents                                                | 0x0005 |
+| * BarrierCommandOpenEvents                                          | 0x0006 |
+| * BarrierCommandCloseEvents                                         | 0x0007 |
+| * BarrierOpenPeriod                                                 | 0x0008 |
+| * BarrierClosePeriod                                                | 0x0009 |
 | * BarrierPosition                                                   | 0x000A |
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -3714,8 +3781,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBarrierControl * cluster = [[CHIPBarrierControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeBarrierMovingStateWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+            subscribeAttributeBarrierMovingStateWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"BarrierControl.BarrierMovingState response %@", [value description]);
@@ -3784,8 +3851,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000103) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBarrierControl * cluster = [[CHIPBarrierControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeBarrierSafetyStatusWithMinInterval:mMinInterval
-                                                          maxInterval:mMaxInterval
+        [cluster subscribeAttributeBarrierSafetyStatusWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                               subscriptionEstablished:NULL
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"BarrierControl.BarrierSafetyStatus response %@",
@@ -3855,8 +3922,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000103) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBarrierControl * cluster = [[CHIPBarrierControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeBarrierCapabilitiesWithMinInterval:mMinInterval
-                                                          maxInterval:mMaxInterval
+        [cluster subscribeAttributeBarrierCapabilitiesWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                               subscriptionEstablished:NULL
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"BarrierControl.BarrierCapabilities response %@",
@@ -3926,8 +3993,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000103) ReportAttribute (0x0000000A) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBarrierControl * cluster = [[CHIPBarrierControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeBarrierPositionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeBarrierPositionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"BarrierControl.BarrierPosition response %@", [value description]);
@@ -3998,8 +4065,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBarrierControl * cluster = [[CHIPBarrierControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"BarrierControl.ServerGeneratedCommandList response %@",
@@ -4071,8 +4138,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBarrierControl * cluster = [[CHIPBarrierControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"BarrierControl.ClientGeneratedCommandList response %@",
@@ -4142,8 +4209,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000103) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBarrierControl * cluster = [[CHIPBarrierControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"BarrierControl.AttributeList response %@", [value description]);
@@ -4212,8 +4279,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000103) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBarrierControl * cluster = [[CHIPBarrierControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"BarrierControl.ClusterRevision response %@", [value description]);
@@ -4238,6 +4305,7 @@ private:
 | Cluster Basic                                                       | 0x0028 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * MfgSpecificPing                                                   |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * DataModelRevision                                                 | 0x0000 |
@@ -4262,6 +4330,7 @@ private:
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -4319,8 +4388,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeDataModelRevisionWithMinInterval:mMinInterval
-                                                        maxInterval:mMaxInterval
+        [cluster subscribeAttributeDataModelRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                        maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"Basic.DataModelRevision response %@", [value description]);
@@ -4389,8 +4458,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeVendorNameWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributeVendorNameWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"Basic.VendorName response %@", [value description]);
@@ -4459,8 +4528,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeVendorIDWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+        [cluster subscribeAttributeVendorIDWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"Basic.VendorID response %@", [value description]);
@@ -4529,8 +4598,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeProductNameWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+        [cluster subscribeAttributeProductNameWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"Basic.ProductName response %@", [value description]);
@@ -4599,8 +4668,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeProductIDWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+        [cluster subscribeAttributeProductIDWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"Basic.ProductID response %@", [value description]);
@@ -4703,8 +4772,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeNodeLabelWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+        [cluster subscribeAttributeNodeLabelWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"Basic.NodeLabel response %@", [value description]);
@@ -4807,8 +4876,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeLocationWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+        [cluster subscribeAttributeLocationWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"Basic.Location response %@", [value description]);
@@ -4877,8 +4946,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x00000007) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeHardwareVersionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeHardwareVersionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Basic.HardwareVersion response %@", [value description]);
@@ -4948,8 +5017,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeHardwareVersionStringWithMinInterval:mMinInterval
-                                                       maxInterval:mMaxInterval
+            subscribeAttributeHardwareVersionStringWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                       maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"Basic.HardwareVersionString response %@", [value description]);
@@ -5018,8 +5087,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x00000009) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeSoftwareVersionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeSoftwareVersionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Basic.SoftwareVersion response %@", [value description]);
@@ -5089,8 +5158,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeSoftwareVersionStringWithMinInterval:mMinInterval
-                                                       maxInterval:mMaxInterval
+            subscribeAttributeSoftwareVersionStringWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                       maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"Basic.SoftwareVersionString response %@", [value description]);
@@ -5159,8 +5228,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x0000000B) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeManufacturingDateWithMinInterval:mMinInterval
-                                                        maxInterval:mMaxInterval
+        [cluster subscribeAttributeManufacturingDateWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                        maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"Basic.ManufacturingDate response %@", [value description]);
@@ -5229,8 +5298,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x0000000C) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributePartNumberWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributePartNumberWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"Basic.PartNumber response %@", [value description]);
@@ -5299,8 +5368,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x0000000D) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeProductURLWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributeProductURLWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"Basic.ProductURL response %@", [value description]);
@@ -5369,8 +5438,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x0000000E) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeProductLabelWithMinInterval:mMinInterval
-                                                   maxInterval:mMaxInterval
+        [cluster subscribeAttributeProductLabelWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                   maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"Basic.ProductLabel response %@", [value description]);
@@ -5439,8 +5508,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x0000000F) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeSerialNumberWithMinInterval:mMinInterval
-                                                   maxInterval:mMaxInterval
+        [cluster subscribeAttributeSerialNumberWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                   maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"Basic.SerialNumber response %@", [value description]);
@@ -5541,8 +5610,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x00000010) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeLocalConfigDisabledWithMinInterval:mMinInterval
-                                                          maxInterval:mMaxInterval
+        [cluster subscribeAttributeLocalConfigDisabledWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                               subscriptionEstablished:NULL
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"Basic.LocalConfigDisabled response %@", [value description]);
@@ -5611,8 +5680,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x00000011) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeReachableWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+        [cluster subscribeAttributeReachableWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"Basic.Reachable response %@", [value description]);
@@ -5681,8 +5750,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x00000012) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeUniqueIDWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+        [cluster subscribeAttributeUniqueIDWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"Basic.UniqueID response %@", [value description]);
@@ -5753,8 +5822,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"Basic.ServerGeneratedCommandList response %@",
@@ -5826,8 +5895,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"Basic.ClientGeneratedCommandList response %@",
@@ -5897,8 +5966,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"Basic.AttributeList response %@", [value description]);
@@ -5967,8 +6036,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000028) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBasic * cluster = [[CHIPBasic alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Basic.ClusterRevision response %@", [value description]);
@@ -5995,12 +6064,19 @@ private:
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
+| * ActiveText                                                        | 0x0004 |
+| * Description                                                       | 0x001C |
+| * InactiveText                                                      | 0x002E |
 | * OutOfService                                                      | 0x0051 |
+| * Polarity                                                          | 0x0054 |
 | * PresentValue                                                      | 0x0055 |
+| * Reliability                                                       | 0x0067 |
 | * StatusFlags                                                       | 0x006F |
+| * ApplicationType                                                   | 0x0100 |
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -6092,8 +6168,8 @@ public:
         CHIPBinaryInputBasic * cluster = [[CHIPBinaryInputBasic alloc] initWithDevice:device
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeOutOfServiceWithMinInterval:mMinInterval
-                                                   maxInterval:mMaxInterval
+        [cluster subscribeAttributeOutOfServiceWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                   maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"BinaryInputBasic.OutOfService response %@", [value description]);
@@ -6200,8 +6276,8 @@ public:
         CHIPBinaryInputBasic * cluster = [[CHIPBinaryInputBasic alloc] initWithDevice:device
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributePresentValueWithMinInterval:mMinInterval
-                                                   maxInterval:mMaxInterval
+        [cluster subscribeAttributePresentValueWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                   maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"BinaryInputBasic.PresentValue response %@", [value description]);
@@ -6274,8 +6350,8 @@ public:
         CHIPBinaryInputBasic * cluster = [[CHIPBinaryInputBasic alloc] initWithDevice:device
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeStatusFlagsWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+        [cluster subscribeAttributeStatusFlagsWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"BinaryInputBasic.StatusFlags response %@", [value description]);
@@ -6350,8 +6426,8 @@ public:
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"BinaryInputBasic.ServerGeneratedCommandList response %@",
@@ -6427,8 +6503,8 @@ public:
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"BinaryInputBasic.ClientGeneratedCommandList response %@",
@@ -6502,8 +6578,8 @@ public:
         CHIPBinaryInputBasic * cluster = [[CHIPBinaryInputBasic alloc] initWithDevice:device
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"BinaryInputBasic.AttributeList response %@", [value description]);
@@ -6576,8 +6652,8 @@ public:
         CHIPBinaryInputBasic * cluster = [[CHIPBinaryInputBasic alloc] initWithDevice:device
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"BinaryInputBasic.ClusterRevision response %@", [value description]);
@@ -6602,107 +6678,101 @@ private:
 | Cluster Binding                                                     | 0x001E |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * Bind                                                              |   0x00 |
+| * Unbind                                                            |   0x01 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * BindingList                                                       | 0x0000 |
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
 \*----------------------------------------------------------------------------*/
 
 /*
- * Attribute BindingList
+ * Command Bind
  */
-class ReadBindingBindingList : public ModelCommand {
+class BindingBind : public ModelCommand {
 public:
-    ReadBindingBindingList()
-        : ModelCommand("read")
+    BindingBind()
+        : ModelCommand("bind")
     {
-        AddArgument("attr-name", "binding-list");
+        AddArgument("NodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("GroupId", 0, UINT16_MAX, &mGroupId);
+        AddArgument("EndpointId", 0, UINT16_MAX, &mEndpointId);
+        AddArgument("ClusterId", 0, UINT32_MAX, &mClusterId);
         ModelCommand::AddArguments();
     }
 
-    ~ReadBindingBindingList() {}
-
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001E) ReadAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001E) command (0x00000000) on endpoint %" PRIu16, endpointId);
 
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBinding * cluster = [[CHIPBinding alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
 
-        [cluster readAttributeBindingListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-            NSLog(@"Binding.BindingList response %@", [value description]);
-            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-        }];
+        __auto_type * params = [[CHIPBindingClusterBindParams alloc] init];
+        params.nodeId = [NSNumber numberWithUnsignedLongLong:mNodeId];
+        params.groupId = [NSNumber numberWithUnsignedShort:mGroupId];
+        params.endpointId = [NSNumber numberWithUnsignedShort:mEndpointId];
+        params.clusterId = [NSNumber numberWithUnsignedInt:mClusterId];
+        [cluster bindWithParams:params
+              completionHandler:^(NSError * _Nullable error) {
+                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+              }];
+
         return CHIP_NO_ERROR;
-    }
-};
-
-class WriteBindingBindingList : public ModelCommand {
-public:
-    WriteBindingBindingList()
-        : ModelCommand("write")
-    {
-        AddArgument("attr-name", "binding-list");
-        //  Array parsing is not supported yet
-        ModelCommand::AddArguments();
-    }
-
-    ~WriteBindingBindingList() {}
-
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001E) WriteAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
-
-        return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
 private:
+    chip::NodeId mNodeId;
+    chip::GroupId mGroupId;
+    chip::EndpointId mEndpointId;
+    chip::ClusterId mClusterId;
 };
 
-class SubscribeAttributeBindingBindingList : public ModelCommand {
+/*
+ * Command Unbind
+ */
+class BindingUnbind : public ModelCommand {
 public:
-    SubscribeAttributeBindingBindingList()
-        : ModelCommand("subscribe")
+    BindingUnbind()
+        : ModelCommand("unbind")
     {
-        AddArgument("attr-name", "binding-list");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("NodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("GroupId", 0, UINT16_MAX, &mGroupId);
+        AddArgument("EndpointId", 0, UINT16_MAX, &mEndpointId);
+        AddArgument("ClusterId", 0, UINT32_MAX, &mClusterId);
         ModelCommand::AddArguments();
     }
 
-    ~SubscribeAttributeBindingBindingList() {}
-
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001E) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001E) command (0x00000001) on endpoint %" PRIu16, endpointId);
+
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBinding * cluster = [[CHIPBinding alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeBindingListWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
-                                      subscriptionEstablished:NULL
-                                                reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
-                                                    NSLog(@"Binding.BindingList response %@", [value description]);
-                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                }];
+
+        __auto_type * params = [[CHIPBindingClusterUnbindParams alloc] init];
+        params.nodeId = [NSNumber numberWithUnsignedLongLong:mNodeId];
+        params.groupId = [NSNumber numberWithUnsignedShort:mGroupId];
+        params.endpointId = [NSNumber numberWithUnsignedShort:mEndpointId];
+        params.clusterId = [NSNumber numberWithUnsignedInt:mClusterId];
+        [cluster unbindWithParams:params
+                completionHandler:^(NSError * _Nullable error) {
+                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                }];
 
         return CHIP_NO_ERROR;
     }
 
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
 private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
+    chip::NodeId mNodeId;
+    chip::GroupId mGroupId;
+    chip::EndpointId mEndpointId;
+    chip::ClusterId mClusterId;
 };
 
 /*
@@ -6755,8 +6825,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBinding * cluster = [[CHIPBinding alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"Binding.ServerGeneratedCommandList response %@",
@@ -6828,8 +6898,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBinding * cluster = [[CHIPBinding alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"Binding.ClientGeneratedCommandList response %@",
@@ -6899,8 +6969,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000001E) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBinding * cluster = [[CHIPBinding alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"Binding.AttributeList response %@", [value description]);
@@ -6969,8 +7039,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000001E) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBinding * cluster = [[CHIPBinding alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Binding.ClusterRevision response %@", [value description]);
@@ -7001,6 +7071,7 @@ private:
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -7055,8 +7126,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000045) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBooleanState * cluster = [[CHIPBooleanState alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeStateValueWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributeStateValueWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"BooleanState.StateValue response %@", [value description]);
@@ -7127,8 +7198,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBooleanState * cluster = [[CHIPBooleanState alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"BooleanState.ServerGeneratedCommandList response %@",
@@ -7200,8 +7271,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBooleanState * cluster = [[CHIPBooleanState alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"BooleanState.ClientGeneratedCommandList response %@",
@@ -7271,8 +7342,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000045) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBooleanState * cluster = [[CHIPBooleanState alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"BooleanState.AttributeList response %@", [value description]);
@@ -7341,8 +7412,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000045) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBooleanState * cluster = [[CHIPBooleanState alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"BooleanState.ClusterRevision response %@", [value description]);
@@ -7367,18 +7438,18 @@ private:
 | Cluster BridgedActions                                              | 0x0025 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * DisableAction                                                     |   0x0A |
-| * DisableActionWithDuration                                         |   0x0B |
-| * EnableAction                                                      |   0x08 |
-| * EnableActionWithDuration                                          |   0x09 |
 | * InstantAction                                                     |   0x00 |
 | * InstantActionWithTransition                                       |   0x01 |
-| * PauseAction                                                       |   0x05 |
-| * PauseActionWithDuration                                           |   0x06 |
-| * ResumeAction                                                      |   0x07 |
 | * StartAction                                                       |   0x02 |
 | * StartActionWithDuration                                           |   0x03 |
 | * StopAction                                                        |   0x04 |
+| * PauseAction                                                       |   0x05 |
+| * PauseActionWithDuration                                           |   0x06 |
+| * ResumeAction                                                      |   0x07 |
+| * EnableAction                                                      |   0x08 |
+| * EnableActionWithDuration                                          |   0x09 |
+| * DisableAction                                                     |   0x0A |
+| * DisableActionWithDuration                                         |   0x0B |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * ActionList                                                        | 0x0000 |
@@ -7387,6 +7458,7 @@ private:
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -7889,8 +7961,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBridgedActions * cluster = [[CHIPBridgedActions alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeActionListWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributeActionListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"BridgedActions.ActionList response %@", [value description]);
@@ -7959,8 +8031,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBridgedActions * cluster = [[CHIPBridgedActions alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeEndpointListWithMinInterval:mMinInterval
-                                                   maxInterval:mMaxInterval
+        [cluster subscribeAttributeEndpointListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                   maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"BridgedActions.EndpointList response %@", [value description]);
@@ -8029,8 +8101,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBridgedActions * cluster = [[CHIPBridgedActions alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeSetupUrlWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+        [cluster subscribeAttributeSetupUrlWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"BridgedActions.SetupUrl response %@", [value description]);
@@ -8101,8 +8173,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBridgedActions * cluster = [[CHIPBridgedActions alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"BridgedActions.ServerGeneratedCommandList response %@",
@@ -8174,8 +8246,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBridgedActions * cluster = [[CHIPBridgedActions alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"BridgedActions.ClientGeneratedCommandList response %@",
@@ -8245,8 +8317,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBridgedActions * cluster = [[CHIPBridgedActions alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"BridgedActions.AttributeList response %@", [value description]);
@@ -8315,8 +8387,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPBridgedActions * cluster = [[CHIPBridgedActions alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"BridgedActions.ClusterRevision response %@", [value description]);
@@ -8357,9 +8429,11 @@ private:
 | * ProductLabel                                                      | 0x000E |
 | * SerialNumber                                                      | 0x000F |
 | * Reachable                                                         | 0x0011 |
+| * UniqueID                                                          | 0x0012 |
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -8421,8 +8495,8 @@ public:
         CHIPBridgedDeviceBasic * cluster = [[CHIPBridgedDeviceBasic alloc] initWithDevice:device
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeVendorNameWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributeVendorNameWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"BridgedDeviceBasic.VendorName response %@", [value description]);
@@ -8495,8 +8569,8 @@ public:
         CHIPBridgedDeviceBasic * cluster = [[CHIPBridgedDeviceBasic alloc] initWithDevice:device
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeVendorIDWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+        [cluster subscribeAttributeVendorIDWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"BridgedDeviceBasic.VendorID response %@", [value description]);
@@ -8569,8 +8643,8 @@ public:
         CHIPBridgedDeviceBasic * cluster = [[CHIPBridgedDeviceBasic alloc] initWithDevice:device
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeProductNameWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+        [cluster subscribeAttributeProductNameWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"BridgedDeviceBasic.ProductName response %@", [value description]);
@@ -8679,8 +8753,8 @@ public:
         CHIPBridgedDeviceBasic * cluster = [[CHIPBridgedDeviceBasic alloc] initWithDevice:device
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeNodeLabelWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+        [cluster subscribeAttributeNodeLabelWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"BridgedDeviceBasic.NodeLabel response %@", [value description]);
@@ -8754,8 +8828,8 @@ public:
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
         [cluster
-            subscribeAttributeHardwareVersionWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+            subscribeAttributeHardwareVersionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"BridgedDeviceBasic.HardwareVersion response %@", [value description]);
@@ -8828,8 +8902,8 @@ public:
         CHIPBridgedDeviceBasic * cluster = [[CHIPBridgedDeviceBasic alloc] initWithDevice:device
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeHardwareVersionStringWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+        [cluster subscribeAttributeHardwareVersionStringWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"BridgedDeviceBasic.HardwareVersionString response %@",
@@ -8904,8 +8978,8 @@ public:
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
         [cluster
-            subscribeAttributeSoftwareVersionWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+            subscribeAttributeSoftwareVersionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"BridgedDeviceBasic.SoftwareVersion response %@", [value description]);
@@ -8978,8 +9052,8 @@ public:
         CHIPBridgedDeviceBasic * cluster = [[CHIPBridgedDeviceBasic alloc] initWithDevice:device
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeSoftwareVersionStringWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+        [cluster subscribeAttributeSoftwareVersionStringWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"BridgedDeviceBasic.SoftwareVersionString response %@",
@@ -9053,8 +9127,8 @@ public:
         CHIPBridgedDeviceBasic * cluster = [[CHIPBridgedDeviceBasic alloc] initWithDevice:device
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeManufacturingDateWithMinInterval:mMinInterval
-                                                        maxInterval:mMaxInterval
+        [cluster subscribeAttributeManufacturingDateWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                        maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"BridgedDeviceBasic.ManufacturingDate response %@",
@@ -9128,8 +9202,8 @@ public:
         CHIPBridgedDeviceBasic * cluster = [[CHIPBridgedDeviceBasic alloc] initWithDevice:device
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributePartNumberWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributePartNumberWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"BridgedDeviceBasic.PartNumber response %@", [value description]);
@@ -9202,8 +9276,8 @@ public:
         CHIPBridgedDeviceBasic * cluster = [[CHIPBridgedDeviceBasic alloc] initWithDevice:device
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeProductURLWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributeProductURLWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"BridgedDeviceBasic.ProductURL response %@", [value description]);
@@ -9276,8 +9350,8 @@ public:
         CHIPBridgedDeviceBasic * cluster = [[CHIPBridgedDeviceBasic alloc] initWithDevice:device
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeProductLabelWithMinInterval:mMinInterval
-                                                   maxInterval:mMaxInterval
+        [cluster subscribeAttributeProductLabelWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                   maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"BridgedDeviceBasic.ProductLabel response %@", [value description]);
@@ -9350,8 +9424,8 @@ public:
         CHIPBridgedDeviceBasic * cluster = [[CHIPBridgedDeviceBasic alloc] initWithDevice:device
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeSerialNumberWithMinInterval:mMinInterval
-                                                   maxInterval:mMaxInterval
+        [cluster subscribeAttributeSerialNumberWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                   maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"BridgedDeviceBasic.SerialNumber response %@", [value description]);
@@ -9424,8 +9498,8 @@ public:
         CHIPBridgedDeviceBasic * cluster = [[CHIPBridgedDeviceBasic alloc] initWithDevice:device
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeReachableWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+        [cluster subscribeAttributeReachableWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"BridgedDeviceBasic.Reachable response %@", [value description]);
@@ -9500,8 +9574,8 @@ public:
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"BridgedDeviceBasic.ServerGeneratedCommandList response %@",
@@ -9577,8 +9651,8 @@ public:
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"BridgedDeviceBasic.ClientGeneratedCommandList response %@",
@@ -9652,8 +9726,8 @@ public:
         CHIPBridgedDeviceBasic * cluster = [[CHIPBridgedDeviceBasic alloc] initWithDevice:device
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"BridgedDeviceBasic.AttributeList response %@", [value description]);
@@ -9727,8 +9801,8 @@ public:
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
         [cluster
-            subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+            subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"BridgedDeviceBasic.ClusterRevision response %@", [value description]);
@@ -9753,8 +9827,8 @@ private:
 | Cluster Channel                                                     | 0x0504 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * ChangeChannelByNumberRequest                                      |   0x02 |
 | * ChangeChannelRequest                                              |   0x00 |
+| * ChangeChannelByNumberRequest                                      |   0x02 |
 | * SkipChannelRequest                                                |   0x03 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
@@ -9764,6 +9838,7 @@ private:
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -9921,8 +9996,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000504) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPChannel * cluster = [[CHIPChannel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeChannelListWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+        [cluster subscribeAttributeChannelListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"Channel.ChannelList response %@", [value description]);
@@ -9965,28 +10040,6 @@ public:
     }
 };
 
-class WriteChannelChannelLineup : public ModelCommand {
-public:
-    WriteChannelChannelLineup()
-        : ModelCommand("write")
-    {
-        AddArgument("attr-name", "channel-lineup");
-        //  Struct parsing is not supported yet
-        ModelCommand::AddArguments();
-    }
-
-    ~WriteChannelChannelLineup() {}
-
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000504) WriteAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
-
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-
-private:
-};
-
 /*
  * Attribute CurrentChannel
  */
@@ -10007,28 +10060,6 @@ public:
 
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
-};
-
-class WriteChannelCurrentChannel : public ModelCommand {
-public:
-    WriteChannelCurrentChannel()
-        : ModelCommand("write")
-    {
-        AddArgument("attr-name", "current-channel");
-        //  Struct parsing is not supported yet
-        ModelCommand::AddArguments();
-    }
-
-    ~WriteChannelCurrentChannel() {}
-
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000504) WriteAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
-
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-
-private:
 };
 
 /*
@@ -10081,8 +10112,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPChannel * cluster = [[CHIPChannel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"Channel.ServerGeneratedCommandList response %@",
@@ -10154,8 +10185,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPChannel * cluster = [[CHIPChannel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"Channel.ClientGeneratedCommandList response %@",
@@ -10225,8 +10256,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000504) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPChannel * cluster = [[CHIPChannel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"Channel.AttributeList response %@", [value description]);
@@ -10295,8 +10326,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000504) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPChannel * cluster = [[CHIPChannel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Channel.ClusterRevision response %@", [value description]);
@@ -10321,25 +10352,25 @@ private:
 | Cluster ColorControl                                                | 0x0300 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * ColorLoopSet                                                      |   0x44 |
-| * EnhancedMoveHue                                                   |   0x41 |
-| * EnhancedMoveToHue                                                 |   0x40 |
-| * EnhancedMoveToHueAndSaturation                                    |   0x43 |
-| * EnhancedStepHue                                                   |   0x42 |
-| * MoveColor                                                         |   0x08 |
-| * MoveColorTemperature                                              |   0x4B |
-| * MoveHue                                                           |   0x01 |
-| * MoveSaturation                                                    |   0x04 |
-| * MoveToColor                                                       |   0x07 |
-| * MoveToColorTemperature                                            |   0x0A |
 | * MoveToHue                                                         |   0x00 |
-| * MoveToHueAndSaturation                                            |   0x06 |
-| * MoveToSaturation                                                  |   0x03 |
-| * StepColor                                                         |   0x09 |
-| * StepColorTemperature                                              |   0x4C |
+| * MoveHue                                                           |   0x01 |
 | * StepHue                                                           |   0x02 |
+| * MoveToSaturation                                                  |   0x03 |
+| * MoveSaturation                                                    |   0x04 |
 | * StepSaturation                                                    |   0x05 |
+| * MoveToHueAndSaturation                                            |   0x06 |
+| * MoveToColor                                                       |   0x07 |
+| * MoveColor                                                         |   0x08 |
+| * StepColor                                                         |   0x09 |
+| * MoveToColorTemperature                                            |   0x0A |
+| * EnhancedMoveToHue                                                 |   0x40 |
+| * EnhancedMoveHue                                                   |   0x41 |
+| * EnhancedStepHue                                                   |   0x42 |
+| * EnhancedMoveToHueAndSaturation                                    |   0x43 |
+| * ColorLoopSet                                                      |   0x44 |
 | * StopMoveStep                                                      |   0x47 |
+| * MoveColorTemperature                                              |   0x4B |
+| * StepColorTemperature                                              |   0x4C |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * CurrentHue                                                        | 0x0000 |
@@ -10397,6 +10428,7 @@ private:
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -11293,8 +11325,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeCurrentHueWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributeCurrentHueWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"ColorControl.CurrentHue response %@", [value description]);
@@ -11363,8 +11395,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeCurrentSaturationWithMinInterval:mMinInterval
-                                                        maxInterval:mMaxInterval
+        [cluster subscribeAttributeCurrentSaturationWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                        maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ColorControl.CurrentSaturation response %@", [value description]);
@@ -11433,8 +11465,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeRemainingTimeWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeRemainingTimeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"ColorControl.RemainingTime response %@", [value description]);
@@ -11503,8 +11535,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeCurrentXWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+        [cluster subscribeAttributeCurrentXWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ColorControl.CurrentX response %@", [value description]);
@@ -11573,8 +11605,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeCurrentYWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+        [cluster subscribeAttributeCurrentYWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ColorControl.CurrentY response %@", [value description]);
@@ -11643,8 +11675,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeDriftCompensationWithMinInterval:mMinInterval
-                                                        maxInterval:mMaxInterval
+        [cluster subscribeAttributeDriftCompensationWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                        maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ColorControl.DriftCompensation response %@", [value description]);
@@ -11713,8 +11745,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeCompensationTextWithMinInterval:mMinInterval
-                                                       maxInterval:mMaxInterval
+        [cluster subscribeAttributeCompensationTextWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                       maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"ColorControl.CompensationText response %@", [value description]);
@@ -11783,8 +11815,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000007) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeColorTemperatureWithMinInterval:mMinInterval
-                                                       maxInterval:mMaxInterval
+        [cluster subscribeAttributeColorTemperatureWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                       maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"ColorControl.ColorTemperature response %@", [value description]);
@@ -11853,8 +11885,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000008) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeColorModeWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+        [cluster subscribeAttributeColorModeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.ColorMode response %@", [value description]);
@@ -11956,8 +11988,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeColorControlOptionsWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+            subscribeAttributeColorControlOptionsWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"ColorControl.ColorControlOptions response %@", [value description]);
@@ -12026,8 +12058,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000010) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeNumberOfPrimariesWithMinInterval:mMinInterval
-                                                        maxInterval:mMaxInterval
+        [cluster subscribeAttributeNumberOfPrimariesWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                        maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ColorControl.NumberOfPrimaries response %@", [value description]);
@@ -12096,8 +12128,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000011) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributePrimary1XWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+        [cluster subscribeAttributePrimary1XWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.Primary1X response %@", [value description]);
@@ -12166,8 +12198,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000012) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributePrimary1YWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+        [cluster subscribeAttributePrimary1YWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.Primary1Y response %@", [value description]);
@@ -12236,8 +12268,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000013) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributePrimary1IntensityWithMinInterval:mMinInterval
-                                                        maxInterval:mMaxInterval
+        [cluster subscribeAttributePrimary1IntensityWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                        maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ColorControl.Primary1Intensity response %@", [value description]);
@@ -12306,8 +12338,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000015) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributePrimary2XWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+        [cluster subscribeAttributePrimary2XWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.Primary2X response %@", [value description]);
@@ -12376,8 +12408,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000016) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributePrimary2YWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+        [cluster subscribeAttributePrimary2YWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.Primary2Y response %@", [value description]);
@@ -12446,8 +12478,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000017) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributePrimary2IntensityWithMinInterval:mMinInterval
-                                                        maxInterval:mMaxInterval
+        [cluster subscribeAttributePrimary2IntensityWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                        maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ColorControl.Primary2Intensity response %@", [value description]);
@@ -12516,8 +12548,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000019) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributePrimary3XWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+        [cluster subscribeAttributePrimary3XWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.Primary3X response %@", [value description]);
@@ -12586,8 +12618,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x0000001A) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributePrimary3YWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+        [cluster subscribeAttributePrimary3YWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.Primary3Y response %@", [value description]);
@@ -12656,8 +12688,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x0000001B) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributePrimary3IntensityWithMinInterval:mMinInterval
-                                                        maxInterval:mMaxInterval
+        [cluster subscribeAttributePrimary3IntensityWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                        maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ColorControl.Primary3Intensity response %@", [value description]);
@@ -12726,8 +12758,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000020) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributePrimary4XWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+        [cluster subscribeAttributePrimary4XWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.Primary4X response %@", [value description]);
@@ -12796,8 +12828,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000021) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributePrimary4YWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+        [cluster subscribeAttributePrimary4YWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.Primary4Y response %@", [value description]);
@@ -12866,8 +12898,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000022) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributePrimary4IntensityWithMinInterval:mMinInterval
-                                                        maxInterval:mMaxInterval
+        [cluster subscribeAttributePrimary4IntensityWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                        maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ColorControl.Primary4Intensity response %@", [value description]);
@@ -12936,8 +12968,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000024) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributePrimary5XWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+        [cluster subscribeAttributePrimary5XWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.Primary5X response %@", [value description]);
@@ -13006,8 +13038,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000025) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributePrimary5YWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+        [cluster subscribeAttributePrimary5YWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.Primary5Y response %@", [value description]);
@@ -13076,8 +13108,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000026) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributePrimary5IntensityWithMinInterval:mMinInterval
-                                                        maxInterval:mMaxInterval
+        [cluster subscribeAttributePrimary5IntensityWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                        maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ColorControl.Primary5Intensity response %@", [value description]);
@@ -13146,8 +13178,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000028) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributePrimary6XWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+        [cluster subscribeAttributePrimary6XWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.Primary6X response %@", [value description]);
@@ -13216,8 +13248,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000029) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributePrimary6YWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+        [cluster subscribeAttributePrimary6YWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ColorControl.Primary6Y response %@", [value description]);
@@ -13286,8 +13318,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x0000002A) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributePrimary6IntensityWithMinInterval:mMinInterval
-                                                        maxInterval:mMaxInterval
+        [cluster subscribeAttributePrimary6IntensityWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                        maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ColorControl.Primary6Intensity response %@", [value description]);
@@ -13388,8 +13420,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000030) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeWhitePointXWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+        [cluster subscribeAttributeWhitePointXWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ColorControl.WhitePointX response %@", [value description]);
@@ -13490,8 +13522,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000031) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeWhitePointYWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+        [cluster subscribeAttributeWhitePointYWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ColorControl.WhitePointY response %@", [value description]);
@@ -13592,8 +13624,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000032) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeColorPointRXWithMinInterval:mMinInterval
-                                                   maxInterval:mMaxInterval
+        [cluster subscribeAttributeColorPointRXWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                   maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"ColorControl.ColorPointRX response %@", [value description]);
@@ -13694,8 +13726,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000033) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeColorPointRYWithMinInterval:mMinInterval
-                                                   maxInterval:mMaxInterval
+        [cluster subscribeAttributeColorPointRYWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                   maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"ColorControl.ColorPointRY response %@", [value description]);
@@ -13796,8 +13828,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000034) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeColorPointRIntensityWithMinInterval:mMinInterval
-                                                           maxInterval:mMaxInterval
+        [cluster subscribeAttributeColorPointRIntensityWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                subscriptionEstablished:NULL
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ColorControl.ColorPointRIntensity response %@",
@@ -13899,8 +13931,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000036) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeColorPointGXWithMinInterval:mMinInterval
-                                                   maxInterval:mMaxInterval
+        [cluster subscribeAttributeColorPointGXWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                   maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"ColorControl.ColorPointGX response %@", [value description]);
@@ -14001,8 +14033,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000037) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeColorPointGYWithMinInterval:mMinInterval
-                                                   maxInterval:mMaxInterval
+        [cluster subscribeAttributeColorPointGYWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                   maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"ColorControl.ColorPointGY response %@", [value description]);
@@ -14103,8 +14135,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00000038) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeColorPointGIntensityWithMinInterval:mMinInterval
-                                                           maxInterval:mMaxInterval
+        [cluster subscribeAttributeColorPointGIntensityWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                subscriptionEstablished:NULL
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ColorControl.ColorPointGIntensity response %@",
@@ -14206,8 +14238,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x0000003A) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeColorPointBXWithMinInterval:mMinInterval
-                                                   maxInterval:mMaxInterval
+        [cluster subscribeAttributeColorPointBXWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                   maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"ColorControl.ColorPointBX response %@", [value description]);
@@ -14308,8 +14340,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x0000003B) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeColorPointBYWithMinInterval:mMinInterval
-                                                   maxInterval:mMaxInterval
+        [cluster subscribeAttributeColorPointBYWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                   maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"ColorControl.ColorPointBY response %@", [value description]);
@@ -14410,8 +14442,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x0000003C) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeColorPointBIntensityWithMinInterval:mMinInterval
-                                                           maxInterval:mMaxInterval
+        [cluster subscribeAttributeColorPointBIntensityWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                subscriptionEstablished:NULL
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ColorControl.ColorPointBIntensity response %@",
@@ -14482,8 +14514,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeEnhancedCurrentHueWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+            subscribeAttributeEnhancedCurrentHueWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"ColorControl.EnhancedCurrentHue response %@", [value description]);
@@ -14552,8 +14584,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00004001) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeEnhancedColorModeWithMinInterval:mMinInterval
-                                                        maxInterval:mMaxInterval
+        [cluster subscribeAttributeEnhancedColorModeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                        maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ColorControl.EnhancedColorMode response %@", [value description]);
@@ -14622,8 +14654,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00004002) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeColorLoopActiveWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeColorLoopActiveWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ColorControl.ColorLoopActive response %@", [value description]);
@@ -14693,8 +14725,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeColorLoopDirectionWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+            subscribeAttributeColorLoopDirectionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"ColorControl.ColorLoopDirection response %@", [value description]);
@@ -14763,8 +14795,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x00004004) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeColorLoopTimeWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeColorLoopTimeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"ColorControl.ColorLoopTime response %@", [value description]);
@@ -14835,8 +14867,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeColorLoopStartEnhancedHueWithMinInterval:mMinInterval
-                                                           maxInterval:mMaxInterval
+            subscribeAttributeColorLoopStartEnhancedHueWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                subscriptionEstablished:NULL
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ColorControl.ColorLoopStartEnhancedHue response %@",
@@ -14908,8 +14940,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeColorLoopStoredEnhancedHueWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeColorLoopStoredEnhancedHueWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"ColorControl.ColorLoopStoredEnhancedHue response %@",
@@ -14979,8 +15011,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x0000400A) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeColorCapabilitiesWithMinInterval:mMinInterval
-                                                        maxInterval:mMaxInterval
+        [cluster subscribeAttributeColorCapabilitiesWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                        maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ColorControl.ColorCapabilities response %@", [value description]);
@@ -15049,8 +15081,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x0000400B) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeColorTempPhysicalMinWithMinInterval:mMinInterval
-                                                           maxInterval:mMaxInterval
+        [cluster subscribeAttributeColorTempPhysicalMinWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                subscriptionEstablished:NULL
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ColorControl.ColorTempPhysicalMin response %@",
@@ -15120,8 +15152,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x0000400C) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeColorTempPhysicalMaxWithMinInterval:mMinInterval
-                                                           maxInterval:mMaxInterval
+        [cluster subscribeAttributeColorTempPhysicalMaxWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                subscriptionEstablished:NULL
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ColorControl.ColorTempPhysicalMax response %@",
@@ -15193,8 +15225,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeCoupleColorTempToLevelMinMiredsWithMinInterval:mMinInterval
-                                                                 maxInterval:mMaxInterval
+            subscribeAttributeCoupleColorTempToLevelMinMiredsWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                      subscriptionEstablished:NULL
                                                                reportHandler:^(
                                                                    NSNumber * _Nullable value, NSError * _Nullable error) {
@@ -15300,8 +15332,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeStartUpColorTemperatureMiredsWithMinInterval:mMinInterval
-                                                               maxInterval:mMaxInterval
+            subscribeAttributeStartUpColorTemperatureMiredsWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                    subscriptionEstablished:NULL
                                                              reportHandler:^(
                                                                  NSNumber * _Nullable value, NSError * _Nullable error) {
@@ -15374,8 +15406,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"ColorControl.ServerGeneratedCommandList response %@",
@@ -15447,8 +15479,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"ColorControl.ClientGeneratedCommandList response %@",
@@ -15518,8 +15550,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"ColorControl.AttributeList response %@", [value description]);
@@ -15588,8 +15620,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ColorControl.ClusterRevision response %@", [value description]);
@@ -15623,6 +15655,7 @@ private:
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -15649,9 +15682,9 @@ public:
         CHIPContentLauncher * cluster = [[CHIPContentLauncher alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
 
         __auto_type * params = [[CHIPContentLauncherClusterLaunchContentRequestParams alloc] init];
+        // search Struct parsing is not supported yet
         params.autoPlay = [NSNumber numberWithBool:mAutoPlay];
         params.data = [[NSString alloc] initWithBytes:mData.data() length:mData.size() encoding:NSUTF8StringEncoding];
-        // search Array parsing is not supported yet
         [cluster launchContentRequestWithParams:params
                               completionHandler:^(
                                   CHIPContentLauncherClusterLaunchResponseParams * _Nullable values, NSError * _Nullable error) {
@@ -15759,8 +15792,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPContentLauncher * cluster = [[CHIPContentLauncher alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeAcceptHeaderListWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+            subscribeAttributeAcceptHeaderListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ContentLauncher.AcceptHeaderList response %@", [value description]);
@@ -15863,8 +15896,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPContentLauncher * cluster = [[CHIPContentLauncher alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeSupportedStreamingProtocolsWithMinInterval:mMinInterval
-                                                             maxInterval:mMaxInterval
+            subscribeAttributeSupportedStreamingProtocolsWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                             maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                  subscriptionEstablished:NULL
                                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"ContentLauncher.SupportedStreamingProtocols response %@",
@@ -15936,8 +15969,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPContentLauncher * cluster = [[CHIPContentLauncher alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"ContentLauncher.ServerGeneratedCommandList response %@",
@@ -16009,8 +16042,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPContentLauncher * cluster = [[CHIPContentLauncher alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"ContentLauncher.ClientGeneratedCommandList response %@",
@@ -16080,8 +16113,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050A) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPContentLauncher * cluster = [[CHIPContentLauncher alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"ContentLauncher.AttributeList response %@", [value description]);
@@ -16150,8 +16183,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050A) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPContentLauncher * cluster = [[CHIPContentLauncher alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ContentLauncher.ClusterRevision response %@", [value description]);
@@ -16185,6 +16218,7 @@ private:
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -16238,8 +16272,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000001D) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDescriptor * cluster = [[CHIPDescriptor alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeDeviceListWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributeDeviceListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"Descriptor.DeviceList response %@", [value description]);
@@ -16308,8 +16342,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000001D) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDescriptor * cluster = [[CHIPDescriptor alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeServerListWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributeServerListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"Descriptor.ServerList response %@", [value description]);
@@ -16378,8 +16412,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000001D) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDescriptor * cluster = [[CHIPDescriptor alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeClientListWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributeClientListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"Descriptor.ClientList response %@", [value description]);
@@ -16448,8 +16482,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000001D) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDescriptor * cluster = [[CHIPDescriptor alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributePartsListWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+        [cluster subscribeAttributePartsListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"Descriptor.PartsList response %@", [value description]);
@@ -16520,8 +16554,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDescriptor * cluster = [[CHIPDescriptor alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"Descriptor.ServerGeneratedCommandList response %@",
@@ -16593,8 +16627,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDescriptor * cluster = [[CHIPDescriptor alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"Descriptor.ClientGeneratedCommandList response %@",
@@ -16664,8 +16698,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000001D) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDescriptor * cluster = [[CHIPDescriptor alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"Descriptor.AttributeList response %@", [value description]);
@@ -16734,8 +16768,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000001D) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDescriptor * cluster = [[CHIPDescriptor alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Descriptor.ClusterRevision response %@", [value description]);
@@ -16766,6 +16800,8 @@ private:
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
 \*----------------------------------------------------------------------------*/
@@ -16861,8 +16897,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDiagnosticLogs * cluster = [[CHIPDiagnosticLogs alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"DiagnosticLogs.ServerGeneratedCommandList response %@",
@@ -16934,8 +16970,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDiagnosticLogs * cluster = [[CHIPDiagnosticLogs alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"DiagnosticLogs.ClientGeneratedCommandList response %@",
@@ -17005,8 +17041,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000032) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDiagnosticLogs * cluster = [[CHIPDiagnosticLogs alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"DiagnosticLogs.AttributeList response %@", [value description]);
@@ -17031,47 +17067,88 @@ private:
 | Cluster DoorLock                                                    | 0x0101 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * ClearCredential                                                   |   0x26 |
-| * ClearUser                                                         |   0x1D |
-| * ClearWeekDaySchedule                                              |   0x0D |
-| * ClearYearDaySchedule                                              |   0x10 |
-| * GetCredentialStatus                                               |   0x24 |
-| * GetUser                                                           |   0x1B |
-| * GetWeekDaySchedule                                                |   0x0C |
-| * GetYearDaySchedule                                                |   0x0F |
 | * LockDoor                                                          |   0x00 |
-| * SetCredential                                                     |   0x22 |
-| * SetUser                                                           |   0x1A |
-| * SetWeekDaySchedule                                                |   0x0B |
-| * SetYearDaySchedule                                                |   0x0E |
 | * UnlockDoor                                                        |   0x01 |
 | * UnlockWithTimeout                                                 |   0x03 |
+| * GetLogRecord                                                      |   0x04 |
+| * SetPINCode                                                        |   0x05 |
+| * GetPINCode                                                        |   0x06 |
+| * ClearPINCode                                                      |   0x07 |
+| * ClearAllPINCodes                                                  |   0x08 |
+| * SetUserStatus                                                     |   0x09 |
+| * GetUserStatus                                                     |   0x0A |
+| * SetWeekDaySchedule                                                |   0x0B |
+| * GetWeekDaySchedule                                                |   0x0C |
+| * ClearWeekDaySchedule                                              |   0x0D |
+| * SetYearDaySchedule                                                |   0x0E |
+| * GetYearDaySchedule                                                |   0x0F |
+| * ClearYearDaySchedule                                              |   0x10 |
+| * SetHolidaySchedule                                                |   0x11 |
+| * GetHolidaySchedule                                                |   0x12 |
+| * ClearHolidaySchedule                                              |   0x13 |
+| * SetUserType                                                       |   0x14 |
+| * GetUserType                                                       |   0x15 |
+| * SetRFIDCode                                                       |   0x16 |
+| * GetRFIDCode                                                       |   0x17 |
+| * ClearRFIDCode                                                     |   0x18 |
+| * ClearAllRFIDCodes                                                 |   0x19 |
+| * SetUser                                                           |   0x1A |
+| * GetUser                                                           |   0x1B |
+| * ClearUser                                                         |   0x1D |
+| * SetCredential                                                     |   0x22 |
+| * GetCredentialStatus                                               |   0x24 |
+| * ClearCredential                                                   |   0x26 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * LockState                                                         | 0x0000 |
 | * LockType                                                          | 0x0001 |
 | * ActuatorEnabled                                                   | 0x0002 |
 | * DoorState                                                         | 0x0003 |
+| * DoorOpenEvents                                                    | 0x0004 |
+| * DoorClosedEvents                                                  | 0x0005 |
+| * OpenPeriod                                                        | 0x0006 |
+| * NumberOfLogRecordsSupported                                       | 0x0010 |
 | * NumberOfTotalUsersSupported                                       | 0x0011 |
 | * NumberOfPINUsersSupported                                         | 0x0012 |
 | * NumberOfRFIDUsersSupported                                        | 0x0013 |
 | * NumberOfWeekDaySchedulesSupportedPerUser                          | 0x0014 |
 | * NumberOfYearDaySchedulesSupportedPerUser                          | 0x0015 |
+| * NumberOfHolidaySchedulesSupported                                 | 0x0016 |
 | * MaxPINCodeLength                                                  | 0x0017 |
 | * MinPINCodeLength                                                  | 0x0018 |
 | * MaxRFIDCodeLength                                                 | 0x0019 |
 | * MinRFIDCodeLength                                                 | 0x001A |
+| * CredentialRulesSupport                                            | 0x001B |
+| * EnableLogging                                                     | 0x0020 |
 | * Language                                                          | 0x0021 |
+| * LEDSettings                                                       | 0x0022 |
 | * AutoRelockTime                                                    | 0x0023 |
 | * SoundVolume                                                       | 0x0024 |
 | * OperatingMode                                                     | 0x0025 |
 | * SupportedOperatingModes                                           | 0x0026 |
+| * DefaultConfigurationRegister                                      | 0x0027 |
+| * EnableLocalProgramming                                            | 0x0028 |
 | * EnableOneTouchLocking                                             | 0x0029 |
+| * EnableInsideStatusLED                                             | 0x002A |
 | * EnablePrivacyModeButton                                           | 0x002B |
+| * LocalProgrammingFeatures                                          | 0x002C |
 | * WrongCodeEntryLimit                                               | 0x0030 |
+| * UserCodeTemporaryDisableTime                                      | 0x0031 |
+| * SendPINOverTheAir                                                 | 0x0032 |
+| * RequirePINforRemoteOperation                                      | 0x0033 |
+| * ExpiringUserTimeout                                               | 0x0035 |
+| * AlarmMask                                                         | 0x0040 |
+| * KeypadOperationEventMask                                          | 0x0041 |
+| * RemoteOperationEventMask                                          | 0x0042 |
+| * ManualOperationEventMask                                          | 0x0043 |
+| * RFIDOperationEventMask                                            | 0x0044 |
+| * KeypadProgrammingEventMask                                        | 0x0045 |
+| * RemoteProgrammingEventMask                                        | 0x0046 |
+| * RFIDProgrammingEventMask                                          | 0x0047 |
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -17699,8 +17776,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeLockStateWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+        [cluster subscribeAttributeLockStateWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"DoorLock.LockState response %@", [value description]);
@@ -17769,8 +17846,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeLockTypeWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+        [cluster subscribeAttributeLockTypeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"DoorLock.LockType response %@", [value description]);
@@ -17839,8 +17916,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeActuatorEnabledWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeActuatorEnabledWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"DoorLock.ActuatorEnabled response %@", [value description]);
@@ -17909,8 +17986,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeDoorStateWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+        [cluster subscribeAttributeDoorStateWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"DoorLock.DoorState response %@", [value description]);
@@ -17981,8 +18058,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeNumberOfTotalUsersSupportedWithMinInterval:mMinInterval
-                                                             maxInterval:mMaxInterval
+            subscribeAttributeNumberOfTotalUsersSupportedWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                             maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                  subscriptionEstablished:NULL
                                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"DoorLock.NumberOfTotalUsersSupported response %@",
@@ -18054,8 +18131,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeNumberOfPINUsersSupportedWithMinInterval:mMinInterval
-                                                           maxInterval:mMaxInterval
+            subscribeAttributeNumberOfPINUsersSupportedWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                subscriptionEstablished:NULL
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"DoorLock.NumberOfPINUsersSupported response %@",
@@ -18127,8 +18204,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeNumberOfRFIDUsersSupportedWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeNumberOfRFIDUsersSupportedWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"DoorLock.NumberOfRFIDUsersSupported response %@",
@@ -18199,8 +18276,10 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x00000014) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeNumberOfWeekDaySchedulesSupportedPerUserWithMinInterval:mMinInterval
-                                                                               maxInterval:mMaxInterval
+        [cluster subscribeAttributeNumberOfWeekDaySchedulesSupportedPerUserWithMinInterval:[NSNumber
+                                                                                               numberWithUnsignedShort:mMinInterval]
+                                                                               maxInterval:[NSNumber
+                                                                                               numberWithUnsignedShort:mMaxInterval]
                                                                    subscriptionEstablished:NULL
                                                                              reportHandler:^(NSNumber * _Nullable value,
                                                                                  NSError * _Nullable error) {
@@ -18275,8 +18354,10 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x00000015) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeNumberOfYearDaySchedulesSupportedPerUserWithMinInterval:mMinInterval
-                                                                               maxInterval:mMaxInterval
+        [cluster subscribeAttributeNumberOfYearDaySchedulesSupportedPerUserWithMinInterval:[NSNumber
+                                                                                               numberWithUnsignedShort:mMinInterval]
+                                                                               maxInterval:[NSNumber
+                                                                                               numberWithUnsignedShort:mMaxInterval]
                                                                    subscriptionEstablished:NULL
                                                                              reportHandler:^(NSNumber * _Nullable value,
                                                                                  NSError * _Nullable error) {
@@ -18350,8 +18431,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x00000017) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeMaxPINCodeLengthWithMinInterval:mMinInterval
-                                                       maxInterval:mMaxInterval
+        [cluster subscribeAttributeMaxPINCodeLengthWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                       maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"DoorLock.MaxPINCodeLength response %@", [value description]);
@@ -18420,8 +18501,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x00000018) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeMinPINCodeLengthWithMinInterval:mMinInterval
-                                                       maxInterval:mMaxInterval
+        [cluster subscribeAttributeMinPINCodeLengthWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                       maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"DoorLock.MinPINCodeLength response %@", [value description]);
@@ -18490,8 +18571,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x00000019) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeMaxRFIDCodeLengthWithMinInterval:mMinInterval
-                                                        maxInterval:mMaxInterval
+        [cluster subscribeAttributeMaxRFIDCodeLengthWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                        maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"DoorLock.MaxRFIDCodeLength response %@", [value description]);
@@ -18560,8 +18641,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x0000001A) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeMinRFIDCodeLengthWithMinInterval:mMinInterval
-                                                        maxInterval:mMaxInterval
+        [cluster subscribeAttributeMinRFIDCodeLengthWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                        maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"DoorLock.MinRFIDCodeLength response %@", [value description]);
@@ -18664,8 +18745,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x00000021) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeLanguageWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+        [cluster subscribeAttributeLanguageWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"DoorLock.Language response %@", [value description]);
@@ -18766,8 +18847,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x00000023) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAutoRelockTimeWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+        [cluster subscribeAttributeAutoRelockTimeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"DoorLock.AutoRelockTime response %@", [value description]);
@@ -18868,8 +18949,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x00000024) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeSoundVolumeWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+        [cluster subscribeAttributeSoundVolumeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"DoorLock.SoundVolume response %@", [value description]);
@@ -18970,8 +19051,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x00000025) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeOperatingModeWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeOperatingModeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"DoorLock.OperatingMode response %@", [value description]);
@@ -19041,8 +19122,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x00000026) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeSupportedOperatingModesWithMinInterval:mMinInterval
-                                                              maxInterval:mMaxInterval
+        [cluster subscribeAttributeSupportedOperatingModesWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                   subscriptionEstablished:NULL
                                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"DoorLock.SupportedOperatingModes response %@",
@@ -19145,8 +19226,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeEnableOneTouchLockingWithMinInterval:mMinInterval
-                                                       maxInterval:mMaxInterval
+            subscribeAttributeEnableOneTouchLockingWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                       maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"DoorLock.EnableOneTouchLocking response %@", [value description]);
@@ -19248,8 +19329,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x0000002B) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeEnablePrivacyModeButtonWithMinInterval:mMinInterval
-                                                              maxInterval:mMaxInterval
+        [cluster subscribeAttributeEnablePrivacyModeButtonWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                   subscriptionEstablished:NULL
                                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"DoorLock.EnablePrivacyModeButton response %@",
@@ -19351,8 +19432,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x00000030) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeWrongCodeEntryLimitWithMinInterval:mMinInterval
-                                                          maxInterval:mMaxInterval
+        [cluster subscribeAttributeWrongCodeEntryLimitWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                               subscriptionEstablished:NULL
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"DoorLock.WrongCodeEntryLimit response %@", [value description]);
@@ -19423,8 +19504,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"DoorLock.ServerGeneratedCommandList response %@",
@@ -19496,8 +19577,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"DoorLock.ClientGeneratedCommandList response %@",
@@ -19567,8 +19648,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"DoorLock.AttributeList response %@", [value description]);
@@ -19637,8 +19718,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"DoorLock.ClusterRevision response %@", [value description]);
@@ -19663,10 +19744,56 @@ private:
 | Cluster ElectricalMeasurement                                       | 0x0B04 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * GetProfileInfoCommand                                             |   0x00 |
+| * GetMeasurementProfileCommand                                      |   0x01 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * MeasurementType                                                   | 0x0000 |
+| * DcVoltage                                                         | 0x0100 |
+| * DcVoltageMin                                                      | 0x0101 |
+| * DcVoltageMax                                                      | 0x0102 |
+| * DcCurrent                                                         | 0x0103 |
+| * DcCurrentMin                                                      | 0x0104 |
+| * DcCurrentMax                                                      | 0x0105 |
+| * DcPower                                                           | 0x0106 |
+| * DcPowerMin                                                        | 0x0107 |
+| * DcPowerMax                                                        | 0x0108 |
+| * DcVoltageMultiplier                                               | 0x0200 |
+| * DcVoltageDivisor                                                  | 0x0201 |
+| * DcCurrentMultiplier                                               | 0x0202 |
+| * DcCurrentDivisor                                                  | 0x0203 |
+| * DcPowerMultiplier                                                 | 0x0204 |
+| * DcPowerDivisor                                                    | 0x0205 |
+| * AcFrequency                                                       | 0x0300 |
+| * AcFrequencyMin                                                    | 0x0301 |
+| * AcFrequencyMax                                                    | 0x0302 |
+| * NeutralCurrent                                                    | 0x0303 |
 | * TotalActivePower                                                  | 0x0304 |
+| * TotalReactivePower                                                | 0x0305 |
+| * TotalApparentPower                                                | 0x0306 |
+| * Measured1stHarmonicCurrent                                        | 0x0307 |
+| * Measured3rdHarmonicCurrent                                        | 0x0308 |
+| * Measured5thHarmonicCurrent                                        | 0x0309 |
+| * Measured7thHarmonicCurrent                                        | 0x030A |
+| * Measured9thHarmonicCurrent                                        | 0x030B |
+| * Measured11thHarmonicCurrent                                       | 0x030C |
+| * MeasuredPhase1stHarmonicCurrent                                   | 0x030D |
+| * MeasuredPhase3rdHarmonicCurrent                                   | 0x030E |
+| * MeasuredPhase5thHarmonicCurrent                                   | 0x030F |
+| * MeasuredPhase7thHarmonicCurrent                                   | 0x0310 |
+| * MeasuredPhase9thHarmonicCurrent                                   | 0x0311 |
+| * MeasuredPhase11thHarmonicCurrent                                  | 0x0312 |
+| * AcFrequencyMultiplier                                             | 0x0400 |
+| * AcFrequencyDivisor                                                | 0x0401 |
+| * PowerMultiplier                                                   | 0x0402 |
+| * PowerDivisor                                                      | 0x0403 |
+| * HarmonicCurrentMultiplier                                         | 0x0404 |
+| * PhaseHarmonicCurrentMultiplier                                    | 0x0405 |
+| * InstantaneousVoltage                                              | 0x0500 |
+| * InstantaneousLineCurrent                                          | 0x0501 |
+| * InstantaneousActiveCurrent                                        | 0x0502 |
+| * InstantaneousReactiveCurrent                                      | 0x0503 |
+| * InstantaneousPower                                                | 0x0504 |
 | * RmsVoltage                                                        | 0x0505 |
 | * RmsVoltageMin                                                     | 0x0506 |
 | * RmsVoltageMax                                                     | 0x0507 |
@@ -19676,9 +19803,83 @@ private:
 | * ActivePower                                                       | 0x050B |
 | * ActivePowerMin                                                    | 0x050C |
 | * ActivePowerMax                                                    | 0x050D |
+| * ReactivePower                                                     | 0x050E |
+| * ApparentPower                                                     | 0x050F |
+| * PowerFactor                                                       | 0x0510 |
+| * AverageRmsVoltageMeasurementPeriod                                | 0x0511 |
+| * AverageRmsUnderVoltageCounter                                     | 0x0513 |
+| * RmsExtremeOverVoltagePeriod                                       | 0x0514 |
+| * RmsExtremeUnderVoltagePeriod                                      | 0x0515 |
+| * RmsVoltageSagPeriod                                               | 0x0516 |
+| * RmsVoltageSwellPeriod                                             | 0x0517 |
+| * AcVoltageMultiplier                                               | 0x0600 |
+| * AcVoltageDivisor                                                  | 0x0601 |
+| * AcCurrentMultiplier                                               | 0x0602 |
+| * AcCurrentDivisor                                                  | 0x0603 |
+| * AcPowerMultiplier                                                 | 0x0604 |
+| * AcPowerDivisor                                                    | 0x0605 |
+| * OverloadAlarmsMask                                                | 0x0700 |
+| * VoltageOverload                                                   | 0x0701 |
+| * CurrentOverload                                                   | 0x0702 |
+| * AcOverloadAlarmsMask                                              | 0x0800 |
+| * AcVoltageOverload                                                 | 0x0801 |
+| * AcCurrentOverload                                                 | 0x0802 |
+| * AcActivePowerOverload                                             | 0x0803 |
+| * AcReactivePowerOverload                                           | 0x0804 |
+| * AverageRmsOverVoltage                                             | 0x0805 |
+| * AverageRmsUnderVoltage                                            | 0x0806 |
+| * RmsExtremeOverVoltage                                             | 0x0807 |
+| * RmsExtremeUnderVoltage                                            | 0x0808 |
+| * RmsVoltageSag                                                     | 0x0809 |
+| * RmsVoltageSwell                                                   | 0x080A |
+| * LineCurrentPhaseB                                                 | 0x0901 |
+| * ActiveCurrentPhaseB                                               | 0x0902 |
+| * ReactiveCurrentPhaseB                                             | 0x0903 |
+| * RmsVoltagePhaseB                                                  | 0x0905 |
+| * RmsVoltageMinPhaseB                                               | 0x0906 |
+| * RmsVoltageMaxPhaseB                                               | 0x0907 |
+| * RmsCurrentPhaseB                                                  | 0x0908 |
+| * RmsCurrentMinPhaseB                                               | 0x0909 |
+| * RmsCurrentMaxPhaseB                                               | 0x090A |
+| * ActivePowerPhaseB                                                 | 0x090B |
+| * ActivePowerMinPhaseB                                              | 0x090C |
+| * ActivePowerMaxPhaseB                                              | 0x090D |
+| * ReactivePowerPhaseB                                               | 0x090E |
+| * ApparentPowerPhaseB                                               | 0x090F |
+| * PowerFactorPhaseB                                                 | 0x0910 |
+| * AverageRmsVoltageMeasurementPeriodPhaseB                          | 0x0911 |
+| * AverageRmsOverVoltageCounterPhaseB                                | 0x0912 |
+| * AverageRmsUnderVoltageCounterPhaseB                               | 0x0913 |
+| * RmsExtremeOverVoltagePeriodPhaseB                                 | 0x0914 |
+| * RmsExtremeUnderVoltagePeriodPhaseB                                | 0x0915 |
+| * RmsVoltageSagPeriodPhaseB                                         | 0x0916 |
+| * RmsVoltageSwellPeriodPhaseB                                       | 0x0917 |
+| * LineCurrentPhaseC                                                 | 0x0A01 |
+| * ActiveCurrentPhaseC                                               | 0x0A02 |
+| * ReactiveCurrentPhaseC                                             | 0x0A03 |
+| * RmsVoltagePhaseC                                                  | 0x0A05 |
+| * RmsVoltageMinPhaseC                                               | 0x0A06 |
+| * RmsVoltageMaxPhaseC                                               | 0x0A07 |
+| * RmsCurrentPhaseC                                                  | 0x0A08 |
+| * RmsCurrentMinPhaseC                                               | 0x0A09 |
+| * RmsCurrentMaxPhaseC                                               | 0x0A0A |
+| * ActivePowerPhaseC                                                 | 0x0A0B |
+| * ActivePowerMinPhaseC                                              | 0x0A0C |
+| * ActivePowerMaxPhaseC                                              | 0x0A0D |
+| * ReactivePowerPhaseC                                               | 0x0A0E |
+| * ApparentPowerPhaseC                                               | 0x0A0F |
+| * PowerFactorPhaseC                                                 | 0x0A10 |
+| * AverageRmsVoltageMeasurementPeriodPhaseC                          | 0x0A11 |
+| * AverageRmsOverVoltageCounterPhaseC                                | 0x0A12 |
+| * AverageRmsUnderVoltageCounterPhaseC                               | 0x0A13 |
+| * RmsExtremeOverVoltagePeriodPhaseC                                 | 0x0A14 |
+| * RmsExtremeUnderVoltagePeriodPhaseC                                | 0x0A15 |
+| * RmsVoltageSagPeriodPhaseC                                         | 0x0A16 |
+| * RmsVoltageSwellPeriodPhaseC                                       | 0x0A17 |
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -19737,8 +19938,8 @@ public:
                                                                                        endpoint:endpointId
                                                                                           queue:callbackQueue];
         [cluster
-            subscribeAttributeMeasurementTypeWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+            subscribeAttributeMeasurementTypeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"ElectricalMeasurement.MeasurementType response %@", [value description]);
@@ -19811,8 +20012,8 @@ public:
         CHIPElectricalMeasurement * cluster = [[CHIPElectricalMeasurement alloc] initWithDevice:device
                                                                                        endpoint:endpointId
                                                                                           queue:callbackQueue];
-        [cluster subscribeAttributeTotalActivePowerWithMinInterval:mMinInterval
-                                                       maxInterval:mMaxInterval
+        [cluster subscribeAttributeTotalActivePowerWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                       maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"ElectricalMeasurement.TotalActivePower response %@",
@@ -19886,8 +20087,8 @@ public:
         CHIPElectricalMeasurement * cluster = [[CHIPElectricalMeasurement alloc] initWithDevice:device
                                                                                        endpoint:endpointId
                                                                                           queue:callbackQueue];
-        [cluster subscribeAttributeRmsVoltageWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributeRmsVoltageWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"ElectricalMeasurement.RmsVoltage response %@", [value description]);
@@ -19961,8 +20162,8 @@ public:
                                                                                        endpoint:endpointId
                                                                                           queue:callbackQueue];
         [cluster
-            subscribeAttributeRmsVoltageMinWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+            subscribeAttributeRmsVoltageMinWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ElectricalMeasurement.RmsVoltageMin response %@", [value description]);
@@ -20036,8 +20237,8 @@ public:
                                                                                        endpoint:endpointId
                                                                                           queue:callbackQueue];
         [cluster
-            subscribeAttributeRmsVoltageMaxWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+            subscribeAttributeRmsVoltageMaxWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ElectricalMeasurement.RmsVoltageMax response %@", [value description]);
@@ -20110,8 +20311,8 @@ public:
         CHIPElectricalMeasurement * cluster = [[CHIPElectricalMeasurement alloc] initWithDevice:device
                                                                                        endpoint:endpointId
                                                                                           queue:callbackQueue];
-        [cluster subscribeAttributeRmsCurrentWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributeRmsCurrentWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"ElectricalMeasurement.RmsCurrent response %@", [value description]);
@@ -20185,8 +20386,8 @@ public:
                                                                                        endpoint:endpointId
                                                                                           queue:callbackQueue];
         [cluster
-            subscribeAttributeRmsCurrentMinWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+            subscribeAttributeRmsCurrentMinWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ElectricalMeasurement.RmsCurrentMin response %@", [value description]);
@@ -20260,8 +20461,8 @@ public:
                                                                                        endpoint:endpointId
                                                                                           queue:callbackQueue];
         [cluster
-            subscribeAttributeRmsCurrentMaxWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+            subscribeAttributeRmsCurrentMaxWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ElectricalMeasurement.RmsCurrentMax response %@", [value description]);
@@ -20334,8 +20535,8 @@ public:
         CHIPElectricalMeasurement * cluster = [[CHIPElectricalMeasurement alloc] initWithDevice:device
                                                                                        endpoint:endpointId
                                                                                           queue:callbackQueue];
-        [cluster subscribeAttributeActivePowerWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+        [cluster subscribeAttributeActivePowerWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ElectricalMeasurement.ActivePower response %@", [value description]);
@@ -20409,8 +20610,8 @@ public:
                                                                                        endpoint:endpointId
                                                                                           queue:callbackQueue];
         [cluster
-            subscribeAttributeActivePowerMinWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+            subscribeAttributeActivePowerMinWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ElectricalMeasurement.ActivePowerMin response %@", [value description]);
@@ -20484,8 +20685,8 @@ public:
                                                                                        endpoint:endpointId
                                                                                           queue:callbackQueue];
         [cluster
-            subscribeAttributeActivePowerMaxWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+            subscribeAttributeActivePowerMaxWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ElectricalMeasurement.ActivePowerMax response %@", [value description]);
@@ -20560,8 +20761,8 @@ public:
                                                                                        endpoint:endpointId
                                                                                           queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"ElectricalMeasurement.ServerGeneratedCommandList response %@",
@@ -20637,8 +20838,8 @@ public:
                                                                                        endpoint:endpointId
                                                                                           queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"ElectricalMeasurement.ClientGeneratedCommandList response %@",
@@ -20713,8 +20914,8 @@ public:
                                                                                        endpoint:endpointId
                                                                                           queue:callbackQueue];
         [cluster
-            subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+            subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ElectricalMeasurement.AttributeList response %@", [value description]);
@@ -20788,8 +20989,8 @@ public:
                                                                                        endpoint:endpointId
                                                                                           queue:callbackQueue];
         [cluster
-            subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+            subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"ElectricalMeasurement.ClusterRevision response %@", [value description]);
@@ -20917,8 +21118,8 @@ public:
         CHIPEthernetNetworkDiagnostics * cluster = [[CHIPEthernetNetworkDiagnostics alloc] initWithDevice:device
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributePHYRateWithMinInterval:mMinInterval
-                                              maxInterval:mMaxInterval
+        [cluster subscribeAttributePHYRateWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"EthernetNetworkDiagnostics.PHYRate response %@", [value description]);
@@ -20991,8 +21192,8 @@ public:
         CHIPEthernetNetworkDiagnostics * cluster = [[CHIPEthernetNetworkDiagnostics alloc] initWithDevice:device
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeFullDuplexWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributeFullDuplexWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"EthernetNetworkDiagnostics.FullDuplex response %@", [value description]);
@@ -21065,8 +21266,8 @@ public:
         CHIPEthernetNetworkDiagnostics * cluster = [[CHIPEthernetNetworkDiagnostics alloc] initWithDevice:device
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributePacketRxCountWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributePacketRxCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"EthernetNetworkDiagnostics.PacketRxCount response %@",
@@ -21140,8 +21341,8 @@ public:
         CHIPEthernetNetworkDiagnostics * cluster = [[CHIPEthernetNetworkDiagnostics alloc] initWithDevice:device
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributePacketTxCountWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributePacketTxCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"EthernetNetworkDiagnostics.PacketTxCount response %@",
@@ -21215,8 +21416,8 @@ public:
         CHIPEthernetNetworkDiagnostics * cluster = [[CHIPEthernetNetworkDiagnostics alloc] initWithDevice:device
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeTxErrCountWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributeTxErrCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"EthernetNetworkDiagnostics.TxErrCount response %@", [value description]);
@@ -21289,8 +21490,8 @@ public:
         CHIPEthernetNetworkDiagnostics * cluster = [[CHIPEthernetNetworkDiagnostics alloc] initWithDevice:device
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeCollisionCountWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+        [cluster subscribeAttributeCollisionCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"EthernetNetworkDiagnostics.CollisionCount response %@",
@@ -21365,8 +21566,8 @@ public:
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
         [cluster
-            subscribeAttributeOverrunCountWithMinInterval:mMinInterval
-                                              maxInterval:mMaxInterval
+            subscribeAttributeOverrunCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"EthernetNetworkDiagnostics.OverrunCount response %@", [value description]);
@@ -21439,8 +21640,8 @@ public:
         CHIPEthernetNetworkDiagnostics * cluster = [[CHIPEthernetNetworkDiagnostics alloc] initWithDevice:device
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeCarrierDetectWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeCarrierDetectWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"EthernetNetworkDiagnostics.CarrierDetect response %@",
@@ -21514,8 +21715,8 @@ public:
         CHIPEthernetNetworkDiagnostics * cluster = [[CHIPEthernetNetworkDiagnostics alloc] initWithDevice:device
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeTimeSinceResetWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+        [cluster subscribeAttributeTimeSinceResetWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"EthernetNetworkDiagnostics.TimeSinceReset response %@",
@@ -21591,8 +21792,8 @@ public:
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"EthernetNetworkDiagnostics.ServerGeneratedCommandList "
@@ -21669,8 +21870,8 @@ public:
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"EthernetNetworkDiagnostics.ClientGeneratedCommandList "
@@ -21745,8 +21946,8 @@ public:
         CHIPEthernetNetworkDiagnostics * cluster = [[CHIPEthernetNetworkDiagnostics alloc] initWithDevice:device
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"EthernetNetworkDiagnostics.AttributeList response %@",
@@ -21820,8 +22021,8 @@ public:
         CHIPEthernetNetworkDiagnostics * cluster = [[CHIPEthernetNetworkDiagnostics alloc] initWithDevice:device
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeFeatureMapWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributeFeatureMapWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"EthernetNetworkDiagnostics.FeatureMap response %@", [value description]);
@@ -21894,8 +22095,8 @@ public:
         CHIPEthernetNetworkDiagnostics * cluster = [[CHIPEthernetNetworkDiagnostics alloc] initWithDevice:device
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"EthernetNetworkDiagnostics.ClusterRevision response %@",
@@ -21927,6 +22128,7 @@ private:
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -21980,8 +22182,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000040) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPFixedLabel * cluster = [[CHIPFixedLabel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeLabelListWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+        [cluster subscribeAttributeLabelListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"FixedLabel.LabelList response %@", [value description]);
@@ -22052,8 +22254,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPFixedLabel * cluster = [[CHIPFixedLabel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"FixedLabel.ServerGeneratedCommandList response %@",
@@ -22125,8 +22327,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPFixedLabel * cluster = [[CHIPFixedLabel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"FixedLabel.ClientGeneratedCommandList response %@",
@@ -22196,8 +22398,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000040) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPFixedLabel * cluster = [[CHIPFixedLabel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"FixedLabel.AttributeList response %@", [value description]);
@@ -22266,8 +22468,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000040) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPFixedLabel * cluster = [[CHIPFixedLabel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"FixedLabel.ClusterRevision response %@", [value description]);
@@ -22301,6 +22503,7 @@ private:
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -22354,8 +22557,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000404) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPFlowMeasurement * cluster = [[CHIPFlowMeasurement alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeMeasuredValueWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeMeasuredValueWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"FlowMeasurement.MeasuredValue response %@", [value description]);
@@ -22425,8 +22628,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPFlowMeasurement * cluster = [[CHIPFlowMeasurement alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeMinMeasuredValueWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+            subscribeAttributeMinMeasuredValueWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"FlowMeasurement.MinMeasuredValue response %@", [value description]);
@@ -22496,8 +22699,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPFlowMeasurement * cluster = [[CHIPFlowMeasurement alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeMaxMeasuredValueWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+            subscribeAttributeMaxMeasuredValueWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"FlowMeasurement.MaxMeasuredValue response %@", [value description]);
@@ -22566,8 +22769,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000404) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPFlowMeasurement * cluster = [[CHIPFlowMeasurement alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeToleranceWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+        [cluster subscribeAttributeToleranceWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"FlowMeasurement.Tolerance response %@", [value description]);
@@ -22638,8 +22841,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPFlowMeasurement * cluster = [[CHIPFlowMeasurement alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"FlowMeasurement.ServerGeneratedCommandList response %@",
@@ -22711,8 +22914,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPFlowMeasurement * cluster = [[CHIPFlowMeasurement alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"FlowMeasurement.ClientGeneratedCommandList response %@",
@@ -22782,8 +22985,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000404) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPFlowMeasurement * cluster = [[CHIPFlowMeasurement alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"FlowMeasurement.AttributeList response %@", [value description]);
@@ -22852,8 +23055,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000404) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPFlowMeasurement * cluster = [[CHIPFlowMeasurement alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"FlowMeasurement.ClusterRevision response %@", [value description]);
@@ -22879,8 +23082,8 @@ private:
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * ArmFailSafe                                                       |   0x00 |
-| * CommissioningComplete                                             |   0x04 |
 | * SetRegulatoryConfig                                               |   0x02 |
+| * CommissioningComplete                                             |   0x04 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Breadcrumb                                                        | 0x0000 |
@@ -22890,6 +23093,7 @@ private:
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -23105,8 +23309,8 @@ public:
         CHIPGeneralCommissioning * cluster = [[CHIPGeneralCommissioning alloc] initWithDevice:device
                                                                                      endpoint:endpointId
                                                                                         queue:callbackQueue];
-        [cluster subscribeAttributeBreadcrumbWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributeBreadcrumbWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"GeneralCommissioning.Breadcrumb response %@", [value description]);
@@ -23201,8 +23405,8 @@ public:
         CHIPGeneralCommissioning * cluster = [[CHIPGeneralCommissioning alloc] initWithDevice:device
                                                                                      endpoint:endpointId
                                                                                         queue:callbackQueue];
-        [cluster subscribeAttributeRegulatoryConfigWithMinInterval:mMinInterval
-                                                       maxInterval:mMaxInterval
+        [cluster subscribeAttributeRegulatoryConfigWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                       maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"GeneralCommissioning.RegulatoryConfig response %@",
@@ -23276,8 +23480,8 @@ public:
         CHIPGeneralCommissioning * cluster = [[CHIPGeneralCommissioning alloc] initWithDevice:device
                                                                                      endpoint:endpointId
                                                                                         queue:callbackQueue];
-        [cluster subscribeAttributeLocationCapabilityWithMinInterval:mMinInterval
-                                                         maxInterval:mMaxInterval
+        [cluster subscribeAttributeLocationCapabilityWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                         maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                              subscriptionEstablished:NULL
                                                        reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                            NSLog(@"GeneralCommissioning.LocationCapability response %@",
@@ -23353,8 +23557,8 @@ public:
                                                                                      endpoint:endpointId
                                                                                         queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"GeneralCommissioning.ServerGeneratedCommandList response %@",
@@ -23430,8 +23634,8 @@ public:
                                                                                      endpoint:endpointId
                                                                                         queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"GeneralCommissioning.ClientGeneratedCommandList response %@",
@@ -23505,8 +23709,8 @@ public:
         CHIPGeneralCommissioning * cluster = [[CHIPGeneralCommissioning alloc] initWithDevice:device
                                                                                      endpoint:endpointId
                                                                                         queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"GeneralCommissioning.AttributeList response %@", [value description]);
@@ -23580,8 +23784,8 @@ public:
                                                                                      endpoint:endpointId
                                                                                         queue:callbackQueue];
         [cluster
-            subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+            subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"GeneralCommissioning.ClusterRevision response %@", [value description]);
@@ -23619,6 +23823,7 @@ private:
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -23680,8 +23885,8 @@ public:
         CHIPGeneralDiagnostics * cluster = [[CHIPGeneralDiagnostics alloc] initWithDevice:device
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeNetworkInterfacesWithMinInterval:mMinInterval
-                                                        maxInterval:mMaxInterval
+        [cluster subscribeAttributeNetworkInterfacesWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                        maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"GeneralDiagnostics.NetworkInterfaces response %@",
@@ -23755,8 +23960,8 @@ public:
         CHIPGeneralDiagnostics * cluster = [[CHIPGeneralDiagnostics alloc] initWithDevice:device
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeRebootCountWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+        [cluster subscribeAttributeRebootCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"GeneralDiagnostics.RebootCount response %@", [value description]);
@@ -23829,8 +24034,8 @@ public:
         CHIPGeneralDiagnostics * cluster = [[CHIPGeneralDiagnostics alloc] initWithDevice:device
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeUpTimeWithMinInterval:mMinInterval
-                                             maxInterval:mMaxInterval
+        [cluster subscribeAttributeUpTimeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                             maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"GeneralDiagnostics.UpTime response %@", [value description]);
@@ -23903,8 +24108,8 @@ public:
         CHIPGeneralDiagnostics * cluster = [[CHIPGeneralDiagnostics alloc] initWithDevice:device
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeTotalOperationalHoursWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+        [cluster subscribeAttributeTotalOperationalHoursWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"GeneralDiagnostics.TotalOperationalHours response %@",
@@ -23978,8 +24183,8 @@ public:
         CHIPGeneralDiagnostics * cluster = [[CHIPGeneralDiagnostics alloc] initWithDevice:device
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeBootReasonsWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+        [cluster subscribeAttributeBootReasonsWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"GeneralDiagnostics.BootReasons response %@", [value description]);
@@ -24052,8 +24257,8 @@ public:
         CHIPGeneralDiagnostics * cluster = [[CHIPGeneralDiagnostics alloc] initWithDevice:device
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeActiveHardwareFaultsWithMinInterval:mMinInterval
-                                                           maxInterval:mMaxInterval
+        [cluster subscribeAttributeActiveHardwareFaultsWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                subscriptionEstablished:NULL
                                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"GeneralDiagnostics.ActiveHardwareFaults response %@",
@@ -24127,8 +24332,8 @@ public:
         CHIPGeneralDiagnostics * cluster = [[CHIPGeneralDiagnostics alloc] initWithDevice:device
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeActiveRadioFaultsWithMinInterval:mMinInterval
-                                                        maxInterval:mMaxInterval
+        [cluster subscribeAttributeActiveRadioFaultsWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                        maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"GeneralDiagnostics.ActiveRadioFaults response %@",
@@ -24202,8 +24407,8 @@ public:
         CHIPGeneralDiagnostics * cluster = [[CHIPGeneralDiagnostics alloc] initWithDevice:device
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeActiveNetworkFaultsWithMinInterval:mMinInterval
-                                                          maxInterval:mMaxInterval
+        [cluster subscribeAttributeActiveNetworkFaultsWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                               subscriptionEstablished:NULL
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"GeneralDiagnostics.ActiveNetworkFaults response %@",
@@ -24279,8 +24484,8 @@ public:
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"GeneralDiagnostics.ServerGeneratedCommandList response %@",
@@ -24356,8 +24561,8 @@ public:
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"GeneralDiagnostics.ClientGeneratedCommandList response %@",
@@ -24431,8 +24636,8 @@ public:
         CHIPGeneralDiagnostics * cluster = [[CHIPGeneralDiagnostics alloc] initWithDevice:device
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"GeneralDiagnostics.AttributeList response %@", [value description]);
@@ -24506,8 +24711,8 @@ public:
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
         [cluster
-            subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+            subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"GeneralDiagnostics.ClusterRevision response %@", [value description]);
@@ -24532,10 +24737,10 @@ private:
 | Cluster GroupKeyManagement                                          | 0x003F |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * KeySetRead                                                        |   0x01 |
-| * KeySetReadAllIndices                                              |   0x04 |
-| * KeySetRemove                                                      |   0x03 |
 | * KeySetWrite                                                       |   0x00 |
+| * KeySetRead                                                        |   0x01 |
+| * KeySetRemove                                                      |   0x03 |
+| * KeySetReadAllIndices                                              |   0x04 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * GroupKeyMap                                                       | 0x0000 |
@@ -24545,6 +24750,7 @@ private:
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -24765,8 +24971,8 @@ public:
         CHIPGroupKeyManagement * cluster = [[CHIPGroupKeyManagement alloc] initWithDevice:device
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeGroupKeyMapWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+        [cluster subscribeAttributeGroupKeyMapWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"GroupKeyManagement.GroupKeyMap response %@", [value description]);
@@ -24839,8 +25045,8 @@ public:
         CHIPGroupKeyManagement * cluster = [[CHIPGroupKeyManagement alloc] initWithDevice:device
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeGroupTableWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributeGroupTableWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"GroupKeyManagement.GroupTable response %@", [value description]);
@@ -24913,8 +25119,8 @@ public:
         CHIPGroupKeyManagement * cluster = [[CHIPGroupKeyManagement alloc] initWithDevice:device
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeMaxGroupsPerFabricWithMinInterval:mMinInterval
-                                                         maxInterval:mMaxInterval
+        [cluster subscribeAttributeMaxGroupsPerFabricWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                         maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                              subscriptionEstablished:NULL
                                                        reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                            NSLog(@"GroupKeyManagement.MaxGroupsPerFabric response %@",
@@ -24988,8 +25194,8 @@ public:
         CHIPGroupKeyManagement * cluster = [[CHIPGroupKeyManagement alloc] initWithDevice:device
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeMaxGroupKeysPerFabricWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+        [cluster subscribeAttributeMaxGroupKeysPerFabricWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"GroupKeyManagement.MaxGroupKeysPerFabric response %@",
@@ -25065,8 +25271,8 @@ public:
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"GroupKeyManagement.ServerGeneratedCommandList response %@",
@@ -25142,8 +25348,8 @@ public:
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"GroupKeyManagement.ClientGeneratedCommandList response %@",
@@ -25217,8 +25423,8 @@ public:
         CHIPGroupKeyManagement * cluster = [[CHIPGroupKeyManagement alloc] initWithDevice:device
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"GroupKeyManagement.AttributeList response %@", [value description]);
@@ -25292,8 +25498,8 @@ public:
                                                                                  endpoint:endpointId
                                                                                     queue:callbackQueue];
         [cluster
-            subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+            subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"GroupKeyManagement.ClusterRevision response %@", [value description]);
@@ -25319,17 +25525,18 @@ private:
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * AddGroup                                                          |   0x00 |
-| * AddGroupIfIdentifying                                             |   0x05 |
-| * GetGroupMembership                                                |   0x02 |
-| * RemoveAllGroups                                                   |   0x04 |
-| * RemoveGroup                                                       |   0x03 |
 | * ViewGroup                                                         |   0x01 |
+| * GetGroupMembership                                                |   0x02 |
+| * RemoveGroup                                                       |   0x03 |
+| * RemoveAllGroups                                                   |   0x04 |
+| * AddGroupIfIdentifying                                             |   0x05 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * NameSupport                                                       | 0x0000 |
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -25589,8 +25796,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000004) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPGroups * cluster = [[CHIPGroups alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeNameSupportWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+        [cluster subscribeAttributeNameSupportWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"Groups.NameSupport response %@", [value description]);
@@ -25661,8 +25868,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPGroups * cluster = [[CHIPGroups alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"Groups.ServerGeneratedCommandList response %@",
@@ -25734,8 +25941,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPGroups * cluster = [[CHIPGroups alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"Groups.ClientGeneratedCommandList response %@",
@@ -25805,8 +26012,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000004) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPGroups * cluster = [[CHIPGroups alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"Groups.AttributeList response %@", [value description]);
@@ -25875,8 +26082,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000004) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPGroups * cluster = [[CHIPGroups alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Groups.ClusterRevision response %@", [value description]);
@@ -25911,6 +26118,7 @@ private:
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -26095,8 +26303,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000003) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPIdentify * cluster = [[CHIPIdentify alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeIdentifyTimeWithMinInterval:mMinInterval
-                                                   maxInterval:mMaxInterval
+        [cluster subscribeAttributeIdentifyTimeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                   maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"Identify.IdentifyTime response %@", [value description]);
@@ -26165,8 +26373,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000003) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPIdentify * cluster = [[CHIPIdentify alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeIdentifyTypeWithMinInterval:mMinInterval
-                                                   maxInterval:mMaxInterval
+        [cluster subscribeAttributeIdentifyTypeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                   maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"Identify.IdentifyType response %@", [value description]);
@@ -26237,8 +26445,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPIdentify * cluster = [[CHIPIdentify alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"Identify.ServerGeneratedCommandList response %@",
@@ -26310,8 +26518,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPIdentify * cluster = [[CHIPIdentify alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"Identify.ClientGeneratedCommandList response %@",
@@ -26381,8 +26589,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000003) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPIdentify * cluster = [[CHIPIdentify alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"Identify.AttributeList response %@", [value description]);
@@ -26451,8 +26659,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000003) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPIdentify * cluster = [[CHIPIdentify alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Identify.ClusterRevision response %@", [value description]);
@@ -26487,6 +26695,7 @@ private:
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -26545,8 +26754,8 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         [cluster
-            subscribeAttributeMeasuredValueWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+            subscribeAttributeMeasuredValueWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"IlluminanceMeasurement.MeasuredValue response %@", [value description]);
@@ -26619,8 +26828,8 @@ public:
         CHIPIlluminanceMeasurement * cluster = [[CHIPIlluminanceMeasurement alloc] initWithDevice:device
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
-        [cluster subscribeAttributeMinMeasuredValueWithMinInterval:mMinInterval
-                                                       maxInterval:mMaxInterval
+        [cluster subscribeAttributeMinMeasuredValueWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                       maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"IlluminanceMeasurement.MinMeasuredValue response %@",
@@ -26694,8 +26903,8 @@ public:
         CHIPIlluminanceMeasurement * cluster = [[CHIPIlluminanceMeasurement alloc] initWithDevice:device
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
-        [cluster subscribeAttributeMaxMeasuredValueWithMinInterval:mMinInterval
-                                                       maxInterval:mMaxInterval
+        [cluster subscribeAttributeMaxMeasuredValueWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                       maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"IlluminanceMeasurement.MaxMeasuredValue response %@",
@@ -26769,8 +26978,8 @@ public:
         CHIPIlluminanceMeasurement * cluster = [[CHIPIlluminanceMeasurement alloc] initWithDevice:device
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
-        [cluster subscribeAttributeToleranceWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+        [cluster subscribeAttributeToleranceWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"IlluminanceMeasurement.Tolerance response %@", [value description]);
@@ -26843,8 +27052,8 @@ public:
         CHIPIlluminanceMeasurement * cluster = [[CHIPIlluminanceMeasurement alloc] initWithDevice:device
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
-        [cluster subscribeAttributeLightSensorTypeWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeLightSensorTypeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"IlluminanceMeasurement.LightSensorType response %@",
@@ -26920,8 +27129,8 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(
@@ -26998,8 +27207,8 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(
@@ -27075,8 +27284,8 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         [cluster
-            subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+            subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"IlluminanceMeasurement.AttributeList response %@", [value description]);
@@ -27149,8 +27358,8 @@ public:
         CHIPIlluminanceMeasurement * cluster = [[CHIPIlluminanceMeasurement alloc] initWithDevice:device
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"IlluminanceMeasurement.ClusterRevision response %@",
@@ -27182,6 +27391,7 @@ private:
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -27272,8 +27482,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPKeypadInput * cluster = [[CHIPKeypadInput alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"KeypadInput.ServerGeneratedCommandList response %@",
@@ -27345,8 +27555,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPKeypadInput * cluster = [[CHIPKeypadInput alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"KeypadInput.ClientGeneratedCommandList response %@",
@@ -27416,8 +27626,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000509) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPKeypadInput * cluster = [[CHIPKeypadInput alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"KeypadInput.AttributeList response %@", [value description]);
@@ -27486,8 +27696,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000509) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPKeypadInput * cluster = [[CHIPKeypadInput alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"KeypadInput.ClusterRevision response %@", [value description]);
@@ -27512,13 +27722,13 @@ private:
 | Cluster LevelControl                                                | 0x0008 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * Move                                                              |   0x01 |
 | * MoveToLevel                                                       |   0x00 |
+| * Move                                                              |   0x01 |
+| * Step                                                              |   0x02 |
+| * Stop                                                              |   0x03 |
 | * MoveToLevelWithOnOff                                              |   0x04 |
 | * MoveWithOnOff                                                     |   0x05 |
-| * Step                                                              |   0x02 |
 | * StepWithOnOff                                                     |   0x06 |
-| * Stop                                                              |   0x03 |
 | * StopWithOnOff                                                     |   0x07 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
@@ -27897,8 +28107,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeCurrentLevelWithMinInterval:mMinInterval
-                                                   maxInterval:mMaxInterval
+        [cluster subscribeAttributeCurrentLevelWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                   maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"LevelControl.CurrentLevel response %@", [value description]);
@@ -27967,8 +28177,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeRemainingTimeWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeRemainingTimeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"LevelControl.RemainingTime response %@", [value description]);
@@ -28037,8 +28247,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeMinLevelWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+        [cluster subscribeAttributeMinLevelWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"LevelControl.MinLevel response %@", [value description]);
@@ -28107,8 +28317,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeMaxLevelWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+        [cluster subscribeAttributeMaxLevelWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"LevelControl.MaxLevel response %@", [value description]);
@@ -28177,8 +28387,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeCurrentFrequencyWithMinInterval:mMinInterval
-                                                       maxInterval:mMaxInterval
+        [cluster subscribeAttributeCurrentFrequencyWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                       maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"LevelControl.CurrentFrequency response %@", [value description]);
@@ -28247,8 +28457,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReportAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeMinFrequencyWithMinInterval:mMinInterval
-                                                   maxInterval:mMaxInterval
+        [cluster subscribeAttributeMinFrequencyWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                   maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"LevelControl.MinFrequency response %@", [value description]);
@@ -28317,8 +28527,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReportAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeMaxFrequencyWithMinInterval:mMinInterval
-                                                   maxInterval:mMaxInterval
+        [cluster subscribeAttributeMaxFrequencyWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                   maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"LevelControl.MaxFrequency response %@", [value description]);
@@ -28419,8 +28629,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReportAttribute (0x0000000F) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeOptionsWithMinInterval:mMinInterval
-                                              maxInterval:mMaxInterval
+        [cluster subscribeAttributeOptionsWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"LevelControl.Options response %@", [value description]);
@@ -28522,8 +28732,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeOnOffTransitionTimeWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+            subscribeAttributeOnOffTransitionTimeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"LevelControl.OnOffTransitionTime response %@", [value description]);
@@ -28624,8 +28834,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReportAttribute (0x00000011) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeOnLevelWithMinInterval:mMinInterval
-                                              maxInterval:mMaxInterval
+        [cluster subscribeAttributeOnLevelWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"LevelControl.OnLevel response %@", [value description]);
@@ -28726,8 +28936,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReportAttribute (0x00000012) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeOnTransitionTimeWithMinInterval:mMinInterval
-                                                       maxInterval:mMaxInterval
+        [cluster subscribeAttributeOnTransitionTimeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                       maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"LevelControl.OnTransitionTime response %@", [value description]);
@@ -28828,8 +29038,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReportAttribute (0x00000013) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeOffTransitionTimeWithMinInterval:mMinInterval
-                                                        maxInterval:mMaxInterval
+        [cluster subscribeAttributeOffTransitionTimeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                        maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"LevelControl.OffTransitionTime response %@", [value description]);
@@ -28930,8 +29140,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReportAttribute (0x00000014) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeDefaultMoveRateWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeDefaultMoveRateWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"LevelControl.DefaultMoveRate response %@", [value description]);
@@ -29033,8 +29243,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeStartUpCurrentLevelWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+            subscribeAttributeStartUpCurrentLevelWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"LevelControl.StartUpCurrentLevel response %@", [value description]);
@@ -29105,8 +29315,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"LevelControl.ServerGeneratedCommandList response %@",
@@ -29178,8 +29388,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"LevelControl.ClientGeneratedCommandList response %@",
@@ -29249,8 +29459,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"LevelControl.AttributeList response %@", [value description]);
@@ -29319,8 +29529,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReportAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeFeatureMapWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributeFeatureMapWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"LevelControl.FeatureMap response %@", [value description]);
@@ -29389,8 +29599,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"LevelControl.ClusterRevision response %@", [value description]);
@@ -29421,6 +29631,8 @@ private:
 | * SupportedLocales                                                  | 0x0002 |
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -29515,8 +29727,8 @@ public:
                                                                                                endpoint:endpointId
                                                                                                   queue:callbackQueue];
         [cluster
-            subscribeAttributeActiveLocaleWithMinInterval:mMinInterval
-                                              maxInterval:mMaxInterval
+            subscribeAttributeActiveLocaleWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"LocalizationConfiguration.ActiveLocale response %@", [value description]);
@@ -29589,8 +29801,8 @@ public:
         CHIPLocalizationConfiguration * cluster = [[CHIPLocalizationConfiguration alloc] initWithDevice:device
                                                                                                endpoint:endpointId
                                                                                                   queue:callbackQueue];
-        [cluster subscribeAttributeSupportedLocalesWithMinInterval:mMinInterval
-                                                       maxInterval:mMaxInterval
+        [cluster subscribeAttributeSupportedLocalesWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                       maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"LocalizationConfiguration.SupportedLocales response %@",
@@ -29666,8 +29878,8 @@ public:
                                                                                                endpoint:endpointId
                                                                                                   queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"LocalizationConfiguration.ServerGeneratedCommandList "
@@ -29744,8 +29956,8 @@ public:
                                                                                                endpoint:endpointId
                                                                                                   queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"LocalizationConfiguration.ClientGeneratedCommandList "
@@ -29820,8 +30032,8 @@ public:
         CHIPLocalizationConfiguration * cluster = [[CHIPLocalizationConfiguration alloc] initWithDevice:device
                                                                                                endpoint:endpointId
                                                                                                   queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"LocalizationConfiguration.ClusterRevision response %@",
@@ -29853,6 +30065,7 @@ private:
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -29936,8 +30149,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPLowPower * cluster = [[CHIPLowPower alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"LowPower.ServerGeneratedCommandList response %@",
@@ -30009,8 +30222,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPLowPower * cluster = [[CHIPLowPower alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"LowPower.ClientGeneratedCommandList response %@",
@@ -30080,8 +30293,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000508) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPLowPower * cluster = [[CHIPLowPower alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"LowPower.AttributeList response %@", [value description]);
@@ -30150,8 +30363,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000508) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPLowPower * cluster = [[CHIPLowPower alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"LowPower.ClusterRevision response %@", [value description]);
@@ -30176,10 +30389,10 @@ private:
 | Cluster MediaInput                                                  | 0x0507 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * HideInputStatusRequest                                            |   0x02 |
-| * RenameInputRequest                                                |   0x03 |
 | * SelectInputRequest                                                |   0x00 |
 | * ShowInputStatusRequest                                            |   0x01 |
+| * HideInputStatusRequest                                            |   0x02 |
+| * RenameInputRequest                                                |   0x03 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * MediaInputList                                                    | 0x0000 |
@@ -30187,6 +30400,7 @@ private:
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -30365,8 +30579,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000507) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPMediaInput * cluster = [[CHIPMediaInput alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeMediaInputListWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+        [cluster subscribeAttributeMediaInputListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"MediaInput.MediaInputList response %@", [value description]);
@@ -30435,8 +30649,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000507) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPMediaInput * cluster = [[CHIPMediaInput alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeCurrentMediaInputWithMinInterval:mMinInterval
-                                                        maxInterval:mMaxInterval
+        [cluster subscribeAttributeCurrentMediaInputWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                        maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"MediaInput.CurrentMediaInput response %@", [value description]);
@@ -30507,8 +30721,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPMediaInput * cluster = [[CHIPMediaInput alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"MediaInput.ServerGeneratedCommandList response %@",
@@ -30580,8 +30794,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPMediaInput * cluster = [[CHIPMediaInput alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"MediaInput.ClientGeneratedCommandList response %@",
@@ -30651,8 +30865,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000507) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPMediaInput * cluster = [[CHIPMediaInput alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"MediaInput.AttributeList response %@", [value description]);
@@ -30721,8 +30935,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000507) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPMediaInput * cluster = [[CHIPMediaInput alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"MediaInput.ClusterRevision response %@", [value description]);
@@ -30747,17 +30961,17 @@ private:
 | Cluster MediaPlayback                                               | 0x0506 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * FastForwardRequest                                                |   0x07 |
-| * NextRequest                                                       |   0x05 |
-| * PauseRequest                                                      |   0x01 |
 | * PlayRequest                                                       |   0x00 |
-| * PreviousRequest                                                   |   0x04 |
-| * RewindRequest                                                     |   0x06 |
-| * SeekRequest                                                       |   0x0B |
-| * SkipBackwardRequest                                               |   0x09 |
-| * SkipForwardRequest                                                |   0x08 |
-| * StartOverRequest                                                  |   0x03 |
+| * PauseRequest                                                      |   0x01 |
 | * StopRequest                                                       |   0x02 |
+| * StartOverRequest                                                  |   0x03 |
+| * PreviousRequest                                                   |   0x04 |
+| * NextRequest                                                       |   0x05 |
+| * RewindRequest                                                     |   0x06 |
+| * FastForwardRequest                                                |   0x07 |
+| * SkipForwardRequest                                                |   0x08 |
+| * SkipBackwardRequest                                               |   0x09 |
+| * SeekRequest                                                       |   0x0B |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * PlaybackState                                                     | 0x0000 |
@@ -30770,6 +30984,7 @@ private:
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -31168,8 +31383,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPMediaPlayback * cluster = [[CHIPMediaPlayback alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributePlaybackStateWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributePlaybackStateWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"MediaPlayback.PlaybackState response %@", [value description]);
@@ -31238,8 +31453,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPMediaPlayback * cluster = [[CHIPMediaPlayback alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeStartTimeWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+        [cluster subscribeAttributeStartTimeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"MediaPlayback.StartTime response %@", [value description]);
@@ -31308,8 +31523,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPMediaPlayback * cluster = [[CHIPMediaPlayback alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeDurationWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+        [cluster subscribeAttributeDurationWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"MediaPlayback.Duration response %@", [value description]);
@@ -31350,28 +31565,6 @@ public:
 
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
-};
-
-class WriteMediaPlaybackPosition : public ModelCommand {
-public:
-    WriteMediaPlaybackPosition()
-        : ModelCommand("write")
-    {
-        AddArgument("attr-name", "position");
-        //  Struct parsing is not supported yet
-        ModelCommand::AddArguments();
-    }
-
-    ~WriteMediaPlaybackPosition() {}
-
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000506) WriteAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
-
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-
-private:
 };
 
 /*
@@ -31422,8 +31615,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPMediaPlayback * cluster = [[CHIPMediaPlayback alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributePlaybackSpeedWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributePlaybackSpeedWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"MediaPlayback.PlaybackSpeed response %@", [value description]);
@@ -31492,8 +31685,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) ReportAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPMediaPlayback * cluster = [[CHIPMediaPlayback alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeSeekRangeEndWithMinInterval:mMinInterval
-                                                   maxInterval:mMaxInterval
+        [cluster subscribeAttributeSeekRangeEndWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                   maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"MediaPlayback.SeekRangeEnd response %@", [value description]);
@@ -31562,8 +31755,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) ReportAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPMediaPlayback * cluster = [[CHIPMediaPlayback alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeSeekRangeStartWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+        [cluster subscribeAttributeSeekRangeStartWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"MediaPlayback.SeekRangeStart response %@", [value description]);
@@ -31634,8 +31827,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPMediaPlayback * cluster = [[CHIPMediaPlayback alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"MediaPlayback.ServerGeneratedCommandList response %@",
@@ -31707,8 +31900,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPMediaPlayback * cluster = [[CHIPMediaPlayback alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"MediaPlayback.ClientGeneratedCommandList response %@",
@@ -31778,8 +31971,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPMediaPlayback * cluster = [[CHIPMediaPlayback alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"MediaPlayback.AttributeList response %@", [value description]);
@@ -31848,8 +32041,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPMediaPlayback * cluster = [[CHIPMediaPlayback alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"MediaPlayback.ClusterRevision response %@", [value description]);
@@ -31885,6 +32078,7 @@ private:
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -31971,8 +32165,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeCurrentModeWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+        [cluster subscribeAttributeCurrentModeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ModeSelect.CurrentMode response %@", [value description]);
@@ -32041,8 +32235,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeSupportedModesWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+        [cluster subscribeAttributeSupportedModesWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"ModeSelect.SupportedModes response %@", [value description]);
@@ -32143,8 +32337,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeOnModeWithMinInterval:mMinInterval
-                                             maxInterval:mMaxInterval
+        [cluster subscribeAttributeOnModeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                             maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"ModeSelect.OnMode response %@", [value description]);
@@ -32213,8 +32407,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeStartUpModeWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+        [cluster subscribeAttributeStartUpModeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ModeSelect.StartUpMode response %@", [value description]);
@@ -32283,8 +32477,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeDescriptionWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+        [cluster subscribeAttributeDescriptionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ModeSelect.Description response %@", [value description]);
@@ -32355,8 +32549,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"ModeSelect.ServerGeneratedCommandList response %@",
@@ -32428,8 +32622,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"ModeSelect.ClientGeneratedCommandList response %@",
@@ -32499,8 +32693,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"ModeSelect.AttributeList response %@", [value description]);
@@ -32569,8 +32763,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000050) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPModeSelect * cluster = [[CHIPModeSelect alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ModeSelect.ClusterRevision response %@", [value description]);
@@ -32595,12 +32789,12 @@ private:
 | Cluster NetworkCommissioning                                        | 0x0031 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * AddOrUpdateThreadNetwork                                          |   0x03 |
-| * AddOrUpdateWiFiNetwork                                            |   0x02 |
-| * ConnectNetwork                                                    |   0x06 |
-| * RemoveNetwork                                                     |   0x04 |
-| * ReorderNetwork                                                    |   0x08 |
 | * ScanNetworks                                                      |   0x00 |
+| * AddOrUpdateWiFiNetwork                                            |   0x02 |
+| * AddOrUpdateThreadNetwork                                          |   0x03 |
+| * RemoveNetwork                                                     |   0x04 |
+| * ConnectNetwork                                                    |   0x06 |
+| * ReorderNetwork                                                    |   0x08 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * MaxNetworks                                                       | 0x0000 |
@@ -32613,6 +32807,7 @@ private:
 | * LastConnectErrorValue                                             | 0x0007 |
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
@@ -32910,8 +33105,8 @@ public:
         CHIPNetworkCommissioning * cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:device
                                                                                      endpoint:endpointId
                                                                                         queue:callbackQueue];
-        [cluster subscribeAttributeMaxNetworksWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+        [cluster subscribeAttributeMaxNetworksWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"NetworkCommissioning.MaxNetworks response %@", [value description]);
@@ -32984,8 +33179,8 @@ public:
         CHIPNetworkCommissioning * cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:device
                                                                                      endpoint:endpointId
                                                                                         queue:callbackQueue];
-        [cluster subscribeAttributeNetworksWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+        [cluster subscribeAttributeNetworksWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"NetworkCommissioning.Networks response %@", [value description]);
@@ -33058,8 +33253,8 @@ public:
         CHIPNetworkCommissioning * cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:device
                                                                                      endpoint:endpointId
                                                                                         queue:callbackQueue];
-        [cluster subscribeAttributeScanMaxTimeSecondsWithMinInterval:mMinInterval
-                                                         maxInterval:mMaxInterval
+        [cluster subscribeAttributeScanMaxTimeSecondsWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                         maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                              subscriptionEstablished:NULL
                                                        reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                            NSLog(@"NetworkCommissioning.ScanMaxTimeSeconds response %@",
@@ -33133,8 +33328,8 @@ public:
         CHIPNetworkCommissioning * cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:device
                                                                                      endpoint:endpointId
                                                                                         queue:callbackQueue];
-        [cluster subscribeAttributeConnectMaxTimeSecondsWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+        [cluster subscribeAttributeConnectMaxTimeSecondsWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"NetworkCommissioning.ConnectMaxTimeSeconds response %@",
@@ -33242,8 +33437,8 @@ public:
         CHIPNetworkCommissioning * cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:device
                                                                                      endpoint:endpointId
                                                                                         queue:callbackQueue];
-        [cluster subscribeAttributeInterfaceEnabledWithMinInterval:mMinInterval
-                                                       maxInterval:mMaxInterval
+        [cluster subscribeAttributeInterfaceEnabledWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                       maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"NetworkCommissioning.InterfaceEnabled response %@",
@@ -33317,8 +33512,8 @@ public:
         CHIPNetworkCommissioning * cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:device
                                                                                      endpoint:endpointId
                                                                                         queue:callbackQueue];
-        [cluster subscribeAttributeLastNetworkingStatusWithMinInterval:mMinInterval
-                                                           maxInterval:mMaxInterval
+        [cluster subscribeAttributeLastNetworkingStatusWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                subscriptionEstablished:NULL
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"NetworkCommissioning.LastNetworkingStatus response %@",
@@ -33392,8 +33587,8 @@ public:
         CHIPNetworkCommissioning * cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:device
                                                                                      endpoint:endpointId
                                                                                         queue:callbackQueue];
-        [cluster subscribeAttributeLastNetworkIDWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeLastNetworkIDWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSData * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"NetworkCommissioning.LastNetworkID response %@", [value description]);
@@ -33466,8 +33661,8 @@ public:
         CHIPNetworkCommissioning * cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:device
                                                                                      endpoint:endpointId
                                                                                         queue:callbackQueue];
-        [cluster subscribeAttributeLastConnectErrorValueWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+        [cluster subscribeAttributeLastConnectErrorValueWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"NetworkCommissioning.LastConnectErrorValue response %@",
@@ -33543,8 +33738,8 @@ public:
                                                                                      endpoint:endpointId
                                                                                         queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"NetworkCommissioning.ServerGeneratedCommandList response %@",
@@ -33620,8 +33815,8 @@ public:
                                                                                      endpoint:endpointId
                                                                                         queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"NetworkCommissioning.ClientGeneratedCommandList response %@",
@@ -33695,8 +33890,8 @@ public:
         CHIPNetworkCommissioning * cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:device
                                                                                      endpoint:endpointId
                                                                                         queue:callbackQueue];
-        [cluster subscribeAttributeFeatureMapWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributeFeatureMapWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"NetworkCommissioning.FeatureMap response %@", [value description]);
@@ -33770,8 +33965,8 @@ public:
                                                                                      endpoint:endpointId
                                                                                         queue:callbackQueue];
         [cluster
-            subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+            subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"NetworkCommissioning.ClusterRevision response %@", [value description]);
@@ -33796,12 +33991,15 @@ private:
 | Cluster OtaSoftwareUpdateProvider                                   | 0x0029 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * QueryImage                                                        |   0x00 |
 | * ApplyUpdateRequest                                                |   0x02 |
 | * NotifyUpdateApplied                                               |   0x04 |
-| * QueryImage                                                        |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -33991,8 +34189,8 @@ public:
                                                                                                endpoint:endpointId
                                                                                                   queue:callbackQueue];
         [cluster
-            subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+            subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"OtaSoftwareUpdateProvider.AttributeList response %@", [value description]);
@@ -34065,8 +34263,8 @@ public:
         CHIPOtaSoftwareUpdateProvider * cluster = [[CHIPOtaSoftwareUpdateProvider alloc] initWithDevice:device
                                                                                                endpoint:endpointId
                                                                                                   queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"OtaSoftwareUpdateProvider.ClusterRevision response %@",
@@ -34099,7 +34297,10 @@ private:
 | * UpdatePossible                                                    | 0x0001 |
 | * UpdateState                                                       | 0x0002 |
 | * UpdateStateProgress                                               | 0x0003 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -34228,8 +34429,8 @@ public:
         CHIPOtaSoftwareUpdateRequestor * cluster = [[CHIPOtaSoftwareUpdateRequestor alloc] initWithDevice:device
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeDefaultOtaProvidersWithMinInterval:mMinInterval
-                                                          maxInterval:mMaxInterval
+        [cluster subscribeAttributeDefaultOtaProvidersWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                               subscriptionEstablished:NULL
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"OtaSoftwareUpdateRequestor.DefaultOtaProviders response %@",
@@ -34303,8 +34504,8 @@ public:
         CHIPOtaSoftwareUpdateRequestor * cluster = [[CHIPOtaSoftwareUpdateRequestor alloc] initWithDevice:device
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeUpdatePossibleWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+        [cluster subscribeAttributeUpdatePossibleWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"OtaSoftwareUpdateRequestor.UpdatePossible response %@",
@@ -34379,8 +34580,8 @@ public:
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
         [cluster
-            subscribeAttributeUpdateStateWithMinInterval:mMinInterval
-                                             maxInterval:mMaxInterval
+            subscribeAttributeUpdateStateWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                             maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"OtaSoftwareUpdateRequestor.UpdateState response %@", [value description]);
@@ -34453,8 +34654,8 @@ public:
         CHIPOtaSoftwareUpdateRequestor * cluster = [[CHIPOtaSoftwareUpdateRequestor alloc] initWithDevice:device
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeUpdateStateProgressWithMinInterval:mMinInterval
-                                                          maxInterval:mMaxInterval
+        [cluster subscribeAttributeUpdateStateProgressWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                               subscriptionEstablished:NULL
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"OtaSoftwareUpdateRequestor.UpdateStateProgress response %@",
@@ -34528,8 +34729,8 @@ public:
         CHIPOtaSoftwareUpdateRequestor * cluster = [[CHIPOtaSoftwareUpdateRequestor alloc] initWithDevice:device
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"OtaSoftwareUpdateRequestor.AttributeList response %@",
@@ -34603,8 +34804,8 @@ public:
         CHIPOtaSoftwareUpdateRequestor * cluster = [[CHIPOtaSoftwareUpdateRequestor alloc] initWithDevice:device
                                                                                                  endpoint:endpointId
                                                                                                     queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"OtaSoftwareUpdateRequestor.ClusterRevision response %@",
@@ -34635,9 +34836,19 @@ private:
 | * Occupancy                                                         | 0x0000 |
 | * OccupancySensorType                                               | 0x0001 |
 | * OccupancySensorTypeBitmap                                         | 0x0002 |
+| * PirOccupiedToUnoccupiedDelay                                      | 0x0010 |
+| * PirUnoccupiedToOccupiedDelay                                      | 0x0011 |
+| * PirUnoccupiedToOccupiedThreshold                                  | 0x0012 |
+| * UltrasonicOccupiedToUnoccupiedDelay                               | 0x0020 |
+| * UltrasonicUnoccupiedToOccupiedDelay                               | 0x0021 |
+| * UltrasonicUnoccupiedToOccupiedThreshold                           | 0x0022 |
+| * PhysicalContactOccupiedToUnoccupiedDelay                          | 0x0030 |
+| * PhysicalContactUnoccupiedToOccupiedDelay                          | 0x0031 |
+| * PhysicalContactUnoccupiedToOccupiedThreshold                      | 0x0032 |
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -34695,8 +34906,8 @@ public:
         CHIPOccupancySensing * cluster = [[CHIPOccupancySensing alloc] initWithDevice:device
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeOccupancyWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+        [cluster subscribeAttributeOccupancyWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"OccupancySensing.Occupancy response %@", [value description]);
@@ -34769,8 +34980,8 @@ public:
         CHIPOccupancySensing * cluster = [[CHIPOccupancySensing alloc] initWithDevice:device
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeOccupancySensorTypeWithMinInterval:mMinInterval
-                                                          maxInterval:mMaxInterval
+        [cluster subscribeAttributeOccupancySensorTypeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                               subscriptionEstablished:NULL
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"OccupancySensing.OccupancySensorType response %@",
@@ -34846,8 +35057,8 @@ public:
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeOccupancySensorTypeBitmapWithMinInterval:mMinInterval
-                                                           maxInterval:mMaxInterval
+            subscribeAttributeOccupancySensorTypeBitmapWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                subscriptionEstablished:NULL
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"OccupancySensing.OccupancySensorTypeBitmap response %@",
@@ -34923,8 +35134,8 @@ public:
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"OccupancySensing.ServerGeneratedCommandList response %@",
@@ -35000,8 +35211,8 @@ public:
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"OccupancySensing.ClientGeneratedCommandList response %@",
@@ -35075,8 +35286,8 @@ public:
         CHIPOccupancySensing * cluster = [[CHIPOccupancySensing alloc] initWithDevice:device
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"OccupancySensing.AttributeList response %@", [value description]);
@@ -35149,8 +35360,8 @@ public:
         CHIPOccupancySensing * cluster = [[CHIPOccupancySensing alloc] initWithDevice:device
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"OccupancySensing.ClusterRevision response %@", [value description]);
@@ -35176,11 +35387,11 @@ private:
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * Off                                                               |   0x00 |
-| * OffWithEffect                                                     |   0x40 |
 | * On                                                                |   0x01 |
+| * Toggle                                                            |   0x02 |
+| * OffWithEffect                                                     |   0x40 |
 | * OnWithRecallGlobalScene                                           |   0x41 |
 | * OnWithTimedOff                                                    |   0x42 |
-| * Toggle                                                            |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * OnOff                                                             | 0x0000 |
@@ -35432,8 +35643,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000006) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeOnOffWithMinInterval:mMinInterval
-                                            maxInterval:mMaxInterval
+        [cluster subscribeAttributeOnOffWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                 subscriptionEstablished:NULL
                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                               NSLog(@"OnOff.OnOff response %@", [value description]);
@@ -35502,8 +35713,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000006) ReportAttribute (0x00004000) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeGlobalSceneControlWithMinInterval:mMinInterval
-                                                         maxInterval:mMaxInterval
+        [cluster subscribeAttributeGlobalSceneControlWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                         maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                              subscriptionEstablished:NULL
                                                        reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                            NSLog(@"OnOff.GlobalSceneControl response %@", [value description]);
@@ -35604,8 +35815,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000006) ReportAttribute (0x00004001) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeOnTimeWithMinInterval:mMinInterval
-                                             maxInterval:mMaxInterval
+        [cluster subscribeAttributeOnTimeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                             maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"OnOff.OnTime response %@", [value description]);
@@ -35706,8 +35917,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000006) ReportAttribute (0x00004002) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeOffWaitTimeWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+        [cluster subscribeAttributeOffWaitTimeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"OnOff.OffWaitTime response %@", [value description]);
@@ -35808,8 +36019,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000006) ReportAttribute (0x00004003) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeStartUpOnOffWithMinInterval:mMinInterval
-                                                   maxInterval:mMaxInterval
+        [cluster subscribeAttributeStartUpOnOffWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                   maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"OnOff.StartUpOnOff response %@", [value description]);
@@ -35880,8 +36091,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"OnOff.ServerGeneratedCommandList response %@",
@@ -35953,8 +36164,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"OnOff.ClientGeneratedCommandList response %@",
@@ -36024,8 +36235,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000006) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"OnOff.AttributeList response %@", [value description]);
@@ -36094,8 +36305,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000006) ReportAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeFeatureMapWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributeFeatureMapWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"OnOff.FeatureMap response %@", [value description]);
@@ -36164,8 +36375,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000006) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"OnOff.ClusterRevision response %@", [value description]);
@@ -36197,6 +36408,7 @@ private:
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -36254,8 +36466,8 @@ public:
         CHIPOnOffSwitchConfiguration * cluster = [[CHIPOnOffSwitchConfiguration alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeSwitchTypeWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributeSwitchTypeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"OnOffSwitchConfiguration.SwitchType response %@", [value description]);
@@ -36363,8 +36575,8 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeSwitchActionsWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+            subscribeAttributeSwitchActionsWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"OnOffSwitchConfiguration.SwitchActions response %@", [value description]);
@@ -36439,8 +36651,8 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"OnOffSwitchConfiguration.ServerGeneratedCommandList response "
@@ -36517,8 +36729,8 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"OnOffSwitchConfiguration.ClientGeneratedCommandList response "
@@ -36594,8 +36806,8 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+            subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"OnOffSwitchConfiguration.AttributeList response %@", [value description]);
@@ -36668,8 +36880,8 @@ public:
         CHIPOnOffSwitchConfiguration * cluster = [[CHIPOnOffSwitchConfiguration alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"OnOffSwitchConfiguration.ClusterRevision response %@",
@@ -36695,15 +36907,15 @@ private:
 | Cluster OperationalCredentials                                      | 0x003E |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * AddNOC                                                            |   0x06 |
-| * AddTrustedRootCertificate                                         |   0x0B |
 | * AttestationRequest                                                |   0x00 |
-| * CSRRequest                                                        |   0x04 |
 | * CertificateChainRequest                                           |   0x02 |
-| * RemoveFabric                                                      |   0x0A |
-| * RemoveTrustedRootCertificate                                      |   0x0C |
-| * UpdateFabricLabel                                                 |   0x09 |
+| * CSRRequest                                                        |   0x04 |
+| * AddNOC                                                            |   0x06 |
 | * UpdateNOC                                                         |   0x07 |
+| * UpdateFabricLabel                                                 |   0x09 |
+| * RemoveFabric                                                      |   0x0A |
+| * AddTrustedRootCertificate                                         |   0x0B |
+| * RemoveTrustedRootCertificate                                      |   0x0C |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * NOCs                                                              | 0x0000 |
@@ -36715,6 +36927,7 @@ private:
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -37109,8 +37322,8 @@ public:
         CHIPOperationalCredentials * cluster = [[CHIPOperationalCredentials alloc] initWithDevice:device
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
-        [cluster subscribeAttributeNOCsWithMinInterval:mMinInterval
-                                           maxInterval:mMaxInterval
+        [cluster subscribeAttributeNOCsWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                           maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                subscriptionEstablished:NULL
                                          reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                              NSLog(@"OperationalCredentials.NOCs response %@", [value description]);
@@ -37183,8 +37396,8 @@ public:
         CHIPOperationalCredentials * cluster = [[CHIPOperationalCredentials alloc] initWithDevice:device
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
-        [cluster subscribeAttributeFabricsListWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+        [cluster subscribeAttributeFabricsListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"OperationalCredentials.FabricsList response %@", [value description]);
@@ -37257,8 +37470,8 @@ public:
         CHIPOperationalCredentials * cluster = [[CHIPOperationalCredentials alloc] initWithDevice:device
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
-        [cluster subscribeAttributeSupportedFabricsWithMinInterval:mMinInterval
-                                                       maxInterval:mMaxInterval
+        [cluster subscribeAttributeSupportedFabricsWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                       maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"OperationalCredentials.SupportedFabrics response %@",
@@ -37332,8 +37545,8 @@ public:
         CHIPOperationalCredentials * cluster = [[CHIPOperationalCredentials alloc] initWithDevice:device
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
-        [cluster subscribeAttributeCommissionedFabricsWithMinInterval:mMinInterval
-                                                          maxInterval:mMaxInterval
+        [cluster subscribeAttributeCommissionedFabricsWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                               subscriptionEstablished:NULL
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"OperationalCredentials.CommissionedFabrics response %@",
@@ -37407,8 +37620,8 @@ public:
         CHIPOperationalCredentials * cluster = [[CHIPOperationalCredentials alloc] initWithDevice:device
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
-        [cluster subscribeAttributeTrustedRootCertificatesWithMinInterval:mMinInterval
-                                                              maxInterval:mMaxInterval
+        [cluster subscribeAttributeTrustedRootCertificatesWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                   subscriptionEstablished:NULL
                                                             reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"OperationalCredentials.TrustedRootCertificates response %@",
@@ -37482,8 +37695,8 @@ public:
         CHIPOperationalCredentials * cluster = [[CHIPOperationalCredentials alloc] initWithDevice:device
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
-        [cluster subscribeAttributeCurrentFabricIndexWithMinInterval:mMinInterval
-                                                         maxInterval:mMaxInterval
+        [cluster subscribeAttributeCurrentFabricIndexWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                         maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                              subscriptionEstablished:NULL
                                                        reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                            NSLog(@"OperationalCredentials.CurrentFabricIndex response %@",
@@ -37559,8 +37772,8 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(
@@ -37637,8 +37850,8 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(
@@ -37714,8 +37927,8 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         [cluster
-            subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+            subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"OperationalCredentials.AttributeList response %@", [value description]);
@@ -37788,8 +38001,8 @@ public:
         CHIPOperationalCredentials * cluster = [[CHIPOperationalCredentials alloc] initWithDevice:device
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"OperationalCredentials.ClusterRevision response %@",
@@ -37820,12 +38033,34 @@ private:
 | * Status                                                            | 0x0000 |
 | * Order                                                             | 0x0001 |
 | * Description                                                       | 0x0002 |
+| * WiredAssessedInputVoltage                                         | 0x0003 |
+| * WiredAssessedInputFrequency                                       | 0x0004 |
+| * WiredCurrentType                                                  | 0x0005 |
+| * WiredAssessedCurrent                                              | 0x0006 |
+| * WiredNominalVoltage                                               | 0x0007 |
+| * WiredMaximumCurrent                                               | 0x0008 |
+| * WiredPresent                                                      | 0x0009 |
+| * ActiveWiredFaults                                                 | 0x000A |
 | * BatteryVoltage                                                    | 0x000B |
 | * BatteryPercentRemaining                                           | 0x000C |
 | * BatteryTimeRemaining                                              | 0x000D |
 | * BatteryChargeLevel                                                | 0x000E |
+| * BatteryReplacementNeeded                                          | 0x000F |
+| * BatteryReplaceability                                             | 0x0010 |
+| * BatteryPresent                                                    | 0x0011 |
 | * ActiveBatteryFaults                                               | 0x0012 |
+| * BatteryReplacementDescription                                     | 0x0013 |
+| * BatteryCommonDesignation                                          | 0x0014 |
+| * BatteryANSIDesignation                                            | 0x0015 |
+| * BatteryIECDesignation                                             | 0x0016 |
+| * BatteryApprovedChemistry                                          | 0x0017 |
+| * BatteryCapacity                                                   | 0x0018 |
+| * BatteryQuantity                                                   | 0x0019 |
 | * BatteryChargeState                                                | 0x001A |
+| * BatteryTimeToFullCharge                                           | 0x001B |
+| * BatteryFunctionalWhileCharging                                    | 0x001C |
+| * BatteryChargingCurrent                                            | 0x001D |
+| * ActiveBatteryChargeFaults                                         | 0x001E |
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -37883,8 +38118,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeStatusWithMinInterval:mMinInterval
-                                             maxInterval:mMaxInterval
+        [cluster subscribeAttributeStatusWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                             maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"PowerSource.Status response %@", [value description]);
@@ -37953,8 +38188,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeOrderWithMinInterval:mMinInterval
-                                            maxInterval:mMaxInterval
+        [cluster subscribeAttributeOrderWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                 subscriptionEstablished:NULL
                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                               NSLog(@"PowerSource.Order response %@", [value description]);
@@ -38023,8 +38258,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeDescriptionWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+        [cluster subscribeAttributeDescriptionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"PowerSource.Description response %@", [value description]);
@@ -38093,8 +38328,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x0000000B) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeBatteryVoltageWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+        [cluster subscribeAttributeBatteryVoltageWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"PowerSource.BatteryVoltage response %@", [value description]);
@@ -38164,8 +38399,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x0000000C) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeBatteryPercentRemainingWithMinInterval:mMinInterval
-                                                              maxInterval:mMaxInterval
+        [cluster subscribeAttributeBatteryPercentRemainingWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                   subscriptionEstablished:NULL
                                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"PowerSource.BatteryPercentRemaining response %@",
@@ -38236,8 +38471,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeBatteryTimeRemainingWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+            subscribeAttributeBatteryTimeRemainingWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"PowerSource.BatteryTimeRemaining response %@", [value description]);
@@ -38307,8 +38542,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeBatteryChargeLevelWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+            subscribeAttributeBatteryChargeLevelWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"PowerSource.BatteryChargeLevel response %@", [value description]);
@@ -38378,8 +38613,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeActiveBatteryFaultsWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+            subscribeAttributeActiveBatteryFaultsWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"PowerSource.ActiveBatteryFaults response %@", [value description]);
@@ -38449,8 +38684,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeBatteryChargeStateWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+            subscribeAttributeBatteryChargeStateWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"PowerSource.BatteryChargeState response %@", [value description]);
@@ -38521,8 +38756,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"PowerSource.ServerGeneratedCommandList response %@",
@@ -38594,8 +38829,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"PowerSource.ClientGeneratedCommandList response %@",
@@ -38665,8 +38900,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"PowerSource.AttributeList response %@", [value description]);
@@ -38735,8 +38970,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeFeatureMapWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributeFeatureMapWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"PowerSource.FeatureMap response %@", [value description]);
@@ -38805,8 +39040,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"PowerSource.ClusterRevision response %@", [value description]);
@@ -38837,6 +39072,7 @@ private:
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -38894,8 +39130,8 @@ public:
         CHIPPowerSourceConfiguration * cluster = [[CHIPPowerSourceConfiguration alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeSourcesWithMinInterval:mMinInterval
-                                              maxInterval:mMaxInterval
+        [cluster subscribeAttributeSourcesWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"PowerSourceConfiguration.Sources response %@", [value description]);
@@ -38970,8 +39206,8 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"PowerSourceConfiguration.ServerGeneratedCommandList response "
@@ -39048,8 +39284,8 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"PowerSourceConfiguration.ClientGeneratedCommandList response "
@@ -39125,8 +39361,8 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+            subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"PowerSourceConfiguration.AttributeList response %@", [value description]);
@@ -39199,8 +39435,8 @@ public:
         CHIPPowerSourceConfiguration * cluster = [[CHIPPowerSourceConfiguration alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"PowerSourceConfiguration.ClusterRevision response %@",
@@ -39231,7 +39467,16 @@ private:
 | * MeasuredValue                                                     | 0x0000 |
 | * MinMeasuredValue                                                  | 0x0001 |
 | * MaxMeasuredValue                                                  | 0x0002 |
+| * Tolerance                                                         | 0x0003 |
+| * ScaledValue                                                       | 0x0010 |
+| * MinScaledValue                                                    | 0x0011 |
+| * MaxScaledValue                                                    | 0x0012 |
+| * ScaledTolerance                                                   | 0x0013 |
+| * Scale                                                             | 0x0014 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -39289,8 +39534,8 @@ public:
         CHIPPressureMeasurement * cluster = [[CHIPPressureMeasurement alloc] initWithDevice:device
                                                                                    endpoint:endpointId
                                                                                       queue:callbackQueue];
-        [cluster subscribeAttributeMeasuredValueWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeMeasuredValueWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"PressureMeasurement.MeasuredValue response %@", [value description]);
@@ -39364,8 +39609,8 @@ public:
                                                                                    endpoint:endpointId
                                                                                       queue:callbackQueue];
         [cluster
-            subscribeAttributeMinMeasuredValueWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+            subscribeAttributeMinMeasuredValueWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"PressureMeasurement.MinMeasuredValue response %@", [value description]);
@@ -39439,8 +39684,8 @@ public:
                                                                                    endpoint:endpointId
                                                                                       queue:callbackQueue];
         [cluster
-            subscribeAttributeMaxMeasuredValueWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+            subscribeAttributeMaxMeasuredValueWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"PressureMeasurement.MaxMeasuredValue response %@", [value description]);
@@ -39513,8 +39758,8 @@ public:
         CHIPPressureMeasurement * cluster = [[CHIPPressureMeasurement alloc] initWithDevice:device
                                                                                    endpoint:endpointId
                                                                                       queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"PressureMeasurement.AttributeList response %@", [value description]);
@@ -39588,8 +39833,8 @@ public:
                                                                                    endpoint:endpointId
                                                                                       queue:callbackQueue];
         [cluster
-            subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+            subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"PressureMeasurement.ClusterRevision response %@", [value description]);
@@ -39719,8 +39964,8 @@ public:
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
         [cluster
-            subscribeAttributeMaxPressureWithMinInterval:mMinInterval
-                                             maxInterval:mMaxInterval
+            subscribeAttributeMaxPressureWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                             maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"PumpConfigurationAndControl.MaxPressure response %@", [value description]);
@@ -39793,8 +40038,8 @@ public:
         CHIPPumpConfigurationAndControl * cluster = [[CHIPPumpConfigurationAndControl alloc] initWithDevice:device
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
-        [cluster subscribeAttributeMaxSpeedWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+        [cluster subscribeAttributeMaxSpeedWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"PumpConfigurationAndControl.MaxSpeed response %@", [value description]);
@@ -39867,8 +40112,8 @@ public:
         CHIPPumpConfigurationAndControl * cluster = [[CHIPPumpConfigurationAndControl alloc] initWithDevice:device
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
-        [cluster subscribeAttributeMaxFlowWithMinInterval:mMinInterval
-                                              maxInterval:mMaxInterval
+        [cluster subscribeAttributeMaxFlowWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"PumpConfigurationAndControl.MaxFlow response %@", [value description]);
@@ -39941,8 +40186,8 @@ public:
         CHIPPumpConfigurationAndControl * cluster = [[CHIPPumpConfigurationAndControl alloc] initWithDevice:device
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
-        [cluster subscribeAttributeMinConstPressureWithMinInterval:mMinInterval
-                                                       maxInterval:mMaxInterval
+        [cluster subscribeAttributeMinConstPressureWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                       maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"PumpConfigurationAndControl.MinConstPressure response %@",
@@ -40016,8 +40261,8 @@ public:
         CHIPPumpConfigurationAndControl * cluster = [[CHIPPumpConfigurationAndControl alloc] initWithDevice:device
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
-        [cluster subscribeAttributeMaxConstPressureWithMinInterval:mMinInterval
-                                                       maxInterval:mMaxInterval
+        [cluster subscribeAttributeMaxConstPressureWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                       maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"PumpConfigurationAndControl.MaxConstPressure response %@",
@@ -40091,8 +40336,8 @@ public:
         CHIPPumpConfigurationAndControl * cluster = [[CHIPPumpConfigurationAndControl alloc] initWithDevice:device
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
-        [cluster subscribeAttributeMinCompPressureWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeMinCompPressureWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"PumpConfigurationAndControl.MinCompPressure response %@",
@@ -40166,8 +40411,8 @@ public:
         CHIPPumpConfigurationAndControl * cluster = [[CHIPPumpConfigurationAndControl alloc] initWithDevice:device
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
-        [cluster subscribeAttributeMaxCompPressureWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeMaxCompPressureWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"PumpConfigurationAndControl.MaxCompPressure response %@",
@@ -40241,8 +40486,8 @@ public:
         CHIPPumpConfigurationAndControl * cluster = [[CHIPPumpConfigurationAndControl alloc] initWithDevice:device
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
-        [cluster subscribeAttributeMinConstSpeedWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeMinConstSpeedWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"PumpConfigurationAndControl.MinConstSpeed response %@",
@@ -40316,8 +40561,8 @@ public:
         CHIPPumpConfigurationAndControl * cluster = [[CHIPPumpConfigurationAndControl alloc] initWithDevice:device
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
-        [cluster subscribeAttributeMaxConstSpeedWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeMaxConstSpeedWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"PumpConfigurationAndControl.MaxConstSpeed response %@",
@@ -40392,8 +40637,8 @@ public:
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
         [cluster
-            subscribeAttributeMinConstFlowWithMinInterval:mMinInterval
-                                              maxInterval:mMaxInterval
+            subscribeAttributeMinConstFlowWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"PumpConfigurationAndControl.MinConstFlow response %@", [value description]);
@@ -40467,8 +40712,8 @@ public:
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
         [cluster
-            subscribeAttributeMaxConstFlowWithMinInterval:mMinInterval
-                                              maxInterval:mMaxInterval
+            subscribeAttributeMaxConstFlowWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"PumpConfigurationAndControl.MaxConstFlow response %@", [value description]);
@@ -40542,8 +40787,8 @@ public:
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
         [cluster
-            subscribeAttributeMinConstTempWithMinInterval:mMinInterval
-                                              maxInterval:mMaxInterval
+            subscribeAttributeMinConstTempWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"PumpConfigurationAndControl.MinConstTemp response %@", [value description]);
@@ -40617,8 +40862,8 @@ public:
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
         [cluster
-            subscribeAttributeMaxConstTempWithMinInterval:mMinInterval
-                                              maxInterval:mMaxInterval
+            subscribeAttributeMaxConstTempWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"PumpConfigurationAndControl.MaxConstTemp response %@", [value description]);
@@ -40692,8 +40937,8 @@ public:
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
         [cluster
-            subscribeAttributePumpStatusWithMinInterval:mMinInterval
-                                            maxInterval:mMaxInterval
+            subscribeAttributePumpStatusWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                 subscriptionEstablished:NULL
                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                               NSLog(@"PumpConfigurationAndControl.PumpStatus response %@", [value description]);
@@ -40767,8 +41012,8 @@ public:
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
         [cluster
-            subscribeAttributeEffectiveOperationModeWithMinInterval:mMinInterval
-                                                        maxInterval:mMaxInterval
+            subscribeAttributeEffectiveOperationModeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                        maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"PumpConfigurationAndControl.EffectiveOperationMode response %@",
@@ -40842,8 +41087,8 @@ public:
         CHIPPumpConfigurationAndControl * cluster = [[CHIPPumpConfigurationAndControl alloc] initWithDevice:device
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
-        [cluster subscribeAttributeEffectiveControlModeWithMinInterval:mMinInterval
-                                                           maxInterval:mMaxInterval
+        [cluster subscribeAttributeEffectiveControlModeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                subscriptionEstablished:NULL
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"PumpConfigurationAndControl.EffectiveControlMode response %@",
@@ -40917,8 +41162,8 @@ public:
         CHIPPumpConfigurationAndControl * cluster = [[CHIPPumpConfigurationAndControl alloc] initWithDevice:device
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
-        [cluster subscribeAttributeCapacityWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+        [cluster subscribeAttributeCapacityWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"PumpConfigurationAndControl.Capacity response %@", [value description]);
@@ -40991,8 +41236,8 @@ public:
         CHIPPumpConfigurationAndControl * cluster = [[CHIPPumpConfigurationAndControl alloc] initWithDevice:device
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
-        [cluster subscribeAttributeSpeedWithMinInterval:mMinInterval
-                                            maxInterval:mMaxInterval
+        [cluster subscribeAttributeSpeedWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                 subscriptionEstablished:NULL
                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                               NSLog(@"PumpConfigurationAndControl.Speed response %@", [value description]);
@@ -41099,8 +41344,8 @@ public:
         CHIPPumpConfigurationAndControl * cluster = [[CHIPPumpConfigurationAndControl alloc] initWithDevice:device
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
-        [cluster subscribeAttributeLifetimeRunningHoursWithMinInterval:mMinInterval
-                                                           maxInterval:mMaxInterval
+        [cluster subscribeAttributeLifetimeRunningHoursWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                subscriptionEstablished:NULL
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"PumpConfigurationAndControl.LifetimeRunningHours response %@",
@@ -41174,8 +41419,8 @@ public:
         CHIPPumpConfigurationAndControl * cluster = [[CHIPPumpConfigurationAndControl alloc] initWithDevice:device
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
-        [cluster subscribeAttributePowerWithMinInterval:mMinInterval
-                                            maxInterval:mMaxInterval
+        [cluster subscribeAttributePowerWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                 subscriptionEstablished:NULL
                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                               NSLog(@"PumpConfigurationAndControl.Power response %@", [value description]);
@@ -41283,8 +41528,8 @@ public:
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
         [cluster
-            subscribeAttributeLifetimeEnergyConsumedWithMinInterval:mMinInterval
-                                                        maxInterval:mMaxInterval
+            subscribeAttributeLifetimeEnergyConsumedWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                        maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"PumpConfigurationAndControl.LifetimeEnergyConsumed response %@",
@@ -41392,8 +41637,8 @@ public:
         CHIPPumpConfigurationAndControl * cluster = [[CHIPPumpConfigurationAndControl alloc] initWithDevice:device
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
-        [cluster subscribeAttributeOperationModeWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeOperationModeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"PumpConfigurationAndControl.OperationMode response %@",
@@ -41502,8 +41747,8 @@ public:
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
         [cluster
-            subscribeAttributeControlModeWithMinInterval:mMinInterval
-                                             maxInterval:mMaxInterval
+            subscribeAttributeControlModeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                             maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"PumpConfigurationAndControl.ControlMode response %@", [value description]);
@@ -41576,8 +41821,8 @@ public:
         CHIPPumpConfigurationAndControl * cluster = [[CHIPPumpConfigurationAndControl alloc] initWithDevice:device
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
-        [cluster subscribeAttributeAlarmMaskWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+        [cluster subscribeAttributeAlarmMaskWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"PumpConfigurationAndControl.AlarmMask response %@", [value description]);
@@ -41652,8 +41897,8 @@ public:
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"PumpConfigurationAndControl.ServerGeneratedCommandList "
@@ -41730,8 +41975,8 @@ public:
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"PumpConfigurationAndControl.ClientGeneratedCommandList "
@@ -41806,8 +42051,8 @@ public:
         CHIPPumpConfigurationAndControl * cluster = [[CHIPPumpConfigurationAndControl alloc] initWithDevice:device
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"PumpConfigurationAndControl.AttributeList response %@",
@@ -41882,8 +42127,8 @@ public:
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
         [cluster
-            subscribeAttributeFeatureMapWithMinInterval:mMinInterval
-                                            maxInterval:mMaxInterval
+            subscribeAttributeFeatureMapWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                 subscriptionEstablished:NULL
                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                               NSLog(@"PumpConfigurationAndControl.FeatureMap response %@", [value description]);
@@ -41956,8 +42201,8 @@ public:
         CHIPPumpConfigurationAndControl * cluster = [[CHIPPumpConfigurationAndControl alloc] initWithDevice:device
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"PumpConfigurationAndControl.ClusterRevision response %@",
@@ -41992,6 +42237,7 @@ private:
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -42049,8 +42295,8 @@ public:
         CHIPRelativeHumidityMeasurement * cluster = [[CHIPRelativeHumidityMeasurement alloc] initWithDevice:device
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
-        [cluster subscribeAttributeMeasuredValueWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeMeasuredValueWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"RelativeHumidityMeasurement.MeasuredValue response %@",
@@ -42124,8 +42370,8 @@ public:
         CHIPRelativeHumidityMeasurement * cluster = [[CHIPRelativeHumidityMeasurement alloc] initWithDevice:device
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
-        [cluster subscribeAttributeMinMeasuredValueWithMinInterval:mMinInterval
-                                                       maxInterval:mMaxInterval
+        [cluster subscribeAttributeMinMeasuredValueWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                       maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"RelativeHumidityMeasurement.MinMeasuredValue response %@",
@@ -42199,8 +42445,8 @@ public:
         CHIPRelativeHumidityMeasurement * cluster = [[CHIPRelativeHumidityMeasurement alloc] initWithDevice:device
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
-        [cluster subscribeAttributeMaxMeasuredValueWithMinInterval:mMinInterval
-                                                       maxInterval:mMaxInterval
+        [cluster subscribeAttributeMaxMeasuredValueWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                       maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"RelativeHumidityMeasurement.MaxMeasuredValue response %@",
@@ -42274,8 +42520,8 @@ public:
         CHIPRelativeHumidityMeasurement * cluster = [[CHIPRelativeHumidityMeasurement alloc] initWithDevice:device
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
-        [cluster subscribeAttributeToleranceWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+        [cluster subscribeAttributeToleranceWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"RelativeHumidityMeasurement.Tolerance response %@", [value description]);
@@ -42350,8 +42596,8 @@ public:
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"RelativeHumidityMeasurement.ServerGeneratedCommandList "
@@ -42428,8 +42674,8 @@ public:
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"RelativeHumidityMeasurement.ClientGeneratedCommandList "
@@ -42504,8 +42750,8 @@ public:
         CHIPRelativeHumidityMeasurement * cluster = [[CHIPRelativeHumidityMeasurement alloc] initWithDevice:device
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"RelativeHumidityMeasurement.AttributeList response %@",
@@ -42579,8 +42825,8 @@ public:
         CHIPRelativeHumidityMeasurement * cluster = [[CHIPRelativeHumidityMeasurement alloc] initWithDevice:device
                                                                                                    endpoint:endpointId
                                                                                                       queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"RelativeHumidityMeasurement.ClusterRevision response %@",
@@ -42607,12 +42853,15 @@ private:
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * AddScene                                                          |   0x00 |
-| * GetSceneMembership                                                |   0x06 |
-| * RecallScene                                                       |   0x05 |
-| * RemoveAllScenes                                                   |   0x03 |
-| * RemoveScene                                                       |   0x02 |
-| * StoreScene                                                        |   0x04 |
 | * ViewScene                                                         |   0x01 |
+| * RemoveScene                                                       |   0x02 |
+| * RemoveAllScenes                                                   |   0x03 |
+| * StoreScene                                                        |   0x04 |
+| * RecallScene                                                       |   0x05 |
+| * GetSceneMembership                                                |   0x06 |
+| * EnhancedAddScene                                                  |   0x40 |
+| * EnhancedViewScene                                                 |   0x41 |
+| * CopyScene                                                         |   0x42 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * SceneCount                                                        | 0x0000 |
@@ -42620,9 +42869,11 @@ private:
 | * CurrentGroup                                                      | 0x0002 |
 | * SceneValid                                                        | 0x0003 |
 | * NameSupport                                                       | 0x0004 |
+| * LastConfiguredBy                                                  | 0x0005 |
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -42942,8 +43193,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPScenes * cluster = [[CHIPScenes alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeSceneCountWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributeSceneCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"Scenes.SceneCount response %@", [value description]);
@@ -43012,8 +43263,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPScenes * cluster = [[CHIPScenes alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeCurrentSceneWithMinInterval:mMinInterval
-                                                   maxInterval:mMaxInterval
+        [cluster subscribeAttributeCurrentSceneWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                   maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"Scenes.CurrentScene response %@", [value description]);
@@ -43082,8 +43333,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPScenes * cluster = [[CHIPScenes alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeCurrentGroupWithMinInterval:mMinInterval
-                                                   maxInterval:mMaxInterval
+        [cluster subscribeAttributeCurrentGroupWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                   maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"Scenes.CurrentGroup response %@", [value description]);
@@ -43152,8 +43403,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPScenes * cluster = [[CHIPScenes alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeSceneValidWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributeSceneValidWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"Scenes.SceneValid response %@", [value description]);
@@ -43222,8 +43473,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPScenes * cluster = [[CHIPScenes alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeNameSupportWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+        [cluster subscribeAttributeNameSupportWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"Scenes.NameSupport response %@", [value description]);
@@ -43294,8 +43545,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPScenes * cluster = [[CHIPScenes alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"Scenes.ServerGeneratedCommandList response %@",
@@ -43367,8 +43618,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPScenes * cluster = [[CHIPScenes alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"Scenes.ClientGeneratedCommandList response %@",
@@ -43438,8 +43689,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPScenes * cluster = [[CHIPScenes alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"Scenes.AttributeList response %@", [value description]);
@@ -43508,8 +43759,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPScenes * cluster = [[CHIPScenes alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Scenes.ClusterRevision response %@", [value description]);
@@ -43633,8 +43884,8 @@ public:
         CHIPSoftwareDiagnostics * cluster = [[CHIPSoftwareDiagnostics alloc] initWithDevice:device
                                                                                    endpoint:endpointId
                                                                                       queue:callbackQueue];
-        [cluster subscribeAttributeThreadMetricsWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeThreadMetricsWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"SoftwareDiagnostics.ThreadMetrics response %@", [value description]);
@@ -43708,8 +43959,8 @@ public:
                                                                                    endpoint:endpointId
                                                                                       queue:callbackQueue];
         [cluster
-            subscribeAttributeCurrentHeapFreeWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+            subscribeAttributeCurrentHeapFreeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"SoftwareDiagnostics.CurrentHeapFree response %@", [value description]);
@@ -43783,8 +44034,8 @@ public:
                                                                                    endpoint:endpointId
                                                                                       queue:callbackQueue];
         [cluster
-            subscribeAttributeCurrentHeapUsedWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+            subscribeAttributeCurrentHeapUsedWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"SoftwareDiagnostics.CurrentHeapUsed response %@", [value description]);
@@ -43859,8 +44110,8 @@ public:
                                                                                    endpoint:endpointId
                                                                                       queue:callbackQueue];
         [cluster
-            subscribeAttributeCurrentHeapHighWatermarkWithMinInterval:mMinInterval
-                                                          maxInterval:mMaxInterval
+            subscribeAttributeCurrentHeapHighWatermarkWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                               subscriptionEstablished:NULL
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"SoftwareDiagnostics.CurrentHeapHighWatermark response %@",
@@ -43936,8 +44187,8 @@ public:
                                                                                    endpoint:endpointId
                                                                                       queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"SoftwareDiagnostics.ServerGeneratedCommandList response %@",
@@ -44013,8 +44264,8 @@ public:
                                                                                    endpoint:endpointId
                                                                                       queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"SoftwareDiagnostics.ClientGeneratedCommandList response %@",
@@ -44088,8 +44339,8 @@ public:
         CHIPSoftwareDiagnostics * cluster = [[CHIPSoftwareDiagnostics alloc] initWithDevice:device
                                                                                    endpoint:endpointId
                                                                                       queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"SoftwareDiagnostics.AttributeList response %@", [value description]);
@@ -44162,8 +44413,8 @@ public:
         CHIPSoftwareDiagnostics * cluster = [[CHIPSoftwareDiagnostics alloc] initWithDevice:device
                                                                                    endpoint:endpointId
                                                                                       queue:callbackQueue];
-        [cluster subscribeAttributeFeatureMapWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributeFeatureMapWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"SoftwareDiagnostics.FeatureMap response %@", [value description]);
@@ -44237,8 +44488,8 @@ public:
                                                                                    endpoint:endpointId
                                                                                       queue:callbackQueue];
         [cluster
-            subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+            subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"SoftwareDiagnostics.ClusterRevision response %@", [value description]);
@@ -44332,8 +44583,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000003B) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPSwitch * cluster = [[CHIPSwitch alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeNumberOfPositionsWithMinInterval:mMinInterval
-                                                        maxInterval:mMaxInterval
+        [cluster subscribeAttributeNumberOfPositionsWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                        maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"Switch.NumberOfPositions response %@", [value description]);
@@ -44402,8 +44653,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000003B) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPSwitch * cluster = [[CHIPSwitch alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeCurrentPositionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeCurrentPositionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Switch.CurrentPosition response %@", [value description]);
@@ -44472,8 +44723,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000003B) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPSwitch * cluster = [[CHIPSwitch alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeMultiPressMaxWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeMultiPressMaxWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"Switch.MultiPressMax response %@", [value description]);
@@ -44544,8 +44795,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPSwitch * cluster = [[CHIPSwitch alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"Switch.ServerGeneratedCommandList response %@",
@@ -44617,8 +44868,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPSwitch * cluster = [[CHIPSwitch alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"Switch.ClientGeneratedCommandList response %@",
@@ -44688,8 +44939,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000003B) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPSwitch * cluster = [[CHIPSwitch alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"Switch.AttributeList response %@", [value description]);
@@ -44758,8 +45009,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000003B) ReportAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPSwitch * cluster = [[CHIPSwitch alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeFeatureMapWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributeFeatureMapWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"Switch.FeatureMap response %@", [value description]);
@@ -44828,8 +45079,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000003B) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPSwitch * cluster = [[CHIPSwitch alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Switch.ClusterRevision response %@", [value description]);
@@ -44862,6 +45113,7 @@ private:
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -44953,8 +45205,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000505) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTargetNavigator * cluster = [[CHIPTargetNavigator alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeTargetNavigatorListWithMinInterval:mMinInterval
-                                                          maxInterval:mMaxInterval
+        [cluster subscribeAttributeTargetNavigatorListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                               subscriptionEstablished:NULL
                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"TargetNavigator.TargetNavigatorList response %@",
@@ -45024,8 +45276,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000505) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTargetNavigator * cluster = [[CHIPTargetNavigator alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeCurrentNavigatorTargetWithMinInterval:mMinInterval
-                                                             maxInterval:mMaxInterval
+        [cluster subscribeAttributeCurrentNavigatorTargetWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                             maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                  subscriptionEstablished:NULL
                                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"TargetNavigator.CurrentNavigatorTarget response %@",
@@ -45097,8 +45349,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTargetNavigator * cluster = [[CHIPTargetNavigator alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"TargetNavigator.ServerGeneratedCommandList response %@",
@@ -45170,8 +45422,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTargetNavigator * cluster = [[CHIPTargetNavigator alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"TargetNavigator.ClientGeneratedCommandList response %@",
@@ -45241,8 +45493,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000505) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTargetNavigator * cluster = [[CHIPTargetNavigator alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"TargetNavigator.AttributeList response %@", [value description]);
@@ -45311,8 +45563,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000505) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTargetNavigator * cluster = [[CHIPTargetNavigator alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"TargetNavigator.ClusterRevision response %@", [value description]);
@@ -45343,7 +45595,10 @@ private:
 | * MinMeasuredValue                                                  | 0x0001 |
 | * MaxMeasuredValue                                                  | 0x0002 |
 | * Tolerance                                                         | 0x0003 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -45402,8 +45657,8 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         [cluster
-            subscribeAttributeMeasuredValueWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+            subscribeAttributeMeasuredValueWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"TemperatureMeasurement.MeasuredValue response %@", [value description]);
@@ -45476,8 +45731,8 @@ public:
         CHIPTemperatureMeasurement * cluster = [[CHIPTemperatureMeasurement alloc] initWithDevice:device
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
-        [cluster subscribeAttributeMinMeasuredValueWithMinInterval:mMinInterval
-                                                       maxInterval:mMaxInterval
+        [cluster subscribeAttributeMinMeasuredValueWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                       maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"TemperatureMeasurement.MinMeasuredValue response %@",
@@ -45551,8 +45806,8 @@ public:
         CHIPTemperatureMeasurement * cluster = [[CHIPTemperatureMeasurement alloc] initWithDevice:device
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
-        [cluster subscribeAttributeMaxMeasuredValueWithMinInterval:mMinInterval
-                                                       maxInterval:mMaxInterval
+        [cluster subscribeAttributeMaxMeasuredValueWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                       maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"TemperatureMeasurement.MaxMeasuredValue response %@",
@@ -45626,8 +45881,8 @@ public:
         CHIPTemperatureMeasurement * cluster = [[CHIPTemperatureMeasurement alloc] initWithDevice:device
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
-        [cluster subscribeAttributeToleranceWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+        [cluster subscribeAttributeToleranceWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"TemperatureMeasurement.Tolerance response %@", [value description]);
@@ -45701,8 +45956,8 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         [cluster
-            subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+            subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"TemperatureMeasurement.AttributeList response %@", [value description]);
@@ -45775,8 +46030,8 @@ public:
         CHIPTemperatureMeasurement * cluster = [[CHIPTemperatureMeasurement alloc] initWithDevice:device
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"TemperatureMeasurement.ClusterRevision response %@",
@@ -45802,24 +46057,28 @@ private:
 | Cluster TestCluster                                                 | 0x050F |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * SimpleStructEchoRequest                                           |   0x11 |
 | * Test                                                              |   0x00 |
-| * TestAddArguments                                                  |   0x04 |
-| * TestEmitTestEventRequest                                          |   0x14 |
-| * TestEnumsRequest                                                  |   0x0E |
-| * TestListInt8UArgumentRequest                                      |   0x0A |
-| * TestListInt8UReverseRequest                                       |   0x0D |
-| * TestListNestedStructListArgumentRequest                           |   0x0C |
-| * TestListStructArgumentRequest                                     |   0x09 |
-| * TestNestedStructArgumentRequest                                   |   0x08 |
-| * TestNestedStructListArgumentRequest                               |   0x0B |
 | * TestNotHandled                                                    |   0x01 |
-| * TestNullableOptionalRequest                                       |   0x0F |
-| * TestSimpleOptionalArgumentRequest                                 |   0x13 |
 | * TestSpecific                                                      |   0x02 |
-| * TestStructArgumentRequest                                         |   0x07 |
 | * TestUnknownCommand                                                |   0x03 |
+| * TestAddArguments                                                  |   0x04 |
+| * TestSimpleArgumentRequest                                         |   0x05 |
+| * TestStructArrayArgumentRequest                                    |   0x06 |
+| * TestStructArgumentRequest                                         |   0x07 |
+| * TestNestedStructArgumentRequest                                   |   0x08 |
+| * TestListStructArgumentRequest                                     |   0x09 |
+| * TestListInt8UArgumentRequest                                      |   0x0A |
+| * TestNestedStructListArgumentRequest                               |   0x0B |
+| * TestListNestedStructListArgumentRequest                           |   0x0C |
+| * TestListInt8UReverseRequest                                       |   0x0D |
+| * TestEnumsRequest                                                  |   0x0E |
+| * TestNullableOptionalRequest                                       |   0x0F |
+| * TestComplexNullableOptionalRequest                                |   0x10 |
+| * SimpleStructEchoRequest                                           |   0x11 |
 | * TimedInvokeRequest                                                |   0x12 |
+| * TestSimpleOptionalArgumentRequest                                 |   0x13 |
+| * TestEmitTestEventRequest                                          |   0x14 |
+| * TestEmitTestFabricScopedEventRequest                              |   0x15 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Boolean                                                           | 0x0000 |
@@ -45865,6 +46124,7 @@ private:
 | * RangeRestrictedInt16u                                             | 0x0028 |
 | * RangeRestrictedInt16s                                             | 0x0029 |
 | * ListLongOctetString                                               | 0x002A |
+| * ListFabricScoped                                                  | 0x002B |
 | * TimedWriteBoolean                                                 | 0x0030 |
 | * GeneralErrorBoolean                                               | 0x0031 |
 | * ClusterErrorBoolean                                               | 0x0032 |
@@ -45905,6 +46165,7 @@ private:
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -46585,8 +46846,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeBooleanWithMinInterval:mMinInterval
-                                              maxInterval:mMaxInterval
+        [cluster subscribeAttributeBooleanWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"TestCluster.Boolean response %@", [value description]);
@@ -46687,8 +46948,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000001) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeBitmap8WithMinInterval:mMinInterval
-                                              maxInterval:mMaxInterval
+        [cluster subscribeAttributeBitmap8WithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"TestCluster.Bitmap8 response %@", [value description]);
@@ -46789,8 +47050,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000002) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeBitmap16WithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+        [cluster subscribeAttributeBitmap16WithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"TestCluster.Bitmap16 response %@", [value description]);
@@ -46891,8 +47152,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeBitmap32WithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+        [cluster subscribeAttributeBitmap32WithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"TestCluster.Bitmap32 response %@", [value description]);
@@ -46993,8 +47254,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeBitmap64WithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+        [cluster subscribeAttributeBitmap64WithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"TestCluster.Bitmap64 response %@", [value description]);
@@ -47095,8 +47356,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeInt8uWithMinInterval:mMinInterval
-                                            maxInterval:mMaxInterval
+        [cluster subscribeAttributeInt8uWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                 subscriptionEstablished:NULL
                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                               NSLog(@"TestCluster.Int8u response %@", [value description]);
@@ -47197,8 +47458,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeInt16uWithMinInterval:mMinInterval
-                                             maxInterval:mMaxInterval
+        [cluster subscribeAttributeInt16uWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                             maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int16u response %@", [value description]);
@@ -47299,8 +47560,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000007) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeInt24uWithMinInterval:mMinInterval
-                                             maxInterval:mMaxInterval
+        [cluster subscribeAttributeInt24uWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                             maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int24u response %@", [value description]);
@@ -47401,8 +47662,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000008) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeInt32uWithMinInterval:mMinInterval
-                                             maxInterval:mMaxInterval
+        [cluster subscribeAttributeInt32uWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                             maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int32u response %@", [value description]);
@@ -47503,8 +47764,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000009) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeInt40uWithMinInterval:mMinInterval
-                                             maxInterval:mMaxInterval
+        [cluster subscribeAttributeInt40uWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                             maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int40u response %@", [value description]);
@@ -47605,8 +47866,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000000A) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeInt48uWithMinInterval:mMinInterval
-                                             maxInterval:mMaxInterval
+        [cluster subscribeAttributeInt48uWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                             maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int48u response %@", [value description]);
@@ -47707,8 +47968,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000000B) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeInt56uWithMinInterval:mMinInterval
-                                             maxInterval:mMaxInterval
+        [cluster subscribeAttributeInt56uWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                             maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int56u response %@", [value description]);
@@ -47809,8 +48070,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000000C) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeInt64uWithMinInterval:mMinInterval
-                                             maxInterval:mMaxInterval
+        [cluster subscribeAttributeInt64uWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                             maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int64u response %@", [value description]);
@@ -47911,8 +48172,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000000D) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeInt8sWithMinInterval:mMinInterval
-                                            maxInterval:mMaxInterval
+        [cluster subscribeAttributeInt8sWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                 subscriptionEstablished:NULL
                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                               NSLog(@"TestCluster.Int8s response %@", [value description]);
@@ -48013,8 +48274,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000000E) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeInt16sWithMinInterval:mMinInterval
-                                             maxInterval:mMaxInterval
+        [cluster subscribeAttributeInt16sWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                             maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int16s response %@", [value description]);
@@ -48115,8 +48376,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000000F) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeInt24sWithMinInterval:mMinInterval
-                                             maxInterval:mMaxInterval
+        [cluster subscribeAttributeInt24sWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                             maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int24s response %@", [value description]);
@@ -48217,8 +48478,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000010) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeInt32sWithMinInterval:mMinInterval
-                                             maxInterval:mMaxInterval
+        [cluster subscribeAttributeInt32sWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                             maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int32s response %@", [value description]);
@@ -48319,8 +48580,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000011) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeInt40sWithMinInterval:mMinInterval
-                                             maxInterval:mMaxInterval
+        [cluster subscribeAttributeInt40sWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                             maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int40s response %@", [value description]);
@@ -48421,8 +48682,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000012) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeInt48sWithMinInterval:mMinInterval
-                                             maxInterval:mMaxInterval
+        [cluster subscribeAttributeInt48sWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                             maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int48s response %@", [value description]);
@@ -48523,8 +48784,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000013) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeInt56sWithMinInterval:mMinInterval
-                                             maxInterval:mMaxInterval
+        [cluster subscribeAttributeInt56sWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                             maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int56s response %@", [value description]);
@@ -48625,8 +48886,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000014) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeInt64sWithMinInterval:mMinInterval
-                                             maxInterval:mMaxInterval
+        [cluster subscribeAttributeInt64sWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                             maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Int64s response %@", [value description]);
@@ -48727,8 +48988,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000015) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeEnum8WithMinInterval:mMinInterval
-                                            maxInterval:mMaxInterval
+        [cluster subscribeAttributeEnum8WithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                 subscriptionEstablished:NULL
                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                               NSLog(@"TestCluster.Enum8 response %@", [value description]);
@@ -48829,8 +49090,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000016) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeEnum16WithMinInterval:mMinInterval
-                                             maxInterval:mMaxInterval
+        [cluster subscribeAttributeEnum16WithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                             maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.Enum16 response %@", [value description]);
@@ -48931,8 +49192,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000017) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeFloatSingleWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+        [cluster subscribeAttributeFloatSingleWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"TestCluster.FloatSingle response %@", [value description]);
@@ -49033,8 +49294,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000018) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeFloatDoubleWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+        [cluster subscribeAttributeFloatDoubleWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"TestCluster.FloatDouble response %@", [value description]);
@@ -49135,8 +49396,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000019) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeOctetStringWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+        [cluster subscribeAttributeOctetStringWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSData * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"TestCluster.OctetString response %@", [value description]);
@@ -49227,8 +49488,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000001A) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeListInt8uWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+        [cluster subscribeAttributeListInt8uWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"TestCluster.ListInt8u response %@", [value description]);
@@ -49319,8 +49580,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000001B) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeListOctetStringWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeListOctetStringWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"TestCluster.ListOctetString response %@", [value description]);
@@ -49411,8 +49672,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000001C) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeListStructOctetStringWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+        [cluster subscribeAttributeListStructOctetStringWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"TestCluster.ListStructOctetString response %@",
@@ -49514,8 +49775,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000001D) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeLongOctetStringWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeLongOctetStringWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSData * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"TestCluster.LongOctetString response %@", [value description]);
@@ -49618,8 +49879,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000001E) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeCharStringWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributeCharStringWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"TestCluster.CharString response %@", [value description]);
@@ -49722,8 +49983,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000001F) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeLongCharStringWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+        [cluster subscribeAttributeLongCharStringWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.LongCharString response %@", [value description]);
@@ -49824,8 +50085,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000020) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeEpochUsWithMinInterval:mMinInterval
-                                              maxInterval:mMaxInterval
+        [cluster subscribeAttributeEpochUsWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"TestCluster.EpochUs response %@", [value description]);
@@ -49926,8 +50187,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000021) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeEpochSWithMinInterval:mMinInterval
-                                             maxInterval:mMaxInterval
+        [cluster subscribeAttributeEpochSWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                             maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                  subscriptionEstablished:NULL
                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                NSLog(@"TestCluster.EpochS response %@", [value description]);
@@ -50028,8 +50289,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000022) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeVendorIdWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+        [cluster subscribeAttributeVendorIdWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"TestCluster.VendorId response %@", [value description]);
@@ -50122,8 +50383,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeListNullablesAndOptionalsStructWithMinInterval:mMinInterval
-                                                                 maxInterval:mMaxInterval
+            subscribeAttributeListNullablesAndOptionalsStructWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                      subscriptionEstablished:NULL
                                                                reportHandler:^(
                                                                    NSArray * _Nullable value, NSError * _Nullable error) {
@@ -50226,8 +50487,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000024) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeEnumAttrWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+        [cluster subscribeAttributeEnumAttrWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"TestCluster.EnumAttr response %@", [value description]);
@@ -50373,8 +50634,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeRangeRestrictedInt8uWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+            subscribeAttributeRangeRestrictedInt8uWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"TestCluster.RangeRestrictedInt8u response %@", [value description]);
@@ -50476,8 +50737,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeRangeRestrictedInt8sWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+            subscribeAttributeRangeRestrictedInt8sWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"TestCluster.RangeRestrictedInt8s response %@", [value description]);
@@ -50578,8 +50839,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000028) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeRangeRestrictedInt16uWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+        [cluster subscribeAttributeRangeRestrictedInt16uWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"TestCluster.RangeRestrictedInt16u response %@",
@@ -50681,8 +50942,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000029) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeRangeRestrictedInt16sWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+        [cluster subscribeAttributeRangeRestrictedInt16sWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"TestCluster.RangeRestrictedInt16s response %@",
@@ -50733,6 +50994,28 @@ public:
     }
 };
 
+class WriteTestClusterListLongOctetString : public ModelCommand {
+public:
+    WriteTestClusterListLongOctetString()
+        : ModelCommand("write")
+    {
+        AddArgument("attr-name", "list-long-octet-string");
+        //  Array parsing is not supported yet
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterListLongOctetString() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) WriteAttribute (0x0000002A) on endpoint %" PRIu16, endpointId);
+
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+private:
+};
+
 class SubscribeAttributeTestClusterListLongOctetString : public ModelCommand {
 public:
     SubscribeAttributeTestClusterListLongOctetString()
@@ -50753,8 +51036,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeListLongOctetStringWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+            subscribeAttributeListLongOctetStringWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.ListLongOctetString response %@", [value description]);
@@ -50855,8 +51138,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00000030) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeTimedWriteBooleanWithMinInterval:mMinInterval
-                                                        maxInterval:mMaxInterval
+        [cluster subscribeAttributeTimedWriteBooleanWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                        maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"TestCluster.TimedWriteBoolean response %@", [value description]);
@@ -50958,8 +51241,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeGeneralErrorBooleanWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+            subscribeAttributeGeneralErrorBooleanWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.GeneralErrorBoolean response %@", [value description]);
@@ -51061,8 +51344,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeClusterErrorBooleanWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+            subscribeAttributeClusterErrorBooleanWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.ClusterErrorBoolean response %@", [value description]);
@@ -51163,8 +51446,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x000000FF) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeUnsupportedWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+        [cluster subscribeAttributeUnsupportedWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"TestCluster.Unsupported response %@", [value description]);
@@ -51265,8 +51548,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008000) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeNullableBooleanWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeNullableBooleanWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"TestCluster.NullableBoolean response %@", [value description]);
@@ -51367,8 +51650,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008001) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeNullableBitmap8WithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeNullableBitmap8WithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"TestCluster.NullableBitmap8 response %@", [value description]);
@@ -51469,8 +51752,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008002) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeNullableBitmap16WithMinInterval:mMinInterval
-                                                       maxInterval:mMaxInterval
+        [cluster subscribeAttributeNullableBitmap16WithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                       maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"TestCluster.NullableBitmap16 response %@", [value description]);
@@ -51571,8 +51854,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008003) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeNullableBitmap32WithMinInterval:mMinInterval
-                                                       maxInterval:mMaxInterval
+        [cluster subscribeAttributeNullableBitmap32WithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                       maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"TestCluster.NullableBitmap32 response %@", [value description]);
@@ -51673,8 +51956,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008004) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeNullableBitmap64WithMinInterval:mMinInterval
-                                                       maxInterval:mMaxInterval
+        [cluster subscribeAttributeNullableBitmap64WithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                       maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"TestCluster.NullableBitmap64 response %@", [value description]);
@@ -51775,8 +52058,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008005) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeNullableInt8uWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeNullableInt8uWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"TestCluster.NullableInt8u response %@", [value description]);
@@ -51877,8 +52160,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008006) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeNullableInt16uWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+        [cluster subscribeAttributeNullableInt16uWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt16u response %@", [value description]);
@@ -51979,8 +52262,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008007) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeNullableInt24uWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+        [cluster subscribeAttributeNullableInt24uWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt24u response %@", [value description]);
@@ -52081,8 +52364,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008008) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeNullableInt32uWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+        [cluster subscribeAttributeNullableInt32uWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt32u response %@", [value description]);
@@ -52183,8 +52466,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008009) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeNullableInt40uWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+        [cluster subscribeAttributeNullableInt40uWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt40u response %@", [value description]);
@@ -52285,8 +52568,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000800A) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeNullableInt48uWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+        [cluster subscribeAttributeNullableInt48uWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt48u response %@", [value description]);
@@ -52387,8 +52670,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000800B) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeNullableInt56uWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+        [cluster subscribeAttributeNullableInt56uWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt56u response %@", [value description]);
@@ -52489,8 +52772,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000800C) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeNullableInt64uWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+        [cluster subscribeAttributeNullableInt64uWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt64u response %@", [value description]);
@@ -52591,8 +52874,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000800D) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeNullableInt8sWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeNullableInt8sWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"TestCluster.NullableInt8s response %@", [value description]);
@@ -52693,8 +52976,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000800E) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeNullableInt16sWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+        [cluster subscribeAttributeNullableInt16sWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt16s response %@", [value description]);
@@ -52795,8 +53078,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000800F) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeNullableInt24sWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+        [cluster subscribeAttributeNullableInt24sWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt24s response %@", [value description]);
@@ -52897,8 +53180,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008010) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeNullableInt32sWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+        [cluster subscribeAttributeNullableInt32sWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt32s response %@", [value description]);
@@ -52999,8 +53282,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008011) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeNullableInt40sWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+        [cluster subscribeAttributeNullableInt40sWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt40s response %@", [value description]);
@@ -53101,8 +53384,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008012) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeNullableInt48sWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+        [cluster subscribeAttributeNullableInt48sWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt48s response %@", [value description]);
@@ -53203,8 +53486,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008013) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeNullableInt56sWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+        [cluster subscribeAttributeNullableInt56sWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt56s response %@", [value description]);
@@ -53305,8 +53588,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008014) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeNullableInt64sWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+        [cluster subscribeAttributeNullableInt64sWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableInt64s response %@", [value description]);
@@ -53407,8 +53690,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008015) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeNullableEnum8WithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeNullableEnum8WithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"TestCluster.NullableEnum8 response %@", [value description]);
@@ -53509,8 +53792,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008016) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeNullableEnum16WithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+        [cluster subscribeAttributeNullableEnum16WithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableEnum16 response %@", [value description]);
@@ -53612,8 +53895,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeNullableFloatSingleWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+            subscribeAttributeNullableFloatSingleWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableFloatSingle response %@", [value description]);
@@ -53715,8 +53998,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeNullableFloatDoubleWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+            subscribeAttributeNullableFloatDoubleWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableFloatDouble response %@", [value description]);
@@ -53818,8 +54101,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeNullableOctetStringWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+            subscribeAttributeNullableOctetStringWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSData * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"TestCluster.NullableOctetString response %@", [value description]);
@@ -53923,8 +54206,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeNullableCharStringWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+            subscribeAttributeNullableCharStringWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"TestCluster.NullableCharString response %@", [value description]);
@@ -54025,8 +54308,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x00008024) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeNullableEnumAttrWithMinInterval:mMinInterval
-                                                       maxInterval:mMaxInterval
+        [cluster subscribeAttributeNullableEnumAttrWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                       maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"TestCluster.NullableEnumAttr response %@", [value description]);
@@ -54173,8 +54456,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeNullableRangeRestrictedInt8uWithMinInterval:mMinInterval
-                                                              maxInterval:mMaxInterval
+            subscribeAttributeNullableRangeRestrictedInt8uWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                   subscriptionEstablished:NULL
                                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"TestCluster.NullableRangeRestrictedInt8u response %@",
@@ -54278,8 +54561,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeNullableRangeRestrictedInt8sWithMinInterval:mMinInterval
-                                                              maxInterval:mMaxInterval
+            subscribeAttributeNullableRangeRestrictedInt8sWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                   subscriptionEstablished:NULL
                                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"TestCluster.NullableRangeRestrictedInt8s response %@",
@@ -54383,8 +54666,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeNullableRangeRestrictedInt16uWithMinInterval:mMinInterval
-                                                               maxInterval:mMaxInterval
+            subscribeAttributeNullableRangeRestrictedInt16uWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                    subscriptionEstablished:NULL
                                                              reportHandler:^(
                                                                  NSNumber * _Nullable value, NSError * _Nullable error) {
@@ -54489,8 +54772,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeNullableRangeRestrictedInt16sWithMinInterval:mMinInterval
-                                                               maxInterval:mMaxInterval
+            subscribeAttributeNullableRangeRestrictedInt16sWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                    subscriptionEstablished:NULL
                                                              reportHandler:^(
                                                                  NSNumber * _Nullable value, NSError * _Nullable error) {
@@ -54563,8 +54846,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"TestCluster.ServerGeneratedCommandList response %@",
@@ -54636,8 +54919,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"TestCluster.ClientGeneratedCommandList response %@",
@@ -54707,8 +54990,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"TestCluster.AttributeList response %@", [value description]);
@@ -54777,8 +55060,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"TestCluster.ClusterRevision response %@", [value description]);
@@ -54803,30 +55086,58 @@ private:
 | Cluster Thermostat                                                  | 0x0201 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * SetpointRaiseLower                                                |   0x00 |
+| * SetWeeklySchedule                                                 |   0x01 |
+| * GetWeeklySchedule                                                 |   0x02 |
 | * ClearWeeklySchedule                                               |   0x03 |
 | * GetRelayStatusLog                                                 |   0x04 |
-| * GetWeeklySchedule                                                 |   0x02 |
-| * SetWeeklySchedule                                                 |   0x01 |
-| * SetpointRaiseLower                                                |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * LocalTemperature                                                  | 0x0000 |
+| * OutdoorTemperature                                                | 0x0001 |
+| * Occupancy                                                         | 0x0002 |
 | * AbsMinHeatSetpointLimit                                           | 0x0003 |
 | * AbsMaxHeatSetpointLimit                                           | 0x0004 |
 | * AbsMinCoolSetpointLimit                                           | 0x0005 |
 | * AbsMaxCoolSetpointLimit                                           | 0x0006 |
+| * PiCoolingDemand                                                   | 0x0007 |
+| * PiHeatingDemand                                                   | 0x0008 |
+| * HvacSystemTypeConfiguration                                       | 0x0009 |
+| * LocalTemperatureCalibration                                       | 0x0010 |
 | * OccupiedCoolingSetpoint                                           | 0x0011 |
 | * OccupiedHeatingSetpoint                                           | 0x0012 |
+| * UnoccupiedCoolingSetpoint                                         | 0x0013 |
+| * UnoccupiedHeatingSetpoint                                         | 0x0014 |
 | * MinHeatSetpointLimit                                              | 0x0015 |
 | * MaxHeatSetpointLimit                                              | 0x0016 |
 | * MinCoolSetpointLimit                                              | 0x0017 |
 | * MaxCoolSetpointLimit                                              | 0x0018 |
 | * MinSetpointDeadBand                                               | 0x0019 |
+| * RemoteSensing                                                     | 0x001A |
 | * ControlSequenceOfOperation                                        | 0x001B |
 | * SystemMode                                                        | 0x001C |
+| * AlarmMask                                                         | 0x001D |
+| * ThermostatRunningMode                                             | 0x001E |
 | * StartOfWeek                                                       | 0x0020 |
 | * NumberOfWeeklyTransitions                                         | 0x0021 |
 | * NumberOfDailyTransitions                                          | 0x0022 |
+| * TemperatureSetpointHold                                           | 0x0023 |
+| * TemperatureSetpointHoldDuration                                   | 0x0024 |
+| * ThermostatProgrammingOperationMode                                | 0x0025 |
+| * ThermostatRunningState                                            | 0x0029 |
+| * SetpointChangeSource                                              | 0x0030 |
+| * SetpointChangeAmount                                              | 0x0031 |
+| * SetpointChangeSourceTimestamp                                     | 0x0032 |
+| * AcType                                                            | 0x0040 |
+| * AcCapacity                                                        | 0x0041 |
+| * AcRefrigerantType                                                 | 0x0042 |
+| * AcCompressor                                                      | 0x0043 |
+| * AcErrorCode                                                       | 0x0044 |
+| * AcLouverPosition                                                  | 0x0045 |
+| * AcCoilTemperature                                                 | 0x0046 |
+| * AcCapacityFormat                                                  | 0x0047 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -55054,8 +55365,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPThermostat * cluster = [[CHIPThermostat alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeLocalTemperatureWithMinInterval:mMinInterval
-                                                       maxInterval:mMaxInterval
+        [cluster subscribeAttributeLocalTemperatureWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                       maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"Thermostat.LocalTemperature response %@", [value description]);
@@ -55125,8 +55436,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPThermostat * cluster = [[CHIPThermostat alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAbsMinHeatSetpointLimitWithMinInterval:mMinInterval
-                                                              maxInterval:mMaxInterval
+        [cluster subscribeAttributeAbsMinHeatSetpointLimitWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                   subscriptionEstablished:NULL
                                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"Thermostat.AbsMinHeatSetpointLimit response %@",
@@ -55197,8 +55508,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPThermostat * cluster = [[CHIPThermostat alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAbsMaxHeatSetpointLimitWithMinInterval:mMinInterval
-                                                              maxInterval:mMaxInterval
+        [cluster subscribeAttributeAbsMaxHeatSetpointLimitWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                   subscriptionEstablished:NULL
                                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"Thermostat.AbsMaxHeatSetpointLimit response %@",
@@ -55269,8 +55580,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReportAttribute (0x00000005) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPThermostat * cluster = [[CHIPThermostat alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAbsMinCoolSetpointLimitWithMinInterval:mMinInterval
-                                                              maxInterval:mMaxInterval
+        [cluster subscribeAttributeAbsMinCoolSetpointLimitWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                   subscriptionEstablished:NULL
                                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"Thermostat.AbsMinCoolSetpointLimit response %@",
@@ -55341,8 +55652,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReportAttribute (0x00000006) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPThermostat * cluster = [[CHIPThermostat alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAbsMaxCoolSetpointLimitWithMinInterval:mMinInterval
-                                                              maxInterval:mMaxInterval
+        [cluster subscribeAttributeAbsMaxCoolSetpointLimitWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                   subscriptionEstablished:NULL
                                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"Thermostat.AbsMaxCoolSetpointLimit response %@",
@@ -55445,8 +55756,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReportAttribute (0x00000011) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPThermostat * cluster = [[CHIPThermostat alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeOccupiedCoolingSetpointWithMinInterval:mMinInterval
-                                                              maxInterval:mMaxInterval
+        [cluster subscribeAttributeOccupiedCoolingSetpointWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                   subscriptionEstablished:NULL
                                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"Thermostat.OccupiedCoolingSetpoint response %@",
@@ -55549,8 +55860,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReportAttribute (0x00000012) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPThermostat * cluster = [[CHIPThermostat alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeOccupiedHeatingSetpointWithMinInterval:mMinInterval
-                                                              maxInterval:mMaxInterval
+        [cluster subscribeAttributeOccupiedHeatingSetpointWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                   subscriptionEstablished:NULL
                                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"Thermostat.OccupiedHeatingSetpoint response %@",
@@ -55653,8 +55964,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPThermostat * cluster = [[CHIPThermostat alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeMinHeatSetpointLimitWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+            subscribeAttributeMinHeatSetpointLimitWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Thermostat.MinHeatSetpointLimit response %@", [value description]);
@@ -55756,8 +56067,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPThermostat * cluster = [[CHIPThermostat alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeMaxHeatSetpointLimitWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+            subscribeAttributeMaxHeatSetpointLimitWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Thermostat.MaxHeatSetpointLimit response %@", [value description]);
@@ -55859,8 +56170,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPThermostat * cluster = [[CHIPThermostat alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeMinCoolSetpointLimitWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+            subscribeAttributeMinCoolSetpointLimitWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Thermostat.MinCoolSetpointLimit response %@", [value description]);
@@ -55962,8 +56273,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPThermostat * cluster = [[CHIPThermostat alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeMaxCoolSetpointLimitWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+            subscribeAttributeMaxCoolSetpointLimitWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Thermostat.MaxCoolSetpointLimit response %@", [value description]);
@@ -56065,8 +56376,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPThermostat * cluster = [[CHIPThermostat alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeMinSetpointDeadBandWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+            subscribeAttributeMinSetpointDeadBandWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"Thermostat.MinSetpointDeadBand response %@", [value description]);
@@ -56169,8 +56480,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPThermostat * cluster = [[CHIPThermostat alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeControlSequenceOfOperationWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeControlSequenceOfOperationWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"Thermostat.ControlSequenceOfOperation response %@",
@@ -56272,8 +56583,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReportAttribute (0x0000001C) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPThermostat * cluster = [[CHIPThermostat alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeSystemModeWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributeSystemModeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"Thermostat.SystemMode response %@", [value description]);
@@ -56342,8 +56653,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReportAttribute (0x00000020) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPThermostat * cluster = [[CHIPThermostat alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeStartOfWeekWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+        [cluster subscribeAttributeStartOfWeekWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"Thermostat.StartOfWeek response %@", [value description]);
@@ -56414,8 +56725,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPThermostat * cluster = [[CHIPThermostat alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeNumberOfWeeklyTransitionsWithMinInterval:mMinInterval
-                                                           maxInterval:mMaxInterval
+            subscribeAttributeNumberOfWeeklyTransitionsWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                subscriptionEstablished:NULL
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"Thermostat.NumberOfWeeklyTransitions response %@",
@@ -56487,8 +56798,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPThermostat * cluster = [[CHIPThermostat alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeNumberOfDailyTransitionsWithMinInterval:mMinInterval
-                                                          maxInterval:mMaxInterval
+            subscribeAttributeNumberOfDailyTransitionsWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                               subscriptionEstablished:NULL
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"Thermostat.NumberOfDailyTransitions response %@",
@@ -56558,8 +56869,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPThermostat * cluster = [[CHIPThermostat alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"Thermostat.AttributeList response %@", [value description]);
@@ -56628,8 +56939,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReportAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPThermostat * cluster = [[CHIPThermostat alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeFeatureMapWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributeFeatureMapWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"Thermostat.FeatureMap response %@", [value description]);
@@ -56698,8 +57009,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000201) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPThermostat * cluster = [[CHIPThermostat alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"Thermostat.ClusterRevision response %@", [value description]);
@@ -56732,6 +57043,7 @@ private:
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -56820,8 +57132,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPThermostatUserInterfaceConfiguration * cluster =
             [[CHIPThermostatUserInterfaceConfiguration alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeTemperatureDisplayModeWithMinInterval:mMinInterval
-                                                             maxInterval:mMaxInterval
+        [cluster subscribeAttributeTemperatureDisplayModeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                             maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                  subscriptionEstablished:NULL
                                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"ThermostatUserInterfaceConfiguration.TemperatureDisplayMode "
@@ -56927,8 +57239,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPThermostatUserInterfaceConfiguration * cluster =
             [[CHIPThermostatUserInterfaceConfiguration alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeKeypadLockoutWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeKeypadLockoutWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"ThermostatUserInterfaceConfiguration.KeypadLockout response %@",
@@ -57034,8 +57346,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPThermostatUserInterfaceConfiguration * cluster =
             [[CHIPThermostatUserInterfaceConfiguration alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeScheduleProgrammingVisibilityWithMinInterval:mMinInterval
-                                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeScheduleProgrammingVisibilityWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                         subscriptionEstablished:NULL
                                                                   reportHandler:^(
                                                                       NSNumber * _Nullable value, NSError * _Nullable error) {
@@ -57111,8 +57423,8 @@ public:
         CHIPThermostatUserInterfaceConfiguration * cluster =
             [[CHIPThermostatUserInterfaceConfiguration alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"ThermostatUserInterfaceConfiguration."
@@ -57187,8 +57499,8 @@ public:
         CHIPThermostatUserInterfaceConfiguration * cluster =
             [[CHIPThermostatUserInterfaceConfiguration alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"ThermostatUserInterfaceConfiguration."
@@ -57261,8 +57573,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPThermostatUserInterfaceConfiguration * cluster =
             [[CHIPThermostatUserInterfaceConfiguration alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"ThermostatUserInterfaceConfiguration.AttributeList response %@",
@@ -57334,8 +57646,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPThermostatUserInterfaceConfiguration * cluster =
             [[CHIPThermostatUserInterfaceConfiguration alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ThermostatUserInterfaceConfiguration.ClusterRevision response %@",
@@ -57519,8 +57831,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeChannelWithMinInterval:mMinInterval
-                                              maxInterval:mMaxInterval
+        [cluster subscribeAttributeChannelWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"ThreadNetworkDiagnostics.Channel response %@", [value description]);
@@ -57593,8 +57905,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeRoutingRoleWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+        [cluster subscribeAttributeRoutingRoleWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ThreadNetworkDiagnostics.RoutingRole response %@", [value description]);
@@ -57667,8 +57979,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeNetworkNameWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+        [cluster subscribeAttributeNetworkNameWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ThreadNetworkDiagnostics.NetworkName response %@", [value description]);
@@ -57741,8 +58053,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributePanIdWithMinInterval:mMinInterval
-                                            maxInterval:mMaxInterval
+        [cluster subscribeAttributePanIdWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                 subscriptionEstablished:NULL
                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                               NSLog(@"ThreadNetworkDiagnostics.PanId response %@", [value description]);
@@ -57816,8 +58128,8 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeExtendedPanIdWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+            subscribeAttributeExtendedPanIdWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ThreadNetworkDiagnostics.ExtendedPanId response %@", [value description]);
@@ -57890,8 +58202,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeMeshLocalPrefixWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeMeshLocalPrefixWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSData * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ThreadNetworkDiagnostics.MeshLocalPrefix response %@",
@@ -57966,8 +58278,8 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeOverrunCountWithMinInterval:mMinInterval
-                                              maxInterval:mMaxInterval
+            subscribeAttributeOverrunCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"ThreadNetworkDiagnostics.OverrunCount response %@", [value description]);
@@ -58040,8 +58352,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeNeighborTableListWithMinInterval:mMinInterval
-                                                        maxInterval:mMaxInterval
+        [cluster subscribeAttributeNeighborTableListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                        maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ThreadNetworkDiagnostics.NeighborTableList response %@",
@@ -58115,8 +58427,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeRouteTableListWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+        [cluster subscribeAttributeRouteTableListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"ThreadNetworkDiagnostics.RouteTableList response %@",
@@ -58190,8 +58502,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributePartitionIdWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+        [cluster subscribeAttributePartitionIdWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ThreadNetworkDiagnostics.PartitionId response %@", [value description]);
@@ -58264,8 +58576,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeWeightingWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+        [cluster subscribeAttributeWeightingWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"ThreadNetworkDiagnostics.Weighting response %@", [value description]);
@@ -58338,8 +58650,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeDataVersionWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+        [cluster subscribeAttributeDataVersionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ThreadNetworkDiagnostics.DataVersion response %@", [value description]);
@@ -58412,8 +58724,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeStableDataVersionWithMinInterval:mMinInterval
-                                                        maxInterval:mMaxInterval
+        [cluster subscribeAttributeStableDataVersionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                        maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ThreadNetworkDiagnostics.StableDataVersion response %@",
@@ -58487,8 +58799,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeLeaderRouterIdWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+        [cluster subscribeAttributeLeaderRouterIdWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"ThreadNetworkDiagnostics.LeaderRouterId response %@",
@@ -58562,8 +58874,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeDetachedRoleCountWithMinInterval:mMinInterval
-                                                        maxInterval:mMaxInterval
+        [cluster subscribeAttributeDetachedRoleCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                        maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ThreadNetworkDiagnostics.DetachedRoleCount response %@",
@@ -58637,8 +58949,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeChildRoleCountWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+        [cluster subscribeAttributeChildRoleCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"ThreadNetworkDiagnostics.ChildRoleCount response %@",
@@ -58712,8 +59024,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeRouterRoleCountWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeRouterRoleCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ThreadNetworkDiagnostics.RouterRoleCount response %@",
@@ -58787,8 +59099,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeLeaderRoleCountWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeLeaderRoleCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ThreadNetworkDiagnostics.LeaderRoleCount response %@",
@@ -58862,8 +59174,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeAttachAttemptCountWithMinInterval:mMinInterval
-                                                         maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttachAttemptCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                         maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                              subscriptionEstablished:NULL
                                                        reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                            NSLog(@"ThreadNetworkDiagnostics.AttachAttemptCount response %@",
@@ -58937,8 +59249,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributePartitionIdChangeCountWithMinInterval:mMinInterval
-                                                             maxInterval:mMaxInterval
+        [cluster subscribeAttributePartitionIdChangeCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                             maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                  subscriptionEstablished:NULL
                                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"ThreadNetworkDiagnostics.PartitionIdChangeCount response %@",
@@ -59014,8 +59326,8 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeBetterPartitionAttachAttemptCountWithMinInterval:mMinInterval
-                                                                   maxInterval:mMaxInterval
+            subscribeAttributeBetterPartitionAttachAttemptCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                                   maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                        subscriptionEstablished:NULL
                                                                  reportHandler:^(
                                                                      NSNumber * _Nullable value, NSError * _Nullable error) {
@@ -59091,8 +59403,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeParentChangeCountWithMinInterval:mMinInterval
-                                                        maxInterval:mMaxInterval
+        [cluster subscribeAttributeParentChangeCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                        maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ThreadNetworkDiagnostics.ParentChangeCount response %@",
@@ -59167,8 +59479,8 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeTxTotalCountWithMinInterval:mMinInterval
-                                              maxInterval:mMaxInterval
+            subscribeAttributeTxTotalCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"ThreadNetworkDiagnostics.TxTotalCount response %@", [value description]);
@@ -59241,8 +59553,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeTxUnicastCountWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+        [cluster subscribeAttributeTxUnicastCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"ThreadNetworkDiagnostics.TxUnicastCount response %@",
@@ -59316,8 +59628,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeTxBroadcastCountWithMinInterval:mMinInterval
-                                                       maxInterval:mMaxInterval
+        [cluster subscribeAttributeTxBroadcastCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                       maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"ThreadNetworkDiagnostics.TxBroadcastCount response %@",
@@ -59391,8 +59703,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeTxAckRequestedCountWithMinInterval:mMinInterval
-                                                          maxInterval:mMaxInterval
+        [cluster subscribeAttributeTxAckRequestedCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                               subscriptionEstablished:NULL
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"ThreadNetworkDiagnostics.TxAckRequestedCount response %@",
@@ -59467,8 +59779,8 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeTxAckedCountWithMinInterval:mMinInterval
-                                              maxInterval:mMaxInterval
+            subscribeAttributeTxAckedCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"ThreadNetworkDiagnostics.TxAckedCount response %@", [value description]);
@@ -59541,8 +59853,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeTxNoAckRequestedCountWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+        [cluster subscribeAttributeTxNoAckRequestedCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"ThreadNetworkDiagnostics.TxNoAckRequestedCount response %@",
@@ -59616,8 +59928,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeTxDataCountWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+        [cluster subscribeAttributeTxDataCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ThreadNetworkDiagnostics.TxDataCount response %@", [value description]);
@@ -59690,8 +60002,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeTxDataPollCountWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeTxDataPollCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ThreadNetworkDiagnostics.TxDataPollCount response %@",
@@ -59766,8 +60078,8 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeTxBeaconCountWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+            subscribeAttributeTxBeaconCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ThreadNetworkDiagnostics.TxBeaconCount response %@", [value description]);
@@ -59840,8 +60152,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeTxBeaconRequestCountWithMinInterval:mMinInterval
-                                                           maxInterval:mMaxInterval
+        [cluster subscribeAttributeTxBeaconRequestCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                subscriptionEstablished:NULL
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ThreadNetworkDiagnostics.TxBeaconRequestCount response %@",
@@ -59916,8 +60228,8 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeTxOtherCountWithMinInterval:mMinInterval
-                                              maxInterval:mMaxInterval
+            subscribeAttributeTxOtherCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"ThreadNetworkDiagnostics.TxOtherCount response %@", [value description]);
@@ -59991,8 +60303,8 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeTxRetryCountWithMinInterval:mMinInterval
-                                              maxInterval:mMaxInterval
+            subscribeAttributeTxRetryCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"ThreadNetworkDiagnostics.TxRetryCount response %@", [value description]);
@@ -60067,8 +60379,8 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeTxDirectMaxRetryExpiryCountWithMinInterval:mMinInterval
-                                                             maxInterval:mMaxInterval
+            subscribeAttributeTxDirectMaxRetryExpiryCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                             maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                  subscriptionEstablished:NULL
                                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"ThreadNetworkDiagnostics.TxDirectMaxRetryExpiryCount "
@@ -60144,8 +60456,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeTxIndirectMaxRetryExpiryCountWithMinInterval:mMinInterval
-                                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeTxIndirectMaxRetryExpiryCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                         subscriptionEstablished:NULL
                                                                   reportHandler:^(
                                                                       NSNumber * _Nullable value, NSError * _Nullable error) {
@@ -60222,8 +60534,8 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeTxErrCcaCountWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+            subscribeAttributeTxErrCcaCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ThreadNetworkDiagnostics.TxErrCcaCount response %@", [value description]);
@@ -60296,8 +60608,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeTxErrAbortCountWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeTxErrAbortCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ThreadNetworkDiagnostics.TxErrAbortCount response %@",
@@ -60371,8 +60683,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeTxErrBusyChannelCountWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+        [cluster subscribeAttributeTxErrBusyChannelCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"ThreadNetworkDiagnostics.TxErrBusyChannelCount response %@",
@@ -60447,8 +60759,8 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeRxTotalCountWithMinInterval:mMinInterval
-                                              maxInterval:mMaxInterval
+            subscribeAttributeRxTotalCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"ThreadNetworkDiagnostics.RxTotalCount response %@", [value description]);
@@ -60521,8 +60833,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeRxUnicastCountWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+        [cluster subscribeAttributeRxUnicastCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"ThreadNetworkDiagnostics.RxUnicastCount response %@",
@@ -60596,8 +60908,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeRxBroadcastCountWithMinInterval:mMinInterval
-                                                       maxInterval:mMaxInterval
+        [cluster subscribeAttributeRxBroadcastCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                       maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"ThreadNetworkDiagnostics.RxBroadcastCount response %@",
@@ -60671,8 +60983,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeRxDataCountWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+        [cluster subscribeAttributeRxDataCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ThreadNetworkDiagnostics.RxDataCount response %@", [value description]);
@@ -60745,8 +61057,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeRxDataPollCountWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeRxDataPollCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ThreadNetworkDiagnostics.RxDataPollCount response %@",
@@ -60821,8 +61133,8 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeRxBeaconCountWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+            subscribeAttributeRxBeaconCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ThreadNetworkDiagnostics.RxBeaconCount response %@", [value description]);
@@ -60895,8 +61207,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeRxBeaconRequestCountWithMinInterval:mMinInterval
-                                                           maxInterval:mMaxInterval
+        [cluster subscribeAttributeRxBeaconRequestCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                subscriptionEstablished:NULL
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"ThreadNetworkDiagnostics.RxBeaconRequestCount response %@",
@@ -60971,8 +61283,8 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeRxOtherCountWithMinInterval:mMinInterval
-                                              maxInterval:mMaxInterval
+            subscribeAttributeRxOtherCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                   subscriptionEstablished:NULL
                                             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                 NSLog(@"ThreadNetworkDiagnostics.RxOtherCount response %@", [value description]);
@@ -61045,8 +61357,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeRxAddressFilteredCountWithMinInterval:mMinInterval
-                                                             maxInterval:mMaxInterval
+        [cluster subscribeAttributeRxAddressFilteredCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                             maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                  subscriptionEstablished:NULL
                                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"ThreadNetworkDiagnostics.RxAddressFilteredCount response %@",
@@ -61122,8 +61434,8 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeRxDestAddrFilteredCountWithMinInterval:mMinInterval
-                                                         maxInterval:mMaxInterval
+            subscribeAttributeRxDestAddrFilteredCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                         maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                              subscriptionEstablished:NULL
                                                        reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                            NSLog(@"ThreadNetworkDiagnostics.RxDestAddrFilteredCount response %@",
@@ -61197,8 +61509,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeRxDuplicatedCountWithMinInterval:mMinInterval
-                                                        maxInterval:mMaxInterval
+        [cluster subscribeAttributeRxDuplicatedCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                        maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ThreadNetworkDiagnostics.RxDuplicatedCount response %@",
@@ -61272,8 +61584,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeRxErrNoFrameCountWithMinInterval:mMinInterval
-                                                        maxInterval:mMaxInterval
+        [cluster subscribeAttributeRxErrNoFrameCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                        maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                             subscriptionEstablished:NULL
                                                       reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                           NSLog(@"ThreadNetworkDiagnostics.RxErrNoFrameCount response %@",
@@ -61349,8 +61661,8 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeRxErrUnknownNeighborCountWithMinInterval:mMinInterval
-                                                           maxInterval:mMaxInterval
+            subscribeAttributeRxErrUnknownNeighborCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                subscriptionEstablished:NULL
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(
@@ -61427,8 +61739,8 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeRxErrInvalidSrcAddrCountWithMinInterval:mMinInterval
-                                                          maxInterval:mMaxInterval
+            subscribeAttributeRxErrInvalidSrcAddrCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                               subscriptionEstablished:NULL
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"ThreadNetworkDiagnostics.RxErrInvalidSrcAddrCount response %@",
@@ -61503,8 +61815,8 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeRxErrSecCountWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+            subscribeAttributeRxErrSecCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ThreadNetworkDiagnostics.RxErrSecCount response %@", [value description]);
@@ -61578,8 +61890,8 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeRxErrFcsCountWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+            subscribeAttributeRxErrFcsCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ThreadNetworkDiagnostics.RxErrFcsCount response %@", [value description]);
@@ -61652,8 +61964,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeRxErrOtherCountWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeRxErrOtherCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ThreadNetworkDiagnostics.RxErrOtherCount response %@",
@@ -61727,8 +62039,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeActiveTimestampWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeActiveTimestampWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ThreadNetworkDiagnostics.ActiveTimestamp response %@",
@@ -61802,8 +62114,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributePendingTimestampWithMinInterval:mMinInterval
-                                                       maxInterval:mMaxInterval
+        [cluster subscribeAttributePendingTimestampWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                       maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                            subscriptionEstablished:NULL
                                                      reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                          NSLog(@"ThreadNetworkDiagnostics.PendingTimestamp response %@",
@@ -61877,8 +62189,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeDelayWithMinInterval:mMinInterval
-                                            maxInterval:mMaxInterval
+        [cluster subscribeAttributeDelayWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                 subscriptionEstablished:NULL
                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                               NSLog(@"ThreadNetworkDiagnostics.Delay response %@", [value description]);
@@ -61951,8 +62263,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeSecurityPolicyWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+        [cluster subscribeAttributeSecurityPolicyWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"ThreadNetworkDiagnostics.SecurityPolicy response %@",
@@ -62026,8 +62338,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeChannelMaskWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+        [cluster subscribeAttributeChannelMaskWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSData * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"ThreadNetworkDiagnostics.ChannelMask response %@", [value description]);
@@ -62102,8 +62414,8 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeOperationalDatasetComponentsWithMinInterval:mMinInterval
-                                                              maxInterval:mMaxInterval
+            subscribeAttributeOperationalDatasetComponentsWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                              maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                   subscriptionEstablished:NULL
                                                             reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                                 NSLog(@"ThreadNetworkDiagnostics.OperationalDatasetComponents "
@@ -62179,8 +62491,8 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeActiveNetworkFaultsListWithMinInterval:mMinInterval
-                                                         maxInterval:mMaxInterval
+            subscribeAttributeActiveNetworkFaultsListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                         maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                              subscriptionEstablished:NULL
                                                        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                            NSLog(@"ThreadNetworkDiagnostics.ActiveNetworkFaultsList response %@",
@@ -62256,8 +62568,8 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"ThreadNetworkDiagnostics.ServerGeneratedCommandList response "
@@ -62334,8 +62646,8 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"ThreadNetworkDiagnostics.ClientGeneratedCommandList response "
@@ -62411,8 +62723,8 @@ public:
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
         [cluster
-            subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+            subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"ThreadNetworkDiagnostics.AttributeList response %@", [value description]);
@@ -62485,8 +62797,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeFeatureMapWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributeFeatureMapWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"ThreadNetworkDiagnostics.FeatureMap response %@", [value description]);
@@ -62559,8 +62871,8 @@ public:
         CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device
                                                                                              endpoint:endpointId
                                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"ThreadNetworkDiagnostics.ClusterRevision response %@",
@@ -62593,6 +62905,8 @@ private:
 | * SupportedCalendarTypes                                            | 0x0002 |
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -62684,8 +62998,8 @@ public:
         CHIPTimeFormatLocalization * cluster = [[CHIPTimeFormatLocalization alloc] initWithDevice:device
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
-        [cluster subscribeAttributeHourFormatWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributeHourFormatWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"TimeFormatLocalization.HourFormat response %@", [value description]);
@@ -62792,8 +63106,8 @@ public:
         CHIPTimeFormatLocalization * cluster = [[CHIPTimeFormatLocalization alloc] initWithDevice:device
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
-        [cluster subscribeAttributeActiveCalendarTypeWithMinInterval:mMinInterval
-                                                         maxInterval:mMaxInterval
+        [cluster subscribeAttributeActiveCalendarTypeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                         maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                              subscriptionEstablished:NULL
                                                        reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                            NSLog(@"TimeFormatLocalization.ActiveCalendarType response %@",
@@ -62867,8 +63181,8 @@ public:
         CHIPTimeFormatLocalization * cluster = [[CHIPTimeFormatLocalization alloc] initWithDevice:device
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
-        [cluster subscribeAttributeSupportedCalendarTypesWithMinInterval:mMinInterval
-                                                             maxInterval:mMaxInterval
+        [cluster subscribeAttributeSupportedCalendarTypesWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                             maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                  subscriptionEstablished:NULL
                                                            reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"TimeFormatLocalization.SupportedCalendarTypes response %@",
@@ -62944,8 +63258,8 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(
@@ -63022,8 +63336,8 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(
@@ -63098,8 +63412,8 @@ public:
         CHIPTimeFormatLocalization * cluster = [[CHIPTimeFormatLocalization alloc] initWithDevice:device
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"TimeFormatLocalization.ClusterRevision response %@",
@@ -63128,6 +63442,8 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * TemperatureUnit                                                   | 0x0000 |
+| * ServerGeneratedCommandList                                        | 0xFFF8 |
+| * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -63221,8 +63537,8 @@ public:
         CHIPUnitLocalization * cluster = [[CHIPUnitLocalization alloc] initWithDevice:device
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeTemperatureUnitWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeTemperatureUnitWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"UnitLocalization.TemperatureUnit response %@", [value description]);
@@ -63295,8 +63611,8 @@ public:
         CHIPUnitLocalization * cluster = [[CHIPUnitLocalization alloc] initWithDevice:device
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"UnitLocalization.AttributeList response %@", [value description]);
@@ -63369,8 +63685,8 @@ public:
         CHIPUnitLocalization * cluster = [[CHIPUnitLocalization alloc] initWithDevice:device
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeFeatureMapWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributeFeatureMapWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"UnitLocalization.FeatureMap response %@", [value description]);
@@ -63443,8 +63759,8 @@ public:
         CHIPUnitLocalization * cluster = [[CHIPUnitLocalization alloc] initWithDevice:device
                                                                              endpoint:endpointId
                                                                                 queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"UnitLocalization.ClusterRevision response %@", [value description]);
@@ -63474,6 +63790,8 @@ private:
 | * LabelList                                                         | 0x0000 |
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -63549,8 +63867,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000041) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPUserLabel * cluster = [[CHIPUserLabel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeLabelListWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+        [cluster subscribeAttributeLabelListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"UserLabel.LabelList response %@", [value description]);
@@ -63621,8 +63939,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPUserLabel * cluster = [[CHIPUserLabel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"UserLabel.ServerGeneratedCommandList response %@",
@@ -63694,8 +64012,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPUserLabel * cluster = [[CHIPUserLabel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"UserLabel.ClientGeneratedCommandList response %@",
@@ -63765,8 +64083,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000041) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPUserLabel * cluster = [[CHIPUserLabel alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"UserLabel.ClusterRevision response %@", [value description]);
@@ -63797,6 +64115,7 @@ private:
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
@@ -63851,8 +64170,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWakeOnLan * cluster = [[CHIPWakeOnLan alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeWakeOnLanMacAddressWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+            subscribeAttributeWakeOnLanMacAddressWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"WakeOnLan.WakeOnLanMacAddress response %@", [value description]);
@@ -63923,8 +64242,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWakeOnLan * cluster = [[CHIPWakeOnLan alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"WakeOnLan.ServerGeneratedCommandList response %@",
@@ -63996,8 +64315,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWakeOnLan * cluster = [[CHIPWakeOnLan alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"WakeOnLan.ClientGeneratedCommandList response %@",
@@ -64067,8 +64386,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000503) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWakeOnLan * cluster = [[CHIPWakeOnLan alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"WakeOnLan.AttributeList response %@", [value description]);
@@ -64137,8 +64456,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000503) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWakeOnLan * cluster = [[CHIPWakeOnLan alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"WakeOnLan.ClusterRevision response %@", [value description]);
@@ -64273,8 +64592,8 @@ public:
         CHIPWiFiNetworkDiagnostics * cluster = [[CHIPWiFiNetworkDiagnostics alloc] initWithDevice:device
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
-        [cluster subscribeAttributeBssidWithMinInterval:mMinInterval
-                                            maxInterval:mMaxInterval
+        [cluster subscribeAttributeBssidWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                 subscriptionEstablished:NULL
                                           reportHandler:^(NSData * _Nullable value, NSError * _Nullable error) {
                                               NSLog(@"WiFiNetworkDiagnostics.Bssid response %@", [value description]);
@@ -64347,8 +64666,8 @@ public:
         CHIPWiFiNetworkDiagnostics * cluster = [[CHIPWiFiNetworkDiagnostics alloc] initWithDevice:device
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
-        [cluster subscribeAttributeSecurityTypeWithMinInterval:mMinInterval
-                                                   maxInterval:mMaxInterval
+        [cluster subscribeAttributeSecurityTypeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                   maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"WiFiNetworkDiagnostics.SecurityType response %@", [value description]);
@@ -64421,8 +64740,8 @@ public:
         CHIPWiFiNetworkDiagnostics * cluster = [[CHIPWiFiNetworkDiagnostics alloc] initWithDevice:device
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
-        [cluster subscribeAttributeWiFiVersionWithMinInterval:mMinInterval
-                                                  maxInterval:mMaxInterval
+        [cluster subscribeAttributeWiFiVersionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                       subscriptionEstablished:NULL
                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                     NSLog(@"WiFiNetworkDiagnostics.WiFiVersion response %@", [value description]);
@@ -64496,8 +64815,8 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         [cluster
-            subscribeAttributeChannelNumberWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+            subscribeAttributeChannelNumberWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"WiFiNetworkDiagnostics.ChannelNumber response %@", [value description]);
@@ -64570,8 +64889,8 @@ public:
         CHIPWiFiNetworkDiagnostics * cluster = [[CHIPWiFiNetworkDiagnostics alloc] initWithDevice:device
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
-        [cluster subscribeAttributeRssiWithMinInterval:mMinInterval
-                                           maxInterval:mMaxInterval
+        [cluster subscribeAttributeRssiWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                           maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                subscriptionEstablished:NULL
                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                              NSLog(@"WiFiNetworkDiagnostics.Rssi response %@", [value description]);
@@ -64644,8 +64963,8 @@ public:
         CHIPWiFiNetworkDiagnostics * cluster = [[CHIPWiFiNetworkDiagnostics alloc] initWithDevice:device
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
-        [cluster subscribeAttributeBeaconLostCountWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeBeaconLostCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"WiFiNetworkDiagnostics.BeaconLostCount response %@",
@@ -64720,8 +65039,8 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         [cluster
-            subscribeAttributeBeaconRxCountWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+            subscribeAttributeBeaconRxCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"WiFiNetworkDiagnostics.BeaconRxCount response %@", [value description]);
@@ -64794,8 +65113,8 @@ public:
         CHIPWiFiNetworkDiagnostics * cluster = [[CHIPWiFiNetworkDiagnostics alloc] initWithDevice:device
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
-        [cluster subscribeAttributePacketMulticastRxCountWithMinInterval:mMinInterval
-                                                             maxInterval:mMaxInterval
+        [cluster subscribeAttributePacketMulticastRxCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                             maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                  subscriptionEstablished:NULL
                                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"WiFiNetworkDiagnostics.PacketMulticastRxCount response %@",
@@ -64869,8 +65188,8 @@ public:
         CHIPWiFiNetworkDiagnostics * cluster = [[CHIPWiFiNetworkDiagnostics alloc] initWithDevice:device
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
-        [cluster subscribeAttributePacketMulticastTxCountWithMinInterval:mMinInterval
-                                                             maxInterval:mMaxInterval
+        [cluster subscribeAttributePacketMulticastTxCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                             maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                  subscriptionEstablished:NULL
                                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"WiFiNetworkDiagnostics.PacketMulticastTxCount response %@",
@@ -64944,8 +65263,8 @@ public:
         CHIPWiFiNetworkDiagnostics * cluster = [[CHIPWiFiNetworkDiagnostics alloc] initWithDevice:device
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
-        [cluster subscribeAttributePacketUnicastRxCountWithMinInterval:mMinInterval
-                                                           maxInterval:mMaxInterval
+        [cluster subscribeAttributePacketUnicastRxCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                subscriptionEstablished:NULL
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"WiFiNetworkDiagnostics.PacketUnicastRxCount response %@",
@@ -65019,8 +65338,8 @@ public:
         CHIPWiFiNetworkDiagnostics * cluster = [[CHIPWiFiNetworkDiagnostics alloc] initWithDevice:device
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
-        [cluster subscribeAttributePacketUnicastTxCountWithMinInterval:mMinInterval
-                                                           maxInterval:mMaxInterval
+        [cluster subscribeAttributePacketUnicastTxCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                subscriptionEstablished:NULL
                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                              NSLog(@"WiFiNetworkDiagnostics.PacketUnicastTxCount response %@",
@@ -65095,8 +65414,8 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         [cluster
-            subscribeAttributeCurrentMaxRateWithMinInterval:mMinInterval
-                                                maxInterval:mMaxInterval
+            subscribeAttributeCurrentMaxRateWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                     subscriptionEstablished:NULL
                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                   NSLog(@"WiFiNetworkDiagnostics.CurrentMaxRate response %@", [value description]);
@@ -65169,8 +65488,8 @@ public:
         CHIPWiFiNetworkDiagnostics * cluster = [[CHIPWiFiNetworkDiagnostics alloc] initWithDevice:device
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
-        [cluster subscribeAttributeOverrunCountWithMinInterval:mMinInterval
-                                                   maxInterval:mMaxInterval
+        [cluster subscribeAttributeOverrunCountWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                   maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"WiFiNetworkDiagnostics.OverrunCount response %@", [value description]);
@@ -65245,8 +65564,8 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(
@@ -65323,8 +65642,8 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(
@@ -65400,8 +65719,8 @@ public:
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
         [cluster
-            subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                               maxInterval:mMaxInterval
+            subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                    subscriptionEstablished:NULL
                                              reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                  NSLog(@"WiFiNetworkDiagnostics.AttributeList response %@", [value description]);
@@ -65474,8 +65793,8 @@ public:
         CHIPWiFiNetworkDiagnostics * cluster = [[CHIPWiFiNetworkDiagnostics alloc] initWithDevice:device
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
-        [cluster subscribeAttributeFeatureMapWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributeFeatureMapWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"WiFiNetworkDiagnostics.FeatureMap response %@", [value description]);
@@ -65548,8 +65867,8 @@ public:
         CHIPWiFiNetworkDiagnostics * cluster = [[CHIPWiFiNetworkDiagnostics alloc] initWithDevice:device
                                                                                          endpoint:endpointId
                                                                                             queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"WiFiNetworkDiagnostics.ClusterRevision response %@",
@@ -65575,18 +65894,22 @@ private:
 | Cluster WindowCovering                                              | 0x0102 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * DownOrClose                                                       |   0x01 |
-| * GoToLiftPercentage                                                |   0x05 |
-| * GoToLiftValue                                                     |   0x04 |
-| * GoToTiltPercentage                                                |   0x08 |
-| * GoToTiltValue                                                     |   0x07 |
-| * StopMotion                                                        |   0x02 |
 | * UpOrOpen                                                          |   0x00 |
+| * DownOrClose                                                       |   0x01 |
+| * StopMotion                                                        |   0x02 |
+| * GoToLiftValue                                                     |   0x04 |
+| * GoToLiftPercentage                                                |   0x05 |
+| * GoToTiltValue                                                     |   0x07 |
+| * GoToTiltPercentage                                                |   0x08 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Type                                                              | 0x0000 |
+| * PhysicalClosedLimitLift                                           | 0x0001 |
+| * PhysicalClosedLimitTilt                                           | 0x0002 |
 | * CurrentPositionLift                                               | 0x0003 |
 | * CurrentPositionTilt                                               | 0x0004 |
+| * NumberOfActuationsLift                                            | 0x0005 |
+| * NumberOfActuationsTilt                                            | 0x0006 |
 | * ConfigStatus                                                      | 0x0007 |
 | * CurrentPositionLiftPercentage                                     | 0x0008 |
 | * CurrentPositionTiltPercentage                                     | 0x0009 |
@@ -65881,8 +66204,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReportAttribute (0x00000000) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeTypeWithMinInterval:mMinInterval
-                                           maxInterval:mMaxInterval
+        [cluster subscribeAttributeTypeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                           maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                subscriptionEstablished:NULL
                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                              NSLog(@"WindowCovering.Type response %@", [value description]);
@@ -65951,8 +66274,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReportAttribute (0x00000003) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeCurrentPositionLiftWithMinInterval:mMinInterval
-                                                          maxInterval:mMaxInterval
+        [cluster subscribeAttributeCurrentPositionLiftWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                               subscriptionEstablished:NULL
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"WindowCovering.CurrentPositionLift response %@",
@@ -66022,8 +66345,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReportAttribute (0x00000004) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeCurrentPositionTiltWithMinInterval:mMinInterval
-                                                          maxInterval:mMaxInterval
+        [cluster subscribeAttributeCurrentPositionTiltWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                               subscriptionEstablished:NULL
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"WindowCovering.CurrentPositionTilt response %@",
@@ -66093,8 +66416,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReportAttribute (0x00000007) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeConfigStatusWithMinInterval:mMinInterval
-                                                   maxInterval:mMaxInterval
+        [cluster subscribeAttributeConfigStatusWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                   maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"WindowCovering.ConfigStatus response %@", [value description]);
@@ -66165,8 +66488,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeCurrentPositionLiftPercentageWithMinInterval:mMinInterval
-                                                               maxInterval:mMaxInterval
+            subscribeAttributeCurrentPositionLiftPercentageWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                    subscriptionEstablished:NULL
                                                              reportHandler:^(
                                                                  NSNumber * _Nullable value, NSError * _Nullable error) {
@@ -66239,8 +66562,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeCurrentPositionTiltPercentageWithMinInterval:mMinInterval
-                                                               maxInterval:mMaxInterval
+            subscribeAttributeCurrentPositionTiltPercentageWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                               maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                    subscriptionEstablished:NULL
                                                              reportHandler:^(
                                                                  NSNumber * _Nullable value, NSError * _Nullable error) {
@@ -66312,8 +66635,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeOperationalStatusWithMinInterval:mMinInterval
-                                                   maxInterval:mMaxInterval
+            subscribeAttributeOperationalStatusWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                   maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"WindowCovering.OperationalStatus response %@", [value description]);
@@ -66384,8 +66707,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeTargetPositionLiftPercent100thsWithMinInterval:mMinInterval
-                                                                 maxInterval:mMaxInterval
+            subscribeAttributeTargetPositionLiftPercent100thsWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                      subscriptionEstablished:NULL
                                                                reportHandler:^(
                                                                    NSNumber * _Nullable value, NSError * _Nullable error) {
@@ -66459,8 +66782,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeTargetPositionTiltPercent100thsWithMinInterval:mMinInterval
-                                                                 maxInterval:mMaxInterval
+            subscribeAttributeTargetPositionTiltPercent100thsWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                      subscriptionEstablished:NULL
                                                                reportHandler:^(
                                                                    NSNumber * _Nullable value, NSError * _Nullable error) {
@@ -66532,8 +66855,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReportAttribute (0x0000000D) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeEndProductTypeWithMinInterval:mMinInterval
-                                                     maxInterval:mMaxInterval
+        [cluster subscribeAttributeEndProductTypeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                          subscriptionEstablished:NULL
                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                        NSLog(@"WindowCovering.EndProductType response %@", [value description]);
@@ -66604,8 +66927,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeCurrentPositionLiftPercent100thsWithMinInterval:mMinInterval
-                                                                  maxInterval:mMaxInterval
+            subscribeAttributeCurrentPositionLiftPercent100thsWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                       subscriptionEstablished:NULL
                                                                 reportHandler:^(
                                                                     NSNumber * _Nullable value, NSError * _Nullable error) {
@@ -66679,8 +67002,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeCurrentPositionTiltPercent100thsWithMinInterval:mMinInterval
-                                                                  maxInterval:mMaxInterval
+            subscribeAttributeCurrentPositionTiltPercent100thsWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                                  maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                       subscriptionEstablished:NULL
                                                                 reportHandler:^(
                                                                     NSNumber * _Nullable value, NSError * _Nullable error) {
@@ -66752,8 +67075,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReportAttribute (0x00000010) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeInstalledOpenLimitLiftWithMinInterval:mMinInterval
-                                                             maxInterval:mMaxInterval
+        [cluster subscribeAttributeInstalledOpenLimitLiftWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                             maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                  subscriptionEstablished:NULL
                                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"WindowCovering.InstalledOpenLimitLift response %@",
@@ -66825,8 +67148,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeInstalledClosedLimitLiftWithMinInterval:mMinInterval
-                                                          maxInterval:mMaxInterval
+            subscribeAttributeInstalledClosedLimitLiftWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                               subscriptionEstablished:NULL
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"WindowCovering.InstalledClosedLimitLift response %@",
@@ -66896,8 +67219,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReportAttribute (0x00000012) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeInstalledOpenLimitTiltWithMinInterval:mMinInterval
-                                                             maxInterval:mMaxInterval
+        [cluster subscribeAttributeInstalledOpenLimitTiltWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                             maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                  subscriptionEstablished:NULL
                                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                                NSLog(@"WindowCovering.InstalledOpenLimitTilt response %@",
@@ -66969,8 +67292,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeInstalledClosedLimitTiltWithMinInterval:mMinInterval
-                                                          maxInterval:mMaxInterval
+            subscribeAttributeInstalledClosedLimitTiltWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                               subscriptionEstablished:NULL
                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                             NSLog(@"WindowCovering.InstalledClosedLimitTilt response %@",
@@ -67072,8 +67395,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReportAttribute (0x00000017) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeModeWithMinInterval:mMinInterval
-                                           maxInterval:mMaxInterval
+        [cluster subscribeAttributeModeWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                           maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                subscriptionEstablished:NULL
                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                              NSLog(@"WindowCovering.Mode response %@", [value description]);
@@ -67142,8 +67465,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReportAttribute (0x0000001A) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeSafetyStatusWithMinInterval:mMinInterval
-                                                   maxInterval:mMaxInterval
+        [cluster subscribeAttributeSafetyStatusWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                   maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                        subscriptionEstablished:NULL
                                                  reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                      NSLog(@"WindowCovering.SafetyStatus response %@", [value description]);
@@ -67214,8 +67537,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeServerGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeServerGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"WindowCovering.ServerGeneratedCommandList response %@",
@@ -67287,8 +67610,8 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         [cluster
-            subscribeAttributeClientGeneratedCommandListWithMinInterval:mMinInterval
-                                                            maxInterval:mMaxInterval
+            subscribeAttributeClientGeneratedCommandListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                                 subscriptionEstablished:NULL
                                                           reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                               NSLog(@"WindowCovering.ClientGeneratedCommandList response %@",
@@ -67358,8 +67681,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReportAttribute (0x0000FFFB) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeAttributeListWithMinInterval:mMinInterval
-                                                    maxInterval:mMaxInterval
+        [cluster subscribeAttributeAttributeListWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                    maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                         subscriptionEstablished:NULL
                                                   reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
                                                       NSLog(@"WindowCovering.AttributeList response %@", [value description]);
@@ -67428,8 +67751,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReportAttribute (0x0000FFFC) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeFeatureMapWithMinInterval:mMinInterval
-                                                 maxInterval:mMaxInterval
+        [cluster subscribeAttributeFeatureMapWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                      subscriptionEstablished:NULL
                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                    NSLog(@"WindowCovering.FeatureMap response %@", [value description]);
@@ -67498,8 +67821,8 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) ReportAttribute (0x0000FFFD) on endpoint %" PRIu16, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        [cluster subscribeAttributeClusterRevisionWithMinInterval:mMinInterval
-                                                      maxInterval:mMaxInterval
+        [cluster subscribeAttributeClusterRevisionWithMinInterval:[NSNumber numberWithUnsignedShort:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedShort:mMaxInterval]
                                           subscriptionEstablished:NULL
                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                                                         NSLog(@"WindowCovering.ClusterRevision response %@", [value description]);
@@ -67786,9 +68109,8 @@ void registerClusterBinding(Commands & commands)
     const char * clusterName = "Binding";
 
     commands_list clusterCommands = {
-        make_unique<ReadBindingBindingList>(), //
-        make_unique<WriteBindingBindingList>(), //
-        make_unique<SubscribeAttributeBindingBindingList>(), //
+        make_unique<BindingBind>(), //
+        make_unique<BindingUnbind>(), //
         make_unique<ReadBindingServerGeneratedCommandList>(), //
         make_unique<SubscribeAttributeBindingServerGeneratedCommandList>(), //
         make_unique<ReadBindingClientGeneratedCommandList>(), //
@@ -67912,9 +68234,7 @@ void registerClusterChannel(Commands & commands)
         make_unique<ReadChannelChannelList>(), //
         make_unique<SubscribeAttributeChannelChannelList>(), //
         make_unique<ReadChannelChannelLineup>(), //
-        make_unique<WriteChannelChannelLineup>(), //
         make_unique<ReadChannelCurrentChannel>(), //
-        make_unique<WriteChannelCurrentChannel>(), //
         make_unique<ReadChannelServerGeneratedCommandList>(), //
         make_unique<SubscribeAttributeChannelServerGeneratedCommandList>(), //
         make_unique<ReadChannelClientGeneratedCommandList>(), //
@@ -68681,7 +69001,6 @@ void registerClusterMediaPlayback(Commands & commands)
         make_unique<ReadMediaPlaybackDuration>(), //
         make_unique<SubscribeAttributeMediaPlaybackDuration>(), //
         make_unique<ReadMediaPlaybackPosition>(), //
-        make_unique<WriteMediaPlaybackPosition>(), //
         make_unique<ReadMediaPlaybackPlaybackSpeed>(), //
         make_unique<SubscribeAttributeMediaPlaybackPlaybackSpeed>(), //
         make_unique<ReadMediaPlaybackSeekRangeEnd>(), //
@@ -69379,6 +69698,7 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<WriteTestClusterRangeRestrictedInt16s>(), //
         make_unique<SubscribeAttributeTestClusterRangeRestrictedInt16s>(), //
         make_unique<ReadTestClusterListLongOctetString>(), //
+        make_unique<WriteTestClusterListLongOctetString>(), //
         make_unique<SubscribeAttributeTestClusterListLongOctetString>(), //
         make_unique<ReadTestClusterTimedWriteBoolean>(), //
         make_unique<WriteTestClusterTimedWriteBoolean>(), //
