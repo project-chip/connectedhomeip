@@ -278,7 +278,7 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
         return EMBER_ZCL_STATUS_FAILURE;
     }
 
-    DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(msToStart), StartDelayTimerHandler, this);
+    mOtaRequestorDriver->ScheduleDelayedAction(UpdateFailureState::kQuerying, System::Clock::Seconds32(msToStart/1000), StartDelayTimerHandler, this);
 
     return EMBER_ZCL_STATUS_SUCCESS;
 }
