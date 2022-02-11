@@ -95,7 +95,7 @@ namespace {
 // implemented them on linux.
 #if CHIP_DEVICE_LAYER_TARGET_LINUX
 constexpr EndpointId kNetworkCommissioningEndpointMain      = 0;
-constexpr EndpointId kNetworkCommissioningEndpointSecondary = 1;
+constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 NetworkCommissioning::LinuxThreadDriver sLinuxThreadDriver;
@@ -114,10 +114,14 @@ void ApplicationInit()
 {
 #if CHIP_DEVICE_LAYER_TARGET_LINUX && defined(ZCL_USING_LEVEL_CONTROL_CLUSTER_SERVER)
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_DEVICE_CONFIG_ENABLE_WPA
+    emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
+
     if (LinuxDeviceOptions::GetInstance().mThread && LinuxDeviceOptions::GetInstance().mWiFi)
     {
         sThreadNetworkCommissioningInstance.Init();
         sWiFiNetworkCommissioningInstance.Init();
+        // Only enable secondary endpoint for network commissioning cluster when both WiFi and Thread are enabled.
+        emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, true);
     }
     else
 #endif
@@ -140,8 +144,9 @@ void ApplicationInit()
     else
 #endif
     {
+        // TODO: Setting 0 as feature map does not match the spec, however, the default value of the feature map is Thread network,
+        // which will cause the commissioner trying to commission a Thread network, we should find a approach to disable a cluster.
         Clusters::NetworkCommissioning::Attributes::FeatureMap::Set(kNetworkCommissioningEndpointMain, 0);
-        Clusters::NetworkCommissioning::Attributes::FeatureMap::Set(kNetworkCommissioningEndpointSecondary, 0);
     }
 #endif // CHIP_DEVICE_LAYER_TARGET_LINUX
 }
