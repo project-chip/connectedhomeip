@@ -20,6 +20,9 @@
 
 // ---- PW Example App Config ----
 
+// Software Verison
+#define SW_VERSION "1.0.0"
+
 // EFR32 WSTK Buttons
 #define PB0 0
 #define PB1 1

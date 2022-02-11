@@ -19,6 +19,9 @@
 
 #pragma once
 
+// Software Version
+#define SW_VERSION "1.0.0"
+
 // ---- Window Example App Config ----
 #define APP_TASK_NAME "APP"
 

@@ -19,6 +19,9 @@
 
 #pragma once
 
+// Software Version
+#define SW_VERSION "1.0.0"
+
 // EFR Logging
 #ifdef __cplusplus
 extern "C" {

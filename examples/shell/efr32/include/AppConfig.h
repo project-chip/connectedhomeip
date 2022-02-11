@@ -21,6 +21,9 @@
 
 // ---- Lighting Example App Config ----
 
+// Software Version
+#define SW_VERSION "1.0.0"
+
 #define APP_TASK_NAME "Shell_Task"
 
 // EFR32 WSTK Buttons
