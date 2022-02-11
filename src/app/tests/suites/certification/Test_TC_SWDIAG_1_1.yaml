@@ -15,6 +15,7 @@
 name: 45.1.1. [TC-SWDIAG-1.1] Attributes with server as DUT
 
 config:
+    nodeId: 0x12344321
     cluster: "Software Diagnostics"
     endpoint: 0
 
@@ -22,6 +23,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label:
           "Reads a list of ThreadMetrics struct non-global attribute from DUT."
