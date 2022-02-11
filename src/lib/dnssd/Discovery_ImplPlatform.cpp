@@ -53,14 +53,19 @@ static void HandleNodeResolve(void * context, DnssdService * result, CHIP_ERROR 
     }
 
     DiscoveredNodeData nodeData;
+
     Platform::CopyString(nodeData.hostName, result->mHostName);
     Platform::CopyString(nodeData.instanceName, result->mName);
 
-    if (result->mAddress.HasValue() && nodeData.numIPs < DiscoveredNodeData::kMaxIPAddresses)
+    if (result->mAddress.HasValue())
     {
-        nodeData.ipAddress[nodeData.numIPs]   = result->mAddress.Value();
-        nodeData.interfaceId[nodeData.numIPs] = result->mInterface;
-        nodeData.numIPs++;
+        nodeData.ipAddress[0] = result->mAddress.Value();
+        nodeData.interfaceId  = result->mInterface;
+        nodeData.numIPs       = 1;
+    }
+    else
+    {
+        nodeData.numIPs = 0;
     }
 
     nodeData.port = result->mPort;
