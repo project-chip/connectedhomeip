@@ -951,10 +951,8 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
     if (aPath.mDataVersion.HasValue() &&
         !IsClusterDataVersionEqual(aPath.mEndpointId, aPath.mClusterId, aPath.mDataVersion.Value()))
     {
-        ChipLogError(DataManagement,
-                     "Write Version mismatch for Endpoint %" PRIx16 ", Cluster " ChipLogFormatMEI,
-                     aPath.mEndpointId,
-                     ChipLogValueMEI(aPath.mClusterId));
+        ChipLogError(DataManagement, "Write Version mismatch for Endpoint %" PRIx16 ", Cluster " ChipLogFormatMEI,
+                     aPath.mEndpointId, ChipLogValueMEI(aPath.mClusterId));
         return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::DataVersionMismatch);
     }
 
