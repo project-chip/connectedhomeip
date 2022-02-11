@@ -224,7 +224,8 @@ ChipError::StorageType pychip_DeviceController_StackInit()
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
     FactoryInitParams factoryParams;
-    factoryParams.fabricStorage = &sFabricStorage;
+    factoryParams.fabricStorage   = &sFabricStorage;
+    factoryParams.storageDelegate = sStorageAdapter;
 
     ReturnErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryParams).AsInteger());
 
