@@ -483,7 +483,6 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowWithCallback(NodeId deviceId
         constexpr EndpointId kBasicClusterEndpoint = 0;
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, kBasicClusterEndpoint);
-
         return cluster.ReadAttribute<app::Clusters::Basic::Attributes::VendorID::TypeInfo>(this, OnVIDReadResponse,
                                                                                            OnVIDPIDReadFailureResponse);
     }

@@ -403,7 +403,7 @@ CHIP_ERROR ReadViaAccessInterface(FabricIndex aAccessingFabricIndex, bool aIsFab
 {
     AttributeValueEncoder::AttributeEncodeState state =
         (aEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *aEncoderState);
-    DataVersion version = kUndefinedDataVersion;
+    DataVersion version = 0;
     ReturnErrorOnFailure(ReadClusterDataVersion(aPath.mEndpointId, aPath.mClusterId, version));
     AttributeValueEncoder valueEncoder(aAttributeReports, aAccessingFabricIndex, aPath, version, aIsFabricFiltered, state);
     CHIP_ERROR err = aAccessInterface->Read(aPath, valueEncoder);
@@ -536,7 +536,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
     AttributeDataIB::Builder & attributeDataIBBuilder = attributeReport.CreateAttributeData();
     ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
 
-    DataVersion version = kUndefinedDataVersion;
+    DataVersion version = 0;
     ReturnErrorOnFailure(ReadClusterDataVersion(aPath.mEndpointId, aPath.mClusterId, version));
     attributeDataIBBuilder.DataVersion(version);
     ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
@@ -978,6 +978,21 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
                                                                          CLUSTER_MASK_SERVER, attributeData,
                                                                          attributeMetadata->attributeType));
     return apWriteHandler->AddStatus(aPath, status);
+}
+
+bool IsClusterDataVersionEqual(EndpointId aEndpointId, ClusterId aClusterId, DataVersion aRequiredVersion)
+{
+    DataVersion * version = emberAfDataVersionStorage(aEndpointId, aClusterId);
+    if (version == nullptr)
+    {
+        ChipLogError(DataManagement, "Endpoint %" PRIx16 ", Cluster " ChipLogFormatMEI " not found in IsClusterDataVersionEqual!",
+                     aEndpointId, ChipLogValueMEI(aClusterId));
+        return false;
+    }
+    else
+    {
+        return (*(version)) == aRequiredVersion;
+    }
 }
 
 } // namespace app

@@ -47,6 +47,29 @@ void Engine::Shutdown()
     mGlobalDirtySet.ReleaseAll();
 }
 
+bool Engine::IsClusterDataVersionMatch(ClusterInfo * aDataVersionFilterList, const ConcreteReadAttributePath & aPath)
+{
+    bool existPathMatch       = false;
+    bool existVersionMismatch = false;
+    for (auto filter = aDataVersionFilterList; filter != nullptr; filter = filter->mpNext)
+    {
+        if (aPath.mEndpointId == filter->mEndpointId && aPath.mClusterId == filter->mClusterId)
+        {
+            existPathMatch = true;
+        }
+
+        if (!IsClusterDataVersionEqual(filter->mEndpointId, filter->mClusterId, filter->mDataVersion.Value()))
+        {
+            existVersionMismatch = true;
+        }
+    }
+    if (!existPathMatch || existVersionMismatch)
+    {
+        return false;
+    }
+    return true;
+}
+
 CHIP_ERROR
 Engine::RetrieveClusterData(const SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
                             AttributeReportIBs::Builder & aAttributeReportIBs, const ConcreteReadAttributePath & aPath,
@@ -108,6 +131,13 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                 if (!concretePathDirty)
                 {
                     // This attribute is not dirty, we just skip this one.
+                    continue;
+                }
+            }
+            else
+            {
+                if (IsClusterDataVersionMatch(apReadHandler->GetDataVersionFilterlist(), readPath))
+                {
                     continue;
                 }
             }

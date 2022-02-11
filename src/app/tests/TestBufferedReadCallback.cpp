@@ -80,8 +80,7 @@ public:
 
     void OnReportBegin() override;
     void OnReportEnd() override;
-    void OnAttributeData(const ConcreteDataAttributePath & aPath, DataVersion aVersion, TLV::TLVReader * apData,
-                         const StatusIB & aStatus) override;
+    void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
     void OnDone() override {}
 
     std::vector<ValidationInstruction> mInstructionList;
@@ -95,7 +94,7 @@ void DataSeriesValidator::OnReportBegin()
 
 void DataSeriesValidator::OnReportEnd() {}
 
-void DataSeriesValidator::OnAttributeData(const ConcreteDataAttributePath & aPath, DataVersion aVersion, TLV::TLVReader * apData,
+void DataSeriesValidator::OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                                           const StatusIB & aStatus)
 {
     uint32_t expectedListLength;
@@ -302,7 +301,6 @@ void DataSeriesGenerator::Generate()
     ReadClient::Callback * callback = &mReadCallback;
     StatusIB status;
     bool hasData;
-    DataVersion version = kUndefinedDataVersion;
 
     callback->OnReportBegin();
 
@@ -403,7 +401,7 @@ void DataSeriesGenerator::Generate()
             path.mListOp      = ConcreteDataAttributePath::ListOperation::ReplaceAll;
             status.mStatus    = Protocols::InteractionModel::Status::Failure;
             hasData           = false;
-            callback->OnAttributeData(path, version, &reader, status);
+            callback->OnAttributeData(path, &reader, status);
             break;
         }
 
@@ -414,7 +412,7 @@ void DataSeriesGenerator::Generate()
             path.mListOp      = ConcreteDataAttributePath::ListOperation::ReplaceAll;
             status.mStatus    = Protocols::InteractionModel::Status::Failure;
             hasData           = false;
-            callback->OnAttributeData(path, version, &reader, status);
+            callback->OnAttributeData(path, &reader, status);
             break;
         }
 
@@ -432,7 +430,7 @@ void DataSeriesGenerator::Generate()
                 writer.Finalize(&handle);
                 reader.Init(std::move(handle));
                 NL_TEST_ASSERT(gSuite, reader.Next() == CHIP_NO_ERROR);
-                callback->OnAttributeData(path, version, &reader, status);
+                callback->OnAttributeData(path, &reader, status);
             }
 
             ChipLogProgress(DataManagement, "\t -- Generating C0..C512");
@@ -455,7 +453,7 @@ void DataSeriesGenerator::Generate()
                 writer.Finalize(&handle);
                 reader.Init(std::move(handle));
                 NL_TEST_ASSERT(gSuite, reader.Next() == CHIP_NO_ERROR);
-                callback->OnAttributeData(path, version, &reader, status);
+                callback->OnAttributeData(path, &reader, status);
             }
 
             break;
@@ -475,7 +473,7 @@ void DataSeriesGenerator::Generate()
                 writer.Finalize(&handle);
                 reader.Init(std::move(handle));
                 NL_TEST_ASSERT(gSuite, reader.Next() == CHIP_NO_ERROR);
-                callback->OnAttributeData(path, version, &reader, status);
+                callback->OnAttributeData(path, &reader, status);
             }
 
             ChipLogProgress(DataManagement, "\t -- Generating D0..D512");
@@ -494,7 +492,7 @@ void DataSeriesGenerator::Generate()
                 writer.Finalize(&handle);
                 reader.Init(std::move(handle));
                 NL_TEST_ASSERT(gSuite, reader.Next() == CHIP_NO_ERROR);
-                callback->OnAttributeData(path, version, &reader, status);
+                callback->OnAttributeData(path, &reader, status);
             }
 
             break;
@@ -509,7 +507,7 @@ void DataSeriesGenerator::Generate()
             writer.Finalize(&handle);
             reader.Init(std::move(handle));
             NL_TEST_ASSERT(gSuite, reader.Next() == CHIP_NO_ERROR);
-            callback->OnAttributeData(path, version, &reader, status);
+            callback->OnAttributeData(path, &reader, status);
         }
 
         index++;
