@@ -510,7 +510,8 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
     }
 
     chip::SetupPayload setupPayload;
-    err = self.cppCommissioner->OpenCommissioningWindow(deviceID, (uint16_t) duration, 0, 0, 0, setupPayload);
+    err = self.cppCommissioner->OpenCommissioningWindow(deviceID, (uint16_t) duration, 0, 0,
+        chip::Controller::DeviceController::CommissioningWindowOption::kOriginalSetupCode, setupPayload);
 
     if (err != CHIP_NO_ERROR) {
         CHIP_LOG_ERROR("Error(%s): Open Pairing Window failed", chip::ErrorStr(err));
@@ -554,8 +555,8 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
     setupPIN &= ((1 << chip::kSetupPINCodeFieldLengthInBits) - 1);
     setupPayload.setUpPINCode = (uint32_t) setupPIN;
 
-    err = self.cppCommissioner->OpenCommissioningWindow(
-        deviceID, (uint16_t) duration, 1000, (uint16_t) discriminator, 2, setupPayload);
+    err = self.cppCommissioner->OpenCommissioningWindow(deviceID, (uint16_t) duration, 1000, (uint16_t) discriminator,
+        chip::Controller::DeviceController::CommissioningWindowOption::kTokenWithProvidedPIN, setupPayload);
 
     if (err != CHIP_NO_ERROR) {
         CHIP_LOG_ERROR("Error(%s): Open Pairing Window failed", chip::ErrorStr(err));
