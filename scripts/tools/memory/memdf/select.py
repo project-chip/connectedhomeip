@@ -23,7 +23,7 @@ import memdf.util.config
 
 from memdf import Config, ConfigDescription, DF
 
-from typing import Optional
+from typing import Mapping, Optional
 
 
 def split_size(config: Config, key: str) -> None:
@@ -51,7 +51,7 @@ def get_limit(config: Config, column: str, name: str) -> int:
     return config.getl([column, 'limit', name], config.get('report.limit', 0))
 
 
-def postprocess_selections(config: Config, key: str) -> None:
+def postprocess_selections(config: Config, key: str, info: Mapping) -> None:
     """Resolve select/ignore command options."""
     split_size(config, key)
     choice, select = key.split('.')
