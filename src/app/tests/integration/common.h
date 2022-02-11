@@ -28,6 +28,7 @@
 #include <messaging/ExchangeMgr.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <transport/SessionHolder.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
 
 #define MAX_MESSAGE_SOURCE_STR_LENGTH (100)
 #define NETWORK_SLEEP_TIME_MSECS (100 * 1000)
@@ -36,6 +37,7 @@ extern chip::Messaging::ExchangeManager gExchangeManager;
 extern chip::SessionManager gSessionManager;
 extern chip::secure_channel::MessageCounterManager gMessageCounterManager;
 extern chip::SessionHolder gSession;
+extern chip::TestPersistentStorageDelegate gStorage;
 
 constexpr chip::NodeId kTestNodeId         = 0x1ULL;
 constexpr chip::NodeId kTestNodeId1        = 0x2ULL;
