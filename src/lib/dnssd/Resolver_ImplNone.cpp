@@ -64,5 +64,10 @@ CHIP_ERROR ResolverProxy::FindCommissioners(DiscoveryFilter filter)
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
+bool ResolverProxy::ResolveNodeIdFromInternalCache(const PeerId & peerId, Inet::IPAddressType type)
+{
+    return false;
+}
+
 } // namespace Dnssd
 } // namespace chip

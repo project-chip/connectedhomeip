@@ -589,8 +589,19 @@ CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressTy
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     mDelegate->Retain();
 
+    DnssdService service;
+
+    ReturnErrorOnFailure(MakeInstanceName(service.mName, sizeof(service.mName), peerId));
+    strncpy(service.mType, kOperationalServiceName, sizeof(service.mType));
+    service.mProtocol    = DnssdServiceProtocol::kDnssdProtocolTcp;
+    service.mAddressType = type;
+    return ChipDnssdResolve(&service, Inet::InterfaceId::Null(), HandleNodeIdResolve, mDelegate);
+}
+
+bool ResolverProxy::ResolveNodeIdFromInternalCache(const PeerId & peerId, Inet::IPAddressType type)
+{
 #if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
-    if (dnssdCacheBypass == Resolver::CacheBypass::Off)
+    if (mDelegate != nullptr)
     {
         /* see if the entry is cached and use it.... */
         ResolvedNodeData nodeData;
@@ -602,14 +613,7 @@ CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressTy
         }
     }
 #endif
-
-    DnssdService service;
-
-    ReturnErrorOnFailure(MakeInstanceName(service.mName, sizeof(service.mName), peerId));
-    strncpy(service.mType, kOperationalServiceName, sizeof(service.mType));
-    service.mProtocol    = DnssdServiceProtocol::kDnssdProtocolTcp;
-    service.mAddressType = type;
-    return ChipDnssdResolve(&service, Inet::InterfaceId::Null(), HandleNodeIdResolve, mDelegate);
+    return false;
 }
 
 CHIP_ERROR ResolverProxy::FindCommissionableNodes(DiscoveryFilter filter)
