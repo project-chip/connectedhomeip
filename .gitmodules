@@ -187,3 +187,6 @@
 [submodule "perfetto"]
 	path = third_party/perfetto/repo
 	url = https://github.com/google/perfetto
+[submodule "p6/serial-flash"]
+	path = third_party/p6/p6_sdk/libs/serial-flash
+	url = https://github.com/Infineon/serial-flash

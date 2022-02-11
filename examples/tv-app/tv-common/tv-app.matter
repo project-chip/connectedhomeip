@@ -167,7 +167,7 @@ server cluster ApplicationLauncher = 1292 {
 
   struct ApplicationEP {
     Application application = 0;
-    CHAR_STRING endpoint = 1;
+    optional ENDPOINT_NO endpoint = 1;
   }
 
   struct Application {
@@ -176,7 +176,7 @@ server cluster ApplicationLauncher = 1292 {
   }
 
   readonly attribute INT16U applicationLauncherList[] = 0;
-  attribute ApplicationEP applicationLauncherApp = 1;
+  attribute nullable ApplicationEP applicationLauncherApp = 1;
   readonly global attribute int16u clusterRevision = 65533;
 
   request struct HideAppRequestRequest {
@@ -185,7 +185,7 @@ server cluster ApplicationLauncher = 1292 {
 
   request struct LaunchAppRequestRequest {
     Application application = 0;
-    OCTET_STRING data = 1;
+    optional OCTET_STRING data = 1;
   }
 
   request struct StopAppRequestRequest {
@@ -331,21 +331,21 @@ server cluster Channel = 1284 {
   struct ChannelInfo {
     INT16U majorNumber = 0;
     INT16U minorNumber = 1;
-    CHAR_STRING<32> name = 2;
-    CHAR_STRING<32> callSign = 3;
-    CHAR_STRING<32> affiliateCallSign = 4;
+    optional CHAR_STRING<32> name = 2;
+    optional CHAR_STRING<32> callSign = 3;
+    optional CHAR_STRING<32> affiliateCallSign = 4;
   }
 
   struct LineupInfo {
     CHAR_STRING operatorName = 0;
-    CHAR_STRING lineupName = 1;
-    CHAR_STRING postalCode = 2;
+    optional CHAR_STRING lineupName = 1;
+    optional CHAR_STRING postalCode = 2;
     LineupInfoTypeEnum lineupInfoType = 3;
   }
 
   readonly attribute ChannelInfo channelList[] = 0;
-  attribute LineupInfo channelLineup = 1;
-  attribute ChannelInfo currentChannel = 2;
+  readonly attribute nullable LineupInfo channelLineup = 1;
+  readonly attribute nullable ChannelInfo currentChannel = 2;
   readonly global attribute int16u clusterRevision = 65533;
 
   request struct ChangeChannelByNumberRequestRequest {
@@ -416,7 +416,7 @@ server cluster ContentLauncher = 1290 {
   struct Parameter {
     ParameterEnum type = 0;
     CHAR_STRING value = 1;
-    AdditionalInfo externalIDList[] = 2;
+    optional AdditionalInfo externalIDList[] = 2;
   }
 
   struct AdditionalInfo {
@@ -426,17 +426,17 @@ server cluster ContentLauncher = 1290 {
 
   struct BrandingInformation {
     CHAR_STRING providerName = 0;
-    StyleInformation background = 1;
-    StyleInformation logo = 2;
-    StyleInformation progressBar = 3;
-    StyleInformation splash = 4;
-    StyleInformation waterMark = 5;
+    optional StyleInformation background = 1;
+    optional StyleInformation logo = 2;
+    optional StyleInformation progressBar = 3;
+    optional StyleInformation splash = 4;
+    optional StyleInformation waterMark = 5;
   }
 
   struct StyleInformation {
-    CHAR_STRING imageUrl = 0;
-    CHAR_STRING color = 1;
-    Dimension size = 2;
+    optional CHAR_STRING imageUrl = 0;
+    optional CHAR_STRING color = 1;
+    optional Dimension size = 2;
   }
 
   struct Dimension {
@@ -450,20 +450,20 @@ server cluster ContentLauncher = 1290 {
   readonly global attribute int16u clusterRevision = 65533;
 
   request struct LaunchContentRequestRequest {
-    BOOLEAN autoPlay = 0;
-    CHAR_STRING data = 1;
-    ContentSearch search[] = 2;
+    ContentSearch search = 0;
+    BOOLEAN autoPlay = 1;
+    optional CHAR_STRING data = 2;
   }
 
   request struct LaunchURLRequestRequest {
     CHAR_STRING contentURL = 0;
-    CHAR_STRING displayString = 1;
-    BrandingInformation brandingInformation = 2;
+    optional CHAR_STRING displayString = 1;
+    optional BrandingInformation brandingInformation = 2;
   }
 
   response struct LaunchResponse {
     StatusEnum status = 0;
-    CHAR_STRING data = 1;
+    optional CHAR_STRING data = 1;
   }
 
   command LaunchContentRequest(LaunchContentRequestRequest): LaunchResponse = 0;
@@ -1049,16 +1049,16 @@ server cluster MediaPlayback = 1286 {
 
   struct PlaybackPosition {
     INT64U updatedAt = 0;
-    INT64U position = 1;
+    nullable INT64U position = 1;
   }
 
   readonly attribute PlaybackStateEnum playbackState = 0;
-  readonly attribute epoch_us startTime = 1;
-  readonly attribute int64u duration = 2;
-  attribute PlaybackPosition position = 3;
+  readonly attribute nullable epoch_us startTime = 1;
+  readonly attribute nullable int64u duration = 2;
+  readonly attribute PlaybackPosition position = 3;
   readonly attribute single playbackSpeed = 4;
-  readonly attribute int64u seekRangeEnd = 5;
-  readonly attribute int64u seekRangeStart = 6;
+  readonly attribute nullable int64u seekRangeEnd = 5;
+  readonly attribute nullable int64u seekRangeStart = 6;
   readonly global attribute int16u clusterRevision = 65533;
 
   request struct SeekRequestRequest {
@@ -1686,12 +1686,12 @@ server cluster TargetNavigator = 1285 {
 
   request struct NavigateTargetRequestRequest {
     INT8U target = 0;
-    CHAR_STRING data = 1;
+    optional CHAR_STRING data = 1;
   }
 
   response struct NavigateTargetResponse {
     StatusEnum status = 0;
-    CHAR_STRING data = 1;
+    optional CHAR_STRING data = 1;
   }
 
   command NavigateTargetRequest(NavigateTargetRequestRequest): NavigateTargetResponse = 0;

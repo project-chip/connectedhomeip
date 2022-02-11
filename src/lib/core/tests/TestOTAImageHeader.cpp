@@ -72,10 +72,14 @@ const uint8_t kMinOtaImageWithoutVendor[] = { 0x1e, 0xf1, 0xee, 0x1b, 0x44, 0x00
 
 void TestHappyPath(nlTestSuite * inSuite, void * inContext)
 {
+    ByteSpan buffer(kOtaImage);
     OTAImageHeader header;
-    NL_TEST_ASSERT(inSuite, DecodeOTAImageHeader(ByteSpan(kOtaImage), header) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, header.mTotalSize == sizeof(kOtaImage));
-    NL_TEST_ASSERT(inSuite, header.mHeaderSize == 82);
+    OTAImageHeaderParser parser;
+
+    parser.Init();
+    NL_TEST_ASSERT(inSuite, parser.AccumulateAndDecode(buffer, header) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, parser.IsInitialized());
+    NL_TEST_ASSERT(inSuite, buffer.size() == strlen("test payload"));
     NL_TEST_ASSERT(inSuite, header.mVendorId == 0xDEAD);
     NL_TEST_ASSERT(inSuite, header.mProductId == 0xBEEF);
     NL_TEST_ASSERT(inSuite, header.mSoftwareVersion == 0xFFFFFFFF);
@@ -92,30 +96,89 @@ void TestHappyPath(nlTestSuite * inSuite, void * inContext)
 
 void TestEmptyBuffer(nlTestSuite * inSuite, void * inContext)
 {
+    ByteSpan buffer{};
     OTAImageHeader header;
-    NL_TEST_ASSERT(inSuite, DecodeOTAImageHeader(ByteSpan(), header) == CHIP_ERROR_BUFFER_TOO_SMALL);
+    OTAImageHeaderParser parser;
+
+    parser.Init();
+    NL_TEST_ASSERT(inSuite, parser.AccumulateAndDecode(buffer, header) == CHIP_ERROR_BUFFER_TOO_SMALL);
+    NL_TEST_ASSERT(inSuite, parser.IsInitialized());
 }
 
 void TestInvalidFileIdentifier(nlTestSuite * inSuite, void * inContext)
 {
-    static const uint8_t otaImage[] = { 0x1e, 0xf1, 0xee, 0x1c };
+    static const uint8_t otaImage[] = { 0x1e, 0xf1, 0xee, 0x1c, 0x10, 0x00, 0x00, 0x00,
+                                        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
+    ByteSpan buffer(otaImage);
     OTAImageHeader header;
-    NL_TEST_ASSERT(inSuite, DecodeOTAImageHeader(ByteSpan(otaImage), header) == CHIP_ERROR_INVALID_FILE_IDENTIFIER);
+    OTAImageHeaderParser parser;
+
+    parser.Init();
+    NL_TEST_ASSERT(inSuite, parser.AccumulateAndDecode(buffer, header) == CHIP_ERROR_INVALID_FILE_IDENTIFIER);
+    NL_TEST_ASSERT(inSuite, !parser.IsInitialized());
 }
 
 void TestTooSmallHeader(nlTestSuite * inSuite, void * inContext)
 {
+    ByteSpan buffer(kMinOtaImage);
     OTAImageHeader header;
-    NL_TEST_ASSERT(inSuite, DecodeOTAImageHeader(ByteSpan(kMinOtaImage), header) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite,
-                   DecodeOTAImageHeader(ByteSpan(kMinOtaImage, sizeof(kMinOtaImage) - 1), header) == CHIP_ERROR_BUFFER_TOO_SMALL);
+    OTAImageHeaderParser parser;
+
+    parser.Init();
+    NL_TEST_ASSERT(inSuite, parser.AccumulateAndDecode(buffer, header) == CHIP_NO_ERROR);
+
+    buffer = ByteSpan(kMinOtaImage, sizeof(kMinOtaImage) - 1);
+    parser.Init();
+    NL_TEST_ASSERT(inSuite, parser.AccumulateAndDecode(buffer, header) == CHIP_ERROR_BUFFER_TOO_SMALL);
+    NL_TEST_ASSERT(inSuite, parser.IsInitialized());
 }
 
 void TestMissingMandatoryField(nlTestSuite * inSuite, void * inContext)
 {
+    ByteSpan buffer(kMinOtaImageWithoutVendor);
     OTAImageHeader header;
-    NL_TEST_ASSERT(inSuite, DecodeOTAImageHeader(ByteSpan(kMinOtaImageWithoutVendor), header) == CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    OTAImageHeaderParser parser;
+
+    parser.Init();
+    NL_TEST_ASSERT(inSuite, parser.AccumulateAndDecode(buffer, header) == CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    NL_TEST_ASSERT(inSuite, !parser.IsInitialized());
+}
+
+void TestSmallBlocks(nlTestSuite * inSuite, void * inContext)
+{
+    constexpr size_t kImageSize = sizeof(kOtaImage);
+
+    CHIP_ERROR error;
+    OTAImageHeader header;
+    OTAImageHeaderParser parser;
+
+    for (size_t blockSize : { 1u, 16u, 128u })
+    {
+        error = CHIP_ERROR_BUFFER_TOO_SMALL;
+        parser.Init();
+
+        for (size_t offset = 0; offset < kImageSize && error == CHIP_ERROR_BUFFER_TOO_SMALL; offset += blockSize)
+        {
+            ByteSpan block(&kOtaImage[offset], chip::min(kImageSize - offset, blockSize));
+            error = parser.AccumulateAndDecode(block, header);
+        }
+
+        NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, parser.IsInitialized());
+        NL_TEST_ASSERT(inSuite, header.mVendorId == 0xDEAD);
+        NL_TEST_ASSERT(inSuite, header.mProductId == 0xBEEF);
+        NL_TEST_ASSERT(inSuite, header.mSoftwareVersion == 0xFFFFFFFF);
+        NL_TEST_ASSERT(inSuite, header.mSoftwareVersionString.data_equal(CharSpan::fromCharString("1.0")));
+        NL_TEST_ASSERT(inSuite, header.mPayloadSize == strlen("test payload"));
+        NL_TEST_ASSERT(inSuite, header.mMinApplicableVersion.HasValue());
+        NL_TEST_ASSERT(inSuite, header.mMinApplicableVersion.Value() == 1);
+        NL_TEST_ASSERT(inSuite, header.mMaxApplicableVersion.HasValue());
+        NL_TEST_ASSERT(inSuite, header.mMaxApplicableVersion.Value() == 2);
+        NL_TEST_ASSERT(inSuite, header.mReleaseNotesURL.data_equal(CharSpan::fromCharString("https://rn")));
+        NL_TEST_ASSERT(inSuite, header.mImageDigestType == OTAImageDigestType::kSha256);
+        NL_TEST_ASSERT(inSuite, header.mImageDigest.size() == 256 / 8);
+    }
 }
 
 // clang-format off
@@ -126,15 +189,27 @@ const nlTest sTests[] =
     NL_TEST_DEF("Test invalid File Identifier", TestInvalidFileIdentifier),
     NL_TEST_DEF("Test too small header", TestTooSmallHeader),
     NL_TEST_DEF("Test missing mandatory field", TestMissingMandatoryField),
+    NL_TEST_DEF("Test small blocks", TestSmallBlocks),
     NL_TEST_SENTINEL()
 };
 // clang-format on
+
+int SetupSuite(void * inContext)
+{
+    return Platform::MemoryInit() == CHIP_NO_ERROR ? SUCCESS : FAILURE;
+}
+
+int TearDownSuite(void * inContext)
+{
+    Platform::MemoryShutdown();
+    return SUCCESS;
+}
 
 } // namespace
 
 int TestOTAImageHeader(void)
 {
-    nlTestSuite theSuite = { "OTA Image header test", &sTests[0] };
+    nlTestSuite theSuite = { "OTA Image header test", &sTests[0], SetupSuite, TearDownSuite };
     nlTestRunner(&theSuite, nullptr);
 
     return nlTestRunnerStats(&theSuite);

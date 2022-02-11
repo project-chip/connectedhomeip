@@ -72,6 +72,7 @@ public:
     void SetDelayedActionTimeSec(uint32_t time) { mDelayedActionTimeSec = time; }
     void SetUserConsentDelegate(chip::ota::UserConsentDelegate * delegate) { mUserConsentDelegate = delegate; }
     void SetSoftwareVersion(uint32_t softwareVersion) { mSoftwareVersion.SetValue(softwareVersion); }
+    void SetSoftwareVersionString(const char * versionString) { mSoftwareVersionString = versionString; }
     void SetUserConsentNeeded(bool needed) { mUserConsentNeeded = needed; }
 
 private:
@@ -91,5 +92,6 @@ private:
                           const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData,
                           uint32_t targetVersion);
     chip::Optional<uint32_t> mSoftwareVersion;
-    bool mUserConsentNeeded = false;
+    const char * mSoftwareVersionString = nullptr;
+    bool mUserConsentNeeded             = false;
 };

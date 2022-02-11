@@ -143,7 +143,7 @@ typedef struct _Application
 typedef struct _ApplicationEP
 {
     Application application;
-    chip::CharSpan endpoint;
+    chip::EndpointId endpoint;
 } ApplicationEP;
 
 // Struct for Target

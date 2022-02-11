@@ -106,7 +106,7 @@ void InteractionModelEngine::Shutdown()
 
     for (auto & writeHandler : mWriteHandlers)
     {
-        VerifyOrDie(writeHandler.IsFree());
+        writeHandler.Abort();
     }
 
     mReportingEngine.Shutdown();
@@ -276,7 +276,7 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
                     ChipLogProgress(InteractionModel,
                                     "Deleting previous subscription from NodeId: " ChipLogFormatX64 ", FabricIndex: %" PRIu8,
                                     ChipLogValueX64(apExchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId()),
-                                    apExchangeContext->GetSessionHandle()->AsSecureSession()->GetFabricIndex());
+                                    apExchangeContext->GetSessionHandle()->GetFabricIndex());
                     mReadHandlers.ReleaseObject(handler);
                 }
 

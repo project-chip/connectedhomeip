@@ -54,9 +54,9 @@
 #endif
 
 #include "AppMain.h"
-#include "Options.h"
 
 using namespace chip;
+using namespace chip::ArgParser;
 using namespace chip::Credentials;
 using namespace chip::DeviceLayer;
 using namespace chip::Inet;
@@ -106,7 +106,7 @@ static bool EnsureWiFiIsStarted()
 }
 #endif
 
-int ChipLinuxAppInit(int argc, char ** argv)
+int ChipLinuxAppInit(int argc, char ** argv, OptionSet * customOptions)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 #if CONFIG_NETWORK_LAYER_BLE
@@ -120,6 +120,9 @@ int ChipLinuxAppInit(int argc, char ** argv)
 #endif
 
     err = Platform::MemoryInit();
+    SuccessOrExit(err);
+
+    err = ParseArguments(argc, argv, customOptions);
     SuccessOrExit(err);
 
 #ifdef CHIP_CONFIG_KVS_PATH
@@ -137,10 +140,14 @@ int ChipLinuxAppInit(int argc, char ** argv)
     err = DeviceLayer::PlatformMgr().InitChipStack();
     SuccessOrExit(err);
 
-    err = GetSetupPayload(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
-    SuccessOrExit(err);
+    if (0 != LinuxDeviceOptions::GetInstance().payload.discriminator)
+    {
+        uint16_t discriminator = LinuxDeviceOptions::GetInstance().payload.discriminator;
+        err                    = DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(discriminator);
+        SuccessOrExit(err);
+    }
 
-    err = ParseArguments(argc, argv);
+    err = GetSetupPayload(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
     SuccessOrExit(err);
 
     ConfigurationMgr().LogDeviceConfig();
@@ -182,7 +189,7 @@ int ChipLinuxAppInit(int argc, char ** argv)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(NotSpecified, "Failed to run Linux Lighting App: %s ", ErrorStr(err));
+        ChipLogProgress(NotSpecified, "Failed to init Linux App: %s ", ErrorStr(err));
         // End the program with non zero error code to indicate a error.
         return 1;
     }

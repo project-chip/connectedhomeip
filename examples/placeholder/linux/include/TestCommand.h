@@ -23,6 +23,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 
+#include <app/tests/suites/commands/discovery/DiscoveryCommands.h>
 #include <app/tests/suites/commands/log/LogCommands.h>
 #include <app/tests/suites/include/PICSChecker.h>
 
@@ -34,7 +35,7 @@ constexpr const char kIdentityAlpha[] = "";
 constexpr const char kIdentityBeta[]  = "";
 constexpr const char kIdentityGamma[] = "";
 
-class TestCommand : public PICSChecker, public LogCommands
+class TestCommand : public PICSChecker, public LogCommands, public DiscoveryCommands
 {
 public:
     TestCommand(const char * commandName) : mCommandPath(0, 0, 0), mAttributePath(0, 0, 0) {}
@@ -68,6 +69,12 @@ public:
     {
         NextTest();
         return CHIP_NO_ERROR;
+    }
+
+    void Exit(std::string message)
+    {
+        ChipLogError(chipTool, " ***** Test Failure: %s\n", message.c_str());
+        SetCommandExitStatus(CHIP_ERROR_INTERNAL);
     }
 
     static void ScheduleNextTest(intptr_t context)

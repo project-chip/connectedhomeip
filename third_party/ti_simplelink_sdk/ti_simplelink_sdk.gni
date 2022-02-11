@@ -20,6 +20,7 @@ import("//build_overrides/openthread.gni")
 import("//build_overrides/pigweed.gni")
 import("//build_overrides/ti_simplelink_sdk.gni")
 
+import("${chip_root}/src/platform/device.gni")
 import("${dir_pw_build}/python.gni")
 import("${freertos_root}/freertos.gni")
 import("${mbedtls_root}/mbedtls.gni")
@@ -230,10 +231,10 @@ template("ti_simplelink_sdk") {
     public_configs = [ ":${sdk_target_name}_config" ]
   }
 
-  if (ti_simplelink_device_family == "cc13x2_26x2") {
-    openthread_example = "cli_mtd"
-  } else if (ti_simplelink_device_family == "cc13x2x7_26x2x7") {
+  if (chip_openthread_ftd) {
     openthread_example = "cli_ftd"
+  } else {
+    openthread_example = "cli_mtd"
   }
 
   config("${sdk_target_name}_openthread_platform_config") {
@@ -290,12 +291,12 @@ template("ti_simplelink_sdk") {
       "${chip_root}/third_party/openthread/repo:openthread_config",
     ]
 
-    if (ti_simplelink_device_family == "cc13x2_26x2") {
-      public_configs +=
-          [ "${chip_root}/third_party/openthread/repo:openthread_mtd_config" ]
-    } else if (ti_simplelink_device_family == "cc13x2x7_26x2x7") {
+    if (chip_openthread_ftd) {
       public_configs +=
           [ "${chip_root}/third_party/openthread/repo:openthread_ftd_config" ]
+    } else {
+      public_configs +=
+          [ "${chip_root}/third_party/openthread/repo:openthread_mtd_config" ]
     }
   }
 

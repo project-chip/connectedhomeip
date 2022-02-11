@@ -1598,11 +1598,11 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer status, String data) {
+    public void onSuccess(Integer status, Optional<String> data) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
       responseValues.put(statusResponseValue, status);
-      CommandResponseInfo dataResponseValue = new CommandResponseInfo("data", "String");
+      CommandResponseInfo dataResponseValue = new CommandResponseInfo("data", "Optional<String>");
       responseValues.put(dataResponseValue, data);
       callback.onSuccess(responseValues);
     }
@@ -5670,11 +5670,11 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer status, String data) {
+    public void onSuccess(Integer status, Optional<String> data) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
       responseValues.put(statusResponseValue, status);
-      CommandResponseInfo dataResponseValue = new CommandResponseInfo("data", "String");
+      CommandResponseInfo dataResponseValue = new CommandResponseInfo("data", "Optional<String>");
       responseValues.put(dataResponseValue, data);
       callback.onSuccess(responseValues);
     }
@@ -7619,7 +7619,7 @@ public class ClusterInfoMapping {
     Map<String, CommandParameterInfo> applicationLauncherlaunchAppRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo applicationLauncherlaunchAppRequestdataCommandParameterInfo =
-        new CommandParameterInfo("data", byte[].class);
+        new CommandParameterInfo("data", Optional.class);
     applicationLauncherlaunchAppRequestCommandParams.put(
         "data", applicationLauncherlaunchAppRequestdataCommandParameterInfo);
 
@@ -7631,7 +7631,7 @@ public class ClusterInfoMapping {
                       (ChipClusters.ApplicationLauncherCluster.LauncherResponseCallback) callback,
                       (ChipStructs.ApplicationLauncherClusterApplication)
                           commandArguments.get("application"),
-                      (byte[]) commandArguments.get("data"));
+                      (Optional<byte[]>) commandArguments.get("data"));
             },
             () -> new DelegatedLauncherResponseCallback(),
             applicationLauncherlaunchAppRequestCommandParams);
@@ -9010,7 +9010,7 @@ public class ClusterInfoMapping {
         "autoPlay", contentLauncherlaunchContentRequestautoPlayCommandParameterInfo);
 
     CommandParameterInfo contentLauncherlaunchContentRequestdataCommandParameterInfo =
-        new CommandParameterInfo("data", String.class);
+        new CommandParameterInfo("data", Optional.class);
     contentLauncherlaunchContentRequestCommandParams.put(
         "data", contentLauncherlaunchContentRequestdataCommandParameterInfo);
 
@@ -9020,10 +9020,10 @@ public class ClusterInfoMapping {
               ((ChipClusters.ContentLauncherCluster) cluster)
                   .launchContentRequest(
                       (ChipClusters.ContentLauncherCluster.LaunchResponseCallback) callback,
+                      (ChipStructs.ContentLauncherClusterContentSearch)
+                          commandArguments.get("search"),
                       (Boolean) commandArguments.get("autoPlay"),
-                      (String) commandArguments.get("data"),
-                      (ArrayList<ChipStructs.ContentLauncherClusterContentSearch>)
-                          commandArguments.get("search"));
+                      (Optional<String>) commandArguments.get("data"));
             },
             () -> new DelegatedLaunchResponseCallback(),
             contentLauncherlaunchContentRequestCommandParams);
@@ -9037,7 +9037,7 @@ public class ClusterInfoMapping {
         "contentURL", contentLauncherlaunchURLRequestcontentURLCommandParameterInfo);
 
     CommandParameterInfo contentLauncherlaunchURLRequestdisplayStringCommandParameterInfo =
-        new CommandParameterInfo("displayString", String.class);
+        new CommandParameterInfo("displayString", Optional.class);
     contentLauncherlaunchURLRequestCommandParams.put(
         "displayString", contentLauncherlaunchURLRequestdisplayStringCommandParameterInfo);
 
@@ -9048,8 +9048,8 @@ public class ClusterInfoMapping {
                   .launchURLRequest(
                       (ChipClusters.ContentLauncherCluster.LaunchResponseCallback) callback,
                       (String) commandArguments.get("contentURL"),
-                      (String) commandArguments.get("displayString"),
-                      (ChipStructs.ContentLauncherClusterBrandingInformation)
+                      (Optional<String>) commandArguments.get("displayString"),
+                      (Optional<ChipStructs.ContentLauncherClusterBrandingInformation>)
                           commandArguments.get("brandingInformation"));
             },
             () -> new DelegatedLaunchResponseCallback(),
@@ -11271,7 +11271,7 @@ public class ClusterInfoMapping {
         "target", targetNavigatornavigateTargetRequesttargetCommandParameterInfo);
 
     CommandParameterInfo targetNavigatornavigateTargetRequestdataCommandParameterInfo =
-        new CommandParameterInfo("data", String.class);
+        new CommandParameterInfo("data", Optional.class);
     targetNavigatornavigateTargetRequestCommandParams.put(
         "data", targetNavigatornavigateTargetRequestdataCommandParameterInfo);
 
@@ -11282,7 +11282,7 @@ public class ClusterInfoMapping {
                   .navigateTargetRequest(
                       (ChipClusters.TargetNavigatorCluster.NavigateTargetResponseCallback) callback,
                       (Integer) commandArguments.get("target"),
-                      (String) commandArguments.get("data"));
+                      (Optional<String>) commandArguments.get("data"));
             },
             () -> new DelegatedNavigateTargetResponseCallback(),
             targetNavigatornavigateTargetRequestCommandParams);

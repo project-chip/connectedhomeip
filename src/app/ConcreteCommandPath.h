@@ -18,8 +18,8 @@
 
 #pragma once
 
+#include <app/ConcreteClusterPath.h>
 #include <app/util/basic-types.h>
-#include <lib/core/Optional.h>
 
 namespace chip {
 namespace app {
@@ -27,20 +27,20 @@ namespace app {
 /**
  * A representation of a concrete invoke path.
  */
-struct ConcreteCommandPath
+struct ConcreteCommandPath : public ConcreteClusterPath
 {
     ConcreteCommandPath(EndpointId aEndpointId, ClusterId aClusterId, CommandId aCommandId) :
-        mEndpointId(aEndpointId), mClusterId(aClusterId), mCommandId(aCommandId)
+        ConcreteClusterPath(aEndpointId, aClusterId), mCommandId(aCommandId)
     {}
 
-    bool operator==(const ConcreteCommandPath & other) const
+    bool operator==(const ConcreteCommandPath & aOther) const
     {
-        return mEndpointId == other.mEndpointId && mClusterId == other.mClusterId && mCommandId == other.mCommandId;
+        return ConcreteClusterPath::operator==(aOther) && (mCommandId == aOther.mCommandId);
     }
 
-    EndpointId mEndpointId = 0;
-    ClusterId mClusterId   = 0;
-    CommandId mCommandId   = 0;
+    bool operator!=(const ConcreteCommandPath & aOther) const { return !(*this == aOther); }
+
+    CommandId mCommandId = 0;
 };
 } // namespace app
 } // namespace chip

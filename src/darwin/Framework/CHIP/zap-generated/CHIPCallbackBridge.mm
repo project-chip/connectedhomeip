@@ -1453,19 +1453,25 @@ void CHIPApplicationLauncherApplicationLauncherListListAttributeCallbackSubscrip
     }
 }
 
-void CHIPApplicationLauncherApplicationLauncherAppStructAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType & value)
+void CHIPApplicationLauncherApplicationLauncherAppStructAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType> & value)
 {
-    CHIPApplicationLauncherClusterApplicationEP * _Nonnull objCValue;
-    objCValue = [CHIPApplicationLauncherClusterApplicationEP new];
-    objCValue.application = [CHIPApplicationLauncherClusterApplication new];
-    objCValue.application.catalogVendorId = [NSNumber numberWithUnsignedShort:value.application.catalogVendorId];
-    objCValue.application.applicationId = [[NSString alloc] initWithBytes:value.application.applicationId.data()
-                                                                   length:value.application.applicationId.size()
-                                                                 encoding:NSUTF8StringEncoding];
-    objCValue.endpoint = [[NSString alloc] initWithBytes:value.endpoint.data()
-                                                  length:value.endpoint.size()
-                                                encoding:NSUTF8StringEncoding];
+    CHIPApplicationLauncherClusterApplicationEP * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [CHIPApplicationLauncherClusterApplicationEP new];
+        objCValue.application = [CHIPApplicationLauncherClusterApplication new];
+        objCValue.application.catalogVendorId = [NSNumber numberWithUnsignedShort:value.Value().application.catalogVendorId];
+        objCValue.application.applicationId = [[NSString alloc] initWithBytes:value.Value().application.applicationId.data()
+                                                                       length:value.Value().application.applicationId.size()
+                                                                     encoding:NSUTF8StringEncoding];
+        if (value.Value().endpoint.HasValue()) {
+            objCValue.endpoint = [NSNumber numberWithUnsignedShort:value.Value().endpoint.Value()];
+        } else {
+            objCValue.endpoint = nil;
+        }
+    }
     DispatchSuccess(context, objCValue);
 };
 
@@ -2709,15 +2715,27 @@ void CHIPChannelChannelListListAttributeCallbackBridge::OnSuccessFn(void * conte
         newElement_0 = [CHIPChannelClusterChannelInfo new];
         newElement_0.majorNumber = [NSNumber numberWithUnsignedShort:entry_0.majorNumber];
         newElement_0.minorNumber = [NSNumber numberWithUnsignedShort:entry_0.minorNumber];
-        newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
-                                                     length:entry_0.name.size()
-                                                   encoding:NSUTF8StringEncoding];
-        newElement_0.callSign = [[NSString alloc] initWithBytes:entry_0.callSign.data()
-                                                         length:entry_0.callSign.size()
+        if (entry_0.name.HasValue()) {
+            newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.Value().data()
+                                                         length:entry_0.name.Value().size()
                                                        encoding:NSUTF8StringEncoding];
-        newElement_0.affiliateCallSign = [[NSString alloc] initWithBytes:entry_0.affiliateCallSign.data()
-                                                                  length:entry_0.affiliateCallSign.size()
-                                                                encoding:NSUTF8StringEncoding];
+        } else {
+            newElement_0.name = nil;
+        }
+        if (entry_0.callSign.HasValue()) {
+            newElement_0.callSign = [[NSString alloc] initWithBytes:entry_0.callSign.Value().data()
+                                                             length:entry_0.callSign.Value().size()
+                                                           encoding:NSUTF8StringEncoding];
+        } else {
+            newElement_0.callSign = nil;
+        }
+        if (entry_0.affiliateCallSign.HasValue()) {
+            newElement_0.affiliateCallSign = [[NSString alloc] initWithBytes:entry_0.affiliateCallSign.Value().data()
+                                                                      length:entry_0.affiliateCallSign.Value().size()
+                                                                    encoding:NSUTF8StringEncoding];
+        } else {
+            newElement_0.affiliateCallSign = nil;
+        }
         [array_0 addObject:newElement_0];
     }
     { // Scope for the error so we will know what it's named
@@ -2748,20 +2766,32 @@ void CHIPChannelChannelListListAttributeCallbackSubscriptionBridge::OnSubscripti
 }
 
 void CHIPChannelChannelLineupStructAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType & value)
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType> & value)
 {
-    CHIPChannelClusterLineupInfo * _Nonnull objCValue;
-    objCValue = [CHIPChannelClusterLineupInfo new];
-    objCValue.operatorName = [[NSString alloc] initWithBytes:value.operatorName.data()
-                                                      length:value.operatorName.size()
-                                                    encoding:NSUTF8StringEncoding];
-    objCValue.lineupName = [[NSString alloc] initWithBytes:value.lineupName.data()
-                                                    length:value.lineupName.size()
-                                                  encoding:NSUTF8StringEncoding];
-    objCValue.postalCode = [[NSString alloc] initWithBytes:value.postalCode.data()
-                                                    length:value.postalCode.size()
-                                                  encoding:NSUTF8StringEncoding];
-    objCValue.lineupInfoType = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.lineupInfoType)];
+    CHIPChannelClusterLineupInfo * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [CHIPChannelClusterLineupInfo new];
+        objCValue.operatorName = [[NSString alloc] initWithBytes:value.Value().operatorName.data()
+                                                          length:value.Value().operatorName.size()
+                                                        encoding:NSUTF8StringEncoding];
+        if (value.Value().lineupName.HasValue()) {
+            objCValue.lineupName = [[NSString alloc] initWithBytes:value.Value().lineupName.Value().data()
+                                                            length:value.Value().lineupName.Value().size()
+                                                          encoding:NSUTF8StringEncoding];
+        } else {
+            objCValue.lineupName = nil;
+        }
+        if (value.Value().postalCode.HasValue()) {
+            objCValue.postalCode = [[NSString alloc] initWithBytes:value.Value().postalCode.Value().data()
+                                                            length:value.Value().postalCode.Value().size()
+                                                          encoding:NSUTF8StringEncoding];
+        } else {
+            objCValue.postalCode = nil;
+        }
+        objCValue.lineupInfoType = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value().lineupInfoType)];
+    }
     DispatchSuccess(context, objCValue);
 };
 
@@ -2782,19 +2812,37 @@ void CHIPChannelChannelLineupStructAttributeCallbackSubscriptionBridge::OnSubscr
 }
 
 void CHIPChannelCurrentChannelStructAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType & value)
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & value)
 {
-    CHIPChannelClusterChannelInfo * _Nonnull objCValue;
-    objCValue = [CHIPChannelClusterChannelInfo new];
-    objCValue.majorNumber = [NSNumber numberWithUnsignedShort:value.majorNumber];
-    objCValue.minorNumber = [NSNumber numberWithUnsignedShort:value.minorNumber];
-    objCValue.name = [[NSString alloc] initWithBytes:value.name.data() length:value.name.size() encoding:NSUTF8StringEncoding];
-    objCValue.callSign = [[NSString alloc] initWithBytes:value.callSign.data()
-                                                  length:value.callSign.size()
-                                                encoding:NSUTF8StringEncoding];
-    objCValue.affiliateCallSign = [[NSString alloc] initWithBytes:value.affiliateCallSign.data()
-                                                           length:value.affiliateCallSign.size()
-                                                         encoding:NSUTF8StringEncoding];
+    CHIPChannelClusterChannelInfo * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [CHIPChannelClusterChannelInfo new];
+        objCValue.majorNumber = [NSNumber numberWithUnsignedShort:value.Value().majorNumber];
+        objCValue.minorNumber = [NSNumber numberWithUnsignedShort:value.Value().minorNumber];
+        if (value.Value().name.HasValue()) {
+            objCValue.name = [[NSString alloc] initWithBytes:value.Value().name.Value().data()
+                                                      length:value.Value().name.Value().size()
+                                                    encoding:NSUTF8StringEncoding];
+        } else {
+            objCValue.name = nil;
+        }
+        if (value.Value().callSign.HasValue()) {
+            objCValue.callSign = [[NSString alloc] initWithBytes:value.Value().callSign.Value().data()
+                                                          length:value.Value().callSign.Value().size()
+                                                        encoding:NSUTF8StringEncoding];
+        } else {
+            objCValue.callSign = nil;
+        }
+        if (value.Value().affiliateCallSign.HasValue()) {
+            objCValue.affiliateCallSign = [[NSString alloc] initWithBytes:value.Value().affiliateCallSign.Value().data()
+                                                                   length:value.Value().affiliateCallSign.Value().size()
+                                                                 encoding:NSUTF8StringEncoding];
+        } else {
+            objCValue.affiliateCallSign = nil;
+        }
+    }
     DispatchSuccess(context, objCValue);
 };
 
@@ -5897,7 +5945,11 @@ void CHIPMediaPlaybackPositionStructAttributeCallbackBridge::OnSuccessFn(
     CHIPMediaPlaybackClusterPlaybackPosition * _Nonnull objCValue;
     objCValue = [CHIPMediaPlaybackClusterPlaybackPosition new];
     objCValue.updatedAt = [NSNumber numberWithUnsignedLongLong:value.updatedAt];
-    objCValue.position = [NSNumber numberWithUnsignedLongLong:value.position];
+    if (value.position.IsNull()) {
+        objCValue.position = nil;
+    } else {
+        objCValue.position = [NSNumber numberWithUnsignedLongLong:value.position.Value()];
+    }
     DispatchSuccess(context, objCValue);
 };
 
@@ -10000,15 +10052,28 @@ void CHIPChannelClusterChangeChannelResponseCallbackBridge::OnSuccessFn(
         response.channelMatch = [CHIPChannelClusterChannelInfo new];
         response.channelMatch.majorNumber = [NSNumber numberWithUnsignedShort:data.channelMatch.majorNumber];
         response.channelMatch.minorNumber = [NSNumber numberWithUnsignedShort:data.channelMatch.minorNumber];
-        response.channelMatch.name = [[NSString alloc] initWithBytes:data.channelMatch.name.data()
-                                                              length:data.channelMatch.name.size()
-                                                            encoding:NSUTF8StringEncoding];
-        response.channelMatch.callSign = [[NSString alloc] initWithBytes:data.channelMatch.callSign.data()
-                                                                  length:data.channelMatch.callSign.size()
+        if (data.channelMatch.name.HasValue()) {
+            response.channelMatch.name = [[NSString alloc] initWithBytes:data.channelMatch.name.Value().data()
+                                                                  length:data.channelMatch.name.Value().size()
                                                                 encoding:NSUTF8StringEncoding];
-        response.channelMatch.affiliateCallSign = [[NSString alloc] initWithBytes:data.channelMatch.affiliateCallSign.data()
-                                                                           length:data.channelMatch.affiliateCallSign.size()
-                                                                         encoding:NSUTF8StringEncoding];
+        } else {
+            response.channelMatch.name = nil;
+        }
+        if (data.channelMatch.callSign.HasValue()) {
+            response.channelMatch.callSign = [[NSString alloc] initWithBytes:data.channelMatch.callSign.Value().data()
+                                                                      length:data.channelMatch.callSign.Value().size()
+                                                                    encoding:NSUTF8StringEncoding];
+        } else {
+            response.channelMatch.callSign = nil;
+        }
+        if (data.channelMatch.affiliateCallSign.HasValue()) {
+            response.channelMatch.affiliateCallSign =
+                [[NSString alloc] initWithBytes:data.channelMatch.affiliateCallSign.Value().data()
+                                         length:data.channelMatch.affiliateCallSign.Value().size()
+                                       encoding:NSUTF8StringEncoding];
+        } else {
+            response.channelMatch.affiliateCallSign = nil;
+        }
     }
     {
         response.errorType = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.errorType)];
@@ -10024,7 +10089,13 @@ void CHIPContentLauncherClusterLaunchResponseCallbackBridge::OnSuccessFn(
         response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
     }
     {
-        response.data = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
+        if (data.data.HasValue()) {
+            response.data = [[NSString alloc] initWithBytes:data.data.Value().data()
+                                                     length:data.data.Value().size()
+                                                   encoding:NSUTF8StringEncoding];
+        } else {
+            response.data = nil;
+        }
     }
     DispatchSuccess(context, response);
 };
@@ -10887,7 +10958,13 @@ void CHIPTargetNavigatorClusterNavigateTargetResponseCallbackBridge::OnSuccessFn
         response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
     }
     {
-        response.data = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
+        if (data.data.HasValue()) {
+            response.data = [[NSString alloc] initWithBytes:data.data.Value().data()
+                                                     length:data.data.Value().size()
+                                                   encoding:NSUTF8StringEncoding];
+        } else {
+            response.data = nil;
+        }
     }
     DispatchSuccess(context, response);
 };

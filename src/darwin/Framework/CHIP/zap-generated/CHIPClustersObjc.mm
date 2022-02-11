@@ -1249,7 +1249,10 @@ using namespace chip::app::Clusters;
     ApplicationLauncher::Commands::LaunchAppRequest::Type request;
     request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
     request.application.applicationId = [self asCharSpan:params.application.applicationId];
-    request.data = [self asByteSpan:params.data];
+    if (params.data != nil) {
+        auto & definedValue_0 = request.data.Emplace();
+        definedValue_0 = [self asByteSpan:params.data];
+    }
 
     new CHIPApplicationLauncherClusterLauncherResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -1320,7 +1323,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeApplicationLauncherAppWithValue:(CHIPApplicationLauncherClusterApplicationEP * _Nonnull)value
+- (void)writeAttributeApplicationLauncherAppWithValue:(CHIPApplicationLauncherClusterApplicationEP * _Nullable)value
                                     completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -1332,9 +1335,17 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = ApplicationLauncher::Attributes::ApplicationLauncherApp::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue.application.catalogVendorId = value.application.catalogVendorId.unsignedShortValue;
-            cppValue.application.applicationId = [self asCharSpan:value.application.applicationId];
-            cppValue.endpoint = [self asCharSpan:value.endpoint];
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0.application.catalogVendorId = value.application.catalogVendorId.unsignedShortValue;
+                nonNullValue_0.application.applicationId = [self asCharSpan:value.application.applicationId];
+                if (value.endpoint != nil) {
+                    auto & definedValue_2 = nonNullValue_0.endpoint.Emplace();
+                    definedValue_2 = value.endpoint.unsignedShortValue;
+                }
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -4471,29 +4482,6 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeChannelLineupWithValue:(CHIPChannelClusterLineupInfo * _Nonnull)value
-                           completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = Channel::Attributes::ChannelLineup::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue.operatorName = [self asCharSpan:value.operatorName];
-            cppValue.lineupName = [self asCharSpan:value.lineupName];
-            cppValue.postalCode = [self asCharSpan:value.postalCode];
-            cppValue.lineupInfoType
-                = static_cast<std::remove_reference_t<decltype(cppValue.lineupInfoType)>>(value.lineupInfoType.unsignedCharValue);
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
 - (void)subscribeAttributeChannelLineupWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
@@ -4522,29 +4510,6 @@ using namespace chip::app::Clusters;
             auto successFn = Callback<ChannelCurrentChannelStructAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeCurrentChannelWithValue:(CHIPChannelClusterChannelInfo * _Nonnull)value
-                            completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = Channel::Attributes::CurrentChannel::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue.majorNumber = value.majorNumber.unsignedShortValue;
-            cppValue.minorNumber = value.minorNumber.unsignedShortValue;
-            cppValue.name = [self asCharSpan:value.name];
-            cppValue.callSign = [self asCharSpan:value.callSign];
-            cppValue.affiliateCallSign = [self asCharSpan:value.affiliateCallSign];
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -6994,78 +6959,61 @@ using namespace chip::app::Clusters;
 {
     ListFreer listFreer;
     ContentLauncher::Commands::LaunchContentRequest::Type request;
-    request.autoPlay = params.autoPlay.boolValue;
-    request.data = [self asCharSpan:params.data];
     {
-        using ListType_0 = std::remove_reference_t<decltype(request.search)>;
-        using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-        if (params.search.count != 0) {
-            auto * listHolder_0 = new ListHolder<ListMemberType_0>(params.search.count);
-            if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+        using ListType_1 = std::remove_reference_t<decltype(request.search.parameterList)>;
+        using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+        if (params.search.parameterList.count != 0) {
+            auto * listHolder_1 = new ListHolder<ListMemberType_1>(params.search.parameterList.count);
+            if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
                 return;
             }
-            listFreer.add(listHolder_0);
-            for (size_t i_0 = 0; i_0 < params.search.count; ++i_0) {
-                if (![params.search[i_0] isKindOfClass:[CHIPContentLauncherClusterContentSearch class]]) {
+            listFreer.add(listHolder_1);
+            for (size_t i_1 = 0; i_1 < params.search.parameterList.count; ++i_1) {
+                if (![params.search.parameterList[i_1] isKindOfClass:[CHIPContentLauncherClusterParameter class]]) {
                     // Wrong kind of value.
                     return;
                 }
-                auto element_0 = (CHIPContentLauncherClusterContentSearch *) params.search[i_0];
-                {
-                    using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].parameterList)>;
-                    using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
-                    if (element_0.parameterList.count != 0) {
-                        auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.parameterList.count);
-                        if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
-                            return;
-                        }
-                        listFreer.add(listHolder_2);
-                        for (size_t i_2 = 0; i_2 < element_0.parameterList.count; ++i_2) {
-                            if (![element_0.parameterList[i_2] isKindOfClass:[CHIPContentLauncherClusterParameter class]]) {
-                                // Wrong kind of value.
+                auto element_1 = (CHIPContentLauncherClusterParameter *) params.search.parameterList[i_1];
+                listHolder_1->mList[i_1].type = static_cast<std::remove_reference_t<decltype(listHolder_1->mList[i_1].type)>>(
+                    element_1.type.unsignedCharValue);
+                listHolder_1->mList[i_1].value = [self asCharSpan:element_1.value];
+                if (element_1.externalIDList != nil) {
+                    auto & definedValue_3 = listHolder_1->mList[i_1].externalIDList.Emplace();
+                    {
+                        using ListType_4 = std::remove_reference_t<decltype(definedValue_3)>;
+                        using ListMemberType_4 = ListMemberTypeGetter<ListType_4>::Type;
+                        if (element_1.externalIDList.count != 0) {
+                            auto * listHolder_4 = new ListHolder<ListMemberType_4>(element_1.externalIDList.count);
+                            if (listHolder_4 == nullptr || listHolder_4->mList == nullptr) {
                                 return;
                             }
-                            auto element_2 = (CHIPContentLauncherClusterParameter *) element_0.parameterList[i_2];
-                            listHolder_2->mList[i_2].type
-                                = static_cast<std::remove_reference_t<decltype(listHolder_2->mList[i_2].type)>>(
-                                    element_2.type.unsignedCharValue);
-                            listHolder_2->mList[i_2].value = [self asCharSpan:element_2.value];
-                            {
-                                using ListType_4 = std::remove_reference_t<decltype(listHolder_2->mList[i_2].externalIDList)>;
-                                using ListMemberType_4 = ListMemberTypeGetter<ListType_4>::Type;
-                                if (element_2.externalIDList.count != 0) {
-                                    auto * listHolder_4 = new ListHolder<ListMemberType_4>(element_2.externalIDList.count);
-                                    if (listHolder_4 == nullptr || listHolder_4->mList == nullptr) {
-                                        return;
-                                    }
-                                    listFreer.add(listHolder_4);
-                                    for (size_t i_4 = 0; i_4 < element_2.externalIDList.count; ++i_4) {
-                                        if (![element_2.externalIDList[i_4]
-                                                isKindOfClass:[CHIPContentLauncherClusterAdditionalInfo class]]) {
-                                            // Wrong kind of value.
-                                            return;
-                                        }
-                                        auto element_4 = (CHIPContentLauncherClusterAdditionalInfo *) element_2.externalIDList[i_4];
-                                        listHolder_4->mList[i_4].name = [self asCharSpan:element_4.name];
-                                        listHolder_4->mList[i_4].value = [self asCharSpan:element_4.value];
-                                    }
-                                    listHolder_2->mList[i_2].externalIDList
-                                        = ListType_4(listHolder_4->mList, element_2.externalIDList.count);
-                                } else {
-                                    listHolder_2->mList[i_2].externalIDList = ListType_4();
+                            listFreer.add(listHolder_4);
+                            for (size_t i_4 = 0; i_4 < element_1.externalIDList.count; ++i_4) {
+                                if (![element_1.externalIDList[i_4]
+                                        isKindOfClass:[CHIPContentLauncherClusterAdditionalInfo class]]) {
+                                    // Wrong kind of value.
+                                    return;
                                 }
+                                auto element_4 = (CHIPContentLauncherClusterAdditionalInfo *) element_1.externalIDList[i_4];
+                                listHolder_4->mList[i_4].name = [self asCharSpan:element_4.name];
+                                listHolder_4->mList[i_4].value = [self asCharSpan:element_4.value];
                             }
+                            definedValue_3 = ListType_4(listHolder_4->mList, element_1.externalIDList.count);
+                        } else {
+                            definedValue_3 = ListType_4();
                         }
-                        listHolder_0->mList[i_0].parameterList = ListType_2(listHolder_2->mList, element_0.parameterList.count);
-                    } else {
-                        listHolder_0->mList[i_0].parameterList = ListType_2();
                     }
                 }
             }
-            request.search = ListType_0(listHolder_0->mList, params.search.count);
+            request.search.parameterList = ListType_1(listHolder_1->mList, params.search.parameterList.count);
         } else {
-            request.search = ListType_0();
+            request.search.parameterList = ListType_1();
         }
+    }
+    request.autoPlay = params.autoPlay.boolValue;
+    if (params.data != nil) {
+        auto & definedValue_0 = request.data.Emplace();
+        definedValue_0 = [self asCharSpan:params.data];
     }
 
     new CHIPContentLauncherClusterLaunchResponseCallbackBridge(
@@ -7083,43 +7031,104 @@ using namespace chip::app::Clusters;
     ListFreer listFreer;
     ContentLauncher::Commands::LaunchURLRequest::Type request;
     request.contentURL = [self asCharSpan:params.contentURL];
-    request.displayString = [self asCharSpan:params.displayString];
-    request.brandingInformation.providerName = [self asCharSpan:params.brandingInformation.providerName];
-    request.brandingInformation.background.imageUrl = [self asCharSpan:params.brandingInformation.background.imageUrl];
-    request.brandingInformation.background.color = [self asCharSpan:params.brandingInformation.background.color];
-    request.brandingInformation.background.size.width = params.brandingInformation.background.size.width.doubleValue;
-    request.brandingInformation.background.size.height = params.brandingInformation.background.size.height.doubleValue;
-    request.brandingInformation.background.size.metric
-        = static_cast<std::remove_reference_t<decltype(request.brandingInformation.background.size.metric)>>(
-            params.brandingInformation.background.size.metric.unsignedCharValue);
-    request.brandingInformation.logo.imageUrl = [self asCharSpan:params.brandingInformation.logo.imageUrl];
-    request.brandingInformation.logo.color = [self asCharSpan:params.brandingInformation.logo.color];
-    request.brandingInformation.logo.size.width = params.brandingInformation.logo.size.width.doubleValue;
-    request.brandingInformation.logo.size.height = params.brandingInformation.logo.size.height.doubleValue;
-    request.brandingInformation.logo.size.metric
-        = static_cast<std::remove_reference_t<decltype(request.brandingInformation.logo.size.metric)>>(
-            params.brandingInformation.logo.size.metric.unsignedCharValue);
-    request.brandingInformation.progressBar.imageUrl = [self asCharSpan:params.brandingInformation.progressBar.imageUrl];
-    request.brandingInformation.progressBar.color = [self asCharSpan:params.brandingInformation.progressBar.color];
-    request.brandingInformation.progressBar.size.width = params.brandingInformation.progressBar.size.width.doubleValue;
-    request.brandingInformation.progressBar.size.height = params.brandingInformation.progressBar.size.height.doubleValue;
-    request.brandingInformation.progressBar.size.metric
-        = static_cast<std::remove_reference_t<decltype(request.brandingInformation.progressBar.size.metric)>>(
-            params.brandingInformation.progressBar.size.metric.unsignedCharValue);
-    request.brandingInformation.splash.imageUrl = [self asCharSpan:params.brandingInformation.splash.imageUrl];
-    request.brandingInformation.splash.color = [self asCharSpan:params.brandingInformation.splash.color];
-    request.brandingInformation.splash.size.width = params.brandingInformation.splash.size.width.doubleValue;
-    request.brandingInformation.splash.size.height = params.brandingInformation.splash.size.height.doubleValue;
-    request.brandingInformation.splash.size.metric
-        = static_cast<std::remove_reference_t<decltype(request.brandingInformation.splash.size.metric)>>(
-            params.brandingInformation.splash.size.metric.unsignedCharValue);
-    request.brandingInformation.waterMark.imageUrl = [self asCharSpan:params.brandingInformation.waterMark.imageUrl];
-    request.brandingInformation.waterMark.color = [self asCharSpan:params.brandingInformation.waterMark.color];
-    request.brandingInformation.waterMark.size.width = params.brandingInformation.waterMark.size.width.doubleValue;
-    request.brandingInformation.waterMark.size.height = params.brandingInformation.waterMark.size.height.doubleValue;
-    request.brandingInformation.waterMark.size.metric
-        = static_cast<std::remove_reference_t<decltype(request.brandingInformation.waterMark.size.metric)>>(
-            params.brandingInformation.waterMark.size.metric.unsignedCharValue);
+    if (params.displayString != nil) {
+        auto & definedValue_0 = request.displayString.Emplace();
+        definedValue_0 = [self asCharSpan:params.displayString];
+    }
+    if (params.brandingInformation != nil) {
+        auto & definedValue_0 = request.brandingInformation.Emplace();
+        definedValue_0.providerName = [self asCharSpan:params.brandingInformation.providerName];
+        if (params.brandingInformation.background != nil) {
+            auto & definedValue_2 = definedValue_0.background.Emplace();
+            if (params.brandingInformation.background.imageUrl != nil) {
+                auto & definedValue_4 = definedValue_2.imageUrl.Emplace();
+                definedValue_4 = [self asCharSpan:params.brandingInformation.background.imageUrl];
+            }
+            if (params.brandingInformation.background.color != nil) {
+                auto & definedValue_4 = definedValue_2.color.Emplace();
+                definedValue_4 = [self asCharSpan:params.brandingInformation.background.color];
+            }
+            if (params.brandingInformation.background.size != nil) {
+                auto & definedValue_4 = definedValue_2.size.Emplace();
+                definedValue_4.width = params.brandingInformation.background.size.width.doubleValue;
+                definedValue_4.height = params.brandingInformation.background.size.height.doubleValue;
+                definedValue_4.metric = static_cast<std::remove_reference_t<decltype(definedValue_4.metric)>>(
+                    params.brandingInformation.background.size.metric.unsignedCharValue);
+            }
+        }
+        if (params.brandingInformation.logo != nil) {
+            auto & definedValue_2 = definedValue_0.logo.Emplace();
+            if (params.brandingInformation.logo.imageUrl != nil) {
+                auto & definedValue_4 = definedValue_2.imageUrl.Emplace();
+                definedValue_4 = [self asCharSpan:params.brandingInformation.logo.imageUrl];
+            }
+            if (params.brandingInformation.logo.color != nil) {
+                auto & definedValue_4 = definedValue_2.color.Emplace();
+                definedValue_4 = [self asCharSpan:params.brandingInformation.logo.color];
+            }
+            if (params.brandingInformation.logo.size != nil) {
+                auto & definedValue_4 = definedValue_2.size.Emplace();
+                definedValue_4.width = params.brandingInformation.logo.size.width.doubleValue;
+                definedValue_4.height = params.brandingInformation.logo.size.height.doubleValue;
+                definedValue_4.metric = static_cast<std::remove_reference_t<decltype(definedValue_4.metric)>>(
+                    params.brandingInformation.logo.size.metric.unsignedCharValue);
+            }
+        }
+        if (params.brandingInformation.progressBar != nil) {
+            auto & definedValue_2 = definedValue_0.progressBar.Emplace();
+            if (params.brandingInformation.progressBar.imageUrl != nil) {
+                auto & definedValue_4 = definedValue_2.imageUrl.Emplace();
+                definedValue_4 = [self asCharSpan:params.brandingInformation.progressBar.imageUrl];
+            }
+            if (params.brandingInformation.progressBar.color != nil) {
+                auto & definedValue_4 = definedValue_2.color.Emplace();
+                definedValue_4 = [self asCharSpan:params.brandingInformation.progressBar.color];
+            }
+            if (params.brandingInformation.progressBar.size != nil) {
+                auto & definedValue_4 = definedValue_2.size.Emplace();
+                definedValue_4.width = params.brandingInformation.progressBar.size.width.doubleValue;
+                definedValue_4.height = params.brandingInformation.progressBar.size.height.doubleValue;
+                definedValue_4.metric = static_cast<std::remove_reference_t<decltype(definedValue_4.metric)>>(
+                    params.brandingInformation.progressBar.size.metric.unsignedCharValue);
+            }
+        }
+        if (params.brandingInformation.splash != nil) {
+            auto & definedValue_2 = definedValue_0.splash.Emplace();
+            if (params.brandingInformation.splash.imageUrl != nil) {
+                auto & definedValue_4 = definedValue_2.imageUrl.Emplace();
+                definedValue_4 = [self asCharSpan:params.brandingInformation.splash.imageUrl];
+            }
+            if (params.brandingInformation.splash.color != nil) {
+                auto & definedValue_4 = definedValue_2.color.Emplace();
+                definedValue_4 = [self asCharSpan:params.brandingInformation.splash.color];
+            }
+            if (params.brandingInformation.splash.size != nil) {
+                auto & definedValue_4 = definedValue_2.size.Emplace();
+                definedValue_4.width = params.brandingInformation.splash.size.width.doubleValue;
+                definedValue_4.height = params.brandingInformation.splash.size.height.doubleValue;
+                definedValue_4.metric = static_cast<std::remove_reference_t<decltype(definedValue_4.metric)>>(
+                    params.brandingInformation.splash.size.metric.unsignedCharValue);
+            }
+        }
+        if (params.brandingInformation.waterMark != nil) {
+            auto & definedValue_2 = definedValue_0.waterMark.Emplace();
+            if (params.brandingInformation.waterMark.imageUrl != nil) {
+                auto & definedValue_4 = definedValue_2.imageUrl.Emplace();
+                definedValue_4 = [self asCharSpan:params.brandingInformation.waterMark.imageUrl];
+            }
+            if (params.brandingInformation.waterMark.color != nil) {
+                auto & definedValue_4 = definedValue_2.color.Emplace();
+                definedValue_4 = [self asCharSpan:params.brandingInformation.waterMark.color];
+            }
+            if (params.brandingInformation.waterMark.size != nil) {
+                auto & definedValue_4 = definedValue_2.size.Emplace();
+                definedValue_4.width = params.brandingInformation.waterMark.size.width.doubleValue;
+                definedValue_4.height = params.brandingInformation.waterMark.size.height.doubleValue;
+                definedValue_4.metric = static_cast<std::remove_reference_t<decltype(definedValue_4.metric)>>(
+                    params.brandingInformation.waterMark.size.metric.unsignedCharValue);
+            }
+        }
+    }
 
     new CHIPContentLauncherClusterLaunchResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -14030,12 +14039,13 @@ using namespace chip::app::Clusters;
 - (void)readAttributeStartTimeWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
 {
-    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-        using TypeInfo = MediaPlayback::Attributes::StartTime::TypeInfo;
-        auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
+    new CHIPNullableInt64uAttributeCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = MediaPlayback::Attributes::StartTime::TypeInfo;
+            auto successFn = Callback<NullableInt64uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
 }
 
 - (void)subscribeAttributeStartTimeWithMinInterval:(uint16_t)minInterval
@@ -14043,14 +14053,14 @@ using namespace chip::app::Clusters;
                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    new CHIPInt64uAttributeCallbackSubscriptionBridge(
+    new CHIPNullableInt64uAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
         ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = MediaPlayback::Attributes::StartTime::TypeInfo;
-            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<NullableInt64uAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-                minInterval, maxInterval, CHIPInt64uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+                minInterval, maxInterval, CHIPNullableInt64uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
         },
         subscriptionEstablishedHandler);
 }
@@ -14058,12 +14068,13 @@ using namespace chip::app::Clusters;
 - (void)readAttributeDurationWithCompletionHandler:(void (^)(
                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
 {
-    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-        using TypeInfo = MediaPlayback::Attributes::Duration::TypeInfo;
-        auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
+    new CHIPNullableInt64uAttributeCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = MediaPlayback::Attributes::Duration::TypeInfo;
+            auto successFn = Callback<NullableInt64uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
 }
 
 - (void)subscribeAttributeDurationWithMinInterval:(uint16_t)minInterval
@@ -14071,14 +14082,14 @@ using namespace chip::app::Clusters;
                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    new CHIPInt64uAttributeCallbackSubscriptionBridge(
+    new CHIPNullableInt64uAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
         ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = MediaPlayback::Attributes::Duration::TypeInfo;
-            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<NullableInt64uAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-                minInterval, maxInterval, CHIPInt64uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+                minInterval, maxInterval, CHIPNullableInt64uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
         },
         subscriptionEstablishedHandler);
 }
@@ -14092,26 +14103,6 @@ using namespace chip::app::Clusters;
             auto successFn = Callback<MediaPlaybackPositionStructAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributePositionWithValue:(CHIPMediaPlaybackClusterPlaybackPosition * _Nonnull)value
-                      completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = MediaPlayback::Attributes::Position::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue.updatedAt = value.updatedAt.unsignedLongLongValue;
-            cppValue.position = value.position.unsignedLongLongValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14166,12 +14157,13 @@ using namespace chip::app::Clusters;
 - (void)readAttributeSeekRangeEndWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
 {
-    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-        using TypeInfo = MediaPlayback::Attributes::SeekRangeEnd::TypeInfo;
-        auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
+    new CHIPNullableInt64uAttributeCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = MediaPlayback::Attributes::SeekRangeEnd::TypeInfo;
+            auto successFn = Callback<NullableInt64uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
 }
 
 - (void)subscribeAttributeSeekRangeEndWithMinInterval:(uint16_t)minInterval
@@ -14179,14 +14171,14 @@ using namespace chip::app::Clusters;
                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    new CHIPInt64uAttributeCallbackSubscriptionBridge(
+    new CHIPNullableInt64uAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
         ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = MediaPlayback::Attributes::SeekRangeEnd::TypeInfo;
-            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<NullableInt64uAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-                minInterval, maxInterval, CHIPInt64uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+                minInterval, maxInterval, CHIPNullableInt64uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
         },
         subscriptionEstablishedHandler);
 }
@@ -14194,12 +14186,13 @@ using namespace chip::app::Clusters;
 - (void)readAttributeSeekRangeStartWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler
 {
-    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-        using TypeInfo = MediaPlayback::Attributes::SeekRangeStart::TypeInfo;
-        auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
+    new CHIPNullableInt64uAttributeCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = MediaPlayback::Attributes::SeekRangeStart::TypeInfo;
+            auto successFn = Callback<NullableInt64uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
 }
 
 - (void)subscribeAttributeSeekRangeStartWithMinInterval:(uint16_t)minInterval
@@ -14208,14 +14201,14 @@ using namespace chip::app::Clusters;
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    new CHIPInt64uAttributeCallbackSubscriptionBridge(
+    new CHIPNullableInt64uAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
         ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = MediaPlayback::Attributes::SeekRangeStart::TypeInfo;
-            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<NullableInt64uAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-                minInterval, maxInterval, CHIPInt64uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+                minInterval, maxInterval, CHIPNullableInt64uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
         },
         subscriptionEstablishedHandler);
 }
@@ -19857,7 +19850,10 @@ using namespace chip::app::Clusters;
     ListFreer listFreer;
     TargetNavigator::Commands::NavigateTargetRequest::Type request;
     request.target = params.target.unsignedCharValue;
-    request.data = [self asCharSpan:params.data];
+    if (params.data != nil) {
+        auto & definedValue_0 = request.data.Emplace();
+        definedValue_0 = [self asCharSpan:params.data];
+    }
 
     new CHIPTargetNavigatorClusterNavigateTargetResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -23105,6 +23101,45 @@ using namespace chip::app::Clusters;
             auto successFn = Callback<TestClusterListLongOctetStringListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeListLongOctetStringWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = TestCluster::Attributes::ListLongOctetString::TypeInfo;
+            TypeInfo::Type cppValue;
+            {
+                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
+                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+                if (value.count != 0) {
+                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
+                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_0);
+                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
+                        if (![value[i_0] isKindOfClass:[NSData class]]) {
+                            // Wrong kind of value.
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        auto element_0 = (NSData *) value[i_0];
+                        listHolder_0->mList[i_0] = [self asByteSpan:element_0];
+                    }
+                    cppValue = ListType_0(listHolder_0->mList, value.count);
+                } else {
+                    cppValue = ListType_0();
+                }
+            }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 

@@ -3314,7 +3314,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _target = @(0);
 
-        _data = @"";
+        _data = nil;
     }
     return self;
 }
@@ -3327,7 +3327,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _data = @"";
+        _data = nil;
     }
     return self;
 }
@@ -3428,11 +3428,11 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
+        _search = [CHIPContentLauncherClusterContentSearch new];
+
         _autoPlay = @(0);
 
-        _data = @"";
-
-        _search = [NSArray array];
+        _data = nil;
     }
     return self;
 }
@@ -3445,9 +3445,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _contentURL = @"";
 
-        _displayString = @"";
+        _displayString = nil;
 
-        _brandingInformation = [CHIPContentLauncherClusterBrandingInformation new];
+        _brandingInformation = nil;
     }
     return self;
 }
@@ -3460,7 +3460,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _data = @"";
+        _data = nil;
     }
     return self;
 }
@@ -3497,7 +3497,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _application = [CHIPApplicationLauncherClusterApplication new];
 
-        _data = [NSData data];
+        _data = nil;
     }
     return self;
 }
