@@ -275,8 +275,8 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "        Value for the SoftwareVersionString field in the QueryImageResponse\n"
                              "        -o/--otaImageList overrides this option\n"
                              "  -c/--UserConsentNeeded\n"
-                             "        If provided, and value of RequestorCanConsent in QueryImageCommand is true,\n"
-                             "        then value of UserConsentNeeded in the QueryImageResponse is set to true.\n"
+                             "        If provided, and value of RequestorCanConsent field in QueryImageCommand is true,\n"
+                             "        then value of UserConsentNeeded field in the QueryImageResponse is set to true.\n"
                              "        Else, value of UserConsentNeeded is false.\n" };
 
 OptionSet * allOptions[] = { &cmdLineOptions, nullptr };
