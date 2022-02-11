@@ -53,8 +53,8 @@ struct NetworkInterface : public app::Clusters::GeneralDiagnostics::Structs::Net
     uint8_t MacAddress[kMaxHardwareAddrSize];
     uint8_t Ipv4AddressesBuffer[kMaxIPv4AddrCount][kMaxIPv4AddrSize];
     uint8_t Ipv6AddressesBuffer[kMaxIPv6AddrCount][kMaxIPv6AddrSize];
-    chip::ByteSpan Ipv4Addresses[kMaxIPv4AddrCount];
-    chip::ByteSpan Ipv6Addresses[kMaxIPv6AddrCount];
+    chip::ByteSpan Ipv4AddressSpans[kMaxIPv4AddrCount];
+    chip::ByteSpan Ipv6AddressSpans[kMaxIPv6AddrCount];
     NetworkInterface * Next; /* Pointer to the next structure.  */
 };
 

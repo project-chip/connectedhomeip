@@ -73,8 +73,8 @@ limitations under the License.
     <item name="OffPremiseServicesReachableIPv6" type="BOOLEAN" isNullable="true"/>
     <!-- TODO(#14075): HWADR not supported yet -->
     <item name="HardwareAddress" type="OCTET_STRING" length="8"/>
-    <item name="IPv4Addresses" type="OCTET_STRING" array="true" length="4"/>
-    <item name="IPv6Addresses" type="OCTET_STRING" array="true" length="8"/>
+    <item name="IPv4Addresses" type="OCTET_STRING" array="true"/>
+    <item name="IPv6Addresses" type="OCTET_STRING" array="true"/>
     <item name="Type" type="InterfaceType"/>
   </struct>
   <cluster>
@@ -88,9 +88,9 @@ limitations under the License.
     <attribute side="server" code="0x02" define="UPTIME" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">UpTime</attribute>
     <attribute side="server" code="0x03" define="TOTAL_OPERATIONAL_HOURS" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x00000000" optional="true">TotalOperationalHours</attribute>
     <attribute side="server" code="0x04" define="BOOT_REASONS" type="ENUM8" writable="false" optional="true">BootReasons</attribute>
-    <attribute side="server" code="0x05" define="ACTIVE_HARDWARE_FAULTS" type="ARRAY" entryType="ENUM8" length="11" writable="false" optional="true">ActiveHardwareFaults</attribute>
-    <attribute side="server" code="0x06" define="ACTIVE_RADIO_FAULTS" type="ARRAY" entryType="ENUM8" length="7" writable="false" optional="true">ActiveRadioFaults</attribute>
-    <attribute side="server" code="0x07" define="ACTIVE_NETWORK_FAULTS" type="ARRAY" entryType="ENUM8" length="4" writable="false" optional="true">ActiveNetworkFaults</attribute>
+    <attribute side="server" code="0x05" define="ACTIVE_HARDWARE_FAULTS" type="ARRAY" entryType="ENUM8" writable="false" optional="true">ActiveHardwareFaults</attribute>
+    <attribute side="server" code="0x06" define="ACTIVE_RADIO_FAULTS" type="ARRAY" entryType="ENUM8" writable="false" optional="true">ActiveRadioFaults</attribute>
+    <attribute side="server" code="0x07" define="ACTIVE_NETWORK_FAULTS" type="ARRAY" entryType="ENUM8" writable="false" optional="true">ActiveNetworkFaults</attribute>
     <event side="server" code="0x00" name="HardwareFaultChange" priority="critical" optional="true">
       <description>Indicate a change in the set of hardware faults currently detected by the Node.</description>
       <field id="0" name="Current" type="HardwareFaultType" array="true"/>

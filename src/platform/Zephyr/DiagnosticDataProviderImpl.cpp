@@ -223,7 +223,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
                 if (interfaceAddressIterator.GetAddress(ipv6Address) == CHIP_NO_ERROR)
                 {
                     memcpy(ifp->Ipv6AddressesBuffer[ipv6AddressesCount], ipv6Address.Addr, kMaxIPv6AddrSize);
-                    ifp->Ipv6Addresses[ipv6AddressesCount] =
+                    ifp->Ipv6AddressSpans[ipv6AddressesCount] =
                         ByteSpan(ifp->Ipv6AddressesBuffer[ipv6AddressesCount], kMaxIPv6AddrSize);
                     ipv6AddressesCount++;
                 }
@@ -231,7 +231,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             interfaceAddressIterator.Next();
         }
 
-        ifp->IPv6Addresses = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv6Addresses, ipv6AddressesCount);
+        ifp->IPv6Addresses = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv6AddressSpans, ipv6AddressesCount);
         head               = ifp;
     }
 
