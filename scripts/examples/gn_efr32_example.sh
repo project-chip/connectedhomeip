@@ -124,7 +124,7 @@ else
                 if [ "$1" =~ *"use_rs911x=true"* ] || [ "$1" =~ *"use_wf200=true"* ]; then
                     USE_WIFI=true
                 fi
-                
+
                 optArgs+=$1" "
                 shift
                 ;;
