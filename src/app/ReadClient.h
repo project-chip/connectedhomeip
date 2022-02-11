@@ -110,14 +110,11 @@ public:
          * receives an OnDone call to destroy the object.
          *
          * @param[in] aPath        The attribute path field in report response.
-         * @param[in] aVersion     The data version for cluster in report response.
          * @param[in] apData       The attribute data of the given path, will be a nullptr if status is not Success.
          * @param[in] aStatus      Attribute-specific status, containing an InteractionModel::Status code as well as an
          *                         optional cluster-specific status code.
          */
-        virtual void OnAttributeData(const ConcreteDataAttributePath & aPath, DataVersion aVersion, TLV::TLVReader * apData,
-                                     const StatusIB & aStatus)
-        {}
+        virtual void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) {}
 
         /**
          * OnSubscriptionEstablished will be called when a subscription is established for the given subscription transaction.
@@ -250,13 +247,13 @@ public:
     // used.
     //
     // The application has to know to
-    // a) allocate a ReadPrepareParams object that will have fields mpEventPathParamsList and mpAttributePathParamsList with
-    // lifetimes as long as the ReadClient itself and b) free those up later in the call to OnDeallocatePaths. Note: At a given
-    // time in the system, you can either have a single subscription with re-sub enabled that that has mKeepSubscriptions = false,
-    // OR, multiple subs with re-sub enabled with mKeepSubscriptions = true. You shall not have a mix of both simultaneously.
-    // If SendAutoResubscribeRequest is called at all, it guarantees that it will call OnDeallocatePaths when OnDone is called.
-    // SendAutoResubscribeRequest is the only case that calls OnDeallocatePaths, since that's the only case when the consumer moved
-    // a ReadParams into the client.
+    // a) allocate a ReadPrepareParams object that will have fields mpEventPathParamsList and mpAttributePathParamsList and
+    // mpDataVersionFilterList with lifetimes as long as the ReadClient itself and b) free those up later in the call to
+    // OnDeallocatePaths. Note: At a given time in the system, you can either have a single subscription with re-sub enabled that
+    // that has mKeepSubscriptions = false, OR, multiple subs with re-sub enabled with mKeepSubscriptions = true. You shall not have
+    // a mix of both simultaneously. If SendAutoResubscribeRequest is called at all, it guarantees that it will call
+    // OnDeallocatePaths when OnDone is called. SendAutoResubscribeRequest is the only case that calls OnDeallocatePaths, since
+    // that's the only case when the consumer moved a ReadParams into the client.
     CHIP_ERROR SendAutoResubscribeRequest(ReadPrepareParams && aReadPrepareParams);
 
 private:
@@ -293,6 +290,8 @@ private:
                                   size_t aEventPathParamsListSize);
     CHIP_ERROR GenerateAttributePathList(AttributePathIBs::Builder & aAttributePathIBsBuilder,
                                          AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize);
+    CHIP_ERROR GenerateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
+                                             DataVersionFilter * apDataVersionFilterList, size_t aDataVersionFilterListSize);
     CHIP_ERROR ProcessAttributeReportIBs(TLV::TLVReader & aAttributeDataIBsReader);
     CHIP_ERROR ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsReader);
 
@@ -310,7 +309,7 @@ private:
     // Specialized request-sending functions.
     CHIP_ERROR SendReadRequest(ReadPrepareParams & aReadPrepareParams);
     CHIP_ERROR SendSubscribeRequest(ReadPrepareParams & aSubscribePrepareParams);
-
+    void UpdateDataVersionFilters(const ConcreteDataAttributePath & aPath);
     static void OnResubscribeTimerCallback(System::Layer * apSystemLayer, void * apAppState);
 
     /*

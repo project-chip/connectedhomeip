@@ -52,7 +52,7 @@ struct ReportCallback : public app::ReadClient::Callback
 
     void OnReportEnd() override;
 
-    void OnAttributeData(const app::ConcreteDataAttributePath & aPath, DataVersion aVersion, TLV::TLVReader * apData,
+    void OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                          const app::StatusIB & aStatus) override;
 
     void OnError(CHIP_ERROR aError) override;

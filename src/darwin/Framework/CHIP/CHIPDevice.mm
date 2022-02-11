@@ -96,8 +96,7 @@ private:
 
     void OnReportEnd() override;
 
-    void OnAttributeData(
-        const ConcreteDataAttributePath & aPath, DataVersion aVersion, TLV::TLVReader * apData, const StatusIB & aStatus) override;
+    void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
 
     void OnError(CHIP_ERROR aError) override;
 
@@ -215,7 +214,7 @@ void SubscriptionCallback::OnReportEnd()
 }
 
 void SubscriptionCallback::OnAttributeData(
-    const ConcreteDataAttributePath & aPath, DataVersion aVersion, TLV::TLVReader * apData, const StatusIB & aStatus)
+    const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus)
 {
     if (aPath.IsListItemOperation()) {
         ReportError(CHIP_ERROR_INCORRECT_STATE);

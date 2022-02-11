@@ -581,7 +581,7 @@ class ChipDeviceController():
         typing.Tuple[int, typing.Type[ClusterObjects.Cluster]],
         # Concrete path
         typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]]
-    ]], returnClusterObject: bool = False, reportInterval: typing.Tuple[int, int] = None, fabricFiltered: bool = True):
+    ]], dataVersionFilters: typing.List[typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int]] = None, returnClusterObject: bool = False, reportInterval: typing.Tuple[int, int] = None, fabricFiltered: bool = True):
         '''
         Read a list of attributes from a target node
 
@@ -614,6 +614,7 @@ class ChipDeviceController():
 
         device = self.GetConnectedDeviceSync(nodeid)
         attrs = []
+        filters = []
         for v in attributes:
             endpoint = None
             cluster = None
@@ -641,8 +642,24 @@ class ChipDeviceController():
                     raise ValueError("Unsupported Attribute Path")
             attrs.append(ClusterAttribute.AttributePath(
                 EndpointId=endpoint, Cluster=cluster, Attribute=attribute))
+        if dataVersionFilters != None:
+            for v in dataVersionFilters:
+                endpoint = None
+                cluster = None
+
+                # endpoint + (cluster) attribute / endpoint + cluster
+                endpoint = v[0]
+                if issubclass(v[1], ClusterObjects.Cluster):
+                    cluster = v[1]
+                else:
+                    raise ValueError("Unsupported Cluster Path")
+                dataVersion = v[2]
+                filters.append(ClusterAttribute.DataVersionFilter(
+                    EndpointId=endpoint, Cluster=cluster, DataVersion=dataVersion))
+            else:
+                filters = None
         res = self._ChipStack.Call(
-            lambda: ClusterAttribute.ReadAttributes(future, eventLoop, device, self, attrs, returnClusterObject, ClusterAttribute.SubscriptionParameters(reportInterval[0], reportInterval[1]) if reportInterval else None, fabricFiltered=fabricFiltered))
+            lambda: ClusterAttribute.ReadAttributes(future, eventLoop, device, self, attrs, filters, returnClusterObject, ClusterAttribute.SubscriptionParameters(reportInterval[0], reportInterval[1]) if reportInterval else None, fabricFiltered=fabricFiltered))
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
         return await future
@@ -755,7 +772,7 @@ class ChipDeviceController():
             nodeid, [(endpoint, attributeType)]))
         path = ClusterAttribute.AttributePath(
             EndpointId=endpoint, Attribute=attributeType)
-        return im.AttributeReadResult(path=im.AttributePath(nodeId=nodeid, endpointId=path.EndpointId, clusterId=path.ClusterId, attributeId=path.AttributeId), status=0, value=result[endpoint][clusterType][attributeType])
+        return im.AttributeReadResult(path=im.AttributePath(nodeId=nodeid, endpointId=path.EndpointId, clusterId=path.ClusterId, attributeId=path.AttributeId), status=0, value=result[0][endpoint][clusterType][attributeType])
 
     def ZCLWriteAttribute(self, cluster: str, attribute: str, nodeid, endpoint, groupid, value, blocking=True):
         req = None
@@ -775,7 +792,7 @@ class ChipDeviceController():
             req = eval(f"GeneratedObjects.{cluster}.Attributes.{attribute}")
         except:
             raise UnknownAttribute(cluster, attribute)
-        return asyncio.run(self.ReadAttribute(nodeid, [(endpoint, req)], False, reportInterval=(minInterval, maxInterval)))
+        return asyncio.run(self.ReadAttribute(nodeid, [(endpoint, req)], None, False, reportInterval=(minInterval, maxInterval)))
 
     def ZCLCommandList(self):
         self.CheckIsActive()

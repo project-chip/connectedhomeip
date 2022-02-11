@@ -187,15 +187,16 @@ public:
      */
     template <typename AttributeInfo>
     CHIP_ERROR ReadAttribute(void * context, ReadResponseSuccessCallback<typename AttributeInfo::DecodableArgType> successCb,
-                             ReadResponseFailureCallback failureCb)
+                             ReadResponseFailureCallback failureCb, const Optional<DataVersion> & aDataVersion = NullOptional)
     {
         return ReadAttribute<typename AttributeInfo::DecodableType, typename AttributeInfo::DecodableArgType>(
-            context, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), successCb, failureCb);
+            context, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), successCb, failureCb, aDataVersion);
     }
 
     template <typename DecodableType, typename DecodableArgType>
     CHIP_ERROR ReadAttribute(void * context, ClusterId clusterId, AttributeId attributeId,
-                             ReadResponseSuccessCallback<DecodableArgType> successCb, ReadResponseFailureCallback failureCb)
+                             ReadResponseSuccessCallback<DecodableArgType> successCb, ReadResponseFailureCallback failureCb,
+                             const Optional<DataVersion> & aDataVersion = NullOptional)
     {
         VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -214,7 +215,8 @@ public:
         };
 
         return Controller::ReadAttribute<DecodableType>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(),
-                                                        mEndpoint, clusterId, attributeId, onSuccessCb, onFailureCb);
+                                                        mEndpoint, clusterId, attributeId, onSuccessCb, onFailureCb, true,
+                                                        aDataVersion);
     }
 
     /**
@@ -225,18 +227,20 @@ public:
     CHIP_ERROR SubscribeAttribute(void * context, ReadResponseSuccessCallback<typename AttributeInfo::DecodableArgType> reportCb,
                                   ReadResponseFailureCallback failureCb, uint16_t minIntervalFloorSeconds,
                                   uint16_t maxIntervalCeilingSeconds,
-                                  SubscriptionEstablishedCallback subscriptionEstablishedCb = nullptr)
+                                  SubscriptionEstablishedCallback subscriptionEstablishedCb = nullptr,
+                                  const Optional<DataVersion> & aDataVersion                = NullOptional)
     {
         return SubscribeAttribute<typename AttributeInfo::DecodableType, typename AttributeInfo::DecodableArgType>(
             context, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), reportCb, failureCb, minIntervalFloorSeconds,
-            maxIntervalCeilingSeconds, subscriptionEstablishedCb);
+            maxIntervalCeilingSeconds, subscriptionEstablishedCb, aDataVersion);
     }
 
     template <typename DecodableType, typename DecodableArgType>
     CHIP_ERROR SubscribeAttribute(void * context, ClusterId clusterId, AttributeId attributeId,
                                   ReadResponseSuccessCallback<DecodableArgType> reportCb, ReadResponseFailureCallback failureCb,
                                   uint16_t minIntervalFloorSeconds, uint16_t maxIntervalCeilingSeconds,
-                                  SubscriptionEstablishedCallback subscriptionEstablishedCb = nullptr)
+                                  SubscriptionEstablishedCallback subscriptionEstablishedCb = nullptr,
+                                  const Optional<DataVersion> & aDataVersion                = NullOptional)
     {
         VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -261,9 +265,10 @@ public:
             }
         };
 
-        return Controller::SubscribeAttribute<DecodableType>(
-            mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint, clusterId, attributeId, onReportCb,
-            onFailureCb, minIntervalFloorSeconds, maxIntervalCeilingSeconds, onSubscriptionEstablishedCb);
+        return Controller::SubscribeAttribute<DecodableType>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(),
+                                                             mEndpoint, clusterId, attributeId, onReportCb, onFailureCb,
+                                                             minIntervalFloorSeconds, maxIntervalCeilingSeconds,
+                                                             onSubscriptionEstablishedCb, true, false, aDataVersion);
     }
 
     /**
