@@ -709,7 +709,7 @@ void SessionManager::ExpiryTimerCallback(System::Layer * layer, void * param)
 {
     SessionManager * mgr = reinterpret_cast<SessionManager *>(param);
 #if CHIP_CONFIG_SESSION_REKEYING
-    // TODO(#2279): session expiration is currently disabled until rekeying is supported
+    // TODO(#14217): session expiration is currently disabled until rekeying is supported
     // the #ifdef should be removed after that.
     mgr->mSecureSessions.ExpireInactiveSessions(System::SystemClock().GetMonotonicTimestamp(),
                                                 System::Clock::Milliseconds32(CHIP_PEER_CONNECTION_TIMEOUT_MS));
