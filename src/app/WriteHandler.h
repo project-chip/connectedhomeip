@@ -124,8 +124,8 @@ private:
     Protocols::InteractionModel::Status HandleWriteRequestMessage(Messaging::ExchangeContext * apExchangeContext,
                                                                   System::PacketBufferHandle && aPayload, bool aIsTimedWrite);
 
-    CHIP_ERROR FinalizeMessage(System::PacketBufferHandle & packet);
-    CHIP_ERROR SendWriteResponse();
+    CHIP_ERROR FinalizeMessage(System::PacketBufferTLVWriter && aMessageWriter, System::PacketBufferHandle & packet);
+    CHIP_ERROR SendWriteResponse(System::PacketBufferTLVWriter && aMessageWriter);
 
     void MoveToState(const State aTargetState);
     void ClearState();
@@ -143,7 +143,6 @@ private: // ExchangeDelegate
 private:
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     WriteResponseMessage::Builder mWriteResponseBuilder;
-    System::PacketBufferTLVWriter mMessageWriter;
     State mState                                  = State::Uninitialized;
     bool mIsTimedRequest                          = false;
     bool mHasMoreChunks                           = false;
