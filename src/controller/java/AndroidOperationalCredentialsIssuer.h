@@ -38,8 +38,6 @@
 
 #include <jni.h>
 
-//#define CONFIG_SUPPORT_ANDROID_ICAC
-
 namespace chip {
 namespace Controller {
 
