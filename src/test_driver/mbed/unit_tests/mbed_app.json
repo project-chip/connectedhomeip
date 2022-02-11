@@ -35,10 +35,10 @@
             "value": "\"0.1.0\""
         },
         "vendor-id": {
-            "value": "9050"
+            "value": "0xFFF1"
         },
         "product-id": {
-            "value": "100"
+            "value": "0x8001"
         }
     }
 }

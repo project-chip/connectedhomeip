@@ -64,10 +64,8 @@ target_sources(${APP_TARGET} PRIVATE
 )
 
 chip_configure_data_model(${APP_TARGET}
-    INCLUDE_CLIENT_CALLBACKS
     INCLUDE_SERVER
     ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../lock-common/lock-app.zap
-    GEN_DIR ${GEN_DIR}/lock-app/zap-generated
 )
 
 target_link_libraries(${APP_TARGET} mbed-os-posix-socket mbed-os mbed-ble mbed-events mbed-netsocket mbed-storage mbed-storage-kv-global-api mbed-mbedtls mbed-emac chip)
