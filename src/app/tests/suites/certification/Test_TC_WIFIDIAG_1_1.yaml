@@ -15,6 +15,7 @@
 name: 54.1.1. [TC-WIFIDIAG-1.1] Attributes with server as DUT
 
 config:
+    nodeId: 0x12344321
     cluster: "WiFi Network Diagnostics"
     endpoint: 0
 
@@ -22,6 +23,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Reads NetworkInterface structure attribute from DUT"
       cluster: "General Diagnostics"

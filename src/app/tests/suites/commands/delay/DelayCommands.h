@@ -31,7 +31,7 @@ public:
     virtual CHIP_ERROR ContinueOnChipMainThread() = 0;
     virtual void OnWaitForMs()                    = 0;
 
-    virtual CHIP_ERROR WaitForCommissionee() { return CHIP_ERROR_NOT_IMPLEMENTED; };
+    virtual CHIP_ERROR WaitForCommissionee(chip::NodeId nodeId) { return CHIP_ERROR_NOT_IMPLEMENTED; };
     virtual CHIP_ERROR WaitForCommissioning() { return CHIP_ERROR_NOT_IMPLEMENTED; };
     CHIP_ERROR WaitForMs(uint16_t ms);
     CHIP_ERROR WaitForCommissionableAdvertisement();

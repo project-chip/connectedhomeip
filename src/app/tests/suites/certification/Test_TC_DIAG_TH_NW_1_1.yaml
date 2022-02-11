@@ -15,6 +15,7 @@
 name: 51.1. TC-DIAG-TH_NW-1.1 ResetCounts Command[DUT Server]
 
 config:
+    nodeId: 0x12344321
     cluster: "Thread Network Diagnostics"
     endpoint: 0
 
@@ -22,6 +23,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Sends ResetCounts command"
       command: "ResetCounts"

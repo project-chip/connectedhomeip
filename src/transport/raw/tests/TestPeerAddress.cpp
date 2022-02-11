@@ -101,39 +101,9 @@ void TestToString(nlTestSuite * inSuite, void * inContext)
 
         PeerAddress udp = PeerAddress(Transport::Type::kUdp);
         udp.SetPort(5840);
-
-        IPAddress::FromString("::1", ip);
-        udp.AppendDestination(ip, InterfaceId::Null());
-        IPAddress::FromString("1223::3456:789a", ip);
-        udp.AppendDestination(ip, InterfaceId::Null());
-
         udp.ToString(buff);
-        NL_TEST_ASSERT(inSuite, !strcmp(buff, "UDP:[::1]:5840 (+1 more)"));
+        NL_TEST_ASSERT(inSuite, !strcmp(buff, "UDP:[::]:5840"));
     }
-
-    {
-
-        PeerAddress udp = PeerAddress(Transport::Type::kUdp);
-        udp.SetPort(5840);
-        udp.ToString(buff);
-        NL_TEST_ASSERT(inSuite, !strcmp(buff, "UDP:NONE:5840"));
-    }
-}
-
-void TestAppendDestinationLimit(nlTestSuite * inSuite, void * inContext)
-{
-    IPAddress ip;
-    IPAddress::FromString("::1", ip);
-
-    PeerAddress udp = PeerAddress(Transport::Type::kUdp);
-    udp.SetPort(123);
-
-    for (unsigned i = 0; i < PeerAddress::kMaxPeerDestinations; i++)
-    {
-        NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == udp.AppendDestination(ip, InterfaceId::Null()));
-    }
-
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR != udp.AppendDestination(ip, InterfaceId::Null()));
 }
 
 /**
@@ -145,7 +115,6 @@ const nlTest sTests[] =
 {
     NL_TEST_DEF("PeerAddress Multicast", TestPeerAddressMulticast),
     NL_TEST_DEF("ToString", TestToString),
-    NL_TEST_DEF("AppendDestination", TestAppendDestinationLimit),
     NL_TEST_SENTINEL()
 };
 // clang-format on

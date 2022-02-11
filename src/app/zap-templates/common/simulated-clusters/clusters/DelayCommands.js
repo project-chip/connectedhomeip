@@ -38,7 +38,7 @@ const WaitForCommissioning = {
 
 const WaitForCommissionee = {
   name : 'WaitForCommissionee',
-  arguments : [],
+  arguments : [ { type : 'NODE_ID', name : 'nodeId' } ],
   response : { arguments : [] }
 };
 
