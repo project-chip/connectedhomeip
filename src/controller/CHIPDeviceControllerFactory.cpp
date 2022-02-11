@@ -229,7 +229,7 @@ void DeviceControllerFactory::Shutdown()
         mSystemState = nullptr;
     }
     mFabricStorage = nullptr;
-    mStorage = nullptr;
+    mStorage       = nullptr;
 }
 
 CHIP_ERROR DeviceControllerSystemState::Shutdown()
