@@ -38,10 +38,12 @@ using namespace ::chip::DeviceLayer::Internal;
 namespace chip {
 namespace DeviceLayer {
 
+#if CHIP_DEVICE_ENABLE_DATA_MODEL
 namespace {
 app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::WiFiDriverImpl::GetInstance()));
 } // namespace
+#endif // CHIP_DEVICE_ENABLE_DATA_MODEL
 
 CHIP_ERROR ConnectivityManagerImpl::InitWiFi()
 {
@@ -51,10 +53,12 @@ CHIP_ERROR ConnectivityManagerImpl::InitWiFi()
     mWiFiStationState = kWiFiStationState_NotConnected;
 
     mWiFiStationReconnectInterval = System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL);
-
+#if CHIP_DEVICE_ENABLE_DATA_MODEL
     err = sWiFiNetworkCommissioningInstance.Init();
-    VerifyOrExit(err == CHIP_NO_ERROR,
-                 ChipLogError(DeviceLayer, "WiFi network commissioning instance init failed: %s", chip::ErrorStr(err)));
+#else
+    err = NetworkCommissioning::WiFiDriverImpl::GetInstance().Init();
+#endif
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "WiFi driver init failed: %s", chip::ErrorStr(err)));
 
     mWiFiStationMode = kWiFiStationMode_Enabled;
     networks         = NetworkCommissioning::WiFiDriverImpl::GetInstance().GetNetworks();
