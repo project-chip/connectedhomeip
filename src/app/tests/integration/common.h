@@ -25,10 +25,10 @@
 #pragma once
 
 #include <app/util/basic-types.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <transport/SessionHolder.h>
-#include <lib/support/TestPersistentStorageDelegate.h>
 
 #define MAX_MESSAGE_SOURCE_STR_LENGTH (100)
 #define NETWORK_SLEEP_TIME_MSECS (100 * 1000)
