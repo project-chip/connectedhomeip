@@ -128,7 +128,7 @@ AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControlle
     setupParams.storageDelegate                = wrapper.get();
     setupParams.pairingDelegate                = wrapper.get();
     setupParams.operationalCredentialsDelegate = opCredsIssuer;
-    initParams.fabricIndependentStorage = setupParams.storageDelegate;
+    initParams.fabricIndependentStorage        = setupParams.storageDelegate;
 
     opCredsIssuer->Initialize(*wrapper.get(), wrapper.get()->mJavaObjectRef);
 
