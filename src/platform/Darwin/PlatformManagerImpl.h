@@ -53,6 +53,8 @@ public:
         return mWorkQueue;
     }
 
+    System::Clock::Timestamp GetStartTime() { return mStartTime; }
+
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
     CHIP_ERROR _InitChipStack();
@@ -85,6 +87,8 @@ private:
     friend class Internal::BLEManagerImpl;
 
     static PlatformManagerImpl sInstance;
+
+    System::Clock::Timestamp mStartTime = System::Clock::kZero;
 
     dispatch_queue_t mWorkQueue = nullptr;
     // Semaphore used to implement blocking behavior in _RunEventLoop.
