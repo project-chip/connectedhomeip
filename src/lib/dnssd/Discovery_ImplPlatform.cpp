@@ -609,7 +609,7 @@ bool ResolverProxy::ResolveNodeIdFromInternalCache(const PeerId & peerId, Inet::
         {
             mDelegate->OnNodeIdResolved(nodeData);
             mDelegate->Release();
-            return CHIP_NO_ERROR;
+            return true;
         }
     }
 #endif
