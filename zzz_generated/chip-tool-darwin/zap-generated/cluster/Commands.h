@@ -4681,7 +4681,7 @@ public:
     }
 
 private:
-    chip::ByteSpan mValue;
+    chip::CharSpan mValue;
 };
 
 class SubscribeAttributeBasicNodeLabel : public ModelCommand {
@@ -4785,7 +4785,7 @@ public:
     }
 
 private:
-    chip::ByteSpan mValue;
+    chip::CharSpan mValue;
 };
 
 class SubscribeAttributeBasicLocation : public ModelCommand {
@@ -8655,7 +8655,7 @@ public:
     }
 
 private:
-    chip::ByteSpan mValue;
+    chip::CharSpan mValue;
 };
 
 class SubscribeAttributeBridgedDeviceBasicNodeLabel : public ModelCommand {
@@ -18642,7 +18642,7 @@ public:
     }
 
 private:
-    chip::ByteSpan mValue;
+    chip::CharSpan mValue;
 };
 
 class SubscribeAttributeDoorLockLanguage : public ModelCommand {
@@ -29490,7 +29490,7 @@ public:
     }
 
 private:
-    chip::ByteSpan mValue;
+    chip::CharSpan mValue;
 };
 
 class SubscribeAttributeLocalizationConfigurationActiveLocale : public ModelCommand {
@@ -49596,7 +49596,7 @@ public:
     }
 
 private:
-    chip::ByteSpan mValue;
+    chip::CharSpan mValue;
 };
 
 class SubscribeAttributeTestClusterCharString : public ModelCommand {
@@ -49700,7 +49700,7 @@ public:
     }
 
 private:
-    chip::ByteSpan mValue;
+    chip::CharSpan mValue;
 };
 
 class SubscribeAttributeTestClusterLongCharString : public ModelCommand {
@@ -53900,7 +53900,7 @@ public:
     }
 
 private:
-    chip::ByteSpan mValue;
+    chip::CharSpan mValue;
 };
 
 class SubscribeAttributeTestClusterNullableCharString : public ModelCommand {
