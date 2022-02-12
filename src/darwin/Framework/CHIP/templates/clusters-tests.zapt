@@ -158,10 +158,6 @@ CHIPDevice * GetConnectedDevice(void)
     CHIPDeviceController * controller = [CHIPDeviceController sharedController];
     XCTAssertNotNil(controller);
 
-    NSError * error;
-    [controller unpairDevice:nodeId error:&error];
-    XCTAssertEqual(error.code, 0);
-
     BOOL stopped = [controller shutdown];
     XCTAssertTrue(stopped);
 }
