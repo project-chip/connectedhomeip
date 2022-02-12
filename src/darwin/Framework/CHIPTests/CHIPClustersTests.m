@@ -44690,8 +44690,8 @@ NSNumber * _Nonnull ourFabricIndex;
         {
             id actualValue = value;
             XCTAssertEqual([actualValue count], 1);
-            XCTAssertEqual([((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).fabricIndex unsignedCharValue],
-                ourFabricIndex);
+            XCTAssertEqualObjects(
+                ((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).fabricIndex, ourFabricIndex);
             XCTAssertTrue([((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).label isEqualToString:@""]);
         }
 
@@ -44753,8 +44753,8 @@ NSNumber * _Nonnull ourFabricIndex;
         {
             id actualValue = value;
             XCTAssertEqual([actualValue count], 1);
-            XCTAssertEqual([((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).fabricIndex unsignedCharValue],
-                ourFabricIndex);
+            XCTAssertEqualObjects(
+                ((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).fabricIndex, ourFabricIndex);
             XCTAssertTrue(
                 [((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).label isEqualToString:@"Batcave"]);
         }
