@@ -5264,7 +5264,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.NetworkCommissioningCluster) cluster)
                   .readLastNetworkingStatusAttribute(
-                      (ChipClusters.IntegerAttributeCallback) callback);
+                      (ChipClusters.NetworkCommissioningCluster
+                              .LastNetworkingStatusAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readNetworkCommissioningLastNetworkingStatusCommandParams);
@@ -5277,7 +5279,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.NetworkCommissioningCluster) cluster)
-                  .readLastNetworkIDAttribute((ChipClusters.OctetStringAttributeCallback) callback);
+                  .readLastNetworkIDAttribute(
+                      (ChipClusters.NetworkCommissioningCluster.LastNetworkIDAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedOctetStringAttributeCallback(),
             readNetworkCommissioningLastNetworkIDCommandParams);
@@ -5291,7 +5295,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.NetworkCommissioningCluster) cluster)
                   .readLastConnectErrorValueAttribute(
-                      (ChipClusters.LongAttributeCallback) callback);
+                      (ChipClusters.NetworkCommissioningCluster
+                              .LastConnectErrorValueAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readNetworkCommissioningLastConnectErrorValueCommandParams);

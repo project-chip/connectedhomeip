@@ -9410,7 +9410,8 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeLastNetworkingStatusWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeLastNetworkingStatusWithValue:(NSNumber * _Nullable)value
+                                  completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -9421,14 +9422,19 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = NetworkCommissioning::Attributes::LastNetworkingStatus::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(value.unsignedCharValue);
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)writeAttributeLastNetworkIDWithValue:(NSData * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeLastNetworkIDWithValue:(NSData * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -9439,14 +9445,19 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = NetworkCommissioning::Attributes::LastNetworkID::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = [self asByteSpan:value];
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = [self asByteSpan:value];
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)writeAttributeLastConnectErrorValueWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributeLastConnectErrorValueWithValue:(NSNumber * _Nullable)value
                                    completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -9458,7 +9469,12 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = NetworkCommissioning::Attributes::LastConnectErrorValue::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedIntValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.intValue;
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);

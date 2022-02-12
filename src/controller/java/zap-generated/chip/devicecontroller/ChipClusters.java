@@ -11356,6 +11356,30 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
+    public interface LastNetworkingStatusAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface LastNetworkIDAttributeCallback {
+      void onSuccess(@Nullable byte[] value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface LastConnectErrorValueAttributeCallback {
+      void onSuccess(@Nullable Long value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
     public interface ServerGeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
@@ -11426,30 +11450,31 @@ public class ChipClusters {
       subscribeInterfaceEnabledAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readLastNetworkingStatusAttribute(IntegerAttributeCallback callback) {
+    public void readLastNetworkingStatusAttribute(LastNetworkingStatusAttributeCallback callback) {
       readLastNetworkingStatusAttribute(chipClusterPtr, callback);
     }
 
     public void subscribeLastNetworkingStatusAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        LastNetworkingStatusAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeLastNetworkingStatusAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readLastNetworkIDAttribute(OctetStringAttributeCallback callback) {
+    public void readLastNetworkIDAttribute(LastNetworkIDAttributeCallback callback) {
       readLastNetworkIDAttribute(chipClusterPtr, callback);
     }
 
     public void subscribeLastNetworkIDAttribute(
-        OctetStringAttributeCallback callback, int minInterval, int maxInterval) {
+        LastNetworkIDAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeLastNetworkIDAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readLastConnectErrorValueAttribute(LongAttributeCallback callback) {
+    public void readLastConnectErrorValueAttribute(
+        LastConnectErrorValueAttributeCallback callback) {
       readLastConnectErrorValueAttribute(chipClusterPtr, callback);
     }
 
     public void subscribeLastConnectErrorValueAttribute(
-        LongAttributeCallback callback, int minInterval, int maxInterval) {
+        LastConnectErrorValueAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeLastConnectErrorValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -11530,25 +11555,31 @@ public class ChipClusters {
         long chipClusterPtr, BooleanAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readLastNetworkingStatusAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, LastNetworkingStatusAttributeCallback callback);
 
     private native void subscribeLastNetworkingStatusAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr,
+        LastNetworkingStatusAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
     private native void readLastNetworkIDAttribute(
-        long chipClusterPtr, OctetStringAttributeCallback callback);
+        long chipClusterPtr, LastNetworkIDAttributeCallback callback);
 
     private native void subscribeLastNetworkIDAttribute(
         long chipClusterPtr,
-        OctetStringAttributeCallback callback,
+        LastNetworkIDAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
     private native void readLastConnectErrorValueAttribute(
-        long chipClusterPtr, LongAttributeCallback callback);
+        long chipClusterPtr, LastConnectErrorValueAttributeCallback callback);
 
     private native void subscribeLastConnectErrorValueAttribute(
-        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr,
+        LastConnectErrorValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
     private native void readServerGeneratedCommandListAttribute(
         long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);
