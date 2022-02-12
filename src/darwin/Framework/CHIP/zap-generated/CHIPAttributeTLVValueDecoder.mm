@@ -7462,8 +7462,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = array_0;
             return value;
         }
-        case Attributes::FabricsList::Id: {
-            using TypeInfo = Attributes::FabricsList::TypeInfo;
+        case Attributes::Fabrics::Id: {
+            using TypeInfo = Attributes::Fabrics::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {

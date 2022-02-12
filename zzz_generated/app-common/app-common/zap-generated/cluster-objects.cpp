@@ -10742,8 +10742,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::NOCs::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, NOCs));
         break;
-    case Attributes::FabricsList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, fabricsList));
+    case Attributes::Fabrics::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, fabrics));
         break;
     case Attributes::SupportedFabrics::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, supportedFabrics));

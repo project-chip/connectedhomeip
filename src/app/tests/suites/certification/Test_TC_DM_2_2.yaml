@@ -53,7 +53,7 @@ tests:
 
     - label: "Query fabrics list"
       command: "readAttribute"
-      attribute: "fabrics list"
+      attribute: "Fabrics"
       response:
           value: [
                   {

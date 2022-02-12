@@ -5668,28 +5668,27 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPOperationalCredentialsFabricsListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<OperationalCredentialsFabricsListListAttributeCallback>
+class CHIPOperationalCredentialsFabricsListAttributeCallbackBridge
+    : public CHIPCallbackBridge<OperationalCredentialsFabricsListAttributeCallback>
 {
 public:
-    CHIPOperationalCredentialsFabricsListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<OperationalCredentialsFabricsListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                   keepAlive){};
+    CHIPOperationalCredentialsFabricsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<OperationalCredentialsFabricsListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::DataModel::DecodableList<
                                 chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & value);
 };
 
-class CHIPOperationalCredentialsFabricsListListAttributeCallbackSubscriptionBridge
-    : public CHIPOperationalCredentialsFabricsListListAttributeCallbackBridge
+class CHIPOperationalCredentialsFabricsListAttributeCallbackSubscriptionBridge
+    : public CHIPOperationalCredentialsFabricsListAttributeCallbackBridge
 {
 public:
-    CHIPOperationalCredentialsFabricsListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPOperationalCredentialsFabricsListListAttributeCallbackBridge(queue, handler, action, true),
+    CHIPOperationalCredentialsFabricsListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             CHIPActionBlock action,
+                                                                             SubscriptionEstablishedHandler establishedHandler) :
+        CHIPOperationalCredentialsFabricsListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 

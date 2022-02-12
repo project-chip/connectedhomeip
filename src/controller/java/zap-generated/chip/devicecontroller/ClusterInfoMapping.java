@@ -4727,8 +4727,8 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedOperationalCredentialsClusterFabricsListAttributeCallback
-      implements ChipClusters.OperationalCredentialsCluster.FabricsListAttributeCallback,
+  public static class DelegatedOperationalCredentialsClusterFabricsAttributeCallback
+      implements ChipClusters.OperationalCredentialsCluster.FabricsAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 

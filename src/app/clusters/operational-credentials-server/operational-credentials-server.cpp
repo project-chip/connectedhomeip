@@ -60,6 +60,7 @@ namespace {
 
 CHIP_ERROR SendNOCResponse(app::CommandHandler * commandObj, const ConcreteCommandPath & path, OperationalCertStatus status,
                            uint8_t index, const CharSpan & debug_text);
+OperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err);
 
 constexpr uint8_t kDACCertificate = 1;
 constexpr uint8_t kPAICertificate = 2;
@@ -209,7 +210,7 @@ CHIP_ERROR OperationalCredentialsAttrAccess::Read(const ConcreteReadAttributePat
     case Attributes::CommissionedFabrics::Id: {
         return ReadCommissionedFabrics(aPath.mEndpointId, aEncoder);
     }
-    case Attributes::FabricsList::Id: {
+    case Attributes::Fabrics::Id: {
         return ReadFabricsList(aPath.mEndpointId, aEncoder);
     }
     case Attributes::TrustedRootCertificates::Id: {
@@ -270,7 +271,7 @@ void fabricListChanged()
 
     // Currently, we only manage FabricsList attribute in endpoint 0, OperationalCredentials cluster is always required to be on
     // EP0.
-    MatterReportingAttributeChangeCallback(0, OperationalCredentials::Id, OperationalCredentials::Attributes::FabricsList::Id);
+    MatterReportingAttributeChangeCallback(0, OperationalCredentials::Id, OperationalCredentials::Attributes::Fabrics::Id);
     MatterReportingAttributeChangeCallback(0, OperationalCredentials::Id,
                                            OperationalCredentials::Attributes::CommissionedFabrics::Id);
 }
@@ -419,28 +420,39 @@ bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(app::CommandH
                                                                    const app::ConcreteCommandPath & commandPath,
                                                                    const Commands::UpdateFabricLabel::DecodableType & commandData)
 {
-    auto & Label = commandData.label;
+    auto & Label        = commandData.label;
+    auto ourFabricIndex = commandObj->GetAccessingFabricIndex();
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: UpdateFabricLabel");
 
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    for (auto & fabricInfo : Server::GetInstance().GetFabricTable())
+    {
+        if (fabricInfo.GetFabricLabel().data_equal(Label) && fabricInfo.GetFabricIndex() != ourFabricIndex)
+        {
+            ChipLogError(Zcl, "Fabric label already in use");
+            SendNOCResponse(commandObj, commandPath, OperationalCertStatus::kLabelConflict, ourFabricIndex, CharSpan());
+            return true;
+        }
+    }
+
     CHIP_ERROR err;
 
     // Fetch current fabric
     FabricInfo * fabric = RetrieveCurrentFabric(commandObj);
-    VerifyOrExit(fabric != nullptr, status = EMBER_ZCL_STATUS_FAILURE);
+    VerifyOrExit(fabric != nullptr, err = CHIP_ERROR_INVALID_FABRIC_ID);
 
     // Set Label on fabric
     err = fabric->SetFabricLabel(Label);
-    VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
+    SuccessOrExit(err);
 
     // Persist updated fabric
     err = Server::GetInstance().GetFabricTable().Store(fabric->GetFabricIndex());
-    VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
+    SuccessOrExit(err);
 
 exit:
     fabricListChanged();
-    emberAfSendImmediateDefaultResponse(status);
+
+    SendNOCResponse(commandObj, commandPath, ConvertToNOCResponseStatus(err), ourFabricIndex, CharSpan());
     return true;
 }
 

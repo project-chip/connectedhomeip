@@ -16913,32 +16913,31 @@ using namespace chip::app::Clusters;
         subscriptionEstablishedHandler);
 }
 
-- (void)readAttributeFabricsListWithCompletionHandler:(void (^)(
-                                                          NSArray * _Nullable value, NSError * _Nullable error))completionHandler
+- (void)readAttributeFabricsWithCompletionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
-    new CHIPOperationalCredentialsFabricsListListAttributeCallbackBridge(
+    new CHIPOperationalCredentialsFabricsListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = OperationalCredentials::Attributes::FabricsList::TypeInfo;
-            auto successFn = Callback<OperationalCredentialsFabricsListListAttributeCallback>::FromCancelable(success);
+            using TypeInfo = OperationalCredentials::Attributes::Fabrics::TypeInfo;
+            auto successFn = Callback<OperationalCredentialsFabricsListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)subscribeAttributeFabricsListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                         maxInterval:(NSNumber * _Nonnull)maxInterval
-                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+- (void)subscribeAttributeFabricsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                   reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    new CHIPOperationalCredentialsFabricsListListAttributeCallbackSubscriptionBridge(
+    new CHIPOperationalCredentialsFabricsListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
         ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = OperationalCredentials::Attributes::FabricsList::TypeInfo;
-            auto successFn = Callback<OperationalCredentialsFabricsListListAttributeCallback>::FromCancelable(success);
+            using TypeInfo = OperationalCredentials::Attributes::Fabrics::TypeInfo;
+            auto successFn = Callback<OperationalCredentialsFabricsListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPOperationalCredentialsFabricsListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+                CHIPOperationalCredentialsFabricsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
         },
         subscriptionEstablishedHandler);
 }

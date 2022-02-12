@@ -953,8 +953,8 @@ typedef void (*CHIPOperationalCredentialsClusterNOCResponseCallbackType)(
 
 typedef void (*CHIPOperationalCredentialsClusterNOCsAttributeCallbackType)(
     void *, const chip::app::Clusters::OperationalCredentials::Attributes::NOCs::TypeInfo::DecodableType &);
-typedef void (*CHIPOperationalCredentialsClusterFabricsListAttributeCallbackType)(
-    void *, const chip::app::Clusters::OperationalCredentials::Attributes::FabricsList::TypeInfo::DecodableType &);
+typedef void (*CHIPOperationalCredentialsClusterFabricsAttributeCallbackType)(
+    void *, const chip::app::Clusters::OperationalCredentials::Attributes::Fabrics::TypeInfo::DecodableType &);
 typedef void (*CHIPOperationalCredentialsClusterSupportedFabricsAttributeCallbackType)(
     void *, chip::app::Clusters::OperationalCredentials::Attributes::SupportedFabrics::TypeInfo::DecodableArgType);
 typedef void (*CHIPOperationalCredentialsClusterCommissionedFabricsAttributeCallbackType)(

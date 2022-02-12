@@ -19089,9 +19089,9 @@ private:
     static void
     OnSuccessCallback_1(void * context,
                         const chip::app::DataModel::DecodableList<
-                            chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & fabricsList)
+                            chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & fabrics)
     {
-        (static_cast<Test_TC_DM_2_2 *>(context))->OnSuccessResponse_1(fabricsList);
+        (static_cast<Test_TC_DM_2_2 *>(context))->OnSuccessResponse_1(fabrics);
     }
 
     static void OnFailureCallback_2(void * context, CHIP_ERROR error)
@@ -19141,7 +19141,7 @@ private:
         chip::Controller::OperationalCredentialsClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::FabricsList::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::Fabrics::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1));
         return CHIP_NO_ERROR;
     }
@@ -19153,15 +19153,15 @@ private:
     }
 
     void OnSuccessResponse_1(const chip::app::DataModel::DecodableList<
-                             chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & fabricsList)
+                             chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & fabrics)
     {
         {
-            auto iter_0 = fabricsList.begin();
-            VerifyOrReturn(CheckNextListItemDecodes<decltype(fabricsList)>("fabricsList", iter_0, 0));
-            VerifyOrReturn(CheckValueAsString("fabricsList[0].label", iter_0.GetValue().label, chip::CharSpan("", 0)));
-            VerifyOrReturn(CheckNoMoreListItems<decltype(fabricsList)>("fabricsList", iter_0, 1));
+            auto iter_0 = fabrics.begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(fabrics)>("fabrics", iter_0, 0));
+            VerifyOrReturn(CheckValueAsString("fabrics[0].label", iter_0.GetValue().label, chip::CharSpan("", 0)));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(fabrics)>("fabrics", iter_0, 1));
         }
-        VerifyOrReturn(CheckConstraintType("fabricsList", "", "list"));
+        VerifyOrReturn(CheckConstraintType("fabrics", "", "list"));
         NextTest();
     }
 
@@ -77196,6 +77196,18 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 4 : Remove nonexistent fabric\n");
             err = TestRemoveNonexistentFabric_4();
             break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Read fabric list before setting label\n");
+            err = TestReadFabricListBeforeSettingLabel_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Set the fabric label\n");
+            err = TestSetTheFabricLabel_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Read fabric list after setting label\n");
+            err = TestReadFabricListAfterSettingLabel_7();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -77207,11 +77219,13 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 5;
+    const uint16_t mTestCount = 8;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
+
+    chip::FabricIndex ourFabricIndex;
 
     void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
     {
@@ -77249,6 +77263,32 @@ private:
     static void OnSuccessCallback_3(void * context, chip::FabricIndex currentFabricIndex)
     {
         (static_cast<TestOperationalCredentialsCluster *>(context))->OnSuccessResponse_3(currentFabricIndex);
+    }
+
+    static void OnFailureCallback_5(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestOperationalCredentialsCluster *>(context))->OnFailureResponse_5(error);
+    }
+
+    static void
+    OnSuccessCallback_5(void * context,
+                        const chip::app::DataModel::DecodableList<
+                            chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & fabrics)
+    {
+        (static_cast<TestOperationalCredentialsCluster *>(context))->OnSuccessResponse_5(fabrics);
+    }
+
+    static void OnFailureCallback_7(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestOperationalCredentialsCluster *>(context))->OnFailureResponse_7(error);
+    }
+
+    static void
+    OnSuccessCallback_7(void * context,
+                        const chip::app::DataModel::DecodableList<
+                            chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & fabrics)
+    {
+        (static_cast<TestOperationalCredentialsCluster *>(context))->OnSuccessResponse_7(fabrics);
     }
 
     //
@@ -77333,6 +77373,7 @@ private:
     {
         VerifyOrReturn(CheckConstraintType("currentFabricIndex", "", "uint8"));
         VerifyOrReturn(CheckConstraintMinValue<chip::FabricIndex>("currentFabricIndex", currentFabricIndex, 1));
+        ourFabricIndex = currentFabricIndex;
         NextTest();
     }
 
@@ -77368,6 +77409,107 @@ private:
                              const chip::Optional<chip::CharSpan> & debugText)
     {
         VerifyOrReturn(CheckValue("statusCode", statusCode, 11));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadFabricListBeforeSettingLabel_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::OperationalCredentialsClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::Fabrics::TypeInfo>(
+            this, OnSuccessCallback_5, OnFailureCallback_5));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_5(const chip::app::DataModel::DecodableList<
+                             chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & fabrics)
+    {
+        {
+            auto iter_0 = fabrics.begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(fabrics)>("fabrics", iter_0, 0));
+            VerifyOrReturn(CheckValue("fabrics[0].fabricIndex", iter_0.GetValue().fabricIndex, ourFabricIndex));
+            VerifyOrReturn(CheckValueAsString("fabrics[0].label", iter_0.GetValue().label, chip::CharSpan("", 0)));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(fabrics)>("fabrics", iter_0, 1));
+        }
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestSetTheFabricLabel_6()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        using RequestType               = chip::app::Clusters::OperationalCredentials::Commands::UpdateFabricLabel::Type;
+
+        RequestType request;
+        request.label = chip::Span<const char>("Batcavegarbage: not in length on purpose", 7);
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestOperationalCredentialsCluster *>(context))
+                ->OnSuccessResponse_6(data.statusCode, data.fabricIndex, data.debugText);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestOperationalCredentialsCluster *>(context))->OnFailureResponse_6(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_6(chip::app::Clusters::OperationalCredentials::OperationalCertStatus statusCode,
+                             const chip::Optional<chip::FabricIndex> & fabricIndex,
+                             const chip::Optional<chip::CharSpan> & debugText)
+    {
+        VerifyOrReturn(CheckValue("statusCode", statusCode, 0));
+
+        VerifyOrReturn(CheckValuePresent("fabricIndex", fabricIndex));
+        VerifyOrReturn(CheckValue("fabricIndex.Value()", fabricIndex.Value(), ourFabricIndex));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadFabricListAfterSettingLabel_7()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::OperationalCredentialsClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::Fabrics::TypeInfo>(
+            this, OnSuccessCallback_7, OnFailureCallback_7));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_7(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_7(const chip::app::DataModel::DecodableList<
+                             chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & fabrics)
+    {
+        {
+            auto iter_0 = fabrics.begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(fabrics)>("fabrics", iter_0, 0));
+            VerifyOrReturn(CheckValue("fabrics[0].fabricIndex", iter_0.GetValue().fabricIndex, ourFabricIndex));
+            VerifyOrReturn(CheckValueAsString("fabrics[0].label", iter_0.GetValue().label, chip::CharSpan("Batcave", 7)));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(fabrics)>("fabrics", iter_0, 1));
+        }
 
         NextTest();
     }

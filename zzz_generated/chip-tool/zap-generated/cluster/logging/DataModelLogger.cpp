@@ -7481,12 +7481,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("NOCs", 1, value);
         }
-        case OperationalCredentials::Attributes::FabricsList::Id: {
+        case OperationalCredentials::Attributes::Fabrics::Id: {
             chip::app::DataModel::DecodableList<
                 chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("fabrics list", 1, value);
+            return DataModelLogger::LogValue("Fabrics", 1, value);
         }
         case OperationalCredentials::Attributes::SupportedFabrics::Id: {
             uint8_t value;

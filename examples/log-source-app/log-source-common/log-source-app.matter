@@ -311,7 +311,7 @@ server cluster OperationalCredentials = 62 {
     CHAR_STRING<32> label = 5;
   }
 
-  readonly attribute FabricDescriptor fabricsList[] = 1;
+  readonly attribute FabricDescriptor fabrics[] = 1;
   readonly attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
   readonly attribute OCTET_STRING trustedRootCertificates[] = 4;
