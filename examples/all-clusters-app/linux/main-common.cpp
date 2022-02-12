@@ -93,10 +93,10 @@ static Identify gIdentify1 = {
 namespace {
 // This file is being used by platforms other than Linux, so we need this check to disable related features since we only
 // implemented them on linux.
-#if CHIP_DEVICE_LAYER_TARGET_LINUX
 constexpr EndpointId kNetworkCommissioningEndpointMain      = 0;
 constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
+#if CHIP_DEVICE_LAYER_TARGET_LINUX
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 NetworkCommissioning::LinuxThreadDriver sLinuxThreadDriver;
 Clusters::NetworkCommissioning::Instance sThreadNetworkCommissioningInstance(kNetworkCommissioningEndpointMain,
@@ -112,10 +112,11 @@ Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(kNetw
 
 void ApplicationInit()
 {
+    (void) kNetworkCommissioningEndpointMain;
     // Enable secondary endpoint only when we need it, this should be applied to all platforms.
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 
-#if CHIP_DEVICE_LAYER_TARGET_LINUX && defined(ZCL_USING_LEVEL_CONTROL_CLUSTER_SERVER)
+#if CHIP_DEVICE_LAYER_TARGET_LINUX
     const bool kThreadEnabled = {
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
         LinuxDeviceOptions::GetInstance().mThread
