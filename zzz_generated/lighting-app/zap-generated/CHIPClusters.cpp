@@ -184,7 +184,5 @@ exit:
     return err;
 }
 
-// OnOff Cluster Commands
-
 } // namespace Controller
 } // namespace chip
