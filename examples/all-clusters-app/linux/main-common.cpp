@@ -134,22 +134,30 @@ void ApplicationInit()
 
     if (kThreadEnabled && kWiFiEnabled)
     {
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
         sThreadNetworkCommissioningInstance.Init();
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
         sWiFiNetworkCommissioningInstance.Init();
+#endif
         // Only enable secondary endpoint for network commissioning cluster when both WiFi and Thread are enabled.
         emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, true);
     }
     else if (kThreadEnabled)
     {
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
         sThreadNetworkCommissioningInstance.Init();
+#endif
     }
     else if (kWiFiEnabled)
     {
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
         // If we only enable WiFi on this device, "move" WiFi instance to main NetworkCommissioning cluster endpoint.
         sWiFiNetworkCommissioningInstance.~Instance();
         new (&sWiFiNetworkCommissioningInstance)
             Clusters::NetworkCommissioning::Instance(kNetworkCommissioningEndpointMain, &sLinuxWiFiDriver);
         sWiFiNetworkCommissioningInstance.Init();
+#endif
     }
     else
     {
