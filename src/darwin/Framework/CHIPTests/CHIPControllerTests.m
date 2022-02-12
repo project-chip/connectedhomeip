@@ -68,8 +68,6 @@
                                 completionHandler:^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
                                     XCTAssertEqual(error.code, CHIPErrorCodeInvalidState);
                                 }]);
-    XCTAssertFalse([controller unpairDevice:1 error:&error]);
-    XCTAssertEqual(error.code, CHIPErrorCodeInvalidState);
 }
 
 @end

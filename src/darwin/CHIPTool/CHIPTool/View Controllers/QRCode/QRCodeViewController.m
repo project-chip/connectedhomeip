@@ -692,6 +692,9 @@
         NSLog(@"Error retrieving device informations over Mdns: %@", error);
         return;
     }
+    // track this device
+    uint64_t deviceId = CHIPGetNextAvailableDeviceID() - 1;
+    CHIPSetDevicePaired(deviceId, YES);
     [self setVendorIDOnAccessory];
 }
 
