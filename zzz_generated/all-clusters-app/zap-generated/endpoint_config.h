@@ -3727,7 +3727,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 // Array of device ids
 #define FIXED_DEVICE_IDS                                                                                                           \
     {                                                                                                                              \
-        22, 256, 256,                                                                                                              \
+        22, 256, 256, 61442                                                                                                        \
     }
 
 // Array of device versions
