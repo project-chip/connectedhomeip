@@ -146,7 +146,7 @@ ChipError::StorageType pychip_DeviceController_PostTaskOnChipThread(ChipThreadTa
 
 ChipError::StorageType pychip_DeviceController_OpenCommissioningWindow(chip::Controller::DeviceCommissioner * devCtrl,
                                                                        chip::NodeId nodeid, uint16_t timeout, uint32_t iteration,
-                                                                       uint16_t discriminator, uint8_t option);
+                                                                       uint16_t discriminator, uint8_t optionInt);
 
 void pychip_DeviceController_PrintDiscoveredDevices(chip::Controller::DeviceCommissioner * devCtrl);
 bool pychip_DeviceController_GetIPForDiscoveredDevice(chip::Controller::DeviceCommissioner * devCtrl, int idx, char * addrStr,
@@ -436,9 +436,11 @@ pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled(chip::Co
 
 ChipError::StorageType pychip_DeviceController_OpenCommissioningWindow(chip::Controller::DeviceCommissioner * devCtrl,
                                                                        chip::NodeId nodeid, uint16_t timeout, uint32_t iteration,
-                                                                       uint16_t discriminator, uint8_t option)
+                                                                       uint16_t discriminator, uint8_t optionInt)
 {
     SetupPayload payload;
+    const auto option = static_cast<Controller::DeviceController::CommissioningWindowOption>(optionInt);
+
     return devCtrl->OpenCommissioningWindow(nodeid, timeout, iteration, discriminator, option, payload).AsInteger();
 }
 
