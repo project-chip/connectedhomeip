@@ -101,7 +101,8 @@ template <typename AttrType>
 CHIP_ERROR WriteAttribute(const SessionHandle & sessionHandle, chip::EndpointId endpointId, ClusterId clusterId,
                           AttributeId attributeId, const AttrType & requestData, WriteCallback::OnSuccessCallbackType onSuccessCb,
                           WriteCallback::OnErrorCallbackType onErrorCb, const Optional<uint16_t> & aTimedWriteTimeoutMs,
-                          WriteCallback::OnDoneCallbackType onDoneCb = nullptr)
+                          WriteCallback::OnDoneCallbackType onDoneCb = nullptr,
+                          const Optional<DataVersion> & aDataVersion = NullOptional)
 {
     auto callback = Platform::MakeUnique<WriteCallback>(onSuccessCb, onErrorCb, onDoneCb);
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
@@ -117,7 +118,7 @@ CHIP_ERROR WriteAttribute(const SessionHandle & sessionHandle, chip::EndpointId 
     else
     {
         ReturnErrorOnFailure(
-            client->EncodeAttribute(chip::app::AttributePathParams(endpointId, clusterId, attributeId), requestData));
+            client->EncodeAttribute(chip::app::AttributePathParams(endpointId, clusterId, attributeId), requestData, aDataVersion));
     }
 
     ReturnErrorOnFailure(client->SendWriteRequest(sessionHandle));
@@ -134,28 +135,32 @@ template <typename AttributeInfo>
 CHIP_ERROR WriteAttribute(const SessionHandle & sessionHandle, chip::EndpointId endpointId,
                           const typename AttributeInfo::Type & requestData, WriteCallback::OnSuccessCallbackType onSuccessCb,
                           WriteCallback::OnErrorCallbackType onErrorCb, const Optional<uint16_t> & aTimedWriteTimeoutMs,
-                          WriteCallback::OnDoneCallbackType onDoneCb = nullptr)
+                          WriteCallback::OnDoneCallbackType onDoneCb = nullptr,
+                          const Optional<DataVersion> & aDataVersion = NullOptional)
 {
     return WriteAttribute(sessionHandle, endpointId, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), requestData,
-                          onSuccessCb, onErrorCb, aTimedWriteTimeoutMs, onDoneCb);
+                          onSuccessCb, onErrorCb, aTimedWriteTimeoutMs, onDoneCb, aDataVersion);
 }
 
 template <typename AttributeInfo>
 CHIP_ERROR WriteAttribute(const SessionHandle & sessionHandle, chip::EndpointId endpointId,
                           const typename AttributeInfo::Type & requestData, WriteCallback::OnSuccessCallbackType onSuccessCb,
                           WriteCallback::OnErrorCallbackType onErrorCb, uint16_t aTimedWriteTimeoutMs,
-                          WriteCallback::OnDoneCallbackType onDoneCb = nullptr)
+                          WriteCallback::OnDoneCallbackType onDoneCb = nullptr,
+                          const Optional<DataVersion> & aDataVersion = NullOptional)
 {
     return WriteAttribute<AttributeInfo>(sessionHandle, endpointId, requestData, onSuccessCb, onErrorCb, onDoneCb,
-                                         MakeOptional(aTimedWriteTimeoutMs), onDoneCb);
+                                         MakeOptional(aTimedWriteTimeoutMs), onDoneCb, aDataVersion);
 }
 
 template <typename AttributeInfo, typename std::enable_if_t<!AttributeInfo::MustUseTimedWrite(), int> = 0>
 CHIP_ERROR WriteAttribute(const SessionHandle & sessionHandle, chip::EndpointId endpointId,
                           const typename AttributeInfo::Type & requestData, WriteCallback::OnSuccessCallbackType onSuccessCb,
-                          WriteCallback::OnErrorCallbackType onErrorCb, WriteCallback::OnDoneCallbackType onDoneCb = nullptr)
+                          WriteCallback::OnErrorCallbackType onErrorCb, WriteCallback::OnDoneCallbackType onDoneCb = nullptr,
+                          const Optional<DataVersion> & aDataVersion = NullOptional)
 {
-    return WriteAttribute<AttributeInfo>(sessionHandle, endpointId, requestData, onSuccessCb, onErrorCb, NullOptional, onDoneCb);
+    return WriteAttribute<AttributeInfo>(sessionHandle, endpointId, requestData, onSuccessCb, onErrorCb, NullOptional, onDoneCb,
+                                         aDataVersion);
 }
 
 } // namespace Controller

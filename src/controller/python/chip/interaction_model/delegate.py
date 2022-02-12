@@ -52,6 +52,7 @@ AttributePathIBstruct = Struct(
     "ClusterId" / Int32ul,
     "AttributeId" / Int32ul,
     "DataVersion" / Int32ul,
+    "HasDataVersion" / Int8ul,
 )
 
 # EventPath should not contain padding

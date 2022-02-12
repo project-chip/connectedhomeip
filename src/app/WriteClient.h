@@ -138,14 +138,15 @@ public:
      *  Encode an attribute value that can be directly encoded using DataModel::Encode. Will create a new chunk when necessary.
      */
     template <class T>
-    CHIP_ERROR EncodeAttribute(const AttributePathParams & attributePath, const T & value)
+    CHIP_ERROR EncodeAttribute(const AttributePathParams & attributePath, const T & value,
+                               const Optional<DataVersion> & aDataVersion = NullOptional)
     {
         ReturnErrorOnFailure(EnsureMessage());
 
         // Here, we are using kInvalidEndpointId for missing endpoint id, which is used when sending group write requests.
         return EncodeSingleAttributeDataIB(
             ConcreteDataAttributePath(attributePath.HasWildcardEndpointId() ? kInvalidEndpointId : attributePath.mEndpointId,
-                                      attributePath.mClusterId, attributePath.mAttributeId),
+                                      attributePath.mClusterId, attributePath.mAttributeId, aDataVersion),
             value);
     }
 
@@ -153,12 +154,13 @@ public:
      *  Encode a possibly-chunked list attribute value.  Will create a new chunk when necessary.
      */
     template <class T>
-    CHIP_ERROR EncodeAttribute(const AttributePathParams & attributePath, const DataModel::List<T> & value)
+    CHIP_ERROR EncodeAttribute(const AttributePathParams & attributePath, const DataModel::List<T> & value,
+                               const Optional<DataVersion> & aDataVersion = NullOptional)
     {
         // Here, we are using kInvalidEndpointId for missing endpoint id, which is used when sending group write requests.
         ConcreteDataAttributePath path =
             ConcreteDataAttributePath(attributePath.HasWildcardEndpointId() ? kInvalidEndpointId : attributePath.mEndpointId,
-                                      attributePath.mClusterId, attributePath.mAttributeId);
+                                      attributePath.mClusterId, attributePath.mAttributeId, aDataVersion);
 
         ReturnErrorOnFailure(EnsureMessage());
 
@@ -179,7 +181,8 @@ public:
      * EncodeAttribute when writing a nullable list.
      */
     template <class T>
-    CHIP_ERROR EncodeAttribute(const AttributePathParams & attributePath, const DataModel::Nullable<T> & value)
+    CHIP_ERROR EncodeAttribute(const AttributePathParams & attributePath, const DataModel::Nullable<T> & value,
+                               const Optional<DataVersion> & aDataVersion = NullOptional)
     {
         ReturnErrorOnFailure(EnsureMessage());
 
@@ -188,7 +191,7 @@ public:
             // Here, we are using kInvalidEndpointId to for missing endpoint id, which is used when sending group write requests.
             return EncodeSingleAttributeDataIB(
                 ConcreteDataAttributePath(attributePath.HasWildcardEndpointId() ? kInvalidEndpointId : attributePath.mEndpointId,
-                                          attributePath.mClusterId, attributePath.mAttributeId),
+                                          attributePath.mClusterId, attributePath.mAttributeId, aDataVersion),
                 value);
         }
         else
@@ -421,6 +424,7 @@ private:
     // of WriteRequestMessage (another end of container)).
     static constexpr uint16_t kReservedSizeForTLVEncodingOverhead = kReservedSizeForIMRevision + kReservedSizeForMoreChunksFlag +
         kReservedSizeForEndOfContainer + kReservedSizeForEndOfContainer;
+    bool mHasDataVersion = false;
 };
 
 } // namespace app

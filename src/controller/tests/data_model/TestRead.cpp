@@ -175,7 +175,7 @@ void TestReadInteraction::TestReadAttributeResponse(nlTestSuite * apSuite, void 
     auto onSuccessCb = [apSuite, &onSuccessCbInvoked](const app::ConcreteDataAttributePath & attributePath,
                                                       const auto & dataResponse) {
         uint8_t i = 0;
-        NL_TEST_ASSERT(apSuite, attributePath.mDataVersion == kDataVersion);
+        NL_TEST_ASSERT(apSuite, attributePath.mDataVersion.HasValue() && attributePath.mDataVersion.Value() == kDataVersion);
         auto iter = dataResponse.begin();
         while (iter.Next())
         {
@@ -453,7 +453,7 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptionsWithDataVersionFi
     // not safe to do so.
     auto onSuccessCb = [apSuite, &numSuccessCalls](const app::ConcreteDataAttributePath & attributePath,
                                                    const auto & dataResponse) {
-        NL_TEST_ASSERT(apSuite, attributePath.mDataVersion == kDataVersion);
+        NL_TEST_ASSERT(apSuite, attributePath.mDataVersion.HasValue() && attributePath.mDataVersion.Value() == kDataVersion);
         numSuccessCalls++;
     };
 
