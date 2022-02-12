@@ -1,6 +1,7 @@
 #CHIP P6 OTA Requestor Example
 
-An example demonstrating the OTA Requestor cluster on a Infineon CY8CKIT-062S2-43012 board.
+An example demonstrating the OTA Requestor cluster on a Infineon
+CY8CKIT-062S2-43012 board.
 
 <hr>
 
@@ -17,9 +18,9 @@ An example demonstrating the OTA Requestor cluster on a Infineon CY8CKIT-062S2-4
 
 ## Introduction
 
-The P6 OTA Requestor example provides a baseline demonstration of a OTA requestor
-device, built using Matter and the Infineon Modustoolbox SDK. It can be
-controlled by Matter controller over Wi-Fi network.
+The P6 OTA Requestor example provides a baseline demonstration of a OTA
+requestor device, built using Matter and the Infineon Modustoolbox SDK. It can
+be controlled by Matter controller over Wi-Fi network.
 
 The P6 device can be commissioned over Bluetooth Low Energy where the device and
 the Matter controller will exchange security information with the Rendezvous
@@ -44,12 +45,10 @@ will then join the network.
 -   Supported hardware:
     [CY8CKIT-062S2-43012](https://www.cypress.com/CY8CKIT-062S2-43012)
 
-*   The following applications must be built to demonstrate the OTA process:
-          
-          - The P6 OTA Requestor App
-          - The Updated P6 OTA Requestor App (or other app)
-          - An OTA Provider App (the Linux ota-provider app is used here)
-          - chip-tool
+*   The following applications must be built to demonstrate the OTA process:   
+     - The P6 OTA Requestor App - The Updated P6 OTA Requestor App (or other
+    app) - An OTA Provider App (the Linux ota-provider app is used here) -
+    chip-tool
 
 *   Build the P6 OTA Requestor application from the chip root dir:
 
@@ -67,7 +66,8 @@ will then join the network.
 
           $ ./scripts/examples/gn_build_example.sh examples/chip-tool/ out/chip-tool/
 
-*   Additionally a pre-compiled bootloader must be flashed to the board. This can be found at:
+*   Additionally a pre-compiled bootloader must be flashed to the board. This
+    can be found at:
 
           $ ./examples/ota-requestor-app/p6/matter-psoc6-mcuboot-bootloader.hex
 
@@ -75,14 +75,14 @@ will then join the network.
 
 ## Flashing the Application
 
--   Flash the bootloader by first putting the CY8CKIT-062S2-43012 board into KitProg3 
-    DAPLINK Mode by pressing the `MODE SELECT` button. `KITPROG3 STATUS` LED will
-    blink to indicate the the board is in the proper mode. A drive named 'DAPLINK' 
-    should be automatically mounted. To flash drag-and-drop 
-    matter-psoc6-mcuboot-bootloader.hex into that drive.
+-   Flash the bootloader by first putting the CY8CKIT-062S2-43012 board into
+    KitProg3 DAPLINK Mode by pressing the `MODE SELECT` button.
+    `KITPROG3 STATUS` LED will blink to indicate the the board is in the proper
+    mode. A drive named 'DAPLINK' should be automatically mounted. To flash
+    drag-and-drop matter-psoc6-mcuboot-bootloader.hex into that drive.
 
--   Put CY8CKIT-062S2-43012 board back into KitProg3 CMSIS-DAP Mode by pressing the
-    `MODE SELECT` button. `KITPROG3 STATUS` LED is ON confirms board is in
+-   Put CY8CKIT-062S2-43012 board back into KitProg3 CMSIS-DAP Mode by pressing
+    the `MODE SELECT` button. `KITPROG3 STATUS` LED is ON confirms board is in
     proper mode.
 
 -   On the command line:
@@ -94,19 +94,27 @@ will then join the network.
 
 ### Running OTA Update Process
 
-- Make sure the ota-requestor-app is flashed and booting on the CY8CKIT-062S2-43012.
+-   Make sure the ota-requestor-app is flashed and booting on the
+    CY8CKIT-062S2-43012.
 
-- Transfer out/ota_requestor_update_debug/chip-p6-ota-requestor-example.bin to a RPi4. 
+-   Transfer out/ota_requestor_update_debug/chip-p6-ota-requestor-example.bin to
+    a RPi4.
 
-- On the RPi: In terminal 1 run the Linux ota-provider-app as follows:
-    $ ./out/ota_provider_debug/chip-ota-provider-app -f chip-p6-ota-requestor-example.bin
+-   On the RPi: In terminal 1 run the Linux ota-provider-app as follows: \$
+    ./out/ota_provider_debug/chip-ota-provider-app -f
+    chip-p6-ota-requestor-example.bin
 
-- On the RPi: In terminal 2 run the following chip-tool commands
+-   On the RPi: In terminal 2 run the following chip-tool commands
     $ ./out/chip-tool/chip-tool pairing ble-wifi 2 "<SSID>" "<PASSWORD>" 20202021 3840
-    $ ./out/chip-tool/chip-tool pairing onnetwork 1 20202021 
-    $ ./out/chip-tool/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
+    $
+    ./out/chip-tool/chip-tool pairing onnetwork 1 20202021 \$
+    ./out/chip-tool/chip-tool otasoftwareupdaterequestor announce-ota-provider 1
+    0 0 0 2 0
 
-- Using a serial emulator reading from the CY8CKIT-062S2-43012, upon the announce-ota-provider call being made, you should observe the updated application being transferred to the board, written to flash, and, when completed, booted into.
+-   Using a serial emulator reading from the CY8CKIT-062S2-43012, upon the
+    announce-ota-provider call being made, you should observe the updated
+    application being transferred to the board, written to flash, and, when
+    completed, booted into.
 
 <a name="notes"></a>
 
