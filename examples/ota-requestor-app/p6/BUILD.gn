@@ -73,9 +73,8 @@ config("p6_ota_config") {
     "CY_ENABLE_XIP_PROGRAM",
   ]
 
-  if(build_update_image)
-  {
-    defines += ["UPDATE_IMAGE"]
+  if (build_update_image) {
+    defines += [ "UPDATE_IMAGE" ]
   }
 }
 
