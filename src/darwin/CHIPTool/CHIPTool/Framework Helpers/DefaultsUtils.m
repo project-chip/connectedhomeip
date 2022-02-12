@@ -125,39 +125,40 @@ void CHIPSetDevicePaired(uint64_t deviceId, BOOL paired)
     CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, KeyForPairedDevice(deviceId), paired ? @"YES" : @"NO");
 }
 
-NSString * KeyForPairedDevice(uint64_t deviceId)
-{
-    return [NSString stringWithFormat:@"%@%llu", kDevicePairedKey, deviceId];
-}
+NSString * KeyForPairedDevice(uint64_t deviceId) { return [NSString stringWithFormat:@"%@%llu", kDevicePairedKey, deviceId]; }
 
 void CHIPUnpairDeviceWithID(uint64_t deviceId)
 {
     CHIPSetDevicePaired(deviceId, NO);
     CHIPGetConnectedDeviceWithID(deviceId, ^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
-        if (error)
-        {
+        if (error) {
             NSLog(@"Failed to unpair device %llu still removing from CHIPTool. %@", deviceId, error);
             return;
         }
         NSLog(@"Attempting to unpair device %llu", deviceId);
-        CHIPOperationalCredentials *opCredsCluster = [[CHIPOperationalCredentials alloc] initWithDevice:device endpoint:0 queue:dispatch_get_main_queue()];
-        [opCredsCluster readAttributeCurrentFabricIndexWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
-            if (error)
-            {
-                NSLog(@"Failed to get current fabric index for device %llu still removing from CHIPTool. %@", deviceId, error);
-                return;
-            }
-            CHIPOperationalCredentialsClusterRemoveFabricParams *params = [[CHIPOperationalCredentialsClusterRemoveFabricParams alloc] init];
-            params.fabricIndex = value;
-            [opCredsCluster removeFabricWithParams:params completionHandler:^(CHIPOperationalCredentialsClusterNOCResponseParams * _Nullable data, NSError * _Nullable error) {
-                if (error)
-                {
-                    NSLog(@"Failed to remove current fabric index %@ for device %llu. %@", params.fabricIndex, deviceId, error);
+        CHIPOperationalCredentials * opCredsCluster = [[CHIPOperationalCredentials alloc] initWithDevice:device
+                                                                                                endpoint:0
+                                                                                                   queue:dispatch_get_main_queue()];
+        [opCredsCluster
+            readAttributeCurrentFabricIndexWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                if (error) {
+                    NSLog(@"Failed to get current fabric index for device %llu still removing from CHIPTool. %@", deviceId, error);
                     return;
                 }
-                NSLog(@"Successfully unpaired deviceId %llu", deviceId);
+                CHIPOperationalCredentialsClusterRemoveFabricParams * params =
+                    [[CHIPOperationalCredentialsClusterRemoveFabricParams alloc] init];
+                params.fabricIndex = value;
+                [opCredsCluster removeFabricWithParams:params
+                                     completionHandler:^(CHIPOperationalCredentialsClusterNOCResponseParams * _Nullable data,
+                                         NSError * _Nullable error) {
+                                         if (error) {
+                                             NSLog(@"Failed to remove current fabric index %@ for device %llu. %@",
+                                                 params.fabricIndex, deviceId, error);
+                                             return;
+                                         }
+                                         NSLog(@"Successfully unpaired deviceId %llu", deviceId);
+                                     }];
             }];
-        }];
     });
 }
 
