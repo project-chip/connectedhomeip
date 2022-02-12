@@ -106,7 +106,7 @@ will then join the network.
     $ ./out/chip-tool/chip-tool pairing onnetwork 1 20202021 
     $ ./out/chip-tool/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
 
-- Using a serial emulator reading from the CY8CKIT-062S2-43012, upon the announce-ota-provider call being made, you should observe the updated application being transfered to the board, written to flash, and, when completed, booted into.
+- Using a serial emulator reading from the CY8CKIT-062S2-43012, upon the announce-ota-provider call being made, you should observe the updated application being transferred to the board, written to flash, and, when completed, booted into.
 
 <a name="notes"></a>
 
