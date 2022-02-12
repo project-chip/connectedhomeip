@@ -61,7 +61,6 @@
 - (void)testControllerInvalidAccess
 {
     CHIPDeviceController * controller = [CHIPDeviceController sharedController];
-    NSError * error;
     XCTAssertFalse([controller isRunning]);
     XCTAssertFalse([controller getConnectedDevice:1234
                                             queue:dispatch_get_main_queue()
