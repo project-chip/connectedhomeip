@@ -1,25 +1,23 @@
-#CHIP P6 All Clusters Example
+#CHIP P6 OTA Requestor Example
 
-An example showing the use of Matter on the Infineon CY8CKIT-062S2-43012 board.
+An example demonstrating the OTA Requestor cluster on a Infineon CY8CKIT-062S2-43012 board.
 
 <hr>
 
--   [Matter P6 All Clusters Example](#chip-p6-clusters-example)
+-   [Matter P6 OTA Requestor Example](#chip-p6-ota-requestor-example)
     -   [Introduction](#introduction)
     -   [Building](#building)
     -   [Flashing the Application](#flashing-the-application)
-    -   [Commissioning and cluster control](#commissioning-and-cluster-control)
-        -   [Setting up Python Controller](#setting-up-python-controller)
-        -   [Commissioning over BLE](#commissioning-over-ble)
-            -   [Notes](#notes)
+    -   [Running OTA Update Process](#running-ota-update-process)
+    -   [Notes](#notes)
 
 <hr>
 
-<a name="intro"></a>
+<a name="introduction"></a>
 
 ## Introduction
 
-The P6 clusters example provides a baseline demonstration of a Cluster control
+The P6 OTA Requestor example provides a baseline demonstration of a OTA requestor
 device, built using Matter and the Infineon Modustoolbox SDK. It can be
 controlled by Matter controller over Wi-Fi network.
 
@@ -46,87 +44,71 @@ will then join the network.
 -   Supported hardware:
     [CY8CKIT-062S2-43012](https://www.cypress.com/CY8CKIT-062S2-43012)
 
-*   Build the example application:
+*   The following applications must be built to demonstrate the OTA process:
+          
+          - The P6 OTA Requestor App
+          - The Updated P6 OTA Requestor App (or other app)
+          - An OTA Provider App (the Linux ota-provider app is used here)
+          - chip-tool
 
-          $ ./scripts/examples/gn_p6_example.sh ./examples/all-clusters-app/p6 out/clusters_app_p6
+*   Build the P6 OTA Requestor application from the chip root dir:
 
--   To delete generated executable, libraries and object files use:
+          $ ./examples/ota-requestor-app/examples/ota_base_build.sh
 
-          $ cd ~/connectedhomeip
-          $ rm -rf out/
+*   Build the P6 OTA Update application from the chip root dir:
 
-<a name="flashing"></a>
+          $ ./examples/ota-requestor-app/examples/ota_update_build.sh
+
+*   On a RPi4: Build the Linux OTA Provider application from the chip root dir:
+
+          $ ./scripts/examples/gn_build_example.sh examples/ota-provider-app/linux/ out/ota_provider_debug/ chip_config_network_layer_ble=false
+
+*   On a RPi4: Build chip-tool:
+
+          $ ./scripts/examples/gn_build_example.sh examples/chip-tool/ out/chip-tool/
+
+*   Additionally a pre-compiled bootloader must be flashed to the board. This can be found at:
+
+          $ ./examples/ota-requestor-app/p6/matter-psoc6-mcuboot-bootloader.hex
+
+<a name="flashing-the-application"></a>
 
 ## Flashing the Application
 
--   Put CY8CKIT-062S2-43012 board on KitProg3 CMSIS-DAP Mode by pressing the
+-   Flash the bootloader by first putting the CY8CKIT-062S2-43012 board into KitProg3 
+    DAPLINK Mode by pressing the `MODE SELECT` button. `KITPROG3 STATUS` LED will
+    blink to indicate the the board is in the proper mode. A drive named 'DAPLINK' 
+    should be automatically mounted. To flash drag-and-drop 
+    matter-psoc6-mcuboot-bootloader.hex into that drive.
+
+-   Put CY8CKIT-062S2-43012 board back into KitProg3 CMSIS-DAP Mode by pressing the
     `MODE SELECT` button. `KITPROG3 STATUS` LED is ON confirms board is in
     proper mode.
 
 -   On the command line:
 
           $ cd ~/connectedhomeip
-          $ python3 out/clusters_app_p6/chip-p6-clusters-example.flash.py
+          $ python3 out/ota_requestor_debug/chip-p6-ota-requestor-example.flash.py
 
-<a name="Commissioning and cluster control"></a>
+<a name="running-ota-update-process"></a>
 
-## Commissioning and cluster control
+### Running OTA Update Process
 
-Commissioning can be carried out using BLE.
+- Make sure the ota-requestor-app is flashed and booting on the CY8CKIT-062S2-43012.
 
-<a name="Setting up Python Controller"></a>
+- Transfer out/ota_requestor_update_debug/chip-p6-ota-requestor-example.bin to a RPi4. 
 
-### Setting up Python Controller
+- On the RPi: In terminal 1 run the Linux ota-provider-app as follows:
+    $ ./out/ota_provider_debug/chip-ota-provider-app -f chip-p6-ota-requestor-example.bin
 
-Once P6 is up and running, we need to set up a device controller on Raspberry Pi
-4 to perform commissioning and cluster control.
+- On the RPi: In terminal 2 run the following chip-tool commands
+    $ ./out/chip-tool/chip-tool pairing ble-wifi 2 "<SSID>" "<PASSWORD>" 20202021 3840
+    $ ./out/chip-tool/chip-tool pairing onnetwork 1 20202021 
+    $ ./out/chip-tool/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
 
--   Set up python controller.
+- Using a serial emulator reading from the CY8CKIT-062S2-43012, upon the announce-ota-provider call being made, you should observe the updated application being transfered to the board, written to flash, and, when completed, booted into.
 
-           $ cd {path-to-connectedhomeip}
-           $ ./scripts/build_python.sh -m platform
-
--   Execute the controller.
-
-           $ source ./out/python_env/bin/activate
-           $ chip-device-ctrl
-
-<a name="Commissioning over BLE"></a>
-
-### Commissioning over BLE
-
--   Establish the secure session over BLE.
-
-         - chip-device-ctrl > ble-scan
-         - chip-device-ctrl > connect -ble 3840 20202021 1234
-
-         Parameters:
-         1. Discriminator: 3840
-         2. Setup-pin-code: 20202021
-         3. Node ID: Optional.
-            If not passed in this command, then it is auto-generated by the controller and
-            displayed in the output of connect.
-            The same value should be used in the next commands.
-            We have chosen a random node ID which is 1234.
-
--   Add credentials of the Wi-Fi network you want the P6 to connect to, using
-    the `AddOrUpdateWiFiNetwork` command and then enable the P6 to connect to it
-    using `EnableWiFiNetwork` command. In this example, we have used `WIFI_SSID`
-    and `WIFI_PASSWORD` as the SSID and passphrase respectively.
-
-         - chip-device-ctrl > zcl NetworkCommissioning AddOrUpdateWiFiNetwork 1234 0 0 ssid=str:WIFI_SSID credentials=str:WIFI_PASSWORD breadcrumb=0
-
-         - chip-device-ctrl > zcl NetworkCommissioning ConnectNetwork 1234 0 0 networkID=str:WIFI_SSID breadcrumb=0
-
--   Close the BLE connection to P6, as it is not required hereafter.
-
-         - chip-device-ctrl > close-ble
-
--   Resolve DNS-SD name and update address of the node in the device controller.
-
-         - chip-device-ctrl > resolve 1234
-
-<a name="Notes"></a>
+<a name="notes"></a>
 
 #### Notes
 
