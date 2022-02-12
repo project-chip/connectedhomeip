@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2021 Project CHIP Authors
+ *   Copyright (c) 2021-2022 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -218,6 +218,7 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricId f
 
         ReturnLogErrorOnFailure(ephemeralKey.Initialize());
         ReturnLogErrorOnFailure(mCredIssuerCmds->GenerateControllerNOCChain(mCommissionerStorage.GetLocalNodeId(), fabricId,
+                                                                            mCommissionerStorage.GetCommissionerCATs(),
                                                                             ephemeralKey, rcacSpan, icacSpan, nocSpan));
         commissionerParams.operationalKeypair = &ephemeralKey;
         commissionerParams.controllerRCAC     = rcacSpan;
