@@ -5843,22 +5843,22 @@ public class ClusterReadMapping {
             readOperationalCredentialsNOCsCommandParams);
     readOperationalCredentialsInteractionInfo.put(
         "readNOCsAttribute", readOperationalCredentialsNOCsAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readOperationalCredentialsFabricsListCommandParams =
+    Map<String, CommandParameterInfo> readOperationalCredentialsFabricsCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readOperationalCredentialsFabricsListAttributeInteractionInfo =
+    InteractionInfo readOperationalCredentialsFabricsAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.OperationalCredentialsCluster) cluster)
-                  .readFabricsListAttribute(
-                      (ChipClusters.OperationalCredentialsCluster.FabricsListAttributeCallback)
+                  .readFabricsAttribute(
+                      (ChipClusters.OperationalCredentialsCluster.FabricsAttributeCallback)
                           callback);
             },
             () ->
                 new ClusterInfoMapping
-                    .DelegatedOperationalCredentialsClusterFabricsListAttributeCallback(),
-            readOperationalCredentialsFabricsListCommandParams);
+                    .DelegatedOperationalCredentialsClusterFabricsAttributeCallback(),
+            readOperationalCredentialsFabricsCommandParams);
     readOperationalCredentialsInteractionInfo.put(
-        "readFabricsListAttribute", readOperationalCredentialsFabricsListAttributeInteractionInfo);
+        "readFabricsAttribute", readOperationalCredentialsFabricsAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readOperationalCredentialsSupportedFabricsCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readOperationalCredentialsSupportedFabricsAttributeInteractionInfo =

@@ -13094,9 +13094,9 @@ void CHIPOperationalCredentialsNOCsAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPOperationalCredentialsFabricsListAttributeCallback::CHIPOperationalCredentialsFabricsListAttributeCallback(jobject javaCallback,
-                                                                                                               bool keepAlive) :
-    chip::Callback::Callback<CHIPOperationalCredentialsClusterFabricsListAttributeCallbackType>(CallbackFn, this),
+CHIPOperationalCredentialsFabricsAttributeCallback::CHIPOperationalCredentialsFabricsAttributeCallback(jobject javaCallback,
+                                                                                                       bool keepAlive) :
+    chip::Callback::Callback<CHIPOperationalCredentialsClusterFabricsAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -13113,7 +13113,7 @@ CHIPOperationalCredentialsFabricsListAttributeCallback::CHIPOperationalCredentia
     }
 }
 
-CHIPOperationalCredentialsFabricsListAttributeCallback::~CHIPOperationalCredentialsFabricsListAttributeCallback()
+CHIPOperationalCredentialsFabricsAttributeCallback::~CHIPOperationalCredentialsFabricsAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -13124,7 +13124,7 @@ CHIPOperationalCredentialsFabricsListAttributeCallback::~CHIPOperationalCredenti
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPOperationalCredentialsFabricsListAttributeCallback::CallbackFn(
+void CHIPOperationalCredentialsFabricsAttributeCallback::CallbackFn(
     void * context,
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & list)
@@ -13136,8 +13136,8 @@ void CHIPOperationalCredentialsFabricsListAttributeCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPOperationalCredentialsFabricsListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPOperationalCredentialsFabricsListAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPOperationalCredentialsFabricsAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPOperationalCredentialsFabricsAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;

@@ -6895,7 +6895,7 @@ void CHIPOperationalCredentialsNOCsListAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void CHIPOperationalCredentialsFabricsListListAttributeCallbackBridge::OnSuccessFn(void * context,
+void CHIPOperationalCredentialsFabricsListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & value)
 {
@@ -6927,9 +6927,9 @@ void CHIPOperationalCredentialsFabricsListListAttributeCallbackBridge::OnSuccess
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPOperationalCredentialsFabricsListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPOperationalCredentialsFabricsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPOperationalCredentialsFabricsListListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPOperationalCredentialsFabricsListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }

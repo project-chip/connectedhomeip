@@ -16355,7 +16355,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NOCs
-namespace FabricsList {
+namespace Fabrics {
 struct TypeInfo
 {
     using Type = chip::app::DataModel::List<const chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::Type>;
@@ -16365,10 +16365,10 @@ struct TypeInfo
         chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FabricsList::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Fabrics::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace FabricsList
+} // namespace Fabrics
 namespace SupportedFabrics {
 struct TypeInfo
 {
@@ -16487,7 +16487,7 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::NOCs::TypeInfo::DecodableType NOCs;
-        Attributes::FabricsList::TypeInfo::DecodableType fabricsList;
+        Attributes::Fabrics::TypeInfo::DecodableType fabrics;
         Attributes::SupportedFabrics::TypeInfo::DecodableType supportedFabrics       = static_cast<uint8_t>(0);
         Attributes::CommissionedFabrics::TypeInfo::DecodableType commissionedFabrics = static_cast<uint8_t>(0);
         Attributes::TrustedRootCertificates::TypeInfo::DecodableType trustedRootCertificates;

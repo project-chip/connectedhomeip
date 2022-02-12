@@ -10416,7 +10416,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeFabricsListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeFabricsWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -10425,7 +10425,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = OperationalCredentials::Attributes::FabricsList::TypeInfo;
+            using TypeInfo = OperationalCredentials::Attributes::Fabrics::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;

@@ -12825,7 +12825,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface FabricsListAttributeCallback {
+    public interface FabricsAttributeCallback {
       void onSuccess(List<ChipStructs.OperationalCredentialsClusterFabricDescriptor> valueList);
 
       void onError(Exception ex);
@@ -12882,13 +12882,13 @@ public class ChipClusters {
       subscribeNOCsAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readFabricsListAttribute(FabricsListAttributeCallback callback) {
-      readFabricsListAttribute(chipClusterPtr, callback);
+    public void readFabricsAttribute(FabricsAttributeCallback callback) {
+      readFabricsAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeFabricsListAttribute(
-        FabricsListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeFabricsListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeFabricsAttribute(
+        FabricsAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFabricsAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readSupportedFabricsAttribute(IntegerAttributeCallback callback) {
@@ -12973,14 +12973,11 @@ public class ChipClusters {
     private native void subscribeNOCsAttribute(
         long chipClusterPtr, NOCsAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readFabricsListAttribute(
-        long chipClusterPtr, FabricsListAttributeCallback callback);
+    private native void readFabricsAttribute(
+        long chipClusterPtr, FabricsAttributeCallback callback);
 
-    private native void subscribeFabricsListAttribute(
-        long chipClusterPtr,
-        FabricsListAttributeCallback callback,
-        int minInterval,
-        int maxInterval);
+    private native void subscribeFabricsAttribute(
+        long chipClusterPtr, FabricsAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readSupportedFabricsAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);

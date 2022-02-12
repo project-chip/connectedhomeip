@@ -5439,20 +5439,20 @@ private:
     bool keepAlive;
 };
 
-class CHIPOperationalCredentialsFabricsListAttributeCallback
-    : public chip::Callback::Callback<CHIPOperationalCredentialsClusterFabricsListAttributeCallbackType>
+class CHIPOperationalCredentialsFabricsAttributeCallback
+    : public chip::Callback::Callback<CHIPOperationalCredentialsClusterFabricsAttributeCallbackType>
 {
 public:
-    CHIPOperationalCredentialsFabricsListAttributeCallback(jobject javaCallback, bool keepAlive = false);
+    CHIPOperationalCredentialsFabricsAttributeCallback(jobject javaCallback, bool keepAlive = false);
 
-    ~CHIPOperationalCredentialsFabricsListAttributeCallback();
+    ~CHIPOperationalCredentialsFabricsAttributeCallback();
 
-    static void maybeDestroy(CHIPOperationalCredentialsFabricsListAttributeCallback * callback)
+    static void maybeDestroy(CHIPOperationalCredentialsFabricsAttributeCallback * callback)
     {
         if (!callback->keepAlive)
         {
             callback->Cancel();
-            chip::Platform::Delete<CHIPOperationalCredentialsFabricsListAttributeCallback>(callback);
+            chip::Platform::Delete<CHIPOperationalCredentialsFabricsAttributeCallback>(callback);
         }
     }
 
@@ -5462,7 +5462,7 @@ public:
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPOperationalCredentialsFabricsListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPOperationalCredentialsFabricsAttributeCallback *>(context)->javaCallbackRef);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 

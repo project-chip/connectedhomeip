@@ -4048,12 +4048,11 @@ NS_ASSUME_NONNULL_BEGIN
                       subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                 reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
-- (void)readAttributeFabricsListWithCompletionHandler:(void (^)(
-                                                          NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeFabricsListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                         maxInterval:(NSNumber * _Nonnull)maxInterval
-                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
+- (void)readAttributeFabricsWithCompletionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeFabricsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                   reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
 
 - (void)readAttributeSupportedFabricsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
