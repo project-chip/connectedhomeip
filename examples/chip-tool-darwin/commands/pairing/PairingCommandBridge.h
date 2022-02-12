@@ -62,7 +62,6 @@ public:
 private:
     void PairWithCode(NSError * __autoreleasing * error);
     void PairWithIPAddress(NSError * __autoreleasing * error);
-    void Unpair(NSError * __autoreleasing * error);
     void SetUpPairingDelegate();
 
     const PairingMode mPairingMode;

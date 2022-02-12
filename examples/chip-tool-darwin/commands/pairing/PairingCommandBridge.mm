@@ -75,5 +75,3 @@ void PairingCommandBridge::PairWithIPAddress(NSError * __autoreleasing * error)
                          setupPINCode:mSetupPINCode
                                 error:error];
 }
-
-void PairingCommandBridge::Unpair(NSError * __autoreleasing * error) { [CurrentCommissioner() unpairDevice:mNodeId error:error]; }
