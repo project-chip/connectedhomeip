@@ -268,13 +268,8 @@
             if (chipDevice) {
                 CHIPOperationalCredentials * cluster =
                     [[CHIPOperationalCredentials alloc] initWithDevice:chipDevice endpoint:0 queue:dispatch_get_main_queue()];
-<<<<<<< HEAD
                 [self updateResult:[NSString stringWithFormat:@"readAttributeFabrics command sent."] isError:NO];
                 [cluster readAttributeFabricsWithCompletionHandler:^(
-=======
-                [self updateResult:[NSString stringWithFormat:@"readAttributeFabricsList command sent."] isError:NO];
-                [cluster readAttributeFabricsListWithCompletionHandler:^(
->>>>>>> 1b1789f686d (Restyled by clang-format)
                     NSArray<CHIPOperationalCredentialsClusterFabricDescriptor *> * _Nullable fabricsList,
                     NSError * _Nullable error) {
                     if (error) {
