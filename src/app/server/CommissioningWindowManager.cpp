@@ -187,18 +187,18 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow()
     }
     else
     {
-        uint32_t iterationCount                   = 0;
-        uint8_t salt[kPBKDFMaximumSaltLen]        = { 0 };
-        size_t saltLen                            = 0;
-        PASEVerifierSerialized serializedVerifier = { 0 };
-        size_t serializedVerifierLen              = 0;
+        uint32_t iterationCount                           = 0;
+        uint8_t salt[Crypto::kSpake2pPBKDFMaximumSaltLen] = { 0 };
+        size_t saltLen                                    = 0;
+        PASEVerifierSerialized serializedVerifier         = { 0 };
+        size_t serializedVerifierLen                      = 0;
         PASEVerifier verifier;
 
         ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSpake2pIterationCount(iterationCount));
         ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSpake2pSalt(salt, sizeof(salt), saltLen));
-        ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSpake2pVerifier(serializedVerifier, kSpake2pSerializedVerifierSize,
-                                                                                serializedVerifierLen));
-        VerifyOrReturnError(kSpake2pSerializedVerifierSize == serializedVerifierLen, CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSpake2pVerifier(
+            serializedVerifier, Crypto::kSpake2pSerializedVerifierSize, serializedVerifierLen));
+        VerifyOrReturnError(Crypto::kSpake2pSerializedVerifierSize == serializedVerifierLen, CHIP_ERROR_INVALID_ARGUMENT);
         ReturnErrorOnFailure(verifier.Deserialize(ByteSpan(serializedVerifier)));
 
         ReturnErrorOnFailure(
