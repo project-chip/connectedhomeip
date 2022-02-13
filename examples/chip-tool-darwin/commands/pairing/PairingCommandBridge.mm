@@ -42,9 +42,6 @@ CHIP_ERROR PairingCommandBridge::RunCommand()
 {
     NSError * error;
     switch (mPairingMode) {
-    case PairingMode::None:
-        Unpair(&error);
-        break;
     case PairingMode::QRCode:
     case PairingMode::ManualCode:
         PairWithCode(&error);
