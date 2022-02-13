@@ -10233,18 +10233,22 @@ class GeneralDiagnostics(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="name", Tag=0, Type=str),
-                            ClusterObjectFieldDescriptor(Label="fabricConnected", Tag=1, Type=bool),
+                            ClusterObjectFieldDescriptor(Label="isOperational", Tag=1, Type=bool),
                             ClusterObjectFieldDescriptor(Label="offPremiseServicesReachableIPv4", Tag=2, Type=typing.Union[Nullable, bool]),
                             ClusterObjectFieldDescriptor(Label="offPremiseServicesReachableIPv6", Tag=3, Type=typing.Union[Nullable, bool]),
                             ClusterObjectFieldDescriptor(Label="hardwareAddress", Tag=4, Type=bytes),
-                            ClusterObjectFieldDescriptor(Label="type", Tag=5, Type=GeneralDiagnostics.Enums.InterfaceType),
+                            ClusterObjectFieldDescriptor(Label="IPv4Addresses", Tag=5, Type=typing.List[bytes]),
+                            ClusterObjectFieldDescriptor(Label="IPv6Addresses", Tag=6, Type=typing.List[bytes]),
+                            ClusterObjectFieldDescriptor(Label="type", Tag=7, Type=GeneralDiagnostics.Enums.InterfaceType),
                     ])
 
             name: 'str' = ""
-            fabricConnected: 'bool' = False
+            isOperational: 'bool' = False
             offPremiseServicesReachableIPv4: 'typing.Union[Nullable, bool]' = NullValue
             offPremiseServicesReachableIPv6: 'typing.Union[Nullable, bool]' = NullValue
             hardwareAddress: 'bytes' = b""
+            IPv4Addresses: 'typing.List[bytes]' = field(default_factory=lambda: [])
+            IPv6Addresses: 'typing.List[bytes]' = field(default_factory=lambda: [])
             type: 'GeneralDiagnostics.Enums.InterfaceType' = 0
 
 

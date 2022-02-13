@@ -4442,7 +4442,7 @@ void CHIPGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge::OnSucce
             newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
                                                          length:entry_0.name.size()
                                                        encoding:NSUTF8StringEncoding];
-            newElement_0.fabricConnected = [NSNumber numberWithBool:entry_0.fabricConnected];
+            newElement_0.isOperational = [NSNumber numberWithBool:entry_0.isOperational];
             if (entry_0.offPremiseServicesReachableIPv4.IsNull()) {
                 newElement_0.offPremiseServicesReachableIPv4 = nil;
             } else {
@@ -4457,6 +4457,38 @@ void CHIPGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge::OnSucce
             }
             newElement_0.hardwareAddress = [NSData dataWithBytes:entry_0.hardwareAddress.data()
                                                           length:entry_0.hardwareAddress.size()];
+            { // Scope for our temporary variables
+                auto * array_2 = [NSMutableArray new];
+                auto iter_2 = entry_0.IPv4Addresses.begin();
+                while (iter_2.Next()) {
+                    auto & entry_2 = iter_2.GetValue();
+                    NSData * newElement_2;
+                    newElement_2 = [NSData dataWithBytes:entry_2.data() length:entry_2.size()];
+                    [array_2 addObject:newElement_2];
+                }
+                CHIP_ERROR err = iter_2.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    OnFailureFn(context, err);
+                    return;
+                }
+                newElement_0.iPv4Addresses = array_2;
+            }
+            { // Scope for our temporary variables
+                auto * array_2 = [NSMutableArray new];
+                auto iter_2 = entry_0.IPv6Addresses.begin();
+                while (iter_2.Next()) {
+                    auto & entry_2 = iter_2.GetValue();
+                    NSData * newElement_2;
+                    newElement_2 = [NSData dataWithBytes:entry_2.data() length:entry_2.size()];
+                    [array_2 addObject:newElement_2];
+                }
+                CHIP_ERROR err = iter_2.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    OnFailureFn(context, err);
+                    return;
+                }
+                newElement_0.iPv6Addresses = array_2;
+            }
             newElement_0.type = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.type)];
             [array_0 addObject:newElement_0];
         }

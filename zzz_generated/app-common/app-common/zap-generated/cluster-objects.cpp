@@ -8072,12 +8072,14 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kName)), name));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricConnected)), fabricConnected));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kIsOperational)), isOperational));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOffPremiseServicesReachableIPv4)),
                                            offPremiseServicesReachableIPv4));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOffPremiseServicesReachableIPv6)),
                                            offPremiseServicesReachableIPv6));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kHardwareAddress)), hardwareAddress));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kIPv4Addresses)), IPv4Addresses));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kIPv6Addresses)), IPv6Addresses));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kType)), type));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
@@ -8098,8 +8100,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kName):
             ReturnErrorOnFailure(DataModel::Decode(reader, name));
             break;
-        case to_underlying(Fields::kFabricConnected):
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricConnected));
+        case to_underlying(Fields::kIsOperational):
+            ReturnErrorOnFailure(DataModel::Decode(reader, isOperational));
             break;
         case to_underlying(Fields::kOffPremiseServicesReachableIPv4):
             ReturnErrorOnFailure(DataModel::Decode(reader, offPremiseServicesReachableIPv4));
@@ -8109,6 +8111,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             break;
         case to_underlying(Fields::kHardwareAddress):
             ReturnErrorOnFailure(DataModel::Decode(reader, hardwareAddress));
+            break;
+        case to_underlying(Fields::kIPv4Addresses):
+            ReturnErrorOnFailure(DataModel::Decode(reader, IPv4Addresses));
+            break;
+        case to_underlying(Fields::kIPv6Addresses):
+            ReturnErrorOnFailure(DataModel::Decode(reader, IPv6Addresses));
             break;
         case to_underlying(Fields::kType):
             ReturnErrorOnFailure(DataModel::Decode(reader, type));

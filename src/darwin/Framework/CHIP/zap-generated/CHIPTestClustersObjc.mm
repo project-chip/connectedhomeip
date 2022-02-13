@@ -6593,7 +6593,7 @@ using namespace chip::app::Clusters;
                         }
                         auto element_0 = (CHIPGeneralDiagnosticsClusterNetworkInterfaceType *) value[i_0];
                         listHolder_0->mList[i_0].name = [self asCharSpan:element_0.name];
-                        listHolder_0->mList[i_0].fabricConnected = element_0.fabricConnected.boolValue;
+                        listHolder_0->mList[i_0].isOperational = element_0.isOperational.boolValue;
                         if (element_0.offPremiseServicesReachableIPv4 == nil) {
                             listHolder_0->mList[i_0].offPremiseServicesReachableIPv4.SetNull();
                         } else {
@@ -6607,6 +6607,52 @@ using namespace chip::app::Clusters;
                             nonNullValue_2 = element_0.offPremiseServicesReachableIPv6.boolValue;
                         }
                         listHolder_0->mList[i_0].hardwareAddress = [self asByteSpan:element_0.hardwareAddress];
+                        {
+                            using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].IPv4Addresses)>;
+                            using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                            if (element_0.iPv4Addresses.count != 0) {
+                                auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.iPv4Addresses.count);
+                                if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
+                                    return CHIP_ERROR_INVALID_ARGUMENT;
+                                }
+                                listFreer.add(listHolder_2);
+                                for (size_t i_2 = 0; i_2 < element_0.iPv4Addresses.count; ++i_2) {
+                                    if (![element_0.iPv4Addresses[i_2] isKindOfClass:[NSData class]]) {
+                                        // Wrong kind of value.
+                                        return CHIP_ERROR_INVALID_ARGUMENT;
+                                    }
+                                    auto element_2 = (NSData *) element_0.iPv4Addresses[i_2];
+                                    listHolder_2->mList[i_2] = [self asByteSpan:element_2];
+                                }
+                                listHolder_0->mList[i_0].IPv4Addresses
+                                    = ListType_2(listHolder_2->mList, element_0.iPv4Addresses.count);
+                            } else {
+                                listHolder_0->mList[i_0].IPv4Addresses = ListType_2();
+                            }
+                        }
+                        {
+                            using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].IPv6Addresses)>;
+                            using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                            if (element_0.iPv6Addresses.count != 0) {
+                                auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.iPv6Addresses.count);
+                                if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
+                                    return CHIP_ERROR_INVALID_ARGUMENT;
+                                }
+                                listFreer.add(listHolder_2);
+                                for (size_t i_2 = 0; i_2 < element_0.iPv6Addresses.count; ++i_2) {
+                                    if (![element_0.iPv6Addresses[i_2] isKindOfClass:[NSData class]]) {
+                                        // Wrong kind of value.
+                                        return CHIP_ERROR_INVALID_ARGUMENT;
+                                    }
+                                    auto element_2 = (NSData *) element_0.iPv6Addresses[i_2];
+                                    listHolder_2->mList[i_2] = [self asByteSpan:element_2];
+                                }
+                                listHolder_0->mList[i_0].IPv6Addresses
+                                    = ListType_2(listHolder_2->mList, element_0.iPv6Addresses.count);
+                            } else {
+                                listHolder_0->mList[i_0].IPv6Addresses = ListType_2();
+                            }
+                        }
                         listHolder_0->mList[i_0].type
                             = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].type)>>(
                                 element_0.type.unsignedCharValue);

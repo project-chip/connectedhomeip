@@ -316,13 +316,17 @@ NS_ASSUME_NONNULL_BEGIN
 
         _name = @"";
 
-        _fabricConnected = @(0);
+        _isOperational = @(0);
 
         _offPremiseServicesReachableIPv4 = nil;
 
         _offPremiseServicesReachableIPv6 = nil;
 
         _hardwareAddress = [NSData data];
+
+        _iPv4Addresses = [NSArray array];
+
+        _iPv6Addresses = [NSArray array];
 
         _type = @(0);
     }
