@@ -36,7 +36,7 @@ public:
         , mSuccess(OnSuccessFn, this)
         , mFailure(OnFailureFn, this)
     {
-        mResponseTime = [NSDate date];
+        mRequestTime = [NSDate date];
         // Generate a unique cookie to track this operation
         mCookie = [NSString stringWithFormat:@"Response Time: %s+%u", typeid(T).name(), arc4random()];
         ChipLogDetail(Controller, "%s", mCookie.UTF8String);
@@ -86,7 +86,7 @@ private:
 
         dispatch_async(callbackBridge->mQueue, ^{
             ChipLogDetail(Controller, "%s %f seconds", callbackBridge->mCookie.UTF8String,
-                -[callbackBridge->mResponseTime timeIntervalSinceNow]);
+                -[callbackBridge->mRequestTime timeIntervalSinceNow]);
             callbackBridge->mHandler(value, error);
 
             if (!callbackBridge->mKeepAlive) {
@@ -102,6 +102,6 @@ private:
     chip::Callback::Callback<CHIPDefaultFailureCallbackType> mFailure;
 
     // Measure the time it took for the callback to trigger
-    NSDate * mResponseTime;
+    NSDate * mRequestTime;
     NSString * mCookie;
 };
