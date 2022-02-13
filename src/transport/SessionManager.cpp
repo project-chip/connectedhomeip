@@ -31,7 +31,6 @@
 
 #include "transport/TraceMessage.h"
 #include <app/util/basic-types.h>
-#include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPKeyIds.h>
 #include <lib/support/CodeUtils.h>
@@ -88,7 +87,6 @@ CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * 
     mSystemLayer           = systemLayer;
     mTransportMgr          = transportMgr;
     mMessageCounterManager = messageCounterManager;
-    mStorage               = storageDelegate;
 
     // TODO: Handle error from mGlobalEncryptedMessageCounter! Unit tests currently crash if you do!
     (void) mGlobalEncryptedMessageCounter.Init();
@@ -140,9 +138,8 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         VerifyOrReturnError(nullptr != groups, CHIP_ERROR_INTERNAL);
 
         packetHeader.SetDestinationGroupId(groupSession->GetGroupId());
-        uint32_t messageCounter = mGroupClientCounter.GetCounter(isControlMsg);
-        packetHeader.SetMessageCounter(messageCounter++);
-        mGroupClientCounter.SetCounter(isControlMsg, messageCounter);
+        packetHeader.SetMessageCounter(mGroupClientCounter.GetCounter(isControlMsg));
+        mGroupClientCounter.IncrementCounter(isControlMsg);
         packetHeader.SetFlags(Header::SecFlagValues::kPrivacyFlag);
         packetHeader.SetSessionType(Header::SessionType::kGroupSession);
         packetHeader.SetSourceNodeId(groupSession->GetSourceNodeId());
@@ -702,7 +699,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
         {
 
             // TODO support cache and sync with MCSP. Issue  #11689
-            ChipLogError(Inet, "Receive Group Msg with key policy Cache and Sync, but MCSP is not implemented");
+            ChipLogError(Inet, "Received Group Msg with key policy Cache and Sync, but MCSP is not implemented");
             return;
 
             // cache and sync
@@ -711,13 +708,15 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
 
         if (err != CHIP_NO_ERROR)
         {
+            // Exit now, since Group Messages don't have acks or responses of any kind.
             ChipLogError(Inet, "Message counter verify failed, err = %" CHIP_ERROR_FORMAT, err.Format());
             return;
         }
     }
     else
     {
-        ChipLogError(Inet, "Invalid NodeId or FabricID after decryption of message, dropping everything");
+        ChipLogError(Inet,
+                     "Group Counter Tables full or invalid NodeId/FabricIndex after decryption of message, dropping everything");
         return;
     }
 

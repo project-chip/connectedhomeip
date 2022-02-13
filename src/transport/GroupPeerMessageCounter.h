@@ -25,11 +25,11 @@
 #include <bitset>
 
 #include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/NodeId.h>
 #include <lib/core/PeerId.h>
 #include <lib/support/Span.h>
 #include <transport/PeerMessageCounter.h>
-#include <lib/core/DataModelTypes.h>
 
 #define GROUP_MSG_COUNTER_MAX_NUMBER_OF_GROUP_DATA_PEER 15
 #define GROUP_MSG_COUNTER_MAX_NUMBER_OF_GROUP_CONTROL_PEER 15
@@ -49,7 +49,7 @@ public:
 class GroupFabric
 {
 public:
-    FabricIndex mFabricIndex        = kUndefinedFabricIndex;
+    FabricIndex mFabricIndex  = kUndefinedFabricIndex;
     uint8_t mControlPeerCount = 0;
     uint8_t mDataPeerCount    = 0;
     GroupSender mDataGroupSenders[GROUP_MSG_COUNTER_MAX_NUMBER_OF_GROUP_DATA_PEER];
@@ -59,29 +59,32 @@ public:
 class GroupPeerTable
 {
 public:
-    CHIP_ERROR FindOrAddPeer(FabricIndex fabricIndex, NodeId nodeId, bool isControl, chip::Transport::PeerMessageCounter *& counter);
+    CHIP_ERROR FindOrAddPeer(FabricIndex fabricIndex, NodeId nodeId, bool isControl,
+                             chip::Transport::PeerMessageCounter *& counter);
 
     // Used in case of MCSP failure
     CHIP_ERROR RemovePeer(FabricIndex fabricIndex, NodeId nodeId, bool isControl);
 
-    // For Unit Test
-    FabricIndex GetFabricIndexAt(uint8_t index);
+// Protected for Unit Tests inheritance
+protected:
+    bool RemoveSpecificPeer(GroupSender * list, NodeId nodeId, uint32_t size);
+    void CompactPeers(GroupSender * list, uint32_t size);
 
-private:
     GroupFabric mGroupFabrics[CHIP_CONFIG_MAX_FABRICS];
 };
 
 // Might want to rename this so that it is explicitly the sending side of counters
-class GroupClientCounters
+class GroupOutgoingCounters
 {
 public:
-    GroupClientCounters(){};
-    GroupClientCounters(chip::PersistentStorageDelegate * storage_delegate);
+    GroupOutgoingCounters(){};
+    GroupOutgoingCounters(chip::PersistentStorageDelegate * storage_delegate);
     CHIP_ERROR Init(chip::PersistentStorageDelegate * storage_delegate);
     uint32_t GetCounter(bool isControl);
-    void SetCounter(bool isControl, uint32_t value);
+    void IncrementCounter(bool isControl);
 
-private:
+    // Protected for Unit Tests inheritance
+protected:
     // TODO Initialize those to random value
     uint32_t mGroupDataCounter                 = 0;
     uint32_t mGroupControlCounter              = 0;

@@ -34,86 +34,86 @@ CHIP_ERROR GroupPeerTable::FindOrAddPeer(FabricIndex fabricIndex, NodeId nodeId,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    for (uint32_t it = 0; it < CHIP_CONFIG_MAX_FABRICS; it++)
+    for (auto & groupFabric : mGroupFabrics)
     {
-        if (mGroupFabrics[it].mFabricIndex == kUndefinedFabricIndex)
+        if (groupFabric.mFabricIndex == kUndefinedFabricIndex)
         {
-            // Already iterate through all known fabricIndex
+            // Already iterated through all known fabricIndex
             // Add the new peer to save some processing time
-            mGroupFabrics[it].mFabricIndex = fabricIndex;
+            groupFabric.mFabricIndex = fabricIndex;
             if (isControl)
             {
-                mGroupFabrics[it].mControlGroupSenders[0].mNodeId = nodeId;
-                counter                                           = &(mGroupFabrics[it].mControlGroupSenders[0].msgCounter);
-                mGroupFabrics[it].mControlPeerCount++;
+                groupFabric.mControlGroupSenders[0].mNodeId = nodeId;
+                counter                                     = &(groupFabric.mControlGroupSenders[0].msgCounter);
+                groupFabric.mControlPeerCount++;
             }
             else
             {
-                mGroupFabrics[it].mDataGroupSenders[0].mNodeId = nodeId;
-                counter                                        = &(mGroupFabrics[it].mDataGroupSenders[0].msgCounter);
-                mGroupFabrics[it].mDataPeerCount++;
+                groupFabric.mDataGroupSenders[0].mNodeId = nodeId;
+                counter                                  = &(groupFabric.mDataGroupSenders[0].msgCounter);
+                groupFabric.mDataPeerCount++;
             }
             return CHIP_NO_ERROR;
         }
 
-        if (fabricIndex == mGroupFabrics[it].mFabricIndex)
+        if (fabricIndex == groupFabric.mFabricIndex)
         {
             if (isControl)
             {
-                for (uint32_t nodeIt = 0; nodeIt < GROUP_MSG_COUNTER_MAX_NUMBER_OF_GROUP_CONTROL_PEER; nodeIt++)
+                for (auto & node : groupFabric.mControlGroupSenders)
                 {
-                    if (mGroupFabrics[it].mControlGroupSenders[nodeIt].mNodeId == kUndefinedNodeId)
+                    if (node.mNodeId == kUndefinedNodeId)
                     {
-                        // Already iterate through all known NodeId
+                        // Already iterated through all known NodeIds
                         // Add the new peer to save some processing time
-                        mGroupFabrics[it].mControlGroupSenders[nodeIt].mNodeId = nodeId;
-                        counter = &(mGroupFabrics[it].mControlGroupSenders[nodeIt].msgCounter);
-                        mGroupFabrics[it].mControlPeerCount++;
+                        node.mNodeId = nodeId;
+                        counter      = &(node.msgCounter);
+                        groupFabric.mControlPeerCount++;
                         return CHIP_NO_ERROR;
                     }
 
-                    if (mGroupFabrics[it].mControlGroupSenders[nodeIt].mNodeId == nodeId)
+                    if (node.mNodeId == nodeId)
                     {
-                        counter = &(mGroupFabrics[it].mControlGroupSenders[nodeIt].msgCounter);
+                        counter = &(node.msgCounter);
                         return CHIP_NO_ERROR;
                     }
                 }
             }
             else
             {
-                for (uint32_t nodeIt = 0; nodeIt < GROUP_MSG_COUNTER_MAX_NUMBER_OF_GROUP_DATA_PEER; nodeIt++)
+                for (auto & node : groupFabric.mDataGroupSenders)
                 {
-                    if (mGroupFabrics[it].mDataGroupSenders[nodeIt].mNodeId == kUndefinedNodeId)
+                    if (node.mNodeId == kUndefinedNodeId)
                     {
-                        // Already iterate through all known NodeId
+                        // Already iterated through all known NodeIds
                         // Add the new peer to save some processing time
-                        mGroupFabrics[it].mDataGroupSenders[nodeIt].mNodeId = nodeId;
-                        counter = &(mGroupFabrics[it].mDataGroupSenders[nodeIt].msgCounter);
-                        mGroupFabrics[it].mDataPeerCount++;
+                        node.mNodeId = nodeId;
+                        counter      = &(node.msgCounter);
+                        groupFabric.mDataPeerCount++;
                         return CHIP_NO_ERROR;
                     }
 
-                    if (mGroupFabrics[it].mDataGroupSenders[nodeIt].mNodeId == nodeId)
+                    if (node.mNodeId == nodeId)
                     {
-                        counter = &(mGroupFabrics[it].mDataGroupSenders[nodeIt].msgCounter);
+                        counter = &(node.msgCounter);
                         return CHIP_NO_ERROR;
                     }
                 }
             }
-            // Exceed the Max number of Group peer
+            // Exceeded the Max number of Group peers
             return CHIP_ERROR_TOO_MANY_PEER_NODES;
         }
     }
 
-    // Exceed the Max number of Group peer
+    // Exceeded the Max number of Group peers
     return CHIP_ERROR_TOO_MANY_PEER_NODES;
 }
 
 // Used in case of MCSP failure
 CHIP_ERROR GroupPeerTable::RemovePeer(FabricIndex fabricIndex, NodeId nodeId, bool isControl)
 {
-    CHIP_ERROR err       = CHIP_ERROR_NOT_FOUND;
-    uint32_t fabricIt    = CHIP_CONFIG_MAX_FABRICS;
+    CHIP_ERROR err    = CHIP_ERROR_NOT_FOUND;
+    uint32_t fabricIt = CHIP_CONFIG_MAX_FABRICS;
 
     if (fabricIndex == kUndefinedFabricIndex || nodeId == kUndefinedNodeId)
     {
@@ -126,30 +126,22 @@ CHIP_ERROR GroupPeerTable::RemovePeer(FabricIndex fabricIndex, NodeId nodeId, bo
         {
             if (isControl)
             {
-                for (uint32_t nodeIt = 0; nodeIt < GROUP_MSG_COUNTER_MAX_NUMBER_OF_GROUP_CONTROL_PEER; nodeIt++)
+                if (RemoveSpecificPeer(mGroupFabrics[it].mControlGroupSenders, nodeId,
+                                       GROUP_MSG_COUNTER_MAX_NUMBER_OF_GROUP_CONTROL_PEER))
                 {
-                    if (mGroupFabrics[it].mControlGroupSenders[nodeIt].mNodeId == nodeId)
-                    {
-                        fabricIt                                            = it;
-                        mGroupFabrics[it].mControlGroupSenders[nodeIt].mNodeId = kUndefinedNodeId;
-                        mGroupFabrics[it].mControlGroupSenders[nodeIt].msgCounter.Reset();
-                        mGroupFabrics[it].mControlPeerCount--;
-                        err = CHIP_NO_ERROR;
-                    }
+                    fabricIt = it;
+                    mGroupFabrics[it].mControlPeerCount--;
+                    err = CHIP_NO_ERROR;
                 }
             }
             else
             {
-                for (uint32_t nodeIt = 0; nodeIt < GROUP_MSG_COUNTER_MAX_NUMBER_OF_GROUP_DATA_PEER; nodeIt++)
+                if (RemoveSpecificPeer(mGroupFabrics[it].mDataGroupSenders, nodeId,
+                                       GROUP_MSG_COUNTER_MAX_NUMBER_OF_GROUP_DATA_PEER))
                 {
-                    if (mGroupFabrics[it].mDataGroupSenders[nodeIt].mNodeId == nodeId)
-                    {
-                        fabricIt                                         = it;
-                        mGroupFabrics[it].mDataGroupSenders[nodeIt].mNodeId = kUndefinedNodeId;
-                        mGroupFabrics[it].mDataGroupSenders[nodeIt].msgCounter.Reset();
-                        mGroupFabrics[it].mDataPeerCount--;
-                        err = CHIP_NO_ERROR;
-                    }
+                    fabricIt = it;
+                    mGroupFabrics[it].mDataPeerCount--;
+                    err = CHIP_NO_ERROR;
                 }
             }
             break;
@@ -162,33 +154,20 @@ CHIP_ERROR GroupPeerTable::RemovePeer(FabricIndex fabricIndex, NodeId nodeId, bo
         if (mGroupFabrics[fabricIt].mDataPeerCount == 0 && mGroupFabrics[fabricIt].mControlPeerCount == 0)
         {
             mGroupFabrics[fabricIt].mFabricIndex = kUndefinedFabricIndex;
-            // To maintain logic integrety Fabric array cannot have empty slot in between data
+            // To maintain logic integrity Fabric array cannot have empty slot in between data
             // Move Fabric around
-            for (uint32_t it = 0; it < CHIP_CONFIG_MAX_FABRICS;)
+            GroupFabric buf = mGroupFabrics[fabricIt];
+            // Find the last non empty element
+            for (uint32_t i = CHIP_CONFIG_MAX_FABRICS - 1; i > fabricIt; i--)
             {
-                GroupFabric buf = mGroupFabrics[it];
-                if (buf.mFabricIndex != kUndefinedFabricIndex)
+                if (mGroupFabrics[i].mFabricIndex != kUndefinedFabricIndex)
                 {
-                    it++;
-                    continue;
+                    // Logic works since all buffer are static
+                    // move it up front
+                    new (&mGroupFabrics[fabricIt]) GroupFabric(mGroupFabrics[i]);
+                    new (&mGroupFabrics[i]) GroupFabric();
+                    break;
                 }
-                // Find the last non empty element
-                for (uint32_t i = CHIP_CONFIG_MAX_FABRICS - 1; i > it; i--)
-                {
-                    if (mGroupFabrics[i].mFabricIndex != kUndefinedFabricIndex)
-                    {
-                        // Logic works since all buffer are static
-                        // move it up front
-                        memcpy(static_cast<void *>(mGroupFabrics + it), static_cast<void *>(mGroupFabrics + i),
-                               sizeof(GroupFabric));
-                        // replace with empty object (easiest way to make sure everything is cleared)
-                        memcpy(static_cast<void *>(mGroupFabrics + i), static_cast<void *>(&buf), sizeof(GroupFabric));
-                        it++;
-                        break;
-                    }
-                }
-                // Nothing to move around
-                break;
             }
         }
     }
@@ -197,23 +176,62 @@ CHIP_ERROR GroupPeerTable::RemovePeer(FabricIndex fabricIndex, NodeId nodeId, bo
     return err;
 }
 
-// For Unit Test
-FabricIndex GroupPeerTable::GetFabricIndexAt(uint8_t index)
+bool GroupPeerTable::RemoveSpecificPeer(GroupSender * list, NodeId nodeId, uint32_t size)
 {
-    if (index < CHIP_CONFIG_MAX_FABRICS)
+    bool removed = false;
+    for (uint32_t nodeIt = 0; nodeIt < size; nodeIt++)
     {
-        return mGroupFabrics[index].mFabricIndex;
+        if (list[nodeIt].mNodeId == nodeId)
+        {
+            list[nodeIt].mNodeId = kUndefinedNodeId;
+            list[nodeIt].msgCounter.Reset();
+            removed = true;
+            break;
+        }
     }
 
-    return kUndefinedFabricIndex;
+    if (removed)
+    {
+        CompactPeers(list, size);
+    }
+
+    return removed;
 }
 
-GroupClientCounters::GroupClientCounters(chip::PersistentStorageDelegate * storage_delegate)
+void GroupPeerTable::CompactPeers(GroupSender * list, uint32_t size)
+{
+    if (list == nullptr)
+    {
+        return;
+    }
+
+    for (uint32_t peerIndex = 0; peerIndex < size; peerIndex++)
+    {
+        if (list[peerIndex].mNodeId != kUndefinedNodeId)
+        {
+            continue;
+        }
+
+        for (uint32_t i = (size - 1); i > peerIndex; i--)
+        {
+            if (list[i].mNodeId != kUndefinedNodeId)
+            {
+                // Logic works since all buffer are static
+                // move it up front
+                new (&list[peerIndex]) GroupSender(list[i]);
+                new (&list[i]) GroupSender();
+                break;
+            }
+        }
+    }
+}
+
+GroupOutgoingCounters::GroupOutgoingCounters(chip::PersistentStorageDelegate * storage_delegate)
 {
     Init(storage_delegate);
 }
 
-CHIP_ERROR GroupClientCounters::Init(chip::PersistentStorageDelegate * storage_delegate)
+CHIP_ERROR GroupOutgoingCounters::Init(chip::PersistentStorageDelegate * storage_delegate)
 {
 
     if (storage_delegate == nullptr)
@@ -229,6 +247,11 @@ CHIP_ERROR GroupClientCounters::Init(chip::PersistentStorageDelegate * storage_d
     mStorage->SyncGetKeyValue(key.GroupControlCounter(), &mGroupControlCounter, size);
     mStorage->SyncGetKeyValue(key.GroupDataCounter(), &mGroupDataCounter, size);
 
+    // Increment by 1 to prevent possible corner case when a powercycle happens
+    // when Ram counter value == Stored counter value
+    mGroupControlCounter++;
+    mGroupDataCounter++;
+
     uint32_t temp = mGroupControlCounter + GROUP_MSG_COUNTER_MIN_INCREMENT;
     mStorage->SyncSetKeyValue(key.GroupControlCounter(), &temp, size);
 
@@ -238,41 +261,41 @@ CHIP_ERROR GroupClientCounters::Init(chip::PersistentStorageDelegate * storage_d
     return CHIP_NO_ERROR;
 }
 
-uint32_t GroupClientCounters::GetCounter(bool isControl)
+uint32_t GroupOutgoingCounters::GetCounter(bool isControl)
 {
     return (isControl) ? mGroupControlCounter : mGroupDataCounter;
 }
 
-void GroupClientCounters::SetCounter(bool isControl, uint32_t value)
+void GroupOutgoingCounters::IncrementCounter(bool isControl)
 {
-    uint32_t temp = 0;
-    uint16_t size = static_cast<uint16_t>(sizeof(uint32_t));
+    uint32_t temp  = 0;
+    uint16_t size  = static_cast<uint16_t>(sizeof(uint32_t));
+    uint32_t value = 0;
     DefaultStorageKeyAllocator key;
+
+    if (isControl)
+    {
+        mGroupControlCounter++;
+        key.GroupControlCounter();
+        value = mGroupControlCounter;
+    }
+    else
+    {
+        mGroupDataCounter++;
+        key.GroupDataCounter();
+        value = mGroupDataCounter;
+    }
 
     if (mStorage == nullptr)
     {
         return;
     }
 
-    if (isControl)
+    mStorage->SyncGetKeyValue(key.KeyName(), &temp, size);
+    if (temp - value == 0)
     {
-        mStorage->SyncGetKeyValue(key.GroupControlCounter(), &temp, size);
-        if (temp <= value || ((temp > (UINT32_MAX - GROUP_MSG_COUNTER_MIN_INCREMENT)) && (value < GROUP_MSG_COUNTER_MIN_INCREMENT)))
-        {
-            temp = value + GROUP_MSG_COUNTER_MIN_INCREMENT;
-            mStorage->SyncSetKeyValue(key.GroupControlCounter(), &temp, sizeof(uint32_t));
-        }
-        mGroupControlCounter = value;
-    }
-    else
-    {
-        mStorage->SyncGetKeyValue(key.GroupDataCounter(), &temp, size);
-        if (temp <= value || ((temp > (UINT32_MAX - GROUP_MSG_COUNTER_MIN_INCREMENT)) && (value < GROUP_MSG_COUNTER_MIN_INCREMENT)))
-        {
-            temp = value + GROUP_MSG_COUNTER_MIN_INCREMENT;
-            mStorage->SyncSetKeyValue(key.GroupDataCounter(), &temp, sizeof(uint32_t));
-        }
-        mGroupDataCounter = value;
+        temp = value + GROUP_MSG_COUNTER_MIN_INCREMENT;
+        mStorage->SyncSetKeyValue(key.KeyName(), &temp, sizeof(uint32_t));
     }
 }
 

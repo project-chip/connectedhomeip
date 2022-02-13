@@ -96,7 +96,6 @@ public:
         if (counter <= mSynced.mMaxCounter)
         {
             uint32_t offset = mSynced.mMaxCounter - counter;
-            ;
 
             if (mIsGroup && (offset > (UINT32_MAX / 2)))
             {
