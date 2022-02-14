@@ -50,6 +50,7 @@ namespace {
 
 // Advertising data content definitions
 #define CHIP_MAX_ADV_DATA_LEN 31
+#define MAX_RESPONSE_DATA_LEN 31
 
 #define CHIP_ADE_DATA_LEN_FLAGS 0x02
 #define CHIP_ADV_DATA_TYPE_FLAGS 0x01
@@ -66,9 +67,6 @@ namespace {
 
 #define WHITE_LED GPIO_PB6
 #define STIMER_IRQ_NUM 1
-
-// Full service UUID - CHIP_BLE_SVC_ID - taken from BleUUID.h header
-const uint8_t chipUUID_CHIPoBLE_Service[CHIP_ADV_SHORT_UUID_LEN] = { 0xFF, 0xF6 };
 
 const ChipBleUUID chipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
                                                  0x9D, 0x11 } };
@@ -171,6 +169,10 @@ CHIP_ERROR BLEManagerImpl::_Init()
     /* Switch off the LED on the beginning */
     gpio_set_low_level(WHITE_LED);
 
+
+    /* Enable CHIP over BLE service */
+    mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
+
     return CHIP_NO_ERROR;
 }
 
@@ -186,42 +188,49 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 {
     ble_sts_t status = BLE_SUCCESS;
     CHIP_ERROR err = CHIP_NO_ERROR;
-    uint32_t index = 0;
-
+    uint8_t index = 0;
+    uint8_t devNameLen = 0;
+    static const uint8_t serviceUuid[CHIP_ADV_SHORT_UUID_LEN] = { 0xF6, 0xFF };     // service UUID
     ChipBLEDeviceIdentificationInfo deviceIdInfo;
+    u8 adv[CHIP_MAX_ADV_DATA_LEN] = {0};                                                     // Advertisement data buff
+    u8 srsp[MAX_RESPONSE_DATA_LEN] = {0};                                                    // Scan Responce data buff
 
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::ConfigureAdvertisingData");
-
-    u8 adv[CHIP_MAX_ADV_DATA_LEN] = {0};
-    // {
-    //     0x05, 0x09, 'e', 'H', 'I', 'D',
-    //     0x02, 0x01, 0x05, 						// BLE limited discoverable mode and BR/EDR not supported
-    //     0x03, 0x19, 0x80, 0x01, 				// 384, Generic Remote Control, Generic category
-    //     0x05, 0x02, 0x12, 0x18, 0x0F, 0x18,		// incomplete list of service class UUIDs (0x1812, 0x180F)
-    // };
-
-    // u8 srsp[] = 
-    // {
-    //     0x08, 0x09, 'e', 'S', 'a', 'm', 'p', 'l', 'e', // Device name
-    // };
 
     /* Get BLE device identification info */
     err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(deviceIdInfo);
     SuccessOrExit(err);
 
+    /* Check device name */
+    if (!mFlags.Has(Flags::kDeviceNameSet))
+    {
+        err = _SetDeviceName("TelinkMatter");
+        SuccessOrExit(err);
+    }
+
     /* Fulfill BLE advertisement data */
+    /* Set flags */
     adv[index++] = CHIP_ADE_DATA_LEN_FLAGS;                                                 // length
     adv[index++] = CHIP_ADV_DATA_TYPE_FLAGS;                                                // AD type : flags
     adv[index++] = CHIP_ADV_DATA_FLAGS;                                                     // AD value
+
+    /* Set Service Data */
     adv[index++] = CHIP_ADV_SERVICE_DATA_LEN;                                               // length
     adv[index++] = CHIP_ADV_DATA_TYPE_SERVICE_DATA;                                         // AD type : Service Data
-    adv[index++] = chipUUID_CHIPoBLE_Service[0];                                            // AD value
-    adv[index++] = chipUUID_CHIPoBLE_Service[1];                                            // AD value
+    adv[index++] = serviceUuid[0];                                                          // AD value
+    adv[index++] = serviceUuid[1];                                                          // AD value
     memcpy(&adv[index], (void *) &deviceIdInfo, sizeof(deviceIdInfo));                      // AD value
     index += sizeof(deviceIdInfo);
 
-    /* Set advetisment data */    
-    status = bls_ll_setAdvData(adv, sizeof(adv));
+    /* Set device name */
+    devNameLen = strlen(mDeviceName);
+    adv[index++] = devNameLen + 1;                                                           // length
+    adv[index++] = CHIP_ADV_DATA_TYPE_NAME;                                                  // AD type : name
+    memcpy(&adv[index], mDeviceName, devNameLen);                                            // AD value
+    index += devNameLen;
+
+    /* Set advetisment data */
+    status = bls_ll_setAdvData(adv, index);
     if(status != BLE_SUCCESS)
     {
         ChipLogError(DeviceLayer, "Fail to set BLE advertisement data. Error %d", status);
@@ -229,14 +238,20 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    /* Set scan responce data */
-    // status = bls_ll_setScanRspData(srsp, sizeof(srsp));
-    // if(status != BLE_SUCCESS)
-    // {
-    //     ChipLogError(DeviceLayer, "Fail to set BLE scan responce data. Error %d", status);
+    index = 0;
+    srsp[index++] = CHIP_ADV_SHORT_UUID_LEN + 1;                                     // AD length
+    srsp[index++] = CHIP_ADV_DATA_TYPE_UUID;                                         // AD type : uuid
+    srsp[index++] = serviceUuid[0];                                                  // AD value
+    srsp[index++] = serviceUuid[1];
 
-    //     return CHIP_ERROR_INCORRECT_STATE;
-    // }
+    /* Set scan responce data */
+    status = bls_ll_setScanRspData(srsp, sizeof(srsp));
+    if(status != BLE_SUCCESS)
+    {
+        ChipLogError(DeviceLayer, "Fail to set BLE scan responce data. Error %d", status);
+
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
 
 exit:
     return err;
@@ -245,6 +260,7 @@ exit:
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 {
     ble_sts_t status = BLE_SUCCESS;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::_SetAdvertisingEnabled");
 
@@ -257,6 +273,15 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
                                                                      : CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
         u16 intervalMax = mFlags.Has(Flags::kFastAdvertisingEnabled) ? CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX
                                                                      : CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
+
+        /* Configure CHIP BLE advertisement data */
+        err = ConfigureAdvertisingData();
+        if(err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Fail to config BLE advertisement data");
+
+            return err;
+        }
 
         /* Setup advertisement paramiters */
         status = bls_ll_setAdvParam(intervalMin, 
@@ -287,7 +312,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
         ChipLogProgress(DeviceLayer, "Disable BLE");
     }
 
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
@@ -315,6 +340,11 @@ CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
 {
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::_GetDeviceName");
 
+    if (strlen(mDeviceName) >= bufSize)
+    {
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
+    strcpy(buf, mDeviceName);
 
     return CHIP_NO_ERROR;
 }
@@ -325,10 +355,12 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * devName)
 
     if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_NotSupported)
     {
+        ChipLogError(DeviceLayer, "Unsupported");
+
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
 
-    if (deviceName != NULL && deviceName[0] != 0)
+    if (devName == NULL && devName[0] == 0)
     {
         ChipLogError(DeviceLayer, "Invalid name");
 
@@ -342,10 +374,10 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * devName)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    strcpy(mDeviceName, deviceName);
+    strcpy(mDeviceName, devName);
     mFlags.Set(Flags::kDeviceNameSet);
     
-    ChipLogProgress(DeviceLayer, "Setting device name to : \"%s\"", deviceName);
+    ChipLogProgress(DeviceLayer, "Setting device name to : \"%s\"", devName);
 
     return CHIP_NO_ERROR;
 }
@@ -416,13 +448,6 @@ void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::NotifyChipConnectionClosed");
 
-}
-
-CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr) const
-{
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::MapBLEError");
-
-    return CHIP_NO_ERROR;
 }
 
 void BLEManagerImpl::DriveBLEState(void)
