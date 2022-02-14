@@ -365,6 +365,7 @@ void AmebaOTAImageProcessor::HandleApply(intptr_t context)
 
 CHIP_ERROR AmebaOTAImageProcessor::ProcessHeader(ByteSpan & block)
 {
+    ChipLogProgress(SoftwareUpdate, "ProcessHeader");
     if (mHeaderParser.IsInitialized())
     {
         OTAImageHeader header;
