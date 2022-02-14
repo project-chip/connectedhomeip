@@ -43,8 +43,6 @@
 #include "drivers.h"
 #include "stack/ble/ble.h"
 
-extern bool isAttestRequest;
-
 using namespace ::chip;
 using namespace ::chip::Ble;
 using namespace ::chip::System;
@@ -151,19 +149,25 @@ BLEManagerImpl BLEManagerImpl::sInstance;
 
 void rf_irq_handler(const void *paramiter)
 {
+    gpio_set_high_level(GREEN_LED);
     irq_blt_sdk_handler();
+    gpio_set_low_level(GREEN_LED);
 }
 
 void stimer_irq_handler(const void *paramiter)
 {
+    gpio_set_high_level(BLUE_LED);
     irq_blt_sdk_handler();
+    gpio_set_low_level(BLUE_LED);
 }
 
 void BLEManagerImpl::BleEntry(void *, void *, void *)
 {
     while(true)
     {
+        // gpio_set_high_level(WHITE_LED);
         blt_sdk_main_loop();
+        // gpio_set_low_level(WHITE_LED);
 
         k_msleep(10);
     }
@@ -213,6 +217,9 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     /* Enable CHIP over BLE service */
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
+
+    /* Suspend BLE Task */
+    // k_thread_suspend(chipBleThread);
 
 exit:
     return err;
@@ -328,6 +335,13 @@ CHIP_ERROR BLEManagerImpl::_InitStack(void)
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
+    unsigned int irq_restore = core_interrupt_disable();
+
+    k_sched_lock();
+
+    dma_chn_dis(DMA1);
+    dma_chn_dis(DMA0);
+
     /* Init Radio driver */
     ble_radio_init();
 
@@ -336,6 +350,10 @@ CHIP_ERROR BLEManagerImpl::_InitStack(void)
 
     /* Init interrupts and DMA for BLE module ??? */
     blc_ll_initBasicMCU();
+
+    ble_tx_dma_config();
+
+    ble_rx_dma_config();
 
     /* Setup MAC Address */
     blc_ll_initStandby_module(macPublic);
@@ -362,6 +380,12 @@ CHIP_ERROR BLEManagerImpl::_InitStack(void)
     ChipLogDetail(DeviceLayer, "RF IRQ assigned vector %d", ret);
 
 exit:
+
+    dma_chn_dis(DMA0);
+    dma_chn_en(DMA1);
+    k_sched_unlock();
+    core_restore_interrupt(irq_restore);
+
     return err;
 }
 
@@ -370,7 +394,7 @@ CHIP_ERROR BLEManagerImpl::_InitGap(void)
     ble_sts_t status = BLE_SUCCESS;
     /* Fifo buffers */
     static u8 txFifoBuff[CHIP_BLE_TX_FIFO_SIZE * CHIP_BLE_TX_FIFO_NUM] = {0};
-    static u8 rxFufoBuff[CHIP_BLE_RX_FIFO_SIZE * CHIP_BLE_RX_FIFO_NUM] = {0};
+    static u8 rxFifoBuff[CHIP_BLE_RX_FIFO_SIZE * CHIP_BLE_RX_FIFO_NUM] = {0};
 
     status = blc_ll_initAclConnTxFifo(txFifoBuff, CHIP_BLE_TX_FIFO_SIZE, CHIP_BLE_TX_FIFO_NUM);
     if(status != BLE_SUCCESS)
@@ -380,7 +404,7 @@ CHIP_ERROR BLEManagerImpl::_InitGap(void)
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    status = blc_ll_initAclConnRxFifo(rxFufoBuff, CHIP_BLE_RX_FIFO_SIZE, CHIP_BLE_RX_FIFO_NUM);
+    status = blc_ll_initAclConnRxFifo(rxFifoBuff, CHIP_BLE_RX_FIFO_SIZE, CHIP_BLE_RX_FIFO_NUM);
     if(status != BLE_SUCCESS)
     {
         ChipLogError(DeviceLayer, "Fail to init BLE RX FIFO. Error %d", status);
@@ -643,12 +667,10 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     }
 
     /* Block IEEE802154 */
+    /* @todo: move to RadioSwitch module*/
     const struct device *radio_dev = device_get_binding(CONFIG_NET_CONFIG_IEEE802154_DEV_NAME);
     __ASSERT(radio_dev != NULL, "Fail to get radio device");
-    
-    struct b91_data *data = (b91_data *)radio_dev->data;
-    
-    data->is_ready = false;
+    b91_ieee802154_deinit(radio_dev);
 
     /* It is time to init BLE stack */
     err = _InitStack();
@@ -693,6 +715,9 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     }
 
     mFlags.Set(Flags::kAdvertising);
+
+    /* Start BLE Task */
+    // k_thread_resume(chipBleThread);
 
     return err;
 }
@@ -865,39 +890,21 @@ bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQU
     return false;
 }
 
+/* @todo: move to RadioSwitch module */
 void BLEManagerImpl::SwitchToIeee802154(void)
 {
+    int result = 0;
 
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::Switch to IEEE802154");
 
-    int result = 0;
     const struct device *radio_dev = device_get_binding(CONFIG_NET_CONFIG_IEEE802154_DEV_NAME);
     __ASSERT(radio_dev != NULL, "Fail to get radio device");
 
-    struct ieee802154_radio_api *radio_api = (struct ieee802154_radio_api *)radio_dev->api;
-    __ASSERT(radio_api != NULL, "Fail to get radio API");
+    /* Stop BLE */
+    // StopAdvertising();
 
-    StopAdvertising();
-
-    k_thread_suspend(chipBleThread);
-
-    k_msleep(1000);
-
-    unsigned int irq_restore = core_interrupt_disable();
-
-    /* Disable STIMER and RF IRQs */
-    irq_disable(STIMER_IRQ_NUM);
-    irq_disable(RF_IRQ_NUM);
-
-    /* Get IEEE802154 context */
-    struct b91_data *data = (b91_data *)radio_dev->data;
-
-    /* Set IRQ handler */ 
-    result = irq_connect_dynamic(RF_IRQ_NUM, 2, data->isr_handler, NULL, 0);
-    ChipLogDetail(DeviceLayer, "RF IRQ assigned vector %d", result);
-
-    /* Set radio settings */
-    dma_chn_dis(DMA1);
+    /* Stop BLE task */
+    // k_thread_suspend(chipBleThread);
 
     /* Reset Radio */
     rf_radio_reset();
@@ -905,32 +912,9 @@ void BLEManagerImpl::SwitchToIeee802154(void)
     /* Reset DMA */
     rf_reset_dma();
 
-    rf_set_tx_rx_off();
-    rf_set_tx_rx_off_auto_mode();  //must call it before baseband reset, or dma dst address will increase
-
-    rf_baseband_reset();
-
-    OT_RADIO_RX_BUF_CLEAR(data->rx_buffer);
-    CLEAR_ALL_RFIRQ_STATUS;
-    rf_clr_irq_mask(FLD_RF_IRQ_ALL);//the uart interrupt should always be opened.
-
-    rf_mode_init();
-    rf_set_zigbee_250K_mode();
-    rf_set_tx_dma(B91_FIFO_DEPTH, B91_TRX_LENGTH);
-    rf_set_rx_maxlen(B91_PAYLOAD_MAX);
-    memset(data->rx_buffer, 0, B91_TRX_LENGTH);
-    memset(data->tx_buffer, 0, B91_TRX_LENGTH);
-    rf_set_rx_dma(data->rx_buffer, B91_FIFO_NUM, B91_TRX_LENGTH);
-    rf_clr_irq_mask(FLD_RF_IRQ_ALL);
-    rf_set_irq_mask((rf_irq_e)(FLD_RF_IRQ_RX | FLD_RF_IRQ_TX));
-    plic_set_priority(IRQ15_ZB_RT, IRQ_PRI_LEV2);
-
-    dma_chn_en(DMA1);
-
-    radio_api->stop(radio_dev);
-    data->is_ready = true;
-
-    core_restore_interrupt(irq_restore);
+    /* Init IEEE802154 */
+    result = b91_ieee802154_init(radio_dev);
+    __ASSERT(result == 0, "Fail to init IEEE802154 radio. Error: %d", result);
 }
 
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
