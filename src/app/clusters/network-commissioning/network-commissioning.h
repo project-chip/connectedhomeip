@@ -114,6 +114,30 @@ public:
     virtual ~Instance() = default;
 };
 
+// NetworkDriver for the devices that don't have / don't need a real network driver.
+class NullNetworkDriver : public DeviceLayer::NetworkCommissioning::EthernetDriver
+{
+public:
+    /**
+     * @brief Returns maximum number of network configs can be added to the driver.
+     */
+    uint8_t GetMaxNetworks() override;
+
+    /**
+     * @brief Returns an iterator for reading the networks, the user will always call NetworkIterator::Release. The iterator should
+     * be consumed in the same context as calling GetNetworks(). Users must call Release() when the iterator goes out of scope.
+     */
+    DeviceLayer::NetworkCommissioning::NetworkIterator * GetNetworks() override;
+
+    /**
+     * @brief Returns the status of the interface, this is an optional feature of a network driver the driver will be enabled by
+     * default.
+     */
+    bool GetEnabled() override;
+
+    virtual ~NullNetworkDriver() = default;
+};
+
 } // namespace NetworkCommissioning
 } // namespace Clusters
 } // namespace app

@@ -433,6 +433,23 @@ void Instance::OnCommissioningComplete(CHIP_ERROR err)
     }
 }
 
+bool NullNetworkDriver::GetEnabled()
+{
+    return false;
+}
+
+uint8_t NullNetworkDriver::GetMaxNetworks()
+{
+    // The minimal value of MaxNetworks should be 1
+    return 1;
+}
+
+DeviceLayer::NetworkCommissioning::NetworkIterator * NullNetworkDriver::GetNetworks()
+{
+    // Instance::Read will accept nullptr as a empty NetworkIterator.
+    return nullptr;
+}
+
 } // namespace NetworkCommissioning
 } // namespace Clusters
 } // namespace app

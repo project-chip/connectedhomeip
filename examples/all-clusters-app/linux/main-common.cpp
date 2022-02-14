@@ -107,6 +107,10 @@ NetworkCommissioning::LinuxWiFiDriver sLinuxWiFiDriver;
 Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(kNetworkCommissioningEndpointSecondary,
                                                                            &sLinuxWiFiDriver);
 #endif
+
+Clusters::NetworkCommissioning::NullNetworkDriver sNullNetworkDriver;
+Clusters::NetworkCommissioning::Instance sNullNetworkCommissioningInstance(kNetworkCommissioningEndpointMain, &sNullNetworkDriver);
+
 #endif // CHIP_DEVICE_LAYER_TARGET_LINUX
 } // namespace
 
@@ -162,9 +166,8 @@ void ApplicationInit()
     }
     else
     {
-        Clusters::NetworkCommissioning::Attributes::FeatureMap::Set(
-            kNetworkCommissioningEndpointMain,
-            to_underlying(Clusters::NetworkCommissioning::NetworkCommissioningFeature::kEthernetNetworkInterface));
+        // Use NullNetworkCommissioningInstance to disable the network commissioning functions.
+        sNullNetworkCommissioningInstance.Init();
     }
 #endif // CHIP_DEVICE_LAYER_TARGET_LINUX
 }
