@@ -30,3 +30,10 @@
 // Use a default pairing code if one hasn't been provisioned in flash.
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+ *
+ * Enable support for Chip-over-BLE (CHIPoBLE).
+ */
+#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
