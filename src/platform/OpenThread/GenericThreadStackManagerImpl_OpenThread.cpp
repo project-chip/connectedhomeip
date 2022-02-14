@@ -1582,7 +1582,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
         VerifyOrExit(otInst != NULL, err = MapOpenThreadError(OT_ERROR_FAILED));
     }
 
-#if !defined(__ZEPHYR__) && !defined(ENABLE_CHIP_SHELL) && !defined(PW_RPC_ENABLED) && CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+#if !defined(__ZEPHYR__) && !defined(PW_RPC_ENABLED) && (defined(ENABLE_CHIP_SHELL) || CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI)
     otAppCliInit(otInst);
 #endif
 
