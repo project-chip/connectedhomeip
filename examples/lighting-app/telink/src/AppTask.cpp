@@ -60,7 +60,8 @@ constexpr uint8_t kButtonReleaseEvent = 0;
 
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), kAppEventQueueSize, alignof(AppEvent));
 
-LEDWidget sStatusLED;
+LEDWidget sThreadStatusLED;
+LEDWidget sBleStatusLED;
 
 Button sFactoryResetButton;
 Button sLightingButton;
@@ -85,8 +86,9 @@ CHIP_ERROR AppTask::Init()
     CHIP_ERROR ret;
 
     // Initialize status LED
-    LEDWidget::InitGpio(SYSTEM_STATE_LED_PORT);
-    sStatusLED.Init(SYSTEM_STATE_LED_PIN);
+    LEDWidget::InitGpio(LEDS_PORT);
+    sThreadStatusLED.Init(THREAD_STATE_LED_PIN);
+    sBleStatusLED.Init(BLE_STATE_LED_PIN);
 
     InitButtons();
 
@@ -108,13 +110,6 @@ CHIP_ERROR AppTask::Init()
 
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
-
-    ret = chip::Server::GetInstance().AddTestCommissioning();
-    if (ret != CHIP_NO_ERROR)
-    {
-        LOG_ERR("Failed to add test pairing");
-        return ret;
-    }
 
     ret = ConnectivityMgr().SetBLEDeviceName("TelinkLight");
     if (ret != CHIP_NO_ERROR)
@@ -167,21 +162,29 @@ CHIP_ERROR AppTask::StartApp()
         {
             if (sIsThreadAttached)
             {
-                sStatusLED.Blink(950, 50);
+                sThreadStatusLED.Blink(950, 50);
             }
             else
             {
-                sStatusLED.Blink(100, 100);
+                sThreadStatusLED.Blink(100, 100);
             }
         }
         else
         {
-            sStatusLED.Blink(50, 950);
+            sThreadStatusLED.Blink(50, 950);
         }
 
-        sStatusLED.Animate();
-        
-        hello_func();
+        // if(sHaveBLEConnections)
+        // {
+        //     sBleStatusLED.Blink(950, 50);
+        // }
+        // else
+        // {
+        //     sBleStatusLED.Set(false);
+        // }
+
+        sThreadStatusLED.Animate();
+        // sBleStatusLED.Animate();
     }
 }
 
@@ -243,10 +246,12 @@ void AppTask::StartThreadButtonEventHandler(void)
 
 void AppTask::StartThreadHandler(AppEvent * aEvent)
 {
+
     if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
     {
         StartDefaultThreadNetwork();
         LOG_INF("Device is not commissioned to a Thread network. Starting with the default configuration.");
+        BLEMgrImpl().SwitchToIeee802154();
     }
     else
     {
@@ -271,7 +276,7 @@ void AppTask::StartBleAdvHandler(AppEvent * aEvent)
     // Don't allow on starting Matter service BLE advertising after Thread provisioning.
     if (ConnectivityMgr().IsThreadProvisioned())
     {
-        LOG_INF("NFC Tag emulation and Matter service BLE advertising not started - device is commissioned to a Thread network.");
+        LOG_INF("Matter service BLE advertising not started - device is commissioned to a Thread network.");
         return;
     }
 

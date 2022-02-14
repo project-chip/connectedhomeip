@@ -32,6 +32,11 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+/*Includes for ieee802154 switchings */
+#define DT_DRV_COMPAT telink_b91_zb
+#include <net/ieee802154_radio.h>
+#include <drivers/ieee802154/b91.h>
+
 /* Telink headers */ 
 #include "types.h"
 #include "tl_common.h"
@@ -92,6 +97,8 @@ typedef struct
 } gap_periConnectParams_t;
 
 
+#define CHIP_MAC_LEN 6
+#define CHIP_MTU_SIZE 244
 #define CHIP_MAX_ADV_DATA_LEN 31
 #define CHIP_MAX_RESPONSE_DATA_LEN 31
 #define CHIP_SHORT_UUID_LEN 2
@@ -105,15 +112,16 @@ typedef struct
 #define CHIP_ADV_SERVICE_DATA_LEN (sizeof(ChipBLEDeviceIdentificationInfo) + CHIP_SHORT_UUID_LEN + 1)
 
 #define CHIP_BLE_TX_FIFO_SIZE 48
-#define CHIP_BLE_TX_FIFO_NUM 17
+#define CHIP_BLE_TX_FIFO_NUM 33
 #define CHIP_BLE_RX_FIFO_SIZE 48
 #define CHIP_BLE_RX_FIFO_NUM 8
 
-#define CHIP_BLE_THREAD_STACK_SIZE 8196
+#define CHIP_BLE_THREAD_STACK_SIZE 2048
 #define CHIP_BLE_THREAD_PRIORITY 2
 
 #define CHIP_RX_BUFF_SIZE 20
-#define CHIP_RF_PACKET_HEADER_SIZE 7
+// #define CHIP_RF_PACKET_HEADER_SIZE 7
+#define CHIP_RF_PACKET_HEADER_SIZE 3
 
 #define WHITE_LED GPIO_PB6
 #define GREEN_LED GPIO_PB5
@@ -121,6 +129,8 @@ typedef struct
 
 #define STIMER_IRQ_NUM 1
 #define RF_IRQ_NUM     15
+
+#define OT_RADIO_RX_BUF_CLEAR(p) do{ p[0] = 0; p[4] = 0; }while(0)
 
 #define CHIP_RX_CHAR_UUID 0x11, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, 0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18
 #define CHIP_TX_CHAR_UUID 0x12, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, 0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18
@@ -139,97 +149,34 @@ BLEManagerImpl BLEManagerImpl::sInstance;
 
 void rf_irq_handler(const void *paramiter)
 {
-    // gpio_set_high_level(WHITE_LED);
-
     irq_blt_sdk_handler();
-
-    // gpio_set_low_level(WHITE_LED);
 }
 
 void stimer_irq_handler(const void *paramiter)
 {
-    // gpio_set_high_level(GREEN_LED);
-
     irq_blt_sdk_handler();
-
-    // gpio_set_low_level(GREEN_LED);
 }
 
-void chip_ble_thread_entry_point(void *, void *, void *)
+void BLEManagerImpl::BleEntry(void *, void *, void *)
 {
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::BLEThreadEntry");
-
-    while(true) {
-        // gpio_set_high_level(BLUE_LED);
-
+    while(true)
+    {
         blt_sdk_main_loop();
 
-        // gpio_set_low_level(BLUE_LED);
-
         k_msleep(10);
-
     }
 }
 
-void connectCallback(u8 e, u8 *p, int n)
-{
-    ChipLogProgress(DeviceLayer, "BLE connect");
-}
-
-void terminateCallback(u8 e, u8 *p, int n)
-{
-    ChipLogProgress(DeviceLayer, "BLE terminate");
-}
-
 /* Thread for runing BLE main loop */
-K_THREAD_DEFINE(chip_ble_thread, 
-                CHIP_BLE_THREAD_STACK_SIZE, 
-                chip_ble_thread_entry_point, 
+K_THREAD_DEFINE(chipBleThread,
+                CHIP_BLE_THREAD_STACK_SIZE,
+                BLEManagerImpl::BleEntry,
                 NULL, NULL, NULL,
                 CHIP_BLE_THREAD_PRIORITY, 0, 0);
 
 CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
-    uint8_t mac_public[6] = {0};
-    uint8_t mac_random_static[6] = {0};
-    int ret = 0;
-
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::_Init");
-
-    /* Init Radio driver */
-    ble_radio_init();
-
-    /* Generate MAC address if it does not exist or read it from flash if it is exist already */
-    blc_initMacAddress(CFG_ADR_MAC_1M_FLASH, mac_public, mac_random_static);
-
-    /* Init interrupts and DMA for BLE module ??? */
-    blc_ll_initBasicMCU();
-
-    /* Setup MAC Address */
-    blc_ll_initStandby_module(mac_public);
-
-    /* Init advertisement */
-    blc_ll_initAdvertising_module();
-
-    /* Init slave role */
-    blc_ll_initSlaveRole_module();
-
-    /* Init connection mode */
-    blc_ll_initConnection_module();
-
-    /* Init GATT */
-    err = _InitGatt();
-    SuccessOrExit(err);
-
-    /* Resetup stimer interrupt to handle BLE stack */
-    ret = irq_connect_dynamic(STIMER_IRQ_NUM, 2, stimer_irq_handler, NULL, 0);
-    ChipLogDetail(DeviceLayer, "Stimer IRQ assigned vector %d", ret);
-
-    /* Resetup rf interrupt to handle BLE stack */ 
-    ret = irq_connect_dynamic(RF_IRQ_NUM, 2, rf_irq_handler, NULL, 0);
-    ChipLogDetail(DeviceLayer, "RF IRQ assigned vector %d", ret);
 
     /* Enable White LED for debug purposes */
     gpio_function_en(WHITE_LED);
@@ -256,6 +203,12 @@ CHIP_ERROR BLEManagerImpl::_Init()
     err = BleLayer::Init(this, this, &DeviceLayer::SystemLayer());
     SuccessOrExit(err);
 
+    /* Set number of connections to zero */
+    mNumConnections = 0;
+
+    /* Unsubscribe all connections */
+    memset(mSubscribedConns, 0, sizeof(mSubscribedConns));
+
     /* Enable CHIP over BLE service */
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
 
@@ -266,65 +219,203 @@ exit:
 int BLEManagerImpl::RxWriteCallback(uint16_t connHandle, void *p)
 {
     rf_packet_att_t *packet = (rf_packet_att_t*)p;
-    int dataLen = packet->rf_len - CHIP_RF_PACKET_HEADER_SIZE;
+    size_t dataLen = packet->l2capLen - CHIP_RF_PACKET_HEADER_SIZE;
     ChipDeviceEvent event;
     
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::RxWriteCallback");
-    ChipLogDetail(DeviceLayer, "Data len: %d", dataLen);
-
     PacketBufferHandle packetBuf = PacketBufferHandle::NewWithData(packet->dat, dataLen);
 
-    ChipLogDetail(DeviceLayer,"Data: %02x %02x %02x %02x %02x %02x %02x %02x",  packet->dat[0],
-                                                                                packet->dat[1],
-                                                                                packet->dat[2],
-                                                                                packet->dat[3],
-                                                                                packet->dat[4],
-                                                                                packet->dat[5],
-                                                                                packet->dat[6],
-                                                                                packet->dat[7]);
-
-    ChipLogDetail(DeviceLayer,"Data: %02x %02x %02x %02x %02x %02x %02x %02x",  packet->dat[8],
-                                                                                packet->dat[9],
-                                                                                packet->dat[10],
-                                                                                packet->dat[11],
-                                                                                packet->dat[12],
-                                                                                packet->dat[13],
-                                                                                packet->dat[14],
-                                                                                packet->dat[15]);
-
-
     // If successful...
-    if (!packetBuf.IsNull())
+    if (packetBuf.IsNull())
     {
-        // Arrange to post a CHIPoBLERXWriteEvent event to the CHIP queue.
-        event.Type                                = DeviceEventType::kPlatformTelinkBleRXWrite;
-        event.Platform.BleRXWriteEvent.connHandle = connHandle;
-        event.Platform.BleRXWriteEvent.Data       = std::move(packetBuf).UnsafeRelease();
-        
-        ChipLogDetail(DeviceLayer, "Packet is ok :)");
+        ChipLogError(DeviceLayer, "Failed to allocate buffer");
+
+        return 0;
     }
 
-    // If we failed to allocate a buffer, post a kPlatformTelinkBleOutOfBuffersEvent event.
-    else
-    {
-        // event.Type = DeviceEventType::kPlatformTelinkBleOutOfBuffersEvent;
-        ChipLogDetail(DeviceLayer, "Packet is bad :(");
-    }
+    // Arrange to post a CHIPoBLERXWriteEvent event to the CHIP queue.
+    event.Type                                = DeviceEventType::kPlatformTelinkBleRXWrite;
+    event.Platform.BleRXWriteEvent.connHandle = connHandle;
+    event.Platform.BleRXWriteEvent.Data       = std::move(packetBuf).UnsafeRelease();
 
     PlatformMgr().PostEventOrDie(&event);
 
     return 0;
 }
 
-CHIP_ERROR BLEManagerImpl::_InitGatt(void)
+void BLEManagerImpl::ConnectCallback(uint8_t bleEvent, uint8_t *data, int len)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    ChipDeviceEvent event;
     ble_sts_t status = BLE_SUCCESS;
 
+    PlatformMgr().LockChipStack();
+
+    /* Set MTU */
+    blt_att_setEffectiveMtuSize(BLS_CONN_HANDLE, CHIP_MTU_SIZE);
+    status = blc_att_setRxMtuSize(CHIP_MTU_SIZE);
+    if(status != BLE_SUCCESS)
+    {
+        ChipLogError(DeviceLayer, "Fail to set MTU size. Error %d", status);
+    }
+
+    event.Type                             = DeviceEventType::kPlatformTelinkBleConnected;
+    event.Platform.BleConnEvent.connHandle = BLS_CONN_HANDLE;
+    event.Platform.BleConnEvent.HciResult  = BLE_SUCCESS;
+
+    PlatformMgr().PostEventOrDie(&event);
+    PlatformMgr().UnlockChipStack();
+}
+
+void BLEManagerImpl::DisconnectCallback(uint8_t bleEvent, uint8_t *data, int len)
+{
+    ChipDeviceEvent event;
+
+    PlatformMgr().LockChipStack();
+
+    event.Type                             = DeviceEventType::kPlatformTelinkBleDisconnected;
+    event.Platform.BleConnEvent.connHandle = BLS_CONN_HANDLE;
+    event.Platform.BleConnEvent.HciResult  = *data; // Reason of disconnection stored in first data byte
+
+    PlatformMgr().PostEventOrDie(&event);
+    PlatformMgr().UnlockChipStack();
+}
+
+int BLEManagerImpl::TxCccWriteCallback(uint16_t connHandle, void *p)
+{
+    ChipDeviceEvent event;
+    rf_packet_att_t *packet = (rf_packet_att_t*)p;
+    int dataLen = packet->rf_len - CHIP_RF_PACKET_HEADER_SIZE;
+    uint16_t value = *((uint16_t *)packet->dat);
+
+    event.Type                                 = DeviceEventType::kPlatformTelinkBleCCCWrite;
+    event.Platform.BleCCCWriteEvent.connHandle = connHandle;
+    event.Platform.BleCCCWriteEvent.Value      = value;
+
+    PlatformMgr().PostEventOrDie(&event);
+
+    return 0;
+}
+
+int BLEManagerImpl::GapEventHandler(uint32_t gapEvent, uint8_t *data, int size)
+{
+    ChipDeviceEvent event;
+
+    if((gapEvent & 0xFF) == GAP_EVT_GATT_HANDLE_VLAUE_CONFIRM)
+    {
+        /* Send TX complete event if everything is fine */
+        event.Type                                   = DeviceEventType::kPlatformTelinkBleTXComplete;
+        event.Platform.BleTXCompleteEvent.connHandle = BLS_CONN_HANDLE;
+
+        PlatformMgr().PostEventOrDie(&event);
+    }
+
+    return 0;
+}
+
+CHIP_ERROR BLEManagerImpl::_InitStack(void)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    uint8_t macPublic[CHIP_MAC_LEN] = {0};
+    uint8_t macRandomStatic[CHIP_MAC_LEN] = {0};
+    int ret = 0;
+
+    if(ConnectivityMgr().IsThreadProvisioned())
+    {
+        ChipLogProgress(DeviceLayer, "Thread Provisioned. Ignore");
+
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    /* Init Radio driver */
+    ble_radio_init();
+
+    /* Generate MAC address if it does not exist or read it from flash if it is exist already */
+    blc_initMacAddress(CFG_ADR_MAC_1M_FLASH, macPublic, macRandomStatic);
+
+    /* Init interrupts and DMA for BLE module ??? */
+    blc_ll_initBasicMCU();
+
+    /* Setup MAC Address */
+    blc_ll_initStandby_module(macPublic);
+
+    /* Init advertisement */
+    blc_ll_initAdvertising_module();
+
+    /* Init slave role */
+    blc_ll_initSlaveRole_module();
+
+    /* Init connection mode */
+    blc_ll_initConnection_module();
+
+    /* Init GAP */
+    err = _InitGap();
+    SuccessOrExit(err);
+
+    /* Resetup stimer interrupt to handle BLE stack */
+    ret = irq_connect_dynamic(STIMER_IRQ_NUM, 2, stimer_irq_handler, NULL, 0);
+    ChipLogDetail(DeviceLayer, "Stimer IRQ assigned vector %d", ret);
+
+    /* Resetup rf interrupt to handle BLE stack */ 
+    ret = irq_connect_dynamic(RF_IRQ_NUM, 2, rf_irq_handler, NULL, 0);
+    ChipLogDetail(DeviceLayer, "RF IRQ assigned vector %d", ret);
+
+exit:
+    return err;
+}
+
+CHIP_ERROR BLEManagerImpl::_InitGap(void)
+{
+    ble_sts_t status = BLE_SUCCESS;
     /* Fifo buffers */
     static u8 txFifoBuff[CHIP_BLE_TX_FIFO_SIZE * CHIP_BLE_TX_FIFO_NUM] = {0};
     static u8 rxFufoBuff[CHIP_BLE_RX_FIFO_SIZE * CHIP_BLE_RX_FIFO_NUM] = {0};
 
+    status = blc_ll_initAclConnTxFifo(txFifoBuff, CHIP_BLE_TX_FIFO_SIZE, CHIP_BLE_TX_FIFO_NUM);
+    if(status != BLE_SUCCESS)
+    {
+        ChipLogError(DeviceLayer, "Fail to init BLE TX FIFO. Error %d", status);
+
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    status = blc_ll_initAclConnRxFifo(rxFufoBuff, CHIP_BLE_RX_FIFO_SIZE, CHIP_BLE_RX_FIFO_NUM);
+    if(status != BLE_SUCCESS)
+    {
+        ChipLogError(DeviceLayer, "Fail to init BLE RX FIFO. Error %d", status);
+        
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    status = blc_controller_check_appBufferInitialization();
+    if(status != BLE_SUCCESS)
+    {
+        ChipLogError(DeviceLayer, "Buffer initialization check failed. Error %d", status);
+
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    /* Init GAP */
+    blc_gap_peripheral_init();
+
+    /* Set up GATT Services */
+    _InitGatt();
+
+    /* L2CAP Initialization */
+    blc_l2cap_register_handler((void *)blc_l2cap_packet_receive);
+
+    /* Setup connect/terminate callbacks */
+    bls_app_registerEventCallback(BLT_EV_FLAG_CONNECT, BLEManagerImpl::ConnectCallback);
+    bls_app_registerEventCallback(BLT_EV_FLAG_TERMINATE, BLEManagerImpl::DisconnectCallback);
+
+    /* Add GAP event handler to handle indication send */
+    blc_gap_registerHostEventHandler(BLEManagerImpl::GapEventHandler);
+    blc_gap_setEventMask(GAP_EVT_MASK_GATT_HANDLE_VLAUE_CONFIRM);
+
+    return CHIP_NO_ERROR;
+}
+
+void BLEManagerImpl::_InitGatt(void)
+{
     /* UUIDs */
     static const u16 primaryServiceUUID     = GATT_UUID_PRIMARY_SERVICE;
     static const u16 gapServiceUUID         = SERVICE_UUID_GENERIC_ACCESS;
@@ -339,7 +430,6 @@ CHIP_ERROR BLEManagerImpl::_InitGatt(void)
     static const u8  MatterRxCharUUID[]     = WRAPPING_BRACES(CHIP_RX_CHAR_UUID);
     static const u8  MatterTxCharUUID[]     = WRAPPING_BRACES(CHIP_TX_CHAR_UUID);
  
-
     /* Characteristics */
     static const u8 devNameCharVal[] = 
     {
@@ -378,7 +468,7 @@ CHIP_ERROR BLEManagerImpl::_InitGatt(void)
 
     static const u8 MatterTxCharVal[] = 
     {
-        CHAR_PROP_NOTIFY,
+        CHAR_PROP_INDICATE,
         U16_LO(Matter_TX_DP_H), U16_HI(Matter_TX_DP_H),
         CHIP_TX_CHAR_UUID
     };
@@ -396,73 +486,34 @@ CHIP_ERROR BLEManagerImpl::_InitGatt(void)
         {ATT_END_H - 1, 0,0,0,0,0},
 
         /* 0001 - 0007  GAP service */
-        {7, ATT_PERMISSIONS_READ, 2,  2,                            (u8*)(&primaryServiceUUID),     (u8*)(&gapServiceUUID),         0},
-        {0, ATT_PERMISSIONS_READ, 2,  sizeof(devNameCharVal),       (u8*)(&characterUUID),          (u8*)(devNameCharVal),          0},
-        {0, ATT_PERMISSIONS_READ, 2,  (u32)kMaxDeviceNameLength,    (u8*)(&devNameUUID),            (u8*)(mDeviceName),             0},
-        {0, ATT_PERMISSIONS_READ, 2,  sizeof(appearanceCharVal),    (u8*)(&characterUUID),          (u8*)(appearanceCharVal),       0},
-        {0, ATT_PERMISSIONS_READ, 2,  sizeof(appearance),           (u8*)(&appearanceUUID),         (u8*)(&appearance),             0},
-        {0, ATT_PERMISSIONS_READ, 2,  sizeof(periConnParamCharVal), (u8*)(&characterUUID),          (u8*)(periConnParamCharVal),    0},
-        {0, ATT_PERMISSIONS_READ, 2,  sizeof(periConnParameters),   (u8*)(&periConnParamUUID),      (u8*)(&periConnParameters),     0},
+        {7, ATT_PERMISSIONS_READ, 2,  2,                            (u8*)(&primaryServiceUUID),     (u8*)(&gapServiceUUID),                   0},
+        {0, ATT_PERMISSIONS_READ, 2,  sizeof(devNameCharVal),       (u8*)(&characterUUID),          (u8*)(devNameCharVal),                    0},
+        {0, ATT_PERMISSIONS_READ, 2,  (u32)kMaxDeviceNameLength,    (u8*)(&devNameUUID),            (u8*)(mDeviceName),                       0},
+        {0, ATT_PERMISSIONS_READ, 2,  sizeof(appearanceCharVal),    (u8*)(&characterUUID),          (u8*)(appearanceCharVal),                 0},
+        {0, ATT_PERMISSIONS_READ, 2,  sizeof(appearance),           (u8*)(&appearanceUUID),         (u8*)(&appearance),                       0},
+        {0, ATT_PERMISSIONS_READ, 2,  sizeof(periConnParamCharVal), (u8*)(&characterUUID),          (u8*)(periConnParamCharVal),              0},
+        {0, ATT_PERMISSIONS_READ, 2,  sizeof(periConnParameters),   (u8*)(&periConnParamUUID),      (u8*)(&periConnParameters),               0},
 
         /* 0008 - 000b GATT */
-        {4, ATT_PERMISSIONS_READ, 2,  2,                            (u8*)(&primaryServiceUUID),     (u8*)(&gattServiceUUID),         0},
-        {0, ATT_PERMISSIONS_READ, 2,  sizeof(serviceChangeCharVal), (u8*)(&characterUUID),          (u8*)(serviceChangeCharVal),     0},
-        {0, ATT_PERMISSIONS_READ, 2,  sizeof(serviceChangeVal),     (u8*)(&serviceChangeUUID),      (u8*)(&serviceChangeVal),        0},
-        {0, ATT_PERMISSIONS_RDWR, 2,  sizeof(serviceChangeCCC),     (u8*)(&clientCharacterCfgUUID), (u8*)(serviceChangeCCC),         0},
+        {4, ATT_PERMISSIONS_READ, 2,  2,                            (u8*)(&primaryServiceUUID),     (u8*)(&gattServiceUUID),                  0},
+        {0, ATT_PERMISSIONS_READ, 2,  sizeof(serviceChangeCharVal), (u8*)(&characterUUID),          (u8*)(serviceChangeCharVal),              0},
+        {0, ATT_PERMISSIONS_READ, 2,  sizeof(serviceChangeVal),     (u8*)(&serviceChangeUUID),      (u8*)(&serviceChangeVal),                 0},
+        {0, ATT_PERMISSIONS_RDWR, 2,  sizeof(serviceChangeCCC),     (u8*)(&clientCharacterCfgUUID), (u8*)(serviceChangeCCC),                  0},
 
         /* 000c - 0011 Matter service */
-        {6, ATT_PERMISSIONS_READ, 2,  2,                            (u8*)(&primaryServiceUUID),     (u8*)(&matterServiceUUID),       0},
-        {0, ATT_PERMISSIONS_READ, 2,  sizeof(MatterRxCharVal),      (u8*)(&characterUUID),          (u8*)(MatterRxCharVal),          0},
-        {0, ATT_PERMISSIONS_RDWR, 16, sizeof(mRxDataBuff),          (u8*)(&MatterRxCharUUID),       mRxDataBuff, RxWriteCallback, NULL},
-        {0, ATT_PERMISSIONS_READ, 2,  sizeof(MatterTxCharVal),      (u8*)(&characterUUID),          (u8*)(MatterTxCharVal),          0},
-        {0, ATT_PERMISSIONS_RDWR, 16, sizeof(mTxDataBuff),          (u8*)(&MatterTxCharUUID),       mTxDataBuff,                     0},
-        {0, ATT_PERMISSIONS_RDWR, 2,  sizeof(matterTxCCC),          (u8*)(&clientCharacterCfgUUID), (u8*)(matterTxCCC),              0}
+        {6, ATT_PERMISSIONS_READ, 2,  2,                            (u8*)(&primaryServiceUUID),     (u8*)(&matterServiceUUID),                 0},
+        {0, ATT_PERMISSIONS_READ, 2,  sizeof(MatterRxCharVal),      (u8*)(&characterUUID),          (u8*)(MatterRxCharVal),                    0},
+        {0, ATT_PERMISSIONS_RDWR, 16, sizeof(mRxDataBuff),          (u8*)(&MatterRxCharUUID),       mRxDataBuff, RxWriteCallback,           NULL},
+        {0, ATT_PERMISSIONS_READ, 2,  sizeof(MatterTxCharVal),      (u8*)(&characterUUID),          (u8*)(MatterTxCharVal),                    0},
+        {0, ATT_PERMISSIONS_RDWR, 16, sizeof(mTxDataBuff),          (u8*)(&MatterTxCharUUID),       mTxDataBuff,                               0},
+        {0, ATT_PERMISSIONS_RDWR, 2,  sizeof(matterTxCCC),          (u8*)(&clientCharacterCfgUUID), (u8*)(matterTxCCC), TxCccWriteCallback, NULL}
     };
 
-    status = blc_ll_initAclConnTxFifo(txFifoBuff, CHIP_BLE_TX_FIFO_SIZE, CHIP_BLE_TX_FIFO_NUM);
-    if(status != BLE_SUCCESS)
-    {
-        ChipLogError(DeviceLayer, "Fail to init BLE TX FIFO. Error %d", status);
-
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    status = blc_ll_initAclConnRxFifo(rxFufoBuff, CHIP_BLE_RX_FIFO_SIZE, CHIP_BLE_RX_FIFO_NUM);
-    if(status != BLE_SUCCESS)
-    {
-        ChipLogError(DeviceLayer, "Fail to init BLE RX FIFO. Error %d", status);
-        
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    status = blc_controller_check_appBufferInitialization();
-    if(status != BLE_SUCCESS)
-    {
-        ChipLogError(DeviceLayer, "Buffer initialization check failed. Error %d", status);
-
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    /* Init GAP */
-    blc_gap_peripheral_init();
-
-    /* Set up GATT table */
     bls_att_setAttributeTable((u8 *)gattTable);
-
-    /* L2CAP Initialization */
-    blc_l2cap_register_handler((void *)blc_l2cap_packet_receive);
-
-    /* Setup connect/terminate callbacks */
-    bls_app_registerEventCallback(BLT_EV_FLAG_CONNECT, connectCallback);
-    bls_app_registerEventCallback(BLT_EV_FLAG_TERMINATE, terminateCallback);
-
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BLEManagerImpl::_SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val)
 {
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::_SetCHIPoBLEServiceMode");
-
     return CHIP_NO_ERROR;
 }
 
@@ -540,57 +591,15 @@ exit:
 
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 {
-    ble_sts_t status = BLE_SUCCESS;
     CHIP_ERROR err = CHIP_NO_ERROR;
-    
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::_SetAdvertisingEnabled");
 
-    if(val == true)
+    if(val)
     {
-        ChipLogProgress(DeviceLayer, "Enable BLE");
-
-        /* At first run always select fast advertising, on the next attemp slow down interval. */
-        u16 intervalMin = mFlags.Has(Flags::kFastAdvertisingEnabled) ? CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN
-                                                                     : CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
-        u16 intervalMax = mFlags.Has(Flags::kFastAdvertisingEnabled) ? CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX
-                                                                     : CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
-
-        /* Configure CHIP BLE advertisement data */
-        err = ConfigureAdvertisingData();
-        if(err != CHIP_NO_ERROR)
-        {
-            ChipLogError(DeviceLayer, "Fail to config BLE advertisement data");
-
-            return err;
-        }
-
-        /* Setup advertisement paramiters */
-        status = bls_ll_setAdvParam(intervalMin, 
-                                    intervalMax,
-                                    ADV_TYPE_CONNECTABLE_UNDIRECTED, 
-                                    OWN_ADDRESS_PUBLIC,
-                                    0,  NULL,
-                                    BLT_ENABLE_ADV_ALL,
-                                    ADV_FP_NONE);
-        if(status != BLE_SUCCESS)
-        {
-            ChipLogError(DeviceLayer, "Fail to set BLE advertisement paramiters. Error %d", status);
-
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
-
-        /* Enable advertisement */
-        status = bls_ll_setAdvEnable(BLC_ADV_ENABLE);
-        if(status != BLE_SUCCESS)
-        {
-            ChipLogError(DeviceLayer, "Fail to start BLE advertisement. Error %d", status);
-
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
+        err = StartAdvertising();
     }
     else
     {
-        ChipLogProgress(DeviceLayer, "Disable BLE");
+        err = StopAdvertising();
     }
 
     return err;
@@ -598,29 +607,95 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 
 CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::StartAdvertising");
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ble_sts_t status = BLE_SUCCESS;
 
-    return _SetAdvertisingEnabled(true);
+    /* At first run always select fast advertising, on the next attemp slow down interval. */
+    u16 intervalMin = mFlags.Has(Flags::kFastAdvertisingEnabled) ? CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN
+                                                                 : CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
+    u16 intervalMax = mFlags.Has(Flags::kFastAdvertisingEnabled) ? CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX
+                                                                 : CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
+
+    if(ConnectivityMgr().IsThreadProvisioned())
+    {
+        ChipLogProgress(DeviceLayer, "Thread provisioned. Start advertisement not possible");
+
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    /* It is time to init BLE stack */
+    err = _InitStack();
+    if(err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Fail to init BLE stack");
+
+        return err;
+    }
+
+    /* Configure CHIP BLE advertisement data */
+    err = ConfigureAdvertisingData();
+    if(err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Fail to config BLE advertisement data");
+
+        return err;
+    }
+
+    /* Setup advertisement paramiters */
+    status = bls_ll_setAdvParam(intervalMin, 
+                                intervalMax,
+                                ADV_TYPE_CONNECTABLE_UNDIRECTED, 
+                                OWN_ADDRESS_PUBLIC,
+                                0,  NULL,
+                                BLT_ENABLE_ADV_ALL,
+                                ADV_FP_NONE);
+    if(status != BLE_SUCCESS)
+    {
+        ChipLogError(DeviceLayer, "Fail to set BLE advertisement paramiters. Error %d", status);
+
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    /* Enable advertisement */
+    status = bls_ll_setAdvEnable(BLC_ADV_ENABLE);
+    if(status != BLE_SUCCESS)
+    {
+        ChipLogError(DeviceLayer, "Fail to start BLE advertisement. Error %d", status);
+
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    mFlags.Set(Flags::kAdvertising);
+
+    return err;
 }
 
 CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
 {
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::StopAdvertising");
+    ble_sts_t status = BLE_SUCCESS;
 
-    return _SetAdvertisingEnabled(false);
+    /* Disable advertisement */
+    status = bls_ll_setAdvEnable(BLC_ADV_DISABLE);
+    if(status != BLE_SUCCESS)
+    {
+        ChipLogError(DeviceLayer, "Fail to stop BLE advertisement. Error %d", status);
+
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    mFlags.Clear(Flags::kAdvertising);
+
+    return CHIP_NO_ERROR;
 }
 
+/// @todo: implementation
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
 {
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::_SetAdvertisingMode");
-
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
 {
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::_GetDeviceName");
-
     if (strlen(mDeviceName) >= bufSize)
     {
         return CHIP_ERROR_BUFFER_TOO_SMALL;
@@ -632,7 +707,6 @@ CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
 
 CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * devName)
 {
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::_SetDeviceName");
 
     if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_NotSupported)
     {
@@ -667,60 +741,78 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::_OnPlatformEvent");
-
     switch (event->Type)
     {
-        case DeviceEventType::kPlatformTelinkBleRXWrite:
-            ChipLogDetail(DeviceLayer, "Event: kPlatformTelinkBleRXWrite");
+        case DeviceEventType::kPlatformTelinkBleConnected:            
+            err = HandleGAPConnect(event);
+            break;
 
+        case DeviceEventType::kPlatformTelinkBleDisconnected:
+            err = HandleGAPDisconnect(event);
+            break;
+
+        case DeviceEventType::kPlatformTelinkBleRXWrite:
             err = HandleRXCharWrite(event);
-        break;
+            break;
+
+        case DeviceEventType::kPlatformTelinkBleCCCWrite:
+            err = HandleTXCharCCCDWrite(event);
+            break;
+
+        case DeviceEventType::kPlatformTelinkBleTXComplete:
+            err = HandleTXCharComplete(event);
+            break;
+
+        case DeviceEventType::kCHIPoBLEConnectionClosed:
+            err = HandleBleConnectionClosed(event);
+            break;
 
         default:
-            ChipLogDetail(DeviceLayer, "Event: Unknown (%d)", event->Type);
+            ChipLogDetail(DeviceLayer, "Event: Unknown (0x%04x)", event->Type);
     }
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Error: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Fail to handle 0x%04x event. Error: %s", event->Type, ErrorStr(err));
     }
 }
 
 bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
 {
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::SubscribeCharacteristic");
-
     return false;
 }
 
 bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
 {
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::UnsubscribeCharacteristic");
-
     return false;
 }
 
 bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 {
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::CloseConnection");
-
     return false;
 }
 
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 {
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::GetMTU");
-
-    return 0;
+    return blc_att_getEffectiveMtuSize(conId);
 }
 
 bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                    PacketBufferHandle data)
+                                    PacketBufferHandle pBuf)
 {
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::SendIndication()");
+    ble_sts_t status = BLE_SUCCESS;
+    uint8_t *data = pBuf->Start();
+    int len = pBuf->DataLength();
 
-    return false;
+    status = blc_gatt_pushHandleValueIndicate(conId, Matter_TX_DP_H, data, len);
+    if(status != BLE_SUCCESS)
+    {
+        ChipLogError(DeviceLayer, "Fail to send indication. Error %d", status);
+
+        return false;
+    }
+
+    return true;
 }
 
 bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
@@ -744,71 +836,212 @@ bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQU
     return false;
 }
 
-void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
+void BLEManagerImpl::SwitchToIeee802154(void)
 {
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::NotifyChipConnectionClosed");
 
+    gpio_set_high_level(WHITE_LED);
+
+    ChipLogProgress(DeviceLayer, "BLEManagerImpl::Switch to IEEE802154");
+
+    int result = 0;
+    const struct device *radio_dev = device_get_binding(CONFIG_NET_CONFIG_IEEE802154_DEV_NAME);
+    __ASSERT(radio_dev != NULL, "Fail to get radio device");
+
+    struct ieee802154_radio_api *radio_api = (struct ieee802154_radio_api *)radio_dev->api;
+    __ASSERT(radio_api != NULL, "Fail to get radio API");
+
+    StopAdvertising();
+
+    k_thread_suspend(chipBleThread);
+
+    k_msleep(1000);
+
+    unsigned int irq_restore = core_interrupt_disable();
+
+    /* Disable STIMER and RF IRQs */
+    irq_disable(STIMER_IRQ_NUM);
+    irq_disable(RF_IRQ_NUM);
+
+    /* Get IEEE802154 context */
+    struct b91_data *data = (b91_data *)radio_dev->data;
+
+    /* Set IRQ handler */ 
+    result = irq_connect_dynamic(RF_IRQ_NUM, 2, data->isr_handler, NULL, 0);
+    ChipLogDetail(DeviceLayer, "RF IRQ assigned vector %d", result);
+
+    /* Set radio settings */
+    dma_chn_dis(DMA1);
+
+    /* Reset Radio */
+    rf_radio_reset();
+
+    /* Reset DMA */
+    rf_reset_dma();
+
+    rf_set_tx_rx_off();
+    rf_set_tx_rx_off_auto_mode();  //must call it before baseband reset, or dma dst address will increase
+
+    rf_baseband_reset();
+
+    OT_RADIO_RX_BUF_CLEAR(data->rx_buffer);
+    CLEAR_ALL_RFIRQ_STATUS;
+    rf_clr_irq_mask(FLD_RF_IRQ_ALL);//the uart interrupt should always be opened.
+
+    rf_mode_init();
+    rf_set_zigbee_250K_mode();
+    rf_set_tx_dma(B91_FIFO_DEPTH, B91_TRX_LENGTH);
+    rf_set_rx_maxlen(B91_PAYLOAD_MAX);
+    memset(data->rx_buffer, 0, B91_TRX_LENGTH);
+    memset(data->tx_buffer, 0, B91_TRX_LENGTH);
+    rf_set_rx_dma(data->rx_buffer, B91_FIFO_NUM, B91_TRX_LENGTH);
+    rf_clr_irq_mask(FLD_RF_IRQ_ALL);
+    rf_set_irq_mask((rf_irq_e)(FLD_RF_IRQ_RX | FLD_RF_IRQ_TX));
+    plic_set_priority(IRQ15_ZB_RT, IRQ_PRI_LEV2);
+
+    dma_chn_en(DMA1);
+
+    radio_api->stop(radio_dev);
+
+    core_restore_interrupt(irq_restore);
+
+    gpio_set_low_level(WHITE_LED);
 }
 
-void BLEManagerImpl::DriveBLEState(void)
+void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::DriveBLEState");
 
 }
 
 uint16_t BLEManagerImpl::_NumConnections(void)
 {
-    return 0;
+    return mNumConnections;
 }
 
-void BLEManagerImpl::DriveBLEState(intptr_t arg)
-{
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::DriveBLEState");
-
-}
-
+/// @todo implement multicinnection subscription 
 CHIP_ERROR BLEManagerImpl::SetSubscribed(uint16_t conId)
 {
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::SetSubscribed");
+
+    mSubscribedConns[0] = true;
 
     return CHIP_NO_ERROR;
 }
 
+/// @todo implement multicinnection subscription 
 bool BLEManagerImpl::UnsetSubscribed(uint16_t conId)
 {
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::UnsetSubscribed");
 
-    return false;
+    mSubscribedConns[0]  = false;
+
+    return true;
 }
 
+/// @todo implement multicinnection subscription 
 bool BLEManagerImpl::IsSubscribed(uint16_t conId)
 {
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::IsSubscribed");
-
-    return false;
+    return mSubscribedConns[0];
 }
 
-void BLEManagerImpl::CancelBleAdvTimeoutTimer(void)
+CHIP_ERROR BLEManagerImpl::HandleGAPConnect(const ChipDeviceEvent * event)
 {
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::CancelBleAdvTimeoutTimer");
+    const BleConnEventType * connEvent = &event->Platform.BleConnEvent;
 
+    /* Increase number of connections */
+    mNumConnections++;
+
+    ChipLogProgress(DeviceLayer, "BLE connection established (ConnId: 0x%02" PRIx16 ")", connEvent->connHandle);
+    ChipLogProgress(DeviceLayer, "Current number of connections: %" PRIu16 "/%" PRIu16, NumConnections(), kMaxConnections);
+
+    return CHIP_NO_ERROR;
 }
 
-void BLEManagerImpl::StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs)
+CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(const ChipDeviceEvent * event)
 {
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::StartBleAdvTimeoutTimer");
+    const BleConnEventType * connEvent = &event->Platform.BleConnEvent;
+    ChipDeviceEvent disconnectEvent;
 
+    /* Decrease number of connections */
+    mNumConnections--;
+
+    ChipLogProgress(DeviceLayer, "BLE GAP connection terminated (reason 0x%02" PRIx16 ")", connEvent->HciResult);
+    ChipLogProgress(DeviceLayer, "Current number of connections: %" PRIu16 "/%" PRIu16, NumConnections(), kMaxConnections);
+
+    /* Unsubscribe */
+    if(UnsetSubscribed(connEvent->connHandle))
+    {
+        HandleUnsubscribeReceived(connEvent->connHandle, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);
+    }
+
+    /* Send Connection close event */
+    disconnectEvent.Type = DeviceEventType::kCHIPoBLEConnectionClosed;
+    ReturnErrorOnFailure(PlatformMgr().PostEvent(&disconnectEvent));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BLEManagerImpl::HandleBleConnectionClosed(const ChipDeviceEvent * event)
+{
+    /* It is time to swich to IEEE802154 radio if it is provisioned */
+    if(ConnectivityMgr().IsThreadProvisioned())
+    {
+        SwitchToIeee802154();
+    }
+ 
+    return CHIP_NO_ERROR;   
 }
 
 CHIP_ERROR BLEManagerImpl::HandleRXCharWrite(const ChipDeviceEvent * event)
 {
-    const BleRXWriteEventType * writeEvent = &event->Platform.BleRXWriteEvent;
+    const BleRXWriteEventType *writeEvent = &event->Platform.BleRXWriteEvent;
 
-    ChipLogDetail(DeviceLayer, "Write request received for CHIPoBLE RX (connHandle 0x%02" PRIx16 ")", 
-                  writeEvent->connHandle);
+    ChipLogDetail(DeviceLayer, "Write request received for CHIPoBLE RX (ConnId 0x%02" PRIx16 ")", writeEvent->connHandle);
 
     HandleWriteReceived(writeEvent->connHandle, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_RX,
                         PacketBufferHandle::Adopt(writeEvent->Data));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BLEManagerImpl::HandleTXCharComplete(const ChipDeviceEvent * event)
+{
+    const BleTXCompleteEventType *completeEvent = &event->Platform.BleTXCompleteEvent;
+
+    ChipLogDetail(DeviceLayer, "Notification for CHIPoBLE TX done (ConnId 0x%02" PRIx16 ")", completeEvent->connHandle);
+
+    // Signal the BLE Layer that the outstanding notification is complete.
+    HandleIndicationConfirmation(completeEvent->connHandle, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BLEManagerImpl::HandleTXCharCCCDWrite(const ChipDeviceEvent * event)
+{
+    const BleCCCWriteEventType *writeEvent = &event->Platform.BleCCCWriteEvent;
+
+    ChipLogDetail(DeviceLayer, "ConnId: 0x%02x, New CCCD value: 0x%04x", writeEvent->connHandle, writeEvent->Value);
+
+    /* If the client has requested to enable notifications and if it is not yet subscribed */
+    if (writeEvent->Value != 0 && SetSubscribed(writeEvent->connHandle) == CHIP_NO_ERROR)
+    {
+        /* Alert the BLE layer that CHIPoBLE "subscribe" has been received and increment the bt_conn reference counter. */
+        HandleSubscribeReceived(writeEvent->connHandle, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);
+
+        ChipLogProgress(DeviceLayer, "CHIPoBLE connection established (ConnId: 0x%02x, GATT MTU: %d)",
+                        writeEvent->connHandle, GetMTU(writeEvent->connHandle));
+
+        /* Post a CHIPoBLEConnectionEstablished event to the DeviceLayer and the application. */
+        {
+            ChipDeviceEvent conEstEvent;
+            conEstEvent.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
+            ReturnErrorOnFailure(PlatformMgr().PostEvent(&conEstEvent));
+        }
+    }
+    else
+    {
+        if (UnsetSubscribed(writeEvent->connHandle))
+        {
+            HandleUnsubscribeReceived(writeEvent->connHandle, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);
+        }
+    }
 
     return CHIP_NO_ERROR;
 }
