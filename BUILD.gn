@@ -436,19 +436,19 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
   if (enable_k32w_lighting_app_build) {
     group("k32w_lighting_app") {
-      deps = [ "${chip_root}/examples/lighting-app/k32w(${chip_root}/config/k32w/toolchain:k32w_lighting_app)" ]
+      deps = [ "${chip_root}/examples/lighting-app/nxp/k32w/k32w0/(${chip_root}/config/k32w/toolchain:k32w_lighting_app)" ]
     }
   }
 
   if (enable_k32w_lock_app_build) {
     group("k32w_lock_app") {
-      deps = [ "${chip_root}/examples/lock-app/k32w(${chip_root}/config/k32w/toolchain:k32w_lock_app)" ]
+      deps = [ "${chip_root}/examples/lock-app/nxp/k32w/k32w0/(${chip_root}/config/k32w/toolchain:k32w_lock_app)" ]
     }
   }
 
   if (enable_k32w_shell_app_build) {
     group("k32w_shell_app") {
-      deps = [ "${chip_root}/examples/shell/k32w(${chip_root}/config/k32w/toolchain:k32w_shell_app)" ]
+      deps = [ "${chip_root}/examples/shell/nxp/k32w/k32w0/(${chip_root}/config/k32w/toolchain:k32w_shell_app)" ]
     }
   }
 

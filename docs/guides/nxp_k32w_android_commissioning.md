@@ -311,11 +311,11 @@ To make your PC work as a Thread Border Router, complete the following tasks:
 ## Building and programming NXP K32W Lock/Light Example Application
 
 See
-[NXP K32W Lock Example Application README](../../examples/lock-app/k32w/README.md)
+[NXP K32W Lock Example Application README](../../examples/lock-app/nxp/k32w/k32w0/README.md)
 to learn how to build and program the lock example onto an K32W061 DK6.
 
 See
-[NXP K32W Light Example Application README](../../examples/lighting-app/k32w/README.md)
+[NXP K32W Light Example Application README](../../examples/lighting-app/nxp/k32w/k32w0/README.md)
 to learn how to build and program the light example onto an K32W061 DK6.
 
 <hr>
