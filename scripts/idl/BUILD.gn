@@ -25,6 +25,7 @@ pw_python_package("idl") {
     "matter_grammar.lark",
 
     # Templates used for generation
+    "generators/java/ChipClustersCpp.jinja",
     "generators/java/ChipClustersRead.jinja",
 
     # Unit test data
