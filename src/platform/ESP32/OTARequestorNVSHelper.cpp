@@ -38,7 +38,7 @@ esp_err_t OTARequestorNVSHelper::ReadSoftwareVersion(uint32_t & softwareVersion)
     err = nvs_get_u32(my_handle, OTARequestorNVSHelper::softwareVersionName, &softwareVersion);
 
     nvs_close(my_handle);
-    return ((err==ESP_OK)?ESP_OK:err);
+    return ((err == ESP_OK) ? ESP_OK : err);
 }
 
 esp_err_t OTARequestorNVSHelper::ReadProviderLocation(chip::NodeId & nodeId, chip::FabricIndex & fabIndex,
@@ -68,7 +68,7 @@ esp_err_t OTARequestorNVSHelper::ReadProviderLocation(chip::NodeId & nodeId, chi
     err = nvs_get_u16(my_handle, OTARequestorNVSHelper::otaProviderEndpointId, &endpointId);
 
     nvs_close(my_handle);
-    return ((err==ESP_OK)?ESP_OK:err);
+    return ((err == ESP_OK) ? ESP_OK : err);
 }
 
 esp_err_t OTARequestorNVSHelper::ClearAllData()
@@ -90,7 +90,7 @@ esp_err_t OTARequestorNVSHelper::ClearAllData()
     err = nvs_commit(my_handle);
 
     nvs_close(my_handle);
-    return ((err==ESP_OK)?ESP_OK:err);
+    return ((err == ESP_OK) ? ESP_OK : err);
 }
 
 esp_err_t OTARequestorNVSHelper::WriteSoftwareVersion(uint32_t softwareVersion)
@@ -112,7 +112,7 @@ esp_err_t OTARequestorNVSHelper::WriteSoftwareVersion(uint32_t softwareVersion)
     err = nvs_commit(my_handle);
 
     nvs_close(my_handle);
-    return ((err==ESP_OK)?ESP_OK:err);
+    return ((err == ESP_OK) ? ESP_OK : err);
 }
 
 esp_err_t OTARequestorNVSHelper::WriteProviderParameters(chip::NodeId nodeId, chip::FabricIndex fabIndex,
@@ -148,5 +148,5 @@ esp_err_t OTARequestorNVSHelper::WriteProviderParameters(chip::NodeId nodeId, ch
     }
 
     err = nvs_commit(my_handle);
-    return ((err==ESP_OK)?ESP_OK:err);
+    return ((err == ESP_OK) ? ESP_OK : err);
 }

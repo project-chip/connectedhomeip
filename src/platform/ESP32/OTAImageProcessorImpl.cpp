@@ -205,7 +205,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     EndpointId endpointId;
     // TODO : switch this over once persistent storage in the OTA Requestor core
     OTARequestorInterface * requestorInstance = GetRequestorInstance();
-    requestorInstance -> TestModeGetProviderParameters(nodeId, fabIndex, endpointId);
+    requestorInstance->TestModeGetProviderParameters(nodeId, fabIndex, endpointId);
     err = OTARequestorNVSHelper::WriteProviderParameters(nodeId, fabIndex, endpointId);
     if (err != ESP_OK)
     {
