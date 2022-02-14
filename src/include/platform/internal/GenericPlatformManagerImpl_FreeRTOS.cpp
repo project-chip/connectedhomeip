@@ -112,9 +112,6 @@ bool GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_IsChipStackLockedByCurrent
     //
     // Similarly, if mChipStackLock has not been created yet, might as well
     // return true.
-    ChipLogError(DeviceLayer, "LOCKY: %d %d %d %d", mEventLoopTask == nullptr, mChipStackLock == nullptr,
-                 xSemaphoreGetMutexHolder(mChipStackLock) == nullptr,
-                 xSemaphoreGetMutexHolder(mChipStackLock) == xTaskGetCurrentTaskHandle());
     return (mEventLoopTask == nullptr) || (mChipStackLock == nullptr) ||
         (xSemaphoreGetMutexHolder(mChipStackLock) == xTaskGetCurrentTaskHandle());
 }
