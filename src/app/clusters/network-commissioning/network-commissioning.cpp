@@ -282,7 +282,7 @@ void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::Connec
     }
 
     mConnectingNetworkIDLen = static_cast<uint8_t>(req.networkID.size());
-    memcpy(mConnectingNetworkID, req.networkID.data(), sizeof(mConnectingNetworkID));
+    memcpy(mConnectingNetworkID, req.networkID.data(), mConnectingNetworkIDLen);
 
     mAsyncCommandHandle = app::CommandHandler::Handle(&ctx.mCommandHandler);
     mpWirelessDriver->ConnectNetwork(req.networkID, this);
@@ -313,7 +313,7 @@ void Instance::OnResult(Status commissioningError, CharSpan errorText, int32_t i
     commandHandle->AddResponseData(mPath, response);
 
     mLastNetworkIDLen = mConnectingNetworkIDLen;
-    memcpy(mLastNetworkID, mConnectingNetworkID, sizeof(mConnectingNetworkID));
+    memcpy(mLastNetworkID, mConnectingNetworkID, mLastNetworkIDLen);
     mLastNetworkingStatusValue.SetNonNull(ToClusterObjectEnum(commissioningError));
     mLastConnectErrorValue.SetNonNull(interfaceStatus);
 
