@@ -34,6 +34,10 @@ class DiagnosticDataProviderImpl : public DiagnosticDataProvider
 {
 public:
     static DiagnosticDataProviderImpl & GetDefaultInstance();
+
+    // ===== Methods that implement the PlatformManager abstract interface.
+    CHIP_ERROR GetUpTime(uint64_t & upTime) override;
+    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
 };
 
 } // namespace DeviceLayer

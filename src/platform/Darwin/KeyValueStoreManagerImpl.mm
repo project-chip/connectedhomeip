@@ -201,6 +201,7 @@ namespace DeviceLayer {
 
             // create Managed Object context
             gContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
+            [gContext setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy];
             [gContext setPersistentStoreCoordinator:coordinator];
 
             mInitialized = true;
