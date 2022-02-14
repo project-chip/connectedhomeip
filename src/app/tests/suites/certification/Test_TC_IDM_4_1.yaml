@@ -1,0 +1,92 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 19.5.1. [TC-IDM-4.1] SubscriptionRequestMessage from DUT test cases
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "DUT sends a subscription request message to the target node/reference
+          device for a single attribute of any data type supported."
+      disabled: true
+
+    - label:
+          "DUT sends the subscription request message to TH TH sends a report
+          data DUT sends the status response back to TH"
+      disabled: true
+
+    - label:
+          "[OPTIONAL] Activate the subscription between the DUT and the TH for
+          an attribute of data type boolean. Modify that attribute on the TH. TH
+          should send the modified data to the DUT. Repeat the above steps
+          multiple times (3 times)."
+      disabled: true
+
+    - label:
+          "[OPTIONAL] Activate the subscription between the DUT and the TH for
+          an attribute of data type string. Modify that attribute on the TH. TH
+          should send the modified data to the DUT. Repeat the above steps
+          multiple times (3 times). 3"
+      disabled: true
+
+    - label:
+          "[OPTIONAL] Activate the subscription between the DUT and the TH for
+          an attribute of data type unsigned integer. Modify that attribute on
+          the TH. TH should send the modified data to the DUT. Repeat the above
+          steps multiple times (3 times)."
+      disabled: true
+
+    - label:
+          "[OPTIONAL] Activate the subscription between the DUT and the TH for
+          an attribute of data type signed integer. Modify that attribute on the
+          TH. TH should send the modified data to the DUT. Repeat the above
+          steps multiple times (3 times)."
+      disabled: true
+
+    - label:
+          "[OPTIONAL] Activate the subscription between the DUT and the TH for
+          an attribute of data type Floating Point. Modify that attribute on the
+          TH. TH should send the modified data to the DUT. Repeat the above
+          steps multiple times (3 times)."
+      disabled: true
+
+    - label:
+          "Activate the subscription between the DUT and the TH for an
+          attribute. Force the TH to not send any report data for the duration
+          of the maximum interval. After the maximum interval, TH sends a report
+          data with the subscription id created during the subscription
+          activation."
+      disabled: true
+
+    - label:
+          "DUT sends a subscription request message to the target node/reference
+          device for multiple attributes(3 attributes)."
+      disabled: true
+
+    - label:
+          "Activate the subscription between the DUT and the TH for an attribute
+          Force the TH to send a report data with no data and Suppress Response
+          set to True"
+      disabled: true
+
+    - label:
+          "[OPTIONAL] Activate the subscription between the DUT and the TH for
+          an attribute of data type list. Modify that attribute on the TH. TH
+          should send the modified data to the DUT. Repeat the above steps
+          multiple times (3 times)."
+      disabled: true

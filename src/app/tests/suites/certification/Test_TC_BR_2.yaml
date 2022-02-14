@@ -1,0 +1,88 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 25.1.2. [TC-BR-2] Changing the set of bridged devices
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "1: preparation"
+      disabled: true
+
+    - label:
+          "- Read Descriptor cluster of endpoint 0 - Read Descriptor cluster of
+          all endpoints listed in the PartsList attribute in the Descriptor
+          cluster of endpoint 0"
+      disabled: true
+
+    - label: "2: add a bridged device"
+      disabled: true
+
+    - label:
+          "Add a bridged device (using a method indicated by the manufacturer)"
+      disabled: true
+
+    - label:
+          "Read the PartsList attribute in the Descriptor cluster on endpoint 0"
+      disabled: true
+
+    - label:
+          "Read Descriptor cluster of all other endpoints listed in the
+          PartsList attribute in the Descriptor cluster of endpoint 0"
+      disabled: true
+
+    - label: "3: check newly added bridged device"
+      disabled: true
+
+    - label:
+          "Perform step 6 (for an actuator) resp. step 7 (for a sensor) of
+          TC-BR-1 for the bridged device added in step 2"
+      disabled: true
+
+    - label: "4: remove a bridged device"
+      disabled: true
+
+    - label:
+          "Remove one of the bridged devices (but not the one which was added in
+          step 2) (using a method indicated by the manufacturer)"
+      disabled: true
+
+    - label:
+          "Read the PartsList attribute in the Descriptor cluster on endpoint 0"
+      disabled: true
+
+    - label:
+          "Read Descriptor cluster of all other endpoints listed in the
+          PartsList attribute in the Descriptor cluster of endpoint 0"
+      disabled: true
+
+    - label: "5: re-add a bridged device"
+      disabled: true
+
+    - label:
+          "Re-add the bridged device which was removed in the previous step
+          (using a method indicated by the manufacturer)"
+      disabled: true
+
+    - label:
+          "Read the PartsList attribute in the Descriptor cluster on endpoint 0"
+      disabled: true
+
+    - label:
+          "Read Descriptor cluster of all other endpoints listed in the
+          PartsList attribute in the Descriptor cluster of endpoint 0"
+      disabled: true
