@@ -29,7 +29,9 @@ else
     echo Provider not commissioned properly
 fi
 
-stdbuf -o0 ./out/ota_requestor_debug/chip-ota-requestor-app --discriminator "$DISCRIMINATOR" --secured-device-port "$UDP_PORT" --KVS /tmp/ota/chip_kvs_requestor | tee /tmp/ota/requestor-log.txt &
+touch chip_kvs_requestor
+
+stdbuf -o0 ./out/ota_requestor_debug/chip-ota-requestor-app --discriminator "$DISCRIMINATOR" --secured-device-port "$UDP_PORT" --KVS chip_kvs_requestor | tee /tmp/ota/requestor-log.txt &
 
 requestor_pid=$!
 
