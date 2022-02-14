@@ -124,14 +124,8 @@ typedef struct
 
 #define CHIP_RF_PACKET_HEADER_SIZE 3
 
-#define WHITE_LED GPIO_PB6
-#define GREEN_LED GPIO_PB5
-#define BLUE_LED GPIO_PB4
-
 #define STIMER_IRQ_NUM 1
 #define RF_IRQ_NUM     15
-
-#define OT_RADIO_RX_BUF_CLEAR(p) do{ p[0] = 0; p[4] = 0; }while(0)
 
 #define CHIP_RX_CHAR_UUID 0x11, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, 0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18
 #define CHIP_TX_CHAR_UUID 0x12, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, 0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18
@@ -178,27 +172,6 @@ K_THREAD_DEFINE(chipBleThread,
 CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
-    /* Enable White LED for debug purposes */
-    gpio_function_en(WHITE_LED);
-    gpio_output_en(WHITE_LED);
-
-    /* Switch off the LED on the beginning */
-    gpio_set_low_level(WHITE_LED);
-
-    /* Enable Green LED for debug purposes */
-    gpio_function_en(GREEN_LED);
-    gpio_output_en(GREEN_LED);
-
-    /* Switch off the LED on the beginning */
-    gpio_set_low_level(GREEN_LED);
-
-    /* Enable Blue LED for debug purposes */
-    gpio_function_en(BLUE_LED);
-    gpio_output_en(BLUE_LED);
-
-    /* Switch off the LED on the beginning */
-    gpio_set_low_level(BLUE_LED);
 
     /* Initialize the CHIP BleLayer. */
     err = BleLayer::Init(this, this, &DeviceLayer::SystemLayer());
