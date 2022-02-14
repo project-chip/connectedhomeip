@@ -101,7 +101,8 @@ private:
     {
         kMaxConnections              = BLE_LAYER_NUM_BLE_ENDPOINTS,
         kMaxDeviceNameLength         = 16, // TODO: right-size this
-        kMaxAdvertisementDataSetSize = 31
+        kMaxAdvertisementDataSetSize = 31,
+        kMaxRxDataBuffSize           = 20
     };
 
     CHIPoBLEServiceMode mServiceMode;
@@ -111,6 +112,7 @@ private:
     uint16_t mSubscribedConIds[kMaxConnections];
     uint8_t mAdvDataBuf[kMaxAdvertisementDataSetSize];
     uint8_t mScanRespDataBuf[kMaxAdvertisementDataSetSize];
+    uint8_t mRxDataBuff[kMaxRxDataBuffSize];
 
     void DriveBLEState(void);
     CHIP_ERROR ConfigureAdvertisingData(void);
