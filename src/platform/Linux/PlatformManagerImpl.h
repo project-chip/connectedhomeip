@@ -30,6 +30,8 @@
 #include <gio/gio.h>
 #endif
 
+#include <thread>
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -97,6 +99,12 @@ private:
     };
     using UniqueGDBusConnection = std::unique_ptr<GDBusConnection, GDBusConnectionDeleter>;
     UniqueGDBusConnection mpGDBusConnection;
+
+    std::thread mGdbusThread;
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    std::thread mWifiIPThread;
 #endif
 };
 

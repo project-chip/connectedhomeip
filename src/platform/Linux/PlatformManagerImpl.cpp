@@ -33,8 +33,6 @@
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.cpp>
 
-#include <thread>
-
 #include <arpa/inet.h>
 #include <dirent.h>
 #include <errno.h>
@@ -175,6 +173,9 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 {
     CHIP_ERROR err;
     struct sigaction action;
+#if CHIP_WITH_GIO
+    GError * error = nullptr;
+#endif
 
     memset(&action, 0, sizeof(action));
     action.sa_handler = SignalHandler;
@@ -183,20 +184,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     sigaction(SIGUSR1, &action, NULL);
     sigaction(SIGUSR2, &action, NULL);
     sigaction(SIGTSTP, &action, NULL);
-
-#if CHIP_WITH_GIO
-    GError * error = nullptr;
-
-    this->mpGDBusConnection = UniqueGDBusConnection(g_bus_get_sync(G_BUS_TYPE_SYSTEM, nullptr, &error));
-
-    std::thread gdbusThread(GDBus_Thread);
-    gdbusThread.detach();
-#endif
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    std::thread wifiIPThread(WiFIIPChangeListener);
-    wifiIPThread.detach();
-#endif
 
     // Initialize the configuration system.
     err = Internal::PosixConfig::Init();
@@ -210,6 +197,15 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     SuccessOrExit(err);
 
     mStartTime = System::SystemClock().GetMonotonicTimestamp();
+
+#if CHIP_WITH_GIO
+    this->mpGDBusConnection = UniqueGDBusConnection(g_bus_get_sync(G_BUS_TYPE_SYSTEM, nullptr, &error));
+    mGdbusThread            = std::thread(GDBus_Thread);
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    mWifiIPThread = std::thread(WiFIIPChangeListener);
+#endif
 
 exit:
     return err;
@@ -236,6 +232,22 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
     {
         ChipLogError(DeviceLayer, "Failed to get current uptime since the Node’s last reboot");
     }
+
+#if CHIP_WITH_GIO
+    if (mGdbusThread.joinable())
+    {
+        pthread_cancel(mGdbusThread.native_handle());
+        mGdbusThread.join();
+    }
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    if (mWifiIPThread.joinable())
+    {
+        pthread_cancel(mWifiIPThread.native_handle());
+        mWifiIPThread.join();
+    }
+#endif
 
     return Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_Shutdown();
 }
