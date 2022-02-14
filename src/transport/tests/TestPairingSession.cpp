@@ -106,8 +106,8 @@ void PairingSessionTryDecodeMissingMRPParams(nlTestSuite * inSuite, void * inCon
     NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, session.DecodeMRPParametersIfPresent(TLV::ContextTag(2), reader) == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, session.GetMRPConfig().mIdleRetransTimeout == gDefaultMRPConfig.mIdleRetransTimeout);
-    NL_TEST_ASSERT(inSuite, session.GetMRPConfig().mActiveRetransTimeout == gDefaultMRPConfig.mActiveRetransTimeout);
+    NL_TEST_ASSERT(inSuite, session.GetMRPConfig().mIdleRetransTimeout == GetLocalMRPConfig().mIdleRetransTimeout);
+    NL_TEST_ASSERT(inSuite, session.GetMRPConfig().mActiveRetransTimeout == GetLocalMRPConfig().mActiveRetransTimeout);
 }
 
 // Test Suite

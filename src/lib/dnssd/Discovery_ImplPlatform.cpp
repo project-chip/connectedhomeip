@@ -236,18 +236,6 @@ CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, const chip::Opti
 
     auto retryInterval = isIdle ? optional.Value().mIdleRetransTimeout : optional.Value().mActiveRetransTimeout;
 
-    // TODO: Issue #5833 - MRP retry intervals should be updated on the poll period value
-    // change or device type change.
-    // TODO: Is this really the best place to set these? Seems like it should be passed
-    // in with the correct values and set one level up from here.
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    chip::DeviceLayer::ConnectivityManager::SEDPollingConfig sedPollingConfig;
-    ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().GetSEDPollingConfig(sedPollingConfig));
-    // Increment default MRP retry intervals by SED poll period to be on the safe side
-    // and avoid unnecessary retransmissions.
-    retryInterval += isIdle ? sedPollingConfig.SlowPollingIntervalMS : sedPollingConfig.FastPollingIntervalMS;
-#endif
-
     if (retryInterval > kMaxRetryInterval)
     {
         ChipLogProgress(Discovery, "MRP retry interval %s value exceeds allowed range of 1 hour, using maximum available",

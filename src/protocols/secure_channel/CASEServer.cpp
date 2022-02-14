@@ -72,7 +72,7 @@ CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
 
     // Setup CASE state machine using the credentials for the current fabric.
     ReturnErrorOnFailure(GetSession().ListenForSessionEstablishment(
-        mSessionKeyId, mFabrics, this, Optional<ReliableMessageProtocolConfig>::Value(gDefaultMRPConfig)));
+        mSessionKeyId, mFabrics, this, Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig())));
 
     // Hand over the exchange context to the CASE session.
     ec->SetDelegate(&GetSession());

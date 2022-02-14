@@ -420,7 +420,7 @@ void SessionManager::RefreshSessionOperationalData(const SessionHandle & session
 void SessionManager::MessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                      System::PacketBufferHandle && msg)
 {
-    Optional<SessionHandle> optionalSession = mUnauthenticatedSessions.FindOrAllocateEntry(peerAddress, gDefaultMRPConfig);
+    Optional<SessionHandle> optionalSession = mUnauthenticatedSessions.FindOrAllocateEntry(peerAddress, GetLocalMRPConfig());
     if (!optionalSession.HasValue())
     {
         ChipLogError(Inet, "UnauthenticatedSession exhausted");

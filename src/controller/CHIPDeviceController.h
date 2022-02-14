@@ -374,8 +374,6 @@ protected:
 
     uint16_t mVendorId;
 
-    ReliableMessageProtocolConfig mMRPConfig = gDefaultMRPConfig;
-
     //////////// SessionRecoveryDelegate Implementation ///////////////
     void OnFirstMessageDeliveryFailed(const SessionHandle & session) override;
 
