@@ -102,7 +102,8 @@ private:
         kMaxConnections              = BLE_LAYER_NUM_BLE_ENDPOINTS,
         kMaxDeviceNameLength         = 16, // TODO: right-size this
         kMaxAdvertisementDataSetSize = 31,
-        kMaxRxDataBuffSize           = 20
+        kMaxRxDataBuffSize           = 20,
+        kMaxTxDataBuffSize           = 20
     };
 
     CHIPoBLEServiceMode mServiceMode;
@@ -113,6 +114,7 @@ private:
     uint8_t mAdvDataBuf[kMaxAdvertisementDataSetSize];
     uint8_t mScanRespDataBuf[kMaxAdvertisementDataSetSize];
     uint8_t mRxDataBuff[kMaxRxDataBuffSize];
+    uint8_t mTxDataBuff[kMaxRxDataBuffSize];
 
     void DriveBLEState(void);
     CHIP_ERROR ConfigureAdvertisingData(void);
@@ -121,6 +123,7 @@ private:
     CHIP_ERROR SetSubscribed(uint16_t conId);
     bool UnsetSubscribed(uint16_t conId);
     bool IsSubscribed(uint16_t conId);
+    CHIP_ERROR HandleRXCharWrite(const ChipDeviceEvent * event);
 
     /* Callbacks from BLE stack*/
     static void DriveBLEState(intptr_t arg);
@@ -128,6 +131,9 @@ private:
     /* Handlers for stack events */
     static void CancelBleAdvTimeoutTimer(void);
     static void StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs);
+
+public:
+    static int RxWriteCallback(uint16_t connHandle, void *p);
 };
 
 /**
