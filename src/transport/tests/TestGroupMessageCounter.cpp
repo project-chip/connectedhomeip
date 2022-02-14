@@ -261,7 +261,6 @@ void CounterTrustFirstTest(nlTestSuite * inSuite, void * inContext)
 
     err = counter->VerifyOrTrustFirst(7);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
 }
 
 void ReorderPeerRemovalTest(nlTestSuite * inSuite, void * inContext)
