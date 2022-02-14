@@ -21,6 +21,7 @@
 name: Basic Group Messaging Tests
 
 config:
+    nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 
@@ -28,6 +29,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Add Group 1 (endpoint 1)"
       cluster: "Groups"

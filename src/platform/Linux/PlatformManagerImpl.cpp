@@ -74,39 +74,39 @@ void SignalHandler(int signum)
         ConfigurationMgr().StoreBootReason(DiagnosticDataProvider::BootReasonType::SoftwareReset);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
-    case SIGHUP:
+    case SIGALRM:
         ConfigurationMgr().StoreBootReason(DiagnosticDataProvider::BootReasonType::BrownOutReset);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
-    case SIGTERM:
+    case SIGVTALRM:
         ConfigurationMgr().StoreBootReason(DiagnosticDataProvider::BootReasonType::PowerOnReboot);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
-    case SIGUSR1:
+    case SIGTRAP:
         ConfigurationMgr().StoreBootReason(DiagnosticDataProvider::BootReasonType::HardwareWatchdogReset);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
-    case SIGUSR2:
+    case SIGILL:
         ConfigurationMgr().StoreBootReason(DiagnosticDataProvider::BootReasonType::SoftwareWatchdogReset);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
-    case SIGTSTP:
+    case SIGIO:
         ConfigurationMgr().StoreBootReason(DiagnosticDataProvider::BootReasonType::SoftwareUpdateCompleted);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
-    case SIGTRAP:
+    case SIGUSR1:
         PlatformMgrImpl().HandleSoftwareFault(SoftwareDiagnostics::Events::SoftwareFault::Id);
         break;
-    case SIGILL:
+    case SIGUSR2:
         PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::HardwareFaultChange::Id);
         break;
-    case SIGALRM:
+    case SIGHUP:
         PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::RadioFaultChange::Id);
         break;
-    case SIGVTALRM:
+    case SIGTERM:
         PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::NetworkFaultChange::Id);
         break;
-    case SIGIO:
+    case SIGTSTP:
         PlatformMgrImpl().HandleSwitchEvent(Switch::Events::SwitchLatched::Id);
         break;
     default:

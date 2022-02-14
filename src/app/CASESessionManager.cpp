@@ -75,8 +75,7 @@ void CASESessionManager::ReleaseSessionForFabric(CompressedFabricId compressedFa
 CHIP_ERROR CASESessionManager::ResolveDeviceAddress(FabricInfo * fabric, NodeId nodeId)
 {
     VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    return mConfig.dnsResolver->ResolveNodeId(fabric->GetPeerIdForNode(nodeId), Inet::IPAddressType::kAny,
-                                              Dnssd::Resolver::CacheBypass::On);
+    return mConfig.dnsResolver->ResolveNodeId(fabric->GetPeerIdForNode(nodeId), Inet::IPAddressType::kAny);
 }
 
 void CASESessionManager::OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeData)
@@ -92,7 +91,7 @@ void CASESessionManager::OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeDa
     VerifyOrReturn(session != nullptr,
                    ChipLogDetail(Controller, "OnNodeIdResolved was called for a device with no active sessions, ignoring it."));
 
-    LogErrorOnFailure(session->UpdateDeviceData(session->ToPeerAddress(nodeData), nodeData.GetMRPConfig()));
+    LogErrorOnFailure(session->UpdateDeviceData(OperationalDeviceProxy::ToPeerAddress(nodeData), nodeData.GetMRPConfig()));
 }
 
 void CASESessionManager::OnNodeIdResolutionFailed(const PeerId & peer, CHIP_ERROR error)

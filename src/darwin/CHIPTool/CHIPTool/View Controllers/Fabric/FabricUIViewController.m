@@ -230,7 +230,9 @@
             if (chipDevice) {
                 CHIPOperationalCredentials * cluster =
                     [[CHIPOperationalCredentials alloc] initWithDevice:chipDevice endpoint:0 queue:dispatch_get_main_queue()];
-                [self updateResult:[NSString stringWithFormat:@"readAttributeFabricsList command sent."] isError:NO];
+                [self
+                    updateResult:[NSString stringWithFormat:@"readAttributeCommissionedFabricsWithCompletionHandler command sent."]
+                         isError:NO];
                 [cluster readAttributeCommissionedFabricsWithCompletionHandler:^(
                     NSNumber * _Nullable commissionedFabrics, NSError * _Nullable error) {
                     if (error) {
@@ -268,17 +270,16 @@
             if (chipDevice) {
                 CHIPOperationalCredentials * cluster =
                     [[CHIPOperationalCredentials alloc] initWithDevice:chipDevice endpoint:0 queue:dispatch_get_main_queue()];
-                [self updateResult:[NSString stringWithFormat:@"readAttributeFabricsList command sent."] isError:NO];
-                [cluster readAttributeFabricsListWithCompletionHandler:^(
-                    NSArray * _Nullable fabricsList, NSError * _Nullable error) {
+                [self updateResult:[NSString stringWithFormat:@"readAttributeFabrics command sent."] isError:NO];
+                [cluster readAttributeFabricsWithCompletionHandler:^(NSArray * _Nullable fabricsList, NSError * _Nullable error) {
                     if (error) {
                         dispatch_async(dispatch_get_main_queue(), ^{
-                            [self updateResult:[NSString stringWithFormat:@"readAttributeFabricsList command failed: %@.", error]
+                            [self updateResult:[NSString stringWithFormat:@"readAttributeFabrics command failed: %@.", error]
                                        isError:YES];
                         });
                     } else {
                         dispatch_async(dispatch_get_main_queue(), ^{
-                            [self updateResult:[NSString stringWithFormat:@"Command readAttributeFabricsList command succeeded."]
+                            [self updateResult:[NSString stringWithFormat:@"Command readAttributeFabrics command succeeded."]
                                        isError:NO];
                         });
                     }

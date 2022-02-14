@@ -48,6 +48,8 @@ static_library("app") {
     "CASEClientPool.h",
     "CASESessionManager.cpp",
     "CASESessionManager.h",
+    "ChunkedWriteCallback.cpp",
+    "ChunkedWriteCallback.h",
     "CommandHandler.cpp",
     "CommandResponseHelper.h",
     "CommandSender.cpp",

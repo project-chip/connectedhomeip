@@ -123,10 +123,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
 
     // TODO Initialize the Software Update Manager object.
 
-    // TODO: Attempt to diagnose Darwin CI, REMOVE ONCE FIXED
-#if !CHIP_DEVICE_LAYER_TARGET_DARWIN
     _ScheduleWork(HandleDeviceRebooted, 0);
-#endif
 
 exit:
     return err;

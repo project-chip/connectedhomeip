@@ -132,7 +132,7 @@ void ReliableMessageMgr::ExecuteActions()
         {
             ChipLogError(ExchangeManager,
                          "Failed to Send CHIP MessageCounter:" ChipLogFormatMessageCounter " on exchange " ChipLogFormatExchange
-                         " sendCount: %" PRIu8 " max retries: %d",
+                         " sendCount: %u max retries: %d",
                          messageCounter, ChipLogValueExchange(&entry->ec.Get()), sendCount, CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS);
 
             // Do not StartTimer, we will schedule the timer at the end of the timer handler.

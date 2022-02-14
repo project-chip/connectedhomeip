@@ -15,6 +15,7 @@
 name: 10.1.1. [TC-DM-1.1] Basic Cluster Server Attributes
 
 config:
+    nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 
@@ -22,6 +23,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Query Data Model Revision"
       command: "readAttribute"

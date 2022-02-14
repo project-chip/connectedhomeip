@@ -2396,9 +2396,9 @@ namespace NOCs {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace NOCs
 
-namespace FabricsList {
+namespace Fabrics {
 static constexpr AttributeId Id = 0x00000001;
-} // namespace FabricsList
+} // namespace Fabrics
 
 namespace SupportedFabrics {
 static constexpr AttributeId Id = 0x00000002;

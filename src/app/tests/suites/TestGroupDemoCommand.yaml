@@ -27,6 +27,7 @@
 name: Group Messaging Demo Commands
 
 config:
+    nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 
@@ -34,12 +35,16 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     # Toggle 1
     - label: "Turn On the light to see attribute change"
       cluster: "On/Off"
       command: "On"
-      groupId: "4660"
+      groupId: 0x0101
 
     - label: "Wait 100ms"
       cluster: "DelayCommands"
@@ -52,7 +57,7 @@ tests:
     - label: "Turn Off the light to see attribute change"
       cluster: "On/Off"
       command: "Off"
-      groupId: "4660"
+      groupId: 0x0101
 
     - label: "Wait 100ms"
       cluster: "DelayCommands"
@@ -66,7 +71,7 @@ tests:
     - label: "Turn On the light to see attribute change"
       cluster: "On/Off"
       command: "On"
-      groupId: "4660"
+      groupId: 0x0101
 
     - label: "Wait 100ms"
       cluster: "DelayCommands"
@@ -79,7 +84,7 @@ tests:
     - label: "Turn Off the light to see attribute change"
       cluster: "On/Off"
       command: "Off"
-      groupId: "4660"
+      groupId: 0x0101
 
     - label: "Wait 100ms"
       cluster: "DelayCommands"
@@ -93,7 +98,7 @@ tests:
     - label: "Turn On the light to see attribute change"
       cluster: "On/Off"
       command: "On"
-      groupId: "4660"
+      groupId: 0x0101
 
     - label: "Wait 100ms"
       cluster: "DelayCommands"
@@ -106,7 +111,7 @@ tests:
     - label: "Turn Off the light to see attribute change"
       cluster: "On/Off"
       command: "Off"
-      groupId: "4660"
+      groupId: 0x0101
 
     - label: "Wait 100ms"
       cluster: "DelayCommands"
@@ -120,7 +125,7 @@ tests:
     - label: "Turn On the light to see attribute change"
       cluster: "On/Off"
       command: "On"
-      groupId: "4660"
+      groupId: 0x0101
 
     - label: "Wait 100ms"
       cluster: "DelayCommands"
@@ -133,7 +138,7 @@ tests:
     - label: "Turn Off the light to see attribute change"
       cluster: "On/Off"
       command: "Off"
-      groupId: "4660"
+      groupId: 0x0101
 
     - label: "Wait 100ms"
       cluster: "DelayCommands"
@@ -147,7 +152,7 @@ tests:
     - label: "Turn On the light to see attribute change"
       cluster: "On/Off"
       command: "On"
-      groupId: "4660"
+      groupId: 0x0101
 
     - label: "Wait 100ms"
       cluster: "DelayCommands"
@@ -160,7 +165,7 @@ tests:
     - label: "Turn Off the light to see attribute change"
       cluster: "On/Off"
       command: "Off"
-      groupId: "4660"
+      groupId: 0x0101
 
     - label: "Wait 100ms"
       cluster: "DelayCommands"

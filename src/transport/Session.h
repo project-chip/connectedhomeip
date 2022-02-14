@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <credentials/FabricTable.h>
 #include <lib/core/CHIPConfig.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <transport/SessionHolder.h>
@@ -67,6 +68,8 @@ public:
     virtual const ReliableMessageProtocolConfig & GetMRPConfig() const = 0;
     virtual System::Clock::Milliseconds32 GetAckTimeout() const        = 0;
 
+    FabricIndex GetFabricIndex() const { return mFabricIndex; }
+
     SecureSession * AsSecureSession();
     UnauthenticatedSession * AsUnauthenticatedSession();
     GroupSession * AsGroupSession();
@@ -85,8 +88,11 @@ protected:
         }
     }
 
+    void SetFabricIndex(FabricIndex index) { mFabricIndex = index; }
+
 private:
     IntrusiveList<SessionHolder> mHolders;
+    FabricIndex mFabricIndex = kUndefinedFabricIndex;
 };
 
 } // namespace Transport

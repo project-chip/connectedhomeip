@@ -11,7 +11,7 @@
   {
     NSMutableArray * temp_{{depth}} = [[NSMutableArray alloc] init];
     {{#each definedValue}}
-      {{>test_value target=(concat "temp_" ../depth "[" @index "]") definedValue=this cluster=../cluster depth=(incrementDepth ../depth) type=../type isArray=false}}
+      {{>test_value target=(concat "temp_" ../depth "[" @index "]") definedValue=this cluster=../cluster depth=(incrementDepth ../depth) type=../type isArray=false parent=../parent}}
     {{/each}}
     {{target}} = temp_{{depth}};
   }

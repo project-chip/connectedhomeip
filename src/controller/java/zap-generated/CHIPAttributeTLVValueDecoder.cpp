@@ -5659,12 +5659,12 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 jobject newElement_0;
                 jobject newElement_0_name;
                 newElement_0_name = env->NewStringUTF(std::string(entry_0.name.data(), entry_0.name.size()).c_str());
-                jobject newElement_0_fabricConnected;
-                std::string newElement_0_fabricConnectedClassName     = "java/lang/Boolean";
-                std::string newElement_0_fabricConnectedCtorSignature = "(Z)V";
-                chip::JniReferences::GetInstance().CreateBoxedObject<bool>(newElement_0_fabricConnectedClassName.c_str(),
-                                                                           newElement_0_fabricConnectedCtorSignature.c_str(),
-                                                                           entry_0.fabricConnected, newElement_0_fabricConnected);
+                jobject newElement_0_isOperational;
+                std::string newElement_0_isOperationalClassName     = "java/lang/Boolean";
+                std::string newElement_0_isOperationalCtorSignature = "(Z)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<bool>(newElement_0_isOperationalClassName.c_str(),
+                                                                           newElement_0_isOperationalCtorSignature.c_str(),
+                                                                           entry_0.isOperational, newElement_0_isOperational);
                 jobject newElement_0_offPremiseServicesReachableIPv4;
                 if (entry_0.offPremiseServicesReachableIPv4.IsNull())
                 {
@@ -5700,6 +5700,34 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                         static_cast<jsize>(entry_0.hardwareAddress.size()),
                                         reinterpret_cast<const jbyte *>(entry_0.hardwareAddress.data()));
                 newElement_0_hardwareAddress = newElement_0_hardwareAddressByteArray;
+                jobject newElement_0_IPv4Addresses;
+                chip::JniReferences::GetInstance().CreateArrayList(newElement_0_IPv4Addresses);
+
+                auto iter_newElement_0_IPv4Addresses_NaN = entry_0.IPv4Addresses.begin();
+                while (iter_newElement_0_IPv4Addresses_NaN.Next())
+                {
+                    auto & entry_NaN = iter_newElement_0_IPv4Addresses_NaN.GetValue();
+                    jobject newElement_NaN;
+                    jbyteArray newElement_NaNByteArray = env->NewByteArray(static_cast<jsize>(entry_NaN.size()));
+                    env->SetByteArrayRegion(newElement_NaNByteArray, 0, static_cast<jsize>(entry_NaN.size()),
+                                            reinterpret_cast<const jbyte *>(entry_NaN.data()));
+                    newElement_NaN = newElement_NaNByteArray;
+                    chip::JniReferences::GetInstance().AddToArrayList(newElement_0_IPv4Addresses, newElement_NaN);
+                }
+                jobject newElement_0_IPv6Addresses;
+                chip::JniReferences::GetInstance().CreateArrayList(newElement_0_IPv6Addresses);
+
+                auto iter_newElement_0_IPv6Addresses_NaN = entry_0.IPv6Addresses.begin();
+                while (iter_newElement_0_IPv6Addresses_NaN.Next())
+                {
+                    auto & entry_NaN = iter_newElement_0_IPv6Addresses_NaN.GetValue();
+                    jobject newElement_NaN;
+                    jbyteArray newElement_NaNByteArray = env->NewByteArray(static_cast<jsize>(entry_NaN.size()));
+                    env->SetByteArrayRegion(newElement_NaNByteArray, 0, static_cast<jsize>(entry_NaN.size()),
+                                            reinterpret_cast<const jbyte *>(entry_NaN.data()));
+                    newElement_NaN = newElement_NaNByteArray;
+                    chip::JniReferences::GetInstance().AddToArrayList(newElement_0_IPv6Addresses, newElement_NaN);
+                }
                 jobject newElement_0_type;
                 std::string newElement_0_typeClassName     = "java/lang/Integer";
                 std::string newElement_0_typeCtorSignature = "(I)V";
@@ -5716,19 +5744,20 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     ChipLogError(Zcl, "Could not find class ChipStructs$GeneralDiagnosticsClusterNetworkInterfaceType");
                     return nullptr;
                 }
-                jmethodID networkInterfaceTypeStructCtor = env->GetMethodID(
-                    networkInterfaceTypeStructClass, "<init>",
-                    "(Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;[BLjava/lang/Integer;)V");
+                jmethodID networkInterfaceTypeStructCtor =
+                    env->GetMethodID(networkInterfaceTypeStructClass, "<init>",
+                                     "(Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;[BLjava/util/"
+                                     "ArrayList;Ljava/util/ArrayList;Ljava/lang/Integer;)V");
                 if (networkInterfaceTypeStructCtor == nullptr)
                 {
                     ChipLogError(Zcl, "Could not find ChipStructs$GeneralDiagnosticsClusterNetworkInterfaceType constructor");
                     return nullptr;
                 }
 
-                newElement_0 =
-                    env->NewObject(networkInterfaceTypeStructClass, networkInterfaceTypeStructCtor, newElement_0_name,
-                                   newElement_0_fabricConnected, newElement_0_offPremiseServicesReachableIPv4,
-                                   newElement_0_offPremiseServicesReachableIPv6, newElement_0_hardwareAddress, newElement_0_type);
+                newElement_0 = env->NewObject(networkInterfaceTypeStructClass, networkInterfaceTypeStructCtor, newElement_0_name,
+                                              newElement_0_isOperational, newElement_0_offPremiseServicesReachableIPv4,
+                                              newElement_0_offPremiseServicesReachableIPv6, newElement_0_hardwareAddress,
+                                              newElement_0_IPv4Addresses, newElement_0_IPv6Addresses, newElement_0_type);
                 chip::JniReferences::GetInstance().AddToArrayList(value, newElement_0);
             }
             return value;
@@ -8924,8 +8953,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::FabricsList::Id: {
-            using TypeInfo = Attributes::FabricsList::TypeInfo;
+        case Attributes::Fabrics::Id: {
+            using TypeInfo = Attributes::Fabrics::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -15536,10 +15565,17 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            jbyteArray valueByteArray = env->NewByteArray(static_cast<jsize>(cppValue.size()));
-            env->SetByteArrayRegion(valueByteArray, 0, static_cast<jsize>(cppValue.size()),
-                                    reinterpret_cast<const jbyte *>(cppValue.data()));
-            value = valueByteArray;
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                jbyteArray valueByteArray = env->NewByteArray(static_cast<jsize>(cppValue.Value().size()));
+                env->SetByteArrayRegion(valueByteArray, 0, static_cast<jsize>(cppValue.Value().size()),
+                                        reinterpret_cast<const jbyte *>(cppValue.Value().data()));
+                value = valueByteArray;
+            }
             return value;
         }
         case Attributes::SecurityType::Id: {
@@ -15551,10 +15587,17 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            std::string valueClassName     = "java/lang/Integer";
-            std::string valueCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue, value);
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Integer";
+                std::string valueCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                              static_cast<uint8_t>(cppValue.Value()), value);
+            }
             return value;
         }
         case Attributes::WiFiVersion::Id: {
@@ -15566,10 +15609,17 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            std::string valueClassName     = "java/lang/Integer";
-            std::string valueCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue, value);
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Integer";
+                std::string valueCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                              static_cast<uint8_t>(cppValue.Value()), value);
+            }
             return value;
         }
         case Attributes::ChannelNumber::Id: {
@@ -15581,10 +15631,17 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            std::string valueClassName     = "java/lang/Integer";
-            std::string valueCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue, value);
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Integer";
+                std::string valueCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                               cppValue.Value(), value);
+            }
             return value;
         }
         case Attributes::Rssi::Id: {
@@ -15596,10 +15653,17 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            std::string valueClassName     = "java/lang/Integer";
-            std::string valueCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<int8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                         cppValue, value);
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Integer";
+                std::string valueCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<int8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                             cppValue.Value(), value);
+            }
             return value;
         }
         case Attributes::BeaconLostCount::Id: {

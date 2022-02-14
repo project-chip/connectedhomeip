@@ -46,6 +46,8 @@ static void HandleBrowse(void * context, DnssdService * services, size_t service
     }
 }
 
+static void HandlePublish(void * context, const char * type, CHIP_ERROR error) {}
+
 static void InitCallback(void * context, CHIP_ERROR error)
 {
     DnssdService service;
@@ -70,7 +72,7 @@ static void InitCallback(void * context, CHIP_ERROR error)
     service.mSubTypes      = nullptr;
     service.mSubTypeSize   = 0;
 
-    NL_TEST_ASSERT(suite, ChipDnssdPublishService(&service) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(suite, ChipDnssdPublishService(&service, HandlePublish) == CHIP_NO_ERROR);
     ChipDnssdBrowse("_mock", DnssdServiceProtocol::kDnssdProtocolTcp, chip::Inet::IPAddressType::kAny,
                     chip::Inet::InterfaceId::Null(), HandleBrowse, suite);
 }
