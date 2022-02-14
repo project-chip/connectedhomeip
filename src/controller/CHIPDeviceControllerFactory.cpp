@@ -22,7 +22,6 @@
  *      that vends Controller objects
  */
 
-#include "platform/ConnectivityManager.h"
 #include <controller/CHIPDeviceControllerFactory.h>
 
 #include <app/util/DataModelHandler.h>
