@@ -48,7 +48,47 @@ namespace Internal {
 
 namespace {
 
-// Advertising data content definitions
+typedef enum
+{
+    ATT_H_START = 0,
+
+    /* GAP service */
+    GenericAccess_PS_H,                     //UUID: 2800, VALUE: uuid 1800
+    GenericAccess_DeviceName_CD_H,          //UUID: 2803, VALUE: Prop: Read | Notify
+    GenericAccess_DeviceName_DP_H,          //UUID: 2A00, VALUE: device name
+    GenericAccess_Appearance_CD_H,          //UUID: 2803, VALUE: Prop: Read
+    GenericAccess_Appearance_DP_H,          //UUID: 2A01, VALUE: appearance
+    CONN_PARAM_CD_H,                        //UUID: 2803, VALUE: Prop: Read
+    CONN_PARAM_DP_H,                        //UUID: 2A04, VALUE: connParameter
+
+    /* GATT service */
+    GenericAttribute_PS_H,                  //UUID: 2800, VALUE: uuid 1801
+    GenericAttribute_ServiceChanged_CD_H,   //UUID: 2803, VALUE: Prop: Indicate
+    GenericAttribute_ServiceChanged_DP_H,   //UUID: 2A05, VALUE: service change
+    GenericAttribute_ServiceChanged_CCB_H,  //UUID: 2902, VALUE: serviceChangeCCC
+
+    /* Device info service */
+    DeviceInformation_PS_H,                 //UUID: 2800, VALUE: uuid 180A
+    DeviceInformation_pnpID_CD_H,           //UUID: 2803, VALUE: Prop: Read
+    DeviceInformation_pnpID_DP_H,           //UUID: 2A50, VALUE: PnPtrs
+
+    ATT_END_H,
+
+}ATT_HANDLE;
+
+typedef struct
+{
+  /** Minimum value for the connection event (interval. 0x0006 - 0x0C80 * 1.25 ms) */
+  u16 intervalMin;
+  /** Maximum value for the connection event (interval. 0x0006 - 0x0C80 * 1.25 ms) */
+  u16 intervalMax;
+  /** Number of LL latency connection events (0x0000 - 0x03e8) */
+  u16 latency;
+  /** Connection Timeout (0x000A - 0x0C80 * 10 ms) */
+  u16 timeout;
+} gap_periConnectParams_t;
+
+
 #define CHIP_MAX_ADV_DATA_LEN 31
 #define MAX_RESPONSE_DATA_LEN 31
 
@@ -61,12 +101,20 @@ namespace {
 #define CHIP_ADV_SHORT_UUID_LEN 2
 #define CHIP_ADV_SERVICE_DATA_LEN (sizeof(ChipBLEDeviceIdentificationInfo) + CHIP_ADV_SHORT_UUID_LEN + 1)
 
+#define CHIP_BLE_TX_FIFO_SIZE 48
+#define CHIP_BLE_TX_FIFO_NUM 17
+#define CHIP_BLE_RX_FIFO_SIZE 48
+#define CHIP_BLE_RX_FIFO_NUM 8
 
-#define CHIP_BLE_THREAD_STACK_SIZE 4096
+#define CHIP_BLE_THREAD_STACK_SIZE 8196
 #define CHIP_BLE_THREAD_PRIORITY 2
 
 #define WHITE_LED GPIO_PB6
+#define GREEN_LED GPIO_PB5
+#define BLUE_LED GPIO_PB4
+
 #define STIMER_IRQ_NUM 1
+#define RF_IRQ_NUM     15
 
 const ChipBleUUID chipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
                                                  0x9D, 0x11 } };
@@ -78,32 +126,22 @@ const ChipBleUUID chipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0
 
 BLEManagerImpl BLEManagerImpl::sInstance;
 
-/**
- * @brief		BLE SDK RF interrupt handler.
- * @param[in]	none
- * @return      none
- */
 void rf_irq_handler(const void *paramiter)
 {
-    gpio_set_high_level(WHITE_LED);
+    // gpio_set_high_level(WHITE_LED);
 
     irq_blt_sdk_handler();
 
-    gpio_set_low_level(WHITE_LED);
+    // gpio_set_low_level(WHITE_LED);
 }
 
-/**
- * @brief		BLE SDK System timer interrupt handler.
- * @param[in]	none
- * @return      none
- */
 void stimer_irq_handler(const void *paramiter)
 {
-    gpio_set_high_level(WHITE_LED);
+    // gpio_set_high_level(GREEN_LED);
 
     irq_blt_sdk_handler();
 
-    gpio_set_low_level(WHITE_LED);
+    // gpio_set_low_level(GREEN_LED);
 }
 
 void chip_ble_thread_entry_point(void *, void *, void *)
@@ -111,9 +149,14 @@ void chip_ble_thread_entry_point(void *, void *, void *)
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::BLEThreadEntry");
 
     while(true) {
+        // gpio_set_high_level(BLUE_LED);
+
         blt_sdk_main_loop();
 
+        // gpio_set_low_level(BLUE_LED);
+
         k_msleep(10);
+
     }
 }
 
@@ -126,8 +169,11 @@ K_THREAD_DEFINE(chip_ble_thread,
 
 CHIP_ERROR BLEManagerImpl::_Init()
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
     uint8_t mac_public[6] = {0};
     uint8_t mac_random_static[6] = {0};
+    int ret = 0;
 
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::_Init");
 
@@ -156,11 +202,20 @@ CHIP_ERROR BLEManagerImpl::_Init()
     /* Init slave role */
     blc_ll_initSlaveRole_module();
 
-    /* Resetup interrupts to handle BLE stack */
-    int ret = irq_connect_dynamic(STIMER_IRQ_NUM, 2, stimer_irq_handler, NULL, 0);
-    ChipLogDetail(DeviceLayer, "Stimer assigned vector %d", ret);
+    /* Init connection mode */
+    blc_ll_initConnection_module();
 
-    irq_enable(STIMER_IRQ_NUM);
+    /* Init GATT */
+    err = _InitGatt();
+    SuccessOrExit(err);
+
+    /* Resetup stimer interrupt to handle BLE stack */
+    ret = irq_connect_dynamic(STIMER_IRQ_NUM, 2, stimer_irq_handler, NULL, 0);
+    ChipLogDetail(DeviceLayer, "Stimer IRQ assigned vector %d", ret);
+
+    /* Resetup rf interrupt to handle BLE stack */ 
+    ret = irq_connect_dynamic(RF_IRQ_NUM, 2, rf_irq_handler, NULL, 0);
+    ChipLogDetail(DeviceLayer, "RF IRQ assigned vector %d", ret);
 
     /* Enable White LED for debug purposes */
     gpio_function_en(WHITE_LED);
@@ -169,9 +224,150 @@ CHIP_ERROR BLEManagerImpl::_Init()
     /* Switch off the LED on the beginning */
     gpio_set_low_level(WHITE_LED);
 
+    /* Enable Green LED for debug purposes */
+    gpio_function_en(GREEN_LED);
+    gpio_output_en(GREEN_LED);
+
+    /* Switch off the LED on the beginning */
+    gpio_set_low_level(GREEN_LED);
+
+    /* Enable Blue LED for debug purposes */
+    gpio_function_en(BLUE_LED);
+    gpio_output_en(BLUE_LED);
+
+    /* Switch off the LED on the beginning */
+    gpio_set_low_level(BLUE_LED);
 
     /* Enable CHIP over BLE service */
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
+
+exit:
+    return err;
+}
+
+CHIP_ERROR BLEManagerImpl::_InitGatt(void)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ble_sts_t status = BLE_SUCCESS;
+
+    /* Fifo buffers */
+    static u8 txFifoBuff[CHIP_BLE_TX_FIFO_SIZE * CHIP_BLE_TX_FIFO_NUM] = {0};
+    static u8 rxFufoBuff[CHIP_BLE_RX_FIFO_SIZE * CHIP_BLE_RX_FIFO_NUM] = {0};
+
+    /* UUIDs */
+    static const u16 my_primaryServiceUUID  = GATT_UUID_PRIMARY_SERVICE;
+    static const u16 my_gapServiceUUID      = SERVICE_UUID_GENERIC_ACCESS;
+    static const u16 my_characterUUID       = GATT_UUID_CHARACTER;
+    static const u16 my_devNameUUID         = GATT_UUID_DEVICE_NAME;
+    static const u16 my_gattServiceUUID     = SERVICE_UUID_GENERIC_ATTRIBUTE;
+    static const u16 serviceChangeUUID      = GATT_UUID_SERVICE_CHANGE;
+    static const u16 clientCharacterCfgUUID = GATT_UUID_CLIENT_CHAR_CFG;
+    static const u16 my_devServiceUUID      = SERVICE_UUID_DEVICE_INFORMATION;
+    static const u16 my_PnPUUID             = CHARACTERISTIC_UUID_PNP_ID;
+    static const u16 my_appearanceUUID      = GATT_UUID_APPEARANCE;
+    static const u16 my_periConnParamUUID   = GATT_UUID_PERI_CONN_PARAM;
+
+    /* Characteristics */
+    static const u8 my_devNameCharVal[5] = 
+    {
+        CHAR_PROP_READ | CHAR_PROP_NOTIFY,
+        U16_LO(GenericAccess_DeviceName_DP_H), U16_HI(GenericAccess_DeviceName_DP_H),
+        U16_LO(GATT_UUID_DEVICE_NAME), U16_HI(GATT_UUID_DEVICE_NAME)
+    };
+
+    static const u8 my_appearanceCharVal[5] = 
+    {
+        CHAR_PROP_READ,
+        U16_LO(GenericAccess_Appearance_DP_H), U16_HI(GenericAccess_Appearance_DP_H),
+        U16_LO(GATT_UUID_APPEARANCE), U16_HI(GATT_UUID_APPEARANCE)
+    };
+
+    static const u8 my_periConnParamCharVal[5] = 
+    {
+        CHAR_PROP_READ,
+        U16_LO(CONN_PARAM_DP_H), U16_HI(CONN_PARAM_DP_H),
+        U16_LO(GATT_UUID_PERI_CONN_PARAM), U16_HI(GATT_UUID_PERI_CONN_PARAM)
+    };
+
+    static const u8 my_serviceChangeCharVal[5] = 
+    {
+        CHAR_PROP_INDICATE,
+        U16_LO(GenericAttribute_ServiceChanged_DP_H), U16_HI(GenericAttribute_ServiceChanged_DP_H),
+        U16_LO(GATT_UUID_SERVICE_CHANGE), U16_HI(GATT_UUID_SERVICE_CHANGE)
+    };
+
+    static const u8 my_PnCharVal[5] = 
+    {
+        CHAR_PROP_READ,
+        U16_LO(DeviceInformation_pnpID_DP_H), U16_HI(DeviceInformation_pnpID_DP_H),
+        U16_LO(CHARACTERISTIC_UUID_PNP_ID), U16_HI(CHARACTERISTIC_UUID_PNP_ID)
+    };
+
+    /* Values */
+    // static const u8 my_devName[] = {'e','S','a','m','p','l','e'};
+    static const u16 my_appearance = GAP_APPEARE_UNKNOWN;
+    static const gap_periConnectParams_t my_periConnParameters = {8, 11, 0, 1000};
+    static u16 serviceChangeVal[2] = {0};
+    static u8 serviceChangeCCC[2] = {0};
+    static const u8 my_PnPtrs [] = {0x02, 0x8a, 0x24, 0x66, 0x82, 0x01, 0x00};
+
+    static const attribute_t gattTable[] = 
+    {
+        {ATT_END_H - 1, 0,0,0,0,0}, // total num of attribute
+
+        // 0001 - 0007  gap
+        {7,ATT_PERMISSIONS_READ,2,2,(u8*)(&my_primaryServiceUUID), (u8*)(&my_gapServiceUUID), 0},
+        {0,ATT_PERMISSIONS_READ,2,sizeof(my_devNameCharVal),(u8*)(&my_characterUUID), (u8*)(my_devNameCharVal), 0},
+        {0,ATT_PERMISSIONS_READ,2,(u32)kMaxDeviceNameLength,(u8*)(&my_devNameUUID), (u8*)(mDeviceName), 0},
+        {0,ATT_PERMISSIONS_READ,2,sizeof(my_appearanceCharVal),(u8*)(&my_characterUUID), (u8*)(my_appearanceCharVal), 0},
+        {0,ATT_PERMISSIONS_READ,2,sizeof(my_appearance), (u8*)(&my_appearanceUUID), (u8*)(&my_appearance), 0},
+        {0,ATT_PERMISSIONS_READ,2,sizeof(my_periConnParamCharVal),(u8*)(&my_characterUUID), (u8*)(my_periConnParamCharVal), 0},
+        {0,ATT_PERMISSIONS_READ,2,sizeof(my_periConnParameters),(u8*)(&my_periConnParamUUID), (u8*)(&my_periConnParameters), 0},
+
+        // 0008 - 000b gatt
+        {4,ATT_PERMISSIONS_READ,2,2,(u8*)(&my_primaryServiceUUID), (u8*)(&my_gattServiceUUID), 0},
+        {0,ATT_PERMISSIONS_READ,2,sizeof(my_serviceChangeCharVal),(u8*)(&my_characterUUID), (u8*)(my_serviceChangeCharVal), 0},
+        {0,ATT_PERMISSIONS_READ,2,sizeof(serviceChangeVal), (u8*)(&serviceChangeUUID), (u8*)(&serviceChangeVal), 0},
+        {0,ATT_PERMISSIONS_RDWR,2,sizeof(serviceChangeCCC),(u8*)(&clientCharacterCfgUUID), (u8*)(serviceChangeCCC), 0},
+
+        // 000c - 000e  device Information Service
+        {3,ATT_PERMISSIONS_READ,2,2,(u8*)(&my_primaryServiceUUID), (u8*)(&my_devServiceUUID), 0},
+        {0,ATT_PERMISSIONS_READ,2,sizeof(my_PnCharVal),(u8*)(&my_characterUUID), (u8*)(my_PnCharVal), 0},
+        {0,ATT_PERMISSIONS_READ,2,sizeof(my_PnPtrs),(u8*)(&my_PnPUUID), (u8*)(my_PnPtrs), 0},
+    };
+
+    status = blc_ll_initAclConnTxFifo(txFifoBuff, CHIP_BLE_TX_FIFO_SIZE, CHIP_BLE_TX_FIFO_NUM);
+    if(status != BLE_SUCCESS)
+    {
+        ChipLogError(DeviceLayer, "Fail to init BLE TX FIFO. Error %d", status);
+
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    status = blc_ll_initAclConnRxFifo(rxFufoBuff, CHIP_BLE_RX_FIFO_SIZE, CHIP_BLE_RX_FIFO_NUM);
+    if(status != BLE_SUCCESS)
+    {
+        ChipLogError(DeviceLayer, "Fail to init BLE RX FIFO. Error %d", status);
+        
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    status = blc_controller_check_appBufferInitialization();
+    if(status != BLE_SUCCESS)
+    {
+        ChipLogError(DeviceLayer, "Buffer initialization check failed. Error %d", status);
+
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    /* Init GAP */
+    blc_gap_peripheral_init();
+
+    /* Set up GATT table */
+    bls_att_setAttributeTable((u8 *)gattTable);
+
+    /* L2CAP Initialization */
+    blc_l2cap_register_handler((void *)blc_l2cap_packet_receive);
 
     return CHIP_NO_ERROR;
 }
@@ -182,7 +378,6 @@ CHIP_ERROR BLEManagerImpl::_SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val)
 
     return CHIP_NO_ERROR;
 }
-
 
 CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 {
