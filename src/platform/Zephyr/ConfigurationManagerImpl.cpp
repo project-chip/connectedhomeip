@@ -36,6 +36,11 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#if CONFIG_SOC_SERIES_RISCV_TELINK_B91
+#include <sys/reboot.h>
+#else
+#include <power/reboot.h>
+#endif
 namespace chip {
 namespace DeviceLayer {
 
