@@ -161,6 +161,12 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     {
         stateParams.caseServer = chip::Platform::New<CASEServer>();
 
+        //
+        // Enable listening for session establishment messages.
+        //
+        // We pass in a nullptr for the BLELayer since we're not permitting usage of BLE in this server modality for the controller,
+        // especially since it will interrupt other potential usages of BLE by the controller acting in a commissioning capacity.
+        //
         ReturnErrorOnFailure(stateParams.caseServer->ListenForSessionEstablishment(
             stateParams.exchangeMgr, stateParams.transportMgr, nullptr, stateParams.sessionMgr, stateParams.fabricTable));
 
@@ -271,6 +277,12 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
 
     ChipLogDetail(Controller, "Shutting down the System State, this will teardown the CHIP Stack");
 
+    if (mCASEServer != nullptr)
+    {
+        chip::Platform::Delete(mCASEServer);
+        mCASEServer = nullptr;
+    }
+
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     Dnssd::Resolver::Instance().Shutdown();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
@@ -311,12 +323,6 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
 
     mSystemLayer        = nullptr;
     mUDPEndPointManager = nullptr;
-
-    if (mCASEServer != nullptr)
-    {
-        chip::Platform::Delete(mCASEServer);
-        mCASEServer = nullptr;
-    }
 
     if (mMessageCounterManager != nullptr)
     {
