@@ -120,12 +120,23 @@ tests:
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
-          value:
-              [
+          value: [
                   # Any CASE can admin
-                  { FabricIndex: 1, Privilege: 5, AuthMode: 2, Subjects: null, Targets: null },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5,
+                      AuthMode: 2,
+                      Subjects: null,
+                      Targets: null,
+                  },
                   # These groups can operate
-                  { FabricIndex: 1, Privilege: 3, AuthMode: 3, Subjects: [ '0x0101', '0x0102' ], Targets: null },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 3,
+                      AuthMode: 3,
+                      Subjects: ["0x0101", "0x0102"],
+                      Targets: null,
+                  },
               ]
 
     # Test Pair 1 : Sends a Group Write Attribute
