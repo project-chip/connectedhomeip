@@ -43,6 +43,8 @@
 #include "drivers.h"
 #include "stack/ble/ble.h"
 
+extern bool isAttestRequest;
+
 using namespace ::chip;
 using namespace ::chip::Ble;
 using namespace ::chip::System;
@@ -433,42 +435,52 @@ void BLEManagerImpl::_InitGatt(void)
     static const u8 devNameCharVal[] = 
     {
         CHAR_PROP_READ | CHAR_PROP_NOTIFY,
-        U16_LO(GenericAccess_DeviceName_DP_H), U16_HI(GenericAccess_DeviceName_DP_H),
-        U16_LO(GATT_UUID_DEVICE_NAME), U16_HI(GATT_UUID_DEVICE_NAME)
+        U16_LO(GenericAccess_DeviceName_DP_H),
+        U16_HI(GenericAccess_DeviceName_DP_H),
+        U16_LO(GATT_UUID_DEVICE_NAME),
+        U16_HI(GATT_UUID_DEVICE_NAME)
     };
 
     static const u8 appearanceCharVal[] = 
     {
         CHAR_PROP_READ,
-        U16_LO(GenericAccess_Appearance_DP_H), U16_HI(GenericAccess_Appearance_DP_H),
-        U16_LO(GATT_UUID_APPEARANCE), U16_HI(GATT_UUID_APPEARANCE)
+        U16_LO(GenericAccess_Appearance_DP_H),
+        U16_HI(GenericAccess_Appearance_DP_H),
+        U16_LO(GATT_UUID_APPEARANCE),
+        U16_HI(GATT_UUID_APPEARANCE)
     };
 
     static const u8 periConnParamCharVal[] = 
     {
         CHAR_PROP_READ,
-        U16_LO(CONN_PARAM_DP_H), U16_HI(CONN_PARAM_DP_H),
-        U16_LO(GATT_UUID_PERI_CONN_PARAM), U16_HI(GATT_UUID_PERI_CONN_PARAM)
+        U16_LO(CONN_PARAM_DP_H),
+        U16_HI(CONN_PARAM_DP_H),
+        U16_LO(GATT_UUID_PERI_CONN_PARAM),
+        U16_HI(GATT_UUID_PERI_CONN_PARAM)
     };
 
     static const u8 serviceChangeCharVal[] = 
     {
         CHAR_PROP_INDICATE,
-        U16_LO(GenericAttribute_ServiceChanged_DP_H), U16_HI(GenericAttribute_ServiceChanged_DP_H),
-        U16_LO(GATT_UUID_SERVICE_CHANGE), U16_HI(GATT_UUID_SERVICE_CHANGE)
+        U16_LO(GenericAttribute_ServiceChanged_DP_H),
+        U16_HI(GenericAttribute_ServiceChanged_DP_H),
+        U16_LO(GATT_UUID_SERVICE_CHANGE),
+        U16_HI(GATT_UUID_SERVICE_CHANGE)
     };
 
     static const u8 MatterRxCharVal[] = 
     {
         CHAR_PROP_WRITE | CHAR_PROP_WRITE_WITHOUT_RSP,
-        U16_LO(Matter_RX_DP_H), U16_HI(Matter_RX_DP_H),
+        U16_LO(Matter_RX_DP_H),
+        U16_HI(Matter_RX_DP_H),
         CHIP_RX_CHAR_UUID
     };
 
     static const u8 MatterTxCharVal[] = 
     {
         CHAR_PROP_INDICATE,
-        U16_LO(Matter_TX_DP_H), U16_HI(Matter_TX_DP_H),
+        U16_LO(Matter_TX_DP_H),
+        U16_HI(Matter_TX_DP_H),
         CHIP_TX_CHAR_UUID
     };
 
@@ -815,10 +827,8 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
                                     PacketBufferHandle pBuf)
 {
     ble_sts_t status = BLE_SUCCESS;
-    uint8_t *data = pBuf->Start();
-    int len = pBuf->DataLength();
 
-    status = blc_gatt_pushHandleValueIndicate(conId, Matter_TX_DP_H, data, len);
+    status = blc_gatt_pushHandleValueIndicate(conId, Matter_TX_DP_H, pBuf->Start(), pBuf->DataLength());
     if(status != BLE_SUCCESS)
     {
         ChipLogError(DeviceLayer, "Fail to send indication. Error %d", status);
