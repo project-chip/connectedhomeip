@@ -125,6 +125,12 @@ typedef struct
 #define CHIP_RX_CHAR_UUID 0x11, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, 0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18
 #define CHIP_TX_CHAR_UUID 0x12, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, 0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18
 
+const ChipBleUUID chipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
+                                                 0x9D, 0x11 } };
+
+const ChipBleUUID chipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
+                                                 0x9D, 0x12 } };
+
 static const uint8_t matterServiceUUID[CHIP_SHORT_UUID_LEN] = { 0xF6, 0xFF };     // service UUID
 
 } // unnamed namespace
@@ -163,6 +169,16 @@ void chip_ble_thread_entry_point(void *, void *, void *)
         k_msleep(10);
 
     }
+}
+
+void connectCallback(u8 e, u8 *p, int n)
+{
+    ChipLogProgress(DeviceLayer, "BLE connect");
+}
+
+void terminateCallback(u8 e, u8 *p, int n)
+{
+    ChipLogProgress(DeviceLayer, "BLE terminate");
 }
 
 /* Thread for runing BLE main loop */
@@ -236,6 +252,10 @@ CHIP_ERROR BLEManagerImpl::_Init()
     /* Switch off the LED on the beginning */
     gpio_set_low_level(BLUE_LED);
 
+    /* Initialize the CHIP BleLayer. */
+    err = BleLayer::Init(this, this, &DeviceLayer::SystemLayer());
+    SuccessOrExit(err);
+
     /* Enable CHIP over BLE service */
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
 
@@ -243,34 +263,56 @@ exit:
     return err;
 }
 
-static int RxWriteCallback(uint16_t connHandle, void *p)
+int BLEManagerImpl::RxWriteCallback(uint16_t connHandle, void *p)
 {
     rf_packet_att_t *packet = (rf_packet_att_t*)p;
     int dataLen = packet->rf_len - CHIP_RF_PACKET_HEADER_SIZE;
-    uint8_t *data = (uint8_t *)p;
-
+    ChipDeviceEvent event;
+    
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::RxWriteCallback");
-
-    ChipLogDetail(DeviceLayer, "Data[0-7]:  0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x", data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
-    ChipLogDetail(DeviceLayer, "Data[8-15]: 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x", data[8], data[9], data[10], data[11], data[12], data[13], data[14], data[15]);
-
-    // ChipLogDetail(DeviceLayer, "Packet info: Header:    0x%02x", static_cast<uint8_t>(packet->header));
-    ChipLogDetail(DeviceLayer, "Packet info: RF len:    %d",     packet->rf_len);
-    ChipLogDetail(DeviceLayer, "Packet info: l2cap len: %d",     packet->l2capLen);
-    ChipLogDetail(DeviceLayer, "Packet info: chanid:    0x%02x", packet->chanId);
-    ChipLogDetail(DeviceLayer, "Packet info: opcode:    0x%02x", packet->opcode);
-    ChipLogDetail(DeviceLayer, "Packet info: handle:    0x%04x", packet->handle);
-
     ChipLogDetail(DeviceLayer, "Data len: %d", dataLen);
 
-    // memcpy(RxDataBuff, packet->data, dataLen);
+    PacketBufferHandle packetBuf = PacketBufferHandle::NewWithData(packet->dat, dataLen);
 
-    for(int i = 0; i < dataLen; i++)
+    ChipLogDetail(DeviceLayer,"Data: %02x %02x %02x %02x %02x %02x %02x %02x",  packet->dat[0],
+                                                                                packet->dat[1],
+                                                                                packet->dat[2],
+                                                                                packet->dat[3],
+                                                                                packet->dat[4],
+                                                                                packet->dat[5],
+                                                                                packet->dat[6],
+                                                                                packet->dat[7]);
+
+    ChipLogDetail(DeviceLayer,"Data: %02x %02x %02x %02x %02x %02x %02x %02x",  packet->dat[8],
+                                                                                packet->dat[9],
+                                                                                packet->dat[10],
+                                                                                packet->dat[11],
+                                                                                packet->dat[12],
+                                                                                packet->dat[13],
+                                                                                packet->dat[14],
+                                                                                packet->dat[15]);
+
+
+    // If successful...
+    if (!packetBuf.IsNull())
     {
-        ChipLogDetail(DeviceLayer, "Data[%d]: %d", i, packet->dat[i]);
+        // Arrange to post a CHIPoBLERXWriteEvent event to the CHIP queue.
+        event.Type                                = DeviceEventType::kPlatformTelinkBleRXWrite;
+        event.Platform.BleRXWriteEvent.connHandle = connHandle;
+        event.Platform.BleRXWriteEvent.Data       = std::move(packetBuf).UnsafeRelease();
+        
+        ChipLogDetail(DeviceLayer, "Packet is ok :)");
     }
 
-    
+    // If we failed to allocate a buffer, post a kPlatformTelinkBleOutOfBuffersEvent event.
+    else
+    {
+        // event.Type = DeviceEventType::kPlatformTelinkBleOutOfBuffersEvent;
+        ChipLogDetail(DeviceLayer, "Packet is bad :(");
+    }
+
+    PlatformMgr().PostEventOrDie(&event);
+
     return 0;
 }
 
@@ -348,7 +390,6 @@ CHIP_ERROR BLEManagerImpl::_InitGatt(void)
     static u8 serviceChangeCCC[2] = {0};
     static u8 matterTxCCC[2] = {0,0};
 
-
     static const attribute_t gattTable[] = 
     {
         /* Total number of attributes */
@@ -372,9 +413,9 @@ CHIP_ERROR BLEManagerImpl::_InitGatt(void)
         /* 000c - 0011 Matter service */
         {6, ATT_PERMISSIONS_READ, 2,  2,                            (u8*)(&primaryServiceUUID),     (u8*)(&matterServiceUUID),       0},
         {0, ATT_PERMISSIONS_READ, 2,  sizeof(MatterRxCharVal),      (u8*)(&characterUUID),          (u8*)(MatterRxCharVal),          0},
-        {0, ATT_PERMISSIONS_RDWR, 16, sizeof(mRxDataBuff),          (u8*)(&MatterRxCharUUID),       mRxDataBuff, RxWriteCallback,  NULL},
+        {0, ATT_PERMISSIONS_RDWR, 16, sizeof(mRxDataBuff),          (u8*)(&MatterRxCharUUID),       mRxDataBuff, RxWriteCallback, NULL},
         {0, ATT_PERMISSIONS_READ, 2,  sizeof(MatterTxCharVal),      (u8*)(&characterUUID),          (u8*)(MatterTxCharVal),          0},
-        {0, ATT_PERMISSIONS_RDWR, 16, sizeof(mRxDataBuff),          (u8*)(&MatterRxCharUUID),       mRxDataBuff,                      0},
+        {0, ATT_PERMISSIONS_RDWR, 16, sizeof(mTxDataBuff),          (u8*)(&MatterTxCharUUID),       mTxDataBuff,                     0},
         {0, ATT_PERMISSIONS_RDWR, 2,  sizeof(matterTxCCC),          (u8*)(&clientCharacterCfgUUID), (u8*)(matterTxCCC),              0}
     };
 
@@ -411,6 +452,10 @@ CHIP_ERROR BLEManagerImpl::_InitGatt(void)
     /* L2CAP Initialization */
     blc_l2cap_register_handler((void *)blc_l2cap_packet_receive);
 
+    /* Setup connect/terminate callbacks */
+    bls_app_registerEventCallback(BLT_EV_FLAG_CONNECT, connectCallback);
+    bls_app_registerEventCallback(BLT_EV_FLAG_TERMINATE, terminateCallback);
+
     return CHIP_NO_ERROR;
 }
 
@@ -428,8 +473,8 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     uint8_t index = 0;
     uint8_t devNameLen = 0;
     ChipBLEDeviceIdentificationInfo deviceIdInfo;
-    u8 adv[CHIP_MAX_ADV_DATA_LEN] = {0};                                                     // Advertisement data buff
-    u8 srsp[CHIP_MAX_RESPONSE_DATA_LEN] = {0};                                               // Scan Responce data buff
+    u8 adv[CHIP_MAX_ADV_DATA_LEN] = {0};
+    u8 srsp[CHIP_MAX_RESPONSE_DATA_LEN] = {0};
 
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::ConfigureAdvertisingData");
 
@@ -446,23 +491,23 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 
     /* Fulfill BLE advertisement data */
     /* Set flags */
-    adv[index++] = CHIP_ADE_DATA_LEN_FLAGS;                                                 // length
-    adv[index++] = CHIP_ADV_DATA_TYPE_FLAGS;                                                // AD type : flags
-    adv[index++] = CHIP_ADV_DATA_FLAGS;                                                     // AD value
+    adv[index++] = CHIP_ADE_DATA_LEN_FLAGS;
+    adv[index++] = CHIP_ADV_DATA_TYPE_FLAGS;
+    adv[index++] = CHIP_ADV_DATA_FLAGS;
 
     /* Set Service Data */
-    adv[index++] = CHIP_ADV_SERVICE_DATA_LEN;                                               // length
-    adv[index++] = CHIP_ADV_DATA_TYPE_SERVICE_DATA;                                         // AD type : Service Data
-    adv[index++] = matterServiceUUID[0];                                                    // AD value
-    adv[index++] = matterServiceUUID[1];                                                    // AD value
-    memcpy(&adv[index], (void *) &deviceIdInfo, sizeof(deviceIdInfo));                      // AD value
+    adv[index++] = CHIP_ADV_SERVICE_DATA_LEN;
+    adv[index++] = CHIP_ADV_DATA_TYPE_SERVICE_DATA;
+    adv[index++] = matterServiceUUID[0];
+    adv[index++] = matterServiceUUID[1];
+    memcpy(&adv[index], (void *) &deviceIdInfo, sizeof(deviceIdInfo));
     index += sizeof(deviceIdInfo);
 
     /* Set device name */
     devNameLen = strlen(mDeviceName);
-    adv[index++] = devNameLen + 1;                                                           // length
-    adv[index++] = CHIP_ADV_DATA_TYPE_NAME;                                                  // AD type : name
-    memcpy(&adv[index], mDeviceName, devNameLen);                                            // AD value
+    adv[index++] = devNameLen + 1;
+    adv[index++] = CHIP_ADV_DATA_TYPE_NAME;
+    memcpy(&adv[index], mDeviceName, devNameLen);
     index += devNameLen;
 
     /* Set advetisment data */
@@ -475,9 +520,9 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     }
 
     index = 0;
-    srsp[index++] = CHIP_SHORT_UUID_LEN + 1;                                     // AD length
-    srsp[index++] = CHIP_ADV_DATA_TYPE_UUID;                                         // AD type : uuid
-    srsp[index++] = matterServiceUUID[0];                                            // AD value
+    srsp[index++] = CHIP_SHORT_UUID_LEN + 1;
+    srsp[index++] = CHIP_ADV_DATA_TYPE_UUID;
+    srsp[index++] = matterServiceUUID[0];
     srsp[index++] = matterServiceUUID[1];
 
     /* Set scan responce data */
@@ -620,7 +665,26 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * devName)
 
 void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::_OnPlatformEvent");
+
+    switch (event->Type)
+    {
+        case DeviceEventType::kPlatformTelinkBleRXWrite:
+            ChipLogDetail(DeviceLayer, "Event: kPlatformTelinkBleRXWrite");
+
+            err = HandleRXCharWrite(event);
+        break;
+
+        default:
+            ChipLogDetail(DeviceLayer, "Event: Unknown (%d)", event->Type);
+    }
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Error: %s", ErrorStr(err));
+    }
 }
 
 bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
@@ -735,6 +799,20 @@ void BLEManagerImpl::StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs)
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::StartBleAdvTimeoutTimer");
 
 }
+
+CHIP_ERROR BLEManagerImpl::HandleRXCharWrite(const ChipDeviceEvent * event)
+{
+    const BleRXWriteEventType * writeEvent = &event->Platform.BleRXWriteEvent;
+
+    ChipLogDetail(DeviceLayer, "Write request received for CHIPoBLE RX (connHandle 0x%02" PRIx16 ")", 
+                  writeEvent->connHandle);
+
+    HandleWriteReceived(writeEvent->connHandle, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_RX,
+                        PacketBufferHandle::Adopt(writeEvent->Data));
+
+    return CHIP_NO_ERROR;
+}
+
 
 } // namespace Internal
 } // namespace DeviceLayer
