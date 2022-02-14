@@ -30,6 +30,7 @@
 #include <app/app-platform/ContentAppPlatform.h>
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #include <app/data-model/Encode.h>
+#include <platform/CHIPDeviceConfig.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;
@@ -38,6 +39,9 @@ using namespace chip::app::Clusters::KeypadInput;
 using namespace chip::AppPlatform;
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
+#define KEYPAD_INPUT_DELEGATE_TABLE_SIZE                                                                                           \
+    (EMBER_AF_KEYPAD_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
+
 // -----------------------------------------------------------------------------
 // Delegate Implementation
 
@@ -45,7 +49,7 @@ using chip::app::Clusters::KeypadInput::Delegate;
 
 namespace {
 
-Delegate * gDelegateTable[EMBER_AF_KEYPAD_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT] = { nullptr };
+Delegate * gDelegateTable[KEYPAD_INPUT_DELEGATE_TABLE_SIZE] = { nullptr };
 
 Delegate * GetDelegate(EndpointId endpoint)
 {

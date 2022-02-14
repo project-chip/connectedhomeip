@@ -50,6 +50,8 @@
 #include <app/data-model/Encode.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
+#include <platform/CHIPDeviceConfig.h>
+
 #include <list>
 
 using namespace chip;
@@ -59,6 +61,9 @@ using namespace chip::app::Clusters::ContentLauncher;
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 using namespace chip::AppPlatform;
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+
+#define CONTENT_LAUNCH_DELEGATE_TABLE_SIZE                                                                                         \
+    (EMBER_AF_CONTENT_LAUNCH_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation

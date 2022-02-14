@@ -51,6 +51,7 @@
 #include <app/util/util.h>
 
 #include <app/reporting/reporting.h>
+#include <platform/CHIPDeviceConfig.h>
 
 #ifdef EMBER_AF_PLUGIN_SCENES
 #include <app/clusters/scenes/scenes.h>
@@ -88,6 +89,9 @@ static bool areStartUpLevelControlServerAttributesNonVolatile(EndpointId endpoin
 #define STARTUP_CURRENT_LEVEL_USE_DEVICE_MINIMUM 0x00
 #define STARTUP_CURRENT_LEVEL_USE_PREVIOUS_LEVEL 0xFF
 
+#define LEVEL_CONTROL_STATE_TABLE_SIZE                                                                                             \
+    (EMBER_AF_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
+
 typedef struct
 {
     CommandId commandId;
@@ -103,7 +107,7 @@ typedef struct
     uint32_t elapsedTimeMs;
 } EmberAfLevelControlState;
 
-static EmberAfLevelControlState stateTable[EMBER_AF_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
+static EmberAfLevelControlState stateTable[LEVEL_CONTROL_STATE_TABLE_SIZE];
 
 static EmberAfLevelControlState * getState(EndpointId endpoint);
 
