@@ -80,7 +80,7 @@ protected:
 
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
     bool _IsChipStackLockedByCurrentThread() const;
-#endif
+#endif // CHIP_STACK_LOCK_TRACKING_ENABLED
 
     // ===== Methods available to the implementation subclass.
 
