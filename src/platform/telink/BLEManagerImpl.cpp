@@ -121,7 +121,8 @@ typedef struct
 #define CHIP_BLE_THREAD_STACK_SIZE 2048
 #define CHIP_BLE_THREAD_PRIORITY 2
 
-#define CHIP_RX_BUFF_SIZE 20
+#define CHIP_BLE_DISCONNECT_REASON 8
+
 #define CHIP_RF_PACKET_HEADER_SIZE 3
 
 #define WHITE_LED GPIO_PB6
@@ -489,7 +490,7 @@ void BLEManagerImpl::_InitGatt(void)
     static const gap_periConnectParams_t periConnParameters = {8, 11, 0, 1000};
     static u16 serviceChangeVal[2] = {0};
     static u8 serviceChangeCCC[2] = {0};
-    static u8 matterTxCCC[2] = {0,0};
+    static u8 matterTxCCC[2] = {0};
 
     static const attribute_t gattTable[] = 
     {
@@ -789,6 +790,10 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
             err = HandleTXCharComplete(event);
             break;
 
+        case DeviceEventType::kThreadStateChange:
+            err = HandleThreadStateChange(event);
+            break;
+
         case DeviceEventType::kCHIPoBLEConnectionClosed:
             err = HandleBleConnectionClosed(event);
             break;
@@ -863,8 +868,6 @@ bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQU
 void BLEManagerImpl::SwitchToIeee802154(void)
 {
 
-    gpio_set_high_level(WHITE_LED);
-
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::Switch to IEEE802154");
 
     int result = 0;
@@ -928,8 +931,6 @@ void BLEManagerImpl::SwitchToIeee802154(void)
     data->is_ready = true;
 
     core_restore_interrupt(irq_restore);
-
-    gpio_set_low_level(WHITE_LED);
 }
 
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
@@ -1003,6 +1004,25 @@ CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(const ChipDeviceEvent * event)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR BLEManagerImpl::HandleThreadStateChange(const ChipDeviceEvent * event)
+{
+    ble_sts_t status = BLE_SUCCESS;
+
+    if(ConnectivityMgr().IsThreadProvisioned())
+    {
+        // If Thread is provisionet it is time to disconnect BLE 
+        status = blc_ll_disconnect(BLS_CONN_HANDLE, CHIP_BLE_DISCONNECT_REASON);
+        if(status != BLE_SUCCESS && status != LL_ERR_CONNECTION_NOT_ESTABLISH)
+        {
+            ChipLogError(DeviceLayer, "Fail to disconnect. Error %d", status);
+
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR BLEManagerImpl::HandleBleConnectionClosed(const ChipDeviceEvent * event)
 {
     /* It is time to swich to IEEE802154 radio if it is provisioned */
@@ -1010,8 +1030,8 @@ CHIP_ERROR BLEManagerImpl::HandleBleConnectionClosed(const ChipDeviceEvent * eve
     {
         SwitchToIeee802154();
     }
- 
-    return CHIP_NO_ERROR;   
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BLEManagerImpl::HandleRXCharWrite(const ChipDeviceEvent * event)
