@@ -286,6 +286,7 @@ CY
 CYW
 DAC
 DAP
+DAPLINK
 DataFrame
 DataModelRevision
 dataset
