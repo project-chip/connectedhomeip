@@ -330,12 +330,11 @@ CHIP_ERROR BLEManagerImpl::_InitStack(void)
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    unsigned int irq_restore = core_interrupt_disable();
+    /* Reset Radio */
+    rf_radio_reset();
 
-    k_sched_lock();
-
-    dma_chn_dis(DMA1);
-    dma_chn_dis(DMA0);
+    /* Reset DMA */
+    rf_reset_dma();
 
     /* Init Radio driver */
     ble_radio_init();
@@ -344,26 +343,8 @@ CHIP_ERROR BLEManagerImpl::_InitStack(void)
     blc_initMacAddress(CFG_ADR_MAC_1M_FLASH, macPublic, macRandomStatic);
 
     /* Init interrupts and DMA for BLE module ??? */
-    // blc_ll_initBasicMCU();
+    blc_ll_initBasicMCU();
 
-    //------------------------ blc_ll_initBasicMCU(); replication ------------------------------
-    reg_system_tick_irq = clock_time() + BIT(31);
-
-    stimer_set_irq_mask((stimer_irq_e)STIMER_IRQ_MASK);
-
-    plic_interrupt_enable(IRQ15_ZB_RT);
-
-    plic_set_priority(IRQ15_ZB_RT, IRQ_PRI_LEV2);
-
-    plic_set_priority(IRQ1_SYSTIMER, IRQ_PRI_LEV2);
-
-    reg_irq_threshold = 0;
-
-    // ble_tx_dma_config();
-
-    // ble_rx_dma_config();
-
-    // ------------------------------------------------------
     /* Setup MAC Address */
     blc_ll_initStandby_module(macPublic);
 
@@ -389,11 +370,6 @@ CHIP_ERROR BLEManagerImpl::_InitStack(void)
     ChipLogDetail(DeviceLayer, "RF IRQ assigned vector %d", ret);
 
 exit:
-
-    dma_chn_dis(DMA0);
-    dma_chn_en(DMA1);
-    k_sched_unlock();
-    core_restore_interrupt(irq_restore);
 
     return err;
 }
