@@ -67,10 +67,13 @@ typedef enum
     GenericAttribute_ServiceChanged_DP_H,   //UUID: 2A05, VALUE: service change
     GenericAttribute_ServiceChanged_CCB_H,  //UUID: 2902, VALUE: serviceChangeCCC
 
-    /* Device info service */
-    DeviceInformation_PS_H,                 //UUID: 2800, VALUE: uuid 180A
-    DeviceInformation_pnpID_CD_H,           //UUID: 2803, VALUE: Prop: Read
-    DeviceInformation_pnpID_DP_H,           //UUID: 2A50, VALUE: PnPtrs
+    /* Matter service */
+    Matter_PS_H,
+    Matter_RX_CD_H,
+    Matter_RX_DP_H,
+    Matter_TX_CD_H,
+    Matter_TX_DP_H,
+    Matter_TX_CCC_H,
 
     ATT_END_H,
 
@@ -90,7 +93,8 @@ typedef struct
 
 
 #define CHIP_MAX_ADV_DATA_LEN 31
-#define MAX_RESPONSE_DATA_LEN 31
+#define CHIP_MAX_RESPONSE_DATA_LEN 31
+#define CHIP_SHORT_UUID_LEN 2
 
 #define CHIP_ADE_DATA_LEN_FLAGS 0x02
 #define CHIP_ADV_DATA_TYPE_FLAGS 0x01
@@ -98,8 +102,7 @@ typedef struct
 #define CHIP_ADV_DATA_TYPE_UUID 0x03
 #define CHIP_ADV_DATA_TYPE_NAME 0x09
 #define CHIP_ADV_DATA_TYPE_SERVICE_DATA 0x16
-#define CHIP_ADV_SHORT_UUID_LEN 2
-#define CHIP_ADV_SERVICE_DATA_LEN (sizeof(ChipBLEDeviceIdentificationInfo) + CHIP_ADV_SHORT_UUID_LEN + 1)
+#define CHIP_ADV_SERVICE_DATA_LEN (sizeof(ChipBLEDeviceIdentificationInfo) + CHIP_SHORT_UUID_LEN + 1)
 
 #define CHIP_BLE_TX_FIFO_SIZE 48
 #define CHIP_BLE_TX_FIFO_NUM 17
@@ -109,6 +112,9 @@ typedef struct
 #define CHIP_BLE_THREAD_STACK_SIZE 8196
 #define CHIP_BLE_THREAD_PRIORITY 2
 
+#define CHIP_RX_BUFF_SIZE 20
+#define CHIP_RF_PACKET_HEADER_SIZE 7
+
 #define WHITE_LED GPIO_PB6
 #define GREEN_LED GPIO_PB5
 #define BLUE_LED GPIO_PB4
@@ -116,11 +122,10 @@ typedef struct
 #define STIMER_IRQ_NUM 1
 #define RF_IRQ_NUM     15
 
-const ChipBleUUID chipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
-                                                 0x9D, 0x11 } };
+#define CHIP_RX_CHAR_UUID 0x11, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, 0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18
+#define CHIP_TX_CHAR_UUID 0x12, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, 0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18
 
-const ChipBleUUID chipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
-                                                 0x9D, 0x12 } };
+static const uint8_t matterServiceUUID[CHIP_SHORT_UUID_LEN] = { 0xF6, 0xFF };     // service UUID
 
 } // unnamed namespace
 
@@ -238,6 +243,32 @@ exit:
     return err;
 }
 
+static int RxWriteCallback(uint16_t connHandle, void* p)
+{
+    rf_packet_att_data_t *packet = (rf_packet_att_data_t*)p;
+    int dataLen = packet->rf_len - CHIP_RF_PACKET_HEADER_SIZE;
+    
+    ChipLogProgress(DeviceLayer, "BLEManagerImpl::RxWriteCallback");
+
+    ChipLogDetail(DeviceLayer, "Packet info: Type:   %d", packet->type);
+    ChipLogDetail(DeviceLayer, "Packet info: RF len: %d", packet->rf_len);
+    ChipLogDetail(DeviceLayer, "Packet info: l2cap:  %d", packet->l2cap);
+    ChipLogDetail(DeviceLayer, "Packet info: chanid: %d", packet->chanid);
+    ChipLogDetail(DeviceLayer, "Packet info: att:    %d", packet->att);
+    ChipLogDetail(DeviceLayer, "Packet info: handle: %d", packet->handle);
+
+    ChipLogDetail(DeviceLayer, "Data len: %d", dataLen);
+
+    // memcpy(RxDataBuff, packet->data, dataLen);
+
+    for(int i = 0; i < dataLen; i++)
+    {
+        ChipLogDetail(DeviceLayer, "Data[%d]: %d", i, packet->dat[i]);
+    }
+
+    return 0;
+}
+
 CHIP_ERROR BLEManagerImpl::_InitGatt(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -258,34 +289,51 @@ CHIP_ERROR BLEManagerImpl::_InitGatt(void)
     static const u16 devServiceUUID         = SERVICE_UUID_DEVICE_INFORMATION;
     static const u16 appearanceUUID         = GATT_UUID_APPEARANCE;
     static const u16 periConnParamUUID      = GATT_UUID_PERI_CONN_PARAM;
+    static const u8  MatterRxCharUUID[]     = WRAPPING_BRACES(CHIP_RX_CHAR_UUID);
+    static const u8  MatterTxCharUUID[]     = WRAPPING_BRACES(CHIP_TX_CHAR_UUID);
+ 
 
     /* Characteristics */
-    static const u8 devNameCharVal[5] = 
+    static const u8 devNameCharVal[] = 
     {
         CHAR_PROP_READ | CHAR_PROP_NOTIFY,
         U16_LO(GenericAccess_DeviceName_DP_H), U16_HI(GenericAccess_DeviceName_DP_H),
         U16_LO(GATT_UUID_DEVICE_NAME), U16_HI(GATT_UUID_DEVICE_NAME)
     };
 
-    static const u8 appearanceCharVal[5] = 
+    static const u8 appearanceCharVal[] = 
     {
         CHAR_PROP_READ,
         U16_LO(GenericAccess_Appearance_DP_H), U16_HI(GenericAccess_Appearance_DP_H),
         U16_LO(GATT_UUID_APPEARANCE), U16_HI(GATT_UUID_APPEARANCE)
     };
 
-    static const u8 periConnParamCharVal[5] = 
+    static const u8 periConnParamCharVal[] = 
     {
         CHAR_PROP_READ,
         U16_LO(CONN_PARAM_DP_H), U16_HI(CONN_PARAM_DP_H),
         U16_LO(GATT_UUID_PERI_CONN_PARAM), U16_HI(GATT_UUID_PERI_CONN_PARAM)
     };
 
-    static const u8 serviceChangeCharVal[5] = 
+    static const u8 serviceChangeCharVal[] = 
     {
         CHAR_PROP_INDICATE,
         U16_LO(GenericAttribute_ServiceChanged_DP_H), U16_HI(GenericAttribute_ServiceChanged_DP_H),
         U16_LO(GATT_UUID_SERVICE_CHANGE), U16_HI(GATT_UUID_SERVICE_CHANGE)
+    };
+
+    static const u8 MatterRxCharVal[] = 
+    {
+        CHAR_PROP_WRITE | CHAR_PROP_WRITE_WITHOUT_RSP,
+        U16_LO(Matter_RX_DP_H), U16_HI(Matter_RX_DP_H),
+        CHIP_RX_CHAR_UUID
+    };
+
+    static const u8 MatterTxCharVal[] = 
+    {
+        CHAR_PROP_NOTIFY,
+        U16_LO(Matter_TX_DP_H), U16_HI(Matter_TX_DP_H),
+        CHIP_TX_CHAR_UUID
     };
 
     /* Values */
@@ -293,6 +341,8 @@ CHIP_ERROR BLEManagerImpl::_InitGatt(void)
     static const gap_periConnectParams_t periConnParameters = {8, 11, 0, 1000};
     static u16 serviceChangeVal[2] = {0};
     static u8 serviceChangeCCC[2] = {0};
+    static u8 matterTxCCC[2] = {0,0};
+
 
     static const attribute_t gattTable[] = 
     {
@@ -300,22 +350,27 @@ CHIP_ERROR BLEManagerImpl::_InitGatt(void)
         {ATT_END_H - 1, 0,0,0,0,0},
 
         /* 0001 - 0007  GAP service */
-        {7,ATT_PERMISSIONS_READ,2,2,(u8*)(&primaryServiceUUID), (u8*)(&gapServiceUUID), 0},
-        {0,ATT_PERMISSIONS_READ,2,sizeof(devNameCharVal),(u8*)(&characterUUID), (u8*)(my_devNameCharVal), 0},
-        {0,ATT_PERMISSIONS_READ,2,(u32)kMaxDeviceNameLength,(u8*)(&devNameUUID), (u8*)(mDeviceName), 0},
-        {0,ATT_PERMISSIONS_READ,2,sizeof(appearanceCharVal),(u8*)(&characterUUID), (u8*)(appearanceCharVal), 0},
-        {0,ATT_PERMISSIONS_READ,2,sizeof(appearance), (u8*)(&appearanceUUID), (u8*)(&appearance), 0},
-        {0,ATT_PERMISSIONS_READ,2,sizeof(periConnParamCharVal),(u8*)(&characterUUID), (u8*)(periConnParamCharVal), 0},
-        {0,ATT_PERMISSIONS_READ,2,sizeof(periConnParameters),(u8*)(&periConnParamUUID), (u8*)(&periConnParameters), 0},
+        {7, ATT_PERMISSIONS_READ, 2,  2,                            (u8*)(&primaryServiceUUID),     (u8*)(&gapServiceUUID),         0},
+        {0, ATT_PERMISSIONS_READ, 2,  sizeof(devNameCharVal),       (u8*)(&characterUUID),          (u8*)(devNameCharVal),          0},
+        {0, ATT_PERMISSIONS_READ, 2,  (u32)kMaxDeviceNameLength,    (u8*)(&devNameUUID),            (u8*)(mDeviceName),             0},
+        {0, ATT_PERMISSIONS_READ, 2,  sizeof(appearanceCharVal),    (u8*)(&characterUUID),          (u8*)(appearanceCharVal),       0},
+        {0, ATT_PERMISSIONS_READ, 2,  sizeof(appearance),           (u8*)(&appearanceUUID),         (u8*)(&appearance),             0},
+        {0, ATT_PERMISSIONS_READ, 2,  sizeof(periConnParamCharVal), (u8*)(&characterUUID),          (u8*)(periConnParamCharVal),    0},
+        {0, ATT_PERMISSIONS_READ, 2,  sizeof(periConnParameters),   (u8*)(&periConnParamUUID),      (u8*)(&periConnParameters),     0},
 
         /* 0008 - 000b GATT */
-        {4,ATT_PERMISSIONS_READ,2,2,(u8*)(&primaryServiceUUID), (u8*)(&gattServiceUUID), 0},
-        {0,ATT_PERMISSIONS_READ,2,sizeof(serviceChangeCharVal),(u8*)(&characterUUID), (u8*)(serviceChangeCharVal), 0},
-        {0,ATT_PERMISSIONS_READ,2,sizeof(serviceChangeVal), (u8*)(&serviceChangeUUID), (u8*)(&serviceChangeVal), 0},
-        {0,ATT_PERMISSIONS_RDWR,2,sizeof(serviceChangeCCC),(u8*)(&clientCharacterCfgUUID), (u8*)(serviceChangeCCC), 0},
+        {4, ATT_PERMISSIONS_READ, 2,  2,                            (u8*)(&primaryServiceUUID),     (u8*)(&gattServiceUUID),         0},
+        {0, ATT_PERMISSIONS_READ, 2,  sizeof(serviceChangeCharVal), (u8*)(&characterUUID),          (u8*)(serviceChangeCharVal),     0},
+        {0, ATT_PERMISSIONS_READ, 2,  sizeof(serviceChangeVal),     (u8*)(&serviceChangeUUID),      (u8*)(&serviceChangeVal),        0},
+        {0, ATT_PERMISSIONS_RDWR, 2,  sizeof(serviceChangeCCC),     (u8*)(&clientCharacterCfgUUID), (u8*)(serviceChangeCCC),         0},
 
-        /* Matter service */
-
+        /* 000c - 0011 Matter service */
+        {6, ATT_PERMISSIONS_READ, 2,  2,                            (u8*)(&primaryServiceUUID),     (u8*)(&matterServiceUUID),       0},
+        {0, ATT_PERMISSIONS_READ, 2,  sizeof(MatterRxCharVal),      (u8*)(&characterUUID),          (u8*)(MatterRxCharVal),          0},
+        {0, ATT_PERMISSIONS_RDWR, 16, sizeof(mRxDataBuff),          (u8*)(&MatterRxCharUUID),       mRxDataBuff, RxWriteCallback,  NULL},
+        {0, ATT_PERMISSIONS_READ, 2,  sizeof(MatterTxCharVal),      (u8*)(&characterUUID),          (u8*)(MatterTxCharVal),          0},
+        {0, ATT_PERMISSIONS_RDWR, 16, sizeof(mRxDataBuff),          (u8*)(&MatterRxCharUUID),       mRxDataBuff,                      0},
+        {0, ATT_PERMISSIONS_RDWR, 2,  sizeof(matterTxCCC),          (u8*)(&clientCharacterCfgUUID), (u8*)(matterTxCCC),              0}
     };
 
     status = blc_ll_initAclConnTxFifo(txFifoBuff, CHIP_BLE_TX_FIFO_SIZE, CHIP_BLE_TX_FIFO_NUM);
@@ -367,10 +422,9 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t index = 0;
     uint8_t devNameLen = 0;
-    static const uint8_t serviceUuid[CHIP_ADV_SHORT_UUID_LEN] = { 0xF6, 0xFF };     // service UUID
     ChipBLEDeviceIdentificationInfo deviceIdInfo;
     u8 adv[CHIP_MAX_ADV_DATA_LEN] = {0};                                                     // Advertisement data buff
-    u8 srsp[MAX_RESPONSE_DATA_LEN] = {0};                                                    // Scan Responce data buff
+    u8 srsp[CHIP_MAX_RESPONSE_DATA_LEN] = {0};                                               // Scan Responce data buff
 
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::ConfigureAdvertisingData");
 
@@ -394,8 +448,8 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     /* Set Service Data */
     adv[index++] = CHIP_ADV_SERVICE_DATA_LEN;                                               // length
     adv[index++] = CHIP_ADV_DATA_TYPE_SERVICE_DATA;                                         // AD type : Service Data
-    adv[index++] = serviceUuid[0];                                                          // AD value
-    adv[index++] = serviceUuid[1];                                                          // AD value
+    adv[index++] = matterServiceUUID[0];                                                    // AD value
+    adv[index++] = matterServiceUUID[1];                                                    // AD value
     memcpy(&adv[index], (void *) &deviceIdInfo, sizeof(deviceIdInfo));                      // AD value
     index += sizeof(deviceIdInfo);
 
@@ -416,10 +470,10 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     }
 
     index = 0;
-    srsp[index++] = CHIP_ADV_SHORT_UUID_LEN + 1;                                     // AD length
+    srsp[index++] = CHIP_SHORT_UUID_LEN + 1;                                     // AD length
     srsp[index++] = CHIP_ADV_DATA_TYPE_UUID;                                         // AD type : uuid
-    srsp[index++] = serviceUuid[0];                                                  // AD value
-    srsp[index++] = serviceUuid[1];
+    srsp[index++] = matterServiceUUID[0];                                            // AD value
+    srsp[index++] = matterServiceUUID[1];
 
     /* Set scan responce data */
     status = bls_ll_setScanRspData(srsp, sizeof(srsp));
