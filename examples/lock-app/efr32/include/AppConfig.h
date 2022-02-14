@@ -22,7 +22,9 @@
 // ---- Lock Example App Config ----
 
 // Software Version
-examples/lock-app/efr32/include/AppConfig.h
+examples / lock -
+    app / efr32 / include /
+        AppConfig.h
 
 #define APP_TASK_NAME "Lck"
 
@@ -32,14 +34,15 @@ examples/lock-app/efr32/include/AppConfig.h
 
 // EFR Logging
 #ifdef __cplusplus
-extern "C" {
+        extern "C"
+{
 #endif
 
-void efr32LogInit(void);
+    void efr32LogInit(void);
 
-void efr32Log(const char * aFormat, ...);
+    void efr32Log(const char * aFormat, ...);
 #define EFR32_LOG(...) efr32Log(__VA_ARGS__);
-void appError(int err);
+    void appError(int err);
 
 #ifdef __cplusplus
 }
