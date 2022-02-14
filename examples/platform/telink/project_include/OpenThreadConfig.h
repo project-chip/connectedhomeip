@@ -97,8 +97,3 @@
 
 #undef OPENTHREAD_CONFIG_LOG_PREPEND_REGION
 #define OPENTHREAD_CONFIG_LOG_PREPEND_REGION 0
-
-#undef OPENTHREAD_CONFIG_PLAT_LOG_MACRO_NAME
-#define OPENTHREAD_CONFIG_PLAT_LOG_MACRO_NAME tlOtPlatLog
-
-void tlOtPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char * aFormat, ...);
