@@ -226,14 +226,6 @@ void BLEManagerImpl::ConnectCallback(uint8_t bleEvent, uint8_t *data, int len)
 
     PlatformMgr().LockChipStack();
 
-    /* Set MTU */
-    blt_att_setEffectiveMtuSize(BLS_CONN_HANDLE, CHIP_MTU_SIZE);
-    status = blc_att_setRxMtuSize(CHIP_MTU_SIZE);
-    if(status != BLE_SUCCESS)
-    {
-        ChipLogError(DeviceLayer, "Fail to set MTU size. Error %d", status);
-    }
-
     event.Type                             = DeviceEventType::kPlatformTelinkBleConnected;
     event.Platform.BleConnEvent.connHandle = BLS_CONN_HANDLE;
     event.Platform.BleConnEvent.HciResult  = BLE_SUCCESS;
@@ -394,6 +386,15 @@ CHIP_ERROR BLEManagerImpl::_InitGap(void)
     /* Add GAP event handler to handle indication send */
     blc_gap_registerHostEventHandler(BLEManagerImpl::GapEventHandler);
     blc_gap_setEventMask(GAP_EVT_MASK_GATT_HANDLE_VLAUE_CONFIRM);
+
+    /* Set MTU */
+    status = blc_att_setRxMtuSize(CHIP_MTU_SIZE);
+    if(status != BLE_SUCCESS)
+    {
+        ChipLogError(DeviceLayer, "Fail to set MTU size. Error %d", status);
+
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
 
     return CHIP_NO_ERROR;
 }
