@@ -27476,7 +27476,15 @@ NSNumber * _Nullable attrCurrentPositionTilt;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterTest_TC_WNCV_3_4_000000_DownOrClose
+- (void)testSendClusterTest_TC_WNCV_3_4_000000_WaitForCommissionee
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"0: Wait for the commissioned device to be retrieved"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    WaitForCommissionee(expectation, queue, nodeId);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_3_4_000001_DownOrClose
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"1a: TH sends DownOrClose command to preposition the DUT in the opposite direction"];
@@ -27496,7 +27504,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_4_000001_WaitForMs
+- (void)testSendClusterTest_TC_WNCV_3_4_000002_WaitForMs
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"1b: TH Waits for fastMotionDuration seconds movement(s) on the device"];
@@ -27505,7 +27513,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
     WaitForMs(expectation, queue, fastMotionDuration);
     [self waitForExpectationsWithTimeout:(fastMotionDuration / 1000) + kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_4_000002_UpOrOpen
+- (void)testSendClusterTest_TC_WNCV_3_4_000003_UpOrOpen
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"2a: TH sends UpOrOpen command to DUT"];
 
@@ -27524,7 +27532,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_4_000003_WaitForMs
+- (void)testSendClusterTest_TC_WNCV_3_4_000004_WaitForMs
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"2b: TH Waits for fullMotionDuration seconds movement(s) on the device"];
@@ -27533,7 +27541,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
     WaitForMs(expectation, queue, fullMotionDuration);
     [self waitForExpectationsWithTimeout:(fullMotionDuration / 1000) + kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_4_000004_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_3_4_000005_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3a: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT"];
@@ -27560,7 +27568,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_4_000005_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_3_4_000006_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3b: If (PA & LF) TH reads CurrentPositionLiftPercentage optional attribute from DUT"];
@@ -27587,7 +27595,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_4_000006_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_3_4_000007_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3c: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT"];
@@ -27614,7 +27622,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_4_000007_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_3_4_000008_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3d: If (PA & TL) TH reads CurrentPositionTiltPercentage optional attribute from DUT"];
@@ -27642,7 +27650,15 @@ NSNumber * _Nullable attrCurrentPositionTilt;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterTest_TC_WNCV_3_5_000000_UpOrOpen
+- (void)testSendClusterTest_TC_WNCV_3_5_000000_WaitForCommissionee
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"0: Wait for the commissioned device to be retrieved"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    WaitForCommissionee(expectation, queue, nodeId);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_3_5_000001_UpOrOpen
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"1a: TH sends UpOrOpen command to preposition the DUT in the opposite direction"];
@@ -27662,7 +27678,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_5_000001_WaitForMs
+- (void)testSendClusterTest_TC_WNCV_3_5_000002_WaitForMs
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"1b: TH Waits for fastMotionDuration seconds movement(s) on the device"];
@@ -27671,7 +27687,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
     WaitForMs(expectation, queue, fastMotionDuration);
     [self waitForExpectationsWithTimeout:(fastMotionDuration / 1000) + kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_5_000002_DownOrClose
+- (void)testSendClusterTest_TC_WNCV_3_5_000003_DownOrClose
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"2a: TH sends DownOrClose command to DUT"];
 
@@ -27690,7 +27706,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_5_000003_WaitForMs
+- (void)testSendClusterTest_TC_WNCV_3_5_000004_WaitForMs
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"2b: TH Waits for fullMotionDuration seconds movement(s) on the device"];
@@ -27699,7 +27715,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
     WaitForMs(expectation, queue, fullMotionDuration);
     [self waitForExpectationsWithTimeout:(fullMotionDuration / 1000) + kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_5_000004_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_3_5_000005_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3a: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT"];
@@ -27726,7 +27742,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_5_000005_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_3_5_000006_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3b: If (PA & LF) TH reads CurrentPositionLiftPercentage optional attribute from DUT"];
@@ -27753,7 +27769,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_5_000006_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_3_5_000007_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3c: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT"];
@@ -27780,7 +27796,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_3_5_000007_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_3_5_000008_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3d: If (PA & TL) TH reads CurrentPositionTiltPercentage optional attribute from DUT"];
@@ -27808,8 +27824,16 @@ NSNumber * _Nullable attrCurrentPositionTilt;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterTest_TC_WNCV_4_3_000000_WaitForCommissionee
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"0: Wait for the commissioned device to be retrieved"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    WaitForCommissionee(expectation, queue, nodeId);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
 NSNumber * _Nullable attrCurrentPositionLiftPercent100ths;
-- (void)testSendClusterTest_TC_WNCV_4_3_000000_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_4_3_000001_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"1a: If (PA_LF & LF) TH reads CurrentPositionLiftPercent100ths from DUT"];
@@ -27848,7 +27872,7 @@ NSNumber * _Nullable attrCurrentPositionLiftPercent100ths;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 NSNumber * _Nullable attrCurrentPositionLiftPercentage;
-- (void)testSendClusterTest_TC_WNCV_4_3_000001_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_4_3_000002_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"1b: If (PA_LF & LF) TH reads CurrentPositionLiftPercentage from DUT"];
@@ -27886,7 +27910,7 @@ NSNumber * _Nullable attrCurrentPositionLiftPercentage;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_4_3_000002_GoToLiftPercentage
+- (void)testSendClusterTest_TC_WNCV_4_3_000003_GoToLiftPercentage
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"2b: TH sends GoToLiftPercentage command with BadParam to DUT"];
@@ -27909,7 +27933,7 @@ NSNumber * _Nullable attrCurrentPositionLiftPercentage;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_4_3_000003_GoToLiftPercentage
+- (void)testSendClusterTest_TC_WNCV_4_3_000004_GoToLiftPercentage
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3a: TH sends GoToLiftPercentage command with 10001 to DUT"];
@@ -27932,7 +27956,7 @@ NSNumber * _Nullable attrCurrentPositionLiftPercentage;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_4_3_000004_GoToLiftPercentage
+- (void)testSendClusterTest_TC_WNCV_4_3_000005_GoToLiftPercentage
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"4a: TH sends GoToLiftPercentage command with 0xFFFF to DUT"];
@@ -27956,8 +27980,16 @@ NSNumber * _Nullable attrCurrentPositionLiftPercentage;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterTest_TC_WNCV_4_4_000000_WaitForCommissionee
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"0: Wait for the commissioned device to be retrieved"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    WaitForCommissionee(expectation, queue, nodeId);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
 NSNumber * _Nullable attrCurrentPositionTiltPercent100ths;
-- (void)testSendClusterTest_TC_WNCV_4_4_000000_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_4_4_000001_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"1a: If (PA_TL & TL) TH reads CurrentPositionTiltPercent100ths from DUT"];
@@ -27996,7 +28028,7 @@ NSNumber * _Nullable attrCurrentPositionTiltPercent100ths;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 NSNumber * _Nullable attrCurrentPositionTiltPercentage;
-- (void)testSendClusterTest_TC_WNCV_4_4_000001_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_4_4_000002_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"1b: If (PA_TL & TL) TH reads CurrentPositionTiltPercentage from DUT"];
@@ -28034,7 +28066,7 @@ NSNumber * _Nullable attrCurrentPositionTiltPercentage;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_4_4_000002_GoToTiltPercentage
+- (void)testSendClusterTest_TC_WNCV_4_4_000003_GoToTiltPercentage
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"2b: TH sends GoToTiltPercentage command with BadParam to DUT"];
@@ -28057,7 +28089,7 @@ NSNumber * _Nullable attrCurrentPositionTiltPercentage;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_4_4_000003_GoToTiltPercentage
+- (void)testSendClusterTest_TC_WNCV_4_4_000004_GoToTiltPercentage
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"3a: TH sends GoToTiltPercentage command with 10001 to DUT"];
@@ -28080,7 +28112,7 @@ NSNumber * _Nullable attrCurrentPositionTiltPercentage;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_4_4_000004_GoToTiltPercentage
+- (void)testSendClusterTest_TC_WNCV_4_4_000005_GoToTiltPercentage
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"4a: TH sends GoToTiltPercentage command with 0xFFFF to DUT"];

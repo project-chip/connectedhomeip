@@ -15,10 +15,19 @@
 name: Window Covering [TC-WNCV-4.3] GoToLiftPercentage Limits Verification with server as DUT
 
 config:
+    nodeId: 0x12344321
     cluster: "Window Covering"
     endpoint: 1
 
 tests:
+    - label: "0: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
     ### CONDITIONAL LIFT Tests from FeatureMap
     ######## Check attribute coherence #######
     ### Step 1x -> Verify the Lift Percent100ths and Percent attributes
