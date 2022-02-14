@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2020-2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,29 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
-import("//build_overrides/chip.gni")
-import("//build_overrides/telink.gni")
-
-import("${build_root}/chip/tests.gni")
-
-assert(current_os == "zephyr")
-
 declare_args() {
-  chip_build_pw_rpc_lib = false
-}
-
-group("telink") {
-  deps = [ 
-    "${chip_root}/src/lib",
-    "${telink_sdk_build_root}/"
-  ]
-
-  if (chip_build_tests) {
-    deps += [ "${chip_root}/src:tests" ]
-  }
-}
-
-group("default") {
-  deps = [ ":telink" ]
+  # Root directory for Qorvo QPGxxxx SDK.
+  telink_sdk_build_root = "//third_party/telink_sdk"
 }

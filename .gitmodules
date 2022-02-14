@@ -193,3 +193,6 @@
 [submodule "p6/serial-flash"]
 	path = third_party/p6/p6_sdk/libs/serial-flash
 	url = https://github.com/Infineon/serial-flash
+[submodule "third_party/telink_sdk/repo"]
+	path = third_party/telink_sdk/repo
+	url = https://github.com/rikorsev/telink_b91_ble_sdk

@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2020 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,29 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
-import("//build_overrides/chip.gni")
-import("//build_overrides/telink.gni")
-
-import("${build_root}/chip/tests.gni")
-
-assert(current_os == "zephyr")
+import("//build_overrides/telink_sdk.gni")
+import("${telink_sdk_build_root}/telink_sdk.gni")
 
 declare_args() {
-  chip_build_pw_rpc_lib = false
+  # Build target to use for QPG SDK. Use this to set global SDK defines.
+  telink_sdk_target = ""
 }
 
-group("telink") {
-  deps = [ 
-    "${chip_root}/src/lib",
-    "${telink_sdk_build_root}/"
-  ]
+assert(telink_sdk_target != "", "telink_sdk_target must be specified")
 
-  if (chip_build_tests) {
-    deps += [ "${chip_root}/src:tests" ]
-  }
-}
-
-group("default") {
-  deps = [ ":telink" ]
+group("telink_sdk") {
+  public_deps = [ telink_sdk_target ]
 }
