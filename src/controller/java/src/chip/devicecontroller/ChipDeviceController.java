@@ -312,10 +312,7 @@ public class ChipDeviceController {
     return getAttestationChallenge(deviceControllerPtr, devicePtr);
   }
 
-  /**
-   * Subscribe to the given attribute path. The size of {@code attributePaths} should be less than
-   * or equal to 20 (kMaxAttributePaths), defined in the native code.
-   */
+  /** Subscribe to the given attribute path. */
   public void subscribeToPath(
       SubscriptionEstablishedCallback subscriptionEstablishedCallback,
       ReportCallback reportCallback,
@@ -334,10 +331,7 @@ public class ChipDeviceController {
         maxInterval);
   }
 
-  /**
-   * Read the given attribute path. The size of {@code attributePaths} should be less than or equal
-   * to 20 (kMaxAttributePaths), defined in the native code.
-   */
+  /** Read the given attribute path. */
   public void readPath(
       ReportCallback callback, long devicePtr, List<ChipAttributePath> attributePaths) {
     ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback);
