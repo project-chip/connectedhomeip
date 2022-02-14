@@ -4267,42 +4267,42 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ApplicationBasic::Attributes::VendorName::Id: {
             chip::CharSpan value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("vendor name", 1, value);
+            return DataModelLogger::LogValue("VendorName", 1, value);
         }
-        case ApplicationBasic::Attributes::VendorId::Id: {
+        case ApplicationBasic::Attributes::VendorID::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("vendor id", 1, value);
+            return DataModelLogger::LogValue("VendorID", 1, value);
         }
         case ApplicationBasic::Attributes::ApplicationName::Id: {
             chip::CharSpan value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("application name", 1, value);
+            return DataModelLogger::LogValue("ApplicationName", 1, value);
         }
-        case ApplicationBasic::Attributes::ProductId::Id: {
+        case ApplicationBasic::Attributes::ProductID::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("product id", 1, value);
+            return DataModelLogger::LogValue("ProductID", 1, value);
         }
-        case ApplicationBasic::Attributes::ApplicationApp::Id: {
+        case ApplicationBasic::Attributes::Application::Id: {
             chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("application app", 1, value);
+            return DataModelLogger::LogValue("Application", 1, value);
         }
-        case ApplicationBasic::Attributes::ApplicationStatus::Id: {
+        case ApplicationBasic::Attributes::Status::Id: {
             chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("application status", 1, value);
+            return DataModelLogger::LogValue("Status", 1, value);
         }
         case ApplicationBasic::Attributes::ApplicationVersion::Id: {
             chip::CharSpan value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("application version", 1, value);
+            return DataModelLogger::LogValue("ApplicationVersion", 1, value);
         }
         case ApplicationBasic::Attributes::AllowedVendorList::Id: {
             chip::app::DataModel::DecodableList<chip::VendorId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("allowed vendor list", 1, value);
+            return DataModelLogger::LogValue("AllowedVendorList", 1, value);
         }
         case ApplicationBasic::Attributes::ServerGeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -4335,15 +4335,15 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case ApplicationLauncher::Id: {
         switch (path.mAttributeId)
         {
-        case ApplicationLauncher::Attributes::ApplicationLauncherList::Id: {
+        case ApplicationLauncher::Attributes::CatalogList::Id: {
             chip::app::DataModel::DecodableList<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("application launcher list", 1, value);
+            return DataModelLogger::LogValue("CatalogList", 1, value);
         }
-        case ApplicationLauncher::Attributes::ApplicationLauncherApp::Id: {
+        case ApplicationLauncher::Attributes::CurrentApp::Id: {
             chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("application launcher app", 1, value);
+            return DataModelLogger::LogValue("CurrentApp", 1, value);
         }
         case ApplicationLauncher::Attributes::ServerGeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -4376,15 +4376,15 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case AudioOutput::Id: {
         switch (path.mAttributeId)
         {
-        case AudioOutput::Attributes::AudioOutputList::Id: {
+        case AudioOutput::Attributes::OutputList::Id: {
             chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("audio output list", 1, value);
+            return DataModelLogger::LogValue("OutputList", 1, value);
         }
-        case AudioOutput::Attributes::CurrentAudioOutput::Id: {
+        case AudioOutput::Attributes::CurrentOutput::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("current audio output", 1, value);
+            return DataModelLogger::LogValue("CurrentOutput", 1, value);
         }
         case AudioOutput::Attributes::ServerGeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -4923,17 +4923,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case Channel::Attributes::ChannelList::Id: {
             chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("channel list", 1, value);
+            return DataModelLogger::LogValue("ChannelList", 1, value);
         }
-        case Channel::Attributes::ChannelLineup::Id: {
+        case Channel::Attributes::Lineup::Id: {
             chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("channel lineup", 1, value);
+            return DataModelLogger::LogValue("Lineup", 1, value);
         }
         case Channel::Attributes::CurrentChannel::Id: {
             chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("current channel", 1, value);
+            return DataModelLogger::LogValue("CurrentChannel", 1, value);
         }
         case Channel::Attributes::ServerGeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -5257,15 +5257,15 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case ContentLauncher::Id: {
         switch (path.mAttributeId)
         {
-        case ContentLauncher::Attributes::AcceptHeaderList::Id: {
+        case ContentLauncher::Attributes::AcceptHeader::Id: {
             chip::app::DataModel::DecodableList<chip::CharSpan> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("accept header list", 1, value);
+            return DataModelLogger::LogValue("AcceptHeader", 1, value);
         }
         case ContentLauncher::Attributes::SupportedStreamingProtocols::Id: {
             uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("supported streaming protocols", 1, value);
+            return DataModelLogger::LogValue("SupportedStreamingProtocols", 1, value);
         }
         case ContentLauncher::Attributes::ServerGeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -6984,15 +6984,15 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case MediaInput::Id: {
         switch (path.mAttributeId)
         {
-        case MediaInput::Attributes::MediaInputList::Id: {
+        case MediaInput::Attributes::InputList::Id: {
             chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("media input list", 1, value);
+            return DataModelLogger::LogValue("InputList", 1, value);
         }
-        case MediaInput::Attributes::CurrentMediaInput::Id: {
+        case MediaInput::Attributes::CurrentInput::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("current media input", 1, value);
+            return DataModelLogger::LogValue("CurrentInput", 1, value);
         }
         case MediaInput::Attributes::ServerGeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -7025,40 +7025,40 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case MediaPlayback::Id: {
         switch (path.mAttributeId)
         {
-        case MediaPlayback::Attributes::PlaybackState::Id: {
+        case MediaPlayback::Attributes::CurrentState::Id: {
             chip::app::Clusters::MediaPlayback::PlaybackStateEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("playback state", 1, value);
+            return DataModelLogger::LogValue("CurrentState", 1, value);
         }
         case MediaPlayback::Attributes::StartTime::Id: {
             chip::app::DataModel::Nullable<uint64_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("start time", 1, value);
+            return DataModelLogger::LogValue("StartTime", 1, value);
         }
         case MediaPlayback::Attributes::Duration::Id: {
             chip::app::DataModel::Nullable<uint64_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("duration", 1, value);
+            return DataModelLogger::LogValue("Duration", 1, value);
         }
-        case MediaPlayback::Attributes::Position::Id: {
-            chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType value;
+        case MediaPlayback::Attributes::SampledPosition::Id: {
+            chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("position", 1, value);
+            return DataModelLogger::LogValue("SampledPosition", 1, value);
         }
         case MediaPlayback::Attributes::PlaybackSpeed::Id: {
             float value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("playback speed", 1, value);
+            return DataModelLogger::LogValue("PlaybackSpeed", 1, value);
         }
         case MediaPlayback::Attributes::SeekRangeEnd::Id: {
             chip::app::DataModel::Nullable<uint64_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("seek range end", 1, value);
+            return DataModelLogger::LogValue("SeekRangeEnd", 1, value);
         }
         case MediaPlayback::Attributes::SeekRangeStart::Id: {
             chip::app::DataModel::Nullable<uint64_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("seek range start", 1, value);
+            return DataModelLogger::LogValue("SeekRangeStart", 1, value);
         }
         case MediaPlayback::Attributes::ServerGeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -8214,15 +8214,15 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case TargetNavigator::Id: {
         switch (path.mAttributeId)
         {
-        case TargetNavigator::Attributes::TargetNavigatorList::Id: {
+        case TargetNavigator::Attributes::TargetList::Id: {
             chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("target navigator list", 1, value);
+            return DataModelLogger::LogValue("TargetList", 1, value);
         }
-        case TargetNavigator::Attributes::CurrentNavigatorTarget::Id: {
+        case TargetNavigator::Attributes::CurrentTarget::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("current navigator target", 1, value);
+            return DataModelLogger::LogValue("CurrentTarget", 1, value);
         }
         case TargetNavigator::Attributes::ServerGeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -9508,10 +9508,10 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case WakeOnLan::Id: {
         switch (path.mAttributeId)
         {
-        case WakeOnLan::Attributes::WakeOnLanMacAddress::Id: {
+        case WakeOnLan::Attributes::MACAddress::Id: {
             chip::CharSpan value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("wake on lan mac address", 1, value);
+            return DataModelLogger::LogValue("MACAddress", 1, value);
         }
         case WakeOnLan::Attributes::ServerGeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;

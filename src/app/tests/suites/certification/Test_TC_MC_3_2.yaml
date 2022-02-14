@@ -30,7 +30,7 @@ tests:
 
     - label: "Send RootMenu"
       disabled: true
-      command: "SendKeyRequest"
+      command: "SendKey"
       arguments:
           values:
               - name: "keyCode"
@@ -38,7 +38,7 @@ tests:
 
     - label: "Send SetupMenu"
       disabled: true
-      command: "SendKeyRequest"
+      command: "SendKey"
       arguments:
           values:
               - name: "keyCode"

@@ -30,6 +30,6 @@ tests:
 
     - label: "Read mac address"
       command: "readAttribute"
-      attribute: "wake on lan mac address"
+      attribute: "MACAddress"
       response:
           value: "00:00:00:00:00"

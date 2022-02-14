@@ -36,7 +36,7 @@ tests:
           "Precondition: Media content in a paused state at the beginning of the
           content"
       disabled: true
-      command: "MediaPause"
+      command: "Pause"
 
     - label: "log a command"
       cluster: "LogCommands"
@@ -49,19 +49,19 @@ tests:
     - label: "Reads the CurrentState attribute from the DUT"
       disabled: true
       command: "readAttribute"
-      attribute: "playback state"
+      attribute: "CurrentState"
       response:
           value: 1
 
     - label: "Reads the PlaybackSpeed attribute from the DUT"
       command: "readAttribute"
-      attribute: "playback speed"
+      attribute: "PlaybackSpeed"
       response:
           value: 0
 
     - label: "Sends a FastForward command"
       disabled: true
-      command: "MediaFastForward"
+      command: "FastForward"
       response:
           values:
               - name: "returnValue"
@@ -77,20 +77,20 @@ tests:
 
     - label: "Reads the CurrentState attribute"
       command: "readAttribute"
-      attribute: "playback state"
+      attribute: "CurrentState"
       response:
           value: 0
 
     - label: "Reads the PlaybackSpeed attribute from the DUT"
       disabled: true
       command: "readAttribute"
-      attribute: "playback speed"
+      attribute: "PlaybackSpeed"
       response:
           value: 1
 
     - label: "Sends a FastForward command"
       disabled: true
-      command: "MediaFastForward"
+      command: "FastForward"
       response:
           values:
               - name: "returnValue"
@@ -107,13 +107,13 @@ tests:
     - label: "Reads the PlaybackSpeed attribute from the DUT"
       disabled: true
       command: "readAttribute"
-      attribute: "playback speed"
+      attribute: "PlaybackSpeed"
       response:
           value: 2
 
     - label: "Sends a Rewind command to the DUT"
       disabled: true
-      command: "MediaRewind"
+      command: "Rewind"
 
     - label: "log a command"
       cluster: "LogCommands"
@@ -125,20 +125,20 @@ tests:
 
     - label: "Reads the CurrentState attribute"
       command: "readAttribute"
-      attribute: "playback state"
+      attribute: "CurrentState"
       response:
           value: 0
 
     - label: "Reads the PlaybackSpeed attribute from the DUT"
       disabled: true
       command: "readAttribute"
-      attribute: "playback speed"
+      attribute: "PlaybackSpeed"
       response:
           value: -1
 
     - label: "Sends a Rewind command to the DUT"
       disabled: true
-      command: "MediaRewind"
+      command: "Rewind"
       response:
           values:
               - name: "returnValue"
@@ -155,13 +155,13 @@ tests:
     - label: "Reads the PlaybackSpeed attribute from the DUT"
       disabled: true
       command: "readAttribute"
-      attribute: "playback speed"
+      attribute: "PlaybackSpeed"
       response:
           value: -2
 
     - label: "Sends a Play command"
       disabled: true
-      command: "MediaPlay"
+      command: "Play"
       response:
           values:
               - name: "returnValue"
@@ -180,18 +180,18 @@ tests:
     - label: "Reads the PlaybackSpeed attribute from the DUT"
       disabled: true
       command: "readAttribute"
-      attribute: "playback speed"
+      attribute: "PlaybackSpeed"
       response:
           value: 1
 
     - label: "Sends consecutive FastForward commands"
       disabled: true
-      command: "MediaFastForward"
+      command: "FastForward"
       response:
           error: 4
 
     - label: "Sends consecutive Rewind commands"
       disabled: true
-      command: "MediaRewind"
+      command: "Rewind"
       response:
           error: 4

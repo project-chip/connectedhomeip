@@ -30,7 +30,7 @@ tests:
 
     - label: "Read attribute Application Launcher list"
       command: "readAttribute"
-      attribute: "Application Launcher List"
+      attribute: "CatalogList"
       response:
           value: [123, 456]
 
@@ -38,12 +38,12 @@ tests:
     - label: "Read attribute application launcher app"
       disabled: true
       command: "readAttribute"
-      attribute: "application launcher app"
+      attribute: "CurrentApp"
       response:
           value: { catalogVendorId: 123, applicationId: "applicationId" }
 
     - label: "Launch App Command"
-      command: "launchAppRequest"
+      command: "launchApp"
       arguments:
           values:
               - name: "data"
@@ -58,7 +58,7 @@ tests:
                 value: 0
 
     - label: "Stop App Command"
-      command: "stopAppRequest"
+      command: "stopApp"
       arguments:
           values:
               - name: "application"
@@ -71,7 +71,7 @@ tests:
                 value: 0
 
     - label: "Hide App Command"
-      command: "hideAppRequest"
+      command: "hideApp"
       arguments:
           values:
               - name: "application"

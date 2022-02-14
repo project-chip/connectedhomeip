@@ -29836,7 +29836,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 namespace WakeOnLan {
 namespace Attributes {
 
-namespace WakeOnLanMacAddress {
+namespace MACAddress {
 
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
 {
@@ -29864,7 +29864,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
     return emberAfWriteServerAttribute(endpoint, Clusters::WakeOnLan::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
-} // namespace WakeOnLanMacAddress
+} // namespace MACAddress
 
 namespace FeatureMap {
 
@@ -30002,7 +30002,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 namespace TargetNavigator {
 namespace Attributes {
 
-namespace CurrentNavigatorTarget {
+namespace CurrentTarget {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
 {
@@ -30031,7 +30031,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::TargetNavigator::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
-} // namespace CurrentNavigatorTarget
+} // namespace CurrentTarget
 
 namespace FeatureMap {
 
@@ -30101,7 +30101,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 namespace MediaPlayback {
 namespace Attributes {
 
-namespace PlaybackState {
+namespace CurrentState {
 
 EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::MediaPlayback::PlaybackStateEnum * value)
 {
@@ -30130,7 +30130,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::MediaPlayback:
     return emberAfWriteServerAttribute(endpoint, Clusters::MediaPlayback::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
-} // namespace PlaybackState
+} // namespace CurrentState
 
 namespace StartTime {
 
@@ -30443,7 +30443,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 namespace MediaInput {
 namespace Attributes {
 
-namespace CurrentMediaInput {
+namespace CurrentInput {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
 {
@@ -30472,7 +30472,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::MediaInput::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
-} // namespace CurrentMediaInput
+} // namespace CurrentInput
 
 namespace FeatureMap {
 
@@ -30777,7 +30777,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 namespace AudioOutput {
 namespace Attributes {
 
-namespace CurrentAudioOutput {
+namespace CurrentOutput {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
 {
@@ -30806,7 +30806,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::AudioOutput::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
-} // namespace CurrentAudioOutput
+} // namespace CurrentOutput
 
 namespace FeatureMap {
 
@@ -30974,7 +30974,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 
 } // namespace VendorName
 
-namespace VendorId {
+namespace VendorID {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
 {
@@ -31003,7 +31003,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
-} // namespace VendorId
+} // namespace VendorID
 
 namespace ApplicationName {
 
@@ -31035,7 +31035,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 
 } // namespace ApplicationName
 
-namespace ProductId {
+namespace ProductID {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
 {
@@ -31064,9 +31064,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
-} // namespace ProductId
+} // namespace ProductID
 
-namespace ApplicationStatus {
+namespace Status {
 
 EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum * value)
 {
@@ -31095,7 +31095,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ApplicationBas
     return emberAfWriteServerAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
-} // namespace ApplicationStatus
+} // namespace Status
 
 namespace ApplicationVersion {
 

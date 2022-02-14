@@ -157,7 +157,7 @@ CHIP_ERROR ApplicationLauncherAttrAccess::Read(const app::ConcreteReadAttributeP
 
     switch (aPath.mAttributeId)
     {
-    case app::Clusters::ApplicationLauncher::Attributes::ApplicationLauncherList::Id: {
+    case app::Clusters::ApplicationLauncher::Attributes::CatalogList::Id: {
         if (isDelegateNull(delegate, endpoint))
         {
             return aEncoder.EncodeEmptyList();
@@ -165,7 +165,7 @@ CHIP_ERROR ApplicationLauncherAttrAccess::Read(const app::ConcreteReadAttributeP
 
         return ReadCatalogListAttribute(aEncoder, delegate);
     }
-    case app::Clusters::ApplicationLauncher::Attributes::ApplicationLauncherApp::Id: {
+    case app::Clusters::ApplicationLauncher::Attributes::CurrentApp::Id: {
         if (isDelegateNull(delegate, endpoint))
         {
             return CHIP_NO_ERROR;
@@ -196,9 +196,8 @@ CHIP_ERROR ApplicationLauncherAttrAccess::ReadCurrentAppAttribute(app::Attribute
 // -----------------------------------------------------------------------------
 // Matter Framework Callbacks Implementation
 
-bool emberAfApplicationLauncherClusterLaunchAppRequestCallback(app::CommandHandler * command,
-                                                               const app::ConcreteCommandPath & commandPath,
-                                                               const Commands::LaunchAppRequest::DecodableType & commandData)
+bool emberAfApplicationLauncherClusterLaunchAppCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                        const Commands::LaunchApp::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
@@ -269,7 +268,7 @@ bool emberAfApplicationLauncherClusterLaunchAppRequestCallback(app::CommandHandl
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "emberAfApplicationLauncherClusterLaunchAppRequestCallback error: %s", err.AsString());
+        ChipLogError(Zcl, "emberAfApplicationLauncherClusterLaunchAppCallback error: %s", err.AsString());
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
 
@@ -279,9 +278,8 @@ exit:
 /**
  * @brief Application Launcher Cluster StopApp Command callback (from client)
  */
-bool emberAfApplicationLauncherClusterStopAppRequestCallback(app::CommandHandler * command,
-                                                             const app::ConcreteCommandPath & commandPath,
-                                                             const Commands::StopAppRequest::DecodableType & commandData)
+bool emberAfApplicationLauncherClusterStopAppCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                      const Commands::StopApp::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
@@ -353,7 +351,7 @@ bool emberAfApplicationLauncherClusterStopAppRequestCallback(app::CommandHandler
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "emberAfApplicationLauncherClusterStopAppRequestCallback error: %s", err.AsString());
+        ChipLogError(Zcl, "emberAfApplicationLauncherClusterStopAppCallback error: %s", err.AsString());
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
 
@@ -363,9 +361,8 @@ exit:
 /**
  * @brief Application Launcher Cluster HideApp Command callback (from client)
  */
-bool emberAfApplicationLauncherClusterHideAppRequestCallback(app::CommandHandler * command,
-                                                             const app::ConcreteCommandPath & commandPath,
-                                                             const Commands::HideAppRequest::DecodableType & commandData)
+bool emberAfApplicationLauncherClusterHideAppCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                      const Commands::HideApp::DecodableType & commandData)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
@@ -434,7 +431,7 @@ bool emberAfApplicationLauncherClusterHideAppRequestCallback(app::CommandHandler
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "emberAfApplicationLauncherClusterStopAppRequestCallback error: %s", err.AsString());
+        ChipLogError(Zcl, "emberAfApplicationLauncherClusterStopAppCallback error: %s", err.AsString());
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
 

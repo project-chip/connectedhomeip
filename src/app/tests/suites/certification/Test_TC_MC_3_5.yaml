@@ -32,6 +32,6 @@ tests:
     - label: "Read launch list attribute."
       disabled: true
       command: "readAttribute"
-      attribute: "application launcher list"
+      attribute: "CatalogList"
       response:
           value: []

@@ -31,7 +31,7 @@ tests:
     # Remove disable flag when SDK supports command.
     - label: "Rename Input Command"
       disabled: true
-      command: "RenameInputRequest"
+      command: "RenameInput"
       arguments:
           values:
               - name: "index"
@@ -41,7 +41,7 @@ tests:
     # Remove disable flag when SDK supports command.
     - label: "Rename Input Command"
       disabled: true
-      command: "RenameInputRequest"
+      command: "RenameInput"
       arguments:
           values:
               - name: "index"
@@ -52,6 +52,6 @@ tests:
     - label: "Read attribute media input list"
       disabled: true
       command: "readAttribute"
-      attribute: "media input list"
+      attribute: "InputList"
       response:
           value: []
