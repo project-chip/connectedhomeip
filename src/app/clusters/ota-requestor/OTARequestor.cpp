@@ -697,24 +697,52 @@ void OTARequestor::DefaultOTAProvidersUpdated()
         // Fall through
     }
 }
+*/
+// !!!!!!!! For testing only. do not commit !!!!!!!!
+NodeId mTestingProviderNodeId =    NodeId(0x77);
+
+
+void OTARequestor::DefaultProviderTimerHandler(System::Layer * systemLayer, void * appState)
+{
+    // Determine whether our current state allows us to proceed
+    OTARequestorAction action = mOtaRequestorDriver->GetRequestorAction(OTARequestorIncomingEvent::DefaultProvidersTimerExpiry);
+
+    if(action == OTARequestorAction::DoNotProceed) {
+        ChipLogProgress(SoftwareUpdate, "Wrong UpdateState, ignoring command");
+    } else if(action == OTARequestorAction::CancelCurrentUpdateAndProceed) {
+        ChipLogProgress(SoftwareUpdate, "Cancelling current update and querying the default provider");
+        CancelImageUpdate();
+    } else if(action == OTARequestorAction::Proceed) {
+        // Fall through
+    }
+
+    VerifyOrReturn(appState != nullptr);
+    OTARequestor *requestorCore =  static_cast<OTARequestor *>(appState);
+
+    // TODO -- implement better API here
+    TestModeSetProviderParameters(mTestingProviderNodeId, 0 , 0);
+    requestorCore->ConnectToProvider(OTARequestor::kQueryImage);
+}
 
 
 void OTARequestor::StartDefaultProvidersTimer()
 {
 
-
-
-   mOtaRequestorDriver->ScheduleDelayedAction(UpdateFailureState::kIdle, System::Clock::Seconds32(), StartDelayTimerHandler, this);
-
+    mOtaRequestorDriver->ScheduleDelayedAction(UpdateFailureState::kIdle,
+                                               System::Clock::Seconds32(),
+                                               [](System::Layer *, void * context){ (static_cast<OTARequestor *>(context))->DefaultProviderTimerHandler(nullptr, context); },
+                                               this);
 }
-*/
+
 
 void OTARequestor::OnCommissioningCompleteRequestor(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
-    ChipLogProgress(SoftwareUpdate, "Device commissioned, query the default provider if present and start a timer");
+    ChipLogProgress(SoftwareUpdate, "Device commissioned, query the default provider");
 
-    
+    // TODO: Should we also send UpdateApplied here?
 
+    // Query the default provider
+    (reinterpret_cast<OTARequestor *>(arg))->DefaultProviderTimerHandler(nullptr, reinterpret_cast<OTARequestor *>(arg));
 }
 
 } // namespace chip

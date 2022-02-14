@@ -246,6 +246,16 @@ private:
     CHIP_ERROR SendNotifyUpdateAppliedRequest(OperationalDeviceProxy & deviceProxy);
 
     /**
+     * Start the periodic timer for querying the default OTA Provider
+     */
+    void StartDefaultProvidersTimer();
+
+    /**
+     * Timer handler for querying the default OTA Provider
+     */
+    void DefaultProviderTimerHandler(System::Layer * systemLayer, void * appState);
+
+    /**
      * Session connection callbacks
      */
     static void OnConnected(void * context, OperationalDeviceProxy * deviceProxy);

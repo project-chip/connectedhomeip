@@ -42,6 +42,7 @@ struct UpdateDescription
 
 enum class UpdateFailureState
 {
+    kIdle,
     kQuerying,
     kDownloading,
     kApplying,
