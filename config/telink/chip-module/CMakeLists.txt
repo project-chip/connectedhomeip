@@ -204,10 +204,8 @@ chip_gn_arg_bool  ("chip_build_tests"                       CONFIG_CHIP_BUILD_TE
 chip_gn_arg_bool  ("chip_inet_config_enable_tcp_endpoint"   CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_build_libshell"                    CONFIG_CHIP_LIB_SHELL)
 
-if (BOARD STREQUAL "native_posix")
-    chip_gn_arg_string("target_cpu" "x86")
-elseif (BOARD STREQUAL "native_posix_64")
-    chip_gn_arg_string("target_cpu" "x64")
+if (CONFIG_CHIP_ENABLE_DNSSD_SRP)
+    chip_gn_arg_string("chip_mdns" "platform")
 endif()
 
 file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/args.gn CONTENT ${CHIP_GN_ARGS})

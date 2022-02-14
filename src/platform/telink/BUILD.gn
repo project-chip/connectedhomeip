@@ -51,6 +51,7 @@ static_library("telink") {
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
+
   if (chip_enable_openthread) {
     sources += [
       "../OpenThread/OpenThreadUtils.cpp",
