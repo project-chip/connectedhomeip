@@ -45,10 +45,11 @@ will then join the network.
 -   Supported hardware:
     [CY8CKIT-062S2-43012](https://www.cypress.com/CY8CKIT-062S2-43012)
 
-*   The following applications must be built to demonstrate the OTA process:   
-     - The P6 OTA Requestor App - The Updated P6 OTA Requestor App (or other
-    app) - An OTA Provider App (the Linux ota-provider app is used here) -
-    chip-tool
+*   The following applications must be built to demonstrate the OTA process:
+
+    -   The P6 OTA Requestor App - The Updated P6 OTA Requestor App (or other
+        app) - An OTA Provider App (the Linux ota-provider app is used here) -
+        chip-tool
 
 *   Build the P6 OTA Requestor application from the chip root dir:
 
