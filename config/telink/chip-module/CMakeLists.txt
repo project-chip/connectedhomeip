@@ -130,6 +130,10 @@ if (CONFIG_CHIP_PW_RPC)
     list(APPEND CHIP_LIBRARIES -lPwRpc)
 endif()
 
+if (CONFIG_TELINK_BLE_LIB)
+    list(APPEND CHIP_LIBRARIES -lB91_ble_lib)
+endif()
+
 # Set up CHIP project configuration file
 
 if (CONFIG_CHIP_PROJECT_CONFIG)
@@ -218,7 +222,6 @@ ExternalProject_Add(
     SOURCE_DIR              ${CHIP_ROOT}
     BINARY_DIR              ${CMAKE_CURRENT_BINARY_DIR}
     CONFIGURE_COMMAND       ${GN_EXECUTABLE}
-                                -v
                                 --root=${CHIP_ROOT}
                                 --root-target=${GN_ROOT_TARGET}
                                 --dotfile=${GN_ROOT_TARGET}/.gn
@@ -248,9 +251,15 @@ target_include_directories(chip INTERFACE
     ${CMAKE_CURRENT_BINARY_DIR}/gen/include
 )
 target_link_directories(chip INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/lib)
+
 if (CONFIG_CHIP_LIB_SHELL)
     target_link_options(chip INTERFACE -Wl,--whole-archive -lCHIPShell -Wl,--no-whole-archive)
 endif()
+
+if (CONFIG_TELINK_BLE_LIB)
+    target_link_directories(chip INTERFACE ${CHIP_ROOT}/third_party/telink_sdk/repo/eagle_ble_sdk/proj_lib)
+endif()
+
 target_link_libraries(chip INTERFACE -Wl,--start-group ${CHIP_LIBRARIES} -Wl,--end-group)
 add_dependencies(chip chip-gn)
 

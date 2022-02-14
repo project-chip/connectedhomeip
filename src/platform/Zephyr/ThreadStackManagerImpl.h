@@ -29,7 +29,6 @@
 #include <zephyr.h>
 
 #include <openthread/thread.h>
-#include <platform/Zephyr/BLEManagerImpl.h>
 
 #include <lib/support/logging/CHIPLogging.h>
 
