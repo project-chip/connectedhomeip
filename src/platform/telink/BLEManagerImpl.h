@@ -130,6 +130,7 @@ private:
     CHIP_ERROR HandleTXCharCCCDWrite(const ChipDeviceEvent *event);
     CHIP_ERROR HandleTXCharComplete(const ChipDeviceEvent * event);
     CHIP_ERROR HandleBleConnectionClosed(const ChipDeviceEvent * event);
+    CHIP_ERROR HandleThreadStateChange(const ChipDeviceEvent * event);
 
     /* Callbacks from BLE stack*/
     static void DriveBLEState(intptr_t arg);
