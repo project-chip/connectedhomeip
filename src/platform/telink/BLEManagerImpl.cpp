@@ -243,19 +243,23 @@ exit:
     return err;
 }
 
-static int RxWriteCallback(uint16_t connHandle, void* p)
+static int RxWriteCallback(uint16_t connHandle, void *p)
 {
-    rf_packet_att_data_t *packet = (rf_packet_att_data_t*)p;
+    rf_packet_att_t *packet = (rf_packet_att_t*)p;
     int dataLen = packet->rf_len - CHIP_RF_PACKET_HEADER_SIZE;
-    
+    uint8_t *data = (uint8_t *)p;
+
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::RxWriteCallback");
 
-    ChipLogDetail(DeviceLayer, "Packet info: Type:   %d", packet->type);
-    ChipLogDetail(DeviceLayer, "Packet info: RF len: %d", packet->rf_len);
-    ChipLogDetail(DeviceLayer, "Packet info: l2cap:  %d", packet->l2cap);
-    ChipLogDetail(DeviceLayer, "Packet info: chanid: %d", packet->chanid);
-    ChipLogDetail(DeviceLayer, "Packet info: att:    %d", packet->att);
-    ChipLogDetail(DeviceLayer, "Packet info: handle: %d", packet->handle);
+    ChipLogDetail(DeviceLayer, "Data[0-7]:  0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x", data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
+    ChipLogDetail(DeviceLayer, "Data[8-15]: 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x", data[8], data[9], data[10], data[11], data[12], data[13], data[14], data[15]);
+
+    // ChipLogDetail(DeviceLayer, "Packet info: Header:    0x%02x", static_cast<uint8_t>(packet->header));
+    ChipLogDetail(DeviceLayer, "Packet info: RF len:    %d",     packet->rf_len);
+    ChipLogDetail(DeviceLayer, "Packet info: l2cap len: %d",     packet->l2capLen);
+    ChipLogDetail(DeviceLayer, "Packet info: chanid:    0x%02x", packet->chanId);
+    ChipLogDetail(DeviceLayer, "Packet info: opcode:    0x%02x", packet->opcode);
+    ChipLogDetail(DeviceLayer, "Packet info: handle:    0x%04x", packet->handle);
 
     ChipLogDetail(DeviceLayer, "Data len: %d", dataLen);
 
@@ -266,6 +270,7 @@ static int RxWriteCallback(uint16_t connHandle, void* p)
         ChipLogDetail(DeviceLayer, "Data[%d]: %d", i, packet->dat[i]);
     }
 
+    
     return 0;
 }
 
