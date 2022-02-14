@@ -565,7 +565,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetRotatingDeviceIdUniq
                                                                                      size_t bufSize)
 {
 #ifdef CHIP_DEVICE_CONFIG_TEST_ROTATING_DEVICE_ID_UNIQUE_ID
-    uint8_t uniqueId[] = CHIP_DEVICE_CONFIG_TEST_ROTATING_DEVICE_ID_UNIQUE_ID;
+    constexpr uint8_t uniqueId[] = CHIP_DEVICE_CONFIG_TEST_ROTATING_DEVICE_ID_UNIQUE_ID;
 
     ReturnErrorCodeIf(sizeof(uniqueId) > bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
     ReturnErrorCodeIf(sizeof(uniqueId) != kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_BUFFER_TOO_SMALL);
