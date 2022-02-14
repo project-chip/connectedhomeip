@@ -64,7 +64,7 @@ function getManualTests()
     'Test_TC_BRAC_2_1',
     'Test_TC_BRAC_2_2',
   ];
-  
+
   const DeviceManagement = [
     'Test_TC_DM_1_2',
     'Test_TC_DM_2_3',
@@ -80,7 +80,7 @@ function getManualTests()
   const Descriptor = [
     'Test_TC_DESC_1_1',
   ];
-  
+
   const EthernetNetworkDiagnostics = [
     'Test_TC_ETHDIAG_1_2',
   ];
@@ -90,7 +90,7 @@ function getManualTests()
     'Test_TC_GC_1_2',
     'Test_TC_GC_1_3',
   ];
-  
+
   const GeneralDiagnostics = [
     'Test_TC_GENDIAG_1_1',
     'Test_TC_GENDIAG_1_2',
@@ -106,7 +106,7 @@ function getManualTests()
   const IlluminanceMeasurement = [
     'Test_TC_ILL_2_1',
   ];
-  
+
   const InteractionDataModel = [
     'Test_TC_IDM_1_1',
     'Test_TC_IDM_1_2',
@@ -161,7 +161,7 @@ function getManualTests()
     'Test_TC_MF_1_23',
     'Test_TC_MF_1_24',
   ];
-  
+
   const ModeSelect = [
     'Test_TC_MOD_1_1',
     'Test_TC_MOD_1_2',
@@ -187,7 +187,7 @@ function getManualTests()
     'Test_TC_PSCFG_1_1',
     'Test_TC_PSCFG_2_1',
   ];
-  
+
   const SecureChannel = [
     'Test_TC_SC_4_5',
     'Test_TC_SC_4_6',
@@ -222,7 +222,7 @@ function getManualTests()
     GeneralCommissioning, //
     GeneralDiagnostics, //
     Identify, //
-    IlluminanceMeasurement, // 
+    IlluminanceMeasurement, //
     InteractionDataModel, //
     MediaControl, //
     MultipleFabrics, //
