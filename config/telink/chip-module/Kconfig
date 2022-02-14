@@ -14,6 +14,10 @@
 #   limitations under the License.
 #
 
-build:
-    cmake: .
-    kconfig: Kconfig
+rsource "../../zephyr/Kconfig"
+
+config TELINK_BLE_LIB
+	bool "Include third party Telink BLE SDK"
+	default n
+	help
+	  Include third party Telink BLE SDK

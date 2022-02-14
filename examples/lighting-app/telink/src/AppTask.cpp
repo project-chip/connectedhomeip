@@ -65,6 +65,7 @@ LEDWidget sStatusLED;
 Button sFactoryResetButton;
 Button sLightingButton;
 Button sThreadStartButton;
+Button sBleAdvStartButton;
 
 bool sIsThreadProvisioned = false;
 bool sIsThreadEnabled     = false;
@@ -106,6 +107,13 @@ CHIP_ERROR AppTask::Init()
 
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+
+    ret = ConnectivityMgr().SetBLEDeviceName("TelinkLight");
+    if (ret != CHIP_NO_ERROR)
+    {
+        LOG_ERR("Fail to set BLE device name");
+        return ret;
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -238,6 +246,39 @@ void AppTask::StartThreadHandler(AppEvent * aEvent)
     }
 }
 
+void AppTask::StartBleAdvButtonEventHandler(void)
+{
+    AppEvent event;
+
+    event.Type               = AppEvent::kEventType_Button;
+    event.ButtonEvent.Action = kButtonPushEvent;
+    event.Handler            = StartBleAdvHandler;
+    sAppTask.PostEvent(&event);
+}
+
+void AppTask::StartBleAdvHandler(AppEvent * aEvent)
+{  
+    LOG_INF("BLE advertising start button pressed");
+
+    // Don't allow on starting Matter service BLE advertising after Thread provisioning.
+    if (ConnectivityMgr().IsThreadProvisioned())
+    {
+        LOG_INF("NFC Tag emulation and Matter service BLE advertising not started - device is commissioned to a Thread network.");
+        return;
+    }
+
+    if (ConnectivityMgr().IsBLEAdvertisingEnabled())
+    {
+        LOG_INF("BLE advertising is already enabled");
+        return;
+    }
+
+    if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() != CHIP_NO_ERROR)
+    {
+        LOG_ERR("OpenBasicCommissioningWindow() failed");
+    }
+}
+
 void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
 {
     if (aAction == LightingManager::ON_ACTION)
@@ -332,8 +373,10 @@ void AppTask::InitButtons(void)
     sFactoryResetButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_1, FactoryResetButtonEventHandler);
     sLightingButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_1, LightingActionButtonEventHandler);
     sThreadStartButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_2, StartThreadButtonEventHandler);
+    sBleAdvStartButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_2, StartBleAdvButtonEventHandler);
 
     ButtonManagerInst().AddButton(sFactoryResetButton);
     ButtonManagerInst().AddButton(sLightingButton);
     ButtonManagerInst().AddButton(sThreadStartButton);
+    ButtonManagerInst().AddButton(sBleAdvStartButton);
 }
