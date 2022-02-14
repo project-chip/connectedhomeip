@@ -63,7 +63,6 @@ public interface ConfigurationManager {
   String kConfigKey_RegulatoryLocation = "regulatory-location";
   String kConfigKey_CountryCode = "country-code";
   String kConfigKey_Breadcrumb = "breadcrumb";
-  String kConfigKey_UniqueId = "unique-id";
 
   // Prefix used for NVS keys that contain Chip group encryption keys.
   String kGroupKeyNamePrefix = "gk-";
