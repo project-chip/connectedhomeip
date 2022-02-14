@@ -48,8 +48,6 @@
 
 #include <algorithm>
 
-#include <hello.h>
-
 LOG_MODULE_DECLARE(app);
 
 namespace {
@@ -173,17 +171,12 @@ CHIP_ERROR AppTask::StartApp()
             sThreadStatusLED.Blink(50, 950);
         }
 
-        // if(sHaveBLEConnections)
-        // {
-        //     sBleStatusLED.Blink(950, 50);
-        // }
-        // else
-        // {
-        //     sBleStatusLED.Set(false);
-        // }
+        if(sHaveBLEConnections)
+        {
+            sThreadStatusLED.Blink(50, 50);
+        }
 
         sThreadStatusLED.Animate();
-        // sBleStatusLED.Animate();
     }
 }
 
