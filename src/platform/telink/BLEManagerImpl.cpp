@@ -120,7 +120,6 @@ typedef struct
 #define CHIP_BLE_THREAD_PRIORITY 2
 
 #define CHIP_RX_BUFF_SIZE 20
-// #define CHIP_RF_PACKET_HEADER_SIZE 7
 #define CHIP_RF_PACKET_HEADER_SIZE 3
 
 #define WHITE_LED GPIO_PB6
@@ -630,6 +629,14 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
+    /* Block IEEE802154 */
+    const struct device *radio_dev = device_get_binding(CONFIG_NET_CONFIG_IEEE802154_DEV_NAME);
+    __ASSERT(radio_dev != NULL, "Fail to get radio device");
+    
+    struct b91_data *data = (b91_data *)radio_dev->data;
+    
+    data->is_ready = false;
+
     /* It is time to init BLE stack */
     err = _InitStack();
     if(err != CHIP_NO_ERROR)
@@ -750,7 +757,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 
     switch (event->Type)
     {
-        case DeviceEventType::kPlatformTelinkBleConnected:            
+        case DeviceEventType::kPlatformTelinkBleConnected:
             err = HandleGAPConnect(event);
             break;
 
@@ -908,6 +915,7 @@ void BLEManagerImpl::SwitchToIeee802154(void)
     dma_chn_en(DMA1);
 
     radio_api->stop(radio_dev);
+    data->is_ready = true;
 
     core_restore_interrupt(irq_restore);
 
