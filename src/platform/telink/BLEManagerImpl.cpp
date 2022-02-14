@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Provides an implementation of the BLEManager singleton object
- *          for the Telink platforms.
+ *          for the Telink platform.
  */
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -42,6 +42,7 @@
 #include "tl_common.h"
 #include "drivers.h"
 #include "stack/ble/ble.h"
+#include "ext_driver/ext_misc.h"
 
 using namespace ::chip;
 using namespace ::chip::Ble;
@@ -149,25 +150,19 @@ BLEManagerImpl BLEManagerImpl::sInstance;
 
 void rf_irq_handler(const void *paramiter)
 {
-    gpio_set_high_level(GREEN_LED);
     irq_blt_sdk_handler();
-    gpio_set_low_level(GREEN_LED);
 }
 
 void stimer_irq_handler(const void *paramiter)
 {
-    gpio_set_high_level(BLUE_LED);
     irq_blt_sdk_handler();
-    gpio_set_low_level(BLUE_LED);
 }
 
 void BLEManagerImpl::BleEntry(void *, void *, void *)
 {
     while(true)
     {
-        // gpio_set_high_level(WHITE_LED);
         blt_sdk_main_loop();
-        // gpio_set_low_level(WHITE_LED);
 
         k_msleep(10);
     }
@@ -219,7 +214,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
 
     /* Suspend BLE Task */
-    // k_thread_suspend(chipBleThread);
+    k_thread_suspend(chipBleThread);
 
 exit:
     return err;
@@ -349,12 +344,26 @@ CHIP_ERROR BLEManagerImpl::_InitStack(void)
     blc_initMacAddress(CFG_ADR_MAC_1M_FLASH, macPublic, macRandomStatic);
 
     /* Init interrupts and DMA for BLE module ??? */
-    blc_ll_initBasicMCU();
+    // blc_ll_initBasicMCU();
 
-    ble_tx_dma_config();
+    //------------------------ blc_ll_initBasicMCU(); replication ------------------------------
+    reg_system_tick_irq = clock_time() + BIT(31);
 
-    ble_rx_dma_config();
+    stimer_set_irq_mask((stimer_irq_e)STIMER_IRQ_MASK);
 
+    plic_interrupt_enable(IRQ15_ZB_RT);
+
+    plic_set_priority(IRQ15_ZB_RT, IRQ_PRI_LEV2);
+
+    plic_set_priority(IRQ1_SYSTIMER, IRQ_PRI_LEV2);
+
+    reg_irq_threshold = 0;
+
+    // ble_tx_dma_config();
+
+    // ble_rx_dma_config();
+
+    // ------------------------------------------------------
     /* Setup MAC Address */
     blc_ll_initStandby_module(macPublic);
 
@@ -717,7 +726,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     mFlags.Set(Flags::kAdvertising);
 
     /* Start BLE Task */
-    // k_thread_resume(chipBleThread);
+    k_thread_resume(chipBleThread);
 
     return err;
 }
@@ -725,6 +734,13 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
 {
     ble_sts_t status = BLE_SUCCESS;
+
+    if(ConnectivityMgr().IsThreadProvisioned())
+    {
+        ChipLogProgress(DeviceLayer, "Thread provisioned. Advertisement already stopped at this stage");
+
+        return CHIP_NO_ERROR;
+    }
 
     /* Disable advertisement */
     status = bls_ll_setAdvEnable(BLC_ADV_DISABLE);
@@ -897,20 +913,20 @@ void BLEManagerImpl::SwitchToIeee802154(void)
 
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::Switch to IEEE802154");
 
-    const struct device *radio_dev = device_get_binding(CONFIG_NET_CONFIG_IEEE802154_DEV_NAME);
-    __ASSERT(radio_dev != NULL, "Fail to get radio device");
-
     /* Stop BLE */
-    // StopAdvertising();
+    StopAdvertising();
 
     /* Stop BLE task */
-    // k_thread_suspend(chipBleThread);
+    k_thread_suspend(chipBleThread);
 
     /* Reset Radio */
     rf_radio_reset();
 
     /* Reset DMA */
     rf_reset_dma();
+
+    const struct device *radio_dev = device_get_binding(CONFIG_NET_CONFIG_IEEE802154_DEV_NAME);
+    __ASSERT(radio_dev != NULL, "Fail to get radio device");
 
     /* Init IEEE802154 */
     result = b91_ieee802154_init(radio_dev);

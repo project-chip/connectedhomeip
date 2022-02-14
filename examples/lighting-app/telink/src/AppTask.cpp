@@ -171,11 +171,6 @@ CHIP_ERROR AppTask::StartApp()
             sThreadStatusLED.Blink(50, 950);
         }
 
-        if(sHaveBLEConnections)
-        {
-            sThreadStatusLED.Blink(50, 50);
-        }
-
         sThreadStatusLED.Animate();
     }
 }
