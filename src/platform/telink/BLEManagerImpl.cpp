@@ -183,13 +183,6 @@ CHIP_ERROR BLEManagerImpl::_Init()
     /* Generate MAC address if it does not exist or read it from flash if it is exist already */
     blc_initMacAddress(CFG_ADR_MAC_1M_FLASH, mac_public, mac_random_static);
 
-    ChipLogDetail(DeviceLayer, "MAC: %02X:%02X:%02X:%02X:%02X:%02X", mac_public[0],
-                                                                     mac_public[1],
-                                                                     mac_public[2],
-                                                                     mac_public[3],
-                                                                     mac_public[4],
-                                                                     mac_public[5]);
-
     /* Init interrupts and DMA for BLE module ??? */
     blc_ll_initBasicMCU();
 
@@ -255,85 +248,74 @@ CHIP_ERROR BLEManagerImpl::_InitGatt(void)
     static u8 rxFufoBuff[CHIP_BLE_RX_FIFO_SIZE * CHIP_BLE_RX_FIFO_NUM] = {0};
 
     /* UUIDs */
-    static const u16 my_primaryServiceUUID  = GATT_UUID_PRIMARY_SERVICE;
-    static const u16 my_gapServiceUUID      = SERVICE_UUID_GENERIC_ACCESS;
-    static const u16 my_characterUUID       = GATT_UUID_CHARACTER;
-    static const u16 my_devNameUUID         = GATT_UUID_DEVICE_NAME;
-    static const u16 my_gattServiceUUID     = SERVICE_UUID_GENERIC_ATTRIBUTE;
+    static const u16 primaryServiceUUID     = GATT_UUID_PRIMARY_SERVICE;
+    static const u16 gapServiceUUID         = SERVICE_UUID_GENERIC_ACCESS;
+    static const u16 characterUUID          = GATT_UUID_CHARACTER;
+    static const u16 devNameUUID            = GATT_UUID_DEVICE_NAME;
+    static const u16 gattServiceUUID        = SERVICE_UUID_GENERIC_ATTRIBUTE;
     static const u16 serviceChangeUUID      = GATT_UUID_SERVICE_CHANGE;
     static const u16 clientCharacterCfgUUID = GATT_UUID_CLIENT_CHAR_CFG;
-    static const u16 my_devServiceUUID      = SERVICE_UUID_DEVICE_INFORMATION;
-    static const u16 my_PnPUUID             = CHARACTERISTIC_UUID_PNP_ID;
-    static const u16 my_appearanceUUID      = GATT_UUID_APPEARANCE;
-    static const u16 my_periConnParamUUID   = GATT_UUID_PERI_CONN_PARAM;
+    static const u16 devServiceUUID         = SERVICE_UUID_DEVICE_INFORMATION;
+    static const u16 appearanceUUID         = GATT_UUID_APPEARANCE;
+    static const u16 periConnParamUUID      = GATT_UUID_PERI_CONN_PARAM;
 
     /* Characteristics */
-    static const u8 my_devNameCharVal[5] = 
+    static const u8 devNameCharVal[5] = 
     {
         CHAR_PROP_READ | CHAR_PROP_NOTIFY,
         U16_LO(GenericAccess_DeviceName_DP_H), U16_HI(GenericAccess_DeviceName_DP_H),
         U16_LO(GATT_UUID_DEVICE_NAME), U16_HI(GATT_UUID_DEVICE_NAME)
     };
 
-    static const u8 my_appearanceCharVal[5] = 
+    static const u8 appearanceCharVal[5] = 
     {
         CHAR_PROP_READ,
         U16_LO(GenericAccess_Appearance_DP_H), U16_HI(GenericAccess_Appearance_DP_H),
         U16_LO(GATT_UUID_APPEARANCE), U16_HI(GATT_UUID_APPEARANCE)
     };
 
-    static const u8 my_periConnParamCharVal[5] = 
+    static const u8 periConnParamCharVal[5] = 
     {
         CHAR_PROP_READ,
         U16_LO(CONN_PARAM_DP_H), U16_HI(CONN_PARAM_DP_H),
         U16_LO(GATT_UUID_PERI_CONN_PARAM), U16_HI(GATT_UUID_PERI_CONN_PARAM)
     };
 
-    static const u8 my_serviceChangeCharVal[5] = 
+    static const u8 serviceChangeCharVal[5] = 
     {
         CHAR_PROP_INDICATE,
         U16_LO(GenericAttribute_ServiceChanged_DP_H), U16_HI(GenericAttribute_ServiceChanged_DP_H),
         U16_LO(GATT_UUID_SERVICE_CHANGE), U16_HI(GATT_UUID_SERVICE_CHANGE)
     };
 
-    static const u8 my_PnCharVal[5] = 
-    {
-        CHAR_PROP_READ,
-        U16_LO(DeviceInformation_pnpID_DP_H), U16_HI(DeviceInformation_pnpID_DP_H),
-        U16_LO(CHARACTERISTIC_UUID_PNP_ID), U16_HI(CHARACTERISTIC_UUID_PNP_ID)
-    };
-
     /* Values */
-    // static const u8 my_devName[] = {'e','S','a','m','p','l','e'};
-    static const u16 my_appearance = GAP_APPEARE_UNKNOWN;
-    static const gap_periConnectParams_t my_periConnParameters = {8, 11, 0, 1000};
+    static const u16 appearance = GAP_APPEARE_UNKNOWN;
+    static const gap_periConnectParams_t periConnParameters = {8, 11, 0, 1000};
     static u16 serviceChangeVal[2] = {0};
     static u8 serviceChangeCCC[2] = {0};
-    static const u8 my_PnPtrs [] = {0x02, 0x8a, 0x24, 0x66, 0x82, 0x01, 0x00};
 
     static const attribute_t gattTable[] = 
     {
-        {ATT_END_H - 1, 0,0,0,0,0}, // total num of attribute
+        /* Total number of attributes */
+        {ATT_END_H - 1, 0,0,0,0,0},
 
-        // 0001 - 0007  gap
-        {7,ATT_PERMISSIONS_READ,2,2,(u8*)(&my_primaryServiceUUID), (u8*)(&my_gapServiceUUID), 0},
-        {0,ATT_PERMISSIONS_READ,2,sizeof(my_devNameCharVal),(u8*)(&my_characterUUID), (u8*)(my_devNameCharVal), 0},
-        {0,ATT_PERMISSIONS_READ,2,(u32)kMaxDeviceNameLength,(u8*)(&my_devNameUUID), (u8*)(mDeviceName), 0},
-        {0,ATT_PERMISSIONS_READ,2,sizeof(my_appearanceCharVal),(u8*)(&my_characterUUID), (u8*)(my_appearanceCharVal), 0},
-        {0,ATT_PERMISSIONS_READ,2,sizeof(my_appearance), (u8*)(&my_appearanceUUID), (u8*)(&my_appearance), 0},
-        {0,ATT_PERMISSIONS_READ,2,sizeof(my_periConnParamCharVal),(u8*)(&my_characterUUID), (u8*)(my_periConnParamCharVal), 0},
-        {0,ATT_PERMISSIONS_READ,2,sizeof(my_periConnParameters),(u8*)(&my_periConnParamUUID), (u8*)(&my_periConnParameters), 0},
+        /* 0001 - 0007  GAP service */
+        {7,ATT_PERMISSIONS_READ,2,2,(u8*)(&primaryServiceUUID), (u8*)(&gapServiceUUID), 0},
+        {0,ATT_PERMISSIONS_READ,2,sizeof(devNameCharVal),(u8*)(&characterUUID), (u8*)(my_devNameCharVal), 0},
+        {0,ATT_PERMISSIONS_READ,2,(u32)kMaxDeviceNameLength,(u8*)(&devNameUUID), (u8*)(mDeviceName), 0},
+        {0,ATT_PERMISSIONS_READ,2,sizeof(appearanceCharVal),(u8*)(&characterUUID), (u8*)(appearanceCharVal), 0},
+        {0,ATT_PERMISSIONS_READ,2,sizeof(appearance), (u8*)(&appearanceUUID), (u8*)(&appearance), 0},
+        {0,ATT_PERMISSIONS_READ,2,sizeof(periConnParamCharVal),(u8*)(&characterUUID), (u8*)(periConnParamCharVal), 0},
+        {0,ATT_PERMISSIONS_READ,2,sizeof(periConnParameters),(u8*)(&periConnParamUUID), (u8*)(&periConnParameters), 0},
 
-        // 0008 - 000b gatt
-        {4,ATT_PERMISSIONS_READ,2,2,(u8*)(&my_primaryServiceUUID), (u8*)(&my_gattServiceUUID), 0},
-        {0,ATT_PERMISSIONS_READ,2,sizeof(my_serviceChangeCharVal),(u8*)(&my_characterUUID), (u8*)(my_serviceChangeCharVal), 0},
+        /* 0008 - 000b GATT */
+        {4,ATT_PERMISSIONS_READ,2,2,(u8*)(&primaryServiceUUID), (u8*)(&gattServiceUUID), 0},
+        {0,ATT_PERMISSIONS_READ,2,sizeof(serviceChangeCharVal),(u8*)(&characterUUID), (u8*)(serviceChangeCharVal), 0},
         {0,ATT_PERMISSIONS_READ,2,sizeof(serviceChangeVal), (u8*)(&serviceChangeUUID), (u8*)(&serviceChangeVal), 0},
         {0,ATT_PERMISSIONS_RDWR,2,sizeof(serviceChangeCCC),(u8*)(&clientCharacterCfgUUID), (u8*)(serviceChangeCCC), 0},
 
-        // 000c - 000e  device Information Service
-        {3,ATT_PERMISSIONS_READ,2,2,(u8*)(&my_primaryServiceUUID), (u8*)(&my_devServiceUUID), 0},
-        {0,ATT_PERMISSIONS_READ,2,sizeof(my_PnCharVal),(u8*)(&my_characterUUID), (u8*)(my_PnCharVal), 0},
-        {0,ATT_PERMISSIONS_READ,2,sizeof(my_PnPtrs),(u8*)(&my_PnPUUID), (u8*)(my_PnPtrs), 0},
+        /* Matter service */
+
     };
 
     status = blc_ll_initAclConnTxFifo(txFifoBuff, CHIP_BLE_TX_FIFO_SIZE, CHIP_BLE_TX_FIFO_NUM);
