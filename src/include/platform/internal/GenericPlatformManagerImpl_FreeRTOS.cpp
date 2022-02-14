@@ -105,6 +105,21 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_UnlockChipStack(void)
 }
 
 template <class ImplClass>
+bool GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_IsChipStackLockedByCurrentThread() const
+{
+    // If we have not started our event loop yet, return true because in that
+    // case we can't be racing against the (not yet started) event loop.
+    //
+    // Similarly, if mChipStackLock has not been created yet, might as well
+    // return true.
+    ChipLogError(DeviceLayer, "LOCKY: %d %d %d %d", mEventLoopTask == nullptr, mChipStackLock == nullptr,
+                 xSemaphoreGetMutexHolder(mChipStackLock) == nullptr,
+                 xSemaphoreGetMutexHolder(mChipStackLock) == xTaskGetCurrentTaskHandle());
+    return (mEventLoopTask == nullptr) || (mChipStackLock == nullptr) ||
+        (xSemaphoreGetMutexHolder(mChipStackLock) == xTaskGetCurrentTaskHandle());
+}
+
+template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_PostEvent(const ChipDeviceEvent * event)
 {
     if (mChipEventQueue == NULL)
