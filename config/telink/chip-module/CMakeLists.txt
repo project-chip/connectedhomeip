@@ -218,6 +218,7 @@ ExternalProject_Add(
     SOURCE_DIR              ${CHIP_ROOT}
     BINARY_DIR              ${CMAKE_CURRENT_BINARY_DIR}
     CONFIGURE_COMMAND       ${GN_EXECUTABLE}
+                                -v
                                 --root=${CHIP_ROOT}
                                 --root-target=${GN_ROOT_TARGET}
                                 --dotfile=${GN_ROOT_TARGET}/.gn
@@ -243,6 +244,7 @@ target_include_directories(chip INTERFACE
     ${CHIP_ROOT}/src/include
     ${CHIP_ROOT}/src/lib
     ${CHIP_ROOT}/third_party/nlassert/repo/include
+    ${CHIP_ROOT}/third_party/telink_sdk
     ${CMAKE_CURRENT_BINARY_DIR}/gen/include
 )
 target_link_directories(chip INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/lib)
