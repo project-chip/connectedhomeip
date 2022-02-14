@@ -179,7 +179,8 @@ class HostBuilder(GnBuilder):
             # Certification only built for openssl
             if self.board == HostBoard.ARM64:
                 # OpenSSL and MBEDTLS conflict. We only cross compile with mbedtls
-                raise Exception("Cannot cross compile CERT TOOL: ssl library conflict")
+                raise Exception(
+                    "Cannot cross compile CERT TOOL: ssl library conflict")
             self.extra_gn_options.append('chip_crypto="openssl"')
             self.build_command = 'src/tools/chip-cert'
 
