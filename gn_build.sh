@@ -75,6 +75,8 @@ echo gn args "$CHIP_ROOT/out/custom"
 echo ninja -C "$CHIP_ROOT/out/custom"
 
 extra_args=""
+extra_debug_args=""
+extra_release_args=""
 user_args=""
 ninja_args=()
 
@@ -157,7 +159,12 @@ k32w_sdk_args=""
 
 if [[ -d "$NXP_K32W061_SDK_ROOT" ]]; then
     k32w_sdk_args+="k32w0_sdk_root=\"$NXP_K32W061_SDK_ROOT\""
-    extra_args+=" $k32w0_sdk_args enable_k32w_builds=true"
+    # RELEASE_K32W builds only:
+    #
+    # Error is LWIP_DEBUG being redefined between 0 and 1 in debug builds in:
+    #    third_party/connectedhomeip/src/lwip/k32w0/lwipopts.h
+    #    gen/include/lwip/lwip_buildconfig.h
+    extra_release_args+=" $k32w0_sdk_args enable_k32w_builds=true"
 fi
 
 echo
@@ -195,8 +202,8 @@ echo
 
 _chip_banner "Build: GN configure"
 
-gn --root="$CHIP_ROOT" gen --check --fail-on-unused-args "$CHIP_ROOT/out/debug" --args='target_os="all"'"$extra_args$user_args"
-gn --root="$CHIP_ROOT" gen --check --fail-on-unused-args "$CHIP_ROOT/out/release" --args='target_os="all" is_debug=false'"$extra_args$user_args"
+gn --root="$CHIP_ROOT" gen --check --fail-on-unused-args "$CHIP_ROOT/out/debug" --args='target_os="all"'"$extra_args$extra_debug_args$user_args"
+gn --root="$CHIP_ROOT" gen --check --fail-on-unused-args "$CHIP_ROOT/out/release" --args='target_os="all" is_debug=false'"$extra_args$extra_release_args$user_args"
 
 _chip_banner "Build: Ninja build"
 
