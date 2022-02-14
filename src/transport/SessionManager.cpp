@@ -720,7 +720,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
         return;
     }
 
-    counter->Commit(packetHeader.GetMessageCounter());
+    counter->CommitWithRollOver(packetHeader.GetMessageCounter());
 
     if (mCB != nullptr)
     {
