@@ -20,12 +20,6 @@
 
 #include "PairingCommandBridge.h"
 
-class Unpair : public PairingCommandBridge
-{
-public:
-    Unpair() : PairingCommandBridge("unpair", PairingMode::None) {}
-};
-
 class PairQRCode : public PairingCommandBridge
 {
 public:
@@ -49,7 +43,6 @@ void registerCommandsPairing(Commands & commands)
     const char * clusterName = "Pairing";
 
     commands_list clusterCommands = {
-        make_unique<Unpair>(),
         make_unique<PairQRCode>(),
         make_unique<PairManualCode>(),
         make_unique<PairWithIPAddress>(),

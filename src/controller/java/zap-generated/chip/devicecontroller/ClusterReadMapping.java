@@ -5843,22 +5843,22 @@ public class ClusterReadMapping {
             readOperationalCredentialsNOCsCommandParams);
     readOperationalCredentialsInteractionInfo.put(
         "readNOCsAttribute", readOperationalCredentialsNOCsAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readOperationalCredentialsFabricsListCommandParams =
+    Map<String, CommandParameterInfo> readOperationalCredentialsFabricsCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readOperationalCredentialsFabricsListAttributeInteractionInfo =
+    InteractionInfo readOperationalCredentialsFabricsAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.OperationalCredentialsCluster) cluster)
-                  .readFabricsListAttribute(
-                      (ChipClusters.OperationalCredentialsCluster.FabricsListAttributeCallback)
+                  .readFabricsAttribute(
+                      (ChipClusters.OperationalCredentialsCluster.FabricsAttributeCallback)
                           callback);
             },
             () ->
                 new ClusterInfoMapping
-                    .DelegatedOperationalCredentialsClusterFabricsListAttributeCallback(),
-            readOperationalCredentialsFabricsListCommandParams);
+                    .DelegatedOperationalCredentialsClusterFabricsAttributeCallback(),
+            readOperationalCredentialsFabricsCommandParams);
     readOperationalCredentialsInteractionInfo.put(
-        "readFabricsListAttribute", readOperationalCredentialsFabricsListAttributeInteractionInfo);
+        "readFabricsAttribute", readOperationalCredentialsFabricsAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readOperationalCredentialsSupportedFabricsCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readOperationalCredentialsSupportedFabricsAttributeInteractionInfo =
@@ -10148,7 +10148,8 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.WiFiNetworkDiagnosticsCluster) cluster)
-                  .readBssidAttribute((ChipClusters.OctetStringAttributeCallback) callback);
+                  .readBssidAttribute(
+                      (ChipClusters.WiFiNetworkDiagnosticsCluster.BssidAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedOctetStringAttributeCallback(),
             readWiFiNetworkDiagnosticsBssidCommandParams);
@@ -10160,7 +10161,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.WiFiNetworkDiagnosticsCluster) cluster)
-                  .readSecurityTypeAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readSecurityTypeAttribute(
+                      (ChipClusters.WiFiNetworkDiagnosticsCluster.SecurityTypeAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readWiFiNetworkDiagnosticsSecurityTypeCommandParams);
@@ -10173,7 +10176,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.WiFiNetworkDiagnosticsCluster) cluster)
-                  .readWiFiVersionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readWiFiVersionAttribute(
+                      (ChipClusters.WiFiNetworkDiagnosticsCluster.WiFiVersionAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readWiFiNetworkDiagnosticsWiFiVersionCommandParams);
@@ -10185,7 +10190,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.WiFiNetworkDiagnosticsCluster) cluster)
-                  .readChannelNumberAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readChannelNumberAttribute(
+                      (ChipClusters.WiFiNetworkDiagnosticsCluster.ChannelNumberAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readWiFiNetworkDiagnosticsChannelNumberCommandParams);
@@ -10198,7 +10205,8 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.WiFiNetworkDiagnosticsCluster) cluster)
-                  .readRssiAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readRssiAttribute(
+                      (ChipClusters.WiFiNetworkDiagnosticsCluster.RssiAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readWiFiNetworkDiagnosticsRssiCommandParams);

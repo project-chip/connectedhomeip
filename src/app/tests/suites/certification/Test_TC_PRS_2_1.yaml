@@ -15,6 +15,7 @@
 name: 36.2.1. [TC-PRS-2.1] Attributes with server as DUT
 
 config:
+    nodeId: 0x12344321
     cluster: "Pressure Measurement"
     endpoint: 1
 
@@ -22,6 +23,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Read the mandatory attribute constraints: MeasuredValue"
       command: "readAttribute"

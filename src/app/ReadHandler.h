@@ -121,7 +121,7 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR SendReportData(System::PacketBufferHandle && aPayload, bool mMoreChunks);
+    CHIP_ERROR SendReportData(System::PacketBufferHandle && aPayload, bool aMoreChunks);
 
     /**
      *  Returns whether this ReadHandler represents a subscription that was created by the other side of the provided exchange.
@@ -132,8 +132,10 @@ public:
     bool IsGeneratingReports() const { return mState == HandlerState::GeneratingReports; }
     bool IsAwaitingReportResponse() const { return mState == HandlerState::AwaitingReportResponse; }
 
+    CHIP_ERROR ProcessDataVersionFilterList(DataVersionFilterIBs::Parser & aDataVersionFilterListParser);
     ClusterInfo * GetAttributeClusterInfolist() { return mpAttributeClusterInfoList; }
     ClusterInfo * GetEventClusterInfolist() { return mpEventClusterInfoList; }
+    ClusterInfo * GetDataVersionFilterlist() const { return mpDataVersionFilterList; }
     EventNumber & GetEventMin() { return mEventMin; }
     PriorityLevel GetCurrentPriority() { return mCurrentPriority; }
 
@@ -240,6 +242,7 @@ private:
     HandlerState mState                      = HandlerState::Idle;
     ClusterInfo * mpAttributeClusterInfoList = nullptr;
     ClusterInfo * mpEventClusterInfoList     = nullptr;
+    ClusterInfo * mpDataVersionFilterList    = nullptr;
 
     PriorityLevel mCurrentPriority = PriorityLevel::Invalid;
 

@@ -153,9 +153,9 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
 {
     OTAQueryStatus queryStatus = OTAQueryStatus::kNotAvailable;
     OTAProviderExample::DeviceSoftwareVersionModel candidate;
-    uint32_t newSoftwareVersion           = 0;
-    const char * newSoftwareVersionString = nullptr;
-    const char * otaFilePath              = nullptr;
+    uint32_t newSoftwareVersion           = commandData.softwareVersion + 1;
+    const char * newSoftwareVersionString = "Example-Image-V0.1";
+    const char * otaFilePath              = mOTAFilePath;
     uint8_t updateToken[kUpdateTokenLen]  = { 0 };
     char strBuf[kUpdateTokenStrLen]       = { 0 };
     char uriBuf[kUriMaxLen]               = { 0 };
@@ -172,23 +172,18 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
         {
             // TODO: Following details shall be read from the OTA file
 
-            // If software version is provided using command line then use it.
-            // Otherwise, bump the software version received in QueryImage by 1.
-            newSoftwareVersion = commandData.softwareVersion + 1;
+            // If software version is provided using command line then use it
             if (mSoftwareVersion.HasValue())
             {
                 newSoftwareVersion = mSoftwareVersion.Value();
             }
 
-            // If software version string is provided using command line then use it.
-            // Otherwise, use default string.
-            newSoftwareVersionString = "Example-Image-V0.1";
+            // If software version string is provided using command line then use it
             if (mSoftwareVersionString)
             {
                 newSoftwareVersionString = mSoftwareVersionString;
             }
 
-            otaFilePath = mOTAFilePath;
             queryStatus = OTAQueryStatus::kUpdateAvailable;
         }
         else if (!mCandidates.empty()) // If list of OTA candidates is supplied instead
@@ -284,13 +279,13 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
 
     response.status = queryStatus;
     response.delayedActionTime.Emplace(delayedActionTimeSec);
-    if (mUserConsentNeeded)
+    if (mUserConsentNeeded && requestorCanConsent)
     {
-        response.userConsentNeeded.Emplace(mUserConsentNeeded);
+        response.userConsentNeeded.Emplace(true);
     }
     else
     {
-        response.userConsentNeeded.Emplace(requestorCanConsent);
+        response.userConsentNeeded.Emplace(false);
     }
     // For test coverage, sending empty metadata when (requestorNodeId % 2) == 0 and not sending otherwise.
     if (commandObj->GetSubjectDescriptor().subject % 2 == 0)

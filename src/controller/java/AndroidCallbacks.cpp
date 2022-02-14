@@ -176,7 +176,7 @@ void ReportCallback::OnReportEnd()
     env->CallVoidMethod(mReportCallbackRef, onReportMethod, map);
 }
 
-void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPath, DataVersion aVersion, TLV::TLVReader * apData,
+void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                                      const app::StatusIB & aStatus)
 {
     CHIP_ERROR err           = CHIP_NO_ERROR;

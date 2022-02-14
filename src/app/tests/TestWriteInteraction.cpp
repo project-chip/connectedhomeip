@@ -75,7 +75,7 @@ class TestWriteClientCallback : public chip::app::WriteClient::Callback
 {
 public:
     void ResetCounter() { mOnSuccessCalled = mOnErrorCalled = mOnDoneCalled = 0; }
-    void OnResponse(const WriteClient * apWriteClient, const chip::app::ConcreteAttributePath & path, StatusIB status) override
+    void OnResponse(const WriteClient * apWriteClient, const chip::app::ConcreteDataAttributePath & path, StatusIB status) override
     {
         mOnSuccessCalled++;
     }
@@ -91,19 +91,12 @@ void TestWriteInteraction::AddAttributeDataIB(nlTestSuite * apSuite, void * apCo
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     AttributePathParams attributePathParams;
+    bool attributeValue              = true;
     attributePathParams.mEndpointId  = 2;
     attributePathParams.mClusterId   = 3;
     attributePathParams.mAttributeId = 4;
 
-    err = aWriteClient.PrepareAttribute(attributePathParams);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    chip::TLV::TLVWriter * writer = aWriteClient.GetAttributeDataIBTLVWriter();
-
-    err = writer->PutBoolean(chip::TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), true);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    err = aWriteClient.FinishAttribute();
+    err = aWriteClient.EncodeAttribute(attributePathParams, attributeValue);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
@@ -137,7 +130,12 @@ void TestWriteInteraction::GenerateWriteRequest(nlTestSuite * apSuite, void * ap
     NL_TEST_ASSERT(apSuite, attributeDataIBBuilder.GetError() == CHIP_NO_ERROR);
     AttributePathIB::Builder & attributePathBuilder = attributeDataIBBuilder.CreatePath();
     NL_TEST_ASSERT(apSuite, attributePathBuilder.GetError() == CHIP_NO_ERROR);
-    attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
+    attributePathBuilder.Node(1)
+        .Endpoint(2)
+        .Cluster(3)
+        .Attribute(4)
+        .ListIndex(DataModel::Nullable<ListIndex>())
+        .EndOfAttributePathIB();
     err = attributePathBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
@@ -184,7 +182,12 @@ void TestWriteInteraction::GenerateWriteResponse(nlTestSuite * apSuite, void * a
 
     AttributePathIB::Builder & attributePathBuilder = attributeStatusIBBuilder.CreatePath();
     NL_TEST_ASSERT(apSuite, attributePathBuilder.GetError() == CHIP_NO_ERROR);
-    attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
+    attributePathBuilder.Node(1)
+        .Endpoint(2)
+        .Cluster(3)
+        .Attribute(4)
+        .ListIndex(DataModel::Nullable<ListIndex>())
+        .EndOfAttributePathIB();
     err = attributePathBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
@@ -325,16 +328,14 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
     ctx.DisableAsyncDispatch();
 }
 
-CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
+CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
                                   TLV::TLVReader & aReader, WriteHandler * aWriteHandler)
 {
     TLV::TLVWriter writer;
     writer.Init(attributeDataTLV);
     writer.CopyElement(TLV::AnonymousTag(), aReader);
     attributeDataTLVLen = writer.GetLengthWritten();
-    return aWriteHandler->AddStatus(
-        ConcreteAttributePath(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId),
-        Protocols::InteractionModel::Status::Success);
+    return aWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::Success);
 }
 
 void TestWriteInteraction::TestWriteRoundtripWithClusterObjects(nlTestSuite * apSuite, void * apContext)
@@ -371,7 +372,7 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjects(nlTestSuite * ap
     // Spec A.11.2 strings SHALL NOT include a terminating null character to mark the end of a string.
     dataTx.e = chip::Span<const char>(charSpanData, strlen(charSpanData));
 
-    writeClient.EncodeAttributeWritePayload(attributePathParams, dataTx);
+    writeClient.EncodeAttribute(attributePathParams, dataTx);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0);

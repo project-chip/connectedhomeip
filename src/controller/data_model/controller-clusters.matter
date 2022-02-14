@@ -1783,11 +1783,13 @@ client cluster GeneralDiagnostics = 51 {
 
   struct NetworkInterfaceType {
     CHAR_STRING<32> name = 0;
-    BOOLEAN fabricConnected = 1;
+    BOOLEAN isOperational = 1;
     nullable BOOLEAN offPremiseServicesReachableIPv4 = 2;
     nullable BOOLEAN offPremiseServicesReachableIPv6 = 3;
     OCTET_STRING<8> hardwareAddress = 4;
-    InterfaceType type = 5;
+    OCTET_STRING IPv4Addresses[] = 5;
+    OCTET_STRING IPv6Addresses[] = 6;
+    InterfaceType type = 7;
   }
 
   critical event HardwareFaultChange = 0 {
@@ -2738,7 +2740,7 @@ client cluster OperationalCredentials = 62 {
   }
 
   readonly attribute NOCStruct NOCs[] = 0;
-  readonly attribute FabricDescriptor fabricsList[] = 1;
+  readonly attribute FabricDescriptor fabrics[] = 1;
   readonly attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
   readonly attribute OCTET_STRING trustedRootCertificates[] = 4;
@@ -3371,7 +3373,7 @@ client cluster TestCluster = 1295 {
   attribute int8s rangeRestrictedInt8s = 39;
   attribute int16u rangeRestrictedInt16u = 40;
   attribute int16s rangeRestrictedInt16s = 41;
-  readonly attribute LONG_OCTET_STRING listLongOctetString[] = 42;
+  attribute LONG_OCTET_STRING listLongOctetString[] = 42;
   attribute boolean timedWriteBoolean = 48;
   attribute boolean generalErrorBoolean = 49;
   attribute boolean clusterErrorBoolean = 50;
@@ -3890,11 +3892,11 @@ client cluster WiFiNetworkDiagnostics = 54 {
     WiFiConnectionStatus connectionStatus = 0;
   }
 
-  readonly attribute octet_string<6> bssid = 0;
-  readonly attribute enum8 securityType = 1;
-  readonly attribute enum8 wiFiVersion = 2;
-  readonly attribute int16u channelNumber = 3;
-  readonly attribute int8s rssi = 4;
+  readonly attribute nullable octet_string<6> bssid = 0;
+  readonly attribute nullable SecurityType securityType = 1;
+  readonly attribute nullable WiFiVersionType wiFiVersion = 2;
+  readonly attribute nullable int16u channelNumber = 3;
+  readonly attribute nullable int8s rssi = 4;
   readonly attribute int32u beaconLostCount = 5;
   readonly attribute int32u beaconRxCount = 6;
   readonly attribute int32u packetMulticastRxCount = 7;

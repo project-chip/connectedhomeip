@@ -39,7 +39,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     else if (attributePath.mClusterId == LevelControl::Id &&
              attributePath.mAttributeId == LevelControl::Attributes::CurrentLevel::Id)
     {
-        ChipLogProgress(Zcl, "[pump-app] Cluster LevelControl: attribute CurrentLevel set to %" PRIu8, *value);
+        ChipLogProgress(Zcl, "[pump-app] Cluster LevelControl: attribute CurrentLevel set to %u", *value);
     }
     else
     {

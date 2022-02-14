@@ -59,7 +59,7 @@ CHIP_ERROR ReadRequestMessage::Parser::CheckSchemaValidity() const
             break;
         case to_underlying(Tag::kDataVersionFilters):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kEventFilters))), CHIP_ERROR_INVALID_TLV_TAG);
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kDataVersionFilters))), CHIP_ERROR_INVALID_TLV_TAG);
             tagPresenceMask |= (1 << to_underlying(Tag::kDataVersionFilters));
             {
                 DataVersionFilterIBs::Parser dataVersionFilters;

@@ -245,13 +245,14 @@ class {{filename}}: public TestCommand
     CHIP_ERROR {{>testCommand}}()
     {
         SetIdentity(kIdentity{{asUpperCamelCase identity}});
-        return {{command}}({{#chip_tests_item_parameters}}{{#not_first}}, {{/not_first}}{{#if (isString type)}}"{{/if~}}
+        return {{command}}({{#chip_tests_item_parameters}}{{#not_first}},{{/not_first}}
+          {{#*inline "defaultValue"}}{{asTypedLiteral (chip_tests_config_get_default_value definedValue) (chip_tests_config_get_type definedValue)}}{{/inline}}
           {{~#if (chip_tests_config_has definedValue)~}}
-          m{{asUpperCamelCase definedValue}}.HasValue() ? m{{asUpperCamelCase definedValue}}.Value() : {{asTypedLiteral (chip_tests_config_get_default_value definedValue) (chip_tests_config_get_type definedValue)}}
-          {{else}}
-          {{definedValue}}
+          m{{asUpperCamelCase definedValue}}.HasValue() ? m{{asUpperCamelCase definedValue}}.Value() : {{~#if (isString type)}}chip::CharSpan::fromCharString("{{>defaultValue}}"){{else}}{{>defaultValue}}{{/if~}}
+          {{~else if (isString type)}}"{{definedValue}}"
+          {{else}}{{definedValue}}
           {{~/if~}}
-        {{~#if (isString type)}}"{{/if}}{{/chip_tests_item_parameters}});
+          {{/chip_tests_item_parameters}});
     }
     {{else if isWait}}
     CHIP_ERROR {{>testCommand}}()

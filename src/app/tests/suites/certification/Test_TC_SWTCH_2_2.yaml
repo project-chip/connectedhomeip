@@ -15,6 +15,7 @@
 name: 74.2.2. [TC-SWTCH-2.2] Primary functionality with server as DUT
 
 config:
+    nodeId: 0x12344321
     cluster: "Switch"
     endpoint: 1
 
@@ -22,6 +23,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     #### 2: tests for Latching Switch
     - label: "User interaction needed"

@@ -15,6 +15,7 @@
 name: Application Basic Cluster Tests
 
 config:
+    nodeId: 0x12344321
     cluster: "Application Basic"
     endpoint: 3
 
@@ -22,8 +23,12 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-    # TODO: Support chars validation
+    # TODO(#14054): Support chars validation
     - label: "Read attribute vendor name"
       command: "readAttribute"
       attribute: "vendor name"
@@ -36,7 +41,7 @@ tests:
       response:
           value: 1
 
-    # TODO: Support chars validation
+    # TODO(#14054): Support chars validation
     - label: "Read attribute application name"
       command: "readAttribute"
       attribute: "application name"
@@ -62,7 +67,7 @@ tests:
       response:
           value: { catalogVendorId: 123, applicationId: "applicationId" }
 
-    # TODO: Support chars validation
+    # TODO(#14054): Support chars validation
     - label: "Read attribute application version"
       command: "readAttribute"
       attribute: "application version"

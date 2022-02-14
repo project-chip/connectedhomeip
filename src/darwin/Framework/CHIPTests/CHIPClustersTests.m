@@ -37,7 +37,7 @@ const uint16_t kPairingTimeoutInSeconds = 10;
 const uint16_t kAddressResolveTimeoutInSeconds = 10;
 const uint16_t kCASESetupTimeoutInSeconds = 30;
 const uint16_t kTimeoutInSeconds = 5;
-const uint64_t kDeviceId = 1;
+const uint64_t nodeId = 0x12344321;
 const uint16_t kDiscriminator = 3840;
 const uint32_t kSetupPINCode = 20202021;
 const uint16_t kRemotePort = 5540;
@@ -65,12 +65,12 @@ void Log(XCTestExpectation * expectation, dispatch_queue_t queue, NSString * mes
 // Stub for User Prompts for XCTests to run.
 void UserPrompt(XCTestExpectation * expectation, dispatch_queue_t queue, NSString * message) { [expectation fulfill]; }
 
-void WaitForCommissionee(XCTestExpectation * expectation, dispatch_queue_t queue)
+void WaitForCommissionee(XCTestExpectation * expectation, dispatch_queue_t queue, uint64_t deviceId)
 {
     CHIPDeviceController * controller = [CHIPDeviceController sharedController];
     XCTAssertNotNil(controller);
 
-    [controller getConnectedDevice:kDeviceId
+    [controller getConnectedDevice:deviceId
                              queue:dispatch_get_main_queue()
                  completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
                      XCTAssertEqual(error.code, 0);
@@ -149,7 +149,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTAssertTrue(started);
 
     NSError * error;
-    [controller pairDevice:kDeviceId
+    [controller pairDevice:nodeId
                    address:kAddress
                       port:kRemotePort
              discriminator:kDiscriminator
@@ -160,7 +160,7 @@ CHIPDevice * GetConnectedDevice(void)
     [self waitForExpectationsWithTimeout:kPairingTimeoutInSeconds handler:nil];
 
     __block XCTestExpectation * connectionExpectation = [self expectationWithDescription:@"CASE established"];
-    [controller getConnectedDevice:kDeviceId
+    [controller getConnectedDevice:nodeId
                              queue:dispatch_get_main_queue()
                  completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
                      XCTAssertEqual(error.code, 0);
@@ -175,10 +175,6 @@ CHIPDevice * GetConnectedDevice(void)
     CHIPDeviceController * controller = [CHIPDeviceController sharedController];
     XCTAssertNotNil(controller);
 
-    NSError * error;
-    [controller unpairDevice:kDeviceId error:&error];
-    XCTAssertEqual(error.code, 0);
-
     BOOL stopped = [controller shutdown];
     XCTAssertTrue(stopped);
 }
@@ -190,7 +186,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     __block CHIPDevice * device;
     __block XCTestExpectation * connectionExpectation = [self expectationWithDescription:@"CASE established"];
-    [controller getConnectedDevice:kDeviceId
+    [controller getConnectedDevice:nodeId
                              queue:dispatch_get_main_queue()
                  completionHandler:^(CHIPDevice * _Nullable retrievedDevice, NSError * _Nullable error) {
                      XCTAssertEqual(error.code, 0);
@@ -232,7 +228,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_BI_1_1_000001_ReadAttribute
@@ -350,7 +346,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_BI_2_1_000001_ReadAttribute
@@ -625,7 +621,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_BI_2_2_000001_ReadAttribute
@@ -826,7 +822,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_BOOL_1_1_000001_ReadAttribute
@@ -944,7 +940,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_BOOL_2_1_000001_ReadAttribute
@@ -1044,7 +1040,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_BRAC_1_1_000001_ReadAttribute
@@ -1096,7 +1092,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_1_1_000001_ReadAttribute
@@ -1166,7 +1162,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_2_1_000001_ReadAttribute
@@ -2633,7 +2629,7 @@ CHIPDevice * GetConnectedDevice(void)
         readAttributeCoupleColorTempToLevelMinMiredsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"Read the optional attribute: CoupleColorTempToLevelMinMireds Error: %@", err);
 
-            if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+            if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                 [expectation fulfill];
                 return;
             }
@@ -2663,7 +2659,8 @@ CHIPDevice * GetConnectedDevice(void)
                                                             @"CoupleColorTempToLevelMinMireds Error: %@",
                                                           err);
 
-                                                      if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                                      if (err.domain == MatterInteractionErrorDomain
+                                                          && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                                           [expectation fulfill];
                                                           return;
                                                       }
@@ -2689,7 +2686,7 @@ CHIPDevice * GetConnectedDevice(void)
         readAttributeCoupleColorTempToLevelMinMiredsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"Reads back optional attribute: CoupleColorTempToLevelMinMireds Error: %@", err);
 
-            if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+            if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                 [expectation fulfill];
                 return;
             }
@@ -2720,7 +2717,7 @@ CHIPDevice * GetConnectedDevice(void)
         readAttributeStartUpColorTemperatureMiredsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"Read the optional attribute: StartUpColorTemperatureMireds Error: %@", err);
 
-            if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+            if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                 [expectation fulfill];
                 return;
             }
@@ -2763,7 +2760,8 @@ CHIPDevice * GetConnectedDevice(void)
                                                           @"StartUpColorTemperatureMireds Error: %@",
                                                         err);
 
-                                                    if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                                    if (err.domain == MatterInteractionErrorDomain
+                                                        && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                                         [expectation fulfill];
                                                         return;
                                                     }
@@ -2789,7 +2787,7 @@ CHIPDevice * GetConnectedDevice(void)
         readAttributeStartUpColorTemperatureMiredsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"Reads back optional attribute: StartUpColorTemperatureMireds Error: %@", err);
 
-            if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+            if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                 [expectation fulfill];
                 return;
             }
@@ -2818,7 +2816,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeRemainingTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the Optional attribute: RemainingTime Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -2847,7 +2845,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeRemainingTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Validate constraints of attribute: RemainingTime Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -2889,7 +2887,8 @@ CHIPDevice * GetConnectedDevice(void)
                            completionHandler:^(NSError * _Nullable err) {
                                NSLog(@"Write the default values to optional attribute: RemainingTime Error: %@", err);
 
-                               if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                               if (err.domain == MatterInteractionErrorDomain
+                                   && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                    [expectation fulfill];
                                    return;
                                }
@@ -2912,7 +2911,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeRemainingTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads back optional attribute: RemainingTime Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -2941,7 +2940,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeDriftCompensationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: DriftCompensation Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -2983,7 +2982,8 @@ CHIPDevice * GetConnectedDevice(void)
                                completionHandler:^(NSError * _Nullable err) {
                                    NSLog(@"Write the default values to optional attribute: DriftCompensation Error: %@", err);
 
-                                   if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                   if (err.domain == MatterInteractionErrorDomain
+                                       && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                        [expectation fulfill];
                                        return;
                                    }
@@ -3006,7 +3006,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeDriftCompensationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads back optional attribute: DriftCompensation Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -3035,7 +3035,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeCompensationTextWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: CompensationText Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -3069,7 +3069,8 @@ CHIPDevice * GetConnectedDevice(void)
                               completionHandler:^(NSError * _Nullable err) {
                                   NSLog(@"Write the default values to optional attribute: CompensationText Error: %@", err);
 
-                                  if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                  if (err.domain == MatterInteractionErrorDomain
+                                      && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                       [expectation fulfill];
                                       return;
                                   }
@@ -3092,7 +3093,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeCompensationTextWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads back optional attribute: CompensationText Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -4237,7 +4238,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeWhitePointXWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: WhitePointX Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -4277,7 +4278,8 @@ CHIPDevice * GetConnectedDevice(void)
                               completionHandler:^(NSError * _Nullable err) {
                                   NSLog(@"Write the default optional attribute: WhitePointX Error: %@", err);
 
-                                  if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                  if (err.domain == MatterInteractionErrorDomain
+                                      && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                       [expectation fulfill];
                                       return;
                                   }
@@ -4301,7 +4303,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeWhitePointXWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the optional attribute: WhitePointX Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -4330,7 +4332,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeWhitePointYWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: WhitePointY Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -4370,7 +4372,8 @@ CHIPDevice * GetConnectedDevice(void)
                               completionHandler:^(NSError * _Nullable err) {
                                   NSLog(@"Write the default optional attribute: WhitePointY Error: %@", err);
 
-                                  if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                  if (err.domain == MatterInteractionErrorDomain
+                                      && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                       [expectation fulfill];
                                       return;
                                   }
@@ -4394,7 +4397,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeWhitePointYWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the optional attribute: WhitePointY Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -4423,7 +4426,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeColorPointRXWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: ColorPointRX Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -4463,7 +4466,8 @@ CHIPDevice * GetConnectedDevice(void)
                                completionHandler:^(NSError * _Nullable err) {
                                    NSLog(@"Write the default optional attribute: ColorPointRX Error: %@", err);
 
-                                   if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                   if (err.domain == MatterInteractionErrorDomain
+                                       && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                        [expectation fulfill];
                                        return;
                                    }
@@ -4487,7 +4491,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeColorPointRXWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the optional attribute: ColorPointRX Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -4516,7 +4520,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeColorPointRYWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: ColorPointRY Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -4556,7 +4560,8 @@ CHIPDevice * GetConnectedDevice(void)
                                completionHandler:^(NSError * _Nullable err) {
                                    NSLog(@"Write the default optional attribute: ColorPointRY Error: %@", err);
 
-                                   if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                   if (err.domain == MatterInteractionErrorDomain
+                                       && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                        [expectation fulfill];
                                        return;
                                    }
@@ -4580,7 +4585,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeColorPointRYWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the optional attribute: ColorPointRY Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -4609,7 +4614,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeColorPointRIntensityWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: ColorPointRIntensity Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -4637,7 +4642,8 @@ CHIPDevice * GetConnectedDevice(void)
                                        completionHandler:^(NSError * _Nullable err) {
                                            NSLog(@"Write the default optional attribute: ColorPointRIntensity Error: %@", err);
 
-                                           if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                           if (err.domain == MatterInteractionErrorDomain
+                                               && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                                [expectation fulfill];
                                                return;
                                            }
@@ -4661,7 +4667,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeColorPointRIntensityWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the optional attribute: ColorPointRIntensity Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -4690,7 +4696,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeColorPointGXWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: ColorPointGX Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -4730,7 +4736,8 @@ CHIPDevice * GetConnectedDevice(void)
                                completionHandler:^(NSError * _Nullable err) {
                                    NSLog(@"Write the default optional attribute: ColorPointGX Error: %@", err);
 
-                                   if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                   if (err.domain == MatterInteractionErrorDomain
+                                       && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                        [expectation fulfill];
                                        return;
                                    }
@@ -4754,7 +4761,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeColorPointGXWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the optional attribute: ColorPointGX Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -4783,7 +4790,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeColorPointGYWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: ColorPointGY Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -4823,7 +4830,8 @@ CHIPDevice * GetConnectedDevice(void)
                                completionHandler:^(NSError * _Nullable err) {
                                    NSLog(@"Write the default optional attribute: ColorPointGY Error: %@", err);
 
-                                   if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                   if (err.domain == MatterInteractionErrorDomain
+                                       && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                        [expectation fulfill];
                                        return;
                                    }
@@ -4847,7 +4855,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeColorPointGYWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the optional attribute: ColorPointGY Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -4876,7 +4884,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeColorPointGIntensityWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: ColorPointGIntensity Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -4904,7 +4912,8 @@ CHIPDevice * GetConnectedDevice(void)
                                        completionHandler:^(NSError * _Nullable err) {
                                            NSLog(@"Write the default optional attribute: ColorPointGIntensity Error: %@", err);
 
-                                           if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                           if (err.domain == MatterInteractionErrorDomain
+                                               && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                                [expectation fulfill];
                                                return;
                                            }
@@ -4928,7 +4937,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeColorPointGIntensityWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the optional attribute: ColorPointGIntensity Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -4957,7 +4966,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeColorPointBXWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: ColorPointBX Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -4997,7 +5006,8 @@ CHIPDevice * GetConnectedDevice(void)
                                completionHandler:^(NSError * _Nullable err) {
                                    NSLog(@"Write the default optional attribute: ColorPointBX Error: %@", err);
 
-                                   if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                   if (err.domain == MatterInteractionErrorDomain
+                                       && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                        [expectation fulfill];
                                        return;
                                    }
@@ -5021,7 +5031,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeColorPointBXWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the optional attribute: ColorPointBX Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -5050,7 +5060,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeColorPointBYWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: ColorPointBY Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -5090,7 +5100,8 @@ CHIPDevice * GetConnectedDevice(void)
                                completionHandler:^(NSError * _Nullable err) {
                                    NSLog(@"Write the default optional attribute: ColorPointBY Error: %@", err);
 
-                                   if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                   if (err.domain == MatterInteractionErrorDomain
+                                       && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                        [expectation fulfill];
                                        return;
                                    }
@@ -5114,7 +5125,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeColorPointBYWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the optional attribute: ColorPointBY Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -5143,7 +5154,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeColorPointBIntensityWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read the optional attribute: ColorPointBIntensity Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -5171,7 +5182,8 @@ CHIPDevice * GetConnectedDevice(void)
                                        completionHandler:^(NSError * _Nullable err) {
                                            NSLog(@"Write the default optional attribute: ColorPointBIntensity Error: %@", err);
 
-                                           if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                           if (err.domain == MatterInteractionErrorDomain
+                                               && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                                [expectation fulfill];
                                                return;
                                            }
@@ -5195,7 +5207,7 @@ CHIPDevice * GetConnectedDevice(void)
     [cluster readAttributeColorPointBIntensityWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back the optional attribute: ColorPointBIntensity Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -5218,7 +5230,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_3_1_000001_On
@@ -5449,7 +5461,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_3_2_000001_On
@@ -5644,7 +5656,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_3_3_000001_On
@@ -5791,7 +5803,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_4_1_000001_On
@@ -5911,7 +5923,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_4_2_000001_On
@@ -6156,7 +6168,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_4_3_000001_On
@@ -6303,7 +6315,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_4_4_000001_On
@@ -6424,7 +6436,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_5_1_000001_On
@@ -6545,7 +6557,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_5_2_000001_On
@@ -6688,7 +6700,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_5_3_000001_On
@@ -6809,7 +6821,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_6_1_000001_On
@@ -6929,7 +6941,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_6_2_000001_On
@@ -7218,7 +7230,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_6_3_000001_On
@@ -7369,7 +7381,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_7_1_000001_On
@@ -7594,7 +7606,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_7_2_000001_On
@@ -7821,7 +7833,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_7_3_000001_On
@@ -7968,7 +7980,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_7_4_000001_On
@@ -8089,7 +8101,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_8_1_000001_On
@@ -8489,7 +8501,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_9_1_000001_On
@@ -9814,7 +9826,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHue4;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_9_2_000001_On
@@ -10288,7 +10300,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_CC_9_3_000001_On
@@ -10864,7 +10876,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_DM_1_1_000001_ReadAttribute
@@ -11126,7 +11138,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     [cluster readAttributeManufacturingDateWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Query ManufacturingDate Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -11159,7 +11171,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     [cluster readAttributePartNumberWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Query PartNumber Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -11188,7 +11200,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     [cluster readAttributeProductURLWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Query ProductURL Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -11217,7 +11229,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     [cluster readAttributeProductLabelWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Query ProductLabel Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -11246,7 +11258,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     [cluster readAttributeSerialNumberWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Query SerialNumber Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -11275,7 +11287,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     [cluster readAttributeLocalConfigDisabledWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Query LocalConfigDisabled Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -11299,7 +11311,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     [cluster readAttributeReachableWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Query Reachable Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -11323,7 +11335,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     [cluster readAttributeUniqueIDWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Query UniqueID Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -11346,7 +11358,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_DM_3_1_000001_ReadAttribute
@@ -11361,7 +11373,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     [cluster readAttributeMaxNetworksWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Query MaxNetworks Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -11385,7 +11397,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     [cluster readAttributeNetworksWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Query Networks Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -11403,7 +11415,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_EMR_1_1_000001_ReadAttribute
@@ -11521,7 +11533,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -11530,7 +11542,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -11539,7 +11551,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_FLW_1_1_000001_ReadAttribute
@@ -11609,7 +11621,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_FLW_2_1_000001_ReadAttribute
@@ -11807,7 +11819,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     [cluster readAttributeToleranceWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: Tolerance Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -11836,7 +11848,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     [cluster readAttributeToleranceWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: Tolerance Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -11876,7 +11888,8 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
                             completionHandler:^(NSError * _Nullable err) {
                                 NSLog(@"write the default value to optional attribute: Tolerance Error: %@", err);
 
-                                if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                if (err.domain == MatterInteractionErrorDomain
+                                    && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                     [expectation fulfill];
                                     return;
                                 }
@@ -11899,7 +11912,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     [cluster readAttributeToleranceWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: Tolerance Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -11922,7 +11935,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_FLW_2_2_000001_ReadAttribute
@@ -11969,7 +11982,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_ILL_1_1_000001_ReadAttribute
@@ -12097,7 +12110,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_1_1_000001_ReadAttribute
@@ -12256,7 +12269,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_2_1_000001_MoveToLevel
@@ -12585,7 +12598,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_2_2_000001_ReadAttribute
@@ -12946,7 +12959,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_3_1_000001_ReadAttribute
@@ -13255,7 +13268,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_4_1_000001_ReadAttribute
@@ -13597,7 +13610,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_5_1_000001_On
@@ -13851,7 +13864,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_6_1_000001_On
@@ -14084,7 +14097,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_MC_1_1_000001_ReadAttribute
@@ -14202,7 +14215,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_MC_2_1_000001_Sleep
@@ -14230,7 +14243,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14239,7 +14252,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14248,7 +14261,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14257,7 +14270,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14266,7 +14279,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14275,7 +14288,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14284,7 +14297,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14293,7 +14306,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14302,7 +14315,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14311,7 +14324,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14320,7 +14333,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14329,7 +14342,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_MC_5_1_000001_ReadAttribute
@@ -14357,7 +14370,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_MC_5_2_000001_UserPrompt
@@ -14374,7 +14387,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_MC_5_3_000001_UserPrompt
@@ -14391,7 +14404,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_MC_6_1_000001_UserPrompt
@@ -14456,7 +14469,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_MC_6_2_000001_UserPrompt
@@ -14545,7 +14558,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_MC_6_3_000001_UserPrompt
@@ -14578,7 +14591,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_MC_6_4_000001_UserPrompt
@@ -14707,7 +14720,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14716,7 +14729,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -14725,7 +14738,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 NSNumber * _Nonnull currentTarget;
@@ -14778,7 +14791,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_MC_9_1_000001_Log
@@ -14929,7 +14942,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_OCC_1_1_000001_ReadAttribute
@@ -14999,7 +15012,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_OCC_2_1_000001_ReadAttribute
@@ -15251,7 +15264,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_OCC_2_2_000001_ReadAttribute
@@ -15298,7 +15311,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_OO_1_1_000001_ReadAttribute
@@ -15505,7 +15518,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_OO_2_1_000001_ReadAttribute
@@ -15864,7 +15877,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_OO_2_2_000001_Off
@@ -16176,7 +16189,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_OO_2_3_000001_On
@@ -17191,7 +17204,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_PS_1_1_000001_ReadAttribute
@@ -17309,7 +17322,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_PRS_1_1_000001_ReadAttribute
@@ -17379,7 +17392,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_PRS_2_1_000001_ReadAttribute
@@ -17588,7 +17601,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_PCC_1_1_000001_ReadAttribute
@@ -17685,7 +17698,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_PCC_2_1_000001_ReadAttribute
@@ -17954,7 +17967,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMinConstPressureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MinConstPressure Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -17980,7 +17993,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMaxConstPressureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MaxConstPressure Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18006,7 +18019,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMinCompPressureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MinCompPressure Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18032,7 +18045,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMaxCompPressureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MaxCompPressure Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18058,7 +18071,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMinConstSpeedWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MinConstSpeed Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18084,7 +18097,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMaxConstSpeedWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MaxConstSpeed Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18110,7 +18123,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMinConstFlowWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MinConstFlow Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18136,7 +18149,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMaxConstFlowWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MaxConstFlow Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18162,7 +18175,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMinConstTempWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MinConstTemp Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18195,7 +18208,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMaxConstTempWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MaxConstTemp Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18228,7 +18241,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributePumpStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: PumpStatus Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18259,7 +18272,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributePumpStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: PumpStatus Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18285,7 +18298,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeSpeedWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: Speed Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18311,7 +18324,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeLifetimeRunningHoursWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: LifetimeRunningHours Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18343,7 +18356,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeLifetimeRunningHoursWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: LifetimeRunningHours Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18369,7 +18382,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributePowerWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: Power Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18395,7 +18408,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeLifetimeEnergyConsumedWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: LifetimeEnergyConsumed Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18427,7 +18440,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeLifetimeEnergyConsumedWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: LifetimeEnergyConsumed Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18456,7 +18469,8 @@ NSNumber * _Nonnull currentTarget;
                                          completionHandler:^(NSError * _Nullable err) {
                                              NSLog(@"write to the optional attribute: LifetimeEnergyConsumed Error: %@", err);
 
-                                             if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                             if (err.domain == MatterInteractionErrorDomain
+                                                 && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                                  [expectation fulfill];
                                                  return;
                                              }
@@ -18482,7 +18496,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMinConstPressureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MinConstPressure Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18508,7 +18522,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMaxConstPressureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MaxConstPressure Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18534,7 +18548,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMinCompPressureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MinCompPressure Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18560,7 +18574,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMaxCompPressureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MaxCompPressure Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18586,7 +18600,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMinConstSpeedWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MinConstSpeed Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18612,7 +18626,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMaxConstSpeedWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MaxConstSpeed Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18638,7 +18652,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMinConstFlowWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MinConstFlow Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18664,7 +18678,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMaxConstFlowWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MaxConstFlow Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18690,7 +18704,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMinConstTempWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MinConstTemp Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18723,7 +18737,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMaxConstTempWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: MaxConstTemp Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18756,7 +18770,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributePumpStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: PumpStatus Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18787,7 +18801,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributePumpStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: PumpStatus Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18813,7 +18827,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeSpeedWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: Speed Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18866,7 +18880,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeLifetimeRunningHoursWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: LifetimeRunningHours Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18892,7 +18906,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributePowerWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: Power Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18918,7 +18932,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeLifetimeEnergyConsumedWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: LifetimeEnergyConsumed Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18950,7 +18964,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeLifetimeEnergyConsumedWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: LifetimeEnergyConsumed Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -18968,7 +18982,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_PCC_2_2_000001_WriteAttribute
@@ -19052,7 +19066,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_PCC_2_3_000001_WriteAttribute
@@ -19281,7 +19295,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_RH_1_1_000001_ReadAttribute
@@ -19357,7 +19371,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_RH_2_1_000001_ReadAttribute
@@ -19429,7 +19443,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeToleranceWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads the optional attribute: Tolerance Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -19460,7 +19474,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeToleranceWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads constraints of attribute: Tolerance Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -19491,7 +19505,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_RH_2_2_000001_ReadAttribute
@@ -19542,7 +19556,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_SWTCH_2_1_000001_ReadAttribute
@@ -19701,7 +19715,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_SWTCH_2_2_000001_UserPrompt
@@ -20039,7 +20053,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_TM_1_1_000001_ReadAttribute
@@ -20115,7 +20129,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_TM_2_1_000001_ReadAttribute
@@ -20153,7 +20167,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeToleranceWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"read the optional attribute: Tolerance Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -20184,7 +20198,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_TM_2_2_000001_ReadAttribute
@@ -20235,7 +20249,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_TSTAT_1_1_000001_ReadAttribute
@@ -20325,7 +20339,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_TSTAT_2_1_000001_ReadAttribute
@@ -21654,7 +21668,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMinSetpointDeadBandWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads optional attributes from DUT: MinSetpointDeadBand Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -21684,7 +21698,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMinSetpointDeadBandWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads constraints of optional attributes from DUT: MinSetpointDeadBand Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -21727,7 +21741,8 @@ NSNumber * _Nonnull currentTarget;
                                                 @"MinSetpointDeadBand Error: %@",
                                               err);
 
-                                          if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                          if (err.domain == MatterInteractionErrorDomain
+                                              && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                               [expectation fulfill];
                                               return;
                                           }
@@ -21752,7 +21767,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeMinSetpointDeadBandWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back optional attributes from DUT: MinSetpointDeadBand Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -21782,7 +21797,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeStartOfWeekWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads constraints of optional attributes from DUT: StartOfWeek Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -21824,7 +21839,8 @@ NSNumber * _Nonnull currentTarget;
                                   NSLog(@"Writes the respective default value to optional attributes to DUT: StartOfWeek Error: %@",
                                       err);
 
-                                  if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                  if (err.domain == MatterInteractionErrorDomain
+                                      && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                       [expectation fulfill];
                                       return;
                                   }
@@ -21847,7 +21863,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeStartOfWeekWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read back optional attributes from DUT: StartOfWeek Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -21877,7 +21893,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeNumberOfWeeklyTransitionsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads constraints of optional attributes from DUT: NumberOfWeeklyTransitions Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -21907,7 +21923,8 @@ NSNumber * _Nonnull currentTarget;
                                                       @"NumberOfWeeklyTransitions Error: %@",
                                                     err);
 
-                                                if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                                if (err.domain == MatterInteractionErrorDomain
+                                                    && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                                     [expectation fulfill];
                                                     return;
                                                 }
@@ -21932,7 +21949,7 @@ NSNumber * _Nonnull currentTarget;
     [cluster readAttributeNumberOfDailyTransitionsWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads constraints of optional attributes from DUT: NumberOfDailyTransitions Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -21962,7 +21979,8 @@ NSNumber * _Nonnull currentTarget;
                                                      @"NumberOfDailyTransitions Error: %@",
                                                    err);
 
-                                               if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                               if (err.domain == MatterInteractionErrorDomain
+                                                   && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                                    [expectation fulfill];
                                                    return;
                                                }
@@ -21980,7 +21998,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_TSTAT_2_2_000001_ReadAttribute
@@ -23281,7 +23299,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_TSUIC_1_1_000001_ReadAttribute
@@ -23354,7 +23372,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_TSUIC_2_1_000001_ReadAttribute
@@ -23713,7 +23731,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_TSUIC_2_2_000001_WriteAttribute
@@ -23962,7 +23980,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_DIAG_TH_NW_1_1_000001_ResetCounts
@@ -24018,7 +24036,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WIFIDIAG_1_1_000001_ReadAttribute
@@ -24046,7 +24064,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -24055,7 +24073,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WNCV_1_1_000001_ReadAttribute
@@ -24244,7 +24262,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WNCV_2_1_000001_ReadAttribute
@@ -25802,7 +25820,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -25811,7 +25829,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WNCV_2_4_000001_ReadAttribute
@@ -25876,7 +25894,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WNCV_2_5_000001_ReadAttribute
@@ -25941,7 +25959,7 @@ NSNumber * _Nonnull currentTarget;
     XCTestExpectation * expectation = [self expectationWithDescription:@"0: Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WNCV_3_1_000001_DownOrClose
@@ -26138,8 +26156,8 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
 
     uint16_t minIntervalArgument = 4U;
     uint16_t maxIntervalArgument = 5U;
-    [cluster subscribeAttributeOperationalStatusWithMinInterval:minIntervalArgument
-        maxInterval:maxIntervalArgument
+    [cluster subscribeAttributeOperationalStatusWithMinInterval:@(minIntervalArgument)
+        maxInterval:@(maxIntervalArgument)
         subscriptionEstablished:^{
             XCTAssertEqual(testSendClusterTest_TC_WNCV_3_1_000007_WaitForReport_Fulfilled, true);
             [expectation fulfill];
@@ -26532,7 +26550,7 @@ ResponseHandler test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
     XCTestExpectation * expectation = [self expectationWithDescription:@"0: Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WNCV_3_2_000001_UpOrOpen
@@ -26729,8 +26747,8 @@ ResponseHandler test_Test_TC_WNCV_3_2_OperationalStatus_Reported = nil;
 
     uint16_t minIntervalArgument = 4U;
     uint16_t maxIntervalArgument = 5U;
-    [cluster subscribeAttributeOperationalStatusWithMinInterval:minIntervalArgument
-        maxInterval:maxIntervalArgument
+    [cluster subscribeAttributeOperationalStatusWithMinInterval:@(minIntervalArgument)
+        maxInterval:@(maxIntervalArgument)
         subscriptionEstablished:^{
             XCTAssertEqual(testSendClusterTest_TC_WNCV_3_2_000007_WaitForReport_Fulfilled, true);
             [expectation fulfill];
@@ -27123,7 +27141,7 @@ ResponseHandler test_Test_TC_WNCV_3_2_OperationalStatus_Reported = nil;
     XCTestExpectation * expectation = [self expectationWithDescription:@"0: Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_WNCV_3_3_000001_DownOrClose
@@ -27212,8 +27230,8 @@ ResponseHandler test_Test_TC_WNCV_3_3_OperationalStatus_Reported = nil;
 
     uint16_t minIntervalArgument = 4U;
     uint16_t maxIntervalArgument = 5U;
-    [cluster subscribeAttributeOperationalStatusWithMinInterval:minIntervalArgument
-        maxInterval:maxIntervalArgument
+    [cluster subscribeAttributeOperationalStatusWithMinInterval:@(minIntervalArgument)
+        maxInterval:@(maxIntervalArgument)
         subscriptionEstablished:^{
             XCTAssertEqual(testSendClusterTest_TC_WNCV_3_3_000005_WaitForReport_Fulfilled, true);
             [expectation fulfill];
@@ -27469,7 +27487,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestCluster_000001_Test
@@ -30495,7 +30513,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 }
 - (void)testSendClusterTestCluster_000131_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute LIST_LONG_OCTET_STRING"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute LIST_LONG_OCTET_STRING (for chunked read)"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -30503,7 +30521,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeListLongOctetStringWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Read attribute LIST_LONG_OCTET_STRING Error: %@", err);
+        NSLog(@"Read attribute LIST_LONG_OCTET_STRING (for chunked read) Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -30557,7 +30575,142 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000132_ReadAttribute
+- (void)testSendClusterTestCluster_000132_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Write attribute LIST_LONG_OCTET_STRING (for chunked write)"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id listLongOctetStringArgument;
+    {
+        NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
+        temp_0[0] = [[NSData alloc]
+            initWithBytes:"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567"
+                          "89abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+                          "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567"
+                          "89abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+                          "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+                   length:512];
+        temp_0[1] = [[NSData alloc]
+            initWithBytes:"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567"
+                          "89abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+                          "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567"
+                          "89abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+                          "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+                   length:512];
+        temp_0[2] = [[NSData alloc]
+            initWithBytes:"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567"
+                          "89abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+                          "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567"
+                          "89abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+                          "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+                   length:512];
+        temp_0[3] = [[NSData alloc]
+            initWithBytes:"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567"
+                          "89abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+                          "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567"
+                          "89abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+                          "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+                   length:512];
+        temp_0[4] = [[NSData alloc]
+            initWithBytes:"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567"
+                          "89abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+                          "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567"
+                          "89abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+                          "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+                   length:512];
+        listLongOctetStringArgument = temp_0;
+    }
+    [cluster writeAttributeListLongOctetStringWithValue:listLongOctetStringArgument
+                                      completionHandler:^(NSError * _Nullable err) {
+                                          NSLog(@"Write attribute LIST_LONG_OCTET_STRING (for chunked write) Error: %@", err);
+
+                                          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                                          [expectation fulfill];
+                                      }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000133_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute LIST_LONG_OCTET_STRING (for chunked read)"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeListLongOctetStringWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read attribute LIST_LONG_OCTET_STRING (for chunked read) Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue count], 5);
+            XCTAssertTrue([actualValue[0]
+                isEqualToData:
+                    [[NSData alloc]
+                        initWithBytes:"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab"
+                                      "cdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567"
+                                      "89abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123"
+                                      "456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+                                      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab"
+                                      "cdef0123456789abcdef0123456789abcdef0123456789abcdef"
+                               length:512]]);
+            XCTAssertTrue([actualValue[1]
+                isEqualToData:
+                    [[NSData alloc]
+                        initWithBytes:"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab"
+                                      "cdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567"
+                                      "89abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123"
+                                      "456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+                                      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab"
+                                      "cdef0123456789abcdef0123456789abcdef0123456789abcdef"
+                               length:512]]);
+            XCTAssertTrue([actualValue[2]
+                isEqualToData:
+                    [[NSData alloc]
+                        initWithBytes:"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab"
+                                      "cdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567"
+                                      "89abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123"
+                                      "456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+                                      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab"
+                                      "cdef0123456789abcdef0123456789abcdef0123456789abcdef"
+                               length:512]]);
+            XCTAssertTrue([actualValue[3]
+                isEqualToData:
+                    [[NSData alloc]
+                        initWithBytes:"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab"
+                                      "cdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567"
+                                      "89abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123"
+                                      "456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+                                      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab"
+                                      "cdef0123456789abcdef0123456789abcdef0123456789abcdef"
+                               length:512]]);
+            XCTAssertTrue([actualValue[4]
+                isEqualToData:
+                    [[NSData alloc]
+                        initWithBytes:"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab"
+                                      "cdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567"
+                                      "89abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123"
+                                      "456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+                                      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab"
+                                      "cdef0123456789abcdef0123456789abcdef0123456789abcdef"
+                               length:512]]);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000134_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute EPOCH_US Default Value"];
 
@@ -30581,7 +30734,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000133_WriteAttribute
+- (void)testSendClusterTestCluster_000135_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute EPOCH_US Max Value"];
 
@@ -30603,7 +30756,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000134_ReadAttribute
+- (void)testSendClusterTestCluster_000136_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute EPOCH_US Max Value"];
 
@@ -30627,7 +30780,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000135_WriteAttribute
+- (void)testSendClusterTestCluster_000137_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute EPOCH_US Min Value"];
 
@@ -30649,7 +30802,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000136_ReadAttribute
+- (void)testSendClusterTestCluster_000138_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute EPOCH_US Min Value"];
 
@@ -30673,7 +30826,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000137_ReadAttribute
+- (void)testSendClusterTestCluster_000139_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute EPOCH_S Default Value"];
 
@@ -30697,7 +30850,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000138_WriteAttribute
+- (void)testSendClusterTestCluster_000140_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute EPOCH_S Max Value"];
 
@@ -30719,7 +30872,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000139_ReadAttribute
+- (void)testSendClusterTestCluster_000141_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute EPOCH_S Max Value"];
 
@@ -30743,7 +30896,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000140_WriteAttribute
+- (void)testSendClusterTestCluster_000142_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute EPOCH_S Min Value"];
 
@@ -30765,7 +30918,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000141_ReadAttribute
+- (void)testSendClusterTestCluster_000143_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute EPOCH_S Min Value"];
 
@@ -30789,7 +30942,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000142_ReadAttribute
+- (void)testSendClusterTestCluster_000144_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute UNSUPPORTED"];
 
@@ -30801,7 +30954,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
     [cluster readAttributeUnsupportedWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Read attribute UNSUPPORTED Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -30818,7 +30971,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000143_WriteAttribute
+- (void)testSendClusterTestCluster_000145_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Writeattribute UNSUPPORTED"];
 
@@ -30833,7 +30986,8 @@ NSNumber * _Nullable attrCurrentPositionTilt;
                               completionHandler:^(NSError * _Nullable err) {
                                   NSLog(@"Writeattribute UNSUPPORTED Error: %@", err);
 
-                                  if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+                                  if (err.domain == MatterInteractionErrorDomain
+                                      && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
                                       [expectation fulfill];
                                       return;
                                   }
@@ -30845,7 +30999,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000144_Test
+- (void)testSendClusterTestCluster_000146_Test
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Send Test Command to unsupported endpoint"];
 
@@ -30863,7 +31017,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000145_Test
+- (void)testSendClusterTestCluster_000147_Test
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Send Test Command to unsupported cluster"];
 
@@ -30881,7 +31035,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000146_ReadAttribute
+- (void)testSendClusterTestCluster_000148_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute vendor_id Default Value"];
 
@@ -30905,7 +31059,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000147_WriteAttribute
+- (void)testSendClusterTestCluster_000149_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute vendor_id"];
 
@@ -30927,7 +31081,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000148_ReadAttribute
+- (void)testSendClusterTestCluster_000150_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute vendor_id"];
 
@@ -30951,7 +31105,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000149_WriteAttribute
+- (void)testSendClusterTestCluster_000151_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Restore attribute vendor_id"];
 
@@ -30973,7 +31127,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000150_TestEnumsRequest
+- (void)testSendClusterTestCluster_000152_TestEnumsRequest
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Send a command with a vendor_id and enum"];
 
@@ -31006,7 +31160,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000151_TestStructArgumentRequest
+- (void)testSendClusterTestCluster_000153_TestStructArgumentRequest
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Send Test Command With Struct Argument and arg1.b is true"];
@@ -31044,7 +31198,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000152_TestStructArgumentRequest
+- (void)testSendClusterTestCluster_000154_TestStructArgumentRequest
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Send Test Command With Struct Argument and arg1.b is false"];
@@ -31082,7 +31236,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000153_TestNestedStructArgumentRequest
+- (void)testSendClusterTestCluster_000155_TestNestedStructArgumentRequest
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Send Test Command With Nested Struct Argument and arg1.c.b is true"];
@@ -31131,7 +31285,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000154_TestNestedStructArgumentRequest
+- (void)testSendClusterTestCluster_000156_TestNestedStructArgumentRequest
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Send Test Command With Nested Struct Argument arg1.c.b is false"];
@@ -31179,7 +31333,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000155_TestNestedStructListArgumentRequest
+- (void)testSendClusterTestCluster_000157_TestNestedStructListArgumentRequest
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Send Test Command With Nested Struct List Argument and all fields b of arg1.d are true"];
@@ -31274,7 +31428,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000156_TestNestedStructListArgumentRequest
+- (void)testSendClusterTestCluster_000158_TestNestedStructListArgumentRequest
 {
     XCTestExpectation * expectation = [self
         expectationWithDescription:@"Send Test Command With Nested Struct List Argument and some fields b of arg1.d are false"];
@@ -31369,7 +31523,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000157_SimpleStructEchoRequest
+- (void)testSendClusterTestCluster_000159_SimpleStructEchoRequest
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Send Test Command With Struct Argument and see what we get back"];
@@ -31416,7 +31570,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000158_TestListInt8UArgumentRequest
+- (void)testSendClusterTestCluster_000160_TestListInt8UArgumentRequest
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Send Test Command With List of INT8U and none of them is set to 0"];
@@ -31457,7 +31611,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000159_TestListInt8UArgumentRequest
+- (void)testSendClusterTestCluster_000161_TestListInt8UArgumentRequest
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Send Test Command With List of INT8U and one of them is set to 0"];
@@ -31499,7 +31653,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000160_TestListInt8UReverseRequest
+- (void)testSendClusterTestCluster_000162_TestListInt8UReverseRequest
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Send Test Command With List of INT8U and get it reversed"];
 
@@ -31548,7 +31702,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000161_TestListInt8UReverseRequest
+- (void)testSendClusterTestCluster_000163_TestListInt8UReverseRequest
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Send Test Command With empty List of INT8U and get an empty list back"];
@@ -31580,7 +31734,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000162_TestListStructArgumentRequest
+- (void)testSendClusterTestCluster_000164_TestListStructArgumentRequest
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Send Test Command With List of Struct Argument and arg1.b of first item is true"];
@@ -31635,7 +31789,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000163_TestListStructArgumentRequest
+- (void)testSendClusterTestCluster_000165_TestListStructArgumentRequest
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Send Test Command With List of Struct Argument and arg1.b of first item is false"];
@@ -31690,7 +31844,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000164_TestListNestedStructListArgumentRequest
+- (void)testSendClusterTestCluster_000166_TestListNestedStructListArgumentRequest
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:
@@ -31790,7 +31944,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000165_TestListNestedStructListArgumentRequest
+- (void)testSendClusterTestCluster_000167_TestListNestedStructListArgumentRequest
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:
@@ -31890,7 +32044,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000166_WriteAttribute
+- (void)testSendClusterTestCluster_000168_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write attribute LIST With List of INT8U and none of them is set to 0"];
@@ -31920,7 +32074,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000167_ReadAttribute
+- (void)testSendClusterTestCluster_000169_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute LIST With List of INT8U"];
 
@@ -31948,7 +32102,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000168_WriteAttribute
+- (void)testSendClusterTestCluster_000170_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute LIST With List of OCTET_STRING"];
 
@@ -31977,7 +32131,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000169_ReadAttribute
+- (void)testSendClusterTestCluster_000171_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute LIST With List of OCTET_STRING"];
 
@@ -32005,7 +32159,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000170_WriteAttribute
+- (void)testSendClusterTestCluster_000172_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write attribute LIST With List of LIST_STRUCT_OCTET_STRING"];
@@ -32047,7 +32201,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000171_ReadAttribute
+- (void)testSendClusterTestCluster_000173_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Read attribute LIST With List of LIST_STRUCT_OCTET_STRING"];
@@ -32088,7 +32242,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000172_TestNullableOptionalRequest
+- (void)testSendClusterTestCluster_000174_TestNullableOptionalRequest
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Send Test Command with optional arg set."];
 
@@ -32129,7 +32283,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000173_TestNullableOptionalRequest
+- (void)testSendClusterTestCluster_000175_TestNullableOptionalRequest
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Send Test Command without its optional arg."];
 
@@ -32156,7 +32310,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000174_ReadAttribute
+- (void)testSendClusterTestCluster_000176_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read list of structs containing nullables and optionals"];
 
@@ -32185,7 +32339,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000175_WriteAttribute
+- (void)testSendClusterTestCluster_000177_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write list of structs containing nullables and optionals"];
 
@@ -32222,7 +32376,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000176_ReadAttribute
+- (void)testSendClusterTestCluster_000178_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Read list of structs containing nullables and optionals after writing"];
@@ -32257,7 +32411,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000177_WriteAttribute
+- (void)testSendClusterTestCluster_000179_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_BOOLEAN null"];
 
@@ -32279,7 +32433,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000178_ReadAttribute
+- (void)testSendClusterTestCluster_000180_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_BOOLEAN null"];
 
@@ -32303,7 +32457,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000179_WriteAttribute
+- (void)testSendClusterTestCluster_000181_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_BOOLEAN True"];
 
@@ -32325,7 +32479,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000180_ReadAttribute
+- (void)testSendClusterTestCluster_000182_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_BOOLEAN True"];
 
@@ -32350,7 +32504,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000181_WriteAttribute
+- (void)testSendClusterTestCluster_000183_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_BITMAP8 Max Value"];
 
@@ -32372,7 +32526,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000182_ReadAttribute
+- (void)testSendClusterTestCluster_000184_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_BITMAP8 Max Value"];
 
@@ -32397,7 +32551,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000183_WriteAttribute
+- (void)testSendClusterTestCluster_000185_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_BITMAP8 Invalid Value"];
 
@@ -32419,7 +32573,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000184_ReadAttribute
+- (void)testSendClusterTestCluster_000186_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_BITMAP8 unchanged Value"];
 
@@ -32444,7 +32598,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000185_WriteAttribute
+- (void)testSendClusterTestCluster_000187_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_BITMAP8 null Value"];
 
@@ -32466,7 +32620,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000186_ReadAttribute
+- (void)testSendClusterTestCluster_000188_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_BITMAP8 null Value"];
 
@@ -32490,7 +32644,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000187_WriteAttribute
+- (void)testSendClusterTestCluster_000189_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_BITMAP16 Max Value"];
 
@@ -32512,7 +32666,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000188_ReadAttribute
+- (void)testSendClusterTestCluster_000190_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_BITMAP16 Max Value"];
 
@@ -32537,7 +32691,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000189_WriteAttribute
+- (void)testSendClusterTestCluster_000191_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_BITMAP16 Invalid Value"];
 
@@ -32559,7 +32713,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000190_ReadAttribute
+- (void)testSendClusterTestCluster_000192_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_BITMAP16 unchanged Value"];
 
@@ -32584,7 +32738,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000191_WriteAttribute
+- (void)testSendClusterTestCluster_000193_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_BITMAP16 null Value"];
 
@@ -32606,7 +32760,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000192_ReadAttribute
+- (void)testSendClusterTestCluster_000194_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_BITMAP16 null Value"];
 
@@ -32630,7 +32784,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000193_WriteAttribute
+- (void)testSendClusterTestCluster_000195_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_BITMAP32 Max Value"];
 
@@ -32652,7 +32806,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000194_ReadAttribute
+- (void)testSendClusterTestCluster_000196_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_BITMAP32 Max Value"];
 
@@ -32677,7 +32831,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000195_WriteAttribute
+- (void)testSendClusterTestCluster_000197_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_BITMAP32 Invalid Value"];
 
@@ -32699,7 +32853,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000196_ReadAttribute
+- (void)testSendClusterTestCluster_000198_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_BITMAP32 unchanged Value"];
 
@@ -32724,7 +32878,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000197_WriteAttribute
+- (void)testSendClusterTestCluster_000199_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_BITMAP32 null Value"];
 
@@ -32746,7 +32900,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000198_ReadAttribute
+- (void)testSendClusterTestCluster_000200_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_BITMAP32 null Value"];
 
@@ -32770,7 +32924,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000199_WriteAttribute
+- (void)testSendClusterTestCluster_000201_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_BITMAP64 Max Value"];
 
@@ -32792,7 +32946,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000200_ReadAttribute
+- (void)testSendClusterTestCluster_000202_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_BITMAP64 Max Value"];
 
@@ -32817,7 +32971,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000201_WriteAttribute
+- (void)testSendClusterTestCluster_000203_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_BITMAP64 Invalid Value"];
 
@@ -32839,7 +32993,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000202_ReadAttribute
+- (void)testSendClusterTestCluster_000204_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_BITMAP64 unchanged Value"];
 
@@ -32864,7 +33018,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000203_WriteAttribute
+- (void)testSendClusterTestCluster_000205_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_BITMAP64 null Value"];
 
@@ -32886,7 +33040,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000204_ReadAttribute
+- (void)testSendClusterTestCluster_000206_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_BITMAP64 null Value"];
 
@@ -32910,7 +33064,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000205_WriteAttribute
+- (void)testSendClusterTestCluster_000207_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT8U Min Value"];
 
@@ -32932,7 +33086,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000206_ReadAttribute
+- (void)testSendClusterTestCluster_000208_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT8U Min Value"];
 
@@ -32957,7 +33111,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000207_WriteAttribute
+- (void)testSendClusterTestCluster_000209_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT8U Max Value"];
 
@@ -32979,7 +33133,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000208_ReadAttribute
+- (void)testSendClusterTestCluster_000210_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT8U Max Value"];
 
@@ -33004,7 +33158,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000209_WriteAttribute
+- (void)testSendClusterTestCluster_000211_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT8U Invalid Value"];
 
@@ -33025,7 +33179,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000210_ReadAttribute
+- (void)testSendClusterTestCluster_000212_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT8U unchanged Value"];
 
@@ -33050,7 +33204,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000211_ReadAttribute
+- (void)testSendClusterTestCluster_000213_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Read attribute NULLABLE_INT8U unchanged Value with constraint"];
@@ -33075,7 +33229,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000212_WriteAttribute
+- (void)testSendClusterTestCluster_000214_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT8U null Value"];
 
@@ -33097,7 +33251,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000213_ReadAttribute
+- (void)testSendClusterTestCluster_000215_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT8U null Value"];
 
@@ -33121,7 +33275,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000214_ReadAttribute
+- (void)testSendClusterTestCluster_000216_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT8U null Value & range"];
 
@@ -33153,7 +33307,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000215_ReadAttribute
+- (void)testSendClusterTestCluster_000217_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT8U null Value & not"];
 
@@ -33179,7 +33333,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000216_WriteAttribute
+- (void)testSendClusterTestCluster_000218_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT8U Value"];
 
@@ -33201,7 +33355,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000217_ReadAttribute
+- (void)testSendClusterTestCluster_000219_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT8U Value in range"];
 
@@ -33233,7 +33387,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000218_ReadAttribute
+- (void)testSendClusterTestCluster_000220_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT8U notValue OK"];
 
@@ -33259,7 +33413,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000219_WriteAttribute
+- (void)testSendClusterTestCluster_000221_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT16U Min Value"];
 
@@ -33281,7 +33435,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000220_ReadAttribute
+- (void)testSendClusterTestCluster_000222_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT16U Min Value"];
 
@@ -33306,7 +33460,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000221_WriteAttribute
+- (void)testSendClusterTestCluster_000223_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT16U Max Value"];
 
@@ -33328,7 +33482,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000222_ReadAttribute
+- (void)testSendClusterTestCluster_000224_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT16U Max Value"];
 
@@ -33353,7 +33507,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000223_WriteAttribute
+- (void)testSendClusterTestCluster_000225_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT16U Invalid Value"];
 
@@ -33375,7 +33529,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000224_ReadAttribute
+- (void)testSendClusterTestCluster_000226_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT16U unchanged Value"];
 
@@ -33400,7 +33554,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000225_WriteAttribute
+- (void)testSendClusterTestCluster_000227_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT16U null Value"];
 
@@ -33422,7 +33576,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000226_ReadAttribute
+- (void)testSendClusterTestCluster_000228_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT16U null Value"];
 
@@ -33446,7 +33600,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000227_ReadAttribute
+- (void)testSendClusterTestCluster_000229_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT16U null Value & range"];
 
@@ -33478,7 +33632,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000228_ReadAttribute
+- (void)testSendClusterTestCluster_000230_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT16U null Value & not"];
 
@@ -33504,7 +33658,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000229_WriteAttribute
+- (void)testSendClusterTestCluster_000231_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT16U Value"];
 
@@ -33526,7 +33680,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000230_ReadAttribute
+- (void)testSendClusterTestCluster_000232_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT16U Value in range"];
 
@@ -33558,7 +33712,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000231_ReadAttribute
+- (void)testSendClusterTestCluster_000233_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT16U notValue OK"];
 
@@ -33584,7 +33738,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000232_WriteAttribute
+- (void)testSendClusterTestCluster_000234_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT32U Min Value"];
 
@@ -33606,7 +33760,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000233_ReadAttribute
+- (void)testSendClusterTestCluster_000235_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT32U Min Value"];
 
@@ -33631,7 +33785,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000234_WriteAttribute
+- (void)testSendClusterTestCluster_000236_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT32U Max Value"];
 
@@ -33653,7 +33807,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000235_ReadAttribute
+- (void)testSendClusterTestCluster_000237_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT32U Max Value"];
 
@@ -33678,7 +33832,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000236_WriteAttribute
+- (void)testSendClusterTestCluster_000238_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT32U Invalid Value"];
 
@@ -33700,7 +33854,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000237_ReadAttribute
+- (void)testSendClusterTestCluster_000239_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT32U unchanged Value"];
 
@@ -33725,7 +33879,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000238_WriteAttribute
+- (void)testSendClusterTestCluster_000240_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT32U null Value"];
 
@@ -33747,7 +33901,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000239_ReadAttribute
+- (void)testSendClusterTestCluster_000241_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT32U null Value"];
 
@@ -33771,7 +33925,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000240_ReadAttribute
+- (void)testSendClusterTestCluster_000242_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT32U null Value & range"];
 
@@ -33803,7 +33957,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000241_ReadAttribute
+- (void)testSendClusterTestCluster_000243_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT32U null Value & not"];
 
@@ -33829,7 +33983,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000242_WriteAttribute
+- (void)testSendClusterTestCluster_000244_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT32U Value"];
 
@@ -33851,7 +34005,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000243_ReadAttribute
+- (void)testSendClusterTestCluster_000245_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT32U Value in range"];
 
@@ -33883,7 +34037,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000244_ReadAttribute
+- (void)testSendClusterTestCluster_000246_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT32U notValue OK"];
 
@@ -33909,7 +34063,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000245_WriteAttribute
+- (void)testSendClusterTestCluster_000247_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT64U Min Value"];
 
@@ -33931,7 +34085,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000246_ReadAttribute
+- (void)testSendClusterTestCluster_000248_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT64U Min Value"];
 
@@ -33956,7 +34110,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000247_WriteAttribute
+- (void)testSendClusterTestCluster_000249_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT64U Max Value"];
 
@@ -33978,7 +34132,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000248_ReadAttribute
+- (void)testSendClusterTestCluster_000250_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT64U Max Value"];
 
@@ -34003,7 +34157,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000249_WriteAttribute
+- (void)testSendClusterTestCluster_000251_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT64U Invalid Value"];
 
@@ -34025,7 +34179,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000250_ReadAttribute
+- (void)testSendClusterTestCluster_000252_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT64U unchanged Value"];
 
@@ -34050,7 +34204,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000251_WriteAttribute
+- (void)testSendClusterTestCluster_000253_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT64U null Value"];
 
@@ -34072,7 +34226,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000252_ReadAttribute
+- (void)testSendClusterTestCluster_000254_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT64U null Value"];
 
@@ -34096,7 +34250,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000253_ReadAttribute
+- (void)testSendClusterTestCluster_000255_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT64U null Value & range"];
 
@@ -34128,7 +34282,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000254_ReadAttribute
+- (void)testSendClusterTestCluster_000256_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT64U null Value & not"];
 
@@ -34154,7 +34308,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000255_WriteAttribute
+- (void)testSendClusterTestCluster_000257_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT64U Value"];
 
@@ -34176,7 +34330,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000256_ReadAttribute
+- (void)testSendClusterTestCluster_000258_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT64U Value in range"];
 
@@ -34208,7 +34362,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000257_ReadAttribute
+- (void)testSendClusterTestCluster_000259_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT64U notValue OK"];
 
@@ -34234,7 +34388,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000258_WriteAttribute
+- (void)testSendClusterTestCluster_000260_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT8S Min Value"];
 
@@ -34256,7 +34410,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000259_ReadAttribute
+- (void)testSendClusterTestCluster_000261_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT8S Min Value"];
 
@@ -34281,7 +34435,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000260_WriteAttribute
+- (void)testSendClusterTestCluster_000262_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT8S Invalid Value"];
 
@@ -34302,7 +34456,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000261_ReadAttribute
+- (void)testSendClusterTestCluster_000263_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT8S unchanged Value"];
 
@@ -34327,7 +34481,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000262_WriteAttribute
+- (void)testSendClusterTestCluster_000264_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT8S null Value"];
 
@@ -34349,7 +34503,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000263_ReadAttribute
+- (void)testSendClusterTestCluster_000265_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT8S null Value"];
 
@@ -34373,7 +34527,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000264_ReadAttribute
+- (void)testSendClusterTestCluster_000266_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT8S null Value & range"];
 
@@ -34405,7 +34559,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000265_ReadAttribute
+- (void)testSendClusterTestCluster_000267_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT8S null Value & not"];
 
@@ -34431,7 +34585,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000266_WriteAttribute
+- (void)testSendClusterTestCluster_000268_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT8S Value"];
 
@@ -34453,7 +34607,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000267_ReadAttribute
+- (void)testSendClusterTestCluster_000269_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT8S Value in range"];
 
@@ -34485,7 +34639,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000268_ReadAttribute
+- (void)testSendClusterTestCluster_000270_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT8S notValue OK"];
 
@@ -34511,7 +34665,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000269_WriteAttribute
+- (void)testSendClusterTestCluster_000271_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT16S Min Value"];
 
@@ -34533,7 +34687,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000270_ReadAttribute
+- (void)testSendClusterTestCluster_000272_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT16S Min Value"];
 
@@ -34558,7 +34712,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000271_WriteAttribute
+- (void)testSendClusterTestCluster_000273_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT16S Invalid Value"];
 
@@ -34580,7 +34734,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000272_ReadAttribute
+- (void)testSendClusterTestCluster_000274_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT16S unchanged Value"];
 
@@ -34605,7 +34759,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000273_WriteAttribute
+- (void)testSendClusterTestCluster_000275_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT16S null Value"];
 
@@ -34627,7 +34781,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000274_ReadAttribute
+- (void)testSendClusterTestCluster_000276_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT16S null Value"];
 
@@ -34651,7 +34805,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000275_ReadAttribute
+- (void)testSendClusterTestCluster_000277_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT16S null Value & range"];
 
@@ -34683,7 +34837,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000276_ReadAttribute
+- (void)testSendClusterTestCluster_000278_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT16S null Value & not"];
 
@@ -34709,7 +34863,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000277_WriteAttribute
+- (void)testSendClusterTestCluster_000279_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT16S Value"];
 
@@ -34731,7 +34885,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000278_ReadAttribute
+- (void)testSendClusterTestCluster_000280_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT16S Value in range"];
 
@@ -34763,7 +34917,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000279_ReadAttribute
+- (void)testSendClusterTestCluster_000281_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT16S notValue OK"];
 
@@ -34789,7 +34943,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000280_WriteAttribute
+- (void)testSendClusterTestCluster_000282_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT32S Min Value"];
 
@@ -34811,7 +34965,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000281_ReadAttribute
+- (void)testSendClusterTestCluster_000283_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT32S Min Value"];
 
@@ -34836,7 +34990,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000282_WriteAttribute
+- (void)testSendClusterTestCluster_000284_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT32S Invalid Value"];
 
@@ -34858,7 +35012,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000283_ReadAttribute
+- (void)testSendClusterTestCluster_000285_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT32S unchanged Value"];
 
@@ -34883,7 +35037,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000284_WriteAttribute
+- (void)testSendClusterTestCluster_000286_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT32S null Value"];
 
@@ -34905,7 +35059,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000285_ReadAttribute
+- (void)testSendClusterTestCluster_000287_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT32S null Value"];
 
@@ -34929,7 +35083,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000286_ReadAttribute
+- (void)testSendClusterTestCluster_000288_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT32S null Value & range"];
 
@@ -34961,7 +35115,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000287_ReadAttribute
+- (void)testSendClusterTestCluster_000289_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT32S null Value & not"];
 
@@ -34987,7 +35141,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000288_WriteAttribute
+- (void)testSendClusterTestCluster_000290_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT32S Value"];
 
@@ -35009,7 +35163,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000289_ReadAttribute
+- (void)testSendClusterTestCluster_000291_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT32S Value in range"];
 
@@ -35041,7 +35195,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000290_ReadAttribute
+- (void)testSendClusterTestCluster_000292_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT32S notValue OK"];
 
@@ -35067,7 +35221,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000291_WriteAttribute
+- (void)testSendClusterTestCluster_000293_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT64S Min Value"];
 
@@ -35089,7 +35243,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000292_ReadAttribute
+- (void)testSendClusterTestCluster_000294_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT64S Min Value"];
 
@@ -35114,7 +35268,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000293_WriteAttribute
+- (void)testSendClusterTestCluster_000295_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT64S Invalid Value"];
 
@@ -35136,7 +35290,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000294_ReadAttribute
+- (void)testSendClusterTestCluster_000296_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT64S unchanged Value"];
 
@@ -35161,7 +35315,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000295_WriteAttribute
+- (void)testSendClusterTestCluster_000297_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT64S null Value"];
 
@@ -35183,7 +35337,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000296_ReadAttribute
+- (void)testSendClusterTestCluster_000298_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT64S null Value"];
 
@@ -35207,7 +35361,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000297_ReadAttribute
+- (void)testSendClusterTestCluster_000299_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT64S null Value & range"];
 
@@ -35239,7 +35393,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000298_ReadAttribute
+- (void)testSendClusterTestCluster_000300_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT64S null Value & not"];
 
@@ -35265,7 +35419,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000299_WriteAttribute
+- (void)testSendClusterTestCluster_000301_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT64S Value"];
 
@@ -35287,7 +35441,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000300_ReadAttribute
+- (void)testSendClusterTestCluster_000302_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT64S Value in range"];
 
@@ -35319,7 +35473,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000301_ReadAttribute
+- (void)testSendClusterTestCluster_000303_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT64S notValue OK"];
 
@@ -35345,7 +35499,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000302_WriteAttribute
+- (void)testSendClusterTestCluster_000304_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_SINGLE medium Value"];
 
@@ -35367,7 +35521,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000303_ReadAttribute
+- (void)testSendClusterTestCluster_000305_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_SINGLE medium Value"];
 
@@ -35392,7 +35546,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000304_WriteAttribute
+- (void)testSendClusterTestCluster_000306_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_SINGLE largest Value"];
 
@@ -35414,7 +35568,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000305_ReadAttribute
+- (void)testSendClusterTestCluster_000307_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_SINGLE largest Value"];
 
@@ -35439,7 +35593,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000306_WriteAttribute
+- (void)testSendClusterTestCluster_000308_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_SINGLE smallest Value"];
 
@@ -35461,7 +35615,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000307_ReadAttribute
+- (void)testSendClusterTestCluster_000309_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_SINGLE smallest Value"];
 
@@ -35486,7 +35640,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000308_WriteAttribute
+- (void)testSendClusterTestCluster_000310_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_SINGLE null Value"];
 
@@ -35508,7 +35662,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000309_ReadAttribute
+- (void)testSendClusterTestCluster_000311_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_SINGLE null Value"];
 
@@ -35532,7 +35686,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000310_WriteAttribute
+- (void)testSendClusterTestCluster_000312_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_SINGLE 0 Value"];
 
@@ -35554,7 +35708,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000311_ReadAttribute
+- (void)testSendClusterTestCluster_000313_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_SINGLE 0 Value"];
 
@@ -35579,7 +35733,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000312_WriteAttribute
+- (void)testSendClusterTestCluster_000314_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_DOUBLE medium Value"];
 
@@ -35601,7 +35755,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000313_ReadAttribute
+- (void)testSendClusterTestCluster_000315_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_DOUBLE medium Value"];
 
@@ -35626,7 +35780,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000314_WriteAttribute
+- (void)testSendClusterTestCluster_000316_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_DOUBLE largest Value"];
 
@@ -35648,7 +35802,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000315_ReadAttribute
+- (void)testSendClusterTestCluster_000317_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_DOUBLE largest Value"];
 
@@ -35673,7 +35827,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000316_WriteAttribute
+- (void)testSendClusterTestCluster_000318_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_DOUBLE smallest Value"];
 
@@ -35695,7 +35849,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000317_ReadAttribute
+- (void)testSendClusterTestCluster_000319_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_DOUBLE smallest Value"];
 
@@ -35720,7 +35874,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000318_WriteAttribute
+- (void)testSendClusterTestCluster_000320_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_DOUBLE null Value"];
 
@@ -35742,7 +35896,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000319_ReadAttribute
+- (void)testSendClusterTestCluster_000321_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_DOUBLE null Value"];
 
@@ -35766,7 +35920,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000320_WriteAttribute
+- (void)testSendClusterTestCluster_000322_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_DOUBLE 0 Value"];
 
@@ -35788,7 +35942,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000321_ReadAttribute
+- (void)testSendClusterTestCluster_000323_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_DOUBLE 0 Value"];
 
@@ -35813,7 +35967,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000322_WriteAttribute
+- (void)testSendClusterTestCluster_000324_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_ENUM8 Min Value"];
 
@@ -35835,7 +35989,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000323_ReadAttribute
+- (void)testSendClusterTestCluster_000325_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_ENUM8 Min Value"];
 
@@ -35860,7 +36014,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000324_WriteAttribute
+- (void)testSendClusterTestCluster_000326_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_ENUM8 Max Value"];
 
@@ -35882,7 +36036,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000325_ReadAttribute
+- (void)testSendClusterTestCluster_000327_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_ENUM8 Max Value"];
 
@@ -35907,7 +36061,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000326_WriteAttribute
+- (void)testSendClusterTestCluster_000328_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_ENUM8 Invalid Value"];
 
@@ -35928,7 +36082,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000327_ReadAttribute
+- (void)testSendClusterTestCluster_000329_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_ENUM8 unchanged Value"];
 
@@ -35953,7 +36107,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000328_WriteAttribute
+- (void)testSendClusterTestCluster_000330_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_ENUM8 null Value"];
 
@@ -35975,7 +36129,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000329_ReadAttribute
+- (void)testSendClusterTestCluster_000331_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_ENUM8 null Value"];
 
@@ -35999,7 +36153,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000330_WriteAttribute
+- (void)testSendClusterTestCluster_000332_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_ENUM16 Min Value"];
 
@@ -36021,7 +36175,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000331_ReadAttribute
+- (void)testSendClusterTestCluster_000333_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_ENUM16 Min Value"];
 
@@ -36046,7 +36200,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000332_WriteAttribute
+- (void)testSendClusterTestCluster_000334_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_ENUM16 Max Value"];
 
@@ -36068,7 +36222,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000333_ReadAttribute
+- (void)testSendClusterTestCluster_000335_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_ENUM16 Max Value"];
 
@@ -36093,7 +36247,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000334_WriteAttribute
+- (void)testSendClusterTestCluster_000336_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_ENUM16 Invalid Value"];
 
@@ -36115,7 +36269,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000335_ReadAttribute
+- (void)testSendClusterTestCluster_000337_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_ENUM16 unchanged Value"];
 
@@ -36140,7 +36294,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000336_WriteAttribute
+- (void)testSendClusterTestCluster_000338_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_ENUM16 null Value"];
 
@@ -36162,7 +36316,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000337_ReadAttribute
+- (void)testSendClusterTestCluster_000339_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_ENUM16 null Value"];
 
@@ -36186,7 +36340,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000338_WriteAttribute
+- (void)testSendClusterTestCluster_000340_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_SIMPLE_ENUM Min Value"];
 
@@ -36208,7 +36362,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000339_ReadAttribute
+- (void)testSendClusterTestCluster_000341_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_SIMPLE_ENUM Min Value"];
 
@@ -36233,7 +36387,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000340_WriteAttribute
+- (void)testSendClusterTestCluster_000342_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_SIMPLE_ENUM Max Value"];
 
@@ -36255,7 +36409,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000341_ReadAttribute
+- (void)testSendClusterTestCluster_000343_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_SIMPLE_ENUM Max Value"];
 
@@ -36280,7 +36434,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000342_WriteAttribute
+- (void)testSendClusterTestCluster_000344_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_SIMPLE_ENUM Invalid Value"];
 
@@ -36302,7 +36456,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000343_ReadAttribute
+- (void)testSendClusterTestCluster_000345_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_SIMPLE_ENUM unchanged Value"];
 
@@ -36327,7 +36481,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000344_WriteAttribute
+- (void)testSendClusterTestCluster_000346_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_SIMPLE_ENUM null Value"];
 
@@ -36349,7 +36503,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000345_ReadAttribute
+- (void)testSendClusterTestCluster_000347_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_SIMPLE_ENUM null Value"];
 
@@ -36373,7 +36527,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000346_ReadAttribute
+- (void)testSendClusterTestCluster_000348_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_OCTET_STRING Default Value"];
 
@@ -36398,53 +36552,6 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000347_WriteAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_OCTET_STRING"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    id nullableOctetStringArgument;
-    nullableOctetStringArgument = [[NSData alloc] initWithBytes:"TestValue" length:9];
-    [cluster writeAttributeNullableOctetStringWithValue:nullableOctetStringArgument
-                                      completionHandler:^(NSError * _Nullable err) {
-                                          NSLog(@"Write attribute NULLABLE_OCTET_STRING Error: %@", err);
-
-                                          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-                                          [expectation fulfill];
-                                      }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTestCluster_000348_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_OCTET_STRING"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeNullableOctetStringWithCompletionHandler:^(NSData * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Read attribute NULLABLE_OCTET_STRING Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertFalse(actualValue == nil);
-            XCTAssertTrue([actualValue isEqualToData:[[NSData alloc] initWithBytes:"TestValue" length:9]]);
-        }
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
 - (void)testSendClusterTestCluster_000349_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_OCTET_STRING"];
@@ -36455,7 +36562,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
     XCTAssertNotNil(cluster);
 
     id nullableOctetStringArgument;
-    nullableOctetStringArgument = nil;
+    nullableOctetStringArgument = [[NSData alloc] initWithBytes:"TestValue" length:9];
     [cluster writeAttributeNullableOctetStringWithValue:nullableOctetStringArgument
                                       completionHandler:^(NSError * _Nullable err) {
                                           NSLog(@"Write attribute NULLABLE_OCTET_STRING Error: %@", err);
@@ -36483,7 +36590,8 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
         {
             id actualValue = value;
-            XCTAssertTrue(actualValue == nil);
+            XCTAssertFalse(actualValue == nil);
+            XCTAssertTrue([actualValue isEqualToData:[[NSData alloc] initWithBytes:"TestValue" length:9]]);
         }
 
         [expectation fulfill];
@@ -36501,7 +36609,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
     XCTAssertNotNil(cluster);
 
     id nullableOctetStringArgument;
-    nullableOctetStringArgument = [[NSData alloc] initWithBytes:"" length:0];
+    nullableOctetStringArgument = nil;
     [cluster writeAttributeNullableOctetStringWithValue:nullableOctetStringArgument
                                       completionHandler:^(NSError * _Nullable err) {
                                           NSLog(@"Write attribute NULLABLE_OCTET_STRING Error: %@", err);
@@ -36529,6 +36637,52 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
         {
             id actualValue = value;
+            XCTAssertTrue(actualValue == nil);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000353_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_OCTET_STRING"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id nullableOctetStringArgument;
+    nullableOctetStringArgument = [[NSData alloc] initWithBytes:"" length:0];
+    [cluster writeAttributeNullableOctetStringWithValue:nullableOctetStringArgument
+                                      completionHandler:^(NSError * _Nullable err) {
+                                          NSLog(@"Write attribute NULLABLE_OCTET_STRING Error: %@", err);
+
+                                          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                                          [expectation fulfill];
+                                      }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000354_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_OCTET_STRING"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeNullableOctetStringWithCompletionHandler:^(NSData * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read attribute NULLABLE_OCTET_STRING Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
             XCTAssertFalse(actualValue == nil);
             XCTAssertTrue([actualValue isEqualToData:[[NSData alloc] initWithBytes:"" length:0]]);
         }
@@ -36538,7 +36692,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000353_ReadAttribute
+- (void)testSendClusterTestCluster_000355_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_CHAR_STRING Default Value"];
 
@@ -36563,7 +36717,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000354_WriteAttribute
+- (void)testSendClusterTestCluster_000356_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_CHAR_STRING"];
 
@@ -36577,53 +36731,6 @@ NSNumber * _Nullable attrCurrentPositionTilt;
     [cluster writeAttributeNullableCharStringWithValue:nullableCharStringArgument
                                      completionHandler:^(NSError * _Nullable err) {
                                          NSLog(@"Write attribute NULLABLE_CHAR_STRING Error: %@", err);
-
-                                         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-                                         [expectation fulfill];
-                                     }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTestCluster_000355_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_CHAR_STRING"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeNullableCharStringWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Read attribute NULLABLE_CHAR_STRING Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertFalse(actualValue == nil);
-            XCTAssertTrue([actualValue isEqualToString:@"☉T☉"]);
-        }
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTestCluster_000356_WriteAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_CHAR_STRING - Value too long"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    id nullableCharStringArgument;
-    nullableCharStringArgument = nil;
-    [cluster writeAttributeNullableCharStringWithValue:nullableCharStringArgument
-                                     completionHandler:^(NSError * _Nullable err) {
-                                         NSLog(@"Write attribute NULLABLE_CHAR_STRING - Value too long Error: %@", err);
 
                                          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -36648,7 +36755,8 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
         {
             id actualValue = value;
-            XCTAssertTrue(actualValue == nil);
+            XCTAssertFalse(actualValue == nil);
+            XCTAssertTrue([actualValue isEqualToString:@"☉T☉"]);
         }
 
         [expectation fulfill];
@@ -36658,7 +36766,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 }
 - (void)testSendClusterTestCluster_000358_WriteAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_CHAR_STRING - Empty"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_CHAR_STRING - Value too long"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -36666,10 +36774,10 @@ NSNumber * _Nullable attrCurrentPositionTilt;
     XCTAssertNotNil(cluster);
 
     id nullableCharStringArgument;
-    nullableCharStringArgument = @"";
+    nullableCharStringArgument = nil;
     [cluster writeAttributeNullableCharStringWithValue:nullableCharStringArgument
                                      completionHandler:^(NSError * _Nullable err) {
-                                         NSLog(@"Write attribute NULLABLE_CHAR_STRING - Empty Error: %@", err);
+                                         NSLog(@"Write attribute NULLABLE_CHAR_STRING - Value too long Error: %@", err);
 
                                          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -36694,6 +36802,52 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
         {
             id actualValue = value;
+            XCTAssertTrue(actualValue == nil);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000360_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_CHAR_STRING - Empty"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id nullableCharStringArgument;
+    nullableCharStringArgument = @"";
+    [cluster writeAttributeNullableCharStringWithValue:nullableCharStringArgument
+                                     completionHandler:^(NSError * _Nullable err) {
+                                         NSLog(@"Write attribute NULLABLE_CHAR_STRING - Empty Error: %@", err);
+
+                                         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                                         [expectation fulfill];
+                                     }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000361_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_CHAR_STRING"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeNullableCharStringWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read attribute NULLABLE_CHAR_STRING Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
             XCTAssertFalse(actualValue == nil);
             XCTAssertTrue([actualValue isEqualToString:@""]);
         }
@@ -36703,7 +36857,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000360_ReadAttribute
+- (void)testSendClusterTestCluster_000362_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute from nonexistent endpoint."];
 
@@ -36721,7 +36875,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000361_ReadAttribute
+- (void)testSendClusterTestCluster_000363_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute from nonexistent cluster."];
 
@@ -36739,7 +36893,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000362_TestSimpleOptionalArgumentRequest
+- (void)testSendClusterTestCluster_000364_TestSimpleOptionalArgumentRequest
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Send a command that takes an optional parameter but do not set it."];
@@ -36761,7 +36915,7 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000363_TestSimpleOptionalArgumentRequest
+- (void)testSendClusterTestCluster_000365_TestSimpleOptionalArgumentRequest
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Send a command that takes an optional parameter but do not set it."];
@@ -36785,9 +36939,9 @@ NSNumber * _Nullable attrCurrentPositionTilt;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-bool testSendClusterTestCluster_000364_WaitForReport_Fulfilled = false;
+bool testSendClusterTestCluster_000366_WaitForReport_Fulfilled = false;
 ResponseHandler test_TestCluster_list_int8u_Reported = nil;
-- (void)testSendClusterTestCluster_000364_WaitForReport
+- (void)testSendClusterTestCluster_000366_WaitForReport
 {
 
     CHIPDevice * device = GetConnectedDevice();
@@ -36809,10 +36963,10 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
             XCTAssertEqual([actualValue[3] unsignedCharValue], 4);
         }
 
-        testSendClusterTestCluster_000364_WaitForReport_Fulfilled = true;
+        testSendClusterTestCluster_000366_WaitForReport_Fulfilled = true;
     };
 }
-- (void)testSendClusterTestCluster_000365_SubscribeAttribute
+- (void)testSendClusterTestCluster_000367_SubscribeAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Subscribe to list attribute"];
 
@@ -36823,10 +36977,10 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     uint16_t minIntervalArgument = 2U;
     uint16_t maxIntervalArgument = 10U;
-    [cluster subscribeAttributeListInt8uWithMinInterval:minIntervalArgument
-        maxInterval:maxIntervalArgument
+    [cluster subscribeAttributeListInt8uWithMinInterval:@(minIntervalArgument)
+        maxInterval:@(maxIntervalArgument)
         subscriptionEstablished:^{
-            XCTAssertEqual(testSendClusterTestCluster_000364_WaitForReport_Fulfilled, true);
+            XCTAssertEqual(testSendClusterTestCluster_000366_WaitForReport_Fulfilled, true);
             [expectation fulfill];
         }
         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
@@ -36842,7 +36996,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000366_WriteAttribute
+- (void)testSendClusterTestCluster_000368_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write subscribed-to list attribute"];
 
@@ -36871,7 +37025,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000367_WaitForReport
+- (void)testSendClusterTestCluster_000369_WaitForReport
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Check for list attribute report"];
 
@@ -36899,7 +37053,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000368_ReadAttribute
+- (void)testSendClusterTestCluster_000370_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read range-restricted unsigned 8-bit integer"];
 
@@ -36923,7 +37077,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000369_WriteAttribute
+- (void)testSendClusterTestCluster_000371_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write min value to a range-restricted unsigned 8-bit integer"];
@@ -36946,7 +37100,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000370_WriteAttribute
+- (void)testSendClusterTestCluster_000372_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write just-below-range value to a range-restricted unsigned 8-bit integer"];
@@ -36971,7 +37125,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000371_WriteAttribute
+- (void)testSendClusterTestCluster_000373_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write just-above-range value to a range-restricted unsigned 8-bit integer"];
@@ -36996,7 +37150,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000372_WriteAttribute
+- (void)testSendClusterTestCluster_000374_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write max value to a range-restricted unsigned 8-bit integer"];
@@ -37019,7 +37173,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000373_ReadAttribute
+- (void)testSendClusterTestCluster_000375_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Verify range-restricted unsigned 8-bit integer value has not changed"];
@@ -37044,7 +37198,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000374_WriteAttribute
+- (void)testSendClusterTestCluster_000376_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write min valid value to a range-restricted unsigned 8-bit integer"];
@@ -37068,7 +37222,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000375_ReadAttribute
+- (void)testSendClusterTestCluster_000377_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Verify range-restricted unsigned 8-bit integer value is at min valid"];
@@ -37093,7 +37247,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000376_WriteAttribute
+- (void)testSendClusterTestCluster_000378_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write max valid value to a range-restricted unsigned 8-bit integer"];
@@ -37117,7 +37271,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000377_ReadAttribute
+- (void)testSendClusterTestCluster_000379_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Verify range-restricted unsigned 8-bit integer value is at max valid"];
@@ -37142,7 +37296,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000378_WriteAttribute
+- (void)testSendClusterTestCluster_000380_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write middle valid value to a range-restricted unsigned 8-bit integer"];
@@ -37166,7 +37320,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000379_ReadAttribute
+- (void)testSendClusterTestCluster_000381_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Verify range-restricted unsigned 8-bit integer value is at mid valid"];
@@ -37191,7 +37345,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000380_ReadAttribute
+- (void)testSendClusterTestCluster_000382_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read range-restricted unsigned 16-bit integer"];
 
@@ -37215,7 +37369,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000381_WriteAttribute
+- (void)testSendClusterTestCluster_000383_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write min value to a range-restricted unsigned 16-bit integer"];
@@ -37238,7 +37392,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000382_WriteAttribute
+- (void)testSendClusterTestCluster_000384_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write just-below-range value to a range-restricted unsigned 16-bit integer"];
@@ -37264,7 +37418,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000383_WriteAttribute
+- (void)testSendClusterTestCluster_000385_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write just-above-range value to a range-restricted unsigned 16-bit integer"];
@@ -37290,7 +37444,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000384_WriteAttribute
+- (void)testSendClusterTestCluster_000386_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write max value to a range-restricted unsigned 16-bit integer"];
@@ -37313,7 +37467,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000385_ReadAttribute
+- (void)testSendClusterTestCluster_000387_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Verify range-restricted unsigned 16-bit integer value has not changed"];
@@ -37338,7 +37492,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000386_WriteAttribute
+- (void)testSendClusterTestCluster_000388_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write min valid value to a range-restricted unsigned 16-bit integer"];
@@ -37362,7 +37516,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000387_ReadAttribute
+- (void)testSendClusterTestCluster_000389_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Verify range-restricted unsigned 16-bit integer value is at min valid"];
@@ -37387,7 +37541,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000388_WriteAttribute
+- (void)testSendClusterTestCluster_000390_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write max valid value to a range-restricted unsigned 16-bit integer"];
@@ -37411,7 +37565,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000389_ReadAttribute
+- (void)testSendClusterTestCluster_000391_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Verify range-restricted unsigned 16-bit integer value is at max valid"];
@@ -37436,7 +37590,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000390_WriteAttribute
+- (void)testSendClusterTestCluster_000392_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write middle valid value to a range-restricted unsigned 16-bit integer"];
@@ -37461,7 +37615,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000391_ReadAttribute
+- (void)testSendClusterTestCluster_000393_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Verify range-restricted unsigned 16-bit integer value is at mid valid"];
@@ -37486,7 +37640,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000392_ReadAttribute
+- (void)testSendClusterTestCluster_000394_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read range-restricted signed 8-bit integer"];
 
@@ -37510,7 +37664,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000393_WriteAttribute
+- (void)testSendClusterTestCluster_000395_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write min value to a range-restricted signed 8-bit integer"];
@@ -37533,7 +37687,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000394_WriteAttribute
+- (void)testSendClusterTestCluster_000396_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write just-below-range value to a range-restricted signed 8-bit integer"];
@@ -37558,7 +37712,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000395_WriteAttribute
+- (void)testSendClusterTestCluster_000397_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write just-above-range value to a range-restricted signed 8-bit integer"];
@@ -37583,7 +37737,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000396_WriteAttribute
+- (void)testSendClusterTestCluster_000398_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write max value to a range-restricted signed 8-bit integer"];
@@ -37606,7 +37760,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000397_ReadAttribute
+- (void)testSendClusterTestCluster_000399_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Verify range-restricted signed 8-bit integer value has not changed"];
@@ -37631,7 +37785,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000398_WriteAttribute
+- (void)testSendClusterTestCluster_000400_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write min valid value to a range-restricted signed 8-bit integer"];
@@ -37655,7 +37809,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000399_ReadAttribute
+- (void)testSendClusterTestCluster_000401_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Verify range-restricted signed 8-bit integer value is at min valid"];
@@ -37680,7 +37834,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000400_WriteAttribute
+- (void)testSendClusterTestCluster_000402_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write max valid value to a range-restricted signed 8-bit integer"];
@@ -37704,7 +37858,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000401_ReadAttribute
+- (void)testSendClusterTestCluster_000403_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Verify range-restricted signed 8-bit integer value is at max valid"];
@@ -37729,7 +37883,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000402_WriteAttribute
+- (void)testSendClusterTestCluster_000404_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write middle valid value to a range-restricted signed 8-bit integer"];
@@ -37753,7 +37907,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000403_ReadAttribute
+- (void)testSendClusterTestCluster_000405_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Verify range-restricted signed 8-bit integer value is at mid valid"];
@@ -37778,7 +37932,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000404_ReadAttribute
+- (void)testSendClusterTestCluster_000406_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read range-restricted signed 16-bit integer"];
 
@@ -37802,7 +37956,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000405_WriteAttribute
+- (void)testSendClusterTestCluster_000407_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write min value to a range-restricted signed 16-bit integer"];
@@ -37825,7 +37979,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000406_WriteAttribute
+- (void)testSendClusterTestCluster_000408_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write just-below-range value to a range-restricted signed 16-bit integer"];
@@ -37850,7 +38004,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000407_WriteAttribute
+- (void)testSendClusterTestCluster_000409_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write just-above-range value to a range-restricted signed 16-bit integer"];
@@ -37875,7 +38029,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000408_WriteAttribute
+- (void)testSendClusterTestCluster_000410_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write max value to a range-restricted signed 16-bit integer"];
@@ -37898,7 +38052,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000409_ReadAttribute
+- (void)testSendClusterTestCluster_000411_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Verify range-restricted signed 16-bit integer value has not changed"];
@@ -37923,7 +38077,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000410_WriteAttribute
+- (void)testSendClusterTestCluster_000412_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write min valid value to a range-restricted signed 16-bit integer"];
@@ -37947,7 +38101,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000411_ReadAttribute
+- (void)testSendClusterTestCluster_000413_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Verify range-restricted signed 16-bit integer value is at min valid"];
@@ -37972,7 +38126,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000412_WriteAttribute
+- (void)testSendClusterTestCluster_000414_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write max valid value to a range-restricted signed 16-bit integer"];
@@ -37996,7 +38150,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000413_ReadAttribute
+- (void)testSendClusterTestCluster_000415_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Verify range-restricted signed 16-bit integer value is at max valid"];
@@ -38021,7 +38175,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000414_WriteAttribute
+- (void)testSendClusterTestCluster_000416_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write middle valid value to a range-restricted signed 16-bit integer"];
@@ -38045,7 +38199,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000415_ReadAttribute
+- (void)testSendClusterTestCluster_000417_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Verify range-restricted signed 16-bit integer value is at mid valid"];
@@ -38070,7 +38224,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000416_ReadAttribute
+- (void)testSendClusterTestCluster_000418_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read nullable range-restricted unsigned 8-bit integer"];
 
@@ -38095,7 +38249,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000417_WriteAttribute
+- (void)testSendClusterTestCluster_000419_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write min value to a nullable range-restricted unsigned 8-bit integer"];
@@ -38120,7 +38274,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000418_WriteAttribute
+- (void)testSendClusterTestCluster_000420_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write just-below-range value to a nullable range-restricted unsigned 8-bit integer"];
@@ -38145,7 +38299,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000419_WriteAttribute
+- (void)testSendClusterTestCluster_000421_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write just-above-range value to a nullable range-restricted unsigned 8-bit integer"];
@@ -38170,7 +38324,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000420_WriteAttribute
+- (void)testSendClusterTestCluster_000422_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write max value to a nullable range-restricted unsigned 8-bit integer"];
@@ -38195,7 +38349,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000421_ReadAttribute
+- (void)testSendClusterTestCluster_000423_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Verify nullable range-restricted unsigned 8-bit integer value has not changed"];
@@ -38221,7 +38375,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000422_WriteAttribute
+- (void)testSendClusterTestCluster_000424_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write min valid value to a nullable range-restricted unsigned 8-bit integer"];
@@ -38246,7 +38400,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000423_ReadAttribute
+- (void)testSendClusterTestCluster_000425_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Verify nullable range-restricted unsigned 8-bit integer value is at min valid"];
@@ -38272,7 +38426,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000424_WriteAttribute
+- (void)testSendClusterTestCluster_000426_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write max valid value to a nullable range-restricted unsigned 8-bit integer"];
@@ -38297,7 +38451,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000425_ReadAttribute
+- (void)testSendClusterTestCluster_000427_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Verify nullable range-restricted unsigned 8-bit integer value is at max valid"];
@@ -38323,7 +38477,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000426_WriteAttribute
+- (void)testSendClusterTestCluster_000428_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write middle valid value to a nullable range-restricted unsigned 8-bit integer"];
@@ -38348,7 +38502,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000427_ReadAttribute
+- (void)testSendClusterTestCluster_000429_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Verify nullable range-restricted unsigned 8-bit integer value is at mid valid"];
@@ -38374,7 +38528,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000428_WriteAttribute
+- (void)testSendClusterTestCluster_000430_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write null value to a nullable range-restricted unsigned 8-bit integer"];
@@ -38399,7 +38553,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000429_ReadAttribute
+- (void)testSendClusterTestCluster_000431_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Verify nullable range-restricted unsigned 8-bit integer value is null"];
@@ -38424,7 +38578,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000430_ReadAttribute
+- (void)testSendClusterTestCluster_000432_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read nullable range-restricted unsigned 16-bit integer"];
 
@@ -38450,7 +38604,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000431_WriteAttribute
+- (void)testSendClusterTestCluster_000433_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write min value to a nullable range-restricted unsigned 16-bit integer"];
@@ -38475,7 +38629,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000432_WriteAttribute
+- (void)testSendClusterTestCluster_000434_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write just-below-range value to a nullable range-restricted unsigned 16-bit integer"];
@@ -38500,7 +38654,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000433_WriteAttribute
+- (void)testSendClusterTestCluster_000435_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write just-above-range value to a nullable range-restricted unsigned 16-bit integer"];
@@ -38525,7 +38679,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000434_WriteAttribute
+- (void)testSendClusterTestCluster_000436_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write max value to a nullable range-restricted unsigned 16-bit integer"];
@@ -38550,7 +38704,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000435_ReadAttribute
+- (void)testSendClusterTestCluster_000437_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Verify nullable range-restricted unsigned 16-bit integer value has not changed"];
@@ -38577,7 +38731,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000436_WriteAttribute
+- (void)testSendClusterTestCluster_000438_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write min valid value to a nullable range-restricted unsigned 16-bit integer"];
@@ -38602,7 +38756,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000437_ReadAttribute
+- (void)testSendClusterTestCluster_000439_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Verify nullable range-restricted unsigned 16-bit integer value is at min valid"];
@@ -38629,7 +38783,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000438_WriteAttribute
+- (void)testSendClusterTestCluster_000440_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write max valid value to a nullable range-restricted unsigned 16-bit integer"];
@@ -38654,7 +38808,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000439_ReadAttribute
+- (void)testSendClusterTestCluster_000441_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Verify nullable range-restricted unsigned 16-bit integer value is at max valid"];
@@ -38681,7 +38835,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000440_WriteAttribute
+- (void)testSendClusterTestCluster_000442_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write middle valid value to a nullable range-restricted unsigned 16-bit integer"];
@@ -38706,7 +38860,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000441_ReadAttribute
+- (void)testSendClusterTestCluster_000443_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Verify nullable range-restricted unsigned 16-bit integer value is at mid valid"];
@@ -38733,7 +38887,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000442_WriteAttribute
+- (void)testSendClusterTestCluster_000444_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write null value to a nullable range-restricted unsigned 16-bit integer"];
@@ -38758,7 +38912,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000443_ReadAttribute
+- (void)testSendClusterTestCluster_000445_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Verify nullable range-restricted unsigned 16-bit integer value is null"];
@@ -38784,7 +38938,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000444_ReadAttribute
+- (void)testSendClusterTestCluster_000446_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read nullable range-restricted signed 8-bit integer"];
 
@@ -38809,7 +38963,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000445_WriteAttribute
+- (void)testSendClusterTestCluster_000447_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write min value to a nullable range-restricted signed 8-bit integer"];
@@ -38835,7 +38989,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000446_WriteAttribute
+- (void)testSendClusterTestCluster_000448_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write just-below-range value to a nullable range-restricted signed 8-bit integer"];
@@ -38860,7 +39014,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000447_WriteAttribute
+- (void)testSendClusterTestCluster_000449_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write just-above-range value to a nullable range-restricted signed 8-bit integer"];
@@ -38885,7 +39039,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000448_WriteAttribute
+- (void)testSendClusterTestCluster_000450_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write max value to a nullable range-restricted signed 8-bit integer"];
@@ -38911,7 +39065,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000449_ReadAttribute
+- (void)testSendClusterTestCluster_000451_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Verify nullable range-restricted signed 8-bit integer value has not changed"];
@@ -38937,7 +39091,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000450_WriteAttribute
+- (void)testSendClusterTestCluster_000452_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write min valid value to a nullable range-restricted signed 8-bit integer"];
@@ -38962,7 +39116,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000451_ReadAttribute
+- (void)testSendClusterTestCluster_000453_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Verify nullable range-restricted signed 8-bit integer value is at min valid"];
@@ -38988,7 +39142,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000452_WriteAttribute
+- (void)testSendClusterTestCluster_000454_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write max valid value to a nullable range-restricted signed 8-bit integer"];
@@ -39013,7 +39167,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000453_ReadAttribute
+- (void)testSendClusterTestCluster_000455_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Verify nullable range-restricted signed 8-bit integer value is at max valid"];
@@ -39039,7 +39193,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000454_WriteAttribute
+- (void)testSendClusterTestCluster_000456_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write middle valid value to a nullable range-restricted signed 8-bit integer"];
@@ -39064,7 +39218,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000455_ReadAttribute
+- (void)testSendClusterTestCluster_000457_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Verify nullable range-restricted signed 8-bit integer value is at mid valid"];
@@ -39090,7 +39244,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000456_WriteAttribute
+- (void)testSendClusterTestCluster_000458_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write null value to a nullable range-restricted signed 8-bit integer"];
@@ -39116,7 +39270,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000457_ReadAttribute
+- (void)testSendClusterTestCluster_000459_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Verify nullable range-restricted signed 8-bit integer value is at null"];
@@ -39141,7 +39295,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000458_ReadAttribute
+- (void)testSendClusterTestCluster_000460_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read nullable range-restricted signed 16-bit integer"];
 
@@ -39167,7 +39321,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000459_WriteAttribute
+- (void)testSendClusterTestCluster_000461_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write min value to a nullable range-restricted signed 16-bit integer"];
@@ -39192,7 +39346,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000460_WriteAttribute
+- (void)testSendClusterTestCluster_000462_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write just-below-range value to a nullable range-restricted signed 16-bit integer"];
@@ -39217,7 +39371,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000461_WriteAttribute
+- (void)testSendClusterTestCluster_000463_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write just-above-range value to a nullable range-restricted signed 16-bit integer"];
@@ -39242,7 +39396,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000462_WriteAttribute
+- (void)testSendClusterTestCluster_000464_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write max value to a nullable range-restricted signed 16-bit integer"];
@@ -39267,7 +39421,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000463_ReadAttribute
+- (void)testSendClusterTestCluster_000465_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Verify nullable range-restricted signed 16-bit integer value has not changed"];
@@ -39294,7 +39448,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000464_WriteAttribute
+- (void)testSendClusterTestCluster_000466_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write min valid value to a nullable range-restricted signed 16-bit integer"];
@@ -39319,7 +39473,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000465_ReadAttribute
+- (void)testSendClusterTestCluster_000467_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Verify nullable range-restricted signed 16-bit integer value is at min valid"];
@@ -39346,7 +39500,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000466_WriteAttribute
+- (void)testSendClusterTestCluster_000468_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write max valid value to a nullable range-restricted signed 16-bit integer"];
@@ -39371,7 +39525,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000467_ReadAttribute
+- (void)testSendClusterTestCluster_000469_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Verify nullable range-restricted signed 16-bit integer value is at max valid"];
@@ -39398,7 +39552,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000468_WriteAttribute
+- (void)testSendClusterTestCluster_000470_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write middle valid value to a nullable range-restricted signed 16-bit integer"];
@@ -39423,7 +39577,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000469_ReadAttribute
+- (void)testSendClusterTestCluster_000471_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Verify nullable range-restricted signed 16-bit integer value is at mid valid"];
@@ -39450,7 +39604,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000470_WriteAttribute
+- (void)testSendClusterTestCluster_000472_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write null value to a nullable range-restricted signed 16-bit integer"];
@@ -39475,7 +39629,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000471_ReadAttribute
+- (void)testSendClusterTestCluster_000473_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Verify nullable range-restricted signed 16-bit integer value is null"];
@@ -39501,7 +39655,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000472_WriteAttribute
+- (void)testSendClusterTestCluster_000474_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute that returns general status on write"];
 
@@ -39523,7 +39677,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000473_WriteAttribute
+- (void)testSendClusterTestCluster_000475_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write attribute that returns cluster-specific status on write"];
@@ -39545,7 +39699,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000474_ReadAttribute
+- (void)testSendClusterTestCluster_000476_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute that returns general status on read"];
 
@@ -39563,7 +39717,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000475_ReadAttribute
+- (void)testSendClusterTestCluster_000477_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"read attribute that returns cluster-specific status on read"];
@@ -39582,7 +39736,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000476_ReadAttribute
+- (void)testSendClusterTestCluster_000478_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"read ClientGeneratedCommandList attribute"];
 
@@ -39624,7 +39778,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000477_ReadAttribute
+- (void)testSendClusterTestCluster_000479_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"read ServerGeneratedCommandList attribute"];
 
@@ -39656,7 +39810,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000478_WriteAttribute
+- (void)testSendClusterTestCluster_000480_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write struct-typed attribute"];
 
@@ -39687,7 +39841,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000479_ReadAttribute
+- (void)testSendClusterTestCluster_000481_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read struct-typed attribute"];
 
@@ -39726,7 +39880,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 NSNumber * _Nonnull TestAddArgumentDefaultValue;
@@ -42421,7 +42575,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestConstraints_000001_WriteAttribute
@@ -42947,7 +43101,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestDelayCommands_000001_WaitForMs
@@ -42964,7 +43118,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestDescriptorCluster_000001_ReadAttribute
@@ -43099,7 +43253,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestBasicInformation_000001_ReadAttribute
@@ -43245,7 +43399,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestGroupsCluster_000001_ViewGroup
@@ -43836,7 +43990,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestGroupKeyManagementCluster_000001_ReadAttribute
@@ -44335,7 +44489,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestIdentifyCluster_000001_Identify
@@ -44366,7 +44520,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestLogCommands_000001_Log
@@ -44391,7 +44545,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestOperationalCredentialsCluster_000001_ReadAttribute
@@ -44450,6 +44604,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
+NSNumber * _Nonnull ourFabricIndex;
 - (void)testSendClusterTestOperationalCredentialsCluster_000003_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read current fabric index"];
@@ -44471,6 +44626,10 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
             if (actualValue != nil) {
                 XCTAssertGreaterThanOrEqual([actualValue unsignedCharValue], 1);
             }
+        }
+        {
+            id actualValue = value;
+            ourFabricIndex = actualValue;
         }
 
         [expectation fulfill];
@@ -44508,13 +44667,106 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
+- (void)testSendClusterTestOperationalCredentialsCluster_000005_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read fabric list before setting label"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestOperationalCredentials * cluster = [[CHIPTestOperationalCredentials alloc] initWithDevice:device
+                                                                                             endpoint:0
+                                                                                                queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeFabricsWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read fabric list before setting label Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue count], 1);
+            XCTAssertEqualObjects(
+                ((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).fabricIndex, ourFabricIndex);
+            XCTAssertTrue([((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).label isEqualToString:@""]);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestOperationalCredentialsCluster_000006_UpdateFabricLabel
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Set the fabric label"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestOperationalCredentials * cluster = [[CHIPTestOperationalCredentials alloc] initWithDevice:device
+                                                                                             endpoint:0
+                                                                                                queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPOperationalCredentialsClusterUpdateFabricLabelParams alloc] init];
+    params.label = @"Batcave";
+    [cluster updateFabricLabelWithParams:params
+                       completionHandler:^(
+                           CHIPOperationalCredentialsClusterNOCResponseParams * _Nullable values, NSError * _Nullable err) {
+                           NSLog(@"Set the fabric label Error: %@", err);
+
+                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                           {
+                               id actualValue = values.statusCode;
+                               XCTAssertEqual([actualValue unsignedCharValue], 0);
+                           }
+                           {
+                               id actualValue = values.fabricIndex;
+                               XCTAssertEqualObjects(actualValue, ourFabricIndex);
+                           }
+
+                           [expectation fulfill];
+                       }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestOperationalCredentialsCluster_000007_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read fabric list after setting label"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestOperationalCredentials * cluster = [[CHIPTestOperationalCredentials alloc] initWithDevice:device
+                                                                                             endpoint:0
+                                                                                                queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeFabricsWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read fabric list after setting label Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue count], 1);
+            XCTAssertEqualObjects(
+                ((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).fabricIndex, ourFabricIndex);
+            XCTAssertTrue(
+                [((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).label isEqualToString:@"Batcave"]);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
 
 - (void)testSendClusterTestModeSelectCluster_000000_WaitForCommissionee
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestModeSelectCluster_000001_ReadAttribute
@@ -44719,7 +44971,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_SWDIAG_1_1_000001_ReadAttribute
@@ -44755,7 +45007,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     [cluster readAttributeCurrentHeapFreeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads CurrentHeapFree non-global attribute value from DUT Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -44780,7 +45032,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     [cluster readAttributeCurrentHeapUsedWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads CurrentHeapUsed non-global attribute value from DUT Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -44805,7 +45057,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     [cluster readAttributeCurrentHeapHighWatermarkWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads CurrentHeapHighWaterMark non-global attribute value from DUT Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -44823,7 +45075,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_SWDIAG_3_1_000001_ResetWatermarks
@@ -44857,7 +45109,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     [cluster readAttributeCurrentHeapUsedWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads CurrentHeapUsed attribute value from DUT Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -44886,7 +45138,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     [cluster readAttributeCurrentHeapHighWatermarkWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads CurrentHeapHighWaterMark attribute value from DUT Error: %@", err);
 
-        if (err.code == CHIPErrorCodeUnsupportedAttribute) {
+        if (err.domain == MatterInteractionErrorDomain && err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
             [expectation fulfill];
             return;
         }
@@ -44909,7 +45161,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForCommissionee(expectation, queue);
+    WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTestSubscribe_OnOff_000001_Off
@@ -44965,8 +45217,8 @@ ResponseHandler test_TestSubscribe_OnOff_OnOff_Reported = nil;
 
     uint16_t minIntervalArgument = 2U;
     uint16_t maxIntervalArgument = 10U;
-    [cluster subscribeAttributeOnOffWithMinInterval:minIntervalArgument
-        maxInterval:maxIntervalArgument
+    [cluster subscribeAttributeOnOffWithMinInterval:@(minIntervalArgument)
+        maxInterval:@(maxIntervalArgument)
         subscriptionEstablished:^{
             XCTAssertEqual(testSendClusterTestSubscribe_OnOff_000002_WaitForReport_Fulfilled, true);
             [expectation fulfill];

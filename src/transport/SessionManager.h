@@ -30,6 +30,7 @@
 #include <crypto/RandUtils.h>
 #include <inet/IPAddress.h>
 #include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
@@ -184,7 +185,8 @@ public:
      * @param messageCounterManager The message counter manager
      */
     CHIP_ERROR Init(System::Layer * systemLayer, TransportMgrBase * transportMgr,
-                    Transport::MessageCounterManagerInterface * messageCounterManager);
+                    Transport::MessageCounterManagerInterface * messageCounterManager,
+                    chip::PersistentStorageDelegate * storageDelegate);
 
     /**
      * @brief
@@ -217,9 +219,9 @@ public:
     }
 
     // TODO: implements group sessions
-    Optional<SessionHandle> CreateGroupSession(GroupId group, chip::FabricIndex fabricIndex)
+    Optional<SessionHandle> CreateGroupSession(GroupId group, chip::FabricIndex fabricIndex, NodeId sourceNodeId)
     {
-        return mGroupSessions.AllocEntry(group, fabricIndex);
+        return mGroupSessions.AllocEntry(group, fabricIndex, sourceNodeId);
     }
     Optional<SessionHandle> FindGroupSession(GroupId group, chip::FabricIndex fabricIndex)
     {
@@ -263,6 +265,9 @@ private:
 
     TransportMgrBase * mTransportMgr                                   = nullptr;
     Transport::MessageCounterManagerInterface * mMessageCounterManager = nullptr;
+
+    // Will be use once PR 14996 is merged
+    chip::PersistentStorageDelegate * mStorage = nullptr;
 
     GlobalUnencryptedMessageCounter mGlobalUnencryptedMessageCounter;
     GlobalEncryptedMessageCounter mGlobalEncryptedMessageCounter;

@@ -222,6 +222,8 @@ efr32_executable("lock_app") {
       "PW_RPC_BUTTON_SERVICE=1",
       "PW_RPC_DEVICE_SERVICE=1",
       "PW_RPC_LOCKING_SERVICE=1",
+      "PW_RPC_OTCLI_SERVICE=1",
+      "PW_RPC_THREAD_SERVICE=1",
     ]
 
     sources += [
@@ -239,6 +241,8 @@ efr32_executable("lock_app") {
       "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:locking_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:ot_cli_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:thread_service.nanopb_rpc",
       "${examples_plat_dir}/pw_sys_io:pw_sys_io_efr32",
     ]
 

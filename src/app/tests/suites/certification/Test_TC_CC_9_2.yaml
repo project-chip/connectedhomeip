@@ -16,6 +16,7 @@ name:
     27.2.21. [TC-CC-9.2] ColorLoopSet Validation - change direction without stop
 
 config:
+    nodeId: 0x12344321
     cluster: "Color Control"
     endpoint: 1
 
@@ -23,6 +24,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Precondition: Turn on light for color control tests"
       cluster: "On/Off"

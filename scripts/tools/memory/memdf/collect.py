@@ -62,7 +62,9 @@ CONFIG: ConfigDescription = {
     **memdf.collector.elftools.CONFIG,
     **memdf.collector.readelf.CONFIG,
     'collect.method': {
-        'help': 'Method of input processing',
+        'help':
+            'Method of input processing: one of'
+            ' elftools, readelf, bloaty, csv, tsv, su.',
         'metavar': 'METHOD',
         'choices': ['elftools', 'readelf', 'bloaty', 'csv', 'tsv', 'su'],
         'default': 'elftools',

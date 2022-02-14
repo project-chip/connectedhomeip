@@ -15,6 +15,7 @@
 name: 7.1.5. [TC-DD-1.5] NFC Rules of advertisement and Onboarding
 
 config:
+    nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 

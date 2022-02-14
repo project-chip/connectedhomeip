@@ -134,7 +134,7 @@ public:
      * store that is both fully local and quick to access.
      *
      * @param[in] skid Buffer containing the subject key identifier (SKID) of the PAA to look-up
-     * @param[inout] outPaaDerBuffer Buffer to receive the contents of the PAA root cert, if found.
+     * @param[in,out] outPaaDerBuffer Buffer to receive the contents of the PAA root cert, if found.
      *                                  Size will be updated to match actual size.
      *
      * @returns CHIP_NO_ERROR on success, CHIP_INVALID_ARGUMENT if `skid` or `outPaaDerBuffer` arguments
@@ -235,7 +235,7 @@ public:
      *
      * @param[in] certDeclBuffer   A ByteSpan with the Certification Declaration content.
      * @param[in] firmwareInfo     A ByteSpan with the Firmware Information content.
-     * @param[in] deviceInfo
+     * @param[in] deviceInfo       The device information
      *
      * @returns AttestationVerificationResult::kSuccess on success or another specific
      *          value from AttestationVerificationResult enum on failure.

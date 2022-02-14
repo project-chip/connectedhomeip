@@ -28,8 +28,6 @@ public:
     /**
      * @brief
      *   Called when a session is releasing
-     *
-     * @param session   The handle to the secure session
      */
     virtual void OnSessionReleased() = 0;
 };

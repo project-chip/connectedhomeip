@@ -24,9 +24,10 @@
 #include <jni.h>
 
 #include <controller/CHIPDeviceController.h>
-#include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <lib/support/TimeUtils.h>
 #include <platform/internal/DeviceNetworkInfo.h>
+
+#include "AndroidOperationalCredentialsIssuer.h"
 
 /**
  * This class contains all relevant information for the JNI view of CHIPDeviceController
@@ -35,7 +36,6 @@
  * Generally it contains the DeviceController class itself, plus any related delegates/callbacks.
  */
 class AndroidDeviceControllerWrapper : public chip::Controller::DevicePairingDelegate,
-                                       public chip::Controller::OperationalCredentialsDelegate,
                                        public chip::PersistentStorageDelegate,
                                        public chip::FabricStorage
 {
@@ -61,19 +61,6 @@ public:
     void OnPairingDeleted(CHIP_ERROR error) override;
     void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR error) override;
 
-    // OperationalCredentialsDelegate implementation
-    CHIP_ERROR GenerateNOCChain(const chip::ByteSpan & csrElements, const chip::ByteSpan & attestationSignature,
-                                const chip::ByteSpan & DAC, const chip::ByteSpan & PAI, const chip::ByteSpan & PAA,
-                                chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion) override;
-
-    void SetNodeIdForNextNOCRequest(chip::NodeId nodeId) override
-    {
-        mNextRequestedNodeId = nodeId;
-        mNodeIdRequested     = true;
-    }
-
-    void SetFabricIdForNextNOCRequest(chip::FabricId fabricId) override { mNextFabricId = fabricId; }
-
     // PersistentStorageDelegate implementation
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override;
     CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override;
@@ -89,35 +76,23 @@ public:
         return reinterpret_cast<AndroidDeviceControllerWrapper *>(handle);
     }
 
+    using AndroidOperationalCredentialsIssuerPtr = std::unique_ptr<chip::Controller::AndroidOperationalCredentialsIssuer>;
+
     static AndroidDeviceControllerWrapper * AllocateNew(JavaVM * vm, jobject deviceControllerObj, chip::NodeId nodeId,
                                                         chip::System::Layer * systemLayer,
                                                         chip::Inet::EndPointManager<chip::Inet::TCPEndPoint> * tcpEndPointManager,
                                                         chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager,
+                                                        AndroidOperationalCredentialsIssuerPtr opCredsIssuer,
                                                         CHIP_ERROR * errInfoOnFailure);
-
-    CHIP_ERROR GenerateNOCChainAfterValidation(chip::NodeId nodeId, chip::FabricId fabricId,
-                                               const chip::Crypto::P256PublicKey & ephemeralKey, chip::MutableByteSpan & rcac,
-                                               chip::MutableByteSpan & icac, chip::MutableByteSpan & noc);
 
 private:
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;
-    chip::Crypto::P256Keypair mIssuer;
-    bool mInitialized  = false;
-    uint32_t mIssuerId = 0;
-    uint32_t mNow      = 0;
-    uint32_t mValidity = 10 * chip::kSecondsPerStandardYear;
 
     ChipDeviceControllerPtr mController;
-    chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
+    AndroidOperationalCredentialsIssuerPtr mOpCredsIssuer;
 
     JavaVM * mJavaVM       = nullptr;
     jobject mJavaObjectRef = nullptr;
-
-    chip::NodeId mNextAvailableNodeId = 1;
-
-    chip::NodeId mNextRequestedNodeId = 1;
-    chip::FabricId mNextFabricId      = 0;
-    bool mNodeIdRequested             = false;
 
     // These fields allow us to release the string/byte array memory later.
     jstring ssidStr                    = nullptr;
@@ -127,10 +102,9 @@ private:
     jbyteArray operationalDatasetBytes = nullptr;
     jbyte * operationalDataset         = nullptr;
 
-    AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller) : mController(std::move(controller))
-    {
-        chip::CalendarToChipEpochTime(2021, 06, 10, 0, 0, 0, mNow);
-    }
+    AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller, AndroidOperationalCredentialsIssuerPtr opCredsIssuer) :
+        mController(std::move(controller)), mOpCredsIssuer(std::move(opCredsIssuer))
+    {}
 };
 
 inline jlong AndroidDeviceControllerWrapper::ToJNIHandle()

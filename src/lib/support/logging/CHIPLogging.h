@@ -376,7 +376,7 @@ bool IsCategoryEnabled(uint8_t category);
 /**
  * Logging helpers for message types, so we format them consistently.
  */
-#define ChipLogFormatMessageType "0x%" PRIx8
+#define ChipLogFormatMessageType "0x%x"
 
 } // namespace Logging
 } // namespace chip

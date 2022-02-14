@@ -16,6 +16,7 @@ name:
     54.2.3. [TC-WIFIDIAG-3.1] Command received functionality with server as DUT
 
 config:
+    nodeId: 0x12344321
     cluster: "WiFi Network Diagnostics"
     endpoint: 0
 
@@ -23,6 +24,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     #Below steps disabled due to issue #13645
     # Also, ResetCounts may not work on some platforms yet?

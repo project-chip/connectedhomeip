@@ -12108,30 +12108,48 @@ namespace NetworkInterfaceType {
 enum class Fields
 {
     kName                            = 0,
-    kFabricConnected                 = 1,
+    kIsOperational                   = 1,
     kOffPremiseServicesReachableIPv4 = 2,
     kOffPremiseServicesReachableIPv6 = 3,
     kHardwareAddress                 = 4,
-    kType                            = 5,
+    kIPv4Addresses                   = 5,
+    kIPv6Addresses                   = 6,
+    kType                            = 7,
 };
 
 struct Type
 {
 public:
     chip::CharSpan name;
-    bool fabricConnected = static_cast<bool>(0);
+    bool isOperational = static_cast<bool>(0);
     DataModel::Nullable<bool> offPremiseServicesReachableIPv4;
     DataModel::Nullable<bool> offPremiseServicesReachableIPv6;
     chip::ByteSpan hardwareAddress;
+    DataModel::List<const chip::ByteSpan> IPv4Addresses;
+    DataModel::List<const chip::ByteSpan> IPv6Addresses;
     InterfaceType type = static_cast<InterfaceType>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
 };
 
-using DecodableType = Type;
+struct DecodableType
+{
+public:
+    chip::CharSpan name;
+    bool isOperational = static_cast<bool>(0);
+    DataModel::Nullable<bool> offPremiseServicesReachableIPv4;
+    DataModel::Nullable<bool> offPremiseServicesReachableIPv6;
+    chip::ByteSpan hardwareAddress;
+    DataModel::DecodableList<chip::ByteSpan> IPv4Addresses;
+    DataModel::DecodableList<chip::ByteSpan> IPv6Addresses;
+    InterfaceType type = static_cast<InterfaceType>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+};
 
 } // namespace NetworkInterfaceType
 } // namespace Structs
@@ -14008,9 +14026,9 @@ namespace Attributes {
 namespace Bssid {
 struct TypeInfo
 {
-    using Type             = chip::ByteSpan;
-    using DecodableType    = chip::ByteSpan;
-    using DecodableArgType = chip::ByteSpan;
+    using Type             = chip::app::DataModel::Nullable<chip::ByteSpan>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::ByteSpan>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::ByteSpan> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Bssid::Id; }
@@ -14021,9 +14039,9 @@ struct TypeInfo
 namespace SecurityType {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::SecurityType>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::SecurityType>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::SecurityType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SecurityType::Id; }
@@ -14033,9 +14051,9 @@ struct TypeInfo
 namespace WiFiVersion {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionType>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionType>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WiFiVersion::Id; }
@@ -14045,9 +14063,9 @@ struct TypeInfo
 namespace ChannelNumber {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ChannelNumber::Id; }
@@ -14057,9 +14075,9 @@ struct TypeInfo
 namespace Rssi {
 struct TypeInfo
 {
-    using Type             = int8_t;
-    using DecodableType    = int8_t;
-    using DecodableArgType = int8_t;
+    using Type             = chip::app::DataModel::Nullable<int8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<int8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<int8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Rssi::Id; }
@@ -14232,10 +14250,10 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::Bssid::TypeInfo::DecodableType bssid;
-        Attributes::SecurityType::TypeInfo::DecodableType securityType                     = static_cast<uint8_t>(0);
-        Attributes::WiFiVersion::TypeInfo::DecodableType wiFiVersion                       = static_cast<uint8_t>(0);
-        Attributes::ChannelNumber::TypeInfo::DecodableType channelNumber                   = static_cast<uint16_t>(0);
-        Attributes::Rssi::TypeInfo::DecodableType rssi                                     = static_cast<int8_t>(0);
+        Attributes::SecurityType::TypeInfo::DecodableType securityType;
+        Attributes::WiFiVersion::TypeInfo::DecodableType wiFiVersion;
+        Attributes::ChannelNumber::TypeInfo::DecodableType channelNumber;
+        Attributes::Rssi::TypeInfo::DecodableType rssi;
         Attributes::BeaconLostCount::TypeInfo::DecodableType beaconLostCount               = static_cast<uint32_t>(0);
         Attributes::BeaconRxCount::TypeInfo::DecodableType beaconRxCount                   = static_cast<uint32_t>(0);
         Attributes::PacketMulticastRxCount::TypeInfo::DecodableType packetMulticastRxCount = static_cast<uint32_t>(0);
@@ -16355,7 +16373,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NOCs
-namespace FabricsList {
+namespace Fabrics {
 struct TypeInfo
 {
     using Type = chip::app::DataModel::List<const chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::Type>;
@@ -16365,10 +16383,10 @@ struct TypeInfo
         chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FabricsList::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Fabrics::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace FabricsList
+} // namespace Fabrics
 namespace SupportedFabrics {
 struct TypeInfo
 {
@@ -16487,7 +16505,7 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::NOCs::TypeInfo::DecodableType NOCs;
-        Attributes::FabricsList::TypeInfo::DecodableType fabricsList;
+        Attributes::Fabrics::TypeInfo::DecodableType fabrics;
         Attributes::SupportedFabrics::TypeInfo::DecodableType supportedFabrics       = static_cast<uint8_t>(0);
         Attributes::CommissionedFabrics::TypeInfo::DecodableType commissionedFabrics = static_cast<uint8_t>(0);
         Attributes::TrustedRootCertificates::TypeInfo::DecodableType trustedRootCertificates;

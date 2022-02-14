@@ -137,14 +137,14 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             strncpy(ifp->Name, ifa->name, Inet::InterfaceId::kMaxIfNameLength);
             ifp->Name[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
 
-            ifp->name            = CharSpan::fromCharString(ifp->Name);
-            ifp->fabricConnected = true;
+            ifp->name          = CharSpan::fromCharString(ifp->Name);
+            ifp->isOperational = true;
             if ((ifa->flags) & NETIF_FLAG_ETHERNET)
                 ifp->type = EMBER_ZCL_INTERFACE_TYPE_ETHERNET;
             else
                 ifp->type = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
-            ifp->offPremiseServicesReachableIPv4.SetNonNull(false);
-            ifp->offPremiseServicesReachableIPv6.SetNonNull(false);
+            ifp->offPremiseServicesReachableIPv4.SetNull();
+            ifp->offPremiseServicesReachableIPv6.SetNull();
 
             memcpy(ifp->MacAddress, ifa->hwaddr, sizeof(ifa->hwaddr));
 

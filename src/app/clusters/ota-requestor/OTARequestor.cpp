@@ -47,7 +47,7 @@ constexpr uint32_t kImmediateStartDelayMs = 1; // Start the timer with this valu
 static void LogQueryImageResponse(const QueryImageResponse::DecodableType & response)
 {
     ChipLogDetail(SoftwareUpdate, "QueryImageResponse:");
-    ChipLogDetail(SoftwareUpdate, "  status: %" PRIu8 "", to_underlying(response.status));
+    ChipLogDetail(SoftwareUpdate, "  status: %u", to_underlying(response.status));
     if (response.delayedActionTime.HasValue())
     {
         ChipLogDetail(SoftwareUpdate, "  delayedActionTime: %" PRIu32 " seconds", response.delayedActionTime.Value());
@@ -84,7 +84,7 @@ static void LogQueryImageResponse(const QueryImageResponse::DecodableType & resp
 static void LogApplyUpdateResponse(const ApplyUpdateResponse::DecodableType & response)
 {
     ChipLogDetail(SoftwareUpdate, "ApplyUpdateResponse:");
-    ChipLogDetail(SoftwareUpdate, "  action: %" PRIu8 "", to_underlying(response.action));
+    ChipLogDetail(SoftwareUpdate, "  action: %u", to_underlying(response.action));
     ChipLogDetail(SoftwareUpdate, "  delayedActionTime: %" PRIu32 " seconds", response.delayedActionTime);
 }
 
@@ -240,10 +240,10 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
     mProviderEndpointId  = providerEndpoint;
 
     ChipLogProgress(SoftwareUpdate, "OTA Requestor received AnnounceOTAProvider");
-    ChipLogDetail(SoftwareUpdate, "  FabricIndex: %" PRIu8, mProviderFabricIndex);
+    ChipLogDetail(SoftwareUpdate, "  FabricIndex: %u", mProviderFabricIndex);
     ChipLogDetail(SoftwareUpdate, "  ProviderNodeID: 0x" ChipLogFormatX64, ChipLogValueX64(mProviderNodeId));
     ChipLogDetail(SoftwareUpdate, "  VendorID: 0x%" PRIx16, commandData.vendorId);
-    ChipLogDetail(SoftwareUpdate, "  AnnouncementReason: %" PRIu8, to_underlying(announcementReason));
+    ChipLogDetail(SoftwareUpdate, "  AnnouncementReason: %u", to_underlying(announcementReason));
     if (commandData.metadataForNode.HasValue())
     {
         ChipLogDetail(SoftwareUpdate, "  MetadataForNode: %zu", commandData.metadataForNode.Value().size());
@@ -263,7 +263,7 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
         msToStart = kImmediateStartDelayMs;
         break;
     default:
-        ChipLogError(SoftwareUpdate, "Unexpected announcementReason: %" PRIu8, static_cast<uint8_t>(announcementReason));
+        ChipLogError(SoftwareUpdate, "Unexpected announcementReason: %u", static_cast<uint8_t>(announcementReason));
         return EMBER_ZCL_STATUS_FAILURE;
     }
 
@@ -550,7 +550,7 @@ CHIP_ERROR OTARequestor::SendQueryImageRequest(OperationalDeviceProxy & devicePr
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(args.softwareVersion));
 
     args.protocolsSupported = kProtocolsSupported;
-    args.requestorCanConsent.SetValue(mOtaRequestorDriver->CanConsent());
+    args.requestorCanConsent.SetValue(mRequestorCanConsent.ValueOr(mOtaRequestorDriver->CanConsent()));
 
     uint16_t hardwareVersion;
     if (DeviceLayer::ConfigurationMgr().GetHardwareVersion(hardwareVersion) == CHIP_NO_ERROR)

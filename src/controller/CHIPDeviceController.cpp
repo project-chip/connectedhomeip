@@ -454,37 +454,33 @@ CHIP_ERROR DeviceController::ComputePASEVerifier(uint32_t iterations, uint32_t s
 }
 
 CHIP_ERROR DeviceController::OpenCommissioningWindowWithCallback(NodeId deviceId, uint16_t timeout, uint32_t iteration,
-                                                                 uint16_t discriminator, uint8_t option,
+                                                                 uint16_t discriminator, CommissioningWindowOption option,
                                                                  chip::Callback::Callback<OnOpenCommissioningWindow> * callback,
                                                                  bool readVIDPIDAttributes)
 {
     mSetupPayload = SetupPayload();
 
+    switch (option)
+    {
+    case CommissioningWindowOption::kOriginalSetupCode:
+    case CommissioningWindowOption::kTokenWithRandomPIN:
+        break;
+    case CommissioningWindowOption::kTokenWithProvidedPIN:
+        mSetupPayload.setUpPINCode = mSuggestedSetUpPINCode;
+        break;
+    default:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     mSetupPayload.version               = 0;
     mSetupPayload.discriminator         = discriminator;
     mSetupPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kOnNetwork);
 
+    mCommissioningWindowOption         = option;
     mCommissioningWindowCallback       = callback;
     mDeviceWithCommissioningWindowOpen = deviceId;
     mCommissioningWindowTimeout        = timeout;
     mCommissioningWindowIteration      = iteration;
-
-    switch (option)
-    {
-    case 0:
-        mCommissioningWindowOption = CommissioningWindowOption::kOriginalSetupCode;
-        break;
-    case 1:
-        mCommissioningWindowOption = CommissioningWindowOption::kTokenWithRandomPIN;
-        break;
-    case 2:
-        mCommissioningWindowOption = CommissioningWindowOption::kTokenWithProvidedPIN;
-        mSetupPayload.setUpPINCode = mSuggestedSetUpPINCode;
-        break;
-    default:
-        ChipLogError(Controller, "Invalid Pairing Window option");
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
 
     if (callback != nullptr && mCommissioningWindowOption != CommissioningWindowOption::kOriginalSetupCode && readVIDPIDAttributes)
     {
@@ -494,7 +490,6 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowWithCallback(NodeId deviceId
         constexpr EndpointId kBasicClusterEndpoint = 0;
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, kBasicClusterEndpoint);
-
         return cluster.ReadAttribute<app::Clusters::Basic::Attributes::VendorID::TypeInfo>(this, OnVIDReadResponse,
                                                                                            OnVIDPIDReadFailureResponse);
     }
@@ -517,7 +512,10 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowInternal()
 
     if (mCommissioningWindowOption != CommissioningWindowOption::kOriginalSetupCode)
     {
-        ByteSpan salt(Uint8::from_const_char(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt));
+        // TODO: Salt should be provided as an input or it should be randomly generated when
+        // the PIN is randomly generated.
+        const char kSpake2pKeyExchangeSalt[] = "SPAKE2P Key Salt";
+        ByteSpan salt(Uint8::from_const_char(kSpake2pKeyExchangeSalt), sizeof(kSpake2pKeyExchangeSalt));
         bool randomSetupPIN = (mCommissioningWindowOption == CommissioningWindowOption::kTokenWithRandomPIN);
         PASEVerifier verifier;
 
@@ -785,7 +783,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
     err = InitializePairedDeviceList();
     SuccessOrExit(err);
 
-    // TODO: We need to specify the peer address for BLE transport in bindings.
+    // TODO(#13940): We need to specify the peer address for BLE transport in bindings.
     if (params.GetPeerAddress().GetTransportType() == Transport::Type::kBle ||
         params.GetPeerAddress().GetTransportType() == Transport::Type::kUndefined)
     {
@@ -1803,7 +1801,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
 
         static constexpr size_t kMaxCountryCodeSize = 3;
-        char countryCodeStr[kMaxCountryCodeSize]    = "WW";
+        char countryCodeStr[kMaxCountryCodeSize]    = "XX";
         size_t actualCountryCodeSize                = 2;
 
 #if CONFIG_DEVICE_LAYER
@@ -1813,7 +1811,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
 #endif
         if (status != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "Unable to find country code, defaulting to WW");
+            ChipLogError(Controller, "Unable to find country code, defaulting to XX");
         }
         chip::CharSpan countryCode(countryCodeStr, actualCountryCodeSize);
 

@@ -18,7 +18,7 @@
       auto-free setup, so we could guarantee no name collisions. }}
   {{zapTypeToEncodableClusterObjectType type ns=ns forceNotList=true forceNotNullable=true forceNotOptional=true}} {{asLowerCamelCase label}}List_{{depth}}[{{definedValue.length}}];
   {{#each definedValue}}
-  {{>commandValue ns=../ns container=(concat (asLowerCamelCase ../label) "List_" ../depth "[" @index "]") definedValue=. type=../type depth=(incrementDepth ../depth)}}
+  {{>commandValue ns=../ns container=(concat (asLowerCamelCase ../label) "List_" ../depth "[" @index "]") definedValue=. type=../type depth=(incrementDepth ../depth) parent=../parent}}
   {{/each}}
   {{container}} = {{asLowerCamelCase label}}List_{{depth}};
   {{else}}

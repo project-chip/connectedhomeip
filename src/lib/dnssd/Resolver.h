@@ -161,7 +161,7 @@ struct DiscoveredNodeData
     Optional<System::Clock::Milliseconds32> mrpRetryIntervalActive;
     uint16_t port;
     unsigned numIPs;
-    Inet::InterfaceId interfaceId[kMaxIPAddresses];
+    Inet::InterfaceId interfaceId; // interface ID for the packet processed
     Inet::IPAddress ipAddress[kMaxIPAddresses];
 
     void Reset()
@@ -321,12 +321,6 @@ public:
 class Resolver
 {
 public:
-    enum class CacheBypass
-    {
-        On,
-        Off
-    };
-
     virtual ~Resolver() {}
 
     /**
@@ -351,15 +345,24 @@ public:
     /**
      * Requests resolution of the given operational node service.
      *
-     * If `dnssdCacheBypass` is set to `On` it forces resolution of the given node and bypass option
-     * of using DNS-SD cache.
+     * This will trigger a DNSSD query.
      *
      * When the operation succeeds or fails, and a resolver delegate has been registered,
      * the result of the operation is passed to the delegate's `OnNodeIdResolved` or
      * `OnNodeIdResolutionFailed` method, respectively.
      */
-    virtual CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type,
-                                     Resolver::CacheBypass dnssdCacheBypass = CacheBypass::Off) = 0;
+    virtual CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) = 0;
+
+    /**
+     * Explicit attempt to resolve a NodeID without performing network operations.
+     *
+     * If the required entry exists in an internal cache, this will call the
+     * underlying delegate `OnNodeIdResolved` and will return true;
+     *
+     * Returns false if the corresponding entry does not exist in the internal cache.
+     * This will NEVER call `OnNodeIdResolutionFailed` and this method does not block.
+     */
+    virtual bool ResolveNodeIdFromInternalCache(const PeerId & peerId, Inet::IPAddressType type) = 0;
 
     /**
      * Finds all commissionable nodes matching the given filter.

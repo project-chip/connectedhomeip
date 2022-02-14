@@ -149,7 +149,7 @@ void OnAddOrUpdateThreadNetworkCommandCallbackInternal(app::CommandHandler * apC
 exit:
     // TODO: We should encode response command here.
 
-    ChipLogDetail(Zcl, "AddOrUpdateThreadNetwork: %" PRIu8, to_underlying(err));
+    ChipLogDetail(Zcl, "AddOrUpdateThreadNetwork: %u", to_underlying(err));
     response.networkingStatus = err;
 #else
     // The target does not supports ThreadNetwork. We should not add AddOrUpdateThreadNetwork command in that case then the upper
@@ -207,7 +207,7 @@ void OnAddOrUpdateWiFiNetworkCommandCallbackInternal(app::CommandHandler * apCom
 exit:
     // TODO: We should encode response command here.
 
-    ChipLogDetail(Zcl, "AddOrUpdateWiFiNetwork: %" PRIu8, to_underlying(err));
+    ChipLogDetail(Zcl, "AddOrUpdateWiFiNetwork: %u", to_underlying(err));
     response.networkingStatus = err;
 #else
     // The target does not supports WiFiNetwork.

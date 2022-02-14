@@ -4008,7 +4008,7 @@ class ChipClusters:
                     "reportable": True,
                 },
                 0x00000001: {
-                    "attributeName": "FabricsList",
+                    "attributeName": "Fabrics",
                     "attributeId": 0x00000001,
                     "type": "",
                     "reportable": True,
@@ -5280,6 +5280,7 @@ class ChipClusters:
                     "attributeId": 0x0000002A,
                     "type": "bytes",
                     "reportable": True,
+                    "writable": True,
                 },
                 0x00000030: {
                     "attributeName": "TimedWriteBoolean",
