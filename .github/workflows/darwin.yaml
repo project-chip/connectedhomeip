@@ -114,7 +114,7 @@ jobs:
               if: always()
               uses: actions/upload-artifact@v2
               with:
-                  name: OTA,Linux-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
+                  name: OTA,Darwin-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
                   path: |
                       /tmp/ota/        
             - name: Delete Defaults
