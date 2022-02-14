@@ -48,6 +48,8 @@
 
 #include <algorithm>
 
+#include <hello.h>
+
 LOG_MODULE_DECLARE(app);
 
 namespace {
@@ -169,6 +171,8 @@ CHIP_ERROR AppTask::StartApp()
         }
 
         sStatusLED.Animate();
+        
+        hello_func();
     }
 }
 
