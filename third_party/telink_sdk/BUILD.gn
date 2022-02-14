@@ -43,7 +43,6 @@ source_set("telink_sdk") {
     "${telink_sdk_build_root}/repo/eagle_ble_sdk/drivers/B91/ext_driver/software_pa.c",
     "${telink_sdk_build_root}/repo/eagle_ble_sdk/drivers/B91/aes.c",
     "${telink_sdk_build_root}/repo/eagle_ble_sdk/vendor/common/blt_common.c",
-    "${telink_sdk_build_root}/repo/eagle_ble_sdk/algorithm/aes_ccm/aes_ccm.c",
     "${telink_sdk_build_root}/repo/eagle_ble_sdk/common/utility.c"
   ]
 
