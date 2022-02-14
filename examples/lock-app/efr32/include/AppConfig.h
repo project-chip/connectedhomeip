@@ -22,7 +22,7 @@
 // ---- Lock Example App Config ----
 
 // Software Version
-#define SW_VERSION "1.0.0"
+examples/lock-app/efr32/include/AppConfig.h
 
 #define APP_TASK_NAME "Lck"
 

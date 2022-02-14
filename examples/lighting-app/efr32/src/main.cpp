@@ -124,6 +124,7 @@ int main(void)
 #ifdef HEAP_MONITORING
     MemMonitoring::startHeapMonitoring();
 #endif
+
     EFR32_LOG("==================================================");
     EFR32_LOG("chip-efr32-lighting-example starting");
     EFR32_LOG("==================================================");

@@ -20,7 +20,7 @@
 #pragma once
 
 // Software Version
-#define SW_VERSION "1.0.0"
+#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "0.1ALPHA"
 
 // ---- Window Example App Config ----
 #define APP_TASK_NAME "APP"
