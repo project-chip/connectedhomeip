@@ -30,6 +30,7 @@
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/OTARequestor.h>
 #include <platform/GenericOTARequestorDriver.h>
+#include <platform/GenericOTARequestorStorage.h>
 #include <platform/qpg/OTAImageProcessorImpl.h>
 
 using namespace chip;
@@ -42,6 +43,7 @@ using namespace chip::DeviceLayer;
 OTARequestor gRequestorCore;
 GenericOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
+GenericOTARequestorStorage gStorage;
 OTAImageProcessorImpl gImageProcessor;
 
 /*****************************************************************************
@@ -53,7 +55,7 @@ void InitializeOTARequestor(void)
     // Initialize and interconnect the Requestor and Image Processor objects
     SetRequestorInstance(&gRequestorCore);
 
-    gRequestorCore.Init(&Server::GetInstance(), &gRequestorUser, &gDownloader);
+    gRequestorCore.Init(&Server::GetInstance(), &gRequestorUser, &gDownloader, &gStorage);
     gImageProcessor.SetOTADownloader(&gDownloader);
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);

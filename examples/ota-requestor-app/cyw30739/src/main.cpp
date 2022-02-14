@@ -27,6 +27,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/CYW30739/OTAImageProcessorImpl.h>
 #include <platform/GenericOTARequestorDriver.h>
+#include <platform/GenericOTARequestorStorage.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <sparcommon.h>
 #include <stdio.h>
@@ -44,6 +45,7 @@ static void InitApp(intptr_t args);
 OTARequestor gRequestorCore;
 DeviceLayer::GenericOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
+GenericOTARequestorStorage gStorage;
 OTAImageProcessorImpl gImageProcessor;
 
 APPLICATION_START()
@@ -129,7 +131,7 @@ void InitApp(intptr_t args)
     // Initialize and interconnect the Requestor and Image Processor objects -- START
     SetRequestorInstance(&gRequestorCore);
 
-    gRequestorCore.Init(&(chip::Server::GetInstance()), &gRequestorUser, &gDownloader);
+    gRequestorCore.Init(&(chip::Server::GetInstance()), &gRequestorUser, &gDownloader, &gStorage);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
     gImageProcessor.SetOTADownloader(&gDownloader);

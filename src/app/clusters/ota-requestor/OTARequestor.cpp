@@ -479,6 +479,8 @@ CHIP_ERROR OTARequestor::AddDefaultOtaProvider(const ProviderLocation::Type & pr
     }
 
     ReturnErrorOnFailure(mDefaultOtaProviderList.Add(providerLocation));
+    // Store in KVS
+    ReturnErrorOnFailure(StoreDefaultOtaProvidersList());
 
     // Should be removed when periodic queries is implemented
     iterator = mDefaultOtaProviderList.Begin();

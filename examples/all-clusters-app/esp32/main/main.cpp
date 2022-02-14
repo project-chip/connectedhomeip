@@ -73,6 +73,7 @@
 #include <platform/ESP32/NetworkCommissioningDriver.h>
 #include <platform/ESP32/OTAImageProcessorImpl.h>
 #include <platform/GenericOTARequestorDriver.h>
+#include <platform/GenericOTARequestorStorage.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
@@ -135,6 +136,7 @@ std::vector<gpio_num_t> button_gpios = { BUTTON_1_GPIO_NUM, BUTTON_2_GPIO_NUM, B
 OTARequestor gRequestorCore;
 GenericOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
+GenericOTARequestorStorage gStorage;
 OTAImageProcessorImpl gImageProcessor;
 #endif
 
@@ -613,7 +615,7 @@ static void InitOTARequestor(void)
 {
 #if CONFIG_ENABLE_OTA_REQUESTOR
     SetRequestorInstance(&gRequestorCore);
-    gRequestorCore.Init(&Server::GetInstance(), &gRequestorUser, &gDownloader);
+    gRequestorCore.Init(&Server::GetInstance(), &gRequestorUser, &gDownloader, &gStorage);
     gImageProcessor.SetOTADownloader(&gDownloader);
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);

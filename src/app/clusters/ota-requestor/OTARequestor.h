@@ -21,8 +21,8 @@
  */
 
 #pragma once
-
 #include <app/CASESessionManager.h>
+#include <app/clusters/ota-requestor/OTARequestorStorage.h>
 #include <app/clusters/ota-requestor/ota-requestor-server.h>
 #include <app/server/Server.h>
 #include <platform/OTARequestorDriver.h>
@@ -98,12 +98,13 @@ public:
      *   - Set the OTA requestor driver instance used to communicate download progress and errors
      *   - Set the BDX downloader instance used for initiating BDX downloads
      */
-    void Init(Server * server, OTARequestorDriver * driver, BDXDownloader * downloader)
+    void Init(Server * server, OTARequestorDriver * driver, BDXDownloader * downloader, OTARequestorStorage * storage)
     {
-        mServer             = server;
-        mCASESessionManager = server->GetCASESessionManager();
-        mOtaRequestorDriver = driver;
-        mBdxDownloader      = downloader;
+        mServer              = server;
+        mCASESessionManager  = server->GetCASESessionManager();
+        mOtaRequestorDriver  = driver;
+        mBdxDownloader       = downloader;
+        mOtaRequestorStorage = storage;
 
         uint32_t version;
         ReturnOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(version));
@@ -113,6 +114,7 @@ public:
         app::DataModel::Nullable<uint8_t> percent;
         percent.SetNull();
         OtaRequestorServerSetUpdateStateProgress(percent);
+        LoadDefaultOtaProvidersList();
     }
 
     /**
@@ -131,6 +133,28 @@ public:
     // Application notifies the Requestor on the user consent action, TRUE if consent is given,
     // FALSE otherwise
     void OnUserConsent(bool result);
+
+    /**
+     * Generic API to load key-value from OTA Requestor storage
+     */
+    CHIP_ERROR GenericLoadFromPersistentStorage(const char * key, void * valueBuffer, uint16_t & bufferSize, size_t * readBytesSize,
+                                                size_t offsetBytes)
+    {
+        return mOtaRequestorStorage->SyncGetKeyValue(key, valueBuffer, bufferSize, readBytesSize, offsetBytes);
+    }
+
+    /**
+     * Generic API to store key-value into OTA Requestor storage
+     */
+    CHIP_ERROR GenericStoreIntoPersistentStorage(const char * key, const void * valueBuffer, uint16_t bufferSize)
+    {
+        return mOtaRequestorStorage->SyncSetKeyValue(key, valueBuffer, bufferSize);
+    }
+
+    /**
+     * Generic API to delete key from OTA Requestor storage
+     */
+    CHIP_ERROR GenericDeleteFromPersistentStorage(const char * key) { return mOtaRequestorStorage->SyncDeleteKeyValue(key); }
 
 private:
     using QueryImageResponseDecodableType  = app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType;
@@ -203,6 +227,15 @@ private:
         chip::Messaging::ExchangeContext * mExchangeCtx;
         chip::BDXDownloader * mDownloader;
     };
+
+    // Load the DefaultOTAProvidersList attribute value from the platform KVS
+    CHIP_ERROR LoadDefaultOtaProvidersList() { return mDefaultOtaProviderList.LoadFromPersistentStorage(mOtaRequestorStorage); }
+
+    // Store the DefaultOTAProvidersList attribute value from the platform KVS
+    CHIP_ERROR StoreDefaultOtaProvidersList() { return mDefaultOtaProviderList.StoreIntoPersistentStorage(mOtaRequestorStorage); }
+
+    // Delete the DefaultOTAProvidersList attribute from the platform KVS
+    CHIP_ERROR DeleteDefaultOtaProvidersList() { return mDefaultOtaProviderList.DeleteFromPersistentStorage(mOtaRequestorStorage); }
 
     /**
      * Set the cached default OTA provider location to use for the next query
@@ -288,6 +321,7 @@ private:
     Messaging::ExchangeContext * mExchangeCtx = nullptr;
     BDXDownloader * mBdxDownloader            = nullptr; // TODO: this should be OTADownloader
     BDXMessenger mBdxMessenger;                          // TODO: ideally this is held by the application
+    OTARequestorStorage * mOtaRequestorStorage = nullptr;
     uint8_t mUpdateTokenBuffer[kMaxUpdateTokenLen];
     ByteSpan mUpdateToken;
     uint32_t mCurrentVersion               = 0;

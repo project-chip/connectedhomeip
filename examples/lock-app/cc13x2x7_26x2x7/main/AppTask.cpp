@@ -34,6 +34,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <platform/GenericOTARequestorDriver.h>
+#include <platform/GenericOTARequestorStorage.h>
 #include <platform/cc13x2_26x2/OTAImageProcessorImpl.h>
 
 #include <app/server/OnboardingCodesUtil.h>
@@ -65,6 +66,7 @@ AppTask AppTask::sAppTask;
 static OTARequestor sRequestorCore;
 static GenericOTARequestorDriver sRequestorUser;
 static BDXDownloader sDownloader;
+static GenericOTARequestorStorage sStorage;
 static OTAImageProcessorImpl sImageProcessor;
 
 void InitializeOTARequestor(void)
@@ -72,7 +74,7 @@ void InitializeOTARequestor(void)
     // Initialize and interconnect the Requestor and Image Processor objects
     SetRequestorInstance(&sRequestorCore);
 
-    sRequestorCore.Init(&Server::GetInstance(), &sRequestorUser, &sDownloader);
+    sRequestorCore.Init(&Server::GetInstance(), &sRequestorUser, &sDownloader, &sStorage);
     sImageProcessor.SetOTADownloader(&sDownloader);
     sDownloader.SetImageProcessorDelegate(&sImageProcessor);
     sRequestorUser.Init(&sRequestorCore, &sImageProcessor);

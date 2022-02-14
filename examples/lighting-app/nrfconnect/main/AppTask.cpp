@@ -43,6 +43,7 @@
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/OTARequestor.h>
 #include <platform/GenericOTARequestorDriver.h>
+#include <platform/GenericOTARequestorStorage.h>
 #include <platform/nrfconnect/OTAImageProcessorImpl.h>
 #endif
 
@@ -85,6 +86,7 @@ GenericOTARequestorDriver sOTARequestorDriver;
 OTAImageProcessorImpl sOTAImageProcessor;
 chip::BDXDownloader sBDXDownloader;
 chip::OTARequestor sOTARequestor;
+chip::GenericOTARequestorStorage sStorage;
 #endif
 
 } // namespace
@@ -188,7 +190,7 @@ void AppTask::InitOTARequestor()
     sOTAImageProcessor.SetOTADownloader(&sBDXDownloader);
     sBDXDownloader.SetImageProcessorDelegate(&sOTAImageProcessor);
     sOTARequestorDriver.Init(&sOTARequestor, &sOTAImageProcessor);
-    sOTARequestor.Init(&chip::Server::GetInstance(), &sOTARequestorDriver, &sBDXDownloader);
+    sOTARequestor.Init(&chip::Server::GetInstance(), &sOTARequestorDriver, &sBDXDownloader, &sStorage);
     chip::SetRequestorInstance(&sOTARequestor);
 #endif
 }

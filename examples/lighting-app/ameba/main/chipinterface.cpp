@@ -46,6 +46,7 @@
 #include "app/clusters/ota-requestor/OTARequestor.h"
 #include "platform/Ameba/AmebaOTAImageProcessor.h"
 #include "platform/GenericOTARequestorDriver.h"
+#include <platform/GenericOTARequestorStorage.h>
 #endif
 
 using namespace ::chip;
@@ -78,6 +79,7 @@ static DeviceCallbacks EchoCallbacks;
 OTARequestor gRequestorCore;
 GenericOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
+GenericOTARequestorStorage gStorage;
 AmebaOTAImageProcessor gImageProcessor;
 #endif
 
@@ -101,7 +103,7 @@ static void InitOTARequestor(void)
     SetRequestorInstance(&gRequestorCore);
 
     // Set server instance used for session establishment
-    gRequestorCore.Init(&(chip::Server::GetInstance()), &gRequestorUser, &gDownloader);
+    gRequestorCore.Init(&(chip::Server::GetInstance()), &gRequestorUser, &gDownloader, &gStorage);
 
     // WARNING: this is probably not realistic to know such details of the image or to even have an OTADownloader instantiated at
     // the beginning of program execution. We're using hardcoded values here for now since this is a reference application.

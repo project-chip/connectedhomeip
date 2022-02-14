@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,18 +16,20 @@
  *    limitations under the License.
  */
 
+/* This file contains the Storage interface for the OTARequestor
+ */
+
 #pragma once
 
-#include "app/clusters/ota-requestor/BDXDownloader.h"
-#include "app/clusters/ota-requestor/OTARequestor.h"
-#include "platform/EFR32/OTAImageProcessorImpl.h"
-#include "platform/GenericOTARequestorDriver.h"
-#include "platform/GenericOTARequestorStorage.h"
-
-class OTAConfig
+namespace chip {
+class OTARequestorStorage : public PersistentStorageDelegate
 {
 public:
-    OTAConfig(){};
+    virtual ~OTARequestorStorage() = default;
 
-    static void Init();
+    // Reads a KVS value from an offset if desired and returns number of bytes read
+    // TODO: Move to PersistentStorageDelegate interface ideally
+    virtual CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size, size_t * read_bytes_size,
+                                       size_t offset_bytes) = 0;
 };
+} // namespace chip

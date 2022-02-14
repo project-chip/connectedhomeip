@@ -24,6 +24,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
+#include <app/clusters/ota-requestor/OTARequestorStorage.h>
 #include <app/util/af-enums.h>
 
 #pragma once
@@ -45,8 +46,7 @@ public:
         /**
          * Initialize iterator values, must be called before calling Next()/GetValue()
          */
-        Iterator(const Optional<app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type> * const list,
-                 size_t size)
+        Iterator(const app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type * const list, size_t size)
         {
             mList         = list;
             mListSize     = size;
@@ -61,7 +61,7 @@ public:
         {
             for (size_t i = mNextIndex; i < mListSize; i++)
             {
-                if (mList[i].HasValue())
+                if (mList[i].fabricIndex != 0)
                 {
                     mCurrentIndex = i;
                     mNextIndex    = mCurrentIndex + 1;
@@ -77,11 +77,11 @@ public:
          */
         const app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & GetValue() const
         {
-            return mList[mCurrentIndex].Value();
+            return mList[mCurrentIndex];
         }
 
     private:
-        const Optional<app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type> * mList;
+        const app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type * mList;
         size_t mListSize;
         size_t mCurrentIndex;
         size_t mNextIndex;
@@ -99,9 +99,9 @@ public:
     {
         for (size_t i = 0; i < mMaxSize; i++)
         {
-            if (!mList[i].HasValue())
+            if (mList[i].fabricIndex == 0)
             {
-                mList[i].SetValue(providerLocation);
+                mList[i] = providerLocation;
                 mListSize++;
                 return CHIP_NO_ERROR;
             }
@@ -117,13 +117,13 @@ public:
     {
         for (size_t i = 0; i < mMaxSize; i++)
         {
-            if (mList[i].HasValue())
+            if (mList[i].fabricIndex != 0)
             {
-                const app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & pl = mList[i].Value();
+                const app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & pl = mList[i];
                 if ((pl.GetFabricIndex() == providerLocation.GetFabricIndex()) &&
                     (pl.providerNodeID == providerLocation.providerNodeID) && (pl.endpoint == providerLocation.endpoint))
                 {
-                    mList[i].ClearValue();
+                    mList[i] = { 0, 0, 0 };
                     mListSize--;
                     return CHIP_NO_ERROR;
                 }
@@ -133,10 +133,48 @@ public:
         return CHIP_ERROR_NOT_FOUND;
     }
 
+    /**
+     * Load the DefaultOTAProvidersList attribute value from the platform KVS
+     * TODO: Use DefaultStorageKeyAllocator.AttributeValue() to get a key composed of the concrete attribute path
+     */
+    CHIP_ERROR LoadFromPersistentStorage(OTARequestorStorage * storage)
+    {
+        size_t read_bytes_size = 0;
+        uint16_t max_size =
+            static_cast<uint16_t>(mMaxSize * sizeof(app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type));
+        CHIP_ERROR ret = storage->SyncGetKeyValue(defaultOtaProvidersListkey, mList, max_size, &read_bytes_size, 0);
+        if (ret == CHIP_NO_ERROR)
+        {
+            mListSize = read_bytes_size / sizeof(app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type);
+        }
+        return ret;
+    }
+
+    /**
+     * Store the DefaultOTAProvidersList attribute value from the platform KVS
+     * TODO: Use DefaultStorageKeyAllocator.AttributeValue() to get a key composed of the concrete attribute path
+     */
+    CHIP_ERROR StoreIntoPersistentStorage(OTARequestorStorage * storage)
+    {
+        return storage->SyncSetKeyValue(
+            defaultOtaProvidersListkey, mList,
+            static_cast<uint16_t>(mListSize * sizeof(app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type)));
+    }
+
+    /**
+     * Delete the DefaultOTAProvidersList attribute from the platform KVS
+     * TODO: Use DefaultStorageKeyAllocator.AttributeValue() to get a key composed of the concrete attribute path
+     */
+    CHIP_ERROR DeleteFromPersistentStorage(OTARequestorStorage * storage)
+    {
+        return storage->SyncDeleteKeyValue(defaultOtaProvidersListkey);
+    }
+
 private:
-    Optional<app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type> mList[CHIP_CONFIG_MAX_FABRICS];
-    size_t mListSize = 0;
-    size_t mMaxSize  = CHIP_CONFIG_MAX_FABRICS;
+    app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type mList[CHIP_CONFIG_MAX_FABRICS] = {};
+    size_t mListSize                                                                                          = 0;
+    size_t mMaxSize                                          = CHIP_CONFIG_MAX_FABRICS;
+    static constexpr const char * defaultOtaProvidersListkey = "otaProvList";
 };
 
 // Interface class to connect the OTA Software Update Requestor cluster command processing

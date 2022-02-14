@@ -1297,7 +1297,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "External",
+              "storageOption": "NVM",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0",

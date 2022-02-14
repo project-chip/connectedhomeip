@@ -37,6 +37,7 @@
 #include "OTAImageProcessorImpl.h"
 #include "OtaSupport.h"
 #include "platform/GenericOTARequestorDriver.h"
+#include "platform/GenericOTARequestorStorage.h"
 #include "src/app/clusters/ota-requestor/BDXDownloader.h"
 #include "src/app/clusters/ota-requestor/OTARequestor.h"
 
@@ -87,6 +88,7 @@ AppTask AppTask::sAppTask;
 static OTARequestor gRequestorCore;
 DeviceLayer::GenericOTARequestorDriver gRequestorUser;
 static BDXDownloader gDownloader;
+static GenericOTARequestorStorage gStorage;
 static OTAImageProcessorImpl gImageProcessor;
 
 CHIP_ERROR AppTask::StartAppTask()
@@ -121,7 +123,7 @@ CHIP_ERROR AppTask::Init()
     // Initialize and interconnect the Requestor and Image Processor objects -- START
     SetRequestorInstance(&gRequestorCore);
 
-    gRequestorCore.Init(&(chip::Server::GetInstance()), &gRequestorUser, &gDownloader);
+    gRequestorCore.Init(&(chip::Server::GetInstance()), &gRequestorUser, &gDownloader, &gStorage);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
     // WARNING: this is probably not realistic to know such details of the image or to even have an OTADownloader instantiated at

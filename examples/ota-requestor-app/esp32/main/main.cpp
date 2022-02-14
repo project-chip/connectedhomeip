@@ -41,6 +41,7 @@
 
 #include "OTAImageProcessorImpl.h"
 #include "platform/GenericOTARequestorDriver.h"
+#include "platform/GenericOTARequestorStorage.h"
 #include "platform/OTARequestorInterface.h"
 
 using namespace ::chip;
@@ -56,6 +57,7 @@ static DeviceCallbacks EchoCallbacks;
 OTARequestor gRequestorCore;
 GenericOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
+GenericOTARequestorStorage gStorage;
 OTAImageProcessorImpl gImageProcessor;
 
 app::Clusters::NetworkCommissioning::Instance
@@ -71,7 +73,7 @@ static void InitServer(intptr_t context)
     sWiFiNetworkCommissioningInstance.Init();
 
     SetRequestorInstance(&gRequestorCore);
-    gRequestorCore.Init(&(Server::GetInstance()), &gRequestorUser, &gDownloader);
+    gRequestorCore.Init(&(Server::GetInstance()), &gRequestorUser, &gDownloader, &gStorage);
     gImageProcessor.SetOTADownloader(&gDownloader);
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);

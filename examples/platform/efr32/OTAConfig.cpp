@@ -64,6 +64,7 @@ __attribute__((used)) ApplicationProperties_t sl_app_properties = {
 chip::OTARequestor gRequestorCore;
 chip::DeviceLayer::GenericOTARequestorDriver gRequestorUser;
 chip::BDXDownloader gDownloader;
+chip::GenericOTARequestorStorage gStorage;
 chip::OTAImageProcessorImpl gImageProcessor;
 
 void OTAConfig::Init()
@@ -71,7 +72,7 @@ void OTAConfig::Init()
     // Initialize and interconnect the Requestor and Image Processor objects -- START
     SetRequestorInstance(&gRequestorCore);
 
-    gRequestorCore.Init(&(chip::Server::GetInstance()), &gRequestorUser, &gDownloader);
+    gRequestorCore.Init(&(chip::Server::GetInstance()), &gRequestorUser, &gDownloader, &gStorage);
 
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
