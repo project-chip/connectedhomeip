@@ -44,7 +44,7 @@ private:
     // Members that implement the BLEManager internal interface.
 
     CHIP_ERROR _Init(void);
-    CHIP_ERROR _InitGatt(void);
+    CHIP_ERROR _Shutdown() { return CHIP_NO_ERROR; }
     CHIPoBLEServiceMode _GetCHIPoBLEServiceMode(void);
     CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool _IsAdvertisingEnabled(void);
@@ -100,7 +100,7 @@ private:
     enum
     {
         kMaxConnections              = BLE_LAYER_NUM_BLE_ENDPOINTS,
-        kMaxDeviceNameLength         = 16, // TODO: right-size this
+        kMaxDeviceNameLength         = 16,
         kMaxAdvertisementDataSetSize = 31,
         kMaxRxDataBuffSize           = 20,
         kMaxTxDataBuffSize           = 20
@@ -109,8 +109,8 @@ private:
     CHIPoBLEServiceMode mServiceMode;
     BitFlags<Flags> mFlags;
     char mDeviceName[kMaxDeviceNameLength + 1];
-    uint16_t mNumGAPCons;
-    uint16_t mSubscribedConIds[kMaxConnections];
+    uint16_t mNumConnections;
+    bool mSubscribedConns[kMaxConnections];
     uint8_t mAdvDataBuf[kMaxAdvertisementDataSetSize];
     uint8_t mScanRespDataBuf[kMaxAdvertisementDataSetSize];
     uint8_t mRxDataBuff[kMaxRxDataBuffSize];
@@ -123,7 +123,13 @@ private:
     CHIP_ERROR SetSubscribed(uint16_t conId);
     bool UnsetSubscribed(uint16_t conId);
     bool IsSubscribed(uint16_t conId);
-    CHIP_ERROR HandleRXCharWrite(const ChipDeviceEvent * event);
+
+    CHIP_ERROR HandleGAPConnect(const ChipDeviceEvent * event);
+    CHIP_ERROR HandleGAPDisconnect(const ChipDeviceEvent * event);
+    CHIP_ERROR HandleRXCharWrite(const ChipDeviceEvent *event);
+    CHIP_ERROR HandleTXCharCCCDWrite(const ChipDeviceEvent *event);
+    CHIP_ERROR HandleTXCharComplete(const ChipDeviceEvent * event);
+    CHIP_ERROR HandleBleConnectionClosed(const ChipDeviceEvent * event);
 
     /* Callbacks from BLE stack*/
     static void DriveBLEState(intptr_t arg);
@@ -132,8 +138,23 @@ private:
     static void CancelBleAdvTimeoutTimer(void);
     static void StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs);
 
+    /* Other init functions */
+    CHIP_ERROR _InitStack(void);
+    void _InitGatt(void);
+    CHIP_ERROR _InitGap(void);
+
 public:
     static int RxWriteCallback(uint16_t connHandle, void *p);
+    static int TxCccWriteCallback(uint16_t connHandle, void *p);
+    static void ConnectCallback(uint8_t event, uint8_t *data, int len);
+    static void DisconnectCallback(uint8_t event, uint8_t *data, int len);
+    static int GapEventHandler(uint32_t event, uint8_t *data, int size);
+
+    /* Switch to IEEE802154 interface. @todo: remove to other module? */
+    void SwitchToIeee802154(void);
+
+    /* BLE thread entry */
+    static void BleEntry(void *, void *, void *);
 };
 
 /**
