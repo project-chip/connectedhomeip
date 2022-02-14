@@ -147,6 +147,8 @@ def HostTargets():
         targets[0].Extend('tv-app', app=HostApp.TV_APP))
     app_targets.append(
         targets[0].Extend('chip-cert', app=HostApp.CERT_TOOL))
+    app_targets.append(
+        targets[0].Extend('address-resolve-tool', app=HostApp.ADDRESS_RESOLVE))
 
     for target in targets:
         app_targets.append(target.Extend(

@@ -26,6 +26,7 @@ class HostApp(Enum):
     THERMOSTAT = auto()
     RPC_CONSOLE = auto()
     MIN_MDNS = auto()
+    ADDRESS_RESOLVE = auto()
     TV_APP = auto()
     LOCK = auto()
     TESTS = auto()
@@ -43,6 +44,8 @@ class HostApp(Enum):
             return 'common/pigweed/rpc_console'
         elif self == HostApp.MIN_MDNS:
             return 'minimal-mdns'
+        elif self == HostApp.ADDRESS_RESOLVE:
+            return '../'
         elif self == HostApp.TV_APP:
             return 'tv-app/linux'
         elif self == HostApp.LOCK:
@@ -75,6 +78,9 @@ class HostApp(Enum):
             yield 'minimal-mdns-client.map'
             yield 'minimal-mdns-server'
             yield 'minimal-mdns-server.map'
+        elif self == HostApp.ADDRESS_RESOLVE:
+            yield 'address-resolve-tool'
+            yield 'address-resolve-tool.map'
         elif self == HostApp.TV_APP:
             yield 'chip-tv-app'
             yield 'chip-tv-app.map'
@@ -183,6 +189,9 @@ class HostBuilder(GnBuilder):
                     "Cannot cross compile CERT TOOL: ssl library conflict")
             self.extra_gn_options.append('chip_crypto="openssl"')
             self.build_command = 'src/tools/chip-cert'
+
+        if app == HostApp.ADDRESS_RESOLVE:
+            self.build_command = 'src/lib/address_resolve:address-resolve-tool'
 
     def GnBuildArgs(self):
         if self.board == HostBoard.NATIVE:
