@@ -693,7 +693,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
 
         if (Credentials::GroupDataProvider::SecurityPolicy::kLowLatency == groupContext.security_policy)
         {
-            err = counter->VerifyOrTrustFirst(packetHeader.GetMessageCounter());
+            err = counter->VerifyOrTrustFirst(packetHeader.GetMessageCounter(), true);
         }
         else
         {
@@ -703,7 +703,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
             return;
 
             // cache and sync
-            // err = counter->Verify(packetHeader.GetMessageCounter());
+            // err = counter->Verify(packetHeader.GetMessageCounter(), true);
         }
 
         if (err != CHIP_NO_ERROR)

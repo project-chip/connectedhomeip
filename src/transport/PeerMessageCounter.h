@@ -33,8 +33,8 @@ class PeerMessageCounter
 {
 public:
     static constexpr size_t kChallengeSize = 8;
+    static constexpr uint32_t kGroupOffset = static_cast<uint32_t>(1 << 31); // 2^31
 
-    PeerMessageCounter(bool isGroup) : mStatus(Status::NotSynced), mIsGroup(isGroup) {}
     PeerMessageCounter() : mStatus(Status::NotSynced) {}
     ~PeerMessageCounter() { Reset(); }
 
@@ -86,7 +86,65 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Verify(uint32_t counter) const
+    /**
+     * @brief Implementation of spec 4.5.4.2
+     *
+     * For encrypted messages of Group Session Type, any arriving message with a counter in the range
+     * [(max_message_counter + 1) to (max_message_counter + 2^31 - 1)] (modulo 2^32) SHALL be considered
+     * new, and cause the max_message_counter value to be updated. Messages with counters from
+     * [(max_message_counter - 2^31) to (max_message_counter - MSG_COUNTER_WINDOW_SIZE - 1)] (modulo 2^
+     * 32) SHALL be considered duplicate. Message counters within the range of the bitmap SHALL be
+     * considered duplicate if the corresponding bit offset is set to true.
+     *
+     */
+    CHIP_ERROR VerifyGroupCounter(uint32_t counter)
+    {
+        uint32_t highLimit = mSynced.mMaxCounter + kGroupOffset + 1;
+        // 1. Check counter value if in valid range
+        if (highLimit < mSynced.mMaxCounter)
+        {
+            // Rollover possible
+            if ((counter > mSynced.mMaxCounter) || (counter <= highLimit))
+            {
+                return CHIP_NO_ERROR;
+            }
+        }
+        else
+        {
+            if ((counter > mSynced.mMaxCounter) && (counter <= highLimit))
+            {
+                return CHIP_NO_ERROR;
+            }
+        }
+        // 2.  Check counter if in invalid range
+        uint32_t invalidLowerLimit = mSynced.mMaxCounter - kGroupOffset;
+        highLimit                  = mSynced.mMaxCounter - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE - 1;
+        if (highLimit > invalidLowerLimit)
+        {
+            if ((counter >= invalidLowerLimit) && (counter <= highLimit))
+            {
+                return CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW;
+            }
+        }
+
+        // 3. Counter Window check
+        uint32_t offset = mSynced.mMaxCounter - counter;
+        if (offset < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
+        {
+            if (mSynced.mWindow.test(offset))
+            {
+                return CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED; // duplicated, in window
+            }
+        }
+        else
+        {
+            return CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW;
+        }
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR VerifyUnicast(uint32_t counter) const
     {
         if (mStatus != Status::Synced)
         {
@@ -96,19 +154,6 @@ public:
         if (counter <= mSynced.mMaxCounter)
         {
             uint32_t offset = mSynced.mMaxCounter - counter;
-
-            if (mIsGroup && (offset > (UINT32_MAX / 2)))
-            {
-                // Different behaviour since Group Counter can roll over
-                // spec 4.5.1.3
-
-                // Possible roll over, set the offset to the smallest of the two
-                uint32_t secondOffset = counter - mSynced.mMaxCounter;
-                if (secondOffset < offset)
-                {
-                    offset = secondOffset;
-                }
-            }
 
             if (offset >= CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
             {
@@ -124,7 +169,16 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR VerifyOrTrustFirst(uint32_t counter)
+    CHIP_ERROR Verify(uint32_t counter, bool useGroupAlgorithm = false)
+    {
+        if (useGroupAlgorithm)
+        {
+            return VerifyGroupCounter(counter);
+        }
+        return VerifyUnicast(counter);
+    }
+
+    CHIP_ERROR VerifyOrTrustFirst(uint32_t counter, bool useGroupAlgorithm = false)
     {
         switch (mStatus)
         {
@@ -133,8 +187,8 @@ public:
             SetCounter(counter);
             return CHIP_NO_ERROR;
         case Status::Synced: {
-            CHIP_ERROR err = Verify(counter);
-            if (err == CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW && !mIsGroup)
+            CHIP_ERROR err = Verify(counter, useGroupAlgorithm);
+            if (err == CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW && !useGroupAlgorithm)
             {
                 // According to chip spec, when global unencrypted message
                 // counter is out of window, the peer may have reset and is
@@ -154,33 +208,71 @@ public:
     /**
      * @brief
      *    With the counter verified and the packet MIC also verified by the secure key, we can trust the packet and adjust
+     *    counter states including possible Rollover for Groups communications.
+     *
+     * @pre Verify(counter) == CHIP_NO_ERROR
+     */
+    void CommitWithRollOver(uint32_t counter)
+    {
+        if (counter <= mSynced.mMaxCounter)
+        {
+            // Take into account rollover
+            uint32_t offset         = mSynced.mMaxCounter - counter;
+            uint32_t rollOverOffset = ((UINT32_MAX - mSynced.mMaxCounter) + counter);
+            if (offset < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
+            {
+                mSynced.mWindow.set(offset);
+            }
+            else if (rollOverOffset < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
+            {
+                // Roll over occured
+                mSynced.mMaxCounter = counter;
+                mSynced.mWindow <<= rollOverOffset;
+                mSynced.mWindow.set(0);
+            }
+            else
+            {
+                // Roll over occured with a leap bigger than CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE
+                mSynced.mMaxCounter = counter;
+                mSynced.mWindow.reset();
+                mSynced.mWindow.set(0);
+            }
+        }
+        else
+        {
+            uint32_t offset = counter - mSynced.mMaxCounter;
+            // advance max counter by `offset`
+            mSynced.mMaxCounter = counter;
+            if (offset < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
+            {
+                mSynced.mWindow <<= offset;
+            }
+            else
+            {
+                mSynced.mWindow.reset();
+            }
+            mSynced.mWindow.set(0);
+        }
+    }
+
+    /**
+     * @brief
+     *    With the counter verified and the packet MIC also verified by the secure key, we can trust the packet and adjust
      *    counter states.
      *
      * @pre Verify(counter) == CHIP_NO_ERROR
      */
     void Commit(uint32_t counter)
     {
-        uint32_t offset = mSynced.mMaxCounter - counter;
+
         if (counter <= mSynced.mMaxCounter)
         {
-            if (mIsGroup && (offset > (UINT32_MAX / 2)))
-            {
-                // Different behaviour since Group Counter can roll over
-                // spec 4.5.1.3
-
-                // Possible roll over, set the offset to the smallest of the two
-                uint32_t secondOffset = counter - mSynced.mMaxCounter;
-                if (secondOffset < offset)
-                {
-                    offset = secondOffset;
-                }
-            }
-
+            uint32_t offset = mSynced.mMaxCounter - counter;
             mSynced.mWindow.set(offset);
         }
         else
         {
-            offset = counter - mSynced.mMaxCounter;
+            uint32_t offset = counter - mSynced.mMaxCounter;
             // advance max counter by `offset`
             mSynced.mMaxCounter = counter;
             if (offset < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
@@ -239,8 +331,6 @@ private:
         SyncInProcess mSyncInProcess;
         Synced mSynced;
     };
-
-    bool mIsGroup = false;
 };
 
 } // namespace Transport

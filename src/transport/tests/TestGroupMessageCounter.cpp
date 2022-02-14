@@ -199,27 +199,29 @@ void CounterTrustFirstTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, counter != nullptr);
 
-    err = counter->VerifyOrTrustFirst(5656);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    counter->Commit(5656);
+    ChipLogDetail(Inet, "%u", counter->kGroupOffset);
 
-    err = counter->VerifyOrTrustFirst(5756);
+    err = counter->VerifyOrTrustFirst(5656, true);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    counter->Commit(5756);
 
-    err = counter->VerifyOrTrustFirst(4756);
+    counter->CommitWithRollOver(5656);
+
+    err = counter->VerifyOrTrustFirst(5756, true);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    counter->CommitWithRollOver(5756);
+    err = counter->VerifyOrTrustFirst(4756, true);
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
 
     // test sequential reception
-    err = counter->VerifyOrTrustFirst(5757);
+    err = counter->VerifyOrTrustFirst(5757, true);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    counter->Commit(5757);
+    counter->CommitWithRollOver(5757);
 
-    err = counter->VerifyOrTrustFirst(5758);
+    err = counter->VerifyOrTrustFirst(5758, true);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    counter->Commit(5758);
+    counter->CommitWithRollOver(5758);
 
-    err = counter->VerifyOrTrustFirst(5756);
+    err = counter->VerifyOrTrustFirst(5756, true);
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
 
     // Test Roll over
@@ -227,41 +229,40 @@ void CounterTrustFirstTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, counter != nullptr);
 
-    err = counter->VerifyOrTrustFirst(UINT32_MAX - 6);
+    err = counter->VerifyOrTrustFirst(UINT32_MAX - 6, true);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    counter->Commit(UINT32_MAX - 6);
+    counter->CommitWithRollOver(UINT32_MAX - 6);
 
-    err = counter->VerifyOrTrustFirst(UINT32_MAX - 1);
+    err = counter->VerifyOrTrustFirst(UINT32_MAX - 1, true);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    counter->Commit(UINT32_MAX - 1);
+    counter->CommitWithRollOver(UINT32_MAX - 1);
 
-    err = counter->VerifyOrTrustFirst(UINT32_MAX);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    err = counter->VerifyOrTrustFirst(0);
+    err = counter->VerifyOrTrustFirst(UINT32_MAX, true);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = counter->VerifyOrTrustFirst(1);
+    err = counter->VerifyOrTrustFirst(0, true);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = counter->VerifyOrTrustFirst(2);
+    err = counter->VerifyOrTrustFirst(1, true);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = counter->VerifyOrTrustFirst(3);
+    err = counter->VerifyOrTrustFirst(2, true);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = counter->VerifyOrTrustFirst(4);
+    err = counter->VerifyOrTrustFirst(3, true);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = counter->VerifyOrTrustFirst(5);
+    err = counter->VerifyOrTrustFirst(4, true);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = counter->VerifyOrTrustFirst(6);
+    err = counter->VerifyOrTrustFirst(5, true);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = counter->VerifyOrTrustFirst(7);
+    err = counter->VerifyOrTrustFirst(6, true);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
+    err = counter->VerifyOrTrustFirst(7, true);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
 void ReorderPeerRemovalTest(nlTestSuite * inSuite, void * inContext)
@@ -323,11 +324,11 @@ void ReorderFabricRemovalTest(nlTestSuite * inSuite, void * inContext)
     err = mGroupPeerMsgCounter.FindOrAddPeer(8, 1, true, counter);
     err = mGroupPeerMsgCounter.FindOrAddPeer(9, 1, true, counter);
 
-    err = counter->VerifyOrTrustFirst(5656);
+    err = counter->VerifyOrTrustFirst(5656, true);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    counter->Commit(5656);
+    counter->CommitWithRollOver(5656);
 
-    err = counter->VerifyOrTrustFirst(4756);
+    err = counter->VerifyOrTrustFirst(4756, true);
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
 
     err = mGroupPeerMsgCounter.FindOrAddPeer(10, 1, true, counter);
@@ -356,7 +357,7 @@ void ReorderFabricRemovalTest(nlTestSuite * inSuite, void * inContext)
     // Validate that counter value were moved around correctly
     err = mGroupPeerMsgCounter.FindOrAddPeer(9, 1, true, counter);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = counter->VerifyOrTrustFirst(4756);
+    err = counter->VerifyOrTrustFirst(4756, true);
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
 }
 

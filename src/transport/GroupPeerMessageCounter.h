@@ -42,8 +42,8 @@ namespace Transport {
 class GroupSender
 {
 public:
-    NodeId mNodeId                = kUndefinedNodeId;
-    PeerMessageCounter msgCounter = { true };
+    NodeId mNodeId = kUndefinedNodeId;
+    PeerMessageCounter msgCounter;
 };
 
 class GroupFabric
@@ -65,7 +65,7 @@ public:
     // Used in case of MCSP failure
     CHIP_ERROR RemovePeer(FabricIndex fabricIndex, NodeId nodeId, bool isControl);
 
-// Protected for Unit Tests inheritance
+    // Protected for Unit Tests inheritance
 protected:
     bool RemoveSpecificPeer(GroupSender * list, NodeId nodeId, uint32_t size);
     void CompactPeers(GroupSender * list, uint32_t size);
