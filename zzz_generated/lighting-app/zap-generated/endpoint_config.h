@@ -566,7 +566,7 @@
     }
 
 // This is an array of EmberAfAttributeMinMaxValue structures.
-#define GENERATED_MIN_MAX_DEFAULT_COUNT 4
+#define GENERATED_MIN_MAX_DEFAULT_COUNT 3
 #define GENERATED_MIN_MAX_DEFAULTS                                                                                                 \
     {                                                                                                                              \
                                                                                                                                    \
@@ -576,18 +576,15 @@
             /* Endpoint: 1, Cluster: Level Control (server) */                                                                     \
             { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x3 }, /* options */                                                      \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Color Control (server) */                                                                     \
-            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF }, /* start up color temperature mireds */                         \
-                                                                                                                                   \
-        /* Endpoint: 2, Cluster: On/off Switch Configuration (server) */                                                           \
+        /* Endpoint: 1, Cluster: Color Control (server) */                                                                         \
         {                                                                                                                          \
-            (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x2                                                                         \
-        } /* switch actions */                                                                                                     \
+            (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF                                                                      \
+        } /* start up color temperature mireds */                                                                                  \
     }
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 230
+#define GENERATED_ATTRIBUTE_COUNT 226
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
                                                                                                                                    \
@@ -881,15 +878,6 @@
             { 0x0001, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },    /* occupancy sensor type */                                 \
             { 0x0002, ZAP_TYPE(BITMAP8), 1, 0, ZAP_EMPTY_DEFAULT() },  /* occupancy sensor type bitmap */                          \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(2) }, /* ClusterRevision */                                       \
-                                                                                                                                   \
-            /* Endpoint: 2, Cluster: On/Off (client) */                                                                            \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(3) }, /* ClusterRevision */              \
-                                                                                                                                   \
-            /* Endpoint: 2, Cluster: On/off Switch Configuration (server) */                                                       \
-            { 0x0000, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() }, /* switch type */                                              \
-            { 0x0010, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                              \
-              ZAP_MIN_MAX_DEFAULTS_INDEX(3) },                         /* switch actions */                                        \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) }, /* ClusterRevision */                                       \
     }
 
 // This is an array of EmberAfCluster structures.
@@ -918,7 +906,7 @@
     };
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
-#define GENERATED_CLUSTER_COUNT 26
+#define GENERATED_CLUSTER_COUNT 24
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
         { 0x001D, ZAP_ATTRIBUTE_INDEX(0), 5, 0, ZAP_CLUSTER_MASK(SERVER), NULL }, /* Endpoint: 0, Cluster: Descriptor (server) */  \
@@ -1009,12 +997,6 @@
               5,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
               chipFuncArrayOccupancySensingServer }, /* Endpoint: 1, Cluster: Occupancy Sensing (server) */                        \
-            {                                                                                                                      \
-                0x0006, ZAP_ATTRIBUTE_INDEX(226), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                             \
-            }, /* Endpoint: 2, Cluster: On/Off (client) */                                                                         \
-            {                                                                                                                      \
-                0x0007, ZAP_ATTRIBUTE_INDEX(227), 3, 4, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
-            }, /* Endpoint: 2, Cluster: On/off Switch Configuration (server) */                                                    \
     }
 
 #define ZAP_CLUSTER_INDEX(index) ((EmberAfCluster *) (&generatedClusters[index]))
@@ -1022,7 +1004,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 18, 1479 }, { ZAP_CLUSTER_INDEX(18), 6, 86 }, { ZAP_CLUSTER_INDEX(24), 2, 6 },                     \
+        { ZAP_CLUSTER_INDEX(0), 18, 1479 }, { ZAP_CLUSTER_INDEX(18), 6, 86 },                                                      \
     }
 
 // Largest attribute size is needed for various buffers
@@ -1032,44 +1014,44 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (687)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (1571)
+#define ATTRIBUTE_MAX_SIZE (1565)
 
 // Number of fixed endpoints
-#define FIXED_ENDPOINT_COUNT (3)
+#define FIXED_ENDPOINT_COUNT (2)
 
 // Array of endpoints that are supported, the data inside
 // the array is the endpoint number.
 #define FIXED_ENDPOINT_ARRAY                                                                                                       \
     {                                                                                                                              \
-        0x0000, 0x0001, 0x0002                                                                                                     \
+        0x0000, 0x0001                                                                                                             \
     }
 
 // Array of profile ids
 #define FIXED_PROFILE_IDS                                                                                                          \
     {                                                                                                                              \
-        0x0103, 0x0103, 0x0103                                                                                                     \
+        0x0103, 0x0103                                                                                                             \
     }
 
 // Array of device ids
 #define FIXED_DEVICE_IDS                                                                                                           \
     {                                                                                                                              \
-        22, 257, 259                                                                                                               \
+        22, 257                                                                                                                    \
     }
 
 // Array of device versions
 #define FIXED_DEVICE_VERSIONS                                                                                                      \
     {                                                                                                                              \
-        1, 1, 1                                                                                                                    \
+        1, 1                                                                                                                       \
     }
 
 // Array of endpoint types supported on each endpoint
 #define FIXED_ENDPOINT_TYPES                                                                                                       \
     {                                                                                                                              \
-        0, 1, 2                                                                                                                    \
+        0, 1                                                                                                                       \
     }
 
 // Array of networks supported on each endpoint
 #define FIXED_NETWORKS                                                                                                             \
     {                                                                                                                              \
-        0, 0, 0                                                                                                                    \
+        0, 0                                                                                                                       \
     }
