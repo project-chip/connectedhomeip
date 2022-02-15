@@ -46,7 +46,6 @@ source_set("binding-table") {
   ]
 }
 
-
 chip_test_suite("tests") {
   output_name = "libAppTests"
 
@@ -54,8 +53,8 @@ chip_test_suite("tests") {
     "TestAttributePathExpandIterator.cpp",
     "TestAttributeValueDecoder.cpp",
     "TestAttributeValueEncoder.cpp",
-    "TestBuilderParser.cpp",
     "TestBindingTable.cpp",
+    "TestBuilderParser.cpp",
     "TestClusterInfo.cpp",
     "TestCommandInteraction.cpp",
     "TestCommandPathParams.cpp",
@@ -85,13 +84,13 @@ chip_test_suite("tests") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    ":binding-table",
     "${chip_root}/src/app",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/tests:helpers",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
     "${nlunit_test_root}:nlunit-test",
-    ":binding-table",
   ]
 
   if (chip_config_network_layer_ble &&
