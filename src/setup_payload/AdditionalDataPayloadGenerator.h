@@ -69,7 +69,7 @@ public:
      *                              TLVBackingStore
      *
      */
-    CHIP_ERROR generateAdditionalDataPayload(uint16_t lifetimeCounter, const char * uniqueIdBuffer, size_t uniqueIdBufferSize,
+    CHIP_ERROR generateAdditionalDataPayload(uint16_t lifetimeCounter, MutableByteSpan uniqueId,
                                              chip::System::PacketBufferHandle & bufferHandle,
                                              BitFlags<AdditionalDataFields> additionalDataFields);
     /**
@@ -82,7 +82,7 @@ public:
      *                 the binary data.  As output, will have its size set to
      *                 the actual size used upon successful generation
      */
-    CHIP_ERROR generateRotatingDeviceIdAsBinary(uint16_t lifetimeCounter, const char * uniqueIdBuffer, size_t uniqueIdBufferSize,
+    CHIP_ERROR generateRotatingDeviceIdAsBinary(uint16_t lifetimeCounter, MutableByteSpan uniqueId,
                                                 MutableByteSpan & rotatingDeviceIdBuffer);
 
     /**
@@ -99,7 +99,7 @@ public:
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise.
      *
      */
-    CHIP_ERROR generateRotatingDeviceIdAsHexString(uint16_t lifetimeCounter, const char * uniqueIdBuffer, size_t uniqueIdBufferSize,
+    CHIP_ERROR generateRotatingDeviceIdAsHexString(uint16_t lifetimeCounter, MutableByteSpan uniqueId,
                                                    char * rotatingDeviceIdBuffer, size_t rotatingDeviceIdBufferSize,
                                                    size_t & rotatingDeviceIdValueOutputSize);
 };

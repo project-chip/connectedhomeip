@@ -72,7 +72,8 @@ public:
         kMaxSerialNumberLength          = 32,
         kMaxUniqueIDLength              = 32,
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
-        kRotatingDeviceIDUniqueIDLength = 16,
+        kMinRotatingDeviceIDUniqueIDLength = 16,
+        kRotatingDeviceIDUniqueIDLength    = CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH,
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
         kPrimaryMACAddressLength = 8,
@@ -107,7 +108,7 @@ public:
     virtual CHIP_ERROR IncrementLifetimeCounter()                     = 0;
     // Unique ID is identifier utilized for the rotating device ID calculation purpose as an input key. It is separate identifier
     // from the Basic cluster unique ID.
-    virtual CHIP_ERROR GetRotatingDeviceIdUniqueId(uint8_t * buf, size_t & outSize, size_t bufSize) = 0;
+    virtual CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) = 0;
 #endif
     virtual CHIP_ERROR GetRegulatoryLocation(uint8_t & location)                       = 0;
     virtual CHIP_ERROR GetCountryCode(char * buf, size_t bufSize, size_t & codeLen)    = 0;

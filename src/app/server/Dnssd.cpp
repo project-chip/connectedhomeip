@@ -507,16 +507,15 @@ void DnssdServer::StartServer(Optional<Dnssd::CommissioningMode> mode)
 CHIP_ERROR DnssdServer::GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t rotatingDeviceIdHexBufferSize)
 {
     uint8_t rotatingDeviceIdUniqueId[chip::DeviceLayer::ConfigurationManager::kRotatingDeviceIDUniqueIDLength];
-    size_t rotatingDeviceIdUniqueIdSize;
+    MutableByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId, sizeof(rotatingDeviceIdUniqueId));
     uint16_t lifetimeCounter               = 0;
     size_t rotatingDeviceIdValueOutputSize = 0;
 
-    ReturnErrorOnFailure(chip::DeviceLayer::ConfigurationMgr().GetRotatingDeviceIdUniqueId(
-        rotatingDeviceIdUniqueId, rotatingDeviceIdUniqueIdSize, sizeof(rotatingDeviceIdUniqueId)));
+    ReturnErrorOnFailure(chip::DeviceLayer::ConfigurationMgr().GetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueIdSpan));
     ReturnErrorOnFailure(chip::DeviceLayer::ConfigurationMgr().GetLifetimeCounter(lifetimeCounter));
     return AdditionalDataPayloadGenerator().generateRotatingDeviceIdAsHexString(
-        lifetimeCounter, reinterpret_cast<char *>(rotatingDeviceIdUniqueId), rotatingDeviceIdUniqueIdSize,
-        rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize, rotatingDeviceIdValueOutputSize);
+        lifetimeCounter, rotatingDeviceIdUniqueIdSpan, rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize,
+        rotatingDeviceIdValueOutputSize);
 }
 #endif
 

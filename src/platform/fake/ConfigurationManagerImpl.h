@@ -69,10 +69,7 @@ private:
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
     CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR IncrementLifetimeCounter() override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR GetRotatingDeviceIdUniqueId(uint8_t * buf, size_t & outSize, size_t bufSize) override
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
+    CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 #endif
     CHIP_ERROR GetFailSafeArmed(bool & val) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR SetFailSafeArmed(bool val) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
