@@ -32,6 +32,10 @@ qpg_cc = "arm-none-eabi-gcc"
 qpg_cxx = "arm-none-eabi-g++"
 chip_mdns = "platform"
 
+# Disable lock tracking, since our FreeRTOS configuration does not set
+# INCLUDE_xSemaphoreGetMutexHolder
+chip_stack_lock_tracking = "none"
+
 chip_project_config_include_dirs =
     [ "//examples/platform/qpg/project_include/" ]
 chip_project_config_include = "<CHIPProjectConfig.h>"

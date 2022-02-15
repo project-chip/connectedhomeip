@@ -23,6 +23,48 @@ namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
 
+template <typename T>
+class otScanResponseIterator : public Iterator<T>
+{
+public:
+    otScanResponseIterator(T * apScanResponse) : mpScanResponse(apScanResponse) {}
+    size_t Count() override { return itemCount; }
+    bool Next(T & item) override
+    {
+        if (mpScanResponse == nullptr || currentIterating >= itemCount)
+        {
+            return false;
+        }
+        item = mpScanResponse[currentIterating];
+        currentIterating++;
+        return true;
+    }
+    void Release() override
+    {
+        itemCount = currentIterating = 0;
+        Platform::MemoryFree(mpScanResponse);
+        mpScanResponse = nullptr;
+    }
+
+    void Add(T * pResponse)
+    {
+        size_t tempCount = itemCount + 1;
+        mpScanResponse   = static_cast<T *>(Platform::MemoryRealloc(mpScanResponse, kItemSize * tempCount));
+        if (mpScanResponse)
+        {
+            // first item at index. update after the copy.
+            memcpy(&(mpScanResponse[itemCount]), pResponse, kItemSize);
+            itemCount = tempCount;
+        }
+    }
+
+private:
+    size_t currentIterating = 0;
+    size_t itemCount        = 0;
+    size_t kItemSize        = sizeof(T);
+    T * mpScanResponse;
+};
+
 class GenericThreadDriver final : public ThreadDriver
 {
 public:
@@ -62,9 +104,9 @@ public:
     void ScanNetworks(ScanCallback * callback) override;
 
 private:
-    ThreadNetworkIterator mThreadIterator = ThreadNetworkIterator(this);
-    Thread::OperationalDataset mSavedNetwork;
-    Thread::OperationalDataset mStagingNetwork;
+    ThreadNetworkIterator mThreadIterator      = ThreadNetworkIterator(this);
+    Thread::OperationalDataset mSavedNetwork   = {};
+    Thread::OperationalDataset mStagingNetwork = {};
 };
 
 } // namespace NetworkCommissioning

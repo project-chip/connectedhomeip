@@ -42,6 +42,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/TypeTraits.h>
+#include <platform/LockTracker.h>
 #include <protocols/interaction_model/Constants.h>
 
 #include <app-common/zap-generated/att-storage.h>
@@ -1017,6 +1018,10 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clust
 
 void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
 {
+    // Attribute writes have asserted this already, but this assert should catch
+    // applications notifying about changes from their end.
+    assertChipStackLockedByCurrentThread();
+
     ClusterInfo info;
     info.mClusterId   = clusterId;
     info.mAttributeId = attributeId;
