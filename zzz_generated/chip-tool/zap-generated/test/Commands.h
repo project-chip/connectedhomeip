@@ -69895,7 +69895,7 @@ private:
         uint16_t minIntervalArgument;
         minIntervalArgument = 2U;
         uint16_t maxIntervalArgument;
-        maxIntervalArgument = 10U;
+        maxIntervalArgument = 5U;
 
         ReturnErrorOnFailure(cluster.SubscribeAttribute<chip::app::Clusters::TestCluster::Attributes::ListInt8u::TypeInfo>(
             this, OnSuccessCallback_367, OnFailureCallback_367, minIntervalArgument, maxIntervalArgument,
@@ -81676,7 +81676,7 @@ private:
         uint16_t minIntervalArgument;
         minIntervalArgument = 2U;
         uint16_t maxIntervalArgument;
-        maxIntervalArgument = 10U;
+        maxIntervalArgument = 5U;
 
         ReturnErrorOnFailure(cluster.SubscribeAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
             this, OnSuccessCallback_3, OnFailureCallback_3, minIntervalArgument, maxIntervalArgument, OnSubscriptionEstablished_3));
