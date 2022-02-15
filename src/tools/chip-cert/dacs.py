@@ -1,4 +1,7 @@
+#!/usr/bin/env python
+
 import argparse
+import os
 import subprocess
 import sys
 import typing
@@ -112,6 +115,9 @@ class DevCertBuilder:
         self.pid = pid
         self.cert_type = cert_type
         self.chipcert = chip_cert_dir + 'chip-cert'
+
+        if not os.path.exists(self.chipcert):
+            raise Exception('Path not found: %s' % self.chipcert)
 
         paa = Names(CertType.PAA, test_dir, dev_dir, pid)
         pai = Names(CertType.PAI, test_dir, dev_dir, pid)
