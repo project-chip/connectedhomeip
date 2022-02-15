@@ -87,8 +87,7 @@ public:
 
     // Add a default OTA provider to the cached list
     virtual CHIP_ERROR
-    AddDefaultOtaProvider(FabricIndex fabricIndex,
-                          app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type const & providerLocation) = 0;
+    AddDefaultOtaProvider(app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type const & providerLocation) = 0;
 };
 
 // The instance of the class implementing OTARequestorInterface must be managed through

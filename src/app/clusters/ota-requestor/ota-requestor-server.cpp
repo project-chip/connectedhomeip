@@ -84,7 +84,7 @@ CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::ReadDefaultOtaProviders(Attribu
     chip::OTARequestorInterface * requestor = chip::GetRequestorInstance();
     if (requestor == nullptr)
     {
-        return CHIP_ERROR_NOT_FOUND;
+        return aEncoder.EncodeEmptyList();;
     }
 
     return requestor->GetDefaultOtaProviderList(aEncoder);
@@ -120,7 +120,7 @@ CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::WriteDefaultOtaProviders(const 
     case ConcreteDataAttributePath::ListOperation::AppendItem: {
         OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType item;
         ReturnErrorOnFailure(aDecoder.Decode(item));
-        return requestor->AddDefaultOtaProvider(aDecoder.AccessingFabricIndex(), item);
+        return requestor->AddDefaultOtaProvider(item);
     }
     default:
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;

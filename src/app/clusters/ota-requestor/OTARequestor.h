@@ -84,7 +84,6 @@ public:
 
     // Add a default OTA provider to the cached list
     CHIP_ERROR AddDefaultOtaProvider(
-        FabricIndex fabricIndex,
         app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type const & providerLocation) override;
 
     //////////// BDXDownloader::StateDelegate Implementation ///////////////
@@ -291,7 +290,7 @@ private:
     OTAUpdateStateEnum mCurrentUpdateState = OTAUpdateStateEnum::kIdle;
     Server * mServer                       = nullptr;
     chip::Optional<bool> mRequestorCanConsent;
-    BitMapObjectPool<ProviderLocationType, CHIP_CONFIG_MAX_FABRICS> mDefaultOtaProviderList;
+    ObjectPool<ProviderLocationType, CHIP_CONFIG_MAX_FABRICS> mDefaultOtaProviderList;
     Optional<ProviderLocationType> mProviderLocation; // Provider location used for the current update in progress
 };
 
