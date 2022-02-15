@@ -126,8 +126,7 @@ CHIP_ERROR GroupPeerTable::RemovePeer(FabricIndex fabricIndex, NodeId nodeId, bo
         {
             if (isControl)
             {
-                if (RemoveSpecificPeer(mGroupFabrics[it].mControlGroupSenders, nodeId,
-                                       GROUP_MSG_COUNTER_MAX_NUMBER_OF_GROUP_CONTROL_PEER))
+                if (RemoveSpecificPeer(mGroupFabrics[it].mControlGroupSenders, nodeId, CHIP_CONFIG_MAX_GROUP_CONTROL_PEERS))
                 {
                     fabricIt = it;
                     mGroupFabrics[it].mControlPeerCount--;
@@ -136,8 +135,7 @@ CHIP_ERROR GroupPeerTable::RemovePeer(FabricIndex fabricIndex, NodeId nodeId, bo
             }
             else
             {
-                if (RemoveSpecificPeer(mGroupFabrics[it].mDataGroupSenders, nodeId,
-                                       GROUP_MSG_COUNTER_MAX_NUMBER_OF_GROUP_DATA_PEER))
+                if (RemoveSpecificPeer(mGroupFabrics[it].mDataGroupSenders, nodeId, CHIP_CONFIG_MAX_GROUP_DATA_PEERS))
                 {
                     fabricIt = it;
                     mGroupFabrics[it].mDataPeerCount--;
@@ -155,8 +153,6 @@ CHIP_ERROR GroupPeerTable::RemovePeer(FabricIndex fabricIndex, NodeId nodeId, bo
         {
             mGroupFabrics[fabricIt].mFabricIndex = kUndefinedFabricIndex;
             // To maintain logic integrity Fabric array cannot have empty slot in between data
-            // Move Fabric around
-            GroupFabric buf = mGroupFabrics[fabricIt];
             // Find the last non empty element
             for (uint32_t i = CHIP_CONFIG_MAX_FABRICS - 1; i > fabricIt; i--)
             {
@@ -200,7 +196,7 @@ bool GroupPeerTable::RemoveSpecificPeer(GroupSender * list, NodeId nodeId, uint3
 
 void GroupPeerTable::CompactPeers(GroupSender * list, uint32_t size)
 {
-    if (list == nullptr)
+    if (list == nullptr || size == 0)
     {
         return;
     }
@@ -244,21 +240,38 @@ CHIP_ERROR GroupOutgoingCounters::Init(chip::PersistentStorageDelegate * storage
     mStorage      = storage_delegate;
     uint16_t size = static_cast<uint16_t>(sizeof(uint32_t));
     DefaultStorageKeyAllocator key;
-    mStorage->SyncGetKeyValue(key.GroupControlCounter(), &mGroupControlCounter, size);
-    mStorage->SyncGetKeyValue(key.GroupDataCounter(), &mGroupDataCounter, size);
+    uint32_t temp;
+    CHIP_ERROR err;
+    err = mStorage->SyncGetKeyValue(key.GroupControlCounter(), &temp, size);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        // might be the first time we retrieve the value
+        // TODO handle this case
+        mGroupControlCounter = 0; // TODO should be random
+    }
+    else
+    {
+        mGroupControlCounter = temp;
+    }
 
-    // Increment by 1 to prevent possible corner case when a powercycle happens
-    // when Ram counter value == Stored counter value
-    mGroupControlCounter++;
-    mGroupDataCounter++;
+    err = mStorage->SyncGetKeyValue(key.GroupDataCounter(), &temp, size);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        // might be the first time we retrieve the value
+        // TODO handle this case
+        mGroupDataCounter = 0; //  TODO should be random
+    }
+    else
+    {
+        mGroupDataCounter = temp;
+    }
 
-    uint32_t temp = mGroupControlCounter + GROUP_MSG_COUNTER_MIN_INCREMENT;
-    mStorage->SyncSetKeyValue(key.GroupControlCounter(), &temp, size);
+    temp = mGroupControlCounter + GROUP_MSG_COUNTER_MIN_INCREMENT;
+    ReturnErrorOnFailure(mStorage->SyncSetKeyValue(key.GroupControlCounter(), &temp, size));
 
     temp = mGroupDataCounter + GROUP_MSG_COUNTER_MIN_INCREMENT;
-    mStorage->SyncSetKeyValue(key.GroupDataCounter(), &temp, size);
 
-    return CHIP_NO_ERROR;
+    return mStorage->SyncSetKeyValue(key.GroupDataCounter(), &temp, size);
 }
 
 uint32_t GroupOutgoingCounters::GetCounter(bool isControl)
@@ -266,7 +279,7 @@ uint32_t GroupOutgoingCounters::GetCounter(bool isControl)
     return (isControl) ? mGroupControlCounter : mGroupDataCounter;
 }
 
-void GroupOutgoingCounters::IncrementCounter(bool isControl)
+CHIP_ERROR GroupOutgoingCounters::IncrementCounter(bool isControl)
 {
     uint32_t temp  = 0;
     uint16_t size  = static_cast<uint16_t>(sizeof(uint32_t));
@@ -288,15 +301,16 @@ void GroupOutgoingCounters::IncrementCounter(bool isControl)
 
     if (mStorage == nullptr)
     {
-        return;
+        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
 
-    mStorage->SyncGetKeyValue(key.KeyName(), &temp, size);
-    if (temp - value == 0)
+    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(key.KeyName(), &temp, size));
+    if (temp == value)
     {
         temp = value + GROUP_MSG_COUNTER_MIN_INCREMENT;
-        mStorage->SyncSetKeyValue(key.KeyName(), &temp, sizeof(uint32_t));
+        return mStorage->SyncSetKeyValue(key.KeyName(), &temp, sizeof(uint32_t));
     }
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Transport

@@ -33,6 +33,8 @@ class PeerMessageCounter
 {
 public:
     static constexpr size_t kChallengeSize = 8;
+    // Const expr to calculate receiving window. Used everywhere the spec specified the usage of
+    // 2^31
     static constexpr uint32_t kGroupOffset = static_cast<uint32_t>(1 << 31); // 2^31
 
     PeerMessageCounter() : mStatus(Status::NotSynced) {}
@@ -99,39 +101,23 @@ public:
      */
     CHIP_ERROR VerifyGroupCounter(uint32_t counter)
     {
-        uint32_t highLimit = mSynced.mMaxCounter + kGroupOffset + 1;
-        // 1. Check counter value if in valid range
-        if (highLimit < mSynced.mMaxCounter)
+        if (mStatus != Status::Synced)
         {
-            // Rollover possible
-            if ((counter > mSynced.mMaxCounter) || (counter <= highLimit))
-            {
-                return CHIP_NO_ERROR;
-            }
-        }
-        else
-        {
-            if ((counter > mSynced.mMaxCounter) && (counter <= highLimit))
-            {
-                return CHIP_NO_ERROR;
-            }
-        }
-        // 2.  Check counter if in invalid range
-        uint32_t invalidLowerLimit = mSynced.mMaxCounter - kGroupOffset;
-        highLimit                  = mSynced.mMaxCounter - CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE - 1;
-        if (highLimit > invalidLowerLimit)
-        {
-            if ((counter >= invalidLowerLimit) && (counter <= highLimit))
-            {
-                return CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW;
-            }
+            return CHIP_ERROR_INCORRECT_STATE;
         }
 
-        // 3. Counter Window check
-        uint32_t offset = mSynced.mMaxCounter - counter;
-        if (offset < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
+        // 1. Check counter value if in valid range
+        uint32_t counterIncrease = counter - mSynced.mMaxCounter;
+        if (counterIncrease >= 1 && counterIncrease <= (kGroupOffset - 1))
         {
-            if (mSynced.mWindow.test(offset))
+            return CHIP_NO_ERROR;
+        }
+
+        // 2. Counter Window check
+        uint32_t offset = mSynced.mMaxCounter - counter;
+        if (offset <= CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
+        {
+            if ((offset == 0) || mSynced.mWindow.test(offset - 1))
             {
                 return CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED; // duplicated, in window
             }
@@ -240,18 +226,26 @@ public:
         }
         else
         {
-            uint32_t offset = counter - mSynced.mMaxCounter;
-            // advance max counter by `offset`
-            mSynced.mMaxCounter = counter;
+            uint32_t offset = mSynced.mMaxCounter - counter;
             if (offset < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
             {
-                mSynced.mWindow <<= offset;
+                mSynced.mWindow.set(offset);
             }
             else
             {
-                mSynced.mWindow.reset();
+                // Not a bit inside the window.  Since we are committing, this is a new mMaxCounter value.
+                mSynced.mMaxCounter = counter;
+                uint32_t shift      = -offset;
+                if (shift > CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
+                {
+                    mSynced.mWindow.reset();
+                }
+                else
+                {
+                    mSynced.mWindow <<= shift;
+                }
+                mSynced.mWindow.set(0);
             }
-            mSynced.mWindow.set(0);
         }
     }
 
@@ -264,7 +258,6 @@ public:
      */
     void Commit(uint32_t counter)
     {
-
         if (counter <= mSynced.mMaxCounter)
         {
             uint32_t offset = mSynced.mMaxCounter - counter;

@@ -31,9 +31,6 @@
 #include <lib/support/Span.h>
 #include <transport/PeerMessageCounter.h>
 
-#define GROUP_MSG_COUNTER_MAX_NUMBER_OF_GROUP_DATA_PEER 15
-#define GROUP_MSG_COUNTER_MAX_NUMBER_OF_GROUP_CONTROL_PEER 15
-
 #define GROUP_MSG_COUNTER_MIN_INCREMENT 1000
 
 namespace chip {
@@ -52,8 +49,8 @@ public:
     FabricIndex mFabricIndex  = kUndefinedFabricIndex;
     uint8_t mControlPeerCount = 0;
     uint8_t mDataPeerCount    = 0;
-    GroupSender mDataGroupSenders[GROUP_MSG_COUNTER_MAX_NUMBER_OF_GROUP_DATA_PEER];
-    GroupSender mControlGroupSenders[GROUP_MSG_COUNTER_MAX_NUMBER_OF_GROUP_CONTROL_PEER];
+    GroupSender mDataGroupSenders[CHIP_CONFIG_MAX_GROUP_DATA_PEERS];
+    GroupSender mControlGroupSenders[CHIP_CONFIG_MAX_GROUP_CONTROL_PEERS];
 };
 
 class GroupPeerTable
@@ -81,7 +78,7 @@ public:
     GroupOutgoingCounters(chip::PersistentStorageDelegate * storage_delegate);
     CHIP_ERROR Init(chip::PersistentStorageDelegate * storage_delegate);
     uint32_t GetCounter(bool isControl);
-    void IncrementCounter(bool isControl);
+    CHIP_ERROR IncrementCounter(bool isControl);
 
     // Protected for Unit Tests inheritance
 protected:
