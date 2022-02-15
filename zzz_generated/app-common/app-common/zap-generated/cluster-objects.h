@@ -11695,9 +11695,10 @@ struct TypeInfo
 namespace LastNetworkingStatus {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus;
-    using DecodableType    = chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus;
-    using DecodableArgType = chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus;
+    using Type          = chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus>;
+    using DecodableType = chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LastNetworkingStatus::Id; }
@@ -11707,9 +11708,9 @@ struct TypeInfo
 namespace LastNetworkID {
 struct TypeInfo
 {
-    using Type             = chip::ByteSpan;
-    using DecodableType    = chip::ByteSpan;
-    using DecodableArgType = chip::ByteSpan;
+    using Type             = chip::app::DataModel::Nullable<chip::ByteSpan>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::ByteSpan>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::ByteSpan> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LastNetworkID::Id; }
@@ -11720,9 +11721,9 @@ struct TypeInfo
 namespace LastConnectErrorValue {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::app::DataModel::Nullable<int32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<int32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<int32_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LastConnectErrorValue::Id; }
@@ -11803,10 +11804,9 @@ struct TypeInfo
         Attributes::ScanMaxTimeSeconds::TypeInfo::DecodableType scanMaxTimeSeconds       = static_cast<uint8_t>(0);
         Attributes::ConnectMaxTimeSeconds::TypeInfo::DecodableType connectMaxTimeSeconds = static_cast<uint8_t>(0);
         Attributes::InterfaceEnabled::TypeInfo::DecodableType interfaceEnabled           = static_cast<bool>(0);
-        Attributes::LastNetworkingStatus::TypeInfo::DecodableType lastNetworkingStatus =
-            static_cast<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus>(0);
+        Attributes::LastNetworkingStatus::TypeInfo::DecodableType lastNetworkingStatus;
         Attributes::LastNetworkID::TypeInfo::DecodableType lastNetworkID;
-        Attributes::LastConnectErrorValue::TypeInfo::DecodableType lastConnectErrorValue = static_cast<uint32_t>(0);
+        Attributes::LastConnectErrorValue::TypeInfo::DecodableType lastConnectErrorValue;
         Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
         Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;

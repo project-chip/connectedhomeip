@@ -21160,8 +21160,10 @@ JNI_METHOD(void, NetworkCommissioningCluster, subscribeLastNetworkingStatusAttri
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
     chip::DeviceLayer::StackLock lock;
-    std::unique_ptr<CHIPInt8uAttributeCallback, void (*)(CHIPInt8uAttributeCallback *)> onSuccess(
-        Platform::New<CHIPInt8uAttributeCallback>(callback, true), chip::Platform::Delete<CHIPInt8uAttributeCallback>);
+    std::unique_ptr<CHIPNetworkCommissioningLastNetworkingStatusAttributeCallback,
+                    void (*)(CHIPNetworkCommissioningLastNetworkingStatusAttributeCallback *)>
+        onSuccess(Platform::New<CHIPNetworkCommissioningLastNetworkingStatusAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPNetworkCommissioningLastNetworkingStatusAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -21184,9 +21186,10 @@ JNI_METHOD(void, NetworkCommissioningCluster, subscribeLastNetworkingStatusAttri
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
-                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-                                                   CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval),
+        CHIPNetworkCommissioningLastNetworkingStatusAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -21198,8 +21201,10 @@ JNI_METHOD(void, NetworkCommissioningCluster, subscribeLastNetworkIDAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
     chip::DeviceLayer::StackLock lock;
-    std::unique_ptr<CHIPOctetStringAttributeCallback, void (*)(CHIPOctetStringAttributeCallback *)> onSuccess(
-        Platform::New<CHIPOctetStringAttributeCallback>(callback, true), chip::Platform::Delete<CHIPOctetStringAttributeCallback>);
+    std::unique_ptr<CHIPNetworkCommissioningLastNetworkIDAttributeCallback,
+                    void (*)(CHIPNetworkCommissioningLastNetworkIDAttributeCallback *)>
+        onSuccess(Platform::New<CHIPNetworkCommissioningLastNetworkIDAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPNetworkCommissioningLastNetworkIDAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -21221,9 +21226,9 @@ JNI_METHOD(void, NetworkCommissioningCluster, subscribeLastNetworkIDAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
-                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-                                                   CHIPOctetStringAttributeCallback::OnSubscriptionEstablished);
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval), CHIPNetworkCommissioningLastNetworkIDAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -21235,8 +21240,10 @@ JNI_METHOD(void, NetworkCommissioningCluster, subscribeLastConnectErrorValueAttr
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
     chip::DeviceLayer::StackLock lock;
-    std::unique_ptr<CHIPInt32uAttributeCallback, void (*)(CHIPInt32uAttributeCallback *)> onSuccess(
-        Platform::New<CHIPInt32uAttributeCallback>(callback, true), chip::Platform::Delete<CHIPInt32uAttributeCallback>);
+    std::unique_ptr<CHIPNetworkCommissioningLastConnectErrorValueAttributeCallback,
+                    void (*)(CHIPNetworkCommissioningLastConnectErrorValueAttributeCallback *)>
+        onSuccess(Platform::New<CHIPNetworkCommissioningLastConnectErrorValueAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPNetworkCommissioningLastConnectErrorValueAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -21259,9 +21266,10 @@ JNI_METHOD(void, NetworkCommissioningCluster, subscribeLastConnectErrorValueAttr
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
-                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-                                                   CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval),
+        CHIPNetworkCommissioningLastConnectErrorValueAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));

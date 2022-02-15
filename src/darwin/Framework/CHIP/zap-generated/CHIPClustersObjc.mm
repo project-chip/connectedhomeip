@@ -15142,11 +15142,11 @@ using namespace chip::app::Clusters;
 - (void)readAttributeLastNetworkingStatusWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler
 {
-    new CHIPNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge(
+    new CHIPNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = NetworkCommissioning::Attributes::LastNetworkingStatus::TypeInfo;
             auto successFn
-                = Callback<NetworkCommissioningClusterNetworkCommissioningStatusAttributeCallback>::FromCancelable(success);
+                = Callback<NullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
@@ -15159,16 +15159,16 @@ using namespace chip::app::Clusters;
                                                 reportHandler:
                                                     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    new CHIPNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge(
+    new CHIPNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
         ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = NetworkCommissioning::Attributes::LastNetworkingStatus::TypeInfo;
             auto successFn
-                = Callback<NetworkCommissioningClusterNetworkCommissioningStatusAttributeCallback>::FromCancelable(success);
+                = Callback<NullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge::
+                CHIPNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge::
                     OnSubscriptionEstablished);
         },
         subscriptionEstablishedHandler);
@@ -15177,10 +15177,10 @@ using namespace chip::app::Clusters;
 - (void)readAttributeLastNetworkIDWithCompletionHandler:(void (^)(
                                                             NSData * _Nullable value, NSError * _Nullable error))completionHandler
 {
-    new CHIPOctetStringAttributeCallbackBridge(
+    new CHIPNullableOctetStringAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = NetworkCommissioning::Attributes::LastNetworkID::TypeInfo;
-            auto successFn = Callback<OctetStringAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<NullableOctetStringAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
@@ -15191,15 +15191,15 @@ using namespace chip::app::Clusters;
                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:(void (^)(NSData * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    new CHIPOctetStringAttributeCallbackSubscriptionBridge(
+    new CHIPNullableOctetStringAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
         ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = NetworkCommissioning::Attributes::LastNetworkID::TypeInfo;
-            auto successFn = Callback<OctetStringAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<NullableOctetStringAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPOctetStringAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+                CHIPNullableOctetStringAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
         },
         subscriptionEstablishedHandler);
 }
@@ -15207,12 +15207,13 @@ using namespace chip::app::Clusters;
 - (void)readAttributeLastConnectErrorValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                     NSError * _Nullable error))completionHandler
 {
-    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-        using TypeInfo = NetworkCommissioning::Attributes::LastConnectErrorValue::TypeInfo;
-        auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
+    new CHIPNullableInt32sAttributeCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = NetworkCommissioning::Attributes::LastConnectErrorValue::TypeInfo;
+            auto successFn = Callback<NullableInt32sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
 }
 
 - (void)subscribeAttributeLastConnectErrorValueWithMinInterval:(NSNumber * _Nonnull)minInterval
@@ -15222,15 +15223,15 @@ using namespace chip::app::Clusters;
                                                  reportHandler:
                                                      (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    new CHIPInt32uAttributeCallbackSubscriptionBridge(
+    new CHIPNullableInt32sAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
         ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = NetworkCommissioning::Attributes::LastConnectErrorValue::TypeInfo;
-            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<NullableInt32sAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPInt32uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+                CHIPNullableInt32sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
         },
         subscriptionEstablishedHandler);
 }
