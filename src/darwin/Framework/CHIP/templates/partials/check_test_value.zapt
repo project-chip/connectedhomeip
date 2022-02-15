@@ -21,7 +21,7 @@
 {{else if isArray}}
     XCTAssertEqual([{{actual}} count], {{expected.length}});
     {{#each expected}}
-      {{>check_test_value actual=(concat ../actual "[" @index "]") expected=this cluster=../cluster isArray=false type=../type}}
+      {{>check_test_value actual=(concat ../actual "[" @index "]") expected=this cluster=../cluster isArray=false type=../type parent=../parent}}
     {{/each}}
 {{else}}
   {{#if_is_struct type}}

@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,15 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.chip.casting;
 
-#pragma once
-
-#include <CommonRpc.h>
-
-namespace chip {
-namespace rpc {
-
-class LightingService;
-
-} // namespace rpc
-} // namespace chip
+public interface TvCastingAppCallback {
+  void onClusterInit(TvCastingApp app, int clusterId, int endpoint);
+}

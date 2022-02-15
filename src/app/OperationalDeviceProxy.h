@@ -178,31 +178,19 @@ public:
 
     static Transport::PeerAddress ToPeerAddress(const Dnssd::ResolvedNodeData & nodeData)
     {
-        Transport::PeerAddress address = Transport::PeerAddress(Transport::Type::kUdp);
-        address.SetPort(nodeData.mPort);
+        Inet::InterfaceId interfaceId = Inet::InterfaceId::Null();
 
-        for (unsigned i = 0; i < nodeData.mNumIPs; i++)
+        // TODO - Revisit usage of InterfaceID only for addresses that are IPv6 LLA
+        // Only use the DNS-SD resolution's InterfaceID for addresses that are IPv6 LLA.
+        // For all other addresses, we should rely on the device's routing table to route messages sent.
+        // Forcing messages down an InterfaceId might fail. For example, in bridged networks like Thread,
+        // mDNS advertisements are not usually received on the same interface the peer is reachable on.
+        if (nodeData.mAddress[0].IsIPv6LinkLocal())
         {
-            const auto addr = nodeData.mAddress[i];
-            // Only use the mDNS resolution's InterfaceID for addresses that are IPv6 LLA.
-            // For all other addresses, we should rely on the device's routing table to route messages sent.
-            // Forcing messages down an InterfaceId might fail. For example, in bridged networks like Thread,
-            // mDNS advertisements are not usually received on the same interface the peer is reachable on.
-            // TODO: Right now, just use addr0, but we should really push all the addresses and interfaces to
-            // the device and allow it to make a proper decision about which addresses are preferred and reachable.
-            CHIP_ERROR err = address.AppendDestination(nodeData.mAddress[i],
-                                                       addr.IsIPv6LinkLocal() ? nodeData.mInterfaceId : Inet::InterfaceId::Null());
-
-            if (err != CHIP_NO_ERROR)
-            {
-                char addr_str[Inet::IPAddress::kMaxStringLength];
-                addr.ToString(addr_str);
-
-                ChipLogError(Controller, "Could not append IP address %s: %s", addr_str, err.AsString());
-            }
+            interfaceId = nodeData.mInterfaceId;
         }
 
-        return address;
+        return Transport::PeerAddress::UDP(nodeData.mAddress[0], nodeData.mPort, interfaceId);
     }
 
 private:

@@ -15,6 +15,7 @@
 name: 21.4.2. [TC-MC-3.6] Current App Verification
 
 config:
+    nodeId: 0x12344321
     cluster: "Application Launcher"
     endpoint: 1
 
@@ -22,11 +23,15 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     # TODO: Update the corresponding values when feature is supported
     - label: "Launch an app with the provided a application ID"
       disabled: true
-      command: "LaunchAppRequest"
+      command: "LaunchApp"
       arguments:
           values:
               - name: "data"
@@ -39,7 +44,7 @@ tests:
     # TODO: Update the corresponding values when feature is supported
     - label: "Stop an app with the provided application ID"
       disabled: true
-      command: "StopAppRequest"
+      command: "StopApp"
       arguments:
           values:
               - name: "applicationId"
@@ -48,7 +53,7 @@ tests:
     # TODO: Update the corresponding values when feature is supported
     - label: "Launch an app with the provided a application ID"
       disabled: true
-      command: "LaunchAppRequest"
+      command: "LaunchApp"
       arguments:
           values:
               - name: "data"
@@ -63,7 +68,7 @@ tests:
     # TODO: Update the corresponding values when feature is supported
     - label: "Launch an app with the provided a application ID"
       disabled: true
-      command: "LaunchAppRequest"
+      command: "LaunchApp"
       arguments:
           values:
               - name: "data"
@@ -76,7 +81,7 @@ tests:
     # TODO: Update the corresponding values when feature is supported
     - label: "Launch an app with the provided a application ID"
       disabled: true
-      command: "LaunchAppRequest"
+      command: "LaunchApp"
       arguments:
           values:
               - name: "data"

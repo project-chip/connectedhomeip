@@ -157,7 +157,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 #endif
     SuccessOrExit(err);
 
-    err = mSessions.Init(&DeviceLayer::SystemLayer(), &mTransports, &mMessageCounterManager);
+    err = mSessions.Init(&DeviceLayer::SystemLayer(), &mTransports, &mMessageCounterManager, &mDeviceStorage);
     SuccessOrExit(err);
 
     err = mExchangeMgr.Init(&mSessions);
@@ -254,8 +254,8 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
                     Transport::PeerAddress::Multicast(fabric.GetFabricIndex(), groupInfo.group_id), true);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(AppServer, "Error when trying to join Group %" PRIu16 " of fabric index %" PRIu8,
-                                 groupInfo.group_id, fabric.GetFabricIndex());
+                    ChipLogError(AppServer, "Error when trying to join Group %" PRIu16 " of fabric index %u", groupInfo.group_id,
+                                 fabric.GetFabricIndex());
                     break;
                 }
             }

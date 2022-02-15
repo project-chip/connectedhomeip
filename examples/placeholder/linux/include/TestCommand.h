@@ -23,6 +23,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 
+#include <app/tests/suites/commands/delay/DelayCommands.h>
 #include <app/tests/suites/commands/discovery/DiscoveryCommands.h>
 #include <app/tests/suites/commands/log/LogCommands.h>
 #include <app/tests/suites/include/PICSChecker.h>
@@ -35,18 +36,14 @@ constexpr const char kIdentityAlpha[] = "";
 constexpr const char kIdentityBeta[]  = "";
 constexpr const char kIdentityGamma[] = "";
 
-class TestCommand : public PICSChecker, public LogCommands, public DiscoveryCommands
+class TestCommand : public PICSChecker, public LogCommands, public DiscoveryCommands, public DelayCommands
 {
 public:
     TestCommand(const char * commandName) : mCommandPath(0, 0, 0), mAttributePath(0, 0, 0) {}
     virtual ~TestCommand() {}
 
     virtual void NextTest() = 0;
-    CHIP_ERROR WaitMS(chip::System::Clock::Timeout ms)
-    {
-        return chip::DeviceLayer::SystemLayer().StartTimer(ms, OnWaitForMsFn, this);
-    }
-    CHIP_ERROR WaitForMs(uint16_t ms) { return WaitMS(chip::System::Clock::Milliseconds32(ms)); }
+
     void SetCommandExitStatus(CHIP_ERROR status)
     {
         chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
@@ -65,9 +62,16 @@ public:
         return 0;
     }
 
-    CHIP_ERROR ContinueOnChipMainThread() override
+    CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err) override
     {
-        NextTest();
+        if (CHIP_NO_ERROR == err)
+        {
+            NextTest();
+        }
+        else
+        {
+            Exit(chip::ErrorStr(err));
+        }
         return CHIP_NO_ERROR;
     }
 
@@ -83,12 +87,6 @@ public:
         command->isRunning    = true;
         command->NextTest();
         chip::DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEvent, context);
-    }
-
-    CHIP_ERROR WaitForCommissioning()
-    {
-        isRunning = false;
-        return chip::DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEvent, reinterpret_cast<intptr_t>(this));
     }
 
     static void OnPlatformEvent(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
@@ -131,11 +129,6 @@ public:
         mCommandPath   = chip::app::ConcreteCommandPath(0, 0, 0);
         mAttributePath = chip::app::ConcreteAttributePath(0, 0, 0);
     }
-    static void OnWaitForMsFn(chip::System::Layer * systemLayer, void * context)
-    {
-        auto * command = static_cast<TestCommand *>(context);
-        command->NextTest();
-    }
 
     std::atomic_bool isRunning{ true };
 
@@ -145,4 +138,13 @@ protected:
     chip::Optional<chip::EndpointId> mEndpointId;
     void SetIdentity(const char * name){};
     void Wait(){};
+
+    /////////// DelayCommands Interface /////////
+    void OnWaitForMs() override { NextTest(); }
+
+    CHIP_ERROR WaitForCommissioning() override
+    {
+        isRunning = false;
+        return chip::DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEvent, reinterpret_cast<intptr_t>(this));
+    }
 };

@@ -222,6 +222,14 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
             ReturnErrorOnFailure(err = request.GetError());
             ReturnErrorOnFailure(GenerateAttributePathList(attributePathListBuilder, aReadPrepareParams.mpAttributePathParamsList,
                                                            aReadPrepareParams.mAttributePathParamsListSize));
+            if (aReadPrepareParams.mDataVersionFilterListSize != 0 && aReadPrepareParams.mpDataVersionFilterList != nullptr)
+            {
+                DataVersionFilterIBs::Builder & dataVersionFilterListBuilder = request.CreateDataVersionFilters();
+                ReturnErrorOnFailure(request.GetError());
+                ReturnErrorOnFailure(GenerateDataVersionFilterList(dataVersionFilterListBuilder,
+                                                                   aReadPrepareParams.mpDataVersionFilterList,
+                                                                   aReadPrepareParams.mDataVersionFilterListSize));
+            }
         }
 
         if (aReadPrepareParams.mEventPathParamsListSize != 0 && aReadPrepareParams.mpEventPathParamsList != nullptr)
@@ -294,6 +302,28 @@ CHIP_ERROR ReadClient::GenerateAttributePathList(AttributePathIBs::Builder & aAt
 
     aAttributePathIBsBuilder.EndOfAttributePathIBs();
     return aAttributePathIBsBuilder.GetError();
+}
+
+CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
+                                                     DataVersionFilter * apDataVersionFilterList, size_t aDataVersionFilterListSize)
+{
+    for (size_t index = 0; index < aDataVersionFilterListSize; index++)
+    {
+        VerifyOrReturnError(apDataVersionFilterList[index].IsValidDataVersionFilter(), CHIP_ERROR_INVALID_ARGUMENT);
+        DataVersionFilterIB::Builder & filter = aDataVersionFilterIBsBuilder.CreateDataVersionFilter();
+        ReturnErrorOnFailure(aDataVersionFilterIBsBuilder.GetError());
+        ClusterPathIB::Builder & path = filter.CreatePath();
+        ReturnErrorOnFailure(filter.GetError());
+        ReturnErrorOnFailure(path.Endpoint(apDataVersionFilterList[index].mEndpointId)
+                                 .Cluster(apDataVersionFilterList[index].mClusterId)
+                                 .EndOfClusterPathIB()
+                                 .GetError());
+        VerifyOrReturnError(apDataVersionFilterList[index].mDataVersion.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(
+            filter.DataVersion(apDataVersionFilterList[index].mDataVersion.Value()).EndOfDataVersionFilterIB().GetError());
+    }
+
+    return aDataVersionFilterIBsBuilder.EndOfDataVersionFilterIBs().GetError();
 }
 
 CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
@@ -554,8 +584,7 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
         TLV::TLVReader reader = aAttributeReportIBsReader;
         ReturnErrorOnFailure(report.Init(reader));
 
-        DataVersion version = kUndefinedDataVersion;
-        err                 = report.GetAttributeStatus(&status);
+        err = report.GetAttributeStatus(&status);
         if (CHIP_NO_ERROR == err)
         {
             StatusIB::Parser errorStatus;
@@ -563,14 +592,21 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
             ReturnErrorOnFailure(ProcessAttributePath(path, attributePath));
             ReturnErrorOnFailure(status.GetErrorStatus(&errorStatus));
             ReturnErrorOnFailure(errorStatus.DecodeStatusIB(statusIB));
-            mpCallback.OnAttributeData(attributePath, version, nullptr, statusIB);
+            mpCallback.OnAttributeData(attributePath, nullptr, statusIB);
         }
         else if (CHIP_END_OF_TLV == err)
         {
             ReturnErrorOnFailure(report.GetAttributeData(&data));
             ReturnErrorOnFailure(data.GetPath(&path));
             ReturnErrorOnFailure(ProcessAttributePath(path, attributePath));
+            DataVersion version = 0;
             ReturnErrorOnFailure(data.GetDataVersion(&version));
+            attributePath.mDataVersion.SetValue(version);
+            if (mReadPrepareParams.mResubscribePolicy != nullptr)
+            {
+                UpdateDataVersionFilters(attributePath);
+            }
+
             ReturnErrorOnFailure(data.GetData(&dataReader));
 
             // The element in an array may be another array -- so we should only set the list operation when we are handling the
@@ -580,7 +616,7 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
                 attributePath.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
             }
 
-            mpCallback.OnAttributeData(attributePath, version, &dataReader, statusIB);
+            mpCallback.OnAttributeData(attributePath, &dataReader, statusIB);
         }
     }
 
@@ -749,6 +785,14 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
         ReturnErrorOnFailure(err = attributePathListBuilder.GetError());
         ReturnErrorOnFailure(GenerateAttributePathList(attributePathListBuilder, aReadPrepareParams.mpAttributePathParamsList,
                                                        aReadPrepareParams.mAttributePathParamsListSize));
+        if (aReadPrepareParams.mDataVersionFilterListSize != 0 && aReadPrepareParams.mpDataVersionFilterList != nullptr)
+        {
+            DataVersionFilterIBs::Builder & dataVersionFilterListBuilder = request.CreateDataVersionFilters();
+            ReturnErrorOnFailure(request.GetError());
+            ReturnErrorOnFailure(GenerateDataVersionFilterList(dataVersionFilterListBuilder,
+                                                               aReadPrepareParams.mpDataVersionFilterList,
+                                                               aReadPrepareParams.mDataVersionFilterListSize));
+        }
     }
 
     if (aReadPrepareParams.mEventPathParamsListSize != 0 && aReadPrepareParams.mpEventPathParamsList != nullptr)
@@ -775,7 +819,6 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
 
     request.IsFabricFiltered(aReadPrepareParams.mIsFabricFiltered).EndOfSubscribeRequestMessage();
     ReturnErrorOnFailure(err = request.GetError());
-
     ReturnErrorOnFailure(writer.Finalize(&msgBuf));
 
     mpExchangeCtx = mpExchangeMgr->NewContext(aReadPrepareParams.mSessionHolder.Get(), this);
@@ -831,5 +874,17 @@ bool ReadClient::ResubscribeIfNeeded()
     return true;
 }
 
+void ReadClient::UpdateDataVersionFilters(const ConcreteDataAttributePath & aPath)
+{
+    for (size_t index = 0; index < mReadPrepareParams.mDataVersionFilterListSize; index++)
+    {
+        if (mReadPrepareParams.mpDataVersionFilterList[index].mEndpointId == aPath.mEndpointId &&
+            mReadPrepareParams.mpDataVersionFilterList[index].mClusterId == aPath.mClusterId)
+        {
+            // Now we know the current version for this cluster is aPath.mDataVersion.
+            mReadPrepareParams.mpDataVersionFilterList[index].mDataVersion = aPath.mDataVersion;
+        }
+    }
+}
 } // namespace app
 } // namespace chip

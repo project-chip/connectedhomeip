@@ -15,6 +15,7 @@
 name: 21.7.3. [TC-MC-5.3] Skip Channel Verification
 
 config:
+    nodeId: 0x12344321
     cluster: "Channel"
     endpoint: 1
 
@@ -22,12 +23,16 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     #Disabled due to issue- #13029
     - label: "Reads the ChannelList attribute from the DUT"
       disabled: true
       command: "readAttribute"
-      attribute: "channel list"
+      attribute: "ChannelList"
       response:
           saveAs: tvchannellistvalues
           constraints:
@@ -37,7 +42,7 @@ tests:
     - label: "Reads the CurrentChannel attribute from the DUT"
       disabled: true
       command: "readAttribute"
-      attribute: "current tv channel"
+      attribute: "CurrentChannel"
       response:
           value: channellistvalues
 
@@ -62,6 +67,6 @@ tests:
     - label: "Reads the CurrentChannel attribute from the DUT"
       disabled: true
       command: "readAttribute"
-      attribute: "current tv channel"
+      attribute: "CurrentChannel"
       response:
           value: channellistvalues

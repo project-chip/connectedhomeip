@@ -60,6 +60,7 @@ public:
         AddArgument("trace_file", &mTraceFile);
         AddArgument("trace_log", 0, 1, &mTraceLog);
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+        AddArgument("ble-adapter", 0, UINT64_MAX, &mBleAdapterId);
     }
 
     /////////// Command Interface /////////
@@ -106,6 +107,7 @@ private:
     chip::FabricId CurrentCommissionerId();
     std::map<std::string, std::unique_ptr<ChipDeviceCommissioner>> mCommissioners;
     chip::Optional<char *> mCommissionerName;
+    chip::Optional<uint16_t> mBleAdapterId;
 
     static void RunQueuedCommand(intptr_t commandArg);
 

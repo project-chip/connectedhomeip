@@ -444,11 +444,11 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
                 strncpy(ifp->Name, ifa->ifa_name, Inet::InterfaceId::kMaxIfNameLength);
                 ifp->Name[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
 
-                ifp->name            = CharSpan::fromCharString(ifp->Name);
-                ifp->fabricConnected = ifa->ifa_flags & IFF_RUNNING;
-                ifp->type            = ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name);
-                ifp->offPremiseServicesReachableIPv4.SetNonNull(false);
-                ifp->offPremiseServicesReachableIPv6.SetNonNull(false);
+                ifp->name          = CharSpan::fromCharString(ifp->Name);
+                ifp->isOperational = ifa->ifa_flags & IFF_RUNNING;
+                ifp->type          = ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name);
+                ifp->offPremiseServicesReachableIPv4.SetNull();
+                ifp->offPremiseServicesReachableIPv6.SetNull();
 
                 if (ConnectivityUtils::GetInterfaceHardwareAddrs(ifa->ifa_name, ifp->MacAddress, kMaxHardwareAddrSize) !=
                     CHIP_NO_ERROR)

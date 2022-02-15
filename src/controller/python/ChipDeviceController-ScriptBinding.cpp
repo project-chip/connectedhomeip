@@ -146,7 +146,7 @@ ChipError::StorageType pychip_DeviceController_PostTaskOnChipThread(ChipThreadTa
 
 ChipError::StorageType pychip_DeviceController_OpenCommissioningWindow(chip::Controller::DeviceCommissioner * devCtrl,
                                                                        chip::NodeId nodeid, uint16_t timeout, uint32_t iteration,
-                                                                       uint16_t discriminator, uint8_t option);
+                                                                       uint16_t discriminator, uint8_t optionInt);
 
 void pychip_DeviceController_PrintDiscoveredDevices(chip::Controller::DeviceCommissioner * devCtrl);
 bool pychip_DeviceController_GetIPForDiscoveredDevice(chip::Controller::DeviceCommissioner * devCtrl, int idx, char * addrStr,
@@ -224,7 +224,8 @@ ChipError::StorageType pychip_DeviceController_StackInit()
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
     FactoryInitParams factoryParams;
-    factoryParams.fabricStorage = &sFabricStorage;
+    factoryParams.fabricStorage            = &sFabricStorage;
+    factoryParams.fabricIndependentStorage = sStorageAdapter;
 
     ReturnErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryParams).AsInteger());
 
@@ -324,7 +325,7 @@ ChipError::StorageType pychip_DeviceController_ConnectIP(chip::Controller::Devic
     VerifyOrReturnError(chip::Inet::IPAddress::FromString(peerAddrStr, peerAddr), CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
 
     // TODO: IP rendezvous should use TCP connection.
-    addr.SetTransportType(chip::Transport::Type::kUdp).SetSingleIPAddress(peerAddr);
+    addr.SetTransportType(chip::Transport::Type::kUdp).SetIPAddress(peerAddr);
     params.SetPeerAddress(addr).SetDiscriminator(0);
 
     devCtrl->ReleaseOperationalDevice(nodeid);
@@ -380,7 +381,7 @@ ChipError::StorageType pychip_DeviceController_EstablishPASESessionIP(chip::Cont
     chip::Transport::PeerAddress addr;
     RendezvousParameters params = chip::RendezvousParameters().SetSetupPINCode(setupPINCode);
     VerifyOrReturnError(chip::Inet::IPAddress::FromString(peerAddrStr, peerAddr), CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
-    addr.SetTransportType(chip::Transport::Type::kUdp).SetSingleIPAddress(peerAddr);
+    addr.SetTransportType(chip::Transport::Type::kUdp).SetIPAddress(peerAddr);
     params.SetPeerAddress(addr).SetDiscriminator(0);
     return devCtrl->EstablishPASEConnection(nodeid, params).AsInteger();
 }
@@ -435,9 +436,11 @@ pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled(chip::Co
 
 ChipError::StorageType pychip_DeviceController_OpenCommissioningWindow(chip::Controller::DeviceCommissioner * devCtrl,
                                                                        chip::NodeId nodeid, uint16_t timeout, uint32_t iteration,
-                                                                       uint16_t discriminator, uint8_t option)
+                                                                       uint16_t discriminator, uint8_t optionInt)
 {
     SetupPayload payload;
+    const auto option = static_cast<Controller::DeviceController::CommissioningWindowOption>(optionInt);
+
     return devCtrl->OpenCommissioningWindow(nodeid, timeout, iteration, discriminator, option, payload).AsInteger();
 }
 

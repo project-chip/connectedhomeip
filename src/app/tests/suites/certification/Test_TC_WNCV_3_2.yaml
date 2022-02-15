@@ -19,6 +19,7 @@ name:
 # TC-WNCV tests featuremap conditional dependencies -> use PICS
 
 config:
+    nodeId: 0x12344321
     cluster: "Window Covering"
     endpoint: 1
 
@@ -26,6 +27,10 @@ tests:
     - label: "0: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     ################ Position Init Phase #############
     ### Step 1x -> Initialize the Covering position before any testing

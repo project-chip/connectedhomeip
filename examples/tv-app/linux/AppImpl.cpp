@@ -133,7 +133,7 @@ DECLARE_DYNAMIC_ATTRIBUTE(ZCL_CHANNEL_LIST_ATTRIBUTE_ID, ARRAY, kDescriptorAttri
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 constexpr CommandId keypadInputIncomingCommands[] = {
-    app::Clusters::KeypadInput::Commands::SendKeyRequest::Id,
+    app::Clusters::KeypadInput::Commands::SendKey::Id,
     kInvalidCommandId,
 };
 constexpr CommandId keypadInputOutgoingCommands[] = {
@@ -141,9 +141,9 @@ constexpr CommandId keypadInputOutgoingCommands[] = {
     kInvalidCommandId,
 };
 constexpr CommandId applicationLauncherIncomingCommands[] = {
-    app::Clusters::ApplicationLauncher::Commands::LaunchAppRequest::Id,
-    app::Clusters::ApplicationLauncher::Commands::StopAppRequest::Id,
-    app::Clusters::ApplicationLauncher::Commands::HideAppRequest::Id,
+    app::Clusters::ApplicationLauncher::Commands::LaunchApp::Id,
+    app::Clusters::ApplicationLauncher::Commands::StopApp::Id,
+    app::Clusters::ApplicationLauncher::Commands::HideApp::Id,
     kInvalidCommandId,
 };
 constexpr CommandId applicationLauncherOutgoingCommands[] = {
@@ -151,9 +151,9 @@ constexpr CommandId applicationLauncherOutgoingCommands[] = {
     kInvalidCommandId,
 };
 constexpr CommandId accountLoginIncomingCommands[] = {
-    app::Clusters::AccountLogin::Commands::GetSetupPINRequest::Id,
-    app::Clusters::AccountLogin::Commands::LoginRequest::Id,
-    app::Clusters::AccountLogin::Commands::LogoutRequest::Id,
+    app::Clusters::AccountLogin::Commands::GetSetupPIN::Id,
+    app::Clusters::AccountLogin::Commands::Login::Id,
+    app::Clusters::AccountLogin::Commands::Logout::Id,
     kInvalidCommandId,
 };
 constexpr CommandId accountLoginOutgoingCommands[] = {
@@ -162,8 +162,8 @@ constexpr CommandId accountLoginOutgoingCommands[] = {
 };
 // TODO: Sort out when the optional commands here should be listed.
 constexpr CommandId contentLauncherIncomingCommands[] = {
-    app::Clusters::ContentLauncher::Commands::LaunchContentRequest::Id,
-    app::Clusters::ContentLauncher::Commands::LaunchURLRequest::Id,
+    app::Clusters::ContentLauncher::Commands::LaunchContent::Id,
+    app::Clusters::ContentLauncher::Commands::LaunchURL::Id,
     kInvalidCommandId,
 };
 constexpr CommandId contentLauncherOutgoingCommands[] = {
@@ -172,19 +172,19 @@ constexpr CommandId contentLauncherOutgoingCommands[] = {
 };
 // TODO: Sort out when the optional commands here should be listed.
 constexpr CommandId mediaPlaybackIncomingCommands[] = {
-    app::Clusters::MediaPlayback::Commands::PlayRequest::Id,        app::Clusters::MediaPlayback::Commands::PauseRequest::Id,
-    app::Clusters::MediaPlayback::Commands::StopRequest::Id,        app::Clusters::MediaPlayback::Commands::StartOverRequest::Id,
-    app::Clusters::MediaPlayback::Commands::PreviousRequest::Id,    app::Clusters::MediaPlayback::Commands::NextRequest::Id,
-    app::Clusters::MediaPlayback::Commands::RewindRequest::Id,      app::Clusters::MediaPlayback::Commands::FastForwardRequest::Id,
-    app::Clusters::MediaPlayback::Commands::SkipForwardRequest::Id, app::Clusters::MediaPlayback::Commands::SkipBackwardRequest::Id,
-    app::Clusters::MediaPlayback::Commands::SeekRequest::Id,        kInvalidCommandId,
+    app::Clusters::MediaPlayback::Commands::Play::Id,         app::Clusters::MediaPlayback::Commands::Pause::Id,
+    app::Clusters::MediaPlayback::Commands::StopPlayback::Id, app::Clusters::MediaPlayback::Commands::StartOver::Id,
+    app::Clusters::MediaPlayback::Commands::Previous::Id,     app::Clusters::MediaPlayback::Commands::Next::Id,
+    app::Clusters::MediaPlayback::Commands::Rewind::Id,       app::Clusters::MediaPlayback::Commands::FastForward::Id,
+    app::Clusters::MediaPlayback::Commands::SkipForward::Id,  app::Clusters::MediaPlayback::Commands::SkipBackward::Id,
+    app::Clusters::MediaPlayback::Commands::Seek::Id,         kInvalidCommandId,
 };
 constexpr CommandId mediaPlaybackOutgoingCommands[] = {
     app::Clusters::MediaPlayback::Commands::PlaybackResponse::Id,
     kInvalidCommandId,
 };
 constexpr CommandId targetNavigatorIncomingCommands[] = {
-    app::Clusters::TargetNavigator::Commands::NavigateTargetRequest::Id,
+    app::Clusters::TargetNavigator::Commands::NavigateTarget::Id,
     kInvalidCommandId,
 };
 constexpr CommandId targetNavigatorOutgoingCommands[] = {
@@ -193,9 +193,9 @@ constexpr CommandId targetNavigatorOutgoingCommands[] = {
 };
 // TODO: Sort out when the optional commands here should be listed.
 constexpr CommandId channelIncomingCommands[] = {
-    app::Clusters::Channel::Commands::ChangeChannelRequest::Id,
-    app::Clusters::Channel::Commands::ChangeChannelByNumberRequest::Id,
-    app::Clusters::Channel::Commands::SkipChannelRequest::Id,
+    app::Clusters::Channel::Commands::ChangeChannel::Id,
+    app::Clusters::Channel::Commands::ChangeChannelByNumber::Id,
+    app::Clusters::Channel::Commands::SkipChannel::Id,
     kInvalidCommandId,
 };
 constexpr CommandId channelOutgoingCommands[] = {
