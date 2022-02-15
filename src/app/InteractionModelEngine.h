@@ -108,7 +108,7 @@ public:
      * @retval #CHIP_ERROR_KEY_NOT_FOUND If no active subscription is found.
      * @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR ShutdownSubscriptions(FabricIndex aFabricIndex, NodeId aPeerNodeId);
+    CHIP_ERROR ShutdownSubscriptions(OperationalId aPeerOperationalId);
 
     uint32_t GetNumActiveReadHandlers() const;
     uint32_t GetNumActiveReadHandlers(ReadHandler::InteractionType type) const;

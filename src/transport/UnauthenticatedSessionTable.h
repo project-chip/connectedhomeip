@@ -74,6 +74,8 @@ public:
     void Retain() override { ReferenceCounted<UnauthenticatedSession, UnauthenticatedSessionDeleter, 0>::Retain(); }
     void Release() override { ReferenceCounted<UnauthenticatedSession, UnauthenticatedSessionDeleter, 0>::Release(); }
 
+    OperationalId GetPeerOperationalId() const override { return OperationalId::UndefinedOperationalId(); }
+
     Access::SubjectDescriptor GetSubjectDescriptor() const override
     {
         return Access::SubjectDescriptor(); // return an empty ISD for unauthenticated session.

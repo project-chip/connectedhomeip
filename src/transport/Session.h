@@ -18,6 +18,7 @@
 
 #include <credentials/FabricTable.h>
 #include <lib/core/CHIPConfig.h>
+#include <lib/core/OperationalId.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <transport/SessionHolder.h>
 #include <transport/raw/PeerAddress.h>
@@ -63,6 +64,7 @@ public:
     virtual void Retain() {}
     virtual void Release() {}
 
+    virtual OperationalId GetPeerOperationalId() const                 = 0;
     virtual Access::SubjectDescriptor GetSubjectDescriptor() const     = 0;
     virtual bool RequireMRP() const                                    = 0;
     virtual const ReliableMessageProtocolConfig & GetMRPConfig() const = 0;

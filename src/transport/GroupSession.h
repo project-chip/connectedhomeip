@@ -38,6 +38,8 @@ public:
     const char * GetSessionTypeString() const override { return "secure"; };
 #endif
 
+    OperationalId GetPeerOperationalId() const override { return OperationalId::UndefinedOperationalId(); }
+
     Access::SubjectDescriptor GetSubjectDescriptor() const override
     {
         Access::SubjectDescriptor subjectDescriptor;

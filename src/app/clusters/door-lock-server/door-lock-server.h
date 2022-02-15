@@ -155,8 +155,7 @@ public:
     }
 
 private:
-    chip::FabricIndex getFabricIndex(const chip::app::CommandHandler * commandObj);
-    chip::NodeId getNodeId(const chip::app::CommandHandler * commandObj);
+    chip::OperationalId getOperationalId(const chip::app::CommandHandler * commandObj);
 
     bool userIndexValid(chip::EndpointId endpointId, uint16_t userIndex);
     bool userIndexValid(chip::EndpointId endpointId, uint16_t userIndex, uint16_t & maxNumberOfUser);
@@ -180,21 +179,21 @@ private:
     bool findUserIndexByCredential(chip::EndpointId endpointId, DlCredentialType credentialType, chip::ByteSpan credentialData,
                                    uint16_t & userIndex, uint16_t & credentialIndex);
 
-    EmberAfStatus createUser(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx, chip::NodeId sourceNodeId,
-                             uint16_t userIndex, const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
+    EmberAfStatus createUser(chip::EndpointId endpointId, chip::OperationalId operationalId, uint16_t userIndex,
+                             const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
                              const Nullable<DlUserStatus> & userStatus, const Nullable<DlUserType> & userType,
                              const Nullable<DlCredentialRule> & credentialRule,
                              const Nullable<DlCredential> & credential = Nullable<DlCredential>());
-    EmberAfStatus modifyUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIndex, chip::NodeId sourceNodeId,
-                             uint16_t userIndex, const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
+    EmberAfStatus modifyUser(chip::EndpointId endpointId, chip::OperationalId operationalId, uint16_t userIndex,
+                             const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
                              const Nullable<DlUserStatus> & userStatus, const Nullable<DlUserType> & userType,
                              const Nullable<DlCredentialRule> & credentialRule);
-    EmberAfStatus clearUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricId, chip::NodeId sourceNodeId,
-                            uint16_t userIndex, bool sendUserChangeEvent);
-    EmberAfStatus clearUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricId, chip::NodeId sourceNodeId,
-                            uint16_t userIndex, const EmberAfPluginDoorLockUserInfo & user, bool sendUserChangeEvent);
+    EmberAfStatus clearUser(chip::EndpointId endpointId, chip::OperationalId operationalId, uint16_t userIndex,
+                            bool sendUserChangeEvent);
+    EmberAfStatus clearUser(chip::EndpointId endpointId, chip::OperationalId operationalId, uint16_t userIndex,
+                            const EmberAfPluginDoorLockUserInfo & user, bool sendUserChangeEvent);
 
-    DlStatus createNewCredentialAndUser(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx, chip::NodeId sourceNodeId,
+    DlStatus createNewCredentialAndUser(chip::EndpointId endpointId, chip::OperationalId operationalId,
                                         const Nullable<DlUserStatus> & userStatus, const Nullable<DlUserType> & userType,
                                         const DlCredential & credential, const chip::ByteSpan & credentialData,
                                         uint16_t & createdUserIndex);
@@ -206,25 +205,22 @@ private:
     DlStatus modifyCredentialForUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIdx, uint16_t userIndex,
                                      const DlCredential & credential);
 
-    DlStatus createCredential(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx, chip::NodeId sourceNodeId,
-                              uint16_t credentialIndex, DlCredentialType credentialType,
-                              const EmberAfPluginDoorLockCredentialInfo & existingCredential, const chip::ByteSpan & credentialData,
-                              Nullable<uint16_t> userIndex, Nullable<DlUserStatus> userStatus, Nullable<DlUserType> userType,
-                              uint16_t & createdUserIndex);
-    DlStatus modifyProgrammingPIN(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIndex, chip::NodeId sourceNodeId,
-                                  uint16_t credentialIndex, DlCredentialType credentialType,
-                                  const EmberAfPluginDoorLockCredentialInfo & existingCredential,
+    DlStatus createCredential(chip::EndpointId endpointId, chip::OperationalId operationalId, uint16_t credentialIndex,
+                              DlCredentialType credentialType, const EmberAfPluginDoorLockCredentialInfo & existingCredential,
+                              const chip::ByteSpan & credentialData, Nullable<uint16_t> userIndex,
+                              Nullable<DlUserStatus> userStatus, Nullable<DlUserType> userType, uint16_t & createdUserIndex);
+    DlStatus modifyProgrammingPIN(chip::EndpointId endpointId, chip::OperationalId operationalId, uint16_t credentialIndex,
+                                  DlCredentialType credentialType, const EmberAfPluginDoorLockCredentialInfo & existingCredential,
                                   const chip::ByteSpan & credentialData);
-    DlStatus modifyCredential(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIndex, chip::NodeId sourceNodeId,
-                              uint16_t credentialIndex, DlCredentialType credentialType,
-                              const EmberAfPluginDoorLockCredentialInfo & existingCredential, const chip::ByteSpan & credentialData,
-                              uint16_t userIndex, Nullable<DlUserStatus> userStatus, Nullable<DlUserType> userType);
+    DlStatus modifyCredential(chip::EndpointId endpointId, chip::OperationalId operationalId, uint16_t credentialIndex,
+                              DlCredentialType credentialType, const EmberAfPluginDoorLockCredentialInfo & existingCredential,
+                              const chip::ByteSpan & credentialData, uint16_t userIndex, Nullable<DlUserStatus> userStatus,
+                              Nullable<DlUserType> userType);
 
-    EmberAfStatus clearCredential(chip::EndpointId endpointId, chip::FabricIndex modifier, chip::NodeId sourceNodeId,
-                                  DlCredentialType credentialType, uint16_t credentialIndex, bool sendUserChangeEvent);
-    EmberAfStatus clearCredentials(chip::EndpointId endpointId, chip::FabricIndex modifier, chip::NodeId sourceNodeId);
-    EmberAfStatus clearCredentials(chip::EndpointId endpointId, chip::FabricIndex modifier, chip::NodeId sourceNodeId,
-                                   DlCredentialType credentialType);
+    EmberAfStatus clearCredential(chip::EndpointId endpointId, chip::OperationalId operationalId, DlCredentialType credentialType,
+                                  uint16_t credentialIndex, bool sendUserChangeEvent);
+    EmberAfStatus clearCredentials(chip::EndpointId endpointId, chip::OperationalId operationalId);
+    EmberAfStatus clearCredentials(chip::EndpointId endpointId, chip::OperationalId operationalId, DlCredentialType credentialType);
 
     CHIP_ERROR sendSetCredentialResponse(chip::app::CommandHandler * commandObj, DlStatus status, uint16_t userIndex,
                                          uint16_t nextCredentialIndex);
@@ -255,8 +251,7 @@ private:
                                               uint32_t localEndTime = 0);
 
     bool sendRemoteLockUserChange(chip::EndpointId endpointId, DlLockDataType dataType, DlDataOperationType operation,
-                                  chip::NodeId nodeId, chip::FabricIndex fabricIndex, uint16_t userIndex = 0,
-                                  uint16_t dataIndex = 0);
+                                  chip::OperationalId operationalId, uint16_t userIndex = 0, uint16_t dataIndex = 0);
 
     DlLockDataType credentialTypeToLockDataType(DlCredentialType credentialType);
 

@@ -83,6 +83,8 @@ public:
     const char * GetSessionTypeString() const override { return "secure"; };
 #endif
 
+    OperationalId GetPeerOperationalId() const override;
+
     Access::SubjectDescriptor GetSubjectDescriptor() const override;
 
     bool RequireMRP() const override { return GetPeerAddress().GetTransportType() == Transport::Type::kUdp; }

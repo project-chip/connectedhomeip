@@ -378,5 +378,11 @@ bool IsCategoryEnabled(uint8_t category);
  */
 #define ChipLogFormatMessageType "0x%x"
 
+/**
+ * Logging helpers for OperationalId
+ */
+#define ChipLogFormatOperationalId "<" ChipLogFormatX64 ", %u>"
+#define ChipLogValueOperationalId(operationalId) ChipLogValueX64(operationalId.GetNodeId()), operationalId.GetFabricIndex()
+
 } // namespace Logging
 } // namespace chip

@@ -189,12 +189,11 @@ CHIP_ERROR InteractionModelEngine::ShutdownSubscription(uint64_t aSubscriptionId
     return CHIP_ERROR_KEY_NOT_FOUND;
 }
 
-CHIP_ERROR InteractionModelEngine::ShutdownSubscriptions(FabricIndex aFabricIndex, NodeId aPeerNodeId)
+CHIP_ERROR InteractionModelEngine::ShutdownSubscriptions(OperationalId aPeerOperationalId)
 {
     for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
     {
-        if (readClient->IsSubscriptionType() && readClient->GetFabricIndex() == aFabricIndex &&
-            readClient->GetPeerNodeId() == aPeerNodeId)
+        if (readClient->IsSubscriptionType() && readClient->GetPeerOperationalId() == aPeerOperationalId)
         {
             readClient->Close(CHIP_NO_ERROR);
         }
@@ -273,10 +272,8 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
             mReadHandlers.ForEachActiveObject([this, apExchangeContext](ReadHandler * handler) {
                 if (handler->IsFromSubscriber(*apExchangeContext))
                 {
-                    ChipLogProgress(InteractionModel,
-                                    "Deleting previous subscription from NodeId: " ChipLogFormatX64 ", FabricIndex: %u",
-                                    ChipLogValueX64(apExchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId()),
-                                    apExchangeContext->GetSessionHandle()->GetFabricIndex());
+                    ChipLogProgress(InteractionModel, "Deleting previous subscription from peer: " ChipLogFormatOperationalId,
+                                    ChipLogValueOperationalId(apExchangeContext->GetSessionHandle()->GetPeerOperationalId()));
                     mReadHandlers.ReleaseObject(handler);
                 }
 
