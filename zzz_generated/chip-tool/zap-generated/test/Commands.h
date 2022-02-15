@@ -50581,6 +50581,7 @@ private:
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type;
 
+        ListFreer listFreer;
         RequestType request;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
@@ -50614,6 +50615,7 @@ private:
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type;
 
+        ListFreer listFreer;
         RequestType request;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
@@ -50648,6 +50650,8 @@ private:
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
+        ListFreer listFreer;
+
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo>(
                 this, OnSuccessCallback_5, OnFailureCallback_5));
@@ -50673,6 +50677,8 @@ private:
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::TypeInfo>(
@@ -50700,6 +50706,8 @@ private:
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
+        ListFreer listFreer;
+
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo>(
                 this, OnSuccessCallback_7, OnFailureCallback_7));
@@ -50725,6 +50733,8 @@ private:
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::TypeInfo>(
@@ -50938,6 +50948,7 @@ private:
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type;
 
+        ListFreer listFreer;
         RequestType request;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
@@ -50971,6 +50982,7 @@ private:
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type;
 
+        ListFreer listFreer;
         RequestType request;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
@@ -51005,6 +51017,8 @@ private:
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
+        ListFreer listFreer;
+
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo>(
                 this, OnSuccessCallback_5, OnFailureCallback_5));
@@ -51030,6 +51044,8 @@ private:
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::TypeInfo>(
@@ -51057,6 +51073,8 @@ private:
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
+        ListFreer listFreer;
+
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo>(
                 this, OnSuccessCallback_7, OnFailureCallback_7));
@@ -51082,6 +51100,8 @@ private:
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::TypeInfo>(
@@ -51258,6 +51278,8 @@ private:
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
+        ListFreer listFreer;
+
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo>(
                 this, OnSuccessCallback_1, OnFailureCallback_1));
@@ -51286,6 +51308,8 @@ private:
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
+        ListFreer listFreer;
+
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::TypeInfo>(
                 this, OnSuccessCallback_2, OnFailureCallback_2));
@@ -51311,6 +51335,7 @@ private:
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::Type;
 
+        ListFreer listFreer;
         RequestType request;
         request.liftPercentageValue    = 63;
         request.liftPercent100thsValue = 12288U;
@@ -51341,6 +51366,7 @@ private:
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::Type;
 
+        ListFreer listFreer;
         RequestType request;
         request.liftPercentageValue    = 100;
         request.liftPercent100thsValue = 10001U;
@@ -51371,6 +51397,7 @@ private:
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::Type;
 
+        ListFreer listFreer;
         RequestType request;
         request.liftPercentageValue    = 255;
         request.liftPercent100thsValue = 65535U;
@@ -51551,6 +51578,8 @@ private:
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
+        ListFreer listFreer;
+
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo>(
                 this, OnSuccessCallback_1, OnFailureCallback_1));
@@ -51579,6 +51608,8 @@ private:
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
+        ListFreer listFreer;
+
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::TypeInfo>(
                 this, OnSuccessCallback_2, OnFailureCallback_2));
@@ -51604,6 +51635,7 @@ private:
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::Type;
 
+        ListFreer listFreer;
         RequestType request;
         request.tiltPercentageValue    = 63;
         request.tiltPercent100thsValue = 12288U;
@@ -51634,6 +51666,7 @@ private:
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::Type;
 
+        ListFreer listFreer;
         RequestType request;
         request.tiltPercentageValue    = 100;
         request.tiltPercent100thsValue = 10001U;
@@ -51664,6 +51697,7 @@ private:
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::Type;
 
+        ListFreer listFreer;
         RequestType request;
         request.tiltPercentageValue    = 255;
         request.tiltPercent100thsValue = 65535U;
