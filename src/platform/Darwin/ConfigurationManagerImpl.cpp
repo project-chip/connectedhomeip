@@ -27,6 +27,7 @@
 
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <platform/ConfigurationManager.h>
+#include <platform/Darwin/DiagnosticDataProviderImpl.h>
 #include <platform/Darwin/PosixConfig.h>
 #include <platform/internal/GenericConfigurationManagerImpl.cpp>
 
@@ -137,14 +138,44 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {
-    CHIP_ERROR err;
-
     // Initialize the generic implementation base class.
-    err = Internal::GenericConfigurationManagerImpl<PosixConfig>::Init();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(Internal::GenericConfigurationManagerImpl<PosixConfig>::Init());
 
-exit:
-    return err;
+    uint32_t rebootCount;
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kCounterKey_RebootCount))
+    {
+        // The first boot after factory reset of the Node.
+        ReturnErrorOnFailure(StoreRebootCount(1));
+    }
+    else
+    {
+        ReturnErrorOnFailure(GetRebootCount(rebootCount));
+        ReturnErrorOnFailure(StoreRebootCount(rebootCount + 1));
+    }
+
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kCounterKey_TotalOperationalHours))
+    {
+        ReturnErrorOnFailure(StoreTotalOperationalHours(0));
+    }
+
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kCounterKey_BootReason))
+    {
+        ReturnErrorOnFailure(StoreBootReason(DiagnosticDataProvider::BootReasonType::Unspecified));
+    }
+
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_RegulatoryLocation))
+    {
+        uint32_t location = to_underlying(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoor);
+        ReturnErrorOnFailure(WriteConfigValue(PosixConfig::kConfigKey_RegulatoryLocation, location));
+    }
+
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_LocationCapability))
+    {
+        uint32_t location = to_underlying(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoor);
+        ReturnErrorOnFailure(WriteConfigValue(PosixConfig::kConfigKey_LocationCapability, location));
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
@@ -176,6 +207,66 @@ void ConfigurationManagerImpl::InitiateFactoryReset()
     ChipLogError(DeviceLayer, "InitiateFactoryReset not implemented");
 }
 
+CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
+{
+    return ReadConfigValue(PosixConfig::kCounterKey_RebootCount, rebootCount);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreRebootCount(uint32_t rebootCount)
+{
+    return WriteConfigValue(PosixConfig::kCounterKey_RebootCount, rebootCount);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
+{
+    return ReadConfigValue(PosixConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOperationalHours)
+{
+    return WriteConfigValue(PosixConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
+{
+    return ReadConfigValue(PosixConfig::kCounterKey_BootReason, bootReason);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreBootReason(uint32_t bootReason)
+{
+    return WriteConfigValue(PosixConfig::kCounterKey_BootReason, bootReason);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetRegulatoryLocation(uint8_t & location)
+{
+    uint32_t value = 0;
+
+    CHIP_ERROR err = ReadConfigValue(PosixConfig::kConfigKey_RegulatoryLocation, value);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(value <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+        location = static_cast<uint8_t>(value);
+    }
+
+    return err;
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetLocationCapability(uint8_t & location)
+{
+    uint32_t value = 0;
+
+    CHIP_ERROR err = ReadConfigValue(PosixConfig::kConfigKey_LocationCapability, value);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(value <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+        location = static_cast<uint8_t>(value);
+    }
+
+    return err;
+}
+
 CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
 {
     PosixConfig::Key configKey{ PosixConfig::kConfigNamespace_ChipCounters, key };
@@ -192,20 +283,6 @@ CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform
 {
     PosixConfig::Key configKey{ PosixConfig::kConfigNamespace_ChipCounters, key };
     return WriteConfigValue(configKey, value);
-}
-
-CHIP_ERROR ConfigurationManagerImpl::StoreCountryCode(const char * code, size_t codeLen)
-{
-    Platform::CopyString(mCountryCode, kCountryCodeLength + 1, code);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConfigurationManagerImpl::GetCountryCode(char * buf, size_t bufSize, size_t & codeLen)
-{
-    Platform::CopyString(buf, kCountryCodeLength + 1, mCountryCode);
-    codeLen = strlen(mCountryCode);
-
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, bool & val)

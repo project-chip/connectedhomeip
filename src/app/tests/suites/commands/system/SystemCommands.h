@@ -26,7 +26,7 @@ public:
     SystemCommands(){};
     virtual ~SystemCommands(){};
 
-    virtual CHIP_ERROR ContinueOnChipMainThread() = 0;
+    virtual CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err) = 0;
 
     CHIP_ERROR Start(uint16_t discriminator);
     CHIP_ERROR Stop();

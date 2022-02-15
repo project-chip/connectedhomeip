@@ -42,9 +42,6 @@ CHIP_ERROR PairingCommandBridge::RunCommand()
 {
     NSError * error;
     switch (mPairingMode) {
-    case PairingMode::None:
-        Unpair(&error);
-        break;
     case PairingMode::QRCode:
     case PairingMode::ManualCode:
         PairWithCode(&error);
@@ -75,5 +72,3 @@ void PairingCommandBridge::PairWithIPAddress(NSError * __autoreleasing * error)
                          setupPINCode:mSetupPINCode
                                 error:error];
 }
-
-void PairingCommandBridge::Unpair(NSError * __autoreleasing * error) { [CurrentCommissioner() unpairDevice:mNodeId error:error]; }

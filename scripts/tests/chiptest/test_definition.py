@@ -32,18 +32,21 @@ TEST_NODE_ID = '0x12344321'
 class App:
     def __init__(self, runner, command):
         self.process = None
+        self.outpipe = None
         self.runner = runner
         self.command = command
         self.stopped = False
+        self.lastLogIndex = 0
 
     def start(self, discriminator):
         if not self.process:
             self.process = None
             process, outpipe, errpipe = self.__startServer(
                 self.runner, self.command, discriminator)
-            self.__waitForServerReady(process, outpipe)
+            self.waitForAnyAdvertisement(process, outpipe)
             self.__updateSetUpCode(outpipe)
             self.process = process
+            self.outpipe = outpipe
             self.stopped = False
             return True
         return False
@@ -54,6 +57,7 @@ class App:
             self.process.kill()
             self.process.wait(10)
             self.process = None
+            self.outpipe = None
             return True
         return False
 
@@ -69,6 +73,19 @@ class App:
         if os.path.exists(storage):
             os.unlink(storage)
 
+        return True
+
+    def waitForAnyAdvertisement(self, process, outpipe):
+        self.__waitFor("mDNS service published:", process, outpipe)
+
+    def waitForCommissionableAdvertisement(self):
+        self.__waitFor("mDNS service published: _matterc._udp",
+                       self.process, self.outpipe)
+        return True
+
+    def waitForOperationalAdvertisement(self):
+        self.__waitFor("mDNS service published: _matter._tcp",
+                       self.process, self.outpipe)
         return True
 
     def poll(self):
@@ -92,21 +109,25 @@ class App:
         app_cmd = command + ['--discriminator', str(discriminator)]
         return runner.RunSubprocess(app_cmd, name='APP ', wait=False)
 
-    def __waitForServerReady(self, server_process, outpipe):
-        logging.debug('Waiting for server to listen.')
+    def __waitFor(self, waitForString, server_process, outpipe):
+        logging.debug('Waiting for %s' % waitForString)
+
         start_time = time.time()
-        server_is_listening = outpipe.CapturedLogContains("Server Listening")
-        while not server_is_listening:
+        ready, self.lastLogIndex = outpipe.CapturedLogContains(
+            waitForString, self.lastLogIndex)
+        while not ready:
             if server_process.poll() is not None:
-                died_str = 'Server died during startup, returncode %d' % server_process.returncode
+                died_str = 'Server died while waiting for %s, returncode %d' % (
+                    waitForString, server_process.returncode)
                 logging.error(died_str)
                 raise Exception(died_str)
             if time.time() - start_time > 10:
-                raise Exception('Timeout for server listening')
+                raise Exception('Timeout while waiting for %s' % waitForString)
             time.sleep(0.1)
-            server_is_listening = outpipe.CapturedLogContains(
-                "Server Listening")
-        logging.debug('Server is listening. Can proceed.')
+            ready, self.lastLogIndex = outpipe.CapturedLogContains(
+                waitForString, self.lastLogIndex)
+
+        logging.debug('Success waiting for: %s' % waitForString)
 
     def __updateSetUpCode(self, outpipe):
         qrLine = outpipe.FindLastMatchingLine('.*SetupQRCode: *\\[(.*)]')
@@ -211,7 +232,7 @@ class TestDefinition:
             runner.RunSubprocess(tool_cmd + ['pairing', 'qrcode', TEST_NODE_ID, app.setupCode],
                                  name='PAIR', dependencies=[apps_register])
 
-            runner.RunSubprocess(tool_cmd + ['tests', self.run_name, TEST_NODE_ID],
+            runner.RunSubprocess(tool_cmd + ['tests', self.run_name],
                                  name='TEST', dependencies=[apps_register])
         except:
             logging.error("!!!!!!!!!!!!!!!!!!!! ERROR !!!!!!!!!!!!!!!!!!!!!!")

@@ -193,8 +193,8 @@ void PacketDataReporter::OnDiscoveredNodeIPAddress(const chip::Inet::IPAddress &
     {
         return;
     }
-    mDiscoveredNodeData.ipAddress[mDiscoveredNodeData.numIPs]   = addr;
-    mDiscoveredNodeData.interfaceId[mDiscoveredNodeData.numIPs] = mInterfaceId;
+    mDiscoveredNodeData.ipAddress[mDiscoveredNodeData.numIPs] = addr;
+    mDiscoveredNodeData.interfaceId                           = mInterfaceId;
     mDiscoveredNodeData.numIPs++;
 }
 
@@ -351,9 +351,10 @@ public:
     CHIP_ERROR Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager) override;
     void Shutdown() override;
     void SetResolverDelegate(ResolverDelegate * delegate) override { mDelegate = delegate; }
-    CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type, Resolver::CacheBypass dnssdCacheBypass) override;
+    CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override;
     CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
+    bool ResolveNodeIdFromInternalCache(const PeerId & peerId, Inet::IPAddressType type) override;
 
 private:
     ResolverDelegate * mDelegate = nullptr;
@@ -506,12 +507,18 @@ CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, DiscoveryFilter filt
     return SendQuery(qname, mdns::Minimal::QType::ANY);
 }
 
-CHIP_ERROR MinMdnsResolver::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type, Resolver::CacheBypass dnssdCacheBypass)
+CHIP_ERROR MinMdnsResolver::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
 {
     mDiscoveryType = DiscoveryType::kOperational;
     mActiveResolves.MarkPending(peerId);
 
     return SendPendingResolveQueries();
+}
+
+bool MinMdnsResolver::ResolveNodeIdFromInternalCache(const PeerId & peerId, Inet::IPAddressType type)
+{
+    // MinMDNS does not do cache node address resolutions.
+    return false;
 }
 
 CHIP_ERROR MinMdnsResolver::ScheduleResolveRetries()
@@ -603,11 +610,11 @@ Resolver & chip::Dnssd::Resolver::Instance()
 // updating the delegate that ends up being used by the server by calling 'SetResolverDelegate'.
 // This effectively allow minimal to have multiple controllers issuing requests as long the requests are serialized, but
 // it won't work well if requests are issued in parallel.
-CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type, Resolver::CacheBypass dnssdCacheBypass)
+CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
 {
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     chip::Dnssd::Resolver::Instance().SetResolverDelegate(mDelegate);
-    return chip::Dnssd::Resolver::Instance().ResolveNodeId(peerId, type, dnssdCacheBypass);
+    return chip::Dnssd::Resolver::Instance().ResolveNodeId(peerId, type);
 }
 
 CHIP_ERROR ResolverProxy::FindCommissionableNodes(DiscoveryFilter filter)
@@ -622,6 +629,11 @@ CHIP_ERROR ResolverProxy::FindCommissioners(DiscoveryFilter filter)
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     chip::Dnssd::Resolver::Instance().SetResolverDelegate(mDelegate);
     return chip::Dnssd::Resolver::Instance().FindCommissioners(filter);
+}
+
+bool ResolverProxy::ResolveNodeIdFromInternalCache(const PeerId & peerId, Inet::IPAddressType type)
+{
+    return chip::Dnssd::Resolver::Instance().ResolveNodeIdFromInternalCache(peerId, type);
 }
 
 } // namespace Dnssd

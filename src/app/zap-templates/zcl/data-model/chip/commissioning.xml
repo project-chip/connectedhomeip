@@ -87,9 +87,9 @@ limitations under the License.
         <attribute side="server" code="0x0002" define="SCAN_MAX_TIME_SECONDS" type="INT8U" writable="false" optional="false">ScanMaxTimeSeconds</attribute>
         <attribute side="server" code="0x0003" define="CONNECT_MAX_TIME_SECONDS" type="INT8U" writable="false" optional="false">ConnectMaxTimeSeconds</attribute>
         <attribute side="server" code="0x0004" define="INTERFACE_ENABLED" type="BOOLEAN" writable="true" optional="false">InterfaceEnabled</attribute>
-        <attribute side="server" code="0x0005" define="LAST_NETWORKING_STATUS" type="NetworkCommissioningStatus" writable="false" optional="false">LastNetworkingStatus</attribute>
-        <attribute side="server" code="0x0006" define="LAST_NETWORK_ID" type="OCTET_STRING" length="32" writable="false" optional="false">LastNetworkID</attribute>
-        <attribute side="server" code="0x0007" define="LAST_CONNECT_ERROR_VALUE" type="INT32U" writable="false" optional="false">LastConnectErrorValue</attribute>
+        <attribute side="server" code="0x0005" define="LAST_NETWORKING_STATUS" type="NetworkCommissioningStatus" writable="false" optional="false" isNullable="true">LastNetworkingStatus</attribute>
+        <attribute side="server" code="0x0006" define="LAST_NETWORK_ID" type="OCTET_STRING" length="32" writable="false" optional="false" isNullable="true">LastNetworkID</attribute>
+        <attribute side="server" code="0x0007" define="LAST_CONNECT_ERROR_VALUE" type="INT32S" writable="false" optional="false" isNullable="true">LastConnectErrorValue</attribute>
 
         <command source="client" code="0x00" name="ScanNetworks" optional="false" response="ScanNetworksResponse" cli="chip network_commissioning scannetworks">
             <description>TODO</description>

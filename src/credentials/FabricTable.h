@@ -142,6 +142,8 @@ public:
         ReleaseOperationalCerts();
     }
 
+    NodeId GetNodeId() const { return mOperationalId.GetNodeId(); }
+    // TODO(#15049): Refactor/rename PeerId to OperationalId or OpId throughout source
     PeerId GetPeerId() const { return mOperationalId; }
     PeerId GetPeerIdForNode(const NodeId node) const
     {

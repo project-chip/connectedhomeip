@@ -43,6 +43,14 @@
 #include "pigweed/rpc_services/Locking.h"
 #endif // defined(PW_RPC_LOCKING_SERVICE) && PW_RPC_LOCKING_SERVICE
 
+#if defined(PW_RPC_OTCLI_SERVICE) && PW_RPC_OTCLI_SERVICE
+#include "pigweed/rpc_services/OtCli.h"
+#endif // defined(PW_RPC_OTCLI_SERVICE) && PW_RPC_OTCLI_SERVICE
+
+#if defined(PW_RPC_THREAD_SERVICE) && PW_RPC_THREAD_SERVICE
+#include "pigweed/rpc_services/Thread.h"
+#endif // defined(PW_RPC_THREAD_SERVICE) && PW_RPC_THREAD_SERVICE
+
 namespace chip {
 namespace rpc {
 
@@ -106,6 +114,14 @@ Lighting lighting_service;
 Locking locking;
 #endif // defined(PW_RPC_LOCKING_SERVICE) && PW_RPC_LOCKING_SERVICE
 
+#if defined(PW_RPC_OTCLI_SERVICE) && PW_RPC_OTCLI_SERVICE
+OtCli ot_cli_service;
+#endif // defined(PW_RPC_OTCLI_SERVICE) && PW_RPC_OTCLI_SERVICE
+
+#if defined(PW_RPC_THREAD_SERVICE) && PW_RPC_THREAD_SERVICE
+Thread thread;
+#endif // defined(PW_RPC_THREAD_SERVICE) && PW_RPC_THREAD_SERVICE
+
 void RegisterServices(pw::rpc::Server & server)
 {
 #if defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
@@ -127,6 +143,14 @@ void RegisterServices(pw::rpc::Server & server)
 #if defined(PW_RPC_LOCKING_SERVICE) && PW_RPC_LOCKING_SERVICE
     server.RegisterService(locking);
 #endif // defined(PW_RPC_LOCKING_SERVICE) && PW_RPC_LOCKING_SERVICE
+
+#if defined(PW_RPC_OTCLI_SERVICE) && PW_RPC_OTCLI_SERVICE
+    server.RegisterService(ot_cli_service);
+#endif // defined(PW_RPC_OTCLI_SERVICE) && PW_RPC_OTCLI_SERVICE
+
+#if defined(PW_RPC_THREAD_SERVICE) && PW_RPC_THREAD_SERVICE
+    server.RegisterService(thread);
+#endif // defined(PW_RPC_THREAD_SERVICE) && PW_RPC_THREAD_SERVICE
 }
 
 } // namespace

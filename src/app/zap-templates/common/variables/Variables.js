@@ -27,6 +27,7 @@ const templateUtil = require(zapPath + 'generator/template-util.js')
 const { getCommands, getAttributes } = require('../simulated-clusters/SimulatedClusters.js');
 
 const knownVariables = {
+  'nodeId' : { type : 'NODE_ID', defaultValue : 0x12345 },
   'endpoint' : { type : 'ENDPOINT_NO', defaultValue : '' },
   'cluster' : { type : 'CHAR_STRING', defaultValue : '' },
   'timeout' : { type : 'INT16U', defaultValue : 30 },

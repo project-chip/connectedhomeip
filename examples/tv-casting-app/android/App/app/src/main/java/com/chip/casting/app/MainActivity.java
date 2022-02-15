@@ -5,6 +5,7 @@ import android.net.nsd.NsdManager;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+import com.chip.casting.TvCastingApp;
 import com.chip.casting.dnssd.CommissionerDiscoveryListener;
 import com.chip.casting.util.GlobalCastingConstants;
 import java.util.concurrent.Executors;
@@ -17,6 +18,8 @@ public class MainActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
     startCommissionerDiscovery();
+
+    testJni();
   }
 
   private void startCommissionerDiscovery() {
@@ -47,5 +50,12 @@ public class MainActivity extends AppCompatActivity {
             },
             10,
             TimeUnit.SECONDS);
+  }
+
+  /** TBD: Temp dummy function for testing */
+  private void testJni() {
+    TvCastingApp tvCastingApp =
+        new TvCastingApp((app, clusterId, endpoint) -> app.doSomethingInCpp(endpoint));
+    tvCastingApp.doSomethingInCpp(0);
   }
 }

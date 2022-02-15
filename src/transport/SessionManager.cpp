@@ -72,15 +72,18 @@ SessionManager::SessionManager() : mState(State::kNotReady) {}
 SessionManager::~SessionManager() {}
 
 CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * transportMgr,
-                                Transport::MessageCounterManagerInterface * messageCounterManager)
+                                Transport::MessageCounterManagerInterface * messageCounterManager,
+                                chip::PersistentStorageDelegate * storageDelegate)
 {
     VerifyOrReturnError(mState == State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(transportMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(storageDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     mState                 = State::kInitialized;
     mSystemLayer           = systemLayer;
     mTransportMgr          = transportMgr;
     mMessageCounterManager = messageCounterManager;
+    mStorage               = storageDelegate;
 
     // TODO: Handle error from mGlobalEncryptedMessageCounter! Unit tests currently crash if you do!
     (void) mGlobalEncryptedMessageCounter.Init();
@@ -133,8 +136,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         packetHeader.SetDestinationGroupId(groupSession->GetGroupId());
         packetHeader.SetFlags(Header::SecFlagValues::kPrivacyFlag);
         packetHeader.SetSessionType(Header::SessionType::kGroupSession);
-        // TODO : Replace the PeerNodeId with Our nodeId
-        packetHeader.SetSourceNodeId(kUndefinedNodeId);
+        packetHeader.SetSourceNodeId(groupSession->GetSourceNodeId());
 
         if (!packetHeader.IsValidGroupMsg())
         {
@@ -608,6 +610,8 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
         return; // malformed packet
     }
 
+    GroupId groupId = packetHeader.GetDestinationGroupId().Value();
+
     if (msg.IsNull())
     {
         ChipLogError(Inet, "Secure transport received Groupcast NULL packet, discarding");
@@ -634,6 +638,11 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
     bool decrypted = false;
     while (!decrypted && iter->Next(groupContext))
     {
+        // Optimization to reduce number of decryption attempts
+        if (groupId != groupContext.group_id)
+        {
+            continue;
+        }
         msgCopy = msg.CloneData();
         decrypted =
             (CHIP_NO_ERROR == SecureMessageCodec::Decrypt(CryptoContext(groupContext.key), payloadHeader, packetHeader, msgCopy));
@@ -686,7 +695,8 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
     if (mCB != nullptr)
     {
         // TODO : When MCSP is done, clean up session creation logique
-        Optional<SessionHandle> session = CreateGroupSession(groupContext.group_id, groupContext.fabric_index);
+        Optional<SessionHandle> session =
+            CreateGroupSession(groupContext.group_id, groupContext.fabric_index, packetHeader.GetSourceNodeId().Value());
 
         VerifyOrReturn(session.HasValue(), ChipLogError(Inet, "Error when creating group session handle."));
         Transport::GroupSession * groupSession = session.Value()->AsGroupSession();
@@ -702,7 +712,7 @@ void SessionManager::ExpiryTimerCallback(System::Layer * layer, void * param)
 {
     SessionManager * mgr = reinterpret_cast<SessionManager *>(param);
 #if CHIP_CONFIG_SESSION_REKEYING
-    // TODO(#2279): session expiration is currently disabled until rekeying is supported
+    // TODO(#14217): session expiration is currently disabled until rekeying is supported
     // the #ifdef should be removed after that.
     mgr->mSecureSessions.ExpireInactiveSessions(System::SystemClock().GetMonotonicTimestamp(),
                                                 System::Clock::Milliseconds32(CHIP_PEER_CONNECTION_TIMEOUT_MS));

@@ -116,7 +116,8 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         err = gFabricStorage.Initialize(&gServerStorage);
         SuccessOrExit(err);
 
-        factoryParams.fabricStorage = &gFabricStorage;
+        factoryParams.fabricStorage            = &gFabricStorage;
+        factoryParams.fabricIndependentStorage = &gServerStorage;
 
         commissionerParams.pairingDelegate = &gPairingDelegate;
         commissionerParams.storageDelegate = &gServerStorage;

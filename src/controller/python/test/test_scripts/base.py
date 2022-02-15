@@ -190,8 +190,8 @@ class BaseTestHelper:
         data2 = await devCtrl2.ReadAttribute(nodeid, [(Clusters.OperationalCredentials.Attributes.NOCs)], fabricFiltered=False)
 
         # Read out noclist from each fabric, and each should contain two NOCs.
-        nocList1 = data1[0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.NOCs]
-        nocList2 = data2[0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.NOCs]
+        nocList1 = data1[0][0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.NOCs]
+        nocList2 = data2[0][0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.NOCs]
 
         if (len(nocList1) != 2 or len(nocList2) != 2):
             self.logger.error("Got back invalid nocList")
@@ -201,8 +201,8 @@ class BaseTestHelper:
         data2 = await devCtrl2.ReadAttribute(nodeid, [(Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)], fabricFiltered=False)
 
         # Read out current fabric from each fabric, and both should be different.
-        currentFabric1 = data1[0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.CurrentFabricIndex]
-        currentFabric2 = data2[0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.CurrentFabricIndex]
+        currentFabric1 = data1[0][0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.CurrentFabricIndex]
+        currentFabric2 = data2[0][0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.CurrentFabricIndex]
         if (currentFabric1 == currentFabric2):
             self.logger.error(
                 "Got back fabric indices that match for two different fabrics!")

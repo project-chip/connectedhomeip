@@ -178,8 +178,8 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
         if (status == CHIP_NO_ERROR)
         {
             // Format is YYYYMMDD
-            snprintf(manufacturingDateString, sizeof(manufacturingDateString), "%04" PRIu16 "%02" PRIu8 "%02" PRIu8,
-                     manufacturingYear, manufacturingMonth, manufacturingDayOfMonth);
+            snprintf(manufacturingDateString, sizeof(manufacturingDateString), "%04" PRIu16 "%02u%02u", manufacturingYear,
+                     manufacturingMonth, manufacturingDayOfMonth);
             status = aEncoder.Encode(chip::CharSpan(manufacturingDateString, strnlen(manufacturingDateString, kMaxLen)));
         }
         break;

@@ -24,6 +24,7 @@
 #include <access/AccessControl.h>
 #include <app/ClusterInfo.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/GlobalAttributes.h>
 #include <app/InteractionModelEngine.h>
 #include <app/RequiredPrivilege.h>
 #include <app/reporting/Engine.h>
@@ -346,29 +347,39 @@ public:
 CHIP_ERROR GlobalAttributeReader::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     using namespace Clusters::Globals::Attributes;
-    // The id of the attributes below is not in the attribute metadata.
-    // TODO: This does not play nicely with wildcard reads.  Need to fix ZAP to
-    // put it in the metadata, or fix wildcard expansion to add it.
     switch (aPath.mAttributeId)
     {
     case AttributeList::Id:
         return aEncoder.EncodeList([this](const auto & encoder) {
-            constexpr AttributeId ourId = Clusters::Globals::Attributes::AttributeList::Id;
-            const size_t count          = mCluster->attributeCount;
-            bool addedOurId             = false;
+            const size_t count     = mCluster->attributeCount;
+            bool addedExtraGlobals = false;
             for (size_t i = 0; i < count; ++i)
             {
-                AttributeId id = mCluster->attributes[i].attributeId;
-                if (!addedOurId && id > ourId)
+                AttributeId id              = mCluster->attributes[i].attributeId;
+                constexpr auto lastGlobalId = GlobalAttributesNotInMetadata[ArraySize(GlobalAttributesNotInMetadata) - 1];
+                // We are relying on GlobalAttributesNotInMetadata not having
+                // any gaps in their ids here, but for now they do because we
+                // have no EventList support.  So this assert is not quite
+                // right.  There should be a "- 1" on the right-hand side of the
+                // equals sign.
+                static_assert(lastGlobalId - GlobalAttributesNotInMetadata[0] == ArraySize(GlobalAttributesNotInMetadata),
+                              "Ids in GlobalAttributesNotInMetadata not consecutive (except EventList)");
+                if (!addedExtraGlobals && id > lastGlobalId)
                 {
-                    ReturnErrorOnFailure(encoder.Encode(ourId));
-                    addedOurId = true;
+                    for (const auto & globalId : GlobalAttributesNotInMetadata)
+                    {
+                        ReturnErrorOnFailure(encoder.Encode(globalId));
+                    }
+                    addedExtraGlobals = true;
                 }
                 ReturnErrorOnFailure(encoder.Encode(id));
             }
-            if (!addedOurId)
+            if (!addedExtraGlobals)
             {
-                ReturnErrorOnFailure(encoder.Encode(ourId));
+                for (const auto & globalId : GlobalAttributesNotInMetadata)
+                {
+                    ReturnErrorOnFailure(encoder.Encode(globalId));
+                }
             }
             return CHIP_NO_ERROR;
         });
@@ -403,7 +414,7 @@ CHIP_ERROR ReadViaAccessInterface(FabricIndex aAccessingFabricIndex, bool aIsFab
 {
     AttributeValueEncoder::AttributeEncodeState state =
         (aEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *aEncoderState);
-    DataVersion version = kUndefinedDataVersion;
+    DataVersion version = 0;
     ReturnErrorOnFailure(ReadClusterDataVersion(aPath.mEndpointId, aPath.mClusterId, version));
     AttributeValueEncoder valueEncoder(aAttributeReports, aAccessingFabricIndex, aPath, version, aIsFabricFiltered, state);
     CHIP_ERROR err = aAccessInterface->Read(aPath, valueEncoder);
@@ -530,7 +541,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
     AttributeDataIB::Builder & attributeDataIBBuilder = attributeReport.CreateAttributeData();
     ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
 
-    DataVersion version = kUndefinedDataVersion;
+    DataVersion version = 0;
     ReturnErrorOnFailure(ReadClusterDataVersion(aPath.mEndpointId, aPath.mClusterId, version));
     attributeDataIBBuilder.DataVersion(version);
     ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
@@ -898,14 +909,9 @@ CHIP_ERROR prepareWriteData(const EmberAfAttributeMetadata * attributeMetadata, 
 }
 } // namespace
 
-// TODO: Refactor WriteSingleClusterData and all dependent functions to take ConcreteAttributePath instead of ClusterInfo
-// as the input argument.
-CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
+CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
                                   TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
 {
-    // Named aPath for now to reduce the amount of code change that needs to
-    // happen when the above TODO is resolved.
-    ConcreteDataAttributePath aPath(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId);
     const EmberAfAttributeMetadata * attributeMetadata =
         emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, CLUSTER_MASK_SERVER);
 
@@ -922,13 +928,18 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
     {
         Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
         Access::Privilege requestPrivilege = RequiredPrivilege::ForWriteAttribute(aPath);
-        CHIP_ERROR err                     = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requestPrivilege);
+        CHIP_ERROR err                     = CHIP_NO_ERROR;
+        if (!apWriteHandler->ACLCheckCacheHit({ aPath, requestPrivilege }))
+        {
+            err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requestPrivilege);
+        }
         if (err != CHIP_NO_ERROR)
         {
             ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
             // TODO: when wildcard/group writes are supported, handle them to discard rather than fail with status
             return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::UnsupportedAccess);
         }
+        apWriteHandler->CacheACLCheckResult({ aPath, requestPrivilege });
     }
 
     if (attributeMetadata->MustUseTimedWrite() && !apWriteHandler->IsTimedWrite())
@@ -936,7 +947,15 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
         return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::NeedsTimedInteraction);
     }
 
-    if (auto * attrOverride = findAttributeAccessOverride(aClusterInfo.mEndpointId, aClusterInfo.mClusterId))
+    if (aPath.mDataVersion.HasValue() &&
+        !IsClusterDataVersionEqual(aPath.mEndpointId, aPath.mClusterId, aPath.mDataVersion.Value()))
+    {
+        ChipLogError(DataManagement, "Write Version mismatch for Endpoint %" PRIx16 ", Cluster " ChipLogFormatMEI,
+                     aPath.mEndpointId, ChipLogValueMEI(aPath.mClusterId));
+        return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::DataVersionMismatch);
+    }
+
+    if (auto * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId))
     {
         AttributeValueDecoder valueDecoder(aReader, aSubjectDescriptor);
         ReturnErrorOnFailure(attrOverride->Write(aPath, valueDecoder));
@@ -966,6 +985,21 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
                                                                          CLUSTER_MASK_SERVER, attributeData,
                                                                          attributeMetadata->attributeType));
     return apWriteHandler->AddStatus(aPath, status);
+}
+
+bool IsClusterDataVersionEqual(EndpointId aEndpointId, ClusterId aClusterId, DataVersion aRequiredVersion)
+{
+    DataVersion * version = emberAfDataVersionStorage(aEndpointId, aClusterId);
+    if (version == nullptr)
+    {
+        ChipLogError(DataManagement, "Endpoint %" PRIx16 ", Cluster " ChipLogFormatMEI " not found in IsClusterDataVersionEqual!",
+                     aEndpointId, ChipLogValueMEI(aClusterId));
+        return false;
+    }
+    else
+    {
+        return (*(version)) == aRequiredVersion;
+    }
 }
 
 } // namespace app

@@ -22,7 +22,6 @@
 #include <platform/CHIPDeviceLayer.h>
 
 #include <lib/core/CHIPError.h>
-#include <lib/support/CHIPArgParser.hpp>
 
 using namespace chip;
 using namespace chip::ArgParser;
@@ -189,7 +188,6 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         else
         {
             LinuxDeviceOptions::GetInstance().payload.discriminator = value;
-            DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(value);
         }
         break;
     }
@@ -233,16 +231,24 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 
 OptionSet sDeviceOptions = { HandleOption, sDeviceOptionDefs, "GENERAL OPTIONS", sDeviceOptionHelp };
 
-OptionSet * sLinuxDeviceOptionSets[] = { &sDeviceOptions, nullptr, nullptr };
+OptionSet * sLinuxDeviceOptionSets[] = { &sDeviceOptions, nullptr, nullptr, nullptr };
 } // namespace
 
-CHIP_ERROR ParseArguments(int argc, char * argv[])
+CHIP_ERROR ParseArguments(int argc, char * argv[], OptionSet * customOptions)
 {
+    // Index 0 is for the general Linux options
+    uint8_t optionSetIndex = 1;
+    if (customOptions != nullptr)
+    {
+        // If there are custom options, include it during arg parsing
+        sLinuxDeviceOptionSets[optionSetIndex++] = customOptions;
+    }
+
     char usage[kAppUsageLength];
     snprintf(usage, kAppUsageLength, "Usage: %s [options]", argv[0]);
 
     HelpOptions helpOptions(argv[0], usage, "1.0");
-    sLinuxDeviceOptionSets[1] = &helpOptions;
+    sLinuxDeviceOptionSets[optionSetIndex] = &helpOptions;
 
     if (!ParseArgs(argv[0], argc, argv, sLinuxDeviceOptionSets))
     {

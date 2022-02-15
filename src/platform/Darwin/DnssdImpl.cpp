@@ -236,9 +236,11 @@ bool CheckForSuccess(GenericContext * context, const char * name, DNSServiceErro
         {
             switch (context->type)
             {
-            case ContextType::Register:
-                // Nothing special to do. Maybe ChipDnssdPublishService should take a callback ?
+            case ContextType::Register: {
+                RegisterContext * registerContext = reinterpret_cast<RegisterContext *>(context);
+                registerContext->callback(registerContext->context, nullptr, CHIP_ERROR_INTERNAL);
                 break;
+            }
             case ContextType::Browse: {
                 BrowseContext * browseContext = reinterpret_cast<BrowseContext *>(context);
                 browseContext->callback(browseContext->context, nullptr, 0, CHIP_ERROR_INTERNAL);
@@ -275,9 +277,12 @@ static void OnRegister(DNSServiceRef sdRef, DNSServiceFlags flags, DNSServiceErr
     VerifyOrReturn(CheckForSuccess(sdCtx, __func__, err));
 
     ChipLogDetail(DeviceLayer, "Mdns: %s name: %s, type: %s, domain: %s, flags: %d", __func__, name, type, domain, flags);
+
+    sdCtx->callback(sdCtx->context, type, CHIP_NO_ERROR);
 };
 
-CHIP_ERROR Register(uint32_t interfaceId, const char * type, const char * name, uint16_t port, TXTRecordRef * recordRef)
+CHIP_ERROR Register(void * context, DnssdPublishCallback callback, uint32_t interfaceId, const char * type, const char * name,
+                    uint16_t port, TXTRecordRef * recordRef)
 {
     DNSServiceErrorType err;
     DNSServiceRef sdRef;
@@ -294,7 +299,7 @@ CHIP_ERROR Register(uint32_t interfaceId, const char * type, const char * name, 
         return CHIP_NO_ERROR;
     }
 
-    sdCtx = chip::Platform::New<RegisterContext>(type, nullptr);
+    sdCtx = chip::Platform::New<RegisterContext>(type, callback, context);
     err   = DNSServiceRegister(&sdRef, 0 /* flags */, interfaceId, name, type, kLocalDot, NULL, ntohs(port), recordLen,
                              recordBytesPtr, OnRegister, sdCtx);
     TXTRecordDeallocate(recordRef);
@@ -541,10 +546,11 @@ CHIP_ERROR ChipDnssdShutdown()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ChipDnssdPublishService(const DnssdService * service)
+CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
 {
     VerifyOrReturnError(service != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsSupportedProtocol(service->mProtocol), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(callback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     if (strcmp(service->mHostName, "") != 0)
     {
@@ -559,7 +565,7 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service)
 
     ChipLogProgress(DeviceLayer, "Publishing service %s on port %u with type: %s on interface id: %" PRIu32, service->mName,
                     service->mPort, regtype.c_str(), interfaceId);
-    return Register(interfaceId, regtype.c_str(), service->mName, service->mPort, &record);
+    return Register(context, callback, interfaceId, regtype.c_str(), service->mName, service->mPort, &record);
 }
 
 CHIP_ERROR ChipDnssdRemoveServices()

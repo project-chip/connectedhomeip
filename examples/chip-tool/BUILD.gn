@@ -69,6 +69,7 @@ static_library("chip-tool-utils") {
 
   public_deps = [
     "${chip_root}/src/app/server",
+    "${chip_root}/src/app/tests/suites/commands/delay",
     "${chip_root}/src/app/tests/suites/commands/discovery",
     "${chip_root}/src/app/tests/suites/commands/log",
     "${chip_root}/src/app/tests/suites/commands/system",

@@ -135,6 +135,16 @@
             }
         },
         {
+            "label": "Build i.MX Linux examples",
+            "type": "shell",
+            "command": "./scripts/examples/imxlinux_example.sh ${input:imxExampleTarget} out/aarch64",
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": ["relative", "${workspaceFolder}/out/aarch64/"]
+            }
+        },
+        {
             "label": "Run Mbed Application",
             "type": "shell",
             "command": "scripts/examples/mbed_example.sh",
@@ -231,6 +241,17 @@
             "type": "promptString",
             "id": "exampleGlob",
             "description": "What applications to build (e.g. '*m5stack*' or 'esp32-*')"
+        },
+        {
+            "type": "pickString",
+            "id": "imxExampleTarget",
+            "description": "What example application type do you want to build?",
+            "options": [
+                "examples/chip-tool",
+                "examples/lighting-app/linux",
+                "examples/thermostat/linux"
+            ],
+            "default": "examples/chip-tool"
         },
         {
             "type": "pickString",

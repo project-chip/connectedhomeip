@@ -26,6 +26,7 @@
 
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <protocols/Protocols.h>
 #include <protocols/echo/Echo.h>
@@ -101,13 +102,14 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
     TransportMgr<LoopbackTransport> transportMgr;
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
+    chip::TestPersistentStorageDelegate deviceStorage;
 
     CHIP_ERROR err;
 
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = sessionManager.Init(&ctx.GetSystemLayer(), &transportMgr, &gMessageCounterManager);
+    err = sessionManager.Init(&ctx.GetSystemLayer(), &transportMgr, &gMessageCounterManager, &deviceStorage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
@@ -130,11 +132,12 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     TransportMgr<LoopbackTransport> transportMgr;
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
+    chip::TestPersistentStorageDelegate deviceStorage;
 
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = sessionManager.Init(&ctx.GetSystemLayer(), &transportMgr, &gMessageCounterManager);
+    err = sessionManager.Init(&ctx.GetSystemLayer(), &transportMgr, &gMessageCounterManager, &deviceStorage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     callback.mSuite = inSuite;
@@ -222,11 +225,12 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     TransportMgr<LoopbackTransport> transportMgr;
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
+    chip::TestPersistentStorageDelegate deviceStorage;
 
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = sessionManager.Init(&ctx.GetSystemLayer(), &transportMgr, &gMessageCounterManager);
+    err = sessionManager.Init(&ctx.GetSystemLayer(), &transportMgr, &gMessageCounterManager, &deviceStorage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     callback.mSuite = inSuite;
@@ -300,11 +304,12 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     TransportMgr<LoopbackTransport> transportMgr;
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
+    chip::TestPersistentStorageDelegate deviceStorage;
 
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = sessionManager.Init(&ctx.GetSystemLayer(), &transportMgr, &gMessageCounterManager);
+    err = sessionManager.Init(&ctx.GetSystemLayer(), &transportMgr, &gMessageCounterManager, &deviceStorage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     callback.mSuite = inSuite;
@@ -406,11 +411,12 @@ void StaleConnectionDropTest(nlTestSuite * inSuite, void * inContext)
     TransportMgr<LoopbackTransport> transportMgr;
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
+    chip::TestPersistentStorageDelegate deviceStorage;
 
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = sessionManager.Init(&ctx.GetSystemLayer(), &transportMgr, &gMessageCounterManager);
+    err = sessionManager.Init(&ctx.GetSystemLayer(), &transportMgr, &gMessageCounterManager, &deviceStorage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));

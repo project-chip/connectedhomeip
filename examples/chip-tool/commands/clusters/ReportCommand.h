@@ -34,7 +34,7 @@ public:
     virtual void OnEventSubscription(){};
 
     /////////// ReadClient Callback Interface /////////
-    void OnAttributeData(const chip::app::ConcreteDataAttributePath & path, chip::DataVersion aVersion, chip::TLV::TLVReader * data,
+    void OnAttributeData(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data,
                          const chip::app::StatusIB & status) override
     {
         CHIP_ERROR error = status.ToChipError();
@@ -108,7 +108,8 @@ public:
 protected:
     CHIP_ERROR ReportAttribute(ChipDevice * device, chip::EndpointId endpointId, chip::ClusterId clusterId,
                                chip::AttributeId attributeId, chip::app::ReadClient::InteractionType interactionType,
-                               uint16_t minInterval = 0, uint16_t maxInterval = 0)
+                               uint16_t minInterval = 0, uint16_t maxInterval = 0,
+                               const chip::Optional<chip::DataVersion> & aDataVersion = chip::NullOptional)
     {
         chip::app::AttributePathParams attributePathParams[1];
         attributePathParams[0].mEndpointId  = endpointId;
@@ -120,6 +121,18 @@ protected:
         params.mEventPathParamsListSize     = 0;
         params.mpAttributePathParamsList    = attributePathParams;
         params.mAttributePathParamsListSize = 1;
+
+        if (mFabricFiltered.HasValue())
+        {
+            params.mIsFabricFiltered = mFabricFiltered.Value();
+        }
+
+        chip::Optional<chip::app::DataVersionFilter> dataVersionFilter;
+        if (aDataVersion.HasValue())
+        {
+            params.mpDataVersionFilterList    = &dataVersionFilter.Emplace(endpointId, clusterId, aDataVersion.Value());
+            params.mDataVersionFilterListSize = 1;
+        }
 
         if (interactionType == chip::app::ReadClient::InteractionType::Subscribe)
         {
@@ -160,6 +173,10 @@ protected:
 
     std::unique_ptr<chip::app::ReadClient> mReadClient;
     chip::app::BufferedReadCallback mBufferedReadAdapter;
+
+    // mFabricFiltered is really only used by the attribute commands, but we end
+    // up needing it in our class's shared code.
+    chip::Optional<bool> mFabricFiltered;
 };
 
 class ReadAttribute : public ReportCommand
@@ -169,6 +186,8 @@ public:
     {
         AddArgument("cluster-id", 0, UINT32_MAX, &mClusterId);
         AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
+        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
+        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         ReportCommand::AddArguments();
     }
 
@@ -176,6 +195,8 @@ public:
         ReportCommand("read-by-id", credsIssuerConfig), mClusterId(clusterId)
     {
         AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
+        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
+        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         ReportCommand::AddArguments();
     }
 
@@ -185,6 +206,8 @@ public:
         mClusterId(clusterId), mAttributeId(attributeId)
     {
         AddArgument("attr-name", attributeName);
+        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
+        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         ReportCommand::AddArguments();
     }
 
@@ -195,12 +218,13 @@ public:
         ChipLogProgress(chipTool, "Sending ReadAttribute to cluster " ChipLogFormatMEI " on endpoint %" PRIu16,
                         ChipLogValueMEI(mClusterId), endpointId);
         return ReportCommand::ReportAttribute(device, endpointId, mClusterId, mAttributeId,
-                                              chip::app::ReadClient::InteractionType::Read);
+                                              chip::app::ReadClient::InteractionType::Read, 0, 0, mDataVersion);
     }
 
 private:
     chip::ClusterId mClusterId;
     chip::AttributeId mAttributeId;
+    chip::Optional<chip::DataVersion> mDataVersion;
 };
 
 class SubscribeAttribute : public ReportCommand
@@ -212,7 +236,9 @@ public:
         AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
         AddArgument("wait", 0, 1, &mWait);
+        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         ReportCommand::AddArguments();
     }
 
@@ -222,7 +248,9 @@ public:
         AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
         AddArgument("wait", 0, 1, &mWait);
+        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         ReportCommand::AddArguments();
     }
 
@@ -234,7 +262,9 @@ public:
         AddArgument("attr-name", attributeName);
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
         AddArgument("wait", 0, 1, &mWait);
+        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         ReportCommand::AddArguments();
     }
 
@@ -245,7 +275,8 @@ public:
         ChipLogProgress(chipTool, "Sending SubscribeAttribute to cluster " ChipLogFormatMEI " on endpoint %" PRIu16,
                         ChipLogValueMEI(mClusterId), endpointId);
         return ReportCommand::ReportAttribute(device, endpointId, mClusterId, mAttributeId,
-                                              chip::app::ReadClient::InteractionType::Subscribe, mMinInterval, mMaxInterval);
+                                              chip::app::ReadClient::InteractionType::Subscribe, mMinInterval, mMaxInterval,
+                                              mDataVersion);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -267,6 +298,7 @@ private:
 
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+    chip::Optional<chip::DataVersion> mDataVersion;
     bool mWait;
 };
 

@@ -61,6 +61,13 @@ using TimerCompleteCallback = void (*)(Layer * aLayer, void * appState);
  *   - LayerLwIP: Adds methods specific to CHIP_SYSTEM_CONFIG_USING_LWIP.
  *   - LayerSockets: Adds I/O event methods specific to CHIP_SYSTEM_CONFIG_USING_SOCKETS.
  *     - LayerSocketsLoop: Adds methods for event-loop-based implementations.
+ *
+ * Threading notes:
+ *
+ * The SDK is not generally thread safe. System::Layer methods should only be called from
+ * a single context, or otherwise externally synchronized. For platforms that use a CHIP
+ * event loop thread, timer callbacks are invoked on that thread; for platforms that use
+ * a CHIP lock, the lock is held.
  */
 class DLL_EXPORT Layer
 {
@@ -124,14 +131,6 @@ public:
     /**
      * @brief
      *   Schedules a function with a signature identical to `OnCompleteFunct` to be run as soon as possible in the CHIP context.
-     *
-     * @note
-     *   This function could, in principle, be implemented as `StartTimer`. The specification for `SystemTimer` however
-     *   permits certain optimizations that might make that implementation impossible. Specifically, `SystemTimer`
-     *   API may only be called from the thread owning the particular `System::Layer`, whereas the `ScheduleWork` may be
-     *   called from any thread. Additionally, whereas the `SystemTimer` API permits the invocation of the already
-     *   expired handler in line, `ScheduleWork` guarantees that the handler function will be called only after the
-     *   current CHIP event completes.
      *
      * @param[in] aComplete     A pointer to a callback function to be called when this timer fires.
      * @param[in] aAppState     A pointer to an application state object to be passed to the callback function as argument.

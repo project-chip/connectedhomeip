@@ -27,6 +27,7 @@
 name: Group Messaging Demo Commands
 
 config:
+    nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
 
@@ -34,6 +35,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     # Toggle 1
     - label: "Turn On the light to see attribute change"

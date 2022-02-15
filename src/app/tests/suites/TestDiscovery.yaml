@@ -15,6 +15,7 @@
 name: Test Discovery
 
 config:
+    nodeId: 0x12344321
     endpoint: 0
     discriminator:
         type: INT16U
@@ -24,7 +25,7 @@ config:
         defaultValue: 65521
     productId:
         type: INT16U
-        defaultValue: 32768
+        defaultValue: 32769
     deviceType:
         type: INT16U
         defaultValue: 5
@@ -41,6 +42,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Open Commissioning Window"
       cluster: "AdministratorCommissioning"
@@ -51,13 +56,9 @@ tests:
               - name: "CommissioningTimeout"
                 value: 120
 
-    - label: "Wait 1000ms for the mdns advertisement to be published"
+    - label: "Wait Commissionable advertisement"
       cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 1000
+      command: "WaitForCommissionableAdvertisement"
 
     - label: "Check Instance Name"
       cluster: "DiscoveryCommands"
@@ -282,6 +283,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Open Commissioning Window"
       cluster: "AdministratorCommissioning"
@@ -292,13 +297,9 @@ tests:
               - name: "CommissioningTimeout"
                 value: 120
 
-    - label: "Wait 1000ms for the mdns advertisement to be published"
+    - label: "Wait Commissionable advertisement"
       cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 1000
+      command: "WaitForCommissionableAdvertisement"
 
     - label: "Check Instance Name"
       cluster: "DiscoveryCommands"
