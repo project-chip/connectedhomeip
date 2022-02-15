@@ -21,8 +21,8 @@
 #include <commands/common/CredentialIssuerCommands.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
+#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
 class ExampleCredentialIssuerCommands : public CredentialIssuerCommands
@@ -32,7 +32,8 @@ public:
     {
         return mOpCredsIssuer.Initialize(storage);
     }
-    CHIP_ERROR SetupDeviceAttestation(chip::Controller::SetupParams & setupParams, const chip::Credentials::AttestationTrustStore * trustStore) override
+    CHIP_ERROR SetupDeviceAttestation(chip::Controller::SetupParams & setupParams,
+                                      const chip::Credentials::AttestationTrustStore * trustStore) override
     {
         chip::Credentials::SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
 

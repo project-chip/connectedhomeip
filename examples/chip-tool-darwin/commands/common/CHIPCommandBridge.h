@@ -62,7 +62,8 @@ protected:
     CHIPDeviceController * CurrentCommissioner();
 
 private:
-    CHIP_ERROR InitializeCommissioner(std::string key, chip::FabricId fabricId, const chip::Credentials::AttestationTrustStore trustStore *);
+    CHIP_ERROR InitializeCommissioner(std::string key, chip::FabricId fabricId,
+                                      const chip::Credentials::AttestationTrustStore trustStore *);
     CHIP_ERROR ShutdownCommissioner();
     uint16_t CurrentCommissionerIndex();
 

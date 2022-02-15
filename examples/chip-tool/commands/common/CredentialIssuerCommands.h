@@ -51,7 +51,8 @@ public:
      *
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    virtual CHIP_ERROR SetupDeviceAttestation(chip::Controller::SetupParams & setupParams, const chip::Credentials::AttestationTrustStore * trustStore) = 0;
+    virtual CHIP_ERROR SetupDeviceAttestation(chip::Controller::SetupParams & setupParams,
+                                              const chip::Credentials::AttestationTrustStore * trustStore) = 0;
 
     virtual chip::Controller::OperationalCredentialsDelegate * GetCredentialIssuer() = 0;
 

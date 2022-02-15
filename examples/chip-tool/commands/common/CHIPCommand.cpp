@@ -172,7 +172,8 @@ CHIP_ERROR CHIPCommand::ShutdownCommissioner(std::string key)
     return mCommissioners[key].get()->Shutdown();
 }
 
-CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricId fabricId, const chip::Credentials::AttestationTrustStore * trustStore)
+CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricId fabricId,
+                                               const chip::Credentials::AttestationTrustStore * trustStore)
 {
     chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
     chip::Platform::ScopedMemoryBuffer<uint8_t> icac;
