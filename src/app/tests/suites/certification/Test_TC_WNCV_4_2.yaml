@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Window Covering [TC-WNCV-4.2] GoToTiltPercentage Long-Run Verification with server as DUT
+name:
+    Window Covering [TC-WNCV-4.2] GoToTiltPercentage Long-Run Verification with
+    server as DUT
 
 # TODO: WindowCovering tests TC-WNCV-4.2 finalize featuremap conditional dependencies
 
@@ -23,7 +25,9 @@ config:
 tests:
     ### Step 1x -> Initialize the Covering position before any testing
     ### MANDATORY Init Commands
-    - label: "1a: TH sends DownOrClose command to preposition the DUT in the opposite direction"
+    - label:
+          "1a: TH sends DownOrClose command to preposition the DUT in the
+          opposite direction"
       command: "DownOrClose"
 
     - label: "1b: TH Waits for 10 seconds movement(s) on the device"
@@ -35,7 +39,9 @@ tests:
                 value: 10000
 
     ### Depends on the FeatureMap -> Check CurrentPosition attributes
-    - label: "1c: If (PA & LF) TH reads CurrentPositionTiltPercent100ths attribute from DUT"
+    - label:
+          "1c: If (PA & LF) TH reads CurrentPositionTiltPercent100ths attribute
+          from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
       response:
@@ -63,11 +69,13 @@ tests:
                 value: 100
 
     ### Mandatory Depends on the FeatureMap
-    - label: "2c: If (PA & LF) TH reads TargetPositionTiltPercent100ths attribute from DUT"
+    - label:
+          "2c: If (PA & LF) TH reads TargetPositionTiltPercent100ths attribute
+          from DUT"
       command: "readAttribute"
       attribute: "TargetPositionTiltPercent100ths"
       response:
-            value: 3000
+          value: 3000
 
     ### Step 3x ->  Verify the DUT has reached its 30%
     ### DUT moves toward its 30% position
@@ -83,7 +91,9 @@ tests:
 
     ### Reports for END OF MOVEMENTs
     ### This report check behave like a DO WHILE waiting for the end of the movements
-    - label: "3b: Verify DUT reports OperationalStatus attribute to TH after a GoToTiltPercentage"
+    - label:
+          "3b: Verify DUT reports OperationalStatus attribute to TH after a
+          GoToTiltPercentage"
       command: "subscribeAttribute"
       attribute: "OperationalStatus"
       minInterval: 10
@@ -106,15 +116,14 @@ tests:
 
     ### Optional Depends on the FeatureMap
     - label:
-          "3d: If (PA & LF) TH reads CurrentPositionTiltPercentage
-           optional attribute from DUT"
+          "3d: If (PA & LF) TH reads CurrentPositionTiltPercentage optional
+          attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercentage"
       response:
           constraints:
               type: uint8
               value: 30
-
 
     ######## GoToTiltPercentage Long-Run for 60.2 percent #######
     ### Step 4x ->  Check GoToTiltPercentage 60.20% Long-Run effects
@@ -137,11 +146,13 @@ tests:
                 value: 100
 
     ### Mandatory Depends on the FeatureMap
-    - label: "4c: If (PA & LF) TH reads TargetPositionTiltPercent100ths attribute from DUT"
+    - label:
+          "4c: If (PA & LF) TH reads TargetPositionTiltPercent100ths attribute
+          from DUT"
       command: "readAttribute"
       attribute: "TargetPositionTiltPercent100ths"
       response:
-            value: 6005
+          value: 6005
 
     ### Step 5x ->  Verify the DUT has reached its 60.2%
     ### DUT moves toward its 60.2% position
@@ -157,7 +168,9 @@ tests:
 
     ### Reports for END OF MOVEMENTs
     ### This report check behave like a DO WHILE waiting for the end of the movements
-    - label: "5b: Verify DUT reports OperationalStatus attribute to TH after a GoToTiltPercentage"
+    - label:
+          "5b: Verify DUT reports OperationalStatus attribute to TH after a
+          GoToTiltPercentage"
       command: "subscribeAttribute"
       attribute: "OperationalStatus"
       minInterval: 10
@@ -166,7 +179,6 @@ tests:
           constraints:
               type: map8
               value: 0
-
 
     ### Mandatory Depends on the FeatureMap
     - label:
@@ -181,8 +193,8 @@ tests:
 
     ### Optional Depends on the FeatureMap
     - label:
-          "5d: If (PA & LF) TH reads CurrentPositionTiltPercentage
-           optional attribute from DUT"
+          "5d: If (PA & LF) TH reads CurrentPositionTiltPercentage optional
+          attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercentage"
       response:

@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Window Covering [TC-WNCV-4.4] GoToTiltPercentage Limits Verification with server as DUT
+name:
+    Window Covering [TC-WNCV-4.4] GoToTiltPercentage Limits Verification with
+    server as DUT
 
 config:
     nodeId: 0x12344321
@@ -32,7 +34,9 @@ tests:
     ######## Check attribute coherence #######
     ### Step 1x -> Verify the Tilt Percent100ths and Percent attributes
     ### Shall be tested as equals CurrentPositionTiltPercent100ths
-    - label: "1a: If (PA_TL & TL) TH reads CurrentPositionTiltPercent100ths from DUT"
+    - label:
+          "1a: If (PA_TL & TL) TH reads CurrentPositionTiltPercent100ths from
+          DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
       PICS: WNCV_TL && WNCV_PA_TL
@@ -42,7 +46,8 @@ tests:
               minValue: 0
               maxValue: 10000
 
-    - label: "1b: If (PA_TL & TL) TH reads CurrentPositionTiltPercentage from DUT"
+    - label:
+          "1b: If (PA_TL & TL) TH reads CurrentPositionTiltPercentage from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercentage"
       PICS: WNCV_TL && WNCV_PA_TL && A_CURRENTPOSITIONTILTPERCENTAGE
