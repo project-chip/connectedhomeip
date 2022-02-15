@@ -302,8 +302,6 @@ EmberAfStatus OTAProviderExample::HandleApplyUpdateRequest(chip::app::CommandHan
                                                            const ApplyUpdateRequest::DecodableType & commandData)
 {
     // TODO: handle multiple transfers by tracking updateTokens
-
-    OTAApplyUpdateAction updateAction = OTAApplyUpdateAction::kProceed; // For now, just allow any update request
     char tokenBuf[kUpdateTokenStrLen] = { 0 };
 
     GetUpdateTokenString(commandData.updateToken, tokenBuf, kUpdateTokenStrLen);
@@ -312,7 +310,7 @@ EmberAfStatus OTAProviderExample::HandleApplyUpdateRequest(chip::app::CommandHan
     VerifyOrReturnError(commandObj != nullptr, EMBER_ZCL_STATUS_INVALID_VALUE);
 
     ApplyUpdateResponse::Type response;
-    response.action            = updateAction;
+    response.action            = mUpdateAction;
     response.delayedActionTime = mDelayedActionTimeSec;
     VerifyOrReturnError(commandObj->AddResponseData(commandPath, response) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
 
