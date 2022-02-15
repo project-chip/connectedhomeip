@@ -2157,7 +2157,7 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public interface BindingListAttributeCallback {
+    public interface BindingAttributeCallback {
       void onSuccess(List<ChipStructs.BindingClusterTargetStruct> valueList);
 
       void onError(Exception ex);
@@ -2189,25 +2189,25 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public void readBindingListAttribute(BindingListAttributeCallback callback) {
-      readBindingListAttribute(chipClusterPtr, callback);
+    public void readBindingAttribute(BindingAttributeCallback callback) {
+      readBindingAttribute(chipClusterPtr, callback);
     }
 
-    public void writeBindingListAttribute(
+    public void writeBindingAttribute(
         DefaultClusterCallback callback, ArrayList<ChipStructs.BindingClusterTargetStruct> value) {
-      writeBindingListAttribute(chipClusterPtr, callback, value, null);
+      writeBindingAttribute(chipClusterPtr, callback, value, null);
     }
 
-    public void writeBindingListAttribute(
+    public void writeBindingAttribute(
         DefaultClusterCallback callback,
         ArrayList<ChipStructs.BindingClusterTargetStruct> value,
         int timedWriteTimeoutMs) {
-      writeBindingListAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+      writeBindingAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
     }
 
-    public void subscribeBindingListAttribute(
-        BindingListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeBindingListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeBindingAttribute(
+        BindingAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeBindingAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readServerGeneratedCommandListAttribute(
@@ -2250,20 +2250,17 @@ public class ChipClusters {
       subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    private native void readBindingListAttribute(
-        long chipClusterPtr, BindingListAttributeCallback callback);
+    private native void readBindingAttribute(
+        long chipClusterPtr, BindingAttributeCallback callback);
 
-    private native void writeBindingListAttribute(
+    private native void writeBindingAttribute(
         long chipClusterPtr,
         DefaultClusterCallback callback,
         ArrayList<ChipStructs.BindingClusterTargetStruct> value,
         @Nullable Integer timedWriteTimeoutMs);
 
-    private native void subscribeBindingListAttribute(
-        long chipClusterPtr,
-        BindingListAttributeCallback callback,
-        int minInterval,
-        int maxInterval);
+    private native void subscribeBindingAttribute(
+        long chipClusterPtr, BindingAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readServerGeneratedCommandListAttribute(
         long chipClusterPtr, ServerGeneratedCommandListAttributeCallback callback);

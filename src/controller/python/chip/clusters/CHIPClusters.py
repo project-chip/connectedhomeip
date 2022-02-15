@@ -689,7 +689,7 @@ class ChipClusters:
             },
             "attributes": {
                 0x00000000: {
-                    "attributeName": "BindingList",
+                    "attributeName": "Binding",
                     "attributeId": 0x00000000,
                     "type": "",
                     "reportable": True,

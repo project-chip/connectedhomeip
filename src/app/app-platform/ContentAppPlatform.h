@@ -149,25 +149,6 @@ protected:
     EndpointId mCurrentEndpointId;
     EndpointId mFirstDynamicEndpointId;
     ContentApp * mContentApps[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
-
-private:
-    using FabricsListDecodableType = app::Clusters::OperationalCredentials::Attributes::FabricsList::TypeInfo::DecodableType;
-
-    static void OnReadFabricsListSuccess(void * context, const FabricsListDecodableType & data);
-    static void OnReadFabricsListFailure(void * context, CHIP_ERROR error);
-    void NotifyBindingFailed(CHIP_ERROR error);
-    void SendBindingWriteRequest(FabricIndex fabricIndex);
-
-    CHIP_ERROR ReadFabricsList(OperationalDeviceProxy * device);
-
-    OperationalDeviceProxy * mBindingDevice = nullptr;
-    EndpointId mDeviceEndpointId;
-    NodeId mBindingNodeId;
-    GroupId mBindingGroupId;
-    EndpointId mBindingEndpointId;
-    ClusterId mBindingClusterId;
-    Controller::WriteResponseSuccessCallback mBindingSucessCallback;
-    Controller::WriteResponseFailureCallback mBindingFailureCallback;
 };
 
 } // namespace AppPlatform

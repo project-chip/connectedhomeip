@@ -1416,19 +1416,19 @@ private:
     bool keepAlive;
 };
 
-class CHIPBindingBindingListAttributeCallback : public chip::Callback::Callback<CHIPBindingClusterBindingListAttributeCallbackType>
+class CHIPBindingBindingAttributeCallback : public chip::Callback::Callback<CHIPBindingClusterBindingAttributeCallbackType>
 {
 public:
-    CHIPBindingBindingListAttributeCallback(jobject javaCallback, bool keepAlive = false);
+    CHIPBindingBindingAttributeCallback(jobject javaCallback, bool keepAlive = false);
 
-    ~CHIPBindingBindingListAttributeCallback();
+    ~CHIPBindingBindingAttributeCallback();
 
-    static void maybeDestroy(CHIPBindingBindingListAttributeCallback * callback)
+    static void maybeDestroy(CHIPBindingBindingAttributeCallback * callback)
     {
         if (!callback->keepAlive)
         {
             callback->Cancel();
-            chip::Platform::Delete<CHIPBindingBindingListAttributeCallback>(callback);
+            chip::Platform::Delete<CHIPBindingBindingAttributeCallback>(callback);
         }
     }
 
@@ -1438,7 +1438,7 @@ public:
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBindingBindingListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBindingBindingAttributeCallback *>(context)->javaCallbackRef);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 

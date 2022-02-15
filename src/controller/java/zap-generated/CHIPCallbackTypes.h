@@ -196,8 +196,8 @@ typedef void (*CHIPBinaryInputBasicClusterAttributeListAttributeCallbackType)(
 typedef void (*CHIPBinaryInputBasicClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::BinaryInputBasic::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
-typedef void (*CHIPBindingClusterBindingListAttributeCallbackType)(
-    void *, const chip::app::Clusters::Binding::Attributes::BindingList::TypeInfo::DecodableType &);
+typedef void (*CHIPBindingClusterBindingAttributeCallbackType)(
+    void *, const chip::app::Clusters::Binding::Attributes::Binding::TypeInfo::DecodableType &);
 typedef void (*CHIPBindingClusterServerGeneratedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::Binding::Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPBindingClusterClientGeneratedCommandListAttributeCallbackType)(

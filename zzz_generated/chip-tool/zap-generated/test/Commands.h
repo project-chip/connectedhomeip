@@ -167,6 +167,7 @@ public:
         printf("TestOperationalCredentialsCluster\n");
         printf("TestModeSelectCluster\n");
         printf("TestSystemCommands\n");
+        printf("TestBinding\n");
         printf("Test_TC_SWDIAG_1_1\n");
         printf("Test_TC_SWDIAG_2_1\n");
         printf("Test_TC_SWDIAG_3_1\n");
@@ -80925,6 +80926,341 @@ private:
     }
 };
 
+class TestBinding : public TestCommand
+{
+public:
+    TestBinding(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestBinding", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~TestBinding() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: TestBinding\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: TestBinding\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Write empty binding table\n");
+            err = TestWriteEmptyBindingTable_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read empty binding table\n");
+            err = TestReadEmptyBindingTable_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Write invalid binding table\n");
+            err = TestWriteInvalidBindingTable_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Write binding table\n");
+            err = TestWriteBindingTable_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Read binding table\n");
+            err = TestReadBindingTable_5();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 6;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    static void OnFailureCallback_1(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestBinding *>(context))->OnFailureResponse_1(error);
+    }
+
+    static void OnSuccessCallback_1(void * context) { (static_cast<TestBinding *>(context))->OnSuccessResponse_1(); }
+
+    static void OnFailureCallback_2(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestBinding *>(context))->OnFailureResponse_2(error);
+    }
+
+    static void OnSuccessCallback_2(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType> & binding)
+    {
+        (static_cast<TestBinding *>(context))->OnSuccessResponse_2(binding);
+    }
+
+    static void OnFailureCallback_3(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestBinding *>(context))->OnFailureResponse_3(error);
+    }
+
+    static void OnSuccessCallback_3(void * context) { (static_cast<TestBinding *>(context))->OnSuccessResponse_3(); }
+
+    static void OnFailureCallback_4(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestBinding *>(context))->OnFailureResponse_4(error);
+    }
+
+    static void OnSuccessCallback_4(void * context) { (static_cast<TestBinding *>(context))->OnSuccessResponse_4(); }
+
+    static void OnFailureCallback_5(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestBinding *>(context))->OnFailureResponse_5(error);
+    }
+
+    static void OnSuccessCallback_5(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType> & binding)
+    {
+        (static_cast<TestBinding *>(context))->OnSuccessResponse_5(binding);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+    }
+
+    CHIP_ERROR TestWriteEmptyBindingTable_1()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::BindingClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+        chip::app::DataModel::List<const chip::app::Clusters::Binding::Structs::TargetStruct::Type> bindingArgument;
+
+        bindingArgument = chip::app::DataModel::List<chip::app::Clusters::Binding::Structs::TargetStruct::Type>();
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Binding::Attributes::Binding::TypeInfo>(
+            bindingArgument, this, OnSuccessCallback_1, OnFailureCallback_1));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_1() { NextTest(); }
+
+    CHIP_ERROR TestReadEmptyBindingTable_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::BindingClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Binding::Attributes::Binding::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_2(
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType> & binding)
+    {
+        {
+            auto iter_0 = binding.begin();
+            VerifyOrReturn(CheckNoMoreListItems<decltype(binding)>("binding", iter_0, 0));
+        }
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteInvalidBindingTable_3()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::BindingClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+        chip::app::DataModel::List<const chip::app::Clusters::Binding::Structs::TargetStruct::Type> bindingArgument;
+
+        {
+            auto * listHolder_0 = new ListHolder<chip::app::Clusters::Binding::Structs::TargetStruct::Type>(2);
+            listFreer.add(listHolder_0);
+
+            listHolder_0->mList[0].fabricIndex = 1;
+
+            listHolder_0->mList[1].fabricIndex = 1;
+            listHolder_0->mList[1].node.Emplace();
+            listHolder_0->mList[1].node.Value() = 1ULL;
+            listHolder_0->mList[1].group.Emplace();
+            listHolder_0->mList[1].group.Value() = 1U;
+            listHolder_0->mList[1].endpoint.Emplace();
+            listHolder_0->mList[1].endpoint.Value() = 1U;
+            listHolder_0->mList[1].cluster.Emplace();
+            listHolder_0->mList[1].cluster.Value() = 6UL;
+
+            bindingArgument =
+                chip::app::DataModel::List<chip::app::Clusters::Binding::Structs::TargetStruct::Type>(listHolder_0->mList, 2);
+        }
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Binding::Attributes::Binding::TypeInfo>(
+            bindingArgument, this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
+        NextTest();
+    }
+
+    void OnSuccessResponse_3() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestWriteBindingTable_4()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::BindingClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+        chip::app::DataModel::List<const chip::app::Clusters::Binding::Structs::TargetStruct::Type> bindingArgument;
+
+        {
+            auto * listHolder_0 = new ListHolder<chip::app::Clusters::Binding::Structs::TargetStruct::Type>(3);
+            listFreer.add(listHolder_0);
+
+            listHolder_0->mList[0].fabricIndex = 1;
+            listHolder_0->mList[0].group.Emplace();
+            listHolder_0->mList[0].group.Value() = 1U;
+
+            listHolder_0->mList[1].fabricIndex = 1;
+            listHolder_0->mList[1].node.Emplace();
+            listHolder_0->mList[1].node.Value() = 1ULL;
+            listHolder_0->mList[1].endpoint.Emplace();
+            listHolder_0->mList[1].endpoint.Value() = 1U;
+            listHolder_0->mList[1].cluster.Emplace();
+            listHolder_0->mList[1].cluster.Value() = 6UL;
+
+            listHolder_0->mList[2].fabricIndex = 1;
+            listHolder_0->mList[2].node.Emplace();
+            listHolder_0->mList[2].node.Value() = 2ULL;
+            listHolder_0->mList[2].endpoint.Emplace();
+            listHolder_0->mList[2].endpoint.Value() = 1U;
+
+            bindingArgument =
+                chip::app::DataModel::List<chip::app::Clusters::Binding::Structs::TargetStruct::Type>(listHolder_0->mList, 3);
+        }
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Binding::Attributes::Binding::TypeInfo>(
+            bindingArgument, this, OnSuccessCallback_4, OnFailureCallback_4));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_4(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_4() { NextTest(); }
+
+    CHIP_ERROR TestReadBindingTable_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::BindingClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ListFreer listFreer;
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Binding::Attributes::Binding::TypeInfo>(
+            this, OnSuccessCallback_5, OnFailureCallback_5));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_5(
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType> & binding)
+    {
+        {
+            auto iter_0 = binding.begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(binding)>("binding", iter_0, 0));
+            VerifyOrReturn(CheckValue("binding[0].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+            VerifyOrReturn(CheckValuePresent("binding[0].group", iter_0.GetValue().group));
+            VerifyOrReturn(CheckValue("binding[0].group.Value()", iter_0.GetValue().group.Value(), 1U));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(binding)>("binding", iter_0, 1));
+            VerifyOrReturn(CheckValue("binding[1].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+            VerifyOrReturn(CheckValuePresent("binding[1].node", iter_0.GetValue().node));
+            VerifyOrReturn(CheckValue("binding[1].node.Value()", iter_0.GetValue().node.Value(), 1ULL));
+            VerifyOrReturn(CheckValuePresent("binding[1].endpoint", iter_0.GetValue().endpoint));
+            VerifyOrReturn(CheckValue("binding[1].endpoint.Value()", iter_0.GetValue().endpoint.Value(), 1U));
+            VerifyOrReturn(CheckValuePresent("binding[1].cluster", iter_0.GetValue().cluster));
+            VerifyOrReturn(CheckValue("binding[1].cluster.Value()", iter_0.GetValue().cluster.Value(), 6UL));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(binding)>("binding", iter_0, 2));
+            VerifyOrReturn(CheckValue("binding[2].fabricIndex", iter_0.GetValue().fabricIndex, 1));
+            VerifyOrReturn(CheckValuePresent("binding[2].node", iter_0.GetValue().node));
+            VerifyOrReturn(CheckValue("binding[2].node.Value()", iter_0.GetValue().node.Value(), 2ULL));
+            VerifyOrReturn(CheckValuePresent("binding[2].endpoint", iter_0.GetValue().endpoint));
+            VerifyOrReturn(CheckValue("binding[2].endpoint.Value()", iter_0.GetValue().endpoint.Value(), 1U));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(binding)>("binding", iter_0, 3));
+        }
+
+        NextTest();
+    }
+};
+
 class Test_TC_SWDIAG_1_1 : public TestCommand
 {
 public:
@@ -95907,6 +96243,7 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<TestOperationalCredentialsCluster>(credsIssuerConfig),
         make_unique<TestModeSelectCluster>(credsIssuerConfig),
         make_unique<TestSystemCommands>(credsIssuerConfig),
+        make_unique<TestBinding>(credsIssuerConfig),
         make_unique<Test_TC_SWDIAG_1_1>(credsIssuerConfig),
         make_unique<Test_TC_SWDIAG_2_1>(credsIssuerConfig),
         make_unique<Test_TC_SWDIAG_3_1>(credsIssuerConfig),

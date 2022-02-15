@@ -36,7 +36,7 @@ namespace chip {
  * E.g. The application will send on/off commands to peer for the OnOff cluster.
  *
  */
-using BoundDeviceChangedHandler = void (*)(const EmberBindingTableEntry * binding, DeviceProxy * peer_device, void * context);
+using BoundDeviceChangedHandler = void (*)(const EmberBindingTableEntry & binding, DeviceProxy * peer_device, void * context);
 
 /**
  *
@@ -74,12 +74,6 @@ public:
      *
      */
     CHIP_ERROR UnicastBindingRemoved(uint8_t bindingEntryId);
-
-    /*
-     * Notifies the BindingManager that a unicast binding is about to moved to a new entry index.
-     *
-     */
-    void UnicastBindingMoved(uint8_t oldEntryId, uint8_t newEntryId);
 
     /*
      * Notifies the BindingManager that a fabric is removed from the device

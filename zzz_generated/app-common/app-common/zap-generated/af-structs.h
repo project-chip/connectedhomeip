@@ -512,11 +512,11 @@ typedef struct _TargetInfo
 // Struct for TargetStruct
 typedef struct _TargetStruct
 {
-    chip::FabricIndex fabricIdx;
-    chip::NodeId nodeId;
-    chip::GroupId groupId;
-    chip::EndpointId endpointId;
-    chip::ClusterId clusterId;
+    chip::FabricIndex FabricIndex;
+    chip::NodeId Node;
+    chip::GroupId Group;
+    chip::EndpointId Endpoint;
+    chip::ClusterId Cluster;
 } TargetStruct;
 
 // Struct for TestFabricScoped

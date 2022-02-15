@@ -394,100 +394,36 @@ CHIP_ERROR ContentAppPlatform::CreateBindingWithCallback(OperationalDeviceProxy 
                                                          Controller::WriteResponseSuccessCallback successCb,
                                                          Controller::WriteResponseFailureCallback failureCb)
 {
-    if (mBindingDevice != nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-    mBindingDevice          = device;
-    mDeviceEndpointId       = deviceEndpointId;
-    mBindingNodeId          = bindingNodeId;
-    mBindingGroupId         = bindingGroupId;
-    mBindingEndpointId      = bindingEndpointId;
-    mBindingClusterId       = bindingClusterId;
-    mBindingSucessCallback  = successCb;
-    mBindingFailureCallback = failureCb;
-
-    CHIP_ERROR error = ReadFabricsList(device);
-    if (error != CHIP_NO_ERROR)
-    {
-        mBindingDevice = nullptr;
-    }
-    ChipLogDetail(Controller, "CreateBindingWithCallback: Sent read fabrics list request, waiting for response");
-    return error;
-}
-
-CHIP_ERROR ContentAppPlatform::ReadFabricsList(OperationalDeviceProxy * device)
-{
-    chip::Controller::OperationalCredentialsCluster cluster;
-    cluster.Associate(device, 0);
-    return cluster.ReadAttribute<FabricsListDecodableType>(this, OperationalCredentials::Id,
-                                                           OperationalCredentials::Attributes::FabricsList::Id,
-                                                           OnReadFabricsListSuccess, OnReadFabricsListFailure);
-}
-
-void ContentAppPlatform::OnReadFabricsListSuccess(void * context, const FabricsListDecodableType & data)
-{
-    ContentAppPlatform * obj = static_cast<ContentAppPlatform *>(context);
-    auto iter                = data.begin();
-    FabricInfo * fabric =
-        Server::GetInstance().GetFabricTable().FindFabricWithCompressedId(obj->mBindingDevice->GetPeerId().GetCompressedFabricId());
-
-    if (fabric == nullptr)
-    {
-        obj->NotifyBindingFailed(CHIP_ERROR_NOT_FOUND);
-    }
-
-    while (iter.Next())
-    {
-        PeerId peer;
-        fabric->GetCompressedId(iter.GetValue().fabricId, iter.GetValue().nodeId, &peer);
-        if (peer == obj->mBindingDevice->GetPeerId())
-        {
-            obj->SendBindingWriteRequest(iter.GetValue().fabricIndex);
-            return;
-        }
-    }
-    obj->NotifyBindingFailed(CHIP_ERROR_NOT_FOUND);
-}
-
-void ContentAppPlatform::OnReadFabricsListFailure(void * context, CHIP_ERROR error)
-{
-    ContentAppPlatform * obj = static_cast<ContentAppPlatform *>(context);
-    obj->NotifyBindingFailed(error);
-}
-
-void ContentAppPlatform::NotifyBindingFailed(CHIP_ERROR error)
-{
-    mBindingDevice = nullptr;
-    mBindingFailureCallback(nullptr, error);
-}
-
-void ContentAppPlatform::SendBindingWriteRequest(FabricIndex fabricIndex)
-{
     chip::Controller::BindingCluster cluster;
-    cluster.Associate(mBindingDevice, mDeviceEndpointId);
+    cluster.Associate(device, deviceEndpointId);
     Binding::Structs::TargetStruct::Type entries[1];
 
-    if (mBindingNodeId != kUndefinedNodeId)
+    if (bindingNodeId != kUndefinedNodeId)
     {
         entries[0] = Binding::Structs::TargetStruct::Type{
-            fabricIndex,
-            Optional<NodeId>(mBindingNodeId),
-            NullOptional,
-            Optional<EndpointId>(mBindingEndpointId),
-            Optional<ClusterId>(mBindingClusterId),
+            .fabricIndex = kUndefinedFabricIndex,
+            .node        = MakeOptional(bindingNodeId),
+            .group       = NullOptional,
+            .endpoint    = MakeOptional(bindingEndpointId),
+            .cluster     = MakeOptional(bindingClusterId),
         };
     }
     else
     {
         entries[0] = Binding::Structs::TargetStruct::Type{
-            fabricIndex, NullOptional, Optional<GroupId>(mBindingGroupId), NullOptional, Optional<ClusterId>(mBindingClusterId),
+            .fabricIndex = kUndefinedFabricIndex,
+            .node        = NullOptional,
+            .group       = MakeOptional(bindingGroupId),
+            .endpoint    = NullOptional,
+            .cluster     = MakeOptional(bindingClusterId),
         };
     }
-    Binding::Attributes::BindingList::TypeInfo::Type bindingList(entries);
-    cluster.WriteAttribute(bindingList, nullptr, Binding::Id, Binding::Attributes::BindingList::Id, mBindingSucessCallback,
-                           mBindingFailureCallback, NullOptional);
+    Binding::Attributes::Binding::TypeInfo::Type bindingList(entries);
+    CHIP_ERROR error = cluster.WriteAttribute(bindingList, nullptr, Binding::Id, Binding::Attributes::Binding::Id, successCb,
+                                              failureCb, NullOptional);
     ChipLogDetail(Controller, "CreateBindingWithCallback: Sent write request, waiting for response");
+
+    return error;
 }
 
 } // namespace AppPlatform

@@ -3739,13 +3739,13 @@ JNI_METHOD(jlong, BindingCluster, initWithDevice)(JNIEnv * env, jobject self, jl
     return reinterpret_cast<jlong>(cppCluster);
 }
 
-JNI_METHOD(void, BindingCluster, subscribeBindingListAttribute)
+JNI_METHOD(void, BindingCluster, subscribeBindingAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
     chip::DeviceLayer::StackLock lock;
-    std::unique_ptr<CHIPBindingBindingListAttributeCallback, void (*)(CHIPBindingBindingListAttributeCallback *)> onSuccess(
-        Platform::New<CHIPBindingBindingListAttributeCallback>(callback, true),
-        chip::Platform::Delete<CHIPBindingBindingListAttributeCallback>);
+    std::unique_ptr<CHIPBindingBindingAttributeCallback, void (*)(CHIPBindingBindingAttributeCallback *)> onSuccess(
+        Platform::New<CHIPBindingBindingAttributeCallback>(callback, true),
+        chip::Platform::Delete<CHIPBindingBindingAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -3762,14 +3762,13 @@ JNI_METHOD(void, BindingCluster, subscribeBindingListAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    using TypeInfo = chip::app::Clusters::Binding::Attributes::BindingList::TypeInfo;
-    auto successFn =
-        chip::Callback::Callback<CHIPBindingClusterBindingListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    using TypeInfo = chip::app::Clusters::Binding::Attributes::Binding::TypeInfo;
+    auto successFn = chip::Callback::Callback<CHIPBindingClusterBindingAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
     err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-                                                   CHIPBindingBindingListAttributeCallback::OnSubscriptionEstablished);
+                                                   CHIPBindingBindingAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));

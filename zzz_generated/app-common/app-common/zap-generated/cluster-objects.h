@@ -6654,30 +6654,30 @@ namespace Structs {
 namespace TargetStruct {
 enum class Fields
 {
-    kFabricIdx  = 0,
-    kNodeId     = 1,
-    kGroupId    = 2,
-    kEndpointId = 3,
-    kClusterId  = 4,
+    kFabricIndex = 0,
+    kNode        = 1,
+    kGroup       = 2,
+    kEndpoint    = 3,
+    kCluster     = 4,
 };
 
 struct Type
 {
 public:
-    chip::FabricIndex fabricIdx = static_cast<chip::FabricIndex>(0);
-    Optional<chip::NodeId> nodeId;
-    Optional<chip::GroupId> groupId;
-    Optional<chip::EndpointId> endpointId;
-    Optional<chip::ClusterId> clusterId;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+    Optional<chip::NodeId> node;
+    Optional<chip::GroupId> group;
+    Optional<chip::EndpointId> endpoint;
+    Optional<chip::ClusterId> cluster;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = true;
 
-    auto GetFabricIndex() const { return fabricIdx; }
+    auto GetFabricIndex() const { return fabricIndex; }
 
-    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIdx = fabricIndex_; }
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
 };
 
 using DecodableType = Type;
@@ -6687,7 +6687,7 @@ using DecodableType = Type;
 
 namespace Attributes {
 
-namespace BindingList {
+namespace Binding {
 struct TypeInfo
 {
     using Type          = chip::app::DataModel::List<const chip::app::Clusters::Binding::Structs::TargetStruct::Type>;
@@ -6696,10 +6696,10 @@ struct TypeInfo
         const chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Binding::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::BindingList::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Binding::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace BindingList
+} // namespace Binding
 namespace ServerGeneratedCommandList {
 struct TypeInfo
 {
@@ -6769,7 +6769,7 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::BindingList::TypeInfo::DecodableType bindingList;
+        Attributes::Binding::TypeInfo::DecodableType binding;
         Attributes::ServerGeneratedCommandList::TypeInfo::DecodableType serverGeneratedCommandList;
         Attributes::ClientGeneratedCommandList::TypeInfo::DecodableType clientGeneratedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;

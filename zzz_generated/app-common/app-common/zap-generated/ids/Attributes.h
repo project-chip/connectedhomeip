@@ -956,9 +956,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace Binding {
 namespace Attributes {
 
-namespace BindingList {
+namespace Binding {
 static constexpr AttributeId Id = 0x00000000;
-} // namespace BindingList
+} // namespace Binding
 
 namespace ServerGeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::ServerGeneratedCommandList::Id;

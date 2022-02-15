@@ -23,10 +23,67 @@
 
 #include <app/util/af-types.h>
 
-EmberStatus emberGetBinding(uint8_t index, EmberBindingTableEntry * result);
+namespace chip {
 
-EmberStatus emberAppendBinding(EmberBindingTableEntry * result);
+class BindingTable
+{
+    friend class Iterator;
 
-EmberStatus emberClearBinding(void);
+public:
+    BindingTable();
 
-uint8_t emberGetBindingTableSize(void);
+    class Iterator
+    {
+        friend class BindingTable;
+
+    public:
+        EmberBindingTableEntry & operator*() { return mTable->mBindingTable[mIndex]; }
+
+        const EmberBindingTableEntry & operator*() const { return mTable->mBindingTable[mIndex]; }
+
+        EmberBindingTableEntry * operator->() { return &(mTable->mBindingTable[mIndex]); }
+
+        const EmberBindingTableEntry * operator->() const { return &(mTable->mBindingTable[mIndex]); }
+
+        Iterator operator++() const;
+
+        bool operator==(const Iterator & rhs) { return mIndex == rhs.mIndex; }
+
+        bool operator!=(const Iterator & rhs) { return mIndex != rhs.mIndex; }
+
+        uint8_t GetIndex() { return mIndex; }
+
+    private:
+        BindingTable * mTable;
+        mutable uint8_t mPrevIndex;
+        mutable uint8_t mIndex;
+    };
+
+    CHIP_ERROR Add(const EmberBindingTableEntry & entry);
+
+    EmberBindingTableEntry & GetAt(uint8_t index);
+
+    Iterator RemoveAt(Iterator iter);
+
+    uint8_t Size() { return mSize; }
+
+    Iterator begin();
+
+    Iterator end();
+
+    static BindingTable & GetInstance() { return sInstance; }
+
+private:
+    static BindingTable sInstance;
+
+    uint8_t GetNextAvaiableIndex();
+
+    EmberBindingTableEntry mBindingTable[EMBER_BINDING_TABLE_SIZE];
+    uint8_t mNextIndex[EMBER_BINDING_TABLE_SIZE];
+
+    uint8_t mHead = EMBER_BINDING_TABLE_SIZE;
+    uint8_t mTail = EMBER_BINDING_TABLE_SIZE;
+    uint8_t mSize = 0;
+};
+
+} // namespace chip
