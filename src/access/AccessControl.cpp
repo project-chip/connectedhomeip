@@ -178,9 +178,6 @@ CHIP_ERROR AccessControl::Finish()
 CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
                                 Privilege requestPrivilege)
 {
-    // Don't check if using default delegate (e.g. test code that isn't testing access control)
-    ReturnErrorCodeIf(&mDelegate == &mDefaultDelegate, CHIP_NO_ERROR);
-
 #if CHIP_DETAIL_LOGGING
     {
         char buf[6 * kCharsPerCatForLogging];
@@ -192,8 +189,19 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
     }
 #endif
 
+    // Don't check if using default delegate (e.g. test code that isn't testing access control)
+    if (&mDelegate == &mDefaultDelegate)
+    {
+        ChipLogDetail(DataManagement, "AccessControl: disabled (this will go away)");
+        return CHIP_NO_ERROR;
+    }
+
     // Operational PASE not supported for v1.0, so PASE implies commissioning, which has highest privilege.
-    ReturnErrorCodeIf(subjectDescriptor.authMode == AuthMode::kPase, CHIP_NO_ERROR);
+    if (subjectDescriptor.authMode == AuthMode::kPase)
+    {
+        ChipLogDetail(DataManagement, "AccessControl: implicit admin via PASE");
+        return CHIP_NO_ERROR;
+    }
 
     EntryIterator iterator;
     ReturnErrorOnFailure(Entries(iterator, &subjectDescriptor.fabricIndex));
