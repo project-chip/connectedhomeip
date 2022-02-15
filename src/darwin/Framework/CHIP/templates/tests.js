@@ -204,7 +204,7 @@ function getTests()
     'Test_TC_WNCV_3_2',
     'Test_TC_WNCV_3_3',
     //'Test_TC_WNCV_3_4', TODO issues #15192
-    //'Test_TC_WNCV_3_5', 
+    //'Test_TC_WNCV_3_5',
     'Test_TC_WNCV_4_3',
     'Test_TC_WNCV_4_4',
   ];
