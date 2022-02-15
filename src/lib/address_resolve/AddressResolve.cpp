@@ -20,5 +20,9 @@
 namespace chip {
 namespace AddressResolve {
 
+// Placed here so we guarantee that the address resolve static library
+// has at least a single cpp file to compile.
+Resolver::~Resolver() {}
+
 } // namespace AddressResolve
 } // namespace chip

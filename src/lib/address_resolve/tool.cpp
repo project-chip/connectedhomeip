@@ -38,7 +38,7 @@ const char * const sHelp =
     "\n"
     "Commands:\n"
     "\n"
-    "    node <nodeid> <fabricid> -- Find the node for the given node/fabric.\n"
+    "    node <nodeid> <compressed_fabricid> -- Find the node for the given node/fabric.\n"
     "\n";
 // clang-format on
 
@@ -106,7 +106,7 @@ bool Cmd_Node(int argc, const char ** argv)
     uint64_t fabric = strtoull(argv[1], nullptr, 0 /* auto-detect base */);
     if (node == 0)
     {
-        ChipLogError(NotSpecified, "Fabric ID %s not supported", argv[1]);
+        ChipLogError(NotSpecified, "Compressed fabric ID %s not supported", argv[1]);
         return false;
     }
 
@@ -118,7 +118,7 @@ bool Cmd_Node(int argc, const char ** argv)
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Discovery, "Lookup requeste failed: %s", err.AsString());
+        ChipLogError(Discovery, "Lookup request failed: %s", err.AsString());
         return false;
     }
     ChipLogProgress(NotSpecified, "Running chip event loop and waiting for finish...");

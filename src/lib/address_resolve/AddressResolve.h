@@ -39,7 +39,7 @@ public:
     /// thread.
     virtual void OnNodeAddressResolved(const PeerId & peerId, const Transport::PeerAddress & address) = 0;
 
-    /// Node resolution failues - occurs only once for a lookup, when an address
+    /// Node resolution failure - occurs only once for a lookup, when an address
     /// could not be resolved - generally due to a timeout or due to DNSSD
     /// infrastructure returning an error.
     ///
@@ -128,13 +128,27 @@ private:
 
 /// These things are expected to be defined by the implementation header.
 namespace Impl {
-class NodeLookupHandle; // MUST derive from NodeLookupHandleBase
-}
+
+// The NodeLookup handle is a CONCRETE implementation that
+// MUST derive from NodeLookupHandleBase
+//
+// The underlying reason is that this handle is used to hold memory for
+// lookup metadata, so that resolvers do not need to maintain a likely unused
+// pool of 'active lookup' metadata.
+//
+// The sideffect of this is that the ImplNodeLookupHandle is exposed to clients
+// for sizeof() memory purposes.
+//
+// Clients MUST only use the interface in NodeLookupHandleBase and assume all
+// other methods/content is implementation defined.
+class NodeLookupHandle;
+
+} // namespace Impl
 
 class Resolver
 {
 public:
-    virtual ~Resolver() = default;
+    virtual ~Resolver();
 
     /// Expected to be called exactly once before the resolver is ever
     /// used.
@@ -163,7 +177,7 @@ public:
 // outside the open space, include the required platform headers for the
 // actual implementation.
 // Expectations of this include:
-//   - define the `Impl::NodeLookupHandle` derifing from NodeLookupHandle
+//   - define the `Impl::NodeLookupHandle` deriving from NodeLookupHandle
 //   - corresponding CPP file should provide a valid Resolver::Instance()
 //     implementation
 #include CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER

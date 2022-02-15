@@ -349,7 +349,7 @@ void DiscoveryImplPlatform::HandleDnssdInit(void * context, CHIP_ERROR initError
         // otherwise DiscoveryImplPlatform is not usable.
         //
         // We rely on the fact that resolverproxy does not use the endpoint
-        // nor does DiscoveryImplPlatofrm use it (since init will be called
+        // nor does DiscoveryImplPlatform use it (since init will be called
         // twice now)
         //
         // The problem is that:
