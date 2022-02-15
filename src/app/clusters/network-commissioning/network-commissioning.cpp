@@ -466,18 +466,19 @@ void Instance::OnCommissioningComplete(CHIP_ERROR err)
 
 bool NullNetworkDriver::GetEnabled()
 {
+    // Disable the interface and it cannot be enabled since there are no physical interfaces.
     return false;
 }
 
 uint8_t NullNetworkDriver::GetMaxNetworks()
 {
-    // The minimal value of MaxNetworks should be 1
+    // The minimal value of MaxNetworks should be 1 per spec.
     return 1;
 }
 
 DeviceLayer::NetworkCommissioning::NetworkIterator * NullNetworkDriver::GetNetworks()
 {
-    // Instance::Read will accept nullptr as a empty NetworkIterator.
+    // Instance::Read accepts nullptr as an empty NetworkIterator.
     return nullptr;
 }
 
