@@ -20,45 +20,110 @@
  */
 
 #include <app/util/binding-table.h>
-#include <zap-generated/gen_config.h>
 
-static EmberBindingTableEntry bindingTable[EMBER_BINDING_TABLE_SIZE];
-static uint8_t sBindingTableSize;
+namespace chip {
 
-EmberStatus emberGetBinding(uint8_t index, EmberBindingTableEntry * result)
+BindingTable BindingTable::sInstance;
+
+BindingTable::BindingTable()
 {
-    if (index >= EMBER_BINDING_TABLE_SIZE)
+    memset(mNextIndex, EMBER_BINDING_TABLE_SIZE, sizeof(mNextIndex));
+}
+
+CHIP_ERROR BindingTable::Add(const EmberBindingTableEntry & entry)
+{
+    if (entry.type == EMBER_UNUSED_BINDING)
     {
-        return EMBER_BAD_ARGUMENT;
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
-
-    *result = bindingTable[index];
-    return EMBER_SUCCESS;
-}
-
-EmberStatus emberAppendBinding(EmberBindingTableEntry * result)
-{
-    if (sBindingTableSize >= EMBER_BINDING_TABLE_SIZE)
+    uint8_t newIndex = GetNextAvaiableIndex();
+    if (newIndex >= EMBER_BINDING_TABLE_SIZE)
     {
-        return EMBER_NO_BUFFERS;
+        return CHIP_ERROR_NO_MEMORY;
     }
-
-    bindingTable[sBindingTableSize++] = *result;
-    return EMBER_SUCCESS;
-}
-
-EmberStatus emberClearBinding(void)
-{
-    for (uint8_t i = 0; i < sBindingTableSize; i++)
+    mBindingTable[newIndex] = entry;
+    if (mTail == EMBER_BINDING_TABLE_SIZE)
     {
-        bindingTable[i].type = EMBER_UNUSED_BINDING;
+        mTail = newIndex;
+        mHead = newIndex;
     }
-    sBindingTableSize = 0;
-
-    return EMBER_SUCCESS;
+    else
+    {
+        mNextIndex[mTail] = newIndex;
+        mTail             = newIndex;
+    }
+    mSize++;
+    return CHIP_NO_ERROR;
 }
 
-uint8_t emberGetBindingTableSize(void)
+EmberBindingTableEntry & BindingTable::GetAt(uint8_t index)
 {
-    return sBindingTableSize;
+    return mBindingTable[index];
 }
+
+BindingTable::Iterator BindingTable::RemoveAt(Iterator iter)
+{
+    if (iter.mTable != this || iter.mIndex == EMBER_BINDING_TABLE_SIZE)
+    {
+        return iter;
+    }
+    if (iter.mIndex == mTail)
+    {
+        mTail = iter.mPrevIndex;
+    }
+    uint8_t next = mNextIndex[iter.mIndex];
+    if (iter.mIndex != mHead)
+    {
+        mNextIndex[iter.mPrevIndex] = next;
+    }
+    else
+    {
+        mHead = next;
+    }
+    mBindingTable[iter.mIndex].type = EMBER_UNUSED_BINDING;
+    mNextIndex[iter.mIndex]         = EMBER_BINDING_TABLE_SIZE;
+    mSize--;
+    iter.mIndex = next;
+    return iter;
+}
+
+BindingTable::Iterator BindingTable::begin()
+{
+    Iterator iter;
+    iter.mTable     = this;
+    iter.mPrevIndex = EMBER_BINDING_TABLE_SIZE;
+    iter.mIndex     = mHead;
+    return iter;
+}
+
+BindingTable::Iterator BindingTable::end()
+{
+    Iterator iter;
+    iter.mTable = this;
+    iter.mIndex = EMBER_BINDING_TABLE_SIZE;
+    return iter;
+}
+
+uint8_t BindingTable::GetNextAvaiableIndex()
+{
+    for (uint8_t i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
+    {
+        if (mBindingTable[i].type == EMBER_UNUSED_BINDING)
+        {
+            return i;
+        }
+    }
+    return EMBER_BINDING_TABLE_SIZE;
+}
+
+BindingTable::Iterator BindingTable::Iterator::operator++() const
+{
+    if (mIndex != EMBER_BINDING_TABLE_SIZE)
+    {
+        mPrevIndex = mIndex;
+        mIndex     = mTable->mNextIndex[mIndex];
+    }
+    return *this;
+}
+
+} // namespace chip

@@ -326,14 +326,14 @@ client cluster BinaryInputBasic = 15 {
 
 client cluster Binding = 30 {
   struct TargetStruct {
-    FABRIC_IDX fabricIdx = 0;
-    optional NODE_ID nodeId = 1;
-    optional GROUP_ID groupId = 2;
-    optional ENDPOINT_NO endpointId = 3;
-    optional CLUSTER_ID clusterId = 4;
+    FABRIC_IDX fabricIndex = 0;
+    optional NODE_ID node = 1;
+    optional GROUP_ID group = 2;
+    optional ENDPOINT_NO endpoint = 3;
+    optional CLUSTER_ID cluster = 4;
   }
 
-  attribute TargetStruct bindingList[] = 0;
+  attribute TargetStruct binding[] = 0;
   readonly global attribute command_id serverGeneratedCommandList[] = 65528;
   readonly global attribute command_id clientGeneratedCommandList[] = 65529;
   readonly global attribute attrib_id attributeList[] = 65531;

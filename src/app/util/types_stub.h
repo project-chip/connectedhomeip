@@ -45,6 +45,9 @@
 
 #include <app/chip-zcl-zpro-codec.h> // For EmberApsFrame
 
+#include <app/util/basic-types.h>
+#include <lib/core/Optional.h>
+
 #include <transport/raw/MessageHeader.h>
 static_assert(sizeof(chip::NodeId) == sizeof(uint64_t), "Unexpected node if size");
 
@@ -524,7 +527,7 @@ struct EmberBindingTableEntry
     }
 
     /** The type of binding. */
-    EmberBindingType type;
+    EmberBindingType type = EMBER_UNUSED_BINDING;
 
     chip::FabricIndex fabricIndex;
     /** The endpoint on the local node. */

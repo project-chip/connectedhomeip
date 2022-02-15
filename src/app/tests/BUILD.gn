@@ -37,6 +37,16 @@ static_library("helpers") {
   ]
 }
 
+source_set("binding-table") {
+  sources = [ "${chip_root}/src/app/util/binding-table.cpp" ]
+
+  public_deps = [
+    "${chip_root}/src/app/util/mock:mock_ember",
+    "${chip_root}/src/lib/core",
+  ]
+}
+
+
 chip_test_suite("tests") {
   output_name = "libAppTests"
 
@@ -45,6 +55,7 @@ chip_test_suite("tests") {
     "TestAttributeValueDecoder.cpp",
     "TestAttributeValueEncoder.cpp",
     "TestBuilderParser.cpp",
+    "TestBindingTable.cpp",
     "TestClusterInfo.cpp",
     "TestCommandInteraction.cpp",
     "TestCommandPathParams.cpp",
@@ -80,6 +91,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
     "${nlunit_test_root}:nlunit-test",
+    ":binding-table",
   ]
 
   if (chip_config_network_layer_ble &&

@@ -19,11 +19,11 @@ limitations under the License.
 
   <struct name="TargetStruct">
     <cluster code="0x001e"/>
-    <item name="fabricIdx" type="FABRIC_IDX"/>
-    <item name="nodeId" type="NODE_ID" optional="true"/>
-    <item name="groupId" type="GROUP_ID" optional="true"/>
-    <item name="endpointId" type="ENDPOINT_NO" optional="true"/>
-    <item name="clusterId" type="CLUSTER_ID" optional="true"/>
+    <item name="FabricIndex" type="FABRIC_IDX"/>
+    <item name="Node" type="NODE_ID" optional="true"/>
+    <item name="Group" type="GROUP_ID" optional="true"/>
+    <item name="Endpoint" type="ENDPOINT_NO" optional="true"/>
+    <item name="Cluster" type="CLUSTER_ID" optional="true"/>
   </struct>
 
   <cluster>
@@ -32,7 +32,7 @@ limitations under the License.
     <code>0x001e</code>
     <define>BINDING_CLUSTER</define>
     <description>The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table.</description>
-    <attribute side="server" code="0x0000" define="BINDING_LIST" type="ARRAY" entryType="TargetStruct" length="254" writable="true" optional="false">binding list</attribute>
+    <attribute side="server" code="0x0000" define="BINDING_LIST" type="ARRAY" entryType="TargetStruct" length="254" writable="true" optional="false">Binding</attribute>
   </cluster>
 
 </configurator>

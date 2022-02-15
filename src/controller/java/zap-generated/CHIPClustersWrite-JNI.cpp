@@ -582,12 +582,12 @@ JNI_METHOD(void, BinaryInputBasicCluster, writePresentValueAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, BindingCluster, writeBindingListAttribute)
+JNI_METHOD(void, BindingCluster, writeBindingAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Binding::Attributes::BindingList::TypeInfo;
+    using TypeInfo = chip::app::Clusters::Binding::Attributes::Binding::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -607,53 +607,52 @@ JNI_METHOD(void, BindingCluster, writeBindingListAttribute)
             {
                 jobject element_0;
                 chip::JniReferences::GetInstance().GetArrayListItem(value, i_0, element_0);
-                jobject element_0_fabricIdxItem_1;
-                chip::JniReferences::GetInstance().GetObjectField(element_0, "fabricIdx", "Ljava/lang/Integer;",
-                                                                  element_0_fabricIdxItem_1);
-                listHolder_0->mList[i_0].fabricIdx =
-                    static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].fabricIdx)>>(
-                        chip::JniReferences::GetInstance().IntegerToPrimitive(element_0_fabricIdxItem_1));
-                jobject element_0_nodeIdItem_1;
-                chip::JniReferences::GetInstance().GetObjectField(element_0, "nodeId", "Ljava/util/Optional;",
-                                                                  element_0_nodeIdItem_1);
-                if (element_0_nodeIdItem_1 != nullptr)
+                jobject element_0_fabricIndexItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "fabricIndex", "Ljava/lang/Integer;",
+                                                                  element_0_fabricIndexItem_1);
+                listHolder_0->mList[i_0].fabricIndex =
+                    static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].fabricIndex)>>(
+                        chip::JniReferences::GetInstance().IntegerToPrimitive(element_0_fabricIndexItem_1));
+                jobject element_0_nodeItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "node", "Ljava/util/Optional;", element_0_nodeItem_1);
+                if (element_0_nodeItem_1 != nullptr)
                 {
                     jobject optionalValue_2;
-                    chip::JniReferences::GetInstance().GetOptionalValue(element_0_nodeIdItem_1, optionalValue_2);
-                    auto & definedValue_2 = listHolder_0->mList[i_0].nodeId.Emplace();
+                    chip::JniReferences::GetInstance().GetOptionalValue(element_0_nodeItem_1, optionalValue_2);
+                    auto & definedValue_2 = listHolder_0->mList[i_0].node.Emplace();
                     definedValue_2        = static_cast<std::remove_reference_t<decltype(definedValue_2)>>(
                         chip::JniReferences::GetInstance().LongToPrimitive(optionalValue_2));
                 }
-                jobject element_0_groupIdItem_1;
-                chip::JniReferences::GetInstance().GetObjectField(element_0, "groupId", "Ljava/util/Optional;",
-                                                                  element_0_groupIdItem_1);
-                if (element_0_groupIdItem_1 != nullptr)
+                jobject element_0_groupItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "group", "Ljava/util/Optional;",
+                                                                  element_0_groupItem_1);
+                if (element_0_groupItem_1 != nullptr)
                 {
                     jobject optionalValue_2;
-                    chip::JniReferences::GetInstance().GetOptionalValue(element_0_groupIdItem_1, optionalValue_2);
-                    auto & definedValue_2 = listHolder_0->mList[i_0].groupId.Emplace();
+                    chip::JniReferences::GetInstance().GetOptionalValue(element_0_groupItem_1, optionalValue_2);
+                    auto & definedValue_2 = listHolder_0->mList[i_0].group.Emplace();
                     definedValue_2        = static_cast<std::remove_reference_t<decltype(definedValue_2)>>(
                         chip::JniReferences::GetInstance().IntegerToPrimitive(optionalValue_2));
                 }
-                jobject element_0_endpointIdItem_1;
-                chip::JniReferences::GetInstance().GetObjectField(element_0, "endpointId", "Ljava/util/Optional;",
-                                                                  element_0_endpointIdItem_1);
-                if (element_0_endpointIdItem_1 != nullptr)
+                jobject element_0_endpointItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "endpoint", "Ljava/util/Optional;",
+                                                                  element_0_endpointItem_1);
+                if (element_0_endpointItem_1 != nullptr)
                 {
                     jobject optionalValue_2;
-                    chip::JniReferences::GetInstance().GetOptionalValue(element_0_endpointIdItem_1, optionalValue_2);
-                    auto & definedValue_2 = listHolder_0->mList[i_0].endpointId.Emplace();
+                    chip::JniReferences::GetInstance().GetOptionalValue(element_0_endpointItem_1, optionalValue_2);
+                    auto & definedValue_2 = listHolder_0->mList[i_0].endpoint.Emplace();
                     definedValue_2        = static_cast<std::remove_reference_t<decltype(definedValue_2)>>(
                         chip::JniReferences::GetInstance().IntegerToPrimitive(optionalValue_2));
                 }
-                jobject element_0_clusterIdItem_1;
-                chip::JniReferences::GetInstance().GetObjectField(element_0, "clusterId", "Ljava/util/Optional;",
-                                                                  element_0_clusterIdItem_1);
-                if (element_0_clusterIdItem_1 != nullptr)
+                jobject element_0_clusterItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "cluster", "Ljava/util/Optional;",
+                                                                  element_0_clusterItem_1);
+                if (element_0_clusterItem_1 != nullptr)
                 {
                     jobject optionalValue_2;
-                    chip::JniReferences::GetInstance().GetOptionalValue(element_0_clusterIdItem_1, optionalValue_2);
-                    auto & definedValue_2 = listHolder_0->mList[i_0].clusterId.Emplace();
+                    chip::JniReferences::GetInstance().GetOptionalValue(element_0_clusterItem_1, optionalValue_2);
+                    auto & definedValue_2 = listHolder_0->mList[i_0].cluster.Emplace();
                     definedValue_2        = static_cast<std::remove_reference_t<decltype(definedValue_2)>>(
                         chip::JniReferences::GetInstance().LongToPrimitive(optionalValue_2));
                 }

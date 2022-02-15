@@ -226,43 +226,43 @@ public class ChipStructs {
   }
 
   public static class BindingClusterTargetStruct {
-    public Integer fabricIdx;
-    public Optional<Long> nodeId;
-    public Optional<Integer> groupId;
-    public Optional<Integer> endpointId;
-    public Optional<Long> clusterId;
+    public Integer fabricIndex;
+    public Optional<Long> node;
+    public Optional<Integer> group;
+    public Optional<Integer> endpoint;
+    public Optional<Long> cluster;
 
     public BindingClusterTargetStruct(
-        Integer fabricIdx,
-        Optional<Long> nodeId,
-        Optional<Integer> groupId,
-        Optional<Integer> endpointId,
-        Optional<Long> clusterId) {
-      this.fabricIdx = fabricIdx;
-      this.nodeId = nodeId;
-      this.groupId = groupId;
-      this.endpointId = endpointId;
-      this.clusterId = clusterId;
+        Integer fabricIndex,
+        Optional<Long> node,
+        Optional<Integer> group,
+        Optional<Integer> endpoint,
+        Optional<Long> cluster) {
+      this.fabricIndex = fabricIndex;
+      this.node = node;
+      this.group = group;
+      this.endpoint = endpoint;
+      this.cluster = cluster;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
       output.append("BindingClusterTargetStruct {\n");
-      output.append("\tfabricIdx: ");
-      output.append(fabricIdx);
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
       output.append("\n");
-      output.append("\tnodeId: ");
-      output.append(nodeId);
+      output.append("\tnode: ");
+      output.append(node);
       output.append("\n");
-      output.append("\tgroupId: ");
-      output.append(groupId);
+      output.append("\tgroup: ");
+      output.append(group);
       output.append("\n");
-      output.append("\tendpointId: ");
-      output.append(endpointId);
+      output.append("\tendpoint: ");
+      output.append(endpoint);
       output.append("\n");
-      output.append("\tclusterId: ");
-      output.append(clusterId);
+      output.append("\tcluster: ");
+      output.append(cluster);
       output.append("\n");
       output.append("}\n");
       return output.toString();

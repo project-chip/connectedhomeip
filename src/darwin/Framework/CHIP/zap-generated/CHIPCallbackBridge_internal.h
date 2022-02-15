@@ -2263,25 +2263,25 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPBindingBindingListListAttributeCallbackBridge : public CHIPCallbackBridge<BindingBindingListListAttributeCallback>
+class CHIPBindingBindingListAttributeCallbackBridge : public CHIPCallbackBridge<BindingBindingListAttributeCallback>
 {
 public:
-    CHIPBindingBindingListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                      bool keepAlive = false) :
-        CHIPCallbackBridge<BindingBindingListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+    CHIPBindingBindingListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                  bool keepAlive = false) :
+        CHIPCallbackBridge<BindingBindingListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType> & value);
 };
 
-class CHIPBindingBindingListListAttributeCallbackSubscriptionBridge : public CHIPBindingBindingListListAttributeCallbackBridge
+class CHIPBindingBindingListAttributeCallbackSubscriptionBridge : public CHIPBindingBindingListAttributeCallbackBridge
 {
 public:
-    CHIPBindingBindingListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  CHIPActionBlock action,
-                                                                  SubscriptionEstablishedHandler establishedHandler) :
-        CHIPBindingBindingListListAttributeCallbackBridge(queue, handler, action, true),
+    CHIPBindingBindingListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                              CHIPActionBlock action,
+                                                              SubscriptionEstablishedHandler establishedHandler) :
+        CHIPBindingBindingListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 

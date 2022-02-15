@@ -31,30 +31,26 @@ CHIP_ERROR PendingNotificationMap::FindLRUConnectPeer(FabricIndex * fabric, Node
     // First, set up a way to easily track which entries correspond to the same peer.
     uint8_t bindingWithSamePeer[EMBER_BINDING_TABLE_SIZE];
 
-    for (uint8_t i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
+    for (auto iter = BindingTable::GetInstance().begin(); iter != BindingTable::GetInstance().end(); ++iter)
     {
-        EmberBindingTableEntry entry;
-        emberGetBinding(i, &entry);
-        if (entry.type != EMBER_UNICAST_BINDING)
+        if (iter->type != EMBER_UNICAST_BINDING)
         {
             continue;
         }
         bool foundSamePeer = false;
-        for (uint8_t j = 0; j < i; j++)
+        for (auto checkIter = BindingTable::GetInstance().begin(); iter != BindingTable::GetInstance().end(); ++iter)
         {
-            EmberBindingTableEntry checkEntry;
-            emberGetBinding(j, &checkEntry);
-            if (checkEntry.type == EMBER_UNICAST_BINDING && checkEntry.fabricIndex == entry.fabricIndex &&
-                checkEntry.nodeId == entry.nodeId)
+            if (checkIter->type == EMBER_UNICAST_BINDING && checkIter->fabricIndex == checkIter->fabricIndex &&
+                checkIter->nodeId == checkIter->nodeId)
             {
-                foundSamePeer          = true;
-                bindingWithSamePeer[i] = j;
+                foundSamePeer                        = true;
+                bindingWithSamePeer[iter.GetIndex()] = checkIter.GetIndex();
                 break;
             }
         }
         if (!foundSamePeer)
         {
-            bindingWithSamePeer[i] = i;
+            bindingWithSamePeer[iter.GetIndex()] = iter.GetIndex();
         }
     }
 
@@ -81,10 +77,9 @@ CHIP_ERROR PendingNotificationMap::FindLRUConnectPeer(FabricIndex * fabric, Node
     }
     if (minLastAppearValue < UINT16_MAX)
     {
-        EmberBindingTableEntry entry;
-        emberGetBinding(lruBindingEntryIndex, &entry);
-        *fabric = entry.fabricIndex;
-        *node   = entry.nodeId;
+        EmberBindingTableEntry entry = BindingTable::GetInstance().GetAt(static_cast<uint8_t>(lruBindingEntryIndex));
+        *fabric                      = entry.fabricIndex;
+        *node                        = entry.nodeId;
         return CHIP_NO_ERROR;
     }
     return CHIP_ERROR_NOT_FOUND;
@@ -113,27 +108,12 @@ void PendingNotificationMap::RemoveEntry(uint8_t bindingEntryId)
     mNumEntries = newEntryCount;
 }
 
-void PendingNotificationMap::ReplaceBindingEntryId(uint8_t oldEntryId, uint8_t newEntryId)
-{
-    uint8_t newEntryCount = 0;
-    for (int i = 0; i < mNumEntries; i++)
-    {
-        if (mPendingBindingEntries[i] == oldEntryId)
-        {
-            mPendingBindingEntries[i] = newEntryId;
-        }
-    }
-    mNumEntries = newEntryCount;
-}
-
 void PendingNotificationMap::RemoveAllEntriesForNode(FabricIndex fabric, NodeId node)
 {
     uint8_t newEntryCount = 0;
     for (int i = 0; i < mNumEntries; i++)
     {
-        EmberBindingTableEntry entry;
-        emberGetBinding(mPendingBindingEntries[i], &entry);
-
+        EmberBindingTableEntry entry = BindingTable::GetInstance().GetAt(mPendingBindingEntries[i]);
         if (entry.fabricIndex != fabric || entry.nodeId != node)
         {
             mPendingBindingEntries[newEntryCount] = mPendingBindingEntries[i];
@@ -149,9 +129,7 @@ void PendingNotificationMap::RemoveAllEntriesForFabric(FabricIndex fabric)
     uint8_t newEntryCount = 0;
     for (int i = 0; i < mNumEntries; i++)
     {
-        EmberBindingTableEntry entry;
-        emberGetBinding(mPendingBindingEntries[i], &entry);
-
+        EmberBindingTableEntry entry = BindingTable::GetInstance().GetAt(mPendingBindingEntries[i]);
         if (entry.fabricIndex != fabric)
         {
             mPendingBindingEntries[newEntryCount] = mPendingBindingEntries[i];

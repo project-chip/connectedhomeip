@@ -3041,19 +3041,18 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)readAttributeBindingListWithCompletionHandler:(void (^)(
-                                                          NSArray * _Nullable value, NSError * _Nullable error))completionHandler
+- (void)readAttributeBindingWithCompletionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
-    new CHIPBindingBindingListListAttributeCallbackBridge(
+    new CHIPBindingBindingListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = Binding::Attributes::BindingList::TypeInfo;
-            auto successFn = Callback<BindingBindingListListAttributeCallback>::FromCancelable(success);
+            using TypeInfo = Binding::Attributes::Binding::TypeInfo;
+            auto successFn = Callback<BindingBindingListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)writeAttributeBindingListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeBindingWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -3062,7 +3061,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = Binding::Attributes::BindingList::TypeInfo;
+            using TypeInfo = Binding::Attributes::Binding::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -3079,22 +3078,22 @@ using namespace chip::app::Clusters;
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
                         auto element_0 = (CHIPBindingClusterTargetStruct *) value[i_0];
-                        listHolder_0->mList[i_0].fabricIdx = element_0.fabricIdx.unsignedCharValue;
-                        if (element_0.nodeId != nil) {
-                            auto & definedValue_2 = listHolder_0->mList[i_0].nodeId.Emplace();
-                            definedValue_2 = element_0.nodeId.unsignedLongLongValue;
+                        listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
+                        if (element_0.node != nil) {
+                            auto & definedValue_2 = listHolder_0->mList[i_0].node.Emplace();
+                            definedValue_2 = element_0.node.unsignedLongLongValue;
                         }
-                        if (element_0.groupId != nil) {
-                            auto & definedValue_2 = listHolder_0->mList[i_0].groupId.Emplace();
-                            definedValue_2 = element_0.groupId.unsignedShortValue;
+                        if (element_0.group != nil) {
+                            auto & definedValue_2 = listHolder_0->mList[i_0].group.Emplace();
+                            definedValue_2 = element_0.group.unsignedShortValue;
                         }
-                        if (element_0.endpointId != nil) {
-                            auto & definedValue_2 = listHolder_0->mList[i_0].endpointId.Emplace();
-                            definedValue_2 = element_0.endpointId.unsignedShortValue;
+                        if (element_0.endpoint != nil) {
+                            auto & definedValue_2 = listHolder_0->mList[i_0].endpoint.Emplace();
+                            definedValue_2 = element_0.endpoint.unsignedShortValue;
                         }
-                        if (element_0.clusterId != nil) {
-                            auto & definedValue_2 = listHolder_0->mList[i_0].clusterId.Emplace();
-                            definedValue_2 = element_0.clusterId.unsignedIntValue;
+                        if (element_0.cluster != nil) {
+                            auto & definedValue_2 = listHolder_0->mList[i_0].cluster.Emplace();
+                            definedValue_2 = element_0.cluster.unsignedIntValue;
                         }
                     }
                     cppValue = ListType_0(listHolder_0->mList, value.count);
@@ -3108,20 +3107,20 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)subscribeAttributeBindingListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                         maxInterval:(NSNumber * _Nonnull)maxInterval
-                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+- (void)subscribeAttributeBindingWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                         subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                   reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    new CHIPBindingBindingListListAttributeCallbackSubscriptionBridge(
+    new CHIPBindingBindingListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
         ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = Binding::Attributes::BindingList::TypeInfo;
-            auto successFn = Callback<BindingBindingListListAttributeCallback>::FromCancelable(success);
+            using TypeInfo = Binding::Attributes::Binding::TypeInfo;
+            auto successFn = Callback<BindingBindingListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
-                CHIPBindingBindingListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+                CHIPBindingBindingListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
         },
         subscriptionEstablishedHandler);
 }

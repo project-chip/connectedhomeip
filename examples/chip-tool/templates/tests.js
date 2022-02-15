@@ -260,6 +260,7 @@ function getTests()
     'TestOperationalCredentialsCluster',
     'TestModeSelectCluster',
     'TestSystemCommands',
+    'TestBinding',
   ];
 
   const SoftwareDiagnostics = [

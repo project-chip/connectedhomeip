@@ -1150,19 +1150,19 @@ public class ClusterReadMapping {
         readBinaryInputBasicClusterRevisionAttributeInteractionInfo);
     readAttributeMap.put("binaryInputBasic", readBinaryInputBasicInteractionInfo);
     Map<String, InteractionInfo> readBindingInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> readBindingBindingListCommandParams =
+    Map<String, CommandParameterInfo> readBindingBindingCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readBindingBindingListAttributeInteractionInfo =
+    InteractionInfo readBindingBindingAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BindingCluster) cluster)
-                  .readBindingListAttribute(
-                      (ChipClusters.BindingCluster.BindingListAttributeCallback) callback);
+                  .readBindingAttribute(
+                      (ChipClusters.BindingCluster.BindingAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedBindingClusterBindingListAttributeCallback(),
-            readBindingBindingListCommandParams);
+            () -> new ClusterInfoMapping.DelegatedBindingClusterBindingAttributeCallback(),
+            readBindingBindingCommandParams);
     readBindingInteractionInfo.put(
-        "readBindingListAttribute", readBindingBindingListAttributeInteractionInfo);
+        "readBindingAttribute", readBindingBindingAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readBindingServerGeneratedCommandListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readBindingServerGeneratedCommandListAttributeInteractionInfo =

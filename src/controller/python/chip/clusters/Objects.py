@@ -5542,7 +5542,7 @@ class Binding(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
-                ClusterObjectFieldDescriptor(Label="bindingList", Tag=0x00000000, Type=typing.List[Binding.Structs.TargetStruct]),
+                ClusterObjectFieldDescriptor(Label="binding", Tag=0x00000000, Type=typing.List[Binding.Structs.TargetStruct]),
                 ClusterObjectFieldDescriptor(Label="serverGeneratedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="clientGeneratedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -5550,7 +5550,7 @@ class Binding(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    bindingList: 'typing.List[Binding.Structs.TargetStruct]' = None
+    binding: 'typing.List[Binding.Structs.TargetStruct]' = None
     serverGeneratedCommandList: 'typing.List[uint]' = None
     clientGeneratedCommandList: 'typing.List[uint]' = None
     attributeList: 'typing.List[uint]' = None
@@ -5565,25 +5565,25 @@ class Binding(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="fabricIdx", Tag=0, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="nodeId", Tag=1, Type=typing.Optional[uint]),
-                            ClusterObjectFieldDescriptor(Label="groupId", Tag=2, Type=typing.Optional[uint]),
-                            ClusterObjectFieldDescriptor(Label="endpointId", Tag=3, Type=typing.Optional[uint]),
-                            ClusterObjectFieldDescriptor(Label="clusterId", Tag=4, Type=typing.Optional[uint]),
+                            ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="node", Tag=1, Type=typing.Optional[uint]),
+                            ClusterObjectFieldDescriptor(Label="group", Tag=2, Type=typing.Optional[uint]),
+                            ClusterObjectFieldDescriptor(Label="endpoint", Tag=3, Type=typing.Optional[uint]),
+                            ClusterObjectFieldDescriptor(Label="cluster", Tag=4, Type=typing.Optional[uint]),
                     ])
 
-            fabricIdx: 'uint' = 0
-            nodeId: 'typing.Optional[uint]' = None
-            groupId: 'typing.Optional[uint]' = None
-            endpointId: 'typing.Optional[uint]' = None
-            clusterId: 'typing.Optional[uint]' = None
+            fabricIndex: 'uint' = 0
+            node: 'typing.Optional[uint]' = None
+            group: 'typing.Optional[uint]' = None
+            endpoint: 'typing.Optional[uint]' = None
+            cluster: 'typing.Optional[uint]' = None
 
 
 
 
     class Attributes:
         @dataclass
-        class BindingList(ClusterAttributeDescriptor):
+        class Binding(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x001E

@@ -105,15 +105,15 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _fabricIdx = @(0);
+        _fabricIndex = @(0);
 
-        _nodeId = nil;
+        _node = nil;
 
-        _groupId = nil;
+        _group = nil;
 
-        _endpointId = nil;
+        _endpoint = nil;
 
-        _clusterId = nil;
+        _cluster = nil;
     }
     return self;
 }
