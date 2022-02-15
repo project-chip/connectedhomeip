@@ -33,9 +33,6 @@ class PeerMessageCounter
 {
 public:
     static constexpr size_t kChallengeSize = 8;
-    // Const expr to calculate receiving window. Used everywhere the spec specified the usage of
-    // 2^31
-    static constexpr uint32_t kGroupOffset = static_cast<uint32_t>(1 << 31); // 2^31
 
     PeerMessageCounter() : mStatus(Status::NotSynced) {}
     ~PeerMessageCounter() { Reset(); }
@@ -106,18 +103,19 @@ public:
             return CHIP_ERROR_INCORRECT_STATE;
         }
 
-        // 1. Check counter value if in valid range
-        uint32_t counterIncrease = counter - mSynced.mMaxCounter;
-        if (counterIncrease >= 1 && counterIncrease <= (kGroupOffset - 1))
+        // 1. Check whether the new counter value falls in the spec's "valid future counter value" window.
+        uint32_t counterIncrease          = counter - mSynced.mMaxCounter;
+        uint32_t groupFutureCounterWindow = (static_cast<uint32_t>(1 << 31)) - 1;
+        if (counterIncrease >= 1 && counterIncrease <= (groupFutureCounterWindow))
         {
             return CHIP_NO_ERROR;
         }
 
         // 2. Counter Window check
         uint32_t offset = mSynced.mMaxCounter - counter;
-        if (offset <= CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
+        if (offset < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
         {
-            if ((offset == 0) || mSynced.mWindow.test(offset - 1))
+            if ((offset == 0) || mSynced.mWindow.test(offset))
             {
                 return CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED; // duplicated, in window
             }
@@ -200,52 +198,25 @@ public:
      */
     void CommitWithRollOver(uint32_t counter)
     {
-        if (counter <= mSynced.mMaxCounter)
+        uint32_t offset = mSynced.mMaxCounter - counter;
+        if (offset < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
         {
-            // Take into account rollover
-            uint32_t offset         = mSynced.mMaxCounter - counter;
-            uint32_t rollOverOffset = ((UINT32_MAX - mSynced.mMaxCounter) + counter);
-            if (offset < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
-            {
-                mSynced.mWindow.set(offset);
-            }
-            else if (rollOverOffset < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
-            {
-                // Roll over occured
-                mSynced.mMaxCounter = counter;
-                mSynced.mWindow <<= rollOverOffset;
-                mSynced.mWindow.set(0);
-            }
-            else
-            {
-                // Roll over occured with a leap bigger than CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE
-                mSynced.mMaxCounter = counter;
-                mSynced.mWindow.reset();
-                mSynced.mWindow.set(0);
-            }
+            mSynced.mWindow.set(offset);
         }
         else
         {
-            uint32_t offset = mSynced.mMaxCounter - counter;
-            if (offset < CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
+            // Not a bit inside the window.  Since we are committing, this is a new mMaxCounter value.
+            mSynced.mMaxCounter = counter;
+            uint32_t shift      = -offset;
+            if (shift > CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
             {
-                mSynced.mWindow.set(offset);
+                mSynced.mWindow.reset();
             }
             else
             {
-                // Not a bit inside the window.  Since we are committing, this is a new mMaxCounter value.
-                mSynced.mMaxCounter = counter;
-                uint32_t shift      = -offset;
-                if (shift > CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
-                {
-                    mSynced.mWindow.reset();
-                }
-                else
-                {
-                    mSynced.mWindow <<= shift;
-                }
-                mSynced.mWindow.set(0);
+                mSynced.mWindow <<= shift;
             }
+            mSynced.mWindow.set(0);
         }
     }
 

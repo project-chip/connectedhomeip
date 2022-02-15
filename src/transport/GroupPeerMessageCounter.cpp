@@ -249,6 +249,10 @@ CHIP_ERROR GroupOutgoingCounters::Init(chip::PersistentStorageDelegate * storage
         // TODO handle this case
         mGroupControlCounter = 0; // TODO should be random
     }
+    else if (err != CHIP_NO_ERROR)
+    {
+        return err;
+    }
     else
     {
         mGroupControlCounter = temp;
@@ -260,6 +264,10 @@ CHIP_ERROR GroupOutgoingCounters::Init(chip::PersistentStorageDelegate * storage
         // might be the first time we retrieve the value
         // TODO handle this case
         mGroupDataCounter = 0; //  TODO should be random
+    }
+    else if (err != CHIP_NO_ERROR)
+    {
+        return err;
     }
     else
     {

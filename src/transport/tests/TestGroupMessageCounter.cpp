@@ -401,7 +401,6 @@ void GroupMessageCounterTest(nlTestSuite * inSuite, void * inContext)
     TestGroupOutgoingCounters groupCientCounter2(&delegate);
 
     NL_TEST_ASSERT(inSuite, groupCientCounter2.GetCounter(true) == UINT32_MAX);
-    ChipLogDetail(Inet, "%u", groupCientCounter2.GetCounter(false));
     NL_TEST_ASSERT(inSuite, groupCientCounter2.GetCounter(false) == GROUP_MSG_COUNTER_MIN_INCREMENT);
 
     // Test Roll over
