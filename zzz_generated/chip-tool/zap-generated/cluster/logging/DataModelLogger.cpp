@@ -7174,17 +7174,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("InterfaceEnabled", 1, value);
         }
         case NetworkCommissioning::Attributes::LastNetworkingStatus::Id: {
-            chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus value;
+            chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LastNetworkingStatus", 1, value);
         }
         case NetworkCommissioning::Attributes::LastNetworkID::Id: {
-            chip::ByteSpan value;
+            chip::app::DataModel::Nullable<chip::ByteSpan> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LastNetworkID", 1, value);
         }
         case NetworkCommissioning::Attributes::LastConnectErrorValue::Id: {
-            uint32_t value;
+            chip::app::DataModel::Nullable<int32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LastConnectErrorValue", 1, value);
         }

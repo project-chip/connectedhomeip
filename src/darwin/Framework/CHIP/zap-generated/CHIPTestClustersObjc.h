@@ -776,10 +776,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeScanMaxTimeSecondsWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeConnectMaxTimeSecondsWithValue:(NSNumber * _Nonnull)value
                                    completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeLastNetworkingStatusWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributeLastNetworkingStatusWithValue:(NSNumber * _Nullable)value
                                   completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeLastNetworkIDWithValue:(NSData * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeLastConnectErrorValueWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributeLastNetworkIDWithValue:(NSData * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeLastConnectErrorValueWithValue:(NSNumber * _Nullable)value
                                    completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeServerGeneratedCommandListWithValue:(NSArray * _Nonnull)value
                                         completionHandler:(StatusCompletion)completionHandler;

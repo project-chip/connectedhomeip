@@ -4955,6 +4955,98 @@ private:
     bool keepAlive;
 };
 
+class CHIPNetworkCommissioningLastNetworkingStatusAttributeCallback
+    : public chip::Callback::Callback<CHIPNetworkCommissioningClusterLastNetworkingStatusAttributeCallbackType>
+{
+public:
+    CHIPNetworkCommissioningLastNetworkingStatusAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPNetworkCommissioningLastNetworkingStatusAttributeCallback();
+
+    static void maybeDestroy(CHIPNetworkCommissioningLastNetworkingStatusAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPNetworkCommissioningLastNetworkingStatusAttributeCallback>(callback);
+        }
+    }
+
+    static void
+    CallbackFn(void * context,
+               const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPNetworkCommissioningLastNetworkingStatusAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPNetworkCommissioningLastNetworkIDAttributeCallback
+    : public chip::Callback::Callback<CHIPNetworkCommissioningClusterLastNetworkIDAttributeCallbackType>
+{
+public:
+    CHIPNetworkCommissioningLastNetworkIDAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPNetworkCommissioningLastNetworkIDAttributeCallback();
+
+    static void maybeDestroy(CHIPNetworkCommissioningLastNetworkIDAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPNetworkCommissioningLastNetworkIDAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<chip::ByteSpan> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPNetworkCommissioningLastNetworkIDAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPNetworkCommissioningLastConnectErrorValueAttributeCallback
+    : public chip::Callback::Callback<CHIPNetworkCommissioningClusterLastConnectErrorValueAttributeCallbackType>
+{
+public:
+    CHIPNetworkCommissioningLastConnectErrorValueAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPNetworkCommissioningLastConnectErrorValueAttributeCallback();
+
+    static void maybeDestroy(CHIPNetworkCommissioningLastConnectErrorValueAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPNetworkCommissioningLastConnectErrorValueAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<int32_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPNetworkCommissioningLastConnectErrorValueAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPNetworkCommissioningServerGeneratedCommandListAttributeCallback
     : public chip::Callback::Callback<CHIPNetworkCommissioningClusterServerGeneratedCommandListAttributeCallbackType>
 {
