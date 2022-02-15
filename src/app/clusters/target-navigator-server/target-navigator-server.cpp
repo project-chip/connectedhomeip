@@ -42,8 +42,8 @@ using namespace chip::app::Clusters::TargetNavigator;
 using namespace chip::AppPlatform;
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
-#define TARGET_NAVIGATOR_DELEGATE_TABLE_SIZE                                                                                       \
-    (EMBER_AF_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
+static constexpr size_t kTargetNavigatorDelegateTableSize =
+    EMBER_AF_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -52,7 +52,7 @@ using chip::app::Clusters::TargetNavigator::Delegate;
 
 namespace {
 
-Delegate * gDelegateTable[TARGET_NAVIGATOR_DELEGATE_TABLE_SIZE] = { nullptr };
+Delegate * gDelegateTable[kTargetNavigatorDelegateTableSize] = { nullptr };
 
 Delegate * GetDelegate(EndpointId endpoint)
 {
