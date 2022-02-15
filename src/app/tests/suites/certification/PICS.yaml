@@ -224,10 +224,12 @@ PICS:
       id: A_CURRENTPOSITIONTILTPERCENTAGE
 
       ## WC-Commands received
-    - label: "Does the device implement receiving the GoToLiftPercentage command?"
+    - label:
+          "Does the device implement receiving the GoToLiftPercentage command?"
       id: PICS_CR_GOTOLIFTPERCENTAGE
 
-    - label: "Does the device implement receiving the GoToTiltPercentage command?"
+    - label:
+          "Does the device implement receiving the GoToTiltPercentage command?"
       id: PICS_CR_GOTOTILTPERCENTAGE
 
       # On/Off Cluster
