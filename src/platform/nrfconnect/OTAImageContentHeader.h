@@ -25,20 +25,20 @@
 namespace chip {
 namespace DeviceLayer {
 
-enum class OTAImageFileId : uint32_t
-{
-    kMcuboot    = 0,
-    kAppMcuboot = 1,
-    kNetMcuboot = 2,
-};
-
 struct OTAImageContentHeader
 {
     static constexpr size_t kMaxFiles = 3;
 
+    enum class FileId : uint32_t
+    {
+        kMcuboot    = 0,
+        kAppMcuboot = 1,
+        kNetMcuboot = 2,
+    };
+
     struct FileInfo
     {
-        uint32_t mFileId;
+        FileId mFileId;
         uint32_t mFileSize;
     };
 
@@ -98,8 +98,8 @@ private:
     CHIP_ERROR DecodeTlv(OTAImageContentHeader & header);
 
     State mState;
-    uint32_t mHeaderTlvSize;
     uint32_t mBufferOffset;
+    uint32_t mHeaderTlvSize;
     Platform::ScopedMemoryBuffer<uint8_t> mBuffer;
 };
 
