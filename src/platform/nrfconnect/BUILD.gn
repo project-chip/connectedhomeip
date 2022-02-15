@@ -73,6 +73,8 @@ static_library("nrfconnect") {
 
   if (chip_enable_ota_requestor) {
     sources += [
+      "OTAImageContentHeader.cpp",
+      "OTAImageContentHeader.h",
       "OTAImageProcessorImpl.cpp",
       "OTAImageProcessorImpl.h",
     ]
