@@ -17,9 +17,10 @@
 
 #include "OTAImageContentHeader.h"
 
+#include <lib/core/CHIPEncoding.h>
 #include <lib/core/CHIPTLV.h>
-#include <lib/support/BufferReader.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/TypeTraits.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -46,6 +47,7 @@ void OTAImageContentHeaderParser::Init()
     mState         = State::kInitialized;
     mBufferOffset  = 0;
     mHeaderTlvSize = 0;
+    mBuffer.Alloc(sizeof(mHeaderTlvSize));
 }
 
 void OTAImageContentHeaderParser::Clear()
@@ -62,6 +64,7 @@ CHIP_ERROR OTAImageContentHeaderParser::AccumulateAndDecode(ByteSpan & buffer, O
 
     if (mState == State::kInitialized)
     {
+        ReturnErrorCodeIf(!mBuffer, CHIP_ERROR_NO_MEMORY);
         Append(buffer, sizeof(mHeaderTlvSize) - mBufferOffset);
         error = DecodeFixed();
     }
