@@ -129,9 +129,9 @@ public class NsdManagerServiceResolver implements ServiceResolver {
     serviceInfo.setServiceName(serviceName);
 
     /**
-     * Note, subtypes registration is using an undocumented feature of android nds-sd
+     * Note, subtypes registration is using an undocumented feature of android dns-sd
      * service/mDNSResponder which MAY STOP WORKING in future Android versions. Here, set type =
-     * "${tyep},${subtypes1},${subtypes2},...", then subtypes1, subtypes2 etc are all registered to
+     * "${type},${subtypes1},${subtypes2},...", then subtypes1, subtypes2 etc are all registered to
      * this dns-sd server, we can usd `dns-sd -B ${type},${subtypes}` or avahi-browse
      * ${subtypes}._sub.${type} -r to browser it
      */
