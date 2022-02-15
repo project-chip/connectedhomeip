@@ -327,17 +327,6 @@ class JavaGenerator(CodeGenerator):
         self.jinja_env.filters['canGenerateSubscribe'] = CanGenerateSubscribe
 
     def internal_render_all(self):
-        # Single generation for compatibility check
-        # Split expected in a future PR
-        self.internal_render_one_output(
-            template_path="java/ChipClustersCpp.jinja",
-            output_file_name="jni/CHIPClusters.cpp",
-            vars={
-                'idl': self.idl,
-                'clusters': self.idl.clusters,
-            }
-        )
-
         # Every cluster has its own impl, to avoid
         # very large compilations (running out of RAM)
         for cluster in self.idl.clusters:
@@ -347,6 +336,15 @@ class JavaGenerator(CodeGenerator):
             self.internal_render_one_output(
                 template_path="java/ChipClustersRead.jinja",
                 output_file_name="jni/%sClient-ReadImpl.cpp" % cluster.name,
+                vars={
+                    'cluster': cluster,
+                    'typeLookup': TypeLookupContext(self.idl, cluster),
+                }
+            )
+
+            self.internal_render_one_output(
+                template_path="java/ChipClustersCpp.jinja",
+                output_file_name="jni/%sClient-InvokeSubscribeImpl.cpp" % cluster.name,
                 vars={
                     'cluster': cluster,
                     'typeLookup': TypeLookupContext(self.idl, cluster),

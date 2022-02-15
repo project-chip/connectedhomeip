@@ -108,20 +108,6 @@
 using namespace chip;
 using namespace chip::Controller;
 
-{# TODO: this should be in a separate source not in generated code -#}
-JNI_METHOD(void, BaseChipCluster, deleteCluster)(JNIEnv * env, jobject self, jlong clusterPtr)
-{
-    chip::DeviceLayer::StackLock lock;
-    ClusterBase * cluster = reinterpret_cast<ClusterBase *>(clusterPtr);
-    if (cluster != nullptr) {
-        delete cluster;
-    }
-}
-
-{% for cluster in clusters | clientClustersOnly -%}
-
-{% set typeLookup = idl | createLookupContext(cluster) %}
-
 JNI_METHOD(jlong, {{cluster.name | capitalcase}}Cluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
     chip::DeviceLayer::StackLock lock;
@@ -223,4 +209,3 @@ JNI_METHOD(void, {{cluster.name}}Cluster, subscribe{{attr.definition.name | capi
 
 {%-   endif -%}
 {% endfor %}
-{%endfor%}
