@@ -179,19 +179,19 @@ private:
     bool findUserIndexByCredential(chip::EndpointId endpointId, DlCredentialType credentialType, chip::ByteSpan credentialData,
                                    uint16_t & userIndex, uint16_t & credentialIndex);
 
-    EmberAfStatus createUser(chip::EndpointId endpointId, chip::OperationalId operationalId,
-                             uint16_t userIndex, const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
+    EmberAfStatus createUser(chip::EndpointId endpointId, chip::OperationalId operationalId, uint16_t userIndex,
+                             const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
                              const Nullable<DlUserStatus> & userStatus, const Nullable<DlUserType> & userType,
                              const Nullable<DlCredentialRule> & credentialRule,
                              const Nullable<DlCredential> & credential = Nullable<DlCredential>());
-    EmberAfStatus modifyUser(chip::EndpointId endpointId, chip::OperationalId operationalId,
-                             uint16_t userIndex, const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
+    EmberAfStatus modifyUser(chip::EndpointId endpointId, chip::OperationalId operationalId, uint16_t userIndex,
+                             const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
                              const Nullable<DlUserStatus> & userStatus, const Nullable<DlUserType> & userType,
                              const Nullable<DlCredentialRule> & credentialRule);
-    EmberAfStatus clearUser(chip::EndpointId endpointId, chip::OperationalId operationalId,
-                            uint16_t userIndex, bool sendUserChangeEvent);
-    EmberAfStatus clearUser(chip::EndpointId endpointId, chip::OperationalId operationalId,
-                            uint16_t userIndex, const EmberAfPluginDoorLockUserInfo & user, bool sendUserChangeEvent);
+    EmberAfStatus clearUser(chip::EndpointId endpointId, chip::OperationalId operationalId, uint16_t userIndex,
+                            bool sendUserChangeEvent);
+    EmberAfStatus clearUser(chip::EndpointId endpointId, chip::OperationalId operationalId, uint16_t userIndex,
+                            const EmberAfPluginDoorLockUserInfo & user, bool sendUserChangeEvent);
 
     DlStatus createNewCredentialAndUser(chip::EndpointId endpointId, chip::OperationalId operationalId,
                                         const Nullable<DlUserStatus> & userStatus, const Nullable<DlUserType> & userType,
@@ -205,22 +205,20 @@ private:
     DlStatus modifyCredentialForUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIdx, uint16_t userIndex,
                                      const DlCredential & credential);
 
-    DlStatus createCredential(chip::EndpointId endpointId, chip::OperationalId operationalId,
-                              uint16_t credentialIndex, DlCredentialType credentialType,
-                              const EmberAfPluginDoorLockCredentialInfo & existingCredential, const chip::ByteSpan & credentialData,
-                              Nullable<uint16_t> userIndex, Nullable<DlUserStatus> userStatus, Nullable<DlUserType> userType,
-                              uint16_t & createdUserIndex);
-    DlStatus modifyProgrammingPIN(chip::EndpointId endpointId, chip::OperationalId operationalId,
-                                  uint16_t credentialIndex, DlCredentialType credentialType,
-                                  const EmberAfPluginDoorLockCredentialInfo & existingCredential,
+    DlStatus createCredential(chip::EndpointId endpointId, chip::OperationalId operationalId, uint16_t credentialIndex,
+                              DlCredentialType credentialType, const EmberAfPluginDoorLockCredentialInfo & existingCredential,
+                              const chip::ByteSpan & credentialData, Nullable<uint16_t> userIndex,
+                              Nullable<DlUserStatus> userStatus, Nullable<DlUserType> userType, uint16_t & createdUserIndex);
+    DlStatus modifyProgrammingPIN(chip::EndpointId endpointId, chip::OperationalId operationalId, uint16_t credentialIndex,
+                                  DlCredentialType credentialType, const EmberAfPluginDoorLockCredentialInfo & existingCredential,
                                   const chip::ByteSpan & credentialData);
-    DlStatus modifyCredential(chip::EndpointId endpointId, chip::OperationalId operationalId,
-                              uint16_t credentialIndex, DlCredentialType credentialType,
-                              const EmberAfPluginDoorLockCredentialInfo & existingCredential, const chip::ByteSpan & credentialData,
-                              uint16_t userIndex, Nullable<DlUserStatus> userStatus, Nullable<DlUserType> userType);
+    DlStatus modifyCredential(chip::EndpointId endpointId, chip::OperationalId operationalId, uint16_t credentialIndex,
+                              DlCredentialType credentialType, const EmberAfPluginDoorLockCredentialInfo & existingCredential,
+                              const chip::ByteSpan & credentialData, uint16_t userIndex, Nullable<DlUserStatus> userStatus,
+                              Nullable<DlUserType> userType);
 
-    EmberAfStatus clearCredential(chip::EndpointId endpointId, chip::OperationalId operationalId,
-                                  DlCredentialType credentialType, uint16_t credentialIndex, bool sendUserChangeEvent);
+    EmberAfStatus clearCredential(chip::EndpointId endpointId, chip::OperationalId operationalId, DlCredentialType credentialType,
+                                  uint16_t credentialIndex, bool sendUserChangeEvent);
     EmberAfStatus clearCredentials(chip::EndpointId endpointId, chip::OperationalId operationalId);
     EmberAfStatus clearCredentials(chip::EndpointId endpointId, chip::OperationalId operationalId, DlCredentialType credentialType);
 

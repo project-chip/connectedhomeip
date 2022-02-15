@@ -272,8 +272,7 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
             mReadHandlers.ForEachActiveObject([this, apExchangeContext](ReadHandler * handler) {
                 if (handler->IsFromSubscriber(*apExchangeContext))
                 {
-                    ChipLogProgress(InteractionModel,
-                                    "Deleting previous subscription from peer: " ChipLogFormatOperationalId,
+                    ChipLogProgress(InteractionModel, "Deleting previous subscription from peer: " ChipLogFormatOperationalId,
                                     ChipLogValueOperationalId(apExchangeContext->GetSessionHandle()->GetPeerOperationalId()));
                     mReadHandlers.ReleaseObject(handler);
                 }

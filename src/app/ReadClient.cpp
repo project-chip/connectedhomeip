@@ -704,7 +704,8 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
     //
     VerifyOrDie(_this->mpImEngine->InActiveReadClientList(_this));
 
-    ChipLogError(DataManagement, "Subscription Liveness timeout with subscription id 0x%" PRIx64 " peer " ChipLogFormatOperationalId,
+    ChipLogError(DataManagement,
+                 "Subscription Liveness timeout with subscription id 0x%" PRIx64 " peer " ChipLogFormatOperationalId,
                  _this->mSubscriptionId, ChipLogValueOperationalId(_this->mPeerOperationalId));
 
     // TODO: add a more specific error here for liveness timeout failure to distinguish between other classes of timeouts (i.e

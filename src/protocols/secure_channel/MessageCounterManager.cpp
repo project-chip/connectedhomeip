@@ -78,7 +78,8 @@ CHIP_ERROR MessageCounterManager::QueueReceivedMessageAndStartSync(const PacketH
                                                                    System::PacketBufferHandle && msgBuf)
 {
     // Queue the message to be reprocessed when sync completes.
-    ReturnErrorOnFailure(AddToReceiveTable(session->GetPeerOperationalId().GetFabricIndex(), packetHeader, peerAddress, std::move(msgBuf)));
+    ReturnErrorOnFailure(
+        AddToReceiveTable(session->GetPeerOperationalId().GetFabricIndex(), packetHeader, peerAddress, std::move(msgBuf)));
     ReturnErrorOnFailure(StartSync(session, state));
 
     // After the message that triggers message counter synchronization is stored, and a message counter
@@ -114,7 +115,8 @@ void MessageCounterManager::OnResponseTimeout(Messaging::ExchangeContext * excha
     }
 }
 
-CHIP_ERROR MessageCounterManager::AddToReceiveTable(FabricIndex fabricIndex, const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+CHIP_ERROR MessageCounterManager::AddToReceiveTable(FabricIndex fabricIndex, const PacketHeader & packetHeader,
+                                                    const Transport::PeerAddress & peerAddress,
                                                     System::PacketBufferHandle && msgBuf)
 {
     ReturnErrorOnFailure(packetHeader.EncodeBeforeData(msgBuf));
@@ -162,7 +164,8 @@ void MessageCounterManager::ProcessPendingMessages(OperationalId operationalId)
                 continue;
             }
 
-            if (packetHeader.GetSourceNodeId().HasValue() && OperationalId(packetHeader.GetSourceNodeId().Value(), entry.fabricIndex) == operationalId)
+            if (packetHeader.GetSourceNodeId().HasValue() &&
+                OperationalId(packetHeader.GetSourceNodeId().Value(), entry.fabricIndex) == operationalId)
             {
                 // Reprocess message.
                 sessionManager->OnMessageReceived(entry.peerAddress, std::move(entry.msgBuf));

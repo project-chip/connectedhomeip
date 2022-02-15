@@ -23,7 +23,8 @@ namespace chip {
 class OperationalId
 {
 public:
-    OperationalId(NodeId nodeId, FabricIndex fabricIndex) : mNodeId(nodeId), mFabricIndex(fabricIndex) {
+    OperationalId(NodeId nodeId, FabricIndex fabricIndex) : mNodeId(nodeId), mFabricIndex(fabricIndex)
+    {
         VerifyOrDie(mNodeId != kUndefinedNodeId);
         VerifyOrDie(mFabricIndex != kUndefinedFabricIndex);
     }
@@ -33,14 +34,8 @@ public:
 
     static constexpr OperationalId UndefinedOperationalId() { return OperationalId(); }
 
-    bool operator==(const OperationalId & that) const
-    {
-        return (mNodeId == that.mNodeId) && (mFabricIndex == that.mFabricIndex);
-    }
-    bool operator!=(const OperationalId & that) const
-    {
-        return !(*this == that);
-    }
+    bool operator==(const OperationalId & that) const { return (mNodeId == that.mNodeId) && (mFabricIndex == that.mFabricIndex); }
+    bool operator!=(const OperationalId & that) const { return !(*this == that); }
 
 private:
     NodeId mNodeId;

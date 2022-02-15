@@ -20,7 +20,6 @@
 namespace chip {
 namespace Transport {
 
-
 OperationalId SecureSession::GetPeerOperationalId() const
 {
     return OperationalId(mPeerNodeId, GetFabricIndex());

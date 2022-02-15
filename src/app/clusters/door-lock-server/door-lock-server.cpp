@@ -242,12 +242,12 @@ void DoorLockServer::SetUserCommandHandler(chip::app::CommandHandler * commandOb
     switch (operationType)
     {
     case DlDataOperationType::kAdd:
-        status = createUser(commandPath.mEndpointId, operationalId, userIndex, userName, userUniqueId, userStatus,
-                            userType, credentialRule);
+        status = createUser(commandPath.mEndpointId, operationalId, userIndex, userName, userUniqueId, userStatus, userType,
+                            credentialRule);
         break;
     case DlDataOperationType::kModify:
-        status = modifyUser(commandPath.mEndpointId, operationalId, userIndex, userName, userUniqueId, userStatus,
-                            userType, credentialRule);
+        status = modifyUser(commandPath.mEndpointId, operationalId, userIndex, userName, userUniqueId, userStatus, userType,
+                            credentialRule);
         break;
     case DlDataOperationType::kClear:
         // appclusters, 5.2.4.34: SetUser command allow only kAdd/kModify, we should respond with INVALID_COMMAND if we got kClear
@@ -413,7 +413,8 @@ void DoorLockServer::ClearUserCommandHandler(chip::app::CommandHandler * command
     }
     emberAfDoorLockClusterPrintln("[ClearUser] Removed all users from storage [users=%d]", maxNumberOfUsers);
 
-    sendRemoteLockUserChange(commandPath.mEndpointId, DlLockDataType::kUserIndex, DlDataOperationType::kClear, operationalId, 0xFFFE, 0xFFFE);
+    sendRemoteLockUserChange(commandPath.mEndpointId, DlLockDataType::kUserIndex, DlDataOperationType::kClear, operationalId,
+                             0xFFFE, 0xFFFE);
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
 }
@@ -549,8 +550,8 @@ void DoorLockServer::SetCredentialCommandHandler(
             return;
         }
 
-        auto status = modifyCredential(commandPath.mEndpointId, operationalId, credentialIndex, credentialType,
-                                       existingCredential, credentialData, userIndex.Value(), userStatus, userType);
+        auto status = modifyCredential(commandPath.mEndpointId, operationalId, credentialIndex, credentialType, existingCredential,
+                                       credentialData, userIndex.Value(), userStatus, userType);
         sendSetCredentialResponse(commandObj, status, 0, nextAvailableCredentialSlot);
         return;
     }
@@ -686,7 +687,8 @@ void DoorLockServer::ClearCredentialCommandHandler(
         return;
     }
 
-    emberAfSendImmediateDefaultResponse(clearCredential(commandPath.mEndpointId, operationalId, credentialType, credentialIndex, false));
+    emberAfSendImmediateDefaultResponse(
+        clearCredential(commandPath.mEndpointId, operationalId, credentialType, credentialIndex, false));
 }
 
 void DoorLockServer::SetWeekDayScheduleCommandHandler(
@@ -790,8 +792,8 @@ void DoorLockServer::SetWeekDayScheduleCommandHandler(
                                   "[endpointId=%d,weekDayIndex=%d,userIndex=%d,daysMask=%d,startTime=\"%d:%d\",endTime=\"%d:%d\"]",
                                   endpointId, weekDayIndex, userIndex, daysMask.Raw(), startHour, startMinute, endHour, endMinute);
 
-    sendRemoteLockUserChange(endpointId, DlLockDataType::kWeekDaySchedule, DlDataOperationType::kAdd, operationalId,
-                             userIndex, static_cast<uint16_t>(weekDayIndex));
+    sendRemoteLockUserChange(endpointId, DlLockDataType::kWeekDaySchedule, DlDataOperationType::kAdd, operationalId, userIndex,
+                             static_cast<uint16_t>(weekDayIndex));
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
 }
@@ -908,8 +910,8 @@ void DoorLockServer::ClearWeekDayScheduleCommandHandler(
         return;
     }
 
-    sendRemoteLockUserChange(endpointId, DlLockDataType::kWeekDaySchedule, DlDataOperationType::kClear, operationalId,
-                             userIndex, static_cast<uint16_t>(weekDayIndex));
+    sendRemoteLockUserChange(endpointId, DlLockDataType::kWeekDaySchedule, DlDataOperationType::kClear, operationalId, userIndex,
+                             static_cast<uint16_t>(weekDayIndex));
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
 }
@@ -985,8 +987,8 @@ void DoorLockServer::SetYearDayScheduleCommandHandler(
                                   "[endpointId=%d,yearDayIndex=%d,userIndex=%d,localStartTime=%" PRIu32 ",endTime=%" PRIu32 "]",
                                   endpointId, yearDayIndex, userIndex, localStarTime, localEndTime);
 
-    sendRemoteLockUserChange(endpointId, DlLockDataType::kYearDaySchedule, DlDataOperationType::kAdd, operationalId,
-                             userIndex, static_cast<uint16_t>(yearDayIndex));
+    sendRemoteLockUserChange(endpointId, DlLockDataType::kYearDaySchedule, DlDataOperationType::kAdd, operationalId, userIndex,
+                             static_cast<uint16_t>(yearDayIndex));
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
 }
@@ -1101,8 +1103,8 @@ void DoorLockServer::ClearYearDayScheduleCommandHandler(
         return;
     }
 
-    sendRemoteLockUserChange(endpointId, DlLockDataType::kYearDaySchedule, DlDataOperationType::kClear, operationalId,
-                             userIndex, static_cast<uint16_t>(yearDayIndex));
+    sendRemoteLockUserChange(endpointId, DlLockDataType::kYearDaySchedule, DlDataOperationType::kClear, operationalId, userIndex,
+                             static_cast<uint16_t>(yearDayIndex));
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
 }
@@ -1418,10 +1420,10 @@ bool DoorLockServer::findUserIndexByCredential(chip::EndpointId endpointId, DlCr
     return false;
 }
 
-EmberAfStatus DoorLockServer::createUser(chip::EndpointId endpointId, chip::OperationalId operationalId,
-                                         uint16_t userIndex, const Nullable<chip::CharSpan> & userName,
-                                         const Nullable<uint32_t> & userUniqueId, const Nullable<DlUserStatus> & userStatus,
-                                         const Nullable<DlUserType> & userType, const Nullable<DlCredentialRule> & credentialRule,
+EmberAfStatus DoorLockServer::createUser(chip::EndpointId endpointId, chip::OperationalId operationalId, uint16_t userIndex,
+                                         const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
+                                         const Nullable<DlUserStatus> & userStatus, const Nullable<DlUserType> & userType,
+                                         const Nullable<DlCredentialRule> & credentialRule,
                                          const Nullable<DlCredential> & credential)
 {
     EmberAfPluginDoorLockUserInfo user;
@@ -1453,15 +1455,17 @@ EmberAfStatus DoorLockServer::createUser(chip::EndpointId endpointId, chip::Oper
         newTotalCredentials = 1;
     }
 
-    if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, operationalId.GetFabricIndex(), operationalId.GetFabricIndex(), newUserName, newUserUniqueId,
-                                      newUserStatus, newUserType, newCredentialRule, newCredentials, newTotalCredentials))
+    if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, operationalId.GetFabricIndex(), operationalId.GetFabricIndex(),
+                                      newUserName, newUserUniqueId, newUserStatus, newUserType, newCredentialRule, newCredentials,
+                                      newTotalCredentials))
     {
-        emberAfDoorLockClusterPrintln(
-            "[createUser] Unable to create user: app error "
-            "[endpointId=%d,creator=" ChipLogFormatOperationalId ",userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32 ",userStatus="
-            "%u,userType=%u,credentialRule=%u,totalCredentials=%zu]",
-            endpointId, ChipLogValueOperationalId(operationalId), userIndex, newUserName.data(), newUserUniqueId, to_underlying(newUserStatus),
-            to_underlying(newUserType), to_underlying(newCredentialRule), newTotalCredentials);
+        emberAfDoorLockClusterPrintln("[createUser] Unable to create user: app error "
+                                      "[endpointId=%d,creator=" ChipLogFormatOperationalId
+                                      ",userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32 ",userStatus="
+                                      "%u,userType=%u,credentialRule=%u,totalCredentials=%zu]",
+                                      endpointId, ChipLogValueOperationalId(operationalId), userIndex, newUserName.data(),
+                                      newUserUniqueId, to_underlying(newUserStatus), to_underlying(newUserType),
+                                      to_underlying(newCredentialRule), newTotalCredentials);
         return EMBER_ZCL_STATUS_FAILURE;
     }
 
@@ -1469,18 +1473,19 @@ EmberAfStatus DoorLockServer::createUser(chip::EndpointId endpointId, chip::Oper
         "[createUser] User created "
         "[endpointId=%d,creator=" ChipLogFormatOperationalId ",userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32 ",userStatus=%"
         "u,userType=%u,credentialRule=%u,totalCredentials=%zu]",
-        endpointId, ChipLogValueOperationalId(operationalId), userIndex, newUserName.data(), newUserUniqueId, to_underlying(newUserStatus),
-        to_underlying(newUserType), to_underlying(newCredentialRule), newTotalCredentials);
+        endpointId, ChipLogValueOperationalId(operationalId), userIndex, newUserName.data(), newUserUniqueId,
+        to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule), newTotalCredentials);
 
-    sendRemoteLockUserChange(endpointId, DlLockDataType::kUserIndex, DlDataOperationType::kAdd, operationalId,
-                             userIndex, userIndex);
+    sendRemoteLockUserChange(endpointId, DlLockDataType::kUserIndex, DlDataOperationType::kAdd, operationalId, userIndex,
+                             userIndex);
 
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-EmberAfStatus DoorLockServer::modifyUser(chip::EndpointId endpointId, chip::OperationalId operationalId , uint16_t userIndex, const Nullable<chip::CharSpan> & userName,
-                                         const Nullable<uint32_t> & userUniqueId, const Nullable<DlUserStatus> & userStatus,
-                                         const Nullable<DlUserType> & userType, const Nullable<DlCredentialRule> & credentialRule)
+EmberAfStatus DoorLockServer::modifyUser(chip::EndpointId endpointId, chip::OperationalId operationalId, uint16_t userIndex,
+                                         const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
+                                         const Nullable<DlUserStatus> & userStatus, const Nullable<DlUserType> & userType,
+                                         const Nullable<DlCredentialRule> & credentialRule)
 {
     // We should get the user by that index first
     EmberAfPluginDoorLockUserInfo user;
@@ -1522,32 +1527,36 @@ EmberAfStatus DoorLockServer::modifyUser(chip::EndpointId endpointId, chip::Oper
     auto newUserType         = userType.IsNull() ? user.userType : userType.Value();
     auto newCredentialRule   = credentialRule.IsNull() ? user.credentialRule : credentialRule.Value();
 
-    if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, user.createdBy, operationalId.GetFabricIndex(), newUserName, newUserUniqueId,
-                                      newUserStatus, newUserType, newCredentialRule, user.credentials.data(),
+    if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, user.createdBy, operationalId.GetFabricIndex(), newUserName,
+                                      newUserUniqueId, newUserStatus, newUserType, newCredentialRule, user.credentials.data(),
                                       user.credentials.size()))
     {
         ChipLogError(Zcl,
                      "[modifyUser] Unable to modify the user: app error "
-                     "[endpointId=%d,modifier=" ChipLogFormatOperationalId ",userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32 ",userStatus=%u"
+                     "[endpointId=%d,modifier=" ChipLogFormatOperationalId ",userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32
+                     ",userStatus=%u"
                      ",userType=%u,credentialRule=%u]",
-                     endpointId, ChipLogValueOperationalId(operationalId), userIndex, newUserName.data(), newUserUniqueId, to_underlying(newUserStatus),
-                     to_underlying(newUserType), to_underlying(newCredentialRule));
+                     endpointId, ChipLogValueOperationalId(operationalId), userIndex, newUserName.data(), newUserUniqueId,
+                     to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule));
         return EMBER_ZCL_STATUS_FAILURE;
     }
 
     emberAfDoorLockClusterPrintln("[modifyUser] User modified "
-                                  "[endpointId=%d,modifier=" ChipLogFormatOperationalId ",userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32
-                                  ",userStatus=%u,"
+                                  "[endpointId=%d,modifier=" ChipLogFormatOperationalId
+                                  ",userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32 ",userStatus=%u,"
                                   "userType=%u,credentialRule=%u]",
-                                  endpointId, ChipLogValueOperationalId(operationalId), userIndex, newUserName.data(), newUserUniqueId,
-                                  to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule));
+                                  endpointId, ChipLogValueOperationalId(operationalId), userIndex, newUserName.data(),
+                                  newUserUniqueId, to_underlying(newUserStatus), to_underlying(newUserType),
+                                  to_underlying(newCredentialRule));
 
-    sendRemoteLockUserChange(endpointId, DlLockDataType::kUserIndex, DlDataOperationType::kModify, operationalId, userIndex, userIndex);
+    sendRemoteLockUserChange(endpointId, DlLockDataType::kUserIndex, DlDataOperationType::kModify, operationalId, userIndex,
+                             userIndex);
 
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-EmberAfStatus DoorLockServer::clearUser(chip::EndpointId endpointId, chip::OperationalId operationalId, uint16_t userIndex, bool sendUserChangeEvent)
+EmberAfStatus DoorLockServer::clearUser(chip::EndpointId endpointId, chip::OperationalId operationalId, uint16_t userIndex,
+                                        bool sendUserChangeEvent)
 {
     EmberAfPluginDoorLockUserInfo user;
     if (!emberAfPluginDoorLockGetUser(endpointId, userIndex, user))
@@ -1558,7 +1567,8 @@ EmberAfStatus DoorLockServer::clearUser(chip::EndpointId endpointId, chip::Opera
     return clearUser(endpointId, operationalId, userIndex, user, sendUserChangeEvent);
 }
 
-EmberAfStatus DoorLockServer::clearUser(chip::EndpointId endpointId, chip::OperationalId operationalId, uint16_t userIndex, const EmberAfPluginDoorLockUserInfo & user, bool sendUserChangeEvent)
+EmberAfStatus DoorLockServer::clearUser(chip::EndpointId endpointId, chip::OperationalId operationalId, uint16_t userIndex,
+                                        const EmberAfPluginDoorLockUserInfo & user, bool sendUserChangeEvent)
 {
     // appclusters, 5.2.4.37: all the credentials associated with user should be cleared when clearing the user
     for (const auto & credential : user.credentials)
@@ -1596,12 +1606,14 @@ EmberAfStatus DoorLockServer::clearUser(chip::EndpointId endpointId, chip::Opera
 
     if (sendUserChangeEvent)
     {
-        sendRemoteLockUserChange(endpointId, DlLockDataType::kUserIndex, DlDataOperationType::kClear, operationalId, userIndex, userIndex);
+        sendRemoteLockUserChange(endpointId, DlLockDataType::kUserIndex, DlDataOperationType::kClear, operationalId, userIndex,
+                                 userIndex);
     }
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-DlStatus DoorLockServer::createNewCredentialAndUser(chip::EndpointId endpointId, chip::OperationalId operationalId, const Nullable<DlUserStatus> & userStatus,
+DlStatus DoorLockServer::createNewCredentialAndUser(chip::EndpointId endpointId, chip::OperationalId operationalId,
+                                                    const Nullable<DlUserStatus> & userStatus,
                                                     const Nullable<DlUserType> & userType, const DlCredential & credential,
                                                     const chip::ByteSpan & credentialData, uint16_t & createdUserIndex)
 {
@@ -1614,9 +1626,8 @@ DlStatus DoorLockServer::createNewCredentialAndUser(chip::EndpointId endpointId,
         return DlStatus::kOccupied;
     }
 
-    auto status =
-        createUser(endpointId, operationalId, availableUserIndex, Nullable<CharSpan>(), Nullable<uint32_t>(),
-                   userStatus, userType, Nullable<DlCredentialRule>(), Nullable<DlCredential>(credential));
+    auto status = createUser(endpointId, operationalId, availableUserIndex, Nullable<CharSpan>(), Nullable<uint32_t>(), userStatus,
+                             userType, Nullable<DlCredentialRule>(), Nullable<DlCredential>(credential));
     if (EMBER_ZCL_STATUS_SUCCESS != status)
     {
         emberAfDoorLockClusterPrintln("[SetCredential] Unable to create new user for credential: internal error "
@@ -1822,7 +1833,8 @@ DlStatus DoorLockServer::modifyCredentialForUser(chip::EndpointId endpointId, ch
     return DlStatus::kInvalidField;
 }
 
-DlStatus DoorLockServer::createCredential(chip::EndpointId endpointId, chip::OperationalId operationalId, uint16_t credentialIndex, DlCredentialType credentialType,
+DlStatus DoorLockServer::createCredential(chip::EndpointId endpointId, chip::OperationalId operationalId, uint16_t credentialIndex,
+                                          DlCredentialType credentialType,
                                           const EmberAfPluginDoorLockCredentialInfo & existingCredential,
                                           const chip::ByteSpan & credentialData, Nullable<uint16_t> userIndex,
                                           Nullable<DlUserStatus> userStatus, Nullable<DlUserType> userType,
@@ -1855,24 +1867,27 @@ DlStatus DoorLockServer::createCredential(chip::EndpointId endpointId, chip::Ope
         emberAfDoorLockClusterPrintln("[SetCredential] UserIndex is not set, creating new user [endpointId=%d,credentialIndex=%d]",
                                       endpointId, credentialIndex);
 
-        status = createNewCredentialAndUser(endpointId, operationalId, userStatus, userType, credential,
-                                            credentialData, createdUserIndex);
+        status = createNewCredentialAndUser(endpointId, operationalId, userStatus, userType, credential, credentialData,
+                                            createdUserIndex);
     }
     else
     {
         // appclusters, 5.2.4.40: if user index is NULL, we should try to modify the existing user
-        status = createNewCredentialAndAddItToUser(endpointId, operationalId.GetFabricIndex(), userIndex.Value(), credential, credentialData);
+        status = createNewCredentialAndAddItToUser(endpointId, operationalId.GetFabricIndex(), userIndex.Value(), credential,
+                                                   credentialData);
     }
 
     if (DlStatus::kSuccess == status)
     {
-        sendRemoteLockUserChange(endpointId, credentialTypeToLockDataType(credentialType), DlDataOperationType::kAdd, operationalId, createdUserIndex == 0 ? userIndex.Value() : createdUserIndex, credentialIndex);
+        sendRemoteLockUserChange(endpointId, credentialTypeToLockDataType(credentialType), DlDataOperationType::kAdd, operationalId,
+                                 createdUserIndex == 0 ? userIndex.Value() : createdUserIndex, credentialIndex);
     }
 
     return status;
 }
 
-DlStatus DoorLockServer::modifyProgrammingPIN(chip::EndpointId endpointId, chip::OperationalId operationalId, uint16_t credentialIndex, DlCredentialType credentialType,
+DlStatus DoorLockServer::modifyProgrammingPIN(chip::EndpointId endpointId, chip::OperationalId operationalId,
+                                              uint16_t credentialIndex, DlCredentialType credentialType,
                                               const EmberAfPluginDoorLockCredentialInfo & existingCredential,
                                               const chip::ByteSpan & credentialData)
 {
@@ -1917,7 +1932,8 @@ DlStatus DoorLockServer::modifyProgrammingPIN(chip::EndpointId endpointId, chip:
     return DlStatus::kSuccess;
 }
 
-DlStatus DoorLockServer::modifyCredential(chip::EndpointId endpointId, chip::OperationalId operationalId, uint16_t credentialIndex, DlCredentialType credentialType,
+DlStatus DoorLockServer::modifyCredential(chip::EndpointId endpointId, chip::OperationalId operationalId, uint16_t credentialIndex,
+                                          DlCredentialType credentialType,
                                           const EmberAfPluginDoorLockCredentialInfo & existingCredential,
                                           const chip::ByteSpan & credentialData, uint16_t userIndex,
                                           Nullable<DlUserStatus> userStatus, Nullable<DlUserType> userType)
@@ -2174,17 +2190,19 @@ EmberAfStatus DoorLockServer::clearCredential(chip::EndpointId endpointId, chip:
 {
     if (DlCredentialType::kProgrammingPIN == credentialType)
     {
-        emberAfDoorLockClusterPrintln("[clearCredential] Cannot clear programming PIN credentials "
-                                      "[endpointId=%d,credentialType=%u,credentialIndex=%d,modifier=" ChipLogFormatOperationalId "]",
-                                      endpointId, to_underlying(credentialType), credentialIndex, ChipLogValueOperationalId(operationalId));
+        emberAfDoorLockClusterPrintln(
+            "[clearCredential] Cannot clear programming PIN credentials "
+            "[endpointId=%d,credentialType=%u,credentialIndex=%d,modifier=" ChipLogFormatOperationalId "]",
+            endpointId, to_underlying(credentialType), credentialIndex, ChipLogValueOperationalId(operationalId));
         return EMBER_ZCL_STATUS_INVALID_COMMAND;
     }
 
     if (!credentialIndexValid(endpointId, credentialType, credentialIndex))
     {
-        emberAfDoorLockClusterPrintln("[clearCredential] Cannot clear credential - index out of bounds "
-                                      "[endpointId=%d,credentialType=%u,credentialIndex=%d,modifier=" ChipLogFormatOperationalId "]",
-                                      endpointId, to_underlying(credentialType), credentialIndex, ChipLogValueOperationalId(operationalId));
+        emberAfDoorLockClusterPrintln(
+            "[clearCredential] Cannot clear credential - index out of bounds "
+            "[endpointId=%d,credentialType=%u,credentialIndex=%d,modifier=" ChipLogFormatOperationalId "]",
+            endpointId, to_underlying(credentialType), credentialIndex, ChipLogValueOperationalId(operationalId));
         return EMBER_ZCL_STATUS_INVALID_COMMAND;
     }
 
@@ -2201,18 +2219,20 @@ EmberAfStatus DoorLockServer::clearCredential(chip::EndpointId endpointId, chip:
 
     if (DlCredentialStatus::kAvailable == credential.status)
     {
-        emberAfDoorLockClusterPrintln("[clearCredential] Ignored attempt to clear unoccupied credential slot "
-                                      "[endpointId=%d,credentialType=%u,credentialIndex=%d,modifier=" ChipLogFormatOperationalId "]",
-                                      endpointId, to_underlying(credentialType), credentialIndex, ChipLogValueOperationalId(operationalId));
+        emberAfDoorLockClusterPrintln(
+            "[clearCredential] Ignored attempt to clear unoccupied credential slot "
+            "[endpointId=%d,credentialType=%u,credentialIndex=%d,modifier=" ChipLogFormatOperationalId "]",
+            endpointId, to_underlying(credentialType), credentialIndex, ChipLogValueOperationalId(operationalId));
         return EMBER_ZCL_STATUS_SUCCESS;
     }
 
     if (credentialType != credential.credentialType)
     {
         emberAfDoorLockClusterPrintln("[clearCredential] Ignored attempt to clear credential of different type "
-                                      "[endpointId=%d,credentialType=%u,credentialIndex=%d,modifier=" ChipLogFormatOperationalId ",actualCredentialType=%u]",
-                                      endpointId, to_underlying(credentialType), credentialIndex, ChipLogValueOperationalId(operationalId),
-                                      to_underlying(credential.credentialType));
+                                      "[endpointId=%d,credentialType=%u,credentialIndex=%d,modifier=" ChipLogFormatOperationalId
+                                      ",actualCredentialType=%u]",
+                                      endpointId, to_underlying(credentialType), credentialIndex,
+                                      ChipLogValueOperationalId(operationalId), to_underlying(credential.credentialType));
         return EMBER_ZCL_STATUS_SUCCESS;
     }
 
@@ -2233,28 +2253,33 @@ EmberAfStatus DoorLockServer::clearCredential(chip::EndpointId endpointId, chip:
         ChipLogError(Zcl,
                      "[clearCredential] Unable to clear credential for related user - couldn't get user from database "
                      "[endpointId=%d,credentialType=%u,credentialIndex=%d,modifier=" ChipLogFormatOperationalId ",userIndex=%d]",
-                     endpointId, to_underlying(credentialType), credentialIndex, ChipLogValueOperationalId(operationalId), relatedUserIndex);
+                     endpointId, to_underlying(credentialType), credentialIndex, ChipLogValueOperationalId(operationalId),
+                     relatedUserIndex);
 
         return EMBER_ZCL_STATUS_FAILURE;
     }
     if (1 == relatedUser.credentials.size())
     {
-        emberAfDoorLockClusterPrintln("[clearCredential] Clearing related user - no credentials left "
-                                      "[endpointId=%d,credentialType=%u,credentialIndex=%d,modifier=" ChipLogFormatOperationalId ",userIndex=%d]",
-                                      endpointId, to_underlying(credentialType), credentialIndex, ChipLogValueOperationalId(operationalId), relatedUserIndex);
+        emberAfDoorLockClusterPrintln(
+            "[clearCredential] Clearing related user - no credentials left "
+            "[endpointId=%d,credentialType=%u,credentialIndex=%d,modifier=" ChipLogFormatOperationalId ",userIndex=%d]",
+            endpointId, to_underlying(credentialType), credentialIndex, ChipLogValueOperationalId(operationalId), relatedUserIndex);
         auto clearStatus = clearUser(endpointId, operationalId, relatedUserIndex, relatedUser, true);
         if (EMBER_ZCL_STATUS_SUCCESS != clearStatus)
         {
             ChipLogError(Zcl,
                          "[clearCredential] Unable to clear related credential user - internal error "
-                         "[endpointId=%d,credentialType=%u,credentialIndex=%d,modifier=" ChipLogFormatOperationalId ",userIndex=%d,status=%d]",
-                         endpointId, to_underlying(credentialType), credentialIndex, ChipLogValueOperationalId(operationalId), relatedUserIndex, clearStatus);
+                         "[endpointId=%d,credentialType=%u,credentialIndex=%d,modifier=" ChipLogFormatOperationalId
+                         ",userIndex=%d,status=%d]",
+                         endpointId, to_underlying(credentialType), credentialIndex, ChipLogValueOperationalId(operationalId),
+                         relatedUserIndex, clearStatus);
 
             return EMBER_ZCL_STATUS_FAILURE;
         }
-        emberAfDoorLockClusterPrintln("[clearCredential] Successfully clear credential and related user "
-                                      "[endpointId=%d,credentialType=%u,credentialIndex=%d,modifier=" ChipLogFormatOperationalId ",userIndex=%d]",
-                                      endpointId, to_underlying(credentialType), credentialIndex, ChipLogValueOperationalId(operationalId), relatedUserIndex);
+        emberAfDoorLockClusterPrintln(
+            "[clearCredential] Successfully clear credential and related user "
+            "[endpointId=%d,credentialType=%u,credentialIndex=%d,modifier=" ChipLogFormatOperationalId ",userIndex=%d]",
+            endpointId, to_underlying(credentialType), credentialIndex, ChipLogValueOperationalId(operationalId), relatedUserIndex);
         return EMBER_ZCL_STATUS_SUCCESS;
     }
 
@@ -2274,9 +2299,10 @@ EmberAfStatus DoorLockServer::clearCredential(chip::EndpointId endpointId, chip:
     {
         ChipLogError(Zcl,
                      "[clearCredential] Unable to clear credential for related user - user has too many credentials associated"
-                     "[endpointId=%d,credentialType=%u,credentialIndex=%d,modifier=" ChipLogFormatOperationalId ",userIndex=%d,credentialsCount=%zu]",
-                     endpointId, to_underlying(credentialType), credentialIndex, ChipLogValueOperationalId(operationalId), relatedUserIndex,
-                     relatedUser.credentials.size());
+                     "[endpointId=%d,credentialType=%u,credentialIndex=%d,modifier=" ChipLogFormatOperationalId
+                     ",userIndex=%d,credentialsCount=%zu]",
+                     endpointId, to_underlying(credentialType), credentialIndex, ChipLogValueOperationalId(operationalId),
+                     relatedUserIndex, relatedUser.credentials.size());
 
         return EMBER_ZCL_STATUS_FAILURE;
     }
@@ -2292,22 +2318,24 @@ EmberAfStatus DoorLockServer::clearCredential(chip::EndpointId endpointId, chip:
         newCredentials[newCredentialsCount++] = c;
     }
 
-    if (!emberAfPluginDoorLockSetUser(endpointId, relatedUserIndex, relatedUser.createdBy, operationalId.GetFabricIndex(), relatedUser.userName,
-                                      relatedUser.userUniqueId, relatedUser.userStatus, relatedUser.userType,
+    if (!emberAfPluginDoorLockSetUser(endpointId, relatedUserIndex, relatedUser.createdBy, operationalId.GetFabricIndex(),
+                                      relatedUser.userName, relatedUser.userUniqueId, relatedUser.userStatus, relatedUser.userType,
                                       relatedUser.credentialRule, newCredentials, newCredentialsCount))
     {
         ChipLogError(Zcl,
                      "[clearCredential] Unable to clear credential for related user - unable to update database "
                      "[endpointId=%d,credentialType=%u"
                      ",credentialIndex=%d,modifier=" ChipLogFormatOperationalId ",userIndex=%d,newCredentialsCount=%zu]",
-                     endpointId, to_underlying(credentialType), credentialIndex, ChipLogValueOperationalId(operationalId), relatedUserIndex, newCredentialsCount);
+                     endpointId, to_underlying(credentialType), credentialIndex, ChipLogValueOperationalId(operationalId),
+                     relatedUserIndex, newCredentialsCount);
         return EMBER_ZCL_STATUS_FAILURE;
     }
 
-    emberAfDoorLockClusterPrintln(
-        "[clearCredential] Successfully clear credential and related user "
-        "[endpointId=%d,credentialType=%u,credentialIndex=%d,modifier=" ChipLogFormatOperationalId ",userIndex=%d,newCredentialsCount=%zu]",
-        endpointId, to_underlying(credentialType), credentialIndex, ChipLogValueOperationalId(operationalId), relatedUserIndex, newCredentialsCount);
+    emberAfDoorLockClusterPrintln("[clearCredential] Successfully clear credential and related user "
+                                  "[endpointId=%d,credentialType=%u,credentialIndex=%d,modifier=" ChipLogFormatOperationalId
+                                  ",userIndex=%d,newCredentialsCount=%zu]",
+                                  endpointId, to_underlying(credentialType), credentialIndex,
+                                  ChipLogValueOperationalId(operationalId), relatedUserIndex, newCredentialsCount);
 
     if (sendUserChangeEvent)
     {
@@ -2407,7 +2435,8 @@ EmberAfStatus DoorLockServer::clearCredentials(chip::EndpointId endpointId, chip
         }
     }
 
-    sendRemoteLockUserChange(endpointId, credentialTypeToLockDataType(credentialType), DlDataOperationType::kClear, operationalId, 0xFFFE, 0xFFFE);
+    sendRemoteLockUserChange(endpointId, credentialTypeToLockDataType(credentialType), DlDataOperationType::kClear, operationalId,
+                             0xFFFE, 0xFFFE);
 
     return EMBER_ZCL_STATUS_SUCCESS;
 }
@@ -2440,7 +2469,8 @@ bool DoorLockServer::sendRemoteLockUserChange(chip::EndpointId endpointId, DlLoc
     }
     emberAfDoorLockClusterPrintln("[RemoteLockUserChange] Sent lock user change event "
                                   "[endpointId=%d,eventNumber=%" PRIu64 ",dataType=%u,operation=%u," ChipLogFormatOperationalId "]",
-                                  endpointId, eventNumber, to_underlying(dataType), to_underlying(operation), ChipLogValueOperationalId(operationalId));
+                                  endpointId, eventNumber, to_underlying(dataType), to_underlying(operation),
+                                  ChipLogValueOperationalId(operationalId));
     return true;
 }
 
@@ -2554,8 +2584,8 @@ exit:
 
     auto operationalId = getOperationalId(commandObj);
     SendLockOperationEvent(endpoint, opType, DlOperationSource::kRemote, reason, Nullable<uint16_t>(pinUserIdx),
-                           Nullable<chip::FabricIndex>(operationalId.GetFabricIndex()), Nullable<chip::NodeId>(operationalId.GetNodeId()),
-                           credList, credListSize, success);
+                           Nullable<chip::FabricIndex>(operationalId.GetFabricIndex()),
+                           Nullable<chip::NodeId>(operationalId.GetNodeId()), credList, credListSize, success);
     return success;
 }
 
