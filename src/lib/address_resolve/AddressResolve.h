@@ -98,7 +98,7 @@ public:
     ///     and should NOT be used as a reject if no ping response
     ///   - At lookup time, if the source ip of a dns reply is contained in the
     ///     list of server ips, that is a great indication of routability and
-    ///     this minlookuptime could be bypassed alltogether.
+    ///     this minlookuptime could be bypassed altogether.
     ///
     /// Implementations for DNSSD may choose to return responses one by one
     /// for addresses (e.g. Platform mdns does this at the time this was written)
