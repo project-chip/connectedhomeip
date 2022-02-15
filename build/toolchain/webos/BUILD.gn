@@ -15,11 +15,9 @@
 
 import("webos_toolchain.gni")
 
-print(target_os)
-
 webos_toolchain("webos") {
   toolchain_args = {
-    target_os = "linux"
+    target_os = "webos"
     target_cpu = "${current_cpu}"
   }
 }

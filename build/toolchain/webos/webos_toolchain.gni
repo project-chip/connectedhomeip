@@ -22,11 +22,10 @@ declare_args() {
 import("//build/toolchain/gcc_toolchain.gni")
 
 template("webos_toolchain") {
-  print("WebOS_ToolChian")
   gcc_toolchain(target_name) {
     ar = ar_webos
-    cc = cc_webos + "  -O2 -Wno-format-security -Wno-error -Wno-cpp"
-    cxx = cxx_webos + " -O2 -Wno-format-security -Wno-error -Wno-cpp"
+    cc = cc_webos
+    cxx = cxx_webos
     toolchain_args = {
       current_cpu = "${current_cpu}"
       current_os = invoker.current_os

@@ -36,17 +36,17 @@ void HandleIncomingBleConnection(Ble::BLEEndPoint * bleEP);
 
 struct BLEAdvConfig
 {
-    char * mpBleName;
-    uint32_t mAdapterId;
-    uint8_t mMajor;
-    uint8_t mMinor;
-    uint16_t mVendorId;
-    uint16_t mProductId;
-    uint64_t mDeviceId;
-    uint8_t mPairingStatus;
+    char * mpBleName = nullptr;
+    uint32_t mAdapterId = 0;
+    uint8_t mMajor = 0;
+    uint8_t mMinor = 0;
+    uint16_t mVendorId = 0;
+    uint16_t mProductId = 0;
+    uint64_t mDeviceId = 0;
+    uint8_t mPairingStatus = 0;
     ChipAdvType mType;
-    uint16_t mDuration;
-    const char * mpAdvertisingUUID;
+    uint16_t mDuration = 0;
+    const char * mpAdvertisingUUID = nullptr;
 };
 
 enum class BleScanState : uint8_t
