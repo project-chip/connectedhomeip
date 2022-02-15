@@ -9,6 +9,6 @@ addresses due to:
 -   multiple interfaces per device
 
 The purpose of address resolution is to find a _single_ ip address to use for
-the given lookup. It employes a set of heuristics to determine what the best IP
+the given lookup. It employs a set of heuristics to determine what the best IP
 (the more likely to route correctly) is and allows custom implementations from
 applications by not including the default implementation.
