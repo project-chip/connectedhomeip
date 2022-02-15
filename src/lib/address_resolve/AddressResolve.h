@@ -90,8 +90,15 @@ public:
 
     /// The minimum lookup time is how much to wait for additional DNSSD
     /// queries even if a reply has already been received or to allow for
-    /// additional heuristics regarding node choice to succeed (e.g. for a
-    /// ping6 response to be received, if an implementation goes that route)
+    /// additional heuristics regarding node choice to succeed.
+    /// Example heuristics and considerations:
+    ///   - ping/ping6 could be used as an indicator of reacability. NOTE that
+    ///     not all devices may respond to ping, so this would only be an
+    ///     additional signal to accept/increase suitability score of an address
+    ///     and should NOT be used as a reject if no ping response
+    ///   - At lookup time, if the source ip of a dns reply is contained in the
+    ///     list of server ips, that is a great indication of routability and
+    ///     this minlookuptime could be bypassed alltogether.
     ///
     /// Implementations for DNSSD may choose to return responses one by one
     /// for addresses (e.g. Platform mdns does this at the time this was written)
