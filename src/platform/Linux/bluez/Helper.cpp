@@ -1198,13 +1198,12 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
     chip::System::PacketBufferHandle bufferHandle;
 
     uint8_t rotatingDeviceIdUniqueId[ConfigurationManager::kRotatingDeviceIDUniqueIDLength];
-    size_t rotatingDeviceIdUniqueIdSize;
+    MutableByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId, sizeof(rotatingDeviceIdUniqueId));
     uint16_t lifetimeCounter = 0;
     BitFlags<AdditionalDataFields> additionalDataFields;
 
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
-    err = ConfigurationMgr().GetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueId, rotatingDeviceIdUniqueIdSize,
-                                                         sizeof(rotatingDeviceIdUniqueId));
+    err = ConfigurationMgr().GetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueIdSpan);
     SuccessOrExit(err);
     err = ConfigurationMgr().GetLifetimeCounter(lifetimeCounter);
     SuccessOrExit(err);
@@ -1212,9 +1211,8 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
     additionalDataFields.Set(AdditionalDataFields::RotatingDeviceId);
 #endif
 
-    err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(
-        lifetimeCounter, reinterpret_cast<char *>(rotatingDeviceIdUniqueId), rotatingDeviceIdUniqueIdSize, bufferHandle,
-        additionalDataFields);
+    err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(lifetimeCounter, rotatingDeviceIdUniqueIdSpan,
+                                                                         bufferHandle, additionalDataFields);
     SuccessOrExit(err);
 
     data = g_memdup(bufferHandle->Start(), bufferHandle->DataLength());
