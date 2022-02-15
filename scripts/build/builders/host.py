@@ -143,7 +143,9 @@ class HostBuilder(GnBuilder):
 
     def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE, enable_ipv4=True,
                  enable_ble=True, use_tsan=False,  use_asan=False, separate_event_loop=True,
-                 test_group=False, use_libfuzzer=False, use_clang=False):
+                 test_group=False, use_libfuzzer=False, use_clang=False,
+                 use_platform_mdns=False
+                 ):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
             runner=runner)
@@ -176,6 +178,9 @@ class HostBuilder(GnBuilder):
 
         if use_clang:
             self.extra_gn_options.append('is_clang=true')
+
+        if use_platform_mdns:
+            self.extra_gn_options.append('chip_mdns="platform"')
 
         if app == HostApp.TESTS:
             self.extra_gn_options.append('chip_build_tests=true')
