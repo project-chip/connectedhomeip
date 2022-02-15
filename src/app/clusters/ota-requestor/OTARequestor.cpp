@@ -450,8 +450,8 @@ void OTARequestor::NotifyUpdateApplied(uint32_t version)
 
 CHIP_ERROR OTARequestor::GetDefaultOtaProviderList(AttributeValueEncoder & encoder)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     return encoder.EncodeList([&](const auto & enc) -> CHIP_ERROR {
+        CHIP_ERROR err = CHIP_NO_ERROR;
         mDefaultOtaProviderList.ForEachActiveObject([&](ProviderLocation::Type * pl) {
             err = enc.Encode(*pl);
             VerifyOrReturnError(err == CHIP_NO_ERROR, Loop::Break);
@@ -474,28 +474,21 @@ CHIP_ERROR OTARequestor::ClearDefaultOtaProviderList(FabricIndex fabricIndex)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OTARequestor::AddDefaultOtaProvider(FabricIndex fabricIndex, ProviderLocation::Type const & providerLocation)
+CHIP_ERROR OTARequestor::AddDefaultOtaProvider(ProviderLocation::Type const & providerLocation)
 {
-    if (providerLocation.GetFabricIndex() == kUndefinedFabricIndex)
-    {
-        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-    }
-
     // Look for an entry with the same fabric index indicated
-    bool fabricIndexExists = false;
-    mDefaultOtaProviderList.ForEachActiveObject([&](auto * pl) {
-        if (pl->GetFabricIndex() == fabricIndex)
+    Loop result = mDefaultOtaProviderList.ForEachActiveObject([&](auto * pl) {
+        if (pl->GetFabricIndex() == providerLocation.GetFabricIndex())
         {
-            fabricIndexExists = true;
             return Loop::Break;
         }
         return Loop::Continue;
     });
 
     // Check if there is already an entry with the same fabric index
-    if (fabricIndexExists)
+    if (result == Loop::Break)
     {
-        ChipLogError(SoftwareUpdate, "Entry with fabric %d already exists", fabricIndex);
+        ChipLogError(SoftwareUpdate, "Default OTA provider entry with fabric %d already exists", providerLocation.GetFabricIndex());
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
 
