@@ -211,13 +211,6 @@ static void TestConfigurationMgr_GetPrimaryMACAddress(nlTestSuite * inSuite, voi
     else
     {
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-#ifndef __MBED__
-        // Verify default MAC address value
-        NL_TEST_ASSERT(inSuite,
-                       strncmp(reinterpret_cast<char *>(mac6Bytes.data()), reinterpret_cast<const char *>(defaultMacAddress),
-                               mac6Bytes.size()) == 0);
-#endif
     }
 }
 
