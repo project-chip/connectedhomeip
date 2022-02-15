@@ -24,4 +24,3 @@
 
 ./scripts/tools/zap/generate.py src/controller/data_model/controller-clusters.zap \
   -o zzz_generated/chip-tool/zap-generated -t examples/chip-tool/templates/templates.json
-
