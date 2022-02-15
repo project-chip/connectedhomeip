@@ -126,8 +126,8 @@ void MediaPlaybackManager::HandleSkipForward(CommandResponseHelper<Commands::Pla
     helper.Success(response);
 }
 
-void MediaPlaybackManager::HandleSeekRequest(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
-                                             const uint64_t & positionMilliseconds)
+void MediaPlaybackManager::HandleSeek(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
+                                      const uint64_t & positionMilliseconds)
 {
     // TODO: Insert code here
     Commands::PlaybackResponse::Type response;
@@ -143,7 +143,7 @@ void MediaPlaybackManager::HandleNext(CommandResponseHelper<Commands::PlaybackRe
     helper.Success(response);
 }
 
-void MediaPlaybackManager::HandleStartOverRequest(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
+void MediaPlaybackManager::HandleStartOver(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
     Commands::PlaybackResponse::Type response;

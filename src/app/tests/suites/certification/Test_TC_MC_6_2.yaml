@@ -36,7 +36,7 @@ tests:
           "Precondition: Media content in a paused state at the beginning of the
           content"
       disabled: true
-      command: "MediaPause"
+      command: "Pause"
 
     - label: "log a command"
       cluster: "LogCommands"
@@ -52,13 +52,13 @@ tests:
     - label: "Reads the CurrentState attribute from the DUT"
       disabled: true
       command: "readAttribute"
-      attribute: "playback state"
+      attribute: "CurrentState"
       response:
           value: 1
 
     - label: "Sends a Play command to the DUT"
       disabled: true
-      command: "MediaPlay"
+      command: "Play"
 
     - label: "log a command"
       cluster: "LogCommands"
@@ -70,13 +70,13 @@ tests:
 
     - label: "Reads the CurrentState attribute"
       command: "readAttribute"
-      attribute: "playback state"
+      attribute: "CurrentState"
       response:
           value: 0
 
     - label: "Sends a StartOver command to the DUT"
       disabled: true
-      command: "MediaStartOver"
+      command: "StartOver"
 
     - label: "log a command"
       cluster: "LogCommands"
@@ -88,7 +88,7 @@ tests:
 
     - label: "Sends a Next command to the DUT"
       disabled: true
-      command: "MediaNext"
+      command: "Next"
 
     - label: "log a command"
       cluster: "LogCommands"
@@ -102,7 +102,7 @@ tests:
 
     - label: "Sends a Previous command to the DUT"
       disabled: true
-      command: "MediaPrevious"
+      command: "Previous"
 
     - label: "log a command"
       cluster: "LogCommands"
@@ -116,7 +116,7 @@ tests:
 
     - label: "Sends a SkipForward command to the DUT "
       disabled: true
-      command: "MediaSkipForward"
+      command: "SkipForward"
       arguments:
           values:
               - name: "DeltaPositionMilliseconds"
@@ -133,13 +133,13 @@ tests:
     - label: "Reads the SampledPosition attribute from the DUT"
       disabled: true
       command: "readAttribute"
-      attribute: "position"
+      attribute: "SampledPosition"
       response:
           value: 10000
 
     - label: "Sends a SkipBackward command to the DUT "
       disabled: true
-      command: "MediaSkipBackward"
+      command: "SkipBackward"
       arguments:
           values:
               - name: "DeltaPositionMilliseconds"
@@ -156,6 +156,6 @@ tests:
     - label: "Reads the SampledPosition attribute from the DUT"
       disabled: true
       command: "readAttribute"
-      attribute: "position"
+      attribute: "SampledPosition"
       response:
           value: 0

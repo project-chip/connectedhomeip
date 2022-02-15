@@ -161,7 +161,7 @@ struct DiscoveredNodeData
     Optional<System::Clock::Milliseconds32> mrpRetryIntervalActive;
     uint16_t port;
     unsigned numIPs;
-    Inet::InterfaceId interfaceId[kMaxIPAddresses];
+    Inet::InterfaceId interfaceId; // interface ID for the packet processed
     Inet::IPAddress ipAddress[kMaxIPAddresses];
 
     void Reset()

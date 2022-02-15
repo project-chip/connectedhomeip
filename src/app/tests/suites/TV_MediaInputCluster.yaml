@@ -30,7 +30,7 @@ tests:
 
     - label: "Read attribute media input list"
       command: "readAttribute"
-      attribute: "media input list"
+      attribute: "InputList"
       response:
           value:
               [
@@ -50,25 +50,25 @@ tests:
 
     - label: "Read current media input"
       command: "readAttribute"
-      attribute: "current media input"
+      attribute: "CurrentInput"
       response:
           value: 0
 
     - label: "Select Input Command"
-      command: "selectInputRequest"
+      command: "selectInput"
       arguments:
           values:
               - name: "index"
                 value: 1
 
     - label: "Hide Input Status Command"
-      command: "hideInputStatusRequest"
+      command: "hideInputStatus"
 
     - label: "Show Input Status Command"
-      command: "showInputStatusRequest"
+      command: "showInputStatus"
 
     - label: "Rename Input Command"
-      command: "renameInputRequest"
+      command: "renameInput"
       arguments:
           values:
               - name: "index"

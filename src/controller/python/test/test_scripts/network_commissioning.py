@@ -18,6 +18,7 @@
 import chip.clusters as Clusters
 import logging
 from chip.clusters.Attribute import AttributePath, AttributeReadResult, AttributeStatus, ValueDecodeFailure
+from chip.clusters.Types import NullValue
 import chip.interaction_model
 import asyncio
 
@@ -61,6 +62,14 @@ class NetworkCommissioningTests:
         logger.info(
             f"The feature map of this endpoint is {values.featureMap}.")
 
+    async def readLastNetworkingStateAttributes(self, endpointId):
+        res = await self._devCtrl.ReadAttribute(nodeid=self._nodeid, attributes=[(endpointId, Clusters.NetworkCommissioning.Attributes.LastConnectErrorValue),
+                                                                                 (endpointId, Clusters.NetworkCommissioning.Attributes.LastNetworkID),
+                                                                                 (endpointId, Clusters.NetworkCommissioning.Attributes.LastNetworkingStatus)], returnClusterObject=True)
+        values = res[0][endpointId][Clusters.NetworkCommissioning]
+        logger.info(f"Got values: {values}")
+        return values
+
     async def test_wifi(self, endpointId):
         logger.info(f"Get basic information of the endpoint")
         res = await self._devCtrl.ReadAttribute(nodeid=self._nodeid, attributes=[
@@ -75,6 +84,13 @@ class NetworkCommissioningTests:
             res[0][endpointId][Clusters.NetworkCommissioning])
         logger.info(f"Finished getting basic information of the endpoint")
 
+        # Read Last* attributes
+        logger.info(f"Read Last* attributes")
+        res = await self.readLastNetworkingStateAttributes(endpointId=endpointId)
+        if (res.lastNetworkID != NullValue) or (res.lastNetworkingStatus != NullValue) or (res.lastConnectErrorValue != NullValue):
+            raise AssertionError(
+                f"LastNetworkID, LastNetworkingStatus and LastConnectErrorValue should be Null")
+
         # Scan networks
         logger.info(f"Scan networks")
         req = Clusters.NetworkCommissioning.Commands.ScanNetworks(
@@ -83,6 +99,13 @@ class NetworkCommissioningTests:
         logger.info(f"Received response: {res}")
         if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
+
+        # Verify Last* attributes
+        logger.info(f"Read Last* attributes")
+        res = await self.readLastNetworkingStateAttributes(endpointId=endpointId)
+        if (res.lastNetworkID != NullValue) or (res.lastNetworkingStatus == NullValue) or (res.lastConnectErrorValue != NullValue):
+            raise AssertionError(
+                f"LastNetworkID and LastConnectErrorValue should be Null and LastNetworkingStatus should not be Null")
 
         # Remove existing network
         logger.info(f"Check network list")
@@ -145,6 +168,13 @@ class NetworkCommissioningTests:
             raise AssertionError(
                 f"Unexpected result: network is not marked as connected")
 
+        # Verify Last* attributes
+        logger.info(f"Read Last* attributes")
+        res = await self.readLastNetworkingStateAttributes(endpointId=endpointId)
+        if (res.lastNetworkID == NullValue) or (res.lastNetworkingStatus == NullValue) or (res.lastConnectErrorValue == NullValue):
+            raise AssertionError(
+                f"LastNetworkID, LastConnectErrorValue and LastNetworkingStatus should not be Null")
+
     async def test_thread(self, endpointId):
         logger.info(f"Get basic information of the endpoint")
         res = await self._devCtrl.ReadAttribute(nodeid=self._nodeid, attributes=[
@@ -159,6 +189,13 @@ class NetworkCommissioningTests:
             res[0][endpointId][Clusters.NetworkCommissioning])
         logger.info(f"Finished getting basic information of the endpoint")
 
+        # Read Last* attributes
+        logger.info(f"Read Last* attributes")
+        res = await self.readLastNetworkingStateAttributes(endpointId=endpointId)
+        if (res.lastNetworkID != NullValue) or (res.lastNetworkingStatus != NullValue) or (res.lastConnectErrorValue != NullValue):
+            raise AssertionError(
+                f"LastNetworkID, LastNetworkingStatus and LastConnectErrorValue should be Null")
+
         # Scan networks
         logger.info(f"Scan networks")
         req = Clusters.NetworkCommissioning.Commands.ScanNetworks(
@@ -167,6 +204,13 @@ class NetworkCommissioningTests:
         logger.info(f"Received response: {res}")
         if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
+
+        # Verify Last* attributes
+        logger.info(f"Read Last* attributes")
+        res = await self.readLastNetworkingStateAttributes(endpointId=endpointId)
+        if (res.lastNetworkID != NullValue) or (res.lastNetworkingStatus == NullValue) or (res.lastConnectErrorValue != NullValue):
+            raise AssertionError(
+                f"LastNetworkID and LastConnectErrorValue should be Null and LastNetworkingStatus should not be Null")
 
         # Remove existing network
         logger.info(f"Check network list")
@@ -211,6 +255,13 @@ class NetworkCommissioningTests:
         if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
         logger.info(f"Device connected to a network.")
+
+        # Verify Last* attributes
+        logger.info(f"Read Last* attributes")
+        res = await self.readLastNetworkingStateAttributes(endpointId=endpointId)
+        if (res.lastNetworkID == NullValue) or (res.lastNetworkingStatus == NullValue) or (res.lastConnectErrorValue == NullValue):
+            raise AssertionError(
+                f"LastNetworkID, LastConnectErrorValue and LastNetworkingStatus should not be Null")
 
         # TODO: Linux Thread driver cannot get infomation of current connected networks.
         '''

@@ -32,7 +32,7 @@ tests:
     - label: "Reads the ChannelList attribute from the DUT"
       disabled: true
       command: "readAttribute"
-      attribute: "channel list"
+      attribute: "ChannelList"
       response:
           saveAs: tvchannellistvalues
           constraints:
@@ -42,7 +42,7 @@ tests:
     - label: "Reads the CurrentChannel attribute from the DUT"
       disabled: true
       command: "readAttribute"
-      attribute: "current tv channel"
+      attribute: "CurrentChannel"
       response:
           value: channellistvalues
 
@@ -67,6 +67,6 @@ tests:
     - label: "Reads the CurrentChannel attribute from the DUT"
       disabled: true
       command: "readAttribute"
-      attribute: "current tv channel"
+      attribute: "CurrentChannel"
       response:
           value: channellistvalues
