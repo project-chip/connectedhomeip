@@ -169,13 +169,6 @@ int main(void)
     }
 #endif // CHIP_ENABLE_OPENTHREAD
 
-    EFR32_LOG("Starting Platform Manager Event Loop");
-    ret = PlatformMgr().StartEventLoopTask();
-    if (ret != CHIP_NO_ERROR)
-    {
-        EFR32_LOG("PlatformMgr().StartEventLoopTask() failed");
-        appError(ret);
-    }
 #ifdef WF200_WIFI
     // Start wfx bus communication task.
     wfx_bus_start();
@@ -203,7 +196,9 @@ int main(void)
      */
 #endif
 #ifdef EFR32_OTA_ENABLED
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
     OTAConfig::Init();
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 #endif // EFR32_OTA_ENABLED
 
     EFR32_LOG("Starting App Task");
@@ -217,6 +212,14 @@ int main(void)
 #ifdef ENABLE_CHIP_SHELL
     chip::startShellTask();
 #endif
+
+    EFR32_LOG("Starting Platform Manager Event Loop");
+    ret = PlatformMgr().StartEventLoopTask();
+    if (ret != CHIP_NO_ERROR)
+    {
+        EFR32_LOG("PlatformMgr().StartEventLoopTask() failed");
+        appError(ret);
+    }
 
     EFR32_LOG("Starting FreeRTOS scheduler");
     sl_system_kernel_start();
