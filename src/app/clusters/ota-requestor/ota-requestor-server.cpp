@@ -45,6 +45,10 @@ public:
     // TODO: Implement Read/Write for OtaSoftwareUpdateRequestorAttrAccess
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
+
+private:
+    CHIP_ERROR ReadDefaultOtaProviders(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR WriteDefaultOtaProviders(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
 };
 
 OtaSoftwareUpdateRequestorAttrAccess gAttrAccess;
@@ -54,7 +58,7 @@ CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::Read(const ConcreteReadAttribut
     switch (aPath.mAttributeId)
     {
     case Attributes::DefaultOtaProviders::Id:
-        return aEncoder.Encode(DataModel::List<uint8_t>());
+        return ReadDefaultOtaProviders(aEncoder);
     default:
         break;
     }
@@ -67,14 +71,61 @@ CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::Write(const ConcreteDataAttribu
     switch (aPath.mAttributeId)
     {
     case Attributes::DefaultOtaProviders::Id: {
-        DataModel::DecodableList<OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> list;
-        ReturnErrorOnFailure(aDecoder.Decode(list));
-        // Ignore the list for now
-        break;
+        return WriteDefaultOtaProviders(aPath, aDecoder);
     }
     default:
         break;
     }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::ReadDefaultOtaProviders(AttributeValueEncoder & aEncoder)
+{
+    chip::OTARequestorInterface * requestor = chip::GetRequestorInstance();
+    if (requestor == nullptr)
+    {
+        return aEncoder.EncodeEmptyList();
+    }
+
+    return requestor->GetDefaultOtaProviderList(aEncoder);
+}
+
+CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::WriteDefaultOtaProviders(const ConcreteDataAttributePath & aPath,
+                                                                          AttributeValueDecoder & aDecoder)
+{
+    chip::OTARequestorInterface * requestor = chip::GetRequestorInstance();
+    if (requestor == nullptr)
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    switch (aPath.mListOp)
+    {
+    case ConcreteDataAttributePath::ListOperation::ReplaceAll: {
+        DataModel::DecodableList<OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> list;
+        ReturnErrorOnFailure(aDecoder.Decode(list));
+
+        // With chunking, a single large list is converted to a list of AttributeDataIBs. The first AttributeDataIB contains an
+        // empty list (to signal this is a replace so clear out contents) followed by a succession of single AttributeDataIBs for
+        // each entry to be added.
+        size_t count = 0;
+        ReturnErrorOnFailure(list.ComputeSize(&count));
+        VerifyOrReturnError(count == 0, CHIP_ERROR_INVALID_ARGUMENT);
+        return requestor->ClearDefaultOtaProviderList(aDecoder.AccessingFabricIndex());
+    }
+    case ConcreteDataAttributePath::ListOperation::ReplaceItem:
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    case ConcreteDataAttributePath::ListOperation::DeleteItem:
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    case ConcreteDataAttributePath::ListOperation::AppendItem: {
+        OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType item;
+        ReturnErrorOnFailure(aDecoder.Decode(item));
+        return requestor->AddDefaultOtaProvider(item);
+    }
+    default:
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+
     return CHIP_NO_ERROR;
 }
 

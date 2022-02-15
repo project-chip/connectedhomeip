@@ -22,6 +22,7 @@
  */
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/util/af-enums.h>
 
@@ -74,12 +75,19 @@ public:
     virtual CHIP_ERROR GetState(EndpointId endpointId,
                                 chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum & state) = 0;
 
-    // Manually set OTA Provider parameters
-    virtual void TestModeSetProviderParameters(NodeId nodeId, FabricIndex fabIndex, EndpointId endpointId) = 0;
-
     // Application directs the Requestor to cancel image update in progress. All the Requestor state is
     // cleared, UpdateState is reset to Idle
     virtual void CancelImageUpdate() = 0;
+
+    // Retrieve the default OTA provider list as an encoded list
+    virtual CHIP_ERROR GetDefaultOtaProviderList(app::AttributeValueEncoder & encoder) = 0;
+
+    // Clear all entries with the specified fabric index in the default OTA provider list
+    virtual CHIP_ERROR ClearDefaultOtaProviderList(FabricIndex fabricIndex) = 0;
+
+    // Add a default OTA provider to the cached list
+    virtual CHIP_ERROR
+    AddDefaultOtaProvider(app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type const & providerLocation) = 0;
 };
 
 // The instance of the class implementing OTARequestorInterface must be managed through
