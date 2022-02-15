@@ -82,7 +82,7 @@ class NetworkCommissioningTests:
             res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
             raise AssertionError(f"Failure expected but got response {res}")
         except chip.interaction_model.InteractionModelError as ex:
-            logger.info(f"Recevied {ex} from server.")
+            logger.info(f"Received {ex} from server.")
 
         logger.info(f"Finished negative test cases.")
 
