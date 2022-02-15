@@ -109,11 +109,10 @@ jobs:
             - name: Build and run OTA example
               timeout-minutes: 20
               run: |
+                  mkdir /tmp/ota/
                   scripts/tests/ota_test.sh
             - name: Uploading OTA logs
               if: always()
-              run: |
-                  mkdir /tmp/ota/
               uses: actions/upload-artifact@v2
               with:
                   name: OTA,Darwin-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
