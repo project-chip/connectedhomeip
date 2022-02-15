@@ -200,23 +200,23 @@ public:
 
     struct AttestationInfo
     {
-        AttestationInfo(const ByteSpan & attestationElementsBuffer, const ByteSpan & attestationChallengeBuffer,
-                        const ByteSpan & attestationSignatureBuffer, const ByteSpan & paiDerBuffer, const ByteSpan & dacDerBuffer,
-                        const ByteSpan & attestationNonce, VendorId vendorId, uint16_t productId) :
-            mAttestationElementsBuffer(attestationElementsBuffer),
-            mAttestationChallengeBuffer(attestationChallengeBuffer), mAttestationSignatureBuffer(attestationSignatureBuffer),
-            mPaiDerBuffer(paiDerBuffer), mDacDerBuffer(dacDerBuffer), mAttestationNonce(attestationNonce), mVendorId(vendorId),
-            mProductId(productId)
+        AttestationInfo(const ByteSpan & attestationElements, const ByteSpan & attestationChallenge,
+                        const ByteSpan & attestationSignature, const ByteSpan & paiDer, const ByteSpan & dacDer,
+                        const ByteSpan & attestationNonce, VendorId remoteVendorId, uint16_t remoteProductId) :
+            attestationElementsBuffer(attestationElements),
+            attestationChallengeBuffer(attestationChallenge), attestationSignatureBuffer(attestationSignature),
+            paiDerBuffer(paiDer), dacDerBuffer(dacDer), attestationNonceBuffer(attestationNonce), vendorId(remoteVendorId),
+            productId(remoteProductId)
         {}
         const ByteSpan
-            mAttestationElementsBuffer; // Buffer containing attestation elements portion of Attestation Response (raw TLV)
-        const ByteSpan mAttestationChallengeBuffer; // Buffer containing the attestation challenge from the secure session
-        const ByteSpan mAttestationSignatureBuffer; // Buffer the signature portion of Attestation Response
-        const ByteSpan mPaiDerBuffer;               // Buffer containing the PAI certificate from device in DER format.
-        const ByteSpan mDacDerBuffer;               // Buffer containing the DAC certificate from device in DER format.
-        const ByteSpan mAttestationNonce;           // Buffer containing attestation nonce.
-        VendorId mVendorId;
-        uint16_t mProductId;
+            attestationElementsBuffer; // Buffer containing attestation elements portion of Attestation Response (raw TLV)
+        const ByteSpan attestationChallengeBuffer; // Buffer containing the attestation challenge from the secure session
+        const ByteSpan attestationSignatureBuffer; // Buffer the signature portion of Attestation Response
+        const ByteSpan paiDerBuffer;               // Buffer containing the PAI certificate from device in DER format.
+        const ByteSpan dacDerBuffer;               // Buffer containing the DAC certificate from device in DER format.
+        const ByteSpan attestationNonceBuffer;     // Buffer containing attestation nonce.
+        VendorId vendorId;
+        uint16_t productId;
     };
 
     /**
