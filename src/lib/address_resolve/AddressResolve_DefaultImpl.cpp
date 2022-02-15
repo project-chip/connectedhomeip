@@ -150,7 +150,7 @@ NodeLookupAction NodeLookupHandle::NextAction(System::Clock::Timestamp now)
     }
 
     // Give up if the maximum search time has been reached
-    if (elapsed < mRequest.GetMaxLookupTime())
+    if (elapsed >= mRequest.GetMaxLookupTime())
     {
         GetListener()->OnNodeAddressResolutionFailed(GetRequest().GetPeerId(), CHIP_ERROR_TIMEOUT);
         return NodeLookupAction::kStopSearching;
