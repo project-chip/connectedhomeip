@@ -36,7 +36,7 @@
 const uint16_t kPairingTimeoutInSeconds = 10;
 const uint16_t kAddressResolveTimeoutInSeconds = 10;
 const uint16_t kCASESetupTimeoutInSeconds = 30;
-const uint16_t kTimeoutInSeconds = 5;
+const uint16_t kTimeoutInSeconds = 20;
 const uint64_t nodeId = 0x12344321;
 const uint16_t kDiscriminator = 3840;
 const uint32_t kSetupPINCode = 20202021;
@@ -36970,7 +36970,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
     XCTAssertNotNil(cluster);
 
     uint16_t minIntervalArgument = 2U;
-    uint16_t maxIntervalArgument = 10U;
+    uint16_t maxIntervalArgument = 5U;
     [cluster subscribeAttributeListInt8uWithMinInterval:@(minIntervalArgument)
         maxInterval:@(maxIntervalArgument)
         subscriptionEstablished:^{
@@ -45212,7 +45212,7 @@ ResponseHandler test_TestSubscribe_OnOff_OnOff_Reported = nil;
     XCTAssertNotNil(cluster);
 
     uint16_t minIntervalArgument = 2U;
-    uint16_t maxIntervalArgument = 10U;
+    uint16_t maxIntervalArgument = 5U;
     [cluster subscribeAttributeOnOffWithMinInterval:@(minIntervalArgument)
         maxInterval:@(maxIntervalArgument)
         subscriptionEstablished:^{
