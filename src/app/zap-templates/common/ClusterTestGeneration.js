@@ -695,7 +695,8 @@ function chip_tests_item_response_parameters(options)
 
         if ('constraints' in expected) {
           responseArg.hasExpectedConstraints = true;
-          responseArg.expectedConstraints    = expected.constraints;
+          responseArg.expectedConstraints
+              = attachGlobal(this.global, expected.constraints, { thisVal : this, name : responseArg.name });
         }
 
         if ('saveAs' in expected) {
