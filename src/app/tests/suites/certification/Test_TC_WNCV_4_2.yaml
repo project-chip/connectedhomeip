@@ -189,10 +189,3 @@ tests:
           constraints:
               type: uint8
               value: 60
-
-
-
-
-
-
-

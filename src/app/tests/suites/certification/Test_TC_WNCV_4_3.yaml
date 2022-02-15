@@ -102,13 +102,3 @@ tests:
                 value: 0xFF
       response:
           error: CONSTRAINT_ERROR
-
-
-
-
-
-
-
-
-
-
