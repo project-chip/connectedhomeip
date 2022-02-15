@@ -46,9 +46,7 @@ tests:
       arguments:
           value:
               [
-                  {
-                      FabricIndex: 1,
-                  },
+                  { FabricIndex: 1 },
                   {
                       FabricIndex: 1,
                       Node: 1,
@@ -60,28 +58,15 @@ tests:
       response:
           error: CONSTRAINT_ERROR
 
-
     - label: "Write binding table"
       command: "writeAttribute"
       attribute: "binding"
       arguments:
           value:
               [
-                  {
-                      FabricIndex: 1,
-                      Group: 1,
-                  },
-                  {
-                      FabricIndex: 1,
-                      Node: 1,
-                      Endpoint: 1,
-                      Cluster: 6,
-                  },
-                  {
-                      FabricIndex: 1,
-                      Node: 2,
-                      Endpoint: 1,
-                  },
+                  { FabricIndex: 1, Group: 1 },
+                  { FabricIndex: 1, Node: 1, Endpoint: 1, Cluster: 6 },
+                  { FabricIndex: 1, Node: 2, Endpoint: 1 },
               ]
 
     - label: "Read binding table"
@@ -90,19 +75,7 @@ tests:
       response:
           value:
               [
-                  {
-                      FabricIndex: 1,
-                      Group: 1,
-                  },
-                  {
-                      FabricIndex: 1,
-                      Node: 1,
-                      Endpoint: 1,
-                      Cluster: 6,
-                  },
-                  {
-                      FabricIndex: 1,
-                      Node: 2,
-                      Endpoint: 1,
-                  },
+                  { FabricIndex: 1, Group: 1 },
+                  { FabricIndex: 1, Node: 1, Endpoint: 1, Cluster: 6 },
+                  { FabricIndex: 1, Node: 2, Endpoint: 1 },
               ]
