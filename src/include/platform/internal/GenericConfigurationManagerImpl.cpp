@@ -136,18 +136,15 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetPrimaryMACAddress(Mu
         ChipLogDetail(DeviceLayer, "Using Thread extended MAC for hostname.");
         return CHIP_NO_ERROR;
     }
-#else
-    if (DeviceLayer::ConfigurationMgr().GetPrimaryWiFiMACAddress(buf.data()) == CHIP_NO_ERROR)
+#endif
+
+    if (chip::DeviceLayer::ConfigurationMgr().GetPrimaryWiFiMACAddress(buf.data()) == CHIP_NO_ERROR)
     {
         ChipLogDetail(DeviceLayer, "Using wifi MAC for hostname");
         return CHIP_NO_ERROR;
     }
-#endif
 
-    ChipLogError(DeviceLayer, "MAC is not known, using a default.");
-    uint8_t temp[ConfigurationManager::kMaxMACAddressLength] = { 0xEE, 0xAA, 0xBA, 0xDA, 0xBA, 0xD0, 0xDD, 0xCA };
-    memcpy(buf.data(), temp, buf.size());
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_NOT_FOUND;
 }
 
 template <class ConfigClass>
