@@ -669,3 +669,34 @@ inline void chipDie(void)
  *       thing in C++ as well.
  */
 #define ArraySize(a) (sizeof(a) / sizeof((a)[0]))
+
+namespace chip {
+
+/**
+ * Utility for checking, at compile time if the array is constexpr, whether an
+ * array is sorted.  Can be used for static_asserts.
+ */
+
+template <typename T>
+constexpr bool ArrayIsSorted(const T * aArray, size_t aLength)
+{
+    if (aLength == 0 || aLength == 1)
+    {
+        return true;
+    }
+
+    if (aArray[0] > aArray[1])
+    {
+        return false;
+    }
+
+    return ArrayIsSorted(aArray + 1, aLength - 1);
+}
+
+template <typename T, size_t N>
+constexpr bool ArrayIsSorted(const T (&aArray)[N])
+{
+    return ArrayIsSorted(aArray, N);
+}
+
+} // namespace chip
