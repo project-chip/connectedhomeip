@@ -103,9 +103,14 @@ void GenericOTARequestorDriver::UpdateDiscontinued()
     mImageProcessor->Abort();
 }
 
+// Cancel all OTA update timers 
 void GenericOTARequestorDriver::UpdateCancelled()
 {
-    // Platform might choose to schedule a retry here
+    // Cancel all OTA Update timers started by  OTARequestorDriver regardless of whether thery are running or not
+    CancelDelayedAction([](System::Layer *, void * context) { ToDriver(context)->mRequestor->DownloadUpdate(); }, this);
+    CancelDelayedAction([](System::Layer *, void * context) { ToDriver(context)->mRequestor->TriggerImmediateQuery(); }, this);
+    CancelDelayedAction([](System::Layer *, void * context) { ToDriver(context)->mImageProcessor->Apply(); }, this);
+    CancelDelayedAction([](System::Layer *, void * context) { ToDriver(context)->mRequestor->ApplyUpdate(); }, this);
 }
 
 void GenericOTARequestorDriver::ScheduleDelayedAction(UpdateFailureState state, System::Clock::Seconds32 delay,

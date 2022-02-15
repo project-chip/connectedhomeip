@@ -251,6 +251,10 @@ private:
     void StartDefaultProvidersTimer();
 
     /**
+     * Stop the periodic timer for querying the default OTA Provider
+     */
+    void StopDefaultProvidersTimer();
+    /**
      * Timer handler for querying the default OTA Provider
      */
     void DefaultProviderTimerHandler(System::Layer * systemLayer, void * appState);

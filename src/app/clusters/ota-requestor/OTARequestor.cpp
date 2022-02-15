@@ -162,6 +162,10 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
         requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::NotAvailable,
                                                            System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
         requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
+
+        // SL TODO: If this was one of the DefaultProviders move to the next one
+        requestorCore->StartDefaultProvidersTimer();
+
         break;
     default:
         requestorCore->RecordErrorUpdateState(UpdateFailureState::kQuerying, CHIP_ERROR_BAD_REQUEST);
@@ -176,6 +180,11 @@ void OTARequestor::OnQueryImageFailure(void * context, CHIP_ERROR error)
 
     ChipLogDetail(SoftwareUpdate, "QueryImage failure response %" CHIP_ERROR_FORMAT, error.Format());
     requestorCore->RecordErrorUpdateState(UpdateFailureState::kQuerying, error);
+
+    // Default provider timer is running if and only if the current state is kIdle. The timer must be started
+    // every time we move to kIdle from any other state
+    requestorCore->StartDefaultProvidersTimer();
+
 }
 
 void OTARequestor::OnApplyUpdateResponse(void * context, const ApplyUpdateResponse::DecodableType & response)
@@ -197,6 +206,7 @@ void OTARequestor::OnApplyUpdateResponse(void * context, const ApplyUpdateRespon
     case OTAApplyUpdateAction::kDiscontinue:
         requestorCore->mOtaRequestorDriver->UpdateDiscontinued();
         requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
+        requestorCore->StartDefaultProvidersTimer(); // The timer must be started every time we move to kIdle from any other state
         break;
     }
 }
@@ -208,6 +218,7 @@ void OTARequestor::OnApplyUpdateFailure(void * context, CHIP_ERROR error)
 
     ChipLogDetail(SoftwareUpdate, "ApplyUpdate failure response %" CHIP_ERROR_FORMAT, error.Format());
     requestorCore->RecordErrorUpdateState(UpdateFailureState::kApplying, error);
+    requestorCore->StartDefaultProvidersTimer(); // The timer must be started every time we move to kIdle from any other state
 }
 
 void OTARequestor::OnNotifyUpdateAppliedResponse(void * context, const app::DataModel::NullObjectType & response) {}
@@ -219,6 +230,7 @@ void OTARequestor::OnNotifyUpdateAppliedFailure(void * context, CHIP_ERROR error
 
     ChipLogDetail(SoftwareUpdate, "NotifyUpdateApplied failure response %" CHIP_ERROR_FORMAT, error.Format());
     requestorCore->RecordErrorUpdateState(UpdateFailureState::kNotifying, error);
+    requestorCore->StartDefaultProvidersTimer(); // The timer must be started every time we move to kIdle from any other state
 }
 
 EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * commandObj,
@@ -229,26 +241,13 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
     auto & announcementReason = commandData.announcementReason;
     auto & providerEndpoint   = commandData.endpoint;
 
+    ChipLogProgress(SoftwareUpdate, "OTA Requestor received AnnounceOTAProvider");
+
     if (commandObj == nullptr || commandObj->GetExchangeContext() == nullptr)
     {
         ChipLogError(SoftwareUpdate, "Cannot access ExchangeContext for FabricIndex");
         return EMBER_ZCL_STATUS_FAILURE;
     }
-
-    mProviderNodeId      = providerNodeId;
-    mProviderFabricIndex = commandObj->GetAccessingFabricIndex();
-    mProviderEndpointId  = providerEndpoint;
-
-    ChipLogProgress(SoftwareUpdate, "OTA Requestor received AnnounceOTAProvider");
-    ChipLogDetail(SoftwareUpdate, "  FabricIndex: %" PRIu8, mProviderFabricIndex);
-    ChipLogDetail(SoftwareUpdate, "  ProviderNodeID: 0x" ChipLogFormatX64, ChipLogValueX64(mProviderNodeId));
-    ChipLogDetail(SoftwareUpdate, "  VendorID: 0x%" PRIx16, commandData.vendorId);
-    ChipLogDetail(SoftwareUpdate, "  AnnouncementReason: %" PRIu8, to_underlying(announcementReason));
-    if (commandData.metadataForNode.HasValue())
-    {
-        ChipLogDetail(SoftwareUpdate, "  MetadataForNode: %zu", commandData.metadataForNode.Value().size());
-    }
-    ChipLogDetail(SoftwareUpdate, "  Endpoint: %" PRIu16, commandData.endpoint);
 
     // Determine whether our current state allows us to proceed
     OTARequestorAction action = mOtaRequestorDriver->GetRequestorAction(OTARequestorIncomingEvent::AnnouncedOTAProviderReceived);
@@ -260,6 +259,26 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
     } else if(action == OTARequestorAction::Proceed) {
         // Fall through
     }
+
+    mProviderNodeId      = providerNodeId;
+    mProviderFabricIndex = commandObj->GetAccessingFabricIndex();
+    mProviderEndpointId  = providerEndpoint;
+
+    // Since  mProviderNodeId is now pointing to the announced node we must cancel the default providers
+    // timer and leave the kIdle state. Spec doesn't define a specific state for this but we can't be in kIdle
+    StopDefaultProvidersTimer();
+    RecordNewUpdateState(OTAUpdateStateEnum::kQuerying, OTAChangeReasonEnum::kSuccess);
+
+    ChipLogDetail(SoftwareUpdate, "  FabricIndex: %" PRIu8, mProviderFabricIndex);
+    ChipLogDetail(SoftwareUpdate, "  ProviderNodeID: 0x" ChipLogFormatX64, ChipLogValueX64(mProviderNodeId));
+    ChipLogDetail(SoftwareUpdate, "  VendorID: 0x%" PRIx16, commandData.vendorId);
+    ChipLogDetail(SoftwareUpdate, "  AnnouncementReason: %" PRIu8, to_underlying(announcementReason));
+    if (commandData.metadataForNode.HasValue())
+    {
+        ChipLogDetail(SoftwareUpdate, "  MetadataForNode: %zu", commandData.metadataForNode.Value().size());
+    }
+    ChipLogDetail(SoftwareUpdate, "  Endpoint: %" PRIu16, commandData.endpoint);
+
 
     // If reason is URGENT_UPDATE_AVAILABLE, we start OTA immediately. Otherwise, respect the timer value set in mOtaStartDelayMs.
     // This is done to exemplify what a real-world OTA Requestor might do while also being configurable enough to use as a test app.
@@ -314,13 +333,13 @@ void OTARequestor::CancelImageUpdate()
     mProviderFabricIndex = kUndefinedFabricIndex;
     mProviderEndpointId  = kRootEndpointId;
 
-    // Notify the platform, it might choose to take additional actions
+    // Notify the platform to cancel the Update timers it may have running
     mOtaRequestorDriver->UpdateCancelled();
 
+    if( mCurrentUpdateState != OTAUpdateStateEnum::kIdle) {
+        StartDefaultProvidersTimer(); // The timer must be started every time we move to kIdle from any other state
+    }
     RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kUnknown);
-
-    // The periodic provider query timer must be restarted whenever the requestor enters the kIdle state
-
 }
 
 CHIP_ERROR OTARequestor::GetUpdateProgress(EndpointId endpointId, app::DataModel::Nullable<uint8_t> & progress)
@@ -351,6 +370,7 @@ void OTARequestor::OnConnected(void * context, OperationalDeviceProxy * devicePr
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(SoftwareUpdate, "Failed to send QueryImage command: %" CHIP_ERROR_FORMAT, err.Format());
+            requestorCore->StartDefaultProvidersTimer(); // The timer must be started every time we move to kIdle from any other state
             requestorCore->RecordErrorUpdateState(UpdateFailureState::kQuerying, err);
             return;
         }
@@ -364,6 +384,7 @@ void OTARequestor::OnConnected(void * context, OperationalDeviceProxy * devicePr
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(SoftwareUpdate, "Failed to start download: %" CHIP_ERROR_FORMAT, err.Format());
+            requestorCore->StartDefaultProvidersTimer(); // The timer must be started every time we move to kIdle from any other state
             requestorCore->RecordErrorUpdateState(UpdateFailureState::kDownloading, err);
             return;
         }
@@ -377,6 +398,7 @@ void OTARequestor::OnConnected(void * context, OperationalDeviceProxy * devicePr
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(SoftwareUpdate, "Failed to send ApplyUpdate command: %" CHIP_ERROR_FORMAT, err.Format());
+            requestorCore->StartDefaultProvidersTimer(); // The timer must be started every time we move to kIdle from any other state
             requestorCore->RecordErrorUpdateState(UpdateFailureState::kApplying, err);
             return;
         }
@@ -390,11 +412,13 @@ void OTARequestor::OnConnected(void * context, OperationalDeviceProxy * devicePr
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(SoftwareUpdate, "Failed to send NotifyUpdateApplied command: %" CHIP_ERROR_FORMAT, err.Format());
+            requestorCore->StartDefaultProvidersTimer(); // The timer must be started every time we move to kIdle from any other state
             requestorCore->RecordErrorUpdateState(UpdateFailureState::kNotifying, err);
             return;
         }
 
         requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
+        requestorCore->StartDefaultProvidersTimer(); // The timer must be started every time we move to kIdle from any other state
         break;
     }
     default:
@@ -410,6 +434,8 @@ void OTARequestor::OnConnectionFailure(void * context, PeerId peerId, CHIP_ERROR
 
     ChipLogError(SoftwareUpdate, "Failed to connect to node 0x" ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
                  ChipLogValueX64(peerId.GetNodeId()), error.Format());
+
+    requestorCore->StartDefaultProvidersTimer(); // The timer must be started every time we move to kIdle from any other state
 
     switch (requestorCore->mOnConnectedAction)
     {
@@ -442,6 +468,11 @@ OTARequestorInterface::OTATriggerResult OTARequestor::TriggerImmediateQuery()
 
     if (mProviderNodeId != kUndefinedNodeId)
     {
+        // We are now querying some provider. Stop the default provider timer and leave the kIdle state. 
+        // Spec doesn't define a specific state for this but we can't be in kIdle
+        StopDefaultProvidersTimer();
+        RecordNewUpdateState(OTAUpdateStateEnum::kQuerying, OTAChangeReasonEnum::kSuccess);
+
         ConnectToProvider(kQueryImage);
         return kTriggerSuccessful;
     }
@@ -487,6 +518,7 @@ void OTARequestor::OnDownloadStateChanged(OTADownloader::State state, OTAChangeR
     case OTADownloader::State::kIdle:
         if (reason != OTAChangeReasonEnum::kSuccess)
         {
+            StartDefaultProvidersTimer(); // The timer must be started every time we move to kIdle from any other state
             RecordErrorUpdateState(UpdateFailureState::kDownloading, CHIP_ERROR_CONNECTION_ABORTED, reason);
         }
 
@@ -524,7 +556,7 @@ void OTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeRe
         targetSoftwareVersion.SetNonNull(mTargetVersion);
     }
     OtaRequestorServerOnStateTransition(previousState, newState, reason, targetSoftwareVersion);
-
+ 
     mCurrentUpdateState = newState;
 }
 
@@ -727,13 +759,20 @@ void OTARequestor::DefaultProviderTimerHandler(System::Layer * systemLayer, void
 
 void OTARequestor::StartDefaultProvidersTimer()
 {
-
+    // TODO: This has to be a method: PickNextDefaultProvider()
+    mProviderNodeId = mTestingProviderNodeId;
     mOtaRequestorDriver->ScheduleDelayedAction(UpdateFailureState::kIdle,
                                                System::Clock::Seconds32(),
                                                [](System::Layer *, void * context){ (static_cast<OTARequestor *>(context))->DefaultProviderTimerHandler(nullptr, context); },
                                                this);
 }
 
+void OTARequestor::StopDefaultProvidersTimer()
+{
+
+    mOtaRequestorDriver->CancelDelayedAction([](System::Layer *, void * context){ (static_cast<OTARequestor *>(context))->DefaultProviderTimerHandler(nullptr, context); },
+                                               this);
+}
 
 void OTARequestor::OnCommissioningCompleteRequestor(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
