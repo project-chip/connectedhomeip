@@ -38,33 +38,36 @@ tests:
                       Privilege: 5, # administer
                       AuthMode: 2, # case
                       Subjects: [nodeId, 1234, 5678, 9090],
-                      Targets: [
-                          {Cluster: null, Endpoint: 0, DeviceType: null},
-                          {Cluster: 1, Endpoint: null, DeviceType: null},
-                          {Cluster: 2, Endpoint: 3, DeviceType: null},
-                      ],
+                      Targets:
+                          [
+                              { Cluster: null, Endpoint: 0, DeviceType: null },
+                              { Cluster: 1, Endpoint: null, DeviceType: null },
+                              { Cluster: 2, Endpoint: 3, DeviceType: null },
+                          ],
                   },
                   {
                       FabricIndex: 1,
                       Privilege: 1, # view
                       AuthMode: 2, # case
                       Subjects: [1234, 5678, 0x8080, 0xFFFF],
-                      Targets: [
-                          {Cluster: null, Endpoint: 1, DeviceType: null},
-                          {Cluster: 2, Endpoint: null, DeviceType: null},
-                          {Cluster: 3, Endpoint: 4, DeviceType: null},
-                      ],
+                      Targets:
+                          [
+                              { Cluster: null, Endpoint: 1, DeviceType: null },
+                              { Cluster: 2, Endpoint: null, DeviceType: null },
+                              { Cluster: 3, Endpoint: 4, DeviceType: null },
+                          ],
                   },
                   {
                       FabricIndex: 1,
                       Privilege: 3, # operate
                       AuthMode: 3, # group
                       Subjects: [0x0101, 0x0102, 0xAAAA, 0xBBBB],
-                      Targets: [
-                          {Cluster: null, Endpoint: 2, DeviceType: null},
-                          {Cluster: 3, Endpoint: null, DeviceType: null},
-                          {Cluster: 4, Endpoint: 5, DeviceType: null},
-                      ],
+                      Targets:
+                          [
+                              { Cluster: null, Endpoint: 2, DeviceType: null },
+                              { Cluster: 3, Endpoint: null, DeviceType: null },
+                              { Cluster: 4, Endpoint: 5, DeviceType: null },
+                          ],
                   },
               ]
 
@@ -78,33 +81,36 @@ tests:
                       Privilege: 5, # administer
                       AuthMode: 2, # case
                       Subjects: [nodeId, 1234, 5678, 9090],
-                      Targets: [
-                          {Cluster: null, Endpoint: 0, DeviceType: null},
-                          {Cluster: 1, Endpoint: null, DeviceType: null},
-                          {Cluster: 2, Endpoint: 3, DeviceType: null},
-                      ],
+                      Targets:
+                          [
+                              { Cluster: null, Endpoint: 0, DeviceType: null },
+                              { Cluster: 1, Endpoint: null, DeviceType: null },
+                              { Cluster: 2, Endpoint: 3, DeviceType: null },
+                          ],
                   },
                   {
                       FabricIndex: 1,
                       Privilege: 1, # view
                       AuthMode: 2, # case
                       Subjects: [1234, 5678, 0x8080, 0xFFFF],
-                      Targets: [
-                          {Cluster: null, Endpoint: 1, DeviceType: null},
-                          {Cluster: 2, Endpoint: null, DeviceType: null},
-                          {Cluster: 3, Endpoint: 4, DeviceType: null},
-                      ],
+                      Targets:
+                          [
+                              { Cluster: null, Endpoint: 1, DeviceType: null },
+                              { Cluster: 2, Endpoint: null, DeviceType: null },
+                              { Cluster: 3, Endpoint: 4, DeviceType: null },
+                          ],
                   },
                   {
                       FabricIndex: 1,
                       Privilege: 3, # operate
                       AuthMode: 3, # group
                       Subjects: [0x0101, 0x0102, 0xAAAA, 0xBBBB],
-                      Targets: [
-                          {Cluster: null, Endpoint: 2, DeviceType: null},
-                          {Cluster: 3, Endpoint: null, DeviceType: null},
-                          {Cluster: 4, Endpoint: 5, DeviceType: null},
-                      ],
+                      Targets:
+                          [
+                              { Cluster: null, Endpoint: 2, DeviceType: null },
+                              { Cluster: 3, Endpoint: null, DeviceType: null },
+                              { Cluster: 4, Endpoint: 5, DeviceType: null },
+                          ],
                   },
               ]
 
@@ -118,20 +124,19 @@ tests:
                       Privilege: 5, # administer
                       AuthMode: 2, # case
                       Subjects: [nodeId],
-                      Targets: [
-                          {Cluster: null, Endpoint: 0, DeviceType: null},
-                          {Cluster: 1, Endpoint: null, DeviceType: null},
-                          {Cluster: 2, Endpoint: 3, DeviceType: null},
-                      ],
+                      Targets:
+                          [
+                              { Cluster: null, Endpoint: 0, DeviceType: null },
+                              { Cluster: 1, Endpoint: null, DeviceType: null },
+                              { Cluster: 2, Endpoint: 3, DeviceType: null },
+                          ],
                   },
                   {
                       FabricIndex: 1,
                       Privilege: 1, # view
                       AuthMode: 2, # case
                       Subjects: [0xCCCC, 0xDDDD],
-                      Targets: [
-                          {Cluster: 5, Endpoint: 6, DeviceType: null},
-                      ],
+                      Targets: [{ Cluster: 5, Endpoint: 6, DeviceType: null }],
                   },
               ]
 
@@ -145,19 +150,18 @@ tests:
                       Privilege: 5, # administer
                       AuthMode: 2, # case
                       Subjects: [nodeId],
-                      Targets: [
-                          {Cluster: null, Endpoint: 0, DeviceType: null},
-                          {Cluster: 1, Endpoint: null, DeviceType: null},
-                          {Cluster: 2, Endpoint: 3, DeviceType: null},
-                      ],
+                      Targets:
+                          [
+                              { Cluster: null, Endpoint: 0, DeviceType: null },
+                              { Cluster: 1, Endpoint: null, DeviceType: null },
+                              { Cluster: 2, Endpoint: 3, DeviceType: null },
+                          ],
                   },
                   {
                       FabricIndex: 1,
                       Privilege: 1, # view
                       AuthMode: 2, # case
                       Subjects: [0xCCCC, 0xDDDD],
-                      Targets: [
-                          {Cluster: 5, Endpoint: 6, DeviceType: null},
-                      ],
+                      Targets: [{ Cluster: 5, Endpoint: 6, DeviceType: null }],
                   },
               ]
