@@ -53,11 +53,6 @@ config("p6_sdk_config") {
     defines += [ string_replace(def, "-D", "", 1) ]
   }
 
-  if (ota_app) {
-    # Maybe don't need to do this
-    #defines -= ["COMPONENT_CM0P_SLEEP"]
-  }
-
   # Pull out static libs (.a files) from generated json
   libs = []
   foreach(lib, mtb_json.libs) {

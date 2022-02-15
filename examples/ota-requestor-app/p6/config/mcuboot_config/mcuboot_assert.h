@@ -8,8 +8,6 @@
 #ifndef MCUBOOT_ASSERT_H
 #define MCUBOOT_ASSERT_H
 
-//#include "cy_bootloader_services.h"
-
 #define CYBL_ASSERT(...) Cy_BLServ_Assert(__VA_ARGS__)
 
 #if !defined(NDEBUG)

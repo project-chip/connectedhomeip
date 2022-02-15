@@ -40,7 +40,6 @@ declare_args() {
 }
 
 config("p6_ota_config") {
-  #ldflags =  ["-T/" + rebase_path("src/cy8c6xxa_cm4.ld", "/", "${p6_project_dir}")]
   ldflags = [ "-T/" + rebase_path("src/cy8c6xxa_cm4_dual_ota_int.ld",
                                   "/",
                                   "${p6_project_dir}") ]
