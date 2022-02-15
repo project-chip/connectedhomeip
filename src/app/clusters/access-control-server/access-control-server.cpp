@@ -486,10 +486,13 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
 
         while (i < oldCount)
         {
+            AccessControl::Entry entry;
+
             --oldCount;
+            ReturnErrorOnFailure(GetAccessControl().ReadEntry(oldCount, entry, &accessingFabricIndex));
+            ReturnErrorOnFailure(
+                LogAccessControlEvent(entry, aDecoder.GetSubjectDescriptor(), AccessControlCluster::ChangeTypeEnum::kRemoved));
             ReturnErrorOnFailure(GetAccessControl().DeleteEntry(oldCount, &accessingFabricIndex));
-            ReturnErrorOnFailure(LogAccessControlEvent(iterator.GetValue().entry, aDecoder.GetSubjectDescriptor(),
-                                                       AccessControlCluster::ChangeTypeEnum::kRemoved));
         }
     }
     else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)

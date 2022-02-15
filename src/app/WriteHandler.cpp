@@ -247,7 +247,18 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         {
             MatterPreAttributeWriteCallback(dataAttributePath);
             TLV::TLVWriter backup;
+            DataVersion version = 0;
             mWriteResponseBuilder.Checkpoint(backup);
+            err = element.GetDataVersion(&version);
+            if (CHIP_NO_ERROR == err)
+            {
+                dataAttributePath.mDataVersion.SetValue(version);
+            }
+            else if (CHIP_END_OF_TLV == err)
+            {
+                err = CHIP_NO_ERROR;
+            }
+            SuccessOrExit(err);
             err = WriteSingleClusterData(subjectDescriptor, dataAttributePath, dataReader, this);
             if (err != CHIP_NO_ERROR)
             {

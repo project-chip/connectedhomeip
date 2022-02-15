@@ -1220,10 +1220,10 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("FabricConnected", indent + 1, value.fabricConnected);
+        CHIP_ERROR err = LogValue("IsOperational", indent + 1, value.isOperational);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricConnected'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'IsOperational'");
             return err;
         }
     }
@@ -1248,6 +1248,22 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'HardwareAddress'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("IPv4Addresses", indent + 1, value.IPv4Addresses);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'IPv4Addresses'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("IPv6Addresses", indent + 1, value.IPv6Addresses);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'IPv6Addresses'");
             return err;
         }
     }
@@ -4120,9 +4136,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
 CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data)
 {
-    ChipLogProgress(chipTool,
-                    "Endpoint: %" PRIu16 " Cluster: " ChipLogFormatMEI " Attribute " ChipLogFormatMEI "DataVersion: %" PRIu32,
-                    path.mEndpointId, ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId), path.mDataVersion);
+    ChipLogProgress(
+        chipTool, "Endpoint: %" PRIu16 " Cluster: " ChipLogFormatMEI " Attribute " ChipLogFormatMEI "DataVersion: %" PRIu32,
+        path.mEndpointId, ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId), path.mDataVersion.ValueOr(0));
 
     switch (path.mClusterId)
     {
@@ -7481,12 +7497,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("NOCs", 1, value);
         }
-        case OperationalCredentials::Attributes::FabricsList::Id: {
+        case OperationalCredentials::Attributes::Fabrics::Id: {
             chip::app::DataModel::DecodableList<
                 chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("fabrics list", 1, value);
+            return DataModelLogger::LogValue("Fabrics", 1, value);
         }
         case OperationalCredentials::Attributes::SupportedFabrics::Id: {
             uint8_t value;

@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2022 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,16 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 
-if (chip_enable_pw_rpc) {
-  import("//build_overrides/pigweed.gni")
-  import("$dir_pw_protobuf_compiler/proto.gni")
+static_library("commissioner") {
+  output_name = "libCommissionerCommands"
 
-  pw_proto_library("wifi_service") {
-    sources = [ "wifi_service/wifi_service.proto" ]
-    inputs = [ "wifi_service/wifi_service.options" ]
-    deps = [ "$dir_pw_protobuf:common_protos" ]
-  }
+  sources = [
+    "CommissionerCommands.cpp",
+    "CommissionerCommands.h",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    "${chip_root}/src/controller",
+    "${chip_root}/src/lib/support",
+  ]
 }

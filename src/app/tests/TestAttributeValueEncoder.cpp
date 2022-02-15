@@ -84,13 +84,13 @@ using TestSetup = LimitedTestSetup<1024>;
             printf("Encoded: \n");                                                                                                 \
             for (size_t i = 0; i < aSetup.writer.GetLengthWritten(); i++)                                                          \
             {                                                                                                                      \
-                printf("0x%02" PRIx8 ",", aSetup.buf[i]);                                                                          \
+                printf("0x%02x,", aSetup.buf[i]);                                                                                  \
             }                                                                                                                      \
             printf("\n");                                                                                                          \
             printf("Expected: \n");                                                                                                \
             for (size_t i = 0; i < sizeof(aExpected); i++)                                                                         \
             {                                                                                                                      \
-                printf("0x%02" PRIx8 ",", aExpected[i]);                                                                           \
+                printf("0x%02x,", aExpected[i]);                                                                                   \
             }                                                                                                                      \
             printf("\n");                                                                                                          \
         }                                                                                                                          \

@@ -4008,7 +4008,7 @@ class ChipClusters:
                     "reportable": True,
                 },
                 0x00000001: {
-                    "attributeName": "FabricsList",
+                    "attributeName": "Fabrics",
                     "attributeId": 0x00000001,
                     "type": "",
                     "reportable": True,

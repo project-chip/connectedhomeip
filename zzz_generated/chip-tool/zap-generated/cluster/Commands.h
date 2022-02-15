@@ -5487,7 +5487,7 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * NOCs                                                              | 0x0000 |
-| * FabricsList                                                       | 0x0001 |
+| * Fabrics                                                           | 0x0001 |
 | * SupportedFabrics                                                  | 0x0002 |
 | * CommissionedFabrics                                               | 0x0003 |
 | * TrustedRootCertificates                                           | 0x0004 |
@@ -18422,7 +18422,7 @@ void registerClusterOperationalCredentials(Commands & commands, CredentialIssuer
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                       //
         make_unique<ReadAttribute>(Id, "nocs", Attributes::NOCs::Id, credsIssuerConfig),                                         //
-        make_unique<ReadAttribute>(Id, "fabrics-list", Attributes::FabricsList::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "fabrics", Attributes::Fabrics::Id, credsIssuerConfig),                                   //
         make_unique<ReadAttribute>(Id, "supported-fabrics", Attributes::SupportedFabrics::Id, credsIssuerConfig),                //
         make_unique<ReadAttribute>(Id, "commissioned-fabrics", Attributes::CommissionedFabrics::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "trusted-root-certificates", Attributes::TrustedRootCertificates::Id, credsIssuerConfig), //
@@ -18437,7 +18437,7 @@ void registerClusterOperationalCredentials(Commands & commands, CredentialIssuer
         make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                                  //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                              //
         make_unique<SubscribeAttribute>(Id, "nocs", Attributes::NOCs::Id, credsIssuerConfig),                                //
-        make_unique<SubscribeAttribute>(Id, "fabrics-list", Attributes::FabricsList::Id, credsIssuerConfig),                 //
+        make_unique<SubscribeAttribute>(Id, "fabrics", Attributes::Fabrics::Id, credsIssuerConfig),                          //
         make_unique<SubscribeAttribute>(Id, "supported-fabrics", Attributes::SupportedFabrics::Id, credsIssuerConfig),       //
         make_unique<SubscribeAttribute>(Id, "commissioned-fabrics", Attributes::CommissionedFabrics::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "trusted-root-certificates", Attributes::TrustedRootCertificates::Id,

@@ -49,10 +49,15 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 
     mRunLoopSem = dispatch_semaphore_create(0);
 
+    // Ensure there is a dispatch queue available
+    GetWorkQueue();
+
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
     err = Internal::GenericPlatformManagerImpl<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
+
+    mStartTime = System::SystemClock().GetMonotonicTimestamp();
 
     static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer()).SetDispatchQueue(GetWorkQueue());
 
@@ -119,6 +124,11 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
 
 CHIP_ERROR PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * event)
 {
+    if (mWorkQueue == nullptr)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
     const ChipDeviceEvent eventCopy = *event;
     dispatch_async(mWorkQueue, ^{
         Impl()->DispatchEvent(&eventCopy);

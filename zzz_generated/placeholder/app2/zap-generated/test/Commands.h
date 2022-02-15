@@ -180,7 +180,7 @@ private:
     CHIP_ERROR TestLogOnOffTestStartup_1()
     {
         SetIdentity(kIdentityAlpha);
-        return Log("          *** Basic Cluster Tests Ready");
+        return Log("*** Basic Cluster Tests Ready");
     }
 
     CHIP_ERROR TestQueryDataModelRevision_2()

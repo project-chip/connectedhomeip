@@ -599,7 +599,9 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
             ReturnErrorOnFailure(report.GetAttributeData(&data));
             ReturnErrorOnFailure(data.GetPath(&path));
             ReturnErrorOnFailure(ProcessAttributePath(path, attributePath));
-            ReturnErrorOnFailure(data.GetDataVersion(&attributePath.mDataVersion));
+            DataVersion version = 0;
+            ReturnErrorOnFailure(data.GetDataVersion(&version));
+            attributePath.mDataVersion.SetValue(version);
             if (mReadPrepareParams.mResubscribePolicy != nullptr)
             {
                 UpdateDataVersionFilters(attributePath);
@@ -880,7 +882,7 @@ void ReadClient::UpdateDataVersionFilters(const ConcreteDataAttributePath & aPat
             mReadPrepareParams.mpDataVersionFilterList[index].mClusterId == aPath.mClusterId)
         {
             // Now we know the current version for this cluster is aPath.mDataVersion.
-            mReadPrepareParams.mpDataVersionFilterList[index].mDataVersion.SetValue(aPath.mDataVersion);
+            mReadPrepareParams.mpDataVersionFilterList[index].mDataVersion = aPath.mDataVersion;
         }
     }
 }

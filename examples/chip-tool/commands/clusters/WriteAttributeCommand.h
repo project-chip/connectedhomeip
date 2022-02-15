@@ -32,6 +32,7 @@ public:
         AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
         AddArgument("attribute-value", &mAttributeValue);
         AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
+        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
         ModelCommand::AddArguments();
     }
 
@@ -41,6 +42,7 @@ public:
         AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
         AddArgument("attribute-value", &mAttributeValue);
         AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
+        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
         ModelCommand::AddArguments();
     }
 
@@ -48,6 +50,7 @@ public:
         ModelCommand("write", credsIssuerConfig)
     {
         AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
+        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
     }
 
     ~WriteAttribute() {}
@@ -98,7 +101,8 @@ public:
 
         mWriteClient = std::make_unique<chip::app::WriteClient>(device->GetExchangeManager(), this, mTimedInteractionTimeoutMs);
 
-        ReturnErrorOnFailure(mWriteClient->EncodeAttribute(attributePathParams, value));
+        ReturnErrorOnFailure(mWriteClient->EncodeAttribute(attributePathParams, value, mDataVersion));
+
         return mWriteClient->SendWriteRequest(device->GetSecureSession().Value());
     }
 
@@ -106,7 +110,7 @@ private:
     chip::ClusterId mClusterId;
     chip::AttributeId mAttributeId;
     chip::Optional<uint16_t> mTimedInteractionTimeoutMs;
-
+    chip::Optional<chip::DataVersion> mDataVersion = chip::NullOptional;
     CustomArgument mAttributeValue;
     std::unique_ptr<chip::app::WriteClient> mWriteClient;
 };

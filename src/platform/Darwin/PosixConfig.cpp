@@ -31,6 +31,8 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/Darwin/PosixConfig.h>
 
+#include <platform/KeyValueStoreManager.h>
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -69,152 +71,100 @@ const PosixConfig::Key PosixConfig::kConfigKey_WiFiStationSecType = { kConfigNam
 const PosixConfig::Key PosixConfig::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "regulatory-location" };
 const PosixConfig::Key PosixConfig::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
 const PosixConfig::Key PosixConfig::kConfigKey_Breadcrumb         = { kConfigNamespace_ChipConfig, "breadcrumb" };
+const PosixConfig::Key PosixConfig::kConfigKey_LocationCapability = { kConfigNamespace_ChipConfig, "location-capability" };
+
+// Keys stored in the Chip-counters namespace
+const PosixConfig::Key PosixConfig::kCounterKey_RebootCount           = { kConfigNamespace_ChipCounters, "reboot-count" };
+const PosixConfig::Key PosixConfig::kCounterKey_UpTime                = { kConfigNamespace_ChipCounters, "up-time" };
+const PosixConfig::Key PosixConfig::kCounterKey_BootReason            = { kConfigNamespace_ChipCounters, "boot-reason" };
+const PosixConfig::Key PosixConfig::kCounterKey_TotalOperationalHours = { kConfigNamespace_ChipCounters,
+                                                                          "total-operational-hours" };
 
 // Prefix used for NVS keys that contain Chip group encryption keys.
 const char PosixConfig::kGroupKeyNamePrefix[] = "gk-";
 
-uint16_t PosixConfig::mPosixSetupDiscriminator = 0xF00; // CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
-char PosixConfig::mPosixCountryCode[3]         = "XX";
-
 CHIP_ERROR PosixConfig::Init()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    return err;
+    return PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
 }
 
 CHIP_ERROR PosixConfig::ReadConfigValue(Key key, bool & val)
 {
-    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    SuccessOrExit(err);
-
-exit:
-    return err;
+    size_t outLen = 0;
+    return ReadConfigValueBin(key, reinterpret_cast<uint8_t *>(&val), sizeof(val), outLen);
 }
 
 CHIP_ERROR PosixConfig::ReadConfigValue(Key key, uint32_t & val)
 {
-    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-
-    if (key == kConfigKey_SetupDiscriminator)
-    {
-        val = mPosixSetupDiscriminator;
-        return CHIP_NO_ERROR;
-    }
-    return err;
+    size_t outLen = 0;
+    return ReadConfigValueBin(key, reinterpret_cast<uint8_t *>(&val), sizeof(val), outLen);
 }
 
 CHIP_ERROR PosixConfig::ReadConfigValue(Key key, uint64_t & val)
 {
-    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    SuccessOrExit(err);
-
-exit:
-    return err;
+    size_t outLen = 0;
+    return ReadConfigValueBin(key, reinterpret_cast<uint8_t *>(&val), sizeof(val), outLen);
 }
 
 CHIP_ERROR PosixConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
-    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-
-    if (key == kConfigKey_CountryCode)
-    {
-        // Do no assume null-termination on read-out
-        constexpr size_t kMaxLen = sizeof(PosixConfig::mPosixCountryCode) - 1;
-        outLen                   = strnlen(PosixConfig::mPosixCountryCode, kMaxLen);
-        VerifyOrReturnError(bufSize >= kMaxLen, CHIP_ERROR_BUFFER_TOO_SMALL);
-        memcpy(&buf[0], &PosixConfig::mPosixCountryCode[0], outLen);
-        return CHIP_NO_ERROR;
-    }
-
-    return err;
+    return ReadConfigValueBin(key, reinterpret_cast<uint8_t *>(buf), bufSize, outLen);
 }
 
 CHIP_ERROR PosixConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
-    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    SuccessOrExit(err);
-
-exit:
+    CHIP_ERROR err = PersistedStorage::KeyValueStoreMgr().Get(key.Name, buf, bufSize, &outLen);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
     return err;
 }
 
 CHIP_ERROR PosixConfig::WriteConfigValue(Key key, bool val)
 {
-    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    SuccessOrExit(err);
-
-exit:
-    return err;
+    return WriteConfigValueBin(key, reinterpret_cast<uint8_t *>(&val), sizeof(val));
 }
 
 CHIP_ERROR PosixConfig::WriteConfigValue(Key key, uint32_t val)
 {
-    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-
-    if (key == kConfigKey_SetupDiscriminator)
-    {
-        mPosixSetupDiscriminator = val;
-        return CHIP_NO_ERROR;
-    }
-    return err;
+    return WriteConfigValueBin(key, reinterpret_cast<uint8_t *>(&val), sizeof(val));
 }
 
 CHIP_ERROR PosixConfig::WriteConfigValue(Key key, uint64_t val)
 {
-    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    SuccessOrExit(err);
-
-exit:
-    return err;
+    return WriteConfigValueBin(key, reinterpret_cast<uint8_t *>(&val), sizeof(val));
 }
 
 CHIP_ERROR PosixConfig::WriteConfigValueStr(Key key, const char * str)
 {
-    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    SuccessOrExit(err);
-
-exit:
-    return err;
+    return WriteConfigValueBin(key, reinterpret_cast<const uint8_t *>(str), strlen(str));
 }
 
 CHIP_ERROR PosixConfig::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
-    if (key == kConfigKey_CountryCode)
-    {
-        VerifyOrReturnError(strLen < sizeof(PosixConfig::mPosixCountryCode), CHIP_ERROR_INVALID_ARGUMENT);
-        memcpy(&PosixConfig::mPosixCountryCode[0], str, strLen);
-        // Internally null-terminate so we may be able to log later. Don't assume we got null-termination on input.
-        PosixConfig::mPosixCountryCode[strLen] = '\0';
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    SuccessOrExit(err);
-
-exit:
-    return err;
+    return WriteConfigValueBin(key, reinterpret_cast<const uint8_t *>(str), strLen);
 }
 
 CHIP_ERROR PosixConfig::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
-    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    SuccessOrExit(err);
-
-exit:
-    return err;
+    return PersistedStorage::KeyValueStoreMgr().Put(key.Name, data, dataLen);
 }
 
 CHIP_ERROR PosixConfig::ClearConfigValue(Key key)
 {
-    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    SuccessOrExit(err);
-
-exit:
-    return err;
+    return PersistedStorage::KeyValueStoreMgr().Delete(key.Name);
 }
 
 bool PosixConfig::ConfigValueExists(Key key)
 {
+    size_t outLen;
+    CHIP_ERROR err = ReadConfigValueBin(key, nullptr, 0, outLen);
+    if (err == CHIP_NO_ERROR || err == CHIP_ERROR_BUFFER_TOO_SMALL)
+    {
+        return true;
+    }
+
     return false;
 }
 

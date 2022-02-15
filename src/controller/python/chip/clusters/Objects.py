@@ -10233,18 +10233,22 @@ class GeneralDiagnostics(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="name", Tag=0, Type=str),
-                            ClusterObjectFieldDescriptor(Label="fabricConnected", Tag=1, Type=bool),
+                            ClusterObjectFieldDescriptor(Label="isOperational", Tag=1, Type=bool),
                             ClusterObjectFieldDescriptor(Label="offPremiseServicesReachableIPv4", Tag=2, Type=typing.Union[Nullable, bool]),
                             ClusterObjectFieldDescriptor(Label="offPremiseServicesReachableIPv6", Tag=3, Type=typing.Union[Nullable, bool]),
                             ClusterObjectFieldDescriptor(Label="hardwareAddress", Tag=4, Type=bytes),
-                            ClusterObjectFieldDescriptor(Label="type", Tag=5, Type=GeneralDiagnostics.Enums.InterfaceType),
+                            ClusterObjectFieldDescriptor(Label="IPv4Addresses", Tag=5, Type=typing.List[bytes]),
+                            ClusterObjectFieldDescriptor(Label="IPv6Addresses", Tag=6, Type=typing.List[bytes]),
+                            ClusterObjectFieldDescriptor(Label="type", Tag=7, Type=GeneralDiagnostics.Enums.InterfaceType),
                     ])
 
             name: 'str' = ""
-            fabricConnected: 'bool' = False
+            isOperational: 'bool' = False
             offPremiseServicesReachableIPv4: 'typing.Union[Nullable, bool]' = NullValue
             offPremiseServicesReachableIPv6: 'typing.Union[Nullable, bool]' = NullValue
             hardwareAddress: 'bytes' = b""
+            IPv4Addresses: 'typing.List[bytes]' = field(default_factory=lambda: [])
+            IPv6Addresses: 'typing.List[bytes]' = field(default_factory=lambda: [])
             type: 'GeneralDiagnostics.Enums.InterfaceType' = 0
 
 
@@ -14043,7 +14047,7 @@ class OperationalCredentials(Cluster):
         return ClusterObjectDescriptor(
             Fields = [
                 ClusterObjectFieldDescriptor(Label="NOCs", Tag=0x00000000, Type=typing.List[OperationalCredentials.Structs.NOCStruct]),
-                ClusterObjectFieldDescriptor(Label="fabricsList", Tag=0x00000001, Type=typing.List[OperationalCredentials.Structs.FabricDescriptor]),
+                ClusterObjectFieldDescriptor(Label="fabrics", Tag=0x00000001, Type=typing.List[OperationalCredentials.Structs.FabricDescriptor]),
                 ClusterObjectFieldDescriptor(Label="supportedFabrics", Tag=0x00000002, Type=uint),
                 ClusterObjectFieldDescriptor(Label="commissionedFabrics", Tag=0x00000003, Type=uint),
                 ClusterObjectFieldDescriptor(Label="trustedRootCertificates", Tag=0x00000004, Type=typing.List[bytes]),
@@ -14056,7 +14060,7 @@ class OperationalCredentials(Cluster):
             ])
 
     NOCs: 'typing.List[OperationalCredentials.Structs.NOCStruct]' = None
-    fabricsList: 'typing.List[OperationalCredentials.Structs.FabricDescriptor]' = None
+    fabrics: 'typing.List[OperationalCredentials.Structs.FabricDescriptor]' = None
     supportedFabrics: 'uint' = None
     commissionedFabrics: 'uint' = None
     trustedRootCertificates: 'typing.List[bytes]' = None
@@ -14353,7 +14357,7 @@ class OperationalCredentials(Cluster):
             value: 'typing.List[OperationalCredentials.Structs.NOCStruct]' = field(default_factory=lambda: [])
 
         @dataclass
-        class FabricsList(ClusterAttributeDescriptor):
+        class Fabrics(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x003E

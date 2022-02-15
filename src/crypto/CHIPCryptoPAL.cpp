@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -503,6 +503,14 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::KDF(const uint8_t * ikm, const size_t 
     HKDF_sha_crypto mHKDF;
 
     ReturnErrorOnFailure(mHKDF.HKDF_SHA256(ikm, ikm_len, salt, salt_len, info, info_len, out, out_len));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeW0(uint8_t * w0out, size_t * w0_len, const uint8_t * w0sin, size_t w0sin_len)
+{
+    ReturnErrorOnFailure(FELoad(w0sin, w0sin_len, w0));
+    ReturnErrorOnFailure(FEWrite(w0, w0out, *w0_len));
 
     return CHIP_NO_ERROR;
 }

@@ -137,8 +137,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             strncpy(ifp->Name, ifa->name, Inet::InterfaceId::kMaxIfNameLength);
             ifp->Name[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
 
-            ifp->name            = CharSpan::fromCharString(ifp->Name);
-            ifp->fabricConnected = true;
+            ifp->name          = CharSpan::fromCharString(ifp->Name);
+            ifp->isOperational = true;
             if ((ifa->flags) & NETIF_FLAG_ETHERNET)
                 ifp->type = EMBER_ZCL_INTERFACE_TYPE_ETHERNET;
             else

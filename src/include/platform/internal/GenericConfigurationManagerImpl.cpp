@@ -702,7 +702,7 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
         err = GetManufacturingDate(year, month, dayOfMonth);
         if (err == CHIP_NO_ERROR)
         {
-            ChipLogProgress(DeviceLayer, "  Manufacturing Date: %04" PRIu16 "/%02" PRIu8 "/%02" PRIu8, year, month, dayOfMonth);
+            ChipLogProgress(DeviceLayer, "  Manufacturing Date: %04" PRIu16 "/%02u/%02u", year, month, dayOfMonth);
         }
         else
         {

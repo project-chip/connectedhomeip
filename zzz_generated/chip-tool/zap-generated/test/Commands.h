@@ -157,7 +157,6 @@ public:
         printf("TestClusterComplexTypes\n");
         printf("TestConstraints\n");
         printf("TestDelayCommands\n");
-        printf("TestDiscovery\n");
         printf("TestLogCommands\n");
         printf("TestSaveAs\n");
         printf("TestConfigVariables\n");
@@ -188,6 +187,7 @@ public:
     ManualTestList() : Command("list-manual"){};
     CHIP_ERROR Run() override
     {
+        printf("TestDiscovery\n");
         printf("Test_TC_DD_1_5\n");
         printf("Test_TC_DD_1_6\n");
         printf("Test_TC_DD_1_7\n");
@@ -19089,9 +19089,9 @@ private:
     static void
     OnSuccessCallback_1(void * context,
                         const chip::app::DataModel::DecodableList<
-                            chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & fabricsList)
+                            chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & fabrics)
     {
-        (static_cast<Test_TC_DM_2_2 *>(context))->OnSuccessResponse_1(fabricsList);
+        (static_cast<Test_TC_DM_2_2 *>(context))->OnSuccessResponse_1(fabrics);
     }
 
     static void OnFailureCallback_2(void * context, CHIP_ERROR error)
@@ -19141,7 +19141,7 @@ private:
         chip::Controller::OperationalCredentialsClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::FabricsList::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::Fabrics::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1));
         return CHIP_NO_ERROR;
     }
@@ -19153,15 +19153,15 @@ private:
     }
 
     void OnSuccessResponse_1(const chip::app::DataModel::DecodableList<
-                             chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & fabricsList)
+                             chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & fabrics)
     {
         {
-            auto iter_0 = fabricsList.begin();
-            VerifyOrReturn(CheckNextListItemDecodes<decltype(fabricsList)>("fabricsList", iter_0, 0));
-            VerifyOrReturn(CheckValueAsString("fabricsList[0].label", iter_0.GetValue().label, chip::CharSpan("", 0)));
-            VerifyOrReturn(CheckNoMoreListItems<decltype(fabricsList)>("fabricsList", iter_0, 1));
+            auto iter_0 = fabrics.begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(fabrics)>("fabrics", iter_0, 0));
+            VerifyOrReturn(CheckValueAsString("fabrics[0].label", iter_0.GetValue().label, chip::CharSpan("", 0)));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(fabrics)>("fabrics", iter_0, 1));
         }
-        VerifyOrReturn(CheckConstraintType("fabricsList", "", "list"));
+        VerifyOrReturn(CheckConstraintType("fabrics", "", "list"));
         NextTest();
     }
 
@@ -25700,7 +25700,7 @@ private:
     CHIP_ERROR TestLogACommand_1()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          verify that the channel has changed on the device.");
+        return UserPrompt("verify that the channel has changed on the device.");
     }
 };
 
@@ -25787,7 +25787,7 @@ private:
     CHIP_ERROR TestLogACommand_1()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          verify that the channel has changed on the device");
+        return UserPrompt("verify that the channel has changed on the device");
     }
 };
 
@@ -25900,13 +25900,13 @@ private:
     CHIP_ERROR TestLogACommand_1()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Verify that media is paused");
+        return UserPrompt("Verify that media is paused");
     }
 
     CHIP_ERROR TestLogACommand_2()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Physically verify that the media is playing");
+        return UserPrompt("Physically verify that the media is playing");
     }
 
     CHIP_ERROR TestReadsThePlaybackStateAttribute_3()
@@ -25936,13 +25936,13 @@ private:
     CHIP_ERROR TestLogACommand_4()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Physically verify that the media is paused");
+        return UserPrompt("Physically verify that the media is paused");
     }
 
     CHIP_ERROR TestLogACommand_5()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Physically verify that the media is stoped");
+        return UserPrompt("Physically verify that the media is stoped");
     }
 };
 
@@ -26067,13 +26067,13 @@ private:
     CHIP_ERROR TestLogACommand_1()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Verify that media is paused");
+        return UserPrompt("Verify that media is paused");
     }
 
     CHIP_ERROR TestLogACommand_2()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Physically verify that the media is playing");
+        return UserPrompt("Physically verify that the media is playing");
     }
 
     CHIP_ERROR TestReadsTheCurrentStateAttribute_3()
@@ -26103,31 +26103,31 @@ private:
     CHIP_ERROR TestLogACommand_4()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Physically verify that the media is started over");
+        return UserPrompt("Physically verify that the media is started over");
     }
 
     CHIP_ERROR TestLogACommand_5()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Verify that the next media item in the queue has been loaded");
+        return UserPrompt("Verify that the next media item in the queue has been loaded");
     }
 
     CHIP_ERROR TestLogACommand_6()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Verify that the previous media item in the queue has been loaded");
+        return UserPrompt("Verify that the previous media item in the queue has been loaded");
     }
 
     CHIP_ERROR TestLogACommand_7()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Verify that the media has skipped forward 10 seconds");
+        return UserPrompt("Verify that the media has skipped forward 10 seconds");
     }
 
     CHIP_ERROR TestLogACommand_8()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Verify that the media has skipped backward 10 seconds");
+        return UserPrompt("Verify that the media has skipped backward 10 seconds");
     }
 };
 
@@ -26222,19 +26222,19 @@ private:
     CHIP_ERROR TestLogACommand_1()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Verify that media is paused");
+        return UserPrompt("Verify that media is paused");
     }
 
     CHIP_ERROR TestLogACommand_2()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Verify that the media has moved to 10 seconds from the starting point.");
+        return UserPrompt("Verify that the media has moved to 10 seconds from the starting point.");
     }
 
     CHIP_ERROR TestLogACommand_3()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          User prompt needed to enter the value beyond the furthest valid position");
+        return UserPrompt("User prompt needed to enter the value beyond the furthest valid position");
     }
 };
 
@@ -26383,7 +26383,7 @@ private:
     CHIP_ERROR TestLogACommand_1()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Verify that media is paused");
+        return UserPrompt("Verify that media is paused");
     }
 
     CHIP_ERROR TestReadsThePlaybackSpeedAttributeFromTheDut_2()
@@ -26413,7 +26413,7 @@ private:
     CHIP_ERROR TestLogACommand_3()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Verify that the media is playing");
+        return UserPrompt("Verify that the media is playing");
     }
 
     CHIP_ERROR TestReadsTheCurrentStateAttribute_4()
@@ -26443,13 +26443,13 @@ private:
     CHIP_ERROR TestLogACommand_5()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Verify that the media play speed has increased");
+        return UserPrompt("Verify that the media play speed has increased");
     }
 
     CHIP_ERROR TestLogACommand_6()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Verify that the media play has reversed direction");
+        return UserPrompt("Verify that the media play has reversed direction");
     }
 
     CHIP_ERROR TestReadsTheCurrentStateAttribute_7()
@@ -26479,13 +26479,13 @@ private:
     CHIP_ERROR TestLogACommand_8()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Verify that the media play has reversed direction");
+        return UserPrompt("Verify that the media play has reversed direction");
     }
 
     CHIP_ERROR TestLogACommand_9()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Verify that the media is has resumed playing forward at the default speed");
+        return UserPrompt("Verify that the media is has resumed playing forward at the default speed");
     }
 };
 
@@ -26970,7 +26970,7 @@ private:
     CHIP_ERROR TestPrecondition_1()
     {
         SetIdentity(kIdentityAlpha);
-        return Log("          DUT has one or more Content Apps available");
+        return Log("DUT has one or more Content Apps available");
     }
 
     CHIP_ERROR TestReadsTheVendorNameAttribute_2()
@@ -36164,13 +36164,13 @@ private:
     CHIP_ERROR TestUserInteractionNeeded_1()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Set up subscription to SwitchLatched event");
+        return UserPrompt("Set up subscription to SwitchLatched event");
     }
 
     CHIP_ERROR TestUserInteractionNeeded_2()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Operator sets switch to first position");
+        return UserPrompt("Operator sets switch to first position");
     }
 
     CHIP_ERROR TestReadCurrentPositionAttribute_3()
@@ -36200,19 +36200,19 @@ private:
     CHIP_ERROR TestUserInteractionNeeded_4()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Operator sets switch to second position");
+        return UserPrompt("Operator sets switch to second position");
     }
 
     CHIP_ERROR TestUserInteractionNeeded_5()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Set up subscription to InitialPress event");
+        return UserPrompt("Set up subscription to InitialPress event");
     }
 
     CHIP_ERROR TestUserInteractionNeeded_6()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Operator does not operate switch");
+        return UserPrompt("Operator does not operate switch");
     }
 
     CHIP_ERROR TestReadCurrentPositionAttribute_7()
@@ -36242,43 +36242,43 @@ private:
     CHIP_ERROR TestUserInteractionNeeded_8()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Operator sets switch to second position");
+        return UserPrompt("Operator sets switch to second position");
     }
 
     CHIP_ERROR TestUserInteractionNeeded_9()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Operator does not operate switch (release switch)");
+        return UserPrompt("Operator does not operate switch (release switch)");
     }
 
     CHIP_ERROR TestUserInteractionNeeded_10()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Set up subscription to InitialPress and ShortRelease events");
+        return UserPrompt("Set up subscription to InitialPress and ShortRelease events");
     }
 
     CHIP_ERROR TestUserInteractionNeeded_11()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Operator does not operate switch");
+        return UserPrompt("Operator does not operate switch");
     }
 
     CHIP_ERROR TestUserInteractionNeeded_12()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Operator operates switch (press briefly)");
+        return UserPrompt("Operator operates switch (press briefly)");
     }
 
     CHIP_ERROR TestUserInteractionNeeded_13()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Operator releases switch");
+        return UserPrompt("Operator releases switch");
     }
 
     CHIP_ERROR TestUserInteractionNeeded_14()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Operator operates switch for 5 seconds");
+        return UserPrompt("Operator operates switch for 5 seconds");
     }
 
     CHIP_ERROR TestWait3000ms_15()
@@ -36290,37 +36290,37 @@ private:
     CHIP_ERROR TestUserInteractionNeeded_16()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Operator releases switch");
+        return UserPrompt("Operator releases switch");
     }
 
     CHIP_ERROR TestUserInteractionNeeded_17()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Set up subscription to InitialPress, LongPress, ShortRelease, LongRelease events");
+        return UserPrompt("Set up subscription to InitialPress, LongPress, ShortRelease, LongRelease events");
     }
 
     CHIP_ERROR TestUserInteractionNeeded_18()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Operator does not operate switch");
+        return UserPrompt("Operator does not operate switch");
     }
 
     CHIP_ERROR TestUserInteractionNeeded_19()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Operator operates switch (press briefly)");
+        return UserPrompt("Operator operates switch (press briefly)");
     }
 
     CHIP_ERROR TestUserInteractionNeeded_20()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Operator releases switch");
+        return UserPrompt("Operator releases switch");
     }
 
     CHIP_ERROR TestUserInteractionNeeded_21()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Operator operates switch for 5 seconds");
+        return UserPrompt("Operator operates switch for 5 seconds");
     }
 
     CHIP_ERROR TestWait3000ms_22()
@@ -36332,92 +36332,91 @@ private:
     CHIP_ERROR TestUserInteractionNeeded_23()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Operator releases switch");
+        return UserPrompt("Operator releases switch");
     }
 
     CHIP_ERROR TestUserInteractionNeeded_24()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt(
-            "          Set up subscription to InitialPress, ShortRelease, MultiPressOngoing, MultiPressComplete events");
+        return UserPrompt("Set up subscription to InitialPress, ShortRelease, MultiPressOngoing, MultiPressComplete events");
     }
 
     CHIP_ERROR TestUserInteractionNeeded_25()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Operator does not operate switch");
+        return UserPrompt("Operator does not operate switch");
     }
 
     CHIP_ERROR TestUserInteractionNeeded_26()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Operator operates switch (press briefly)");
+        return UserPrompt("Operator operates switch (press briefly)");
     }
 
     CHIP_ERROR TestUserInteractionNeeded_27()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Operator releases switch");
+        return UserPrompt("Operator releases switch");
     }
 
     CHIP_ERROR TestUserInteractionNeeded_28()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Operator operates switch (press briefly)");
+        return UserPrompt("Operator operates switch (press briefly)");
     }
 
     CHIP_ERROR TestUserInteractionNeeded_29()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Operator releases switch");
+        return UserPrompt("Operator releases switch");
     }
 
     CHIP_ERROR TestUserInteractionNeeded_30()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Operator operates switch again (press briefly)");
+        return UserPrompt("Operator operates switch again (press briefly)");
     }
 
     CHIP_ERROR TestUserInteractionNeeded_31()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Operator releases switch");
+        return UserPrompt("Operator releases switch");
     }
 
     CHIP_ERROR TestUserInteractionNeeded_32()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Operator operates switch again (press briefly)");
+        return UserPrompt("Operator operates switch again (press briefly)");
     }
 
     CHIP_ERROR TestUserInteractionNeeded_33()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Operator releases switch");
+        return UserPrompt("Operator releases switch");
     }
 
     CHIP_ERROR TestUserInteractionNeeded_34()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Operator operates switch again (press briefly)");
+        return UserPrompt("Operator operates switch again (press briefly)");
     }
 
     CHIP_ERROR TestUserInteractionNeeded_35()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Operator releases switch");
+        return UserPrompt("Operator releases switch");
     }
 
     CHIP_ERROR TestUserInteractionNeeded_36()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Operator operates switch again (press briefly)");
+        return UserPrompt("Operator operates switch again (press briefly)");
     }
 
     CHIP_ERROR TestUserInteractionNeeded_37()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          Operator releases switch");
+        return UserPrompt("Operator releases switch");
     }
 };
 
@@ -72052,545 +72051,6 @@ private:
     }
 };
 
-class TestDiscovery : public TestCommand
-{
-public:
-    TestDiscovery(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestDiscovery", credsIssuerConfig), mTestIndex(0)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("discriminator", 0, UINT16_MAX, &mDiscriminator);
-        AddArgument("vendorId", 0, UINT16_MAX, &mVendorId);
-        AddArgument("productId", 0, UINT16_MAX, &mProductId);
-        AddArgument("deviceType", 0, UINT16_MAX, &mDeviceType);
-    }
-
-    ~TestDiscovery()
-    {
-        if (deviceInstanceNameBeforeRebootBuffer != nullptr)
-        {
-            chip::Platform::MemoryFree(deviceInstanceNameBeforeRebootBuffer);
-            deviceInstanceNameBeforeRebootBuffer = nullptr;
-        }
-    }
-
-    /////////// TestCommand Interface /////////
-    void NextTest() override
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        if (0 == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Start: TestDiscovery\n");
-        }
-
-        if (mTestCount == mTestIndex)
-        {
-            ChipLogProgress(chipTool, " **** Test Complete: TestDiscovery\n");
-            SetCommandExitStatus(CHIP_NO_ERROR);
-            return;
-        }
-
-        Wait();
-
-        // Ensure we increment mTestIndex before we start running the relevant
-        // command.  That way if we lose the timeslice after we send the message
-        // but before our function call returns, we won't end up with an
-        // incorrect mTestIndex value observed when we get the response.
-        switch (mTestIndex++)
-        {
-        case 0:
-            ChipLogProgress(chipTool, " ***** Test Step 0 : Reboot target device\n");
-            err = TestRebootTargetDevice_0();
-            break;
-        case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Wait for the commissioned device to be retrieved\n");
-            err = TestWaitForTheCommissionedDeviceToBeRetrieved_1();
-            break;
-        case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Open Commissioning Window\n");
-            err = TestOpenCommissioningWindow_2();
-            break;
-        case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Wait Commissionable advertisement\n");
-            err = TestWaitCommissionableAdvertisement_3();
-            break;
-        case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Check Instance Name\n");
-            err = TestCheckInstanceName_4();
-            break;
-        case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Check Long Discriminator _L\n");
-            err = TestCheckLongDiscriminatorL_5();
-            break;
-        case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Check Short Discriminator (_S)\n");
-            err = TestCheckShortDiscriminatorS_6();
-            break;
-        case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Check Commissioning Mode (_CM)\n");
-            err = TestCheckCommissioningModeCm_7();
-            break;
-        case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Check Vendor ID (_V)\n");
-            if (ShouldSkip("VENDOR_SUBTYPE"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestCheckVendorIdV_8();
-            break;
-        case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : TXT key for discriminator (D)\n");
-            err = TestTxtKeyForDiscriminatorD_9();
-            break;
-        case 10:
-            ChipLogProgress(chipTool, " ***** Test Step 10 : TXT key for Vendor ID and Product ID (VP)\n");
-            if (ShouldSkip("VP_KEY"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestTxtKeyForVendorIdAndProductIdVp_10();
-            break;
-        case 11:
-            ChipLogProgress(chipTool, " ***** Test Step 11 : TXT key for Vendor ID and Product ID (VP)\n");
-            if (ShouldSkip("VP_KEY"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestTxtKeyForVendorIdAndProductIdVp_11();
-            break;
-        case 12:
-            ChipLogProgress(chipTool, " ***** Test Step 12 : Optional TXT key for MRP Retry Interval Idle (CRI)\n");
-            if (ShouldSkip("CRI_COMM_DISCOVERY_KEY"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestOptionalTxtKeyForMrpRetryIntervalIdleCri_12();
-            break;
-        case 13:
-            ChipLogProgress(chipTool, " ***** Test Step 13 : Optional TXT key for MRP Retry Interval Active (CRA)\n");
-            if (ShouldSkip("CRA_COMM_DISCOVERY_KEY"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestOptionalTxtKeyForMrpRetryIntervalActiveCra_13();
-            break;
-        case 14:
-            ChipLogProgress(chipTool, " ***** Test Step 14 : TXT key for commissioning mode (CM)\n");
-            err = TestTxtKeyForCommissioningModeCm_14();
-            break;
-        case 15:
-            ChipLogProgress(chipTool, " ***** Test Step 15 : Optional TXT key for device name (DN)\n");
-            if (ShouldSkip("DN_KEY"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestOptionalTxtKeyForDeviceNameDn_15();
-            break;
-        case 16:
-            ChipLogProgress(chipTool, " ***** Test Step 16 : Optional TXT key for rotating device identifier (RI)\n");
-            if (ShouldSkip("RI_KEY"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestOptionalTxtKeyForRotatingDeviceIdentifierRi_16();
-            break;
-        case 17:
-            ChipLogProgress(chipTool, " ***** Test Step 17 : Optional TXT key for pairing hint (PH)\n");
-            if (ShouldSkip("PH_KEY"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestOptionalTxtKeyForPairingHintPh_17();
-            break;
-        case 18:
-            ChipLogProgress(chipTool, " ***** Test Step 18 : Optional TXT key for pairing instructions (PI)\n");
-            if (ShouldSkip("PI_KEY"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestOptionalTxtKeyForPairingInstructionsPi_18();
-            break;
-        case 19:
-            ChipLogProgress(chipTool, " ***** Test Step 19 : Check IPs\n");
-            err = TestCheckIPs_19();
-            break;
-        case 20:
-            ChipLogProgress(chipTool, " ***** Test Step 20 : Reboot target device\n");
-            err = TestRebootTargetDevice_20();
-            break;
-        case 21:
-            ChipLogProgress(chipTool, " ***** Test Step 21 : Wait for the commissioned device to be retrieved\n");
-            err = TestWaitForTheCommissionedDeviceToBeRetrieved_21();
-            break;
-        case 22:
-            ChipLogProgress(chipTool, " ***** Test Step 22 : Open Commissioning Window\n");
-            err = TestOpenCommissioningWindow_22();
-            break;
-        case 23:
-            ChipLogProgress(chipTool, " ***** Test Step 23 : Wait Commissionable advertisement\n");
-            err = TestWaitCommissionableAdvertisement_23();
-            break;
-        case 24:
-            ChipLogProgress(chipTool, " ***** Test Step 24 : Check Instance Name\n");
-            err = TestCheckInstanceName_24();
-            break;
-        }
-
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }
-    }
-
-private:
-    std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 25;
-
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mDiscriminator;
-    chip::Optional<uint16_t> mVendorId;
-    chip::Optional<uint16_t> mProductId;
-    chip::Optional<uint16_t> mDeviceType;
-
-    char * deviceInstanceNameBeforeRebootBuffer = nullptr;
-    chip::CharSpan deviceInstanceNameBeforeReboot;
-
-    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
-    {
-        bool isExpectedDnssdResult = false;
-        if ((mTestIndex - 1) == 4)
-        {
-            isExpectedDnssdResult = true;
-
-            VerifyOrReturn(CheckConstraintMinLength("instanceName", nodeData.instanceName.size(), 16));
-            VerifyOrReturn(CheckConstraintMaxLength("instanceName", nodeData.instanceName.size(), 16));
-
-            if (deviceInstanceNameBeforeRebootBuffer != nullptr)
-            {
-                chip::Platform::MemoryFree(deviceInstanceNameBeforeRebootBuffer);
-            }
-            deviceInstanceNameBeforeRebootBuffer = static_cast<char *>(chip::Platform::MemoryAlloc(nodeData.instanceName.size()));
-            memcpy(deviceInstanceNameBeforeRebootBuffer, nodeData.instanceName.data(), nodeData.instanceName.size());
-            deviceInstanceNameBeforeReboot = chip::CharSpan(deviceInstanceNameBeforeRebootBuffer, nodeData.instanceName.size());
-        }
-        if ((mTestIndex - 1) == 5)
-        {
-            isExpectedDnssdResult = true;
-        }
-        if ((mTestIndex - 1) == 6)
-        {
-            isExpectedDnssdResult = true;
-        }
-        if ((mTestIndex - 1) == 7)
-        {
-            isExpectedDnssdResult = true;
-        }
-        if ((mTestIndex - 1) == 8)
-        {
-            isExpectedDnssdResult = true;
-        }
-        if ((mTestIndex - 1) == 9)
-        {
-            isExpectedDnssdResult = true;
-
-            VerifyOrReturn(CheckValue("longDiscriminator", nodeData.longDiscriminator,
-                                      mDiscriminator.HasValue() ? mDiscriminator.Value() : GetUniqueDiscriminator()));
-
-            VerifyOrReturn(CheckConstraintMinValue<uint16_t>("longDiscriminator", nodeData.longDiscriminator, 0U));
-            VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("longDiscriminator", nodeData.longDiscriminator, 4096U));
-        }
-        if ((mTestIndex - 1) == 10)
-        {
-            isExpectedDnssdResult = true;
-
-            VerifyOrReturn(CheckValue("vendorId", nodeData.vendorId, mVendorId.HasValue() ? mVendorId.Value() : 65521U));
-        }
-        if ((mTestIndex - 1) == 11)
-        {
-            isExpectedDnssdResult = true;
-
-            VerifyOrReturn(CheckValue("productId", nodeData.productId, mProductId.HasValue() ? mProductId.Value() : 32769U));
-        }
-        if ((mTestIndex - 1) == 12)
-        {
-            isExpectedDnssdResult = true;
-
-            VerifyOrReturn(CheckValuePresent("mrpRetryIntervalIdle", nodeData.mrpRetryIntervalIdle));
-
-            VerifyOrReturn(
-                CheckConstraintMaxValue<uint32_t>("mrpRetryIntervalIdle", nodeData.mrpRetryIntervalIdle.Value(), 3600000UL));
-        }
-        if ((mTestIndex - 1) == 13)
-        {
-            isExpectedDnssdResult = true;
-
-            VerifyOrReturn(CheckValuePresent("mrpRetryIntervalActive", nodeData.mrpRetryIntervalActive));
-
-            VerifyOrReturn(
-                CheckConstraintMaxValue<uint32_t>("mrpRetryIntervalActive", nodeData.mrpRetryIntervalActive.Value(), 3600000UL));
-        }
-        if ((mTestIndex - 1) == 14)
-        {
-            isExpectedDnssdResult = true;
-
-            VerifyOrReturn(CheckValue("commissioningMode", nodeData.commissioningMode, 1));
-        }
-        if ((mTestIndex - 1) == 15)
-        {
-            isExpectedDnssdResult = true;
-
-            VerifyOrReturn(CheckConstraintMaxLength("deviceName", nodeData.deviceName.size(), 32));
-        }
-        if ((mTestIndex - 1) == 16)
-        {
-            isExpectedDnssdResult = true;
-
-            VerifyOrReturn(CheckConstraintMaxValue<uint64_t>("rotatingIdLen", nodeData.rotatingIdLen, 100ULL));
-        }
-        if ((mTestIndex - 1) == 17)
-        {
-            isExpectedDnssdResult = true;
-        }
-        if ((mTestIndex - 1) == 18)
-        {
-            isExpectedDnssdResult = true;
-
-            VerifyOrReturn(CheckConstraintMaxLength("pairingInstruction", nodeData.pairingInstruction.size(), 128));
-        }
-        if ((mTestIndex - 1) == 19)
-        {
-            isExpectedDnssdResult = true;
-
-            VerifyOrReturn(CheckConstraintMinValue<uint8_t>("numIPs", nodeData.numIPs, 1));
-        }
-        if ((mTestIndex - 1) == 24)
-        {
-            isExpectedDnssdResult = true;
-
-            VerifyOrReturn(CheckConstraintMinLength("instanceName", nodeData.instanceName.size(), 16));
-            VerifyOrReturn(CheckConstraintMaxLength("instanceName", nodeData.instanceName.size(), 16));
-
-            VerifyOrReturn(CheckConstraintNotValue("instanceName", nodeData.instanceName, deviceInstanceNameBeforeReboot));
-        }
-
-        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
-        NextTest();
-    }
-
-    //
-    // Tests methods
-    //
-
-    CHIP_ERROR TestRebootTargetDevice_0()
-    {
-        SetIdentity(kIdentityAlpha);
-        return Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : GetUniqueDiscriminator());
-    }
-
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_1()
-    {
-        SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
-    }
-
-    CHIP_ERROR TestOpenCommissioningWindow_2()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
-        using RequestType = chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type;
-
-        RequestType request;
-        request.commissioningTimeout = 120U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestDiscovery *>(context))->OnSuccessResponse_2();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<TestDiscovery *>(context))->OnFailureResponse_2(error);
-        };
-
-        ReturnErrorOnFailure(
-            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_2(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_2() { NextTest(); }
-
-    CHIP_ERROR TestWaitCommissionableAdvertisement_3()
-    {
-        SetIdentity(kIdentityAlpha);
-        return WaitForCommissionableAdvertisement();
-    }
-
-    CHIP_ERROR TestCheckInstanceName_4()
-    {
-        SetIdentity(kIdentityAlpha);
-        return FindCommissionable();
-    }
-
-    CHIP_ERROR TestCheckLongDiscriminatorL_5()
-    {
-        SetIdentity(kIdentityAlpha);
-        return FindCommissionableByLongDiscriminator(mDiscriminator.HasValue() ? mDiscriminator.Value() : GetUniqueDiscriminator());
-    }
-
-    CHIP_ERROR TestCheckShortDiscriminatorS_6()
-    {
-        SetIdentity(kIdentityAlpha);
-        return FindCommissionableByShortDiscriminator(mDiscriminator.HasValue() ? mDiscriminator.Value()
-                                                                                : GetUniqueDiscriminator());
-    }
-
-    CHIP_ERROR TestCheckCommissioningModeCm_7()
-    {
-        SetIdentity(kIdentityAlpha);
-        return FindCommissionableByCommissioningMode();
-    }
-
-    CHIP_ERROR TestCheckVendorIdV_8()
-    {
-        SetIdentity(kIdentityAlpha);
-        return FindCommissionableByVendorId(mVendorId.HasValue() ? mVendorId.Value() : 65521U);
-    }
-
-    CHIP_ERROR TestTxtKeyForDiscriminatorD_9()
-    {
-        SetIdentity(kIdentityAlpha);
-        return FindCommissionable();
-    }
-
-    CHIP_ERROR TestTxtKeyForVendorIdAndProductIdVp_10()
-    {
-        SetIdentity(kIdentityAlpha);
-        return FindCommissionable();
-    }
-
-    CHIP_ERROR TestTxtKeyForVendorIdAndProductIdVp_11()
-    {
-        SetIdentity(kIdentityAlpha);
-        return FindCommissionable();
-    }
-
-    CHIP_ERROR TestOptionalTxtKeyForMrpRetryIntervalIdleCri_12()
-    {
-        SetIdentity(kIdentityAlpha);
-        return FindCommissionable();
-    }
-
-    CHIP_ERROR TestOptionalTxtKeyForMrpRetryIntervalActiveCra_13()
-    {
-        SetIdentity(kIdentityAlpha);
-        return FindCommissionable();
-    }
-
-    CHIP_ERROR TestTxtKeyForCommissioningModeCm_14()
-    {
-        SetIdentity(kIdentityAlpha);
-        return FindCommissionable();
-    }
-
-    CHIP_ERROR TestOptionalTxtKeyForDeviceNameDn_15()
-    {
-        SetIdentity(kIdentityAlpha);
-        return FindCommissionable();
-    }
-
-    CHIP_ERROR TestOptionalTxtKeyForRotatingDeviceIdentifierRi_16()
-    {
-        SetIdentity(kIdentityAlpha);
-        return FindCommissionable();
-    }
-
-    CHIP_ERROR TestOptionalTxtKeyForPairingHintPh_17()
-    {
-        SetIdentity(kIdentityAlpha);
-        return FindCommissionable();
-    }
-
-    CHIP_ERROR TestOptionalTxtKeyForPairingInstructionsPi_18()
-    {
-        SetIdentity(kIdentityAlpha);
-        return FindCommissionable();
-    }
-
-    CHIP_ERROR TestCheckIPs_19()
-    {
-        SetIdentity(kIdentityAlpha);
-        return FindCommissionable();
-    }
-
-    CHIP_ERROR TestRebootTargetDevice_20()
-    {
-        SetIdentity(kIdentityAlpha);
-        return Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : GetUniqueDiscriminator());
-    }
-
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_21()
-    {
-        SetIdentity(kIdentityAlpha);
-        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
-    }
-
-    CHIP_ERROR TestOpenCommissioningWindow_22()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
-        using RequestType = chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type;
-
-        RequestType request;
-        request.commissioningTimeout = 120U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestDiscovery *>(context))->OnSuccessResponse_22();
-        };
-
-        auto failure = [](void * context, CHIP_ERROR error) {
-            (static_cast<TestDiscovery *>(context))->OnFailureResponse_22(error);
-        };
-
-        ReturnErrorOnFailure(
-            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_22(CHIP_ERROR error)
-    {
-        chip::app::StatusIB status(error);
-        ThrowFailureResponse();
-    }
-
-    void OnSuccessResponse_22() { NextTest(); }
-
-    CHIP_ERROR TestWaitCommissionableAdvertisement_23()
-    {
-        SetIdentity(kIdentityAlpha);
-        return WaitForCommissionableAdvertisement();
-    }
-
-    CHIP_ERROR TestCheckInstanceName_24()
-    {
-        SetIdentity(kIdentityAlpha);
-        return FindCommissionable();
-    }
-};
-
 class TestLogCommands : public TestCommand
 {
 public:
@@ -72678,13 +72138,13 @@ private:
     CHIP_ERROR TestLogASimpleMessage_1()
     {
         SetIdentity(kIdentityAlpha);
-        return Log("          This is a simple message");
+        return Log("This is a simple message");
     }
 
     CHIP_ERROR TestDoASimpleUserPromptMessage_2()
     {
         SetIdentity(kIdentityAlpha);
-        return UserPrompt("          This is a simple message");
+        return UserPrompt("This is a simple message");
     }
 };
 
@@ -77736,6 +77196,18 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 4 : Remove nonexistent fabric\n");
             err = TestRemoveNonexistentFabric_4();
             break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Read fabric list before setting label\n");
+            err = TestReadFabricListBeforeSettingLabel_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Set the fabric label\n");
+            err = TestSetTheFabricLabel_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Read fabric list after setting label\n");
+            err = TestReadFabricListAfterSettingLabel_7();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -77747,11 +77219,13 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 5;
+    const uint16_t mTestCount = 8;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
+
+    chip::FabricIndex ourFabricIndex;
 
     void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
     {
@@ -77789,6 +77263,32 @@ private:
     static void OnSuccessCallback_3(void * context, chip::FabricIndex currentFabricIndex)
     {
         (static_cast<TestOperationalCredentialsCluster *>(context))->OnSuccessResponse_3(currentFabricIndex);
+    }
+
+    static void OnFailureCallback_5(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestOperationalCredentialsCluster *>(context))->OnFailureResponse_5(error);
+    }
+
+    static void
+    OnSuccessCallback_5(void * context,
+                        const chip::app::DataModel::DecodableList<
+                            chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & fabrics)
+    {
+        (static_cast<TestOperationalCredentialsCluster *>(context))->OnSuccessResponse_5(fabrics);
+    }
+
+    static void OnFailureCallback_7(void * context, CHIP_ERROR error)
+    {
+        (static_cast<TestOperationalCredentialsCluster *>(context))->OnFailureResponse_7(error);
+    }
+
+    static void
+    OnSuccessCallback_7(void * context,
+                        const chip::app::DataModel::DecodableList<
+                            chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & fabrics)
+    {
+        (static_cast<TestOperationalCredentialsCluster *>(context))->OnSuccessResponse_7(fabrics);
     }
 
     //
@@ -77873,6 +77373,7 @@ private:
     {
         VerifyOrReturn(CheckConstraintType("currentFabricIndex", "", "uint8"));
         VerifyOrReturn(CheckConstraintMinValue<chip::FabricIndex>("currentFabricIndex", currentFabricIndex, 1));
+        ourFabricIndex = currentFabricIndex;
         NextTest();
     }
 
@@ -77908,6 +77409,107 @@ private:
                              const chip::Optional<chip::CharSpan> & debugText)
     {
         VerifyOrReturn(CheckValue("statusCode", statusCode, 11));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadFabricListBeforeSettingLabel_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::OperationalCredentialsClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::Fabrics::TypeInfo>(
+            this, OnSuccessCallback_5, OnFailureCallback_5));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_5(const chip::app::DataModel::DecodableList<
+                             chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & fabrics)
+    {
+        {
+            auto iter_0 = fabrics.begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(fabrics)>("fabrics", iter_0, 0));
+            VerifyOrReturn(CheckValue("fabrics[0].fabricIndex", iter_0.GetValue().fabricIndex, ourFabricIndex));
+            VerifyOrReturn(CheckValueAsString("fabrics[0].label", iter_0.GetValue().label, chip::CharSpan("", 0)));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(fabrics)>("fabrics", iter_0, 1));
+        }
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestSetTheFabricLabel_6()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        using RequestType               = chip::app::Clusters::OperationalCredentials::Commands::UpdateFabricLabel::Type;
+
+        RequestType request;
+        request.label = chip::Span<const char>("Batcavegarbage: not in length on purpose", 7);
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestOperationalCredentialsCluster *>(context))
+                ->OnSuccessResponse_6(data.statusCode, data.fabricIndex, data.debugText);
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestOperationalCredentialsCluster *>(context))->OnFailureResponse_6(error);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_6(chip::app::Clusters::OperationalCredentials::OperationalCertStatus statusCode,
+                             const chip::Optional<chip::FabricIndex> & fabricIndex,
+                             const chip::Optional<chip::CharSpan> & debugText)
+    {
+        VerifyOrReturn(CheckValue("statusCode", statusCode, 0));
+
+        VerifyOrReturn(CheckValuePresent("fabricIndex", fabricIndex));
+        VerifyOrReturn(CheckValue("fabricIndex.Value()", fabricIndex.Value(), ourFabricIndex));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadFabricListAfterSettingLabel_7()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::OperationalCredentialsClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::Fabrics::TypeInfo>(
+            this, OnSuccessCallback_7, OnFailureCallback_7));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_7(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_7(const chip::app::DataModel::DecodableList<
+                             chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & fabrics)
+    {
+        {
+            auto iter_0 = fabrics.begin();
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(fabrics)>("fabrics", iter_0, 0));
+            VerifyOrReturn(CheckValue("fabrics[0].fabricIndex", iter_0.GetValue().fabricIndex, ourFabricIndex));
+            VerifyOrReturn(CheckValueAsString("fabrics[0].label", iter_0.GetValue().label, chip::CharSpan("Batcave", 7)));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(fabrics)>("fabrics", iter_0, 1));
+        }
 
         NextTest();
     }
@@ -90812,6 +90414,545 @@ private:
     }
 };
 
+class TestDiscovery : public TestCommand
+{
+public:
+    TestDiscovery(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestDiscovery", credsIssuerConfig), mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("discriminator", 0, UINT16_MAX, &mDiscriminator);
+        AddArgument("vendorId", 0, UINT16_MAX, &mVendorId);
+        AddArgument("productId", 0, UINT16_MAX, &mProductId);
+        AddArgument("deviceType", 0, UINT16_MAX, &mDeviceType);
+    }
+
+    ~TestDiscovery()
+    {
+        if (deviceInstanceNameBeforeRebootBuffer != nullptr)
+        {
+            chip::Platform::MemoryFree(deviceInstanceNameBeforeRebootBuffer);
+            deviceInstanceNameBeforeRebootBuffer = nullptr;
+        }
+    }
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: TestDiscovery\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: TestDiscovery\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Reboot target device\n");
+            err = TestRebootTargetDevice_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Open Commissioning Window\n");
+            err = TestOpenCommissioningWindow_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Wait Commissionable advertisement\n");
+            err = TestWaitCommissionableAdvertisement_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Check Instance Name\n");
+            err = TestCheckInstanceName_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Check Long Discriminator _L\n");
+            err = TestCheckLongDiscriminatorL_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Check Short Discriminator (_S)\n");
+            err = TestCheckShortDiscriminatorS_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Check Commissioning Mode (_CM)\n");
+            err = TestCheckCommissioningModeCm_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Check Vendor ID (_V)\n");
+            if (ShouldSkip("VENDOR_SUBTYPE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestCheckVendorIdV_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : TXT key for discriminator (D)\n");
+            err = TestTxtKeyForDiscriminatorD_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : TXT key for Vendor ID and Product ID (VP)\n");
+            if (ShouldSkip("VP_KEY"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestTxtKeyForVendorIdAndProductIdVp_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : TXT key for Vendor ID and Product ID (VP)\n");
+            if (ShouldSkip("VP_KEY"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestTxtKeyForVendorIdAndProductIdVp_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Optional TXT key for MRP Retry Interval Idle (CRI)\n");
+            if (ShouldSkip("CRI_COMM_DISCOVERY_KEY"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestOptionalTxtKeyForMrpRetryIntervalIdleCri_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : Optional TXT key for MRP Retry Interval Active (CRA)\n");
+            if (ShouldSkip("CRA_COMM_DISCOVERY_KEY"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestOptionalTxtKeyForMrpRetryIntervalActiveCra_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : TXT key for commissioning mode (CM)\n");
+            err = TestTxtKeyForCommissioningModeCm_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool, " ***** Test Step 15 : Optional TXT key for device name (DN)\n");
+            if (ShouldSkip("DN_KEY"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestOptionalTxtKeyForDeviceNameDn_15();
+            break;
+        case 16:
+            ChipLogProgress(chipTool, " ***** Test Step 16 : Optional TXT key for rotating device identifier (RI)\n");
+            if (ShouldSkip("RI_KEY"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestOptionalTxtKeyForRotatingDeviceIdentifierRi_16();
+            break;
+        case 17:
+            ChipLogProgress(chipTool, " ***** Test Step 17 : Optional TXT key for pairing hint (PH)\n");
+            if (ShouldSkip("PH_KEY"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestOptionalTxtKeyForPairingHintPh_17();
+            break;
+        case 18:
+            ChipLogProgress(chipTool, " ***** Test Step 18 : Optional TXT key for pairing instructions (PI)\n");
+            if (ShouldSkip("PI_KEY"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestOptionalTxtKeyForPairingInstructionsPi_18();
+            break;
+        case 19:
+            ChipLogProgress(chipTool, " ***** Test Step 19 : Check IPs\n");
+            err = TestCheckIPs_19();
+            break;
+        case 20:
+            ChipLogProgress(chipTool, " ***** Test Step 20 : Reboot target device\n");
+            err = TestRebootTargetDevice_20();
+            break;
+        case 21:
+            ChipLogProgress(chipTool, " ***** Test Step 21 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_21();
+            break;
+        case 22:
+            ChipLogProgress(chipTool, " ***** Test Step 22 : Open Commissioning Window\n");
+            err = TestOpenCommissioningWindow_22();
+            break;
+        case 23:
+            ChipLogProgress(chipTool, " ***** Test Step 23 : Wait Commissionable advertisement\n");
+            err = TestWaitCommissionableAdvertisement_23();
+            break;
+        case 24:
+            ChipLogProgress(chipTool, " ***** Test Step 24 : Check Instance Name\n");
+            err = TestCheckInstanceName_24();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 25;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mDiscriminator;
+    chip::Optional<uint16_t> mVendorId;
+    chip::Optional<uint16_t> mProductId;
+    chip::Optional<uint16_t> mDeviceType;
+
+    char * deviceInstanceNameBeforeRebootBuffer = nullptr;
+    chip::CharSpan deviceInstanceNameBeforeReboot;
+
+    void OnDiscoveryCommandsResults(const DiscoveryCommandResult & nodeData) override
+    {
+        bool isExpectedDnssdResult = false;
+        if ((mTestIndex - 1) == 4)
+        {
+            isExpectedDnssdResult = true;
+
+            VerifyOrReturn(CheckConstraintMinLength("instanceName", nodeData.instanceName.size(), 16));
+            VerifyOrReturn(CheckConstraintMaxLength("instanceName", nodeData.instanceName.size(), 16));
+
+            if (deviceInstanceNameBeforeRebootBuffer != nullptr)
+            {
+                chip::Platform::MemoryFree(deviceInstanceNameBeforeRebootBuffer);
+            }
+            deviceInstanceNameBeforeRebootBuffer = static_cast<char *>(chip::Platform::MemoryAlloc(nodeData.instanceName.size()));
+            memcpy(deviceInstanceNameBeforeRebootBuffer, nodeData.instanceName.data(), nodeData.instanceName.size());
+            deviceInstanceNameBeforeReboot = chip::CharSpan(deviceInstanceNameBeforeRebootBuffer, nodeData.instanceName.size());
+        }
+        if ((mTestIndex - 1) == 5)
+        {
+            isExpectedDnssdResult = true;
+        }
+        if ((mTestIndex - 1) == 6)
+        {
+            isExpectedDnssdResult = true;
+        }
+        if ((mTestIndex - 1) == 7)
+        {
+            isExpectedDnssdResult = true;
+        }
+        if ((mTestIndex - 1) == 8)
+        {
+            isExpectedDnssdResult = true;
+        }
+        if ((mTestIndex - 1) == 9)
+        {
+            isExpectedDnssdResult = true;
+
+            VerifyOrReturn(CheckValue("longDiscriminator", nodeData.longDiscriminator,
+                                      mDiscriminator.HasValue() ? mDiscriminator.Value() : GetUniqueDiscriminator()));
+
+            VerifyOrReturn(CheckConstraintMinValue<uint16_t>("longDiscriminator", nodeData.longDiscriminator, 0U));
+            VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("longDiscriminator", nodeData.longDiscriminator, 4096U));
+        }
+        if ((mTestIndex - 1) == 10)
+        {
+            isExpectedDnssdResult = true;
+
+            VerifyOrReturn(CheckValue("vendorId", nodeData.vendorId, mVendorId.HasValue() ? mVendorId.Value() : 65521U));
+        }
+        if ((mTestIndex - 1) == 11)
+        {
+            isExpectedDnssdResult = true;
+
+            VerifyOrReturn(CheckValue("productId", nodeData.productId, mProductId.HasValue() ? mProductId.Value() : 32769U));
+        }
+        if ((mTestIndex - 1) == 12)
+        {
+            isExpectedDnssdResult = true;
+
+            VerifyOrReturn(CheckValuePresent("mrpRetryIntervalIdle", nodeData.mrpRetryIntervalIdle));
+
+            VerifyOrReturn(
+                CheckConstraintMaxValue<uint32_t>("mrpRetryIntervalIdle", nodeData.mrpRetryIntervalIdle.Value(), 3600000UL));
+        }
+        if ((mTestIndex - 1) == 13)
+        {
+            isExpectedDnssdResult = true;
+
+            VerifyOrReturn(CheckValuePresent("mrpRetryIntervalActive", nodeData.mrpRetryIntervalActive));
+
+            VerifyOrReturn(
+                CheckConstraintMaxValue<uint32_t>("mrpRetryIntervalActive", nodeData.mrpRetryIntervalActive.Value(), 3600000UL));
+        }
+        if ((mTestIndex - 1) == 14)
+        {
+            isExpectedDnssdResult = true;
+
+            VerifyOrReturn(CheckValue("commissioningMode", nodeData.commissioningMode, 1));
+        }
+        if ((mTestIndex - 1) == 15)
+        {
+            isExpectedDnssdResult = true;
+
+            VerifyOrReturn(CheckConstraintMaxLength("deviceName", nodeData.deviceName.size(), 32));
+        }
+        if ((mTestIndex - 1) == 16)
+        {
+            isExpectedDnssdResult = true;
+
+            VerifyOrReturn(CheckConstraintMaxValue<uint64_t>("rotatingIdLen", nodeData.rotatingIdLen, 100ULL));
+        }
+        if ((mTestIndex - 1) == 17)
+        {
+            isExpectedDnssdResult = true;
+        }
+        if ((mTestIndex - 1) == 18)
+        {
+            isExpectedDnssdResult = true;
+
+            VerifyOrReturn(CheckConstraintMaxLength("pairingInstruction", nodeData.pairingInstruction.size(), 128));
+        }
+        if ((mTestIndex - 1) == 19)
+        {
+            isExpectedDnssdResult = true;
+
+            VerifyOrReturn(CheckConstraintMinValue<uint8_t>("numIPs", nodeData.numIPs, 1));
+        }
+        if ((mTestIndex - 1) == 24)
+        {
+            isExpectedDnssdResult = true;
+
+            VerifyOrReturn(CheckConstraintMinLength("instanceName", nodeData.instanceName.size(), 16));
+            VerifyOrReturn(CheckConstraintMaxLength("instanceName", nodeData.instanceName.size(), 16));
+
+            VerifyOrReturn(CheckConstraintNotValue("instanceName", nodeData.instanceName, deviceInstanceNameBeforeReboot));
+        }
+
+        VerifyOrReturn(isExpectedDnssdResult, Exit("An unexpected dnssd result has been received"));
+        NextTest();
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestRebootTargetDevice_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : GetUniqueDiscriminator());
+    }
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_1()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+    }
+
+    CHIP_ERROR TestOpenCommissioningWindow_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        using RequestType = chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type;
+
+        RequestType request;
+        request.commissioningTimeout = 120U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestDiscovery *>(context))->OnSuccessResponse_2();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestDiscovery *>(context))->OnFailureResponse_2(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_2() { NextTest(); }
+
+    CHIP_ERROR TestWaitCommissionableAdvertisement_3()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionableAdvertisement();
+    }
+
+    CHIP_ERROR TestCheckInstanceName_4()
+    {
+        SetIdentity(kIdentityAlpha);
+        return FindCommissionable();
+    }
+
+    CHIP_ERROR TestCheckLongDiscriminatorL_5()
+    {
+        SetIdentity(kIdentityAlpha);
+        return FindCommissionableByLongDiscriminator(mDiscriminator.HasValue() ? mDiscriminator.Value() : GetUniqueDiscriminator());
+    }
+
+    CHIP_ERROR TestCheckShortDiscriminatorS_6()
+    {
+        SetIdentity(kIdentityAlpha);
+        return FindCommissionableByShortDiscriminator(mDiscriminator.HasValue() ? mDiscriminator.Value()
+                                                                                : GetUniqueDiscriminator());
+    }
+
+    CHIP_ERROR TestCheckCommissioningModeCm_7()
+    {
+        SetIdentity(kIdentityAlpha);
+        return FindCommissionableByCommissioningMode();
+    }
+
+    CHIP_ERROR TestCheckVendorIdV_8()
+    {
+        SetIdentity(kIdentityAlpha);
+        return FindCommissionableByVendorId(mVendorId.HasValue() ? mVendorId.Value() : 65521U);
+    }
+
+    CHIP_ERROR TestTxtKeyForDiscriminatorD_9()
+    {
+        SetIdentity(kIdentityAlpha);
+        return FindCommissionable();
+    }
+
+    CHIP_ERROR TestTxtKeyForVendorIdAndProductIdVp_10()
+    {
+        SetIdentity(kIdentityAlpha);
+        return FindCommissionable();
+    }
+
+    CHIP_ERROR TestTxtKeyForVendorIdAndProductIdVp_11()
+    {
+        SetIdentity(kIdentityAlpha);
+        return FindCommissionable();
+    }
+
+    CHIP_ERROR TestOptionalTxtKeyForMrpRetryIntervalIdleCri_12()
+    {
+        SetIdentity(kIdentityAlpha);
+        return FindCommissionable();
+    }
+
+    CHIP_ERROR TestOptionalTxtKeyForMrpRetryIntervalActiveCra_13()
+    {
+        SetIdentity(kIdentityAlpha);
+        return FindCommissionable();
+    }
+
+    CHIP_ERROR TestTxtKeyForCommissioningModeCm_14()
+    {
+        SetIdentity(kIdentityAlpha);
+        return FindCommissionable();
+    }
+
+    CHIP_ERROR TestOptionalTxtKeyForDeviceNameDn_15()
+    {
+        SetIdentity(kIdentityAlpha);
+        return FindCommissionable();
+    }
+
+    CHIP_ERROR TestOptionalTxtKeyForRotatingDeviceIdentifierRi_16()
+    {
+        SetIdentity(kIdentityAlpha);
+        return FindCommissionable();
+    }
+
+    CHIP_ERROR TestOptionalTxtKeyForPairingHintPh_17()
+    {
+        SetIdentity(kIdentityAlpha);
+        return FindCommissionable();
+    }
+
+    CHIP_ERROR TestOptionalTxtKeyForPairingInstructionsPi_18()
+    {
+        SetIdentity(kIdentityAlpha);
+        return FindCommissionable();
+    }
+
+    CHIP_ERROR TestCheckIPs_19()
+    {
+        SetIdentity(kIdentityAlpha);
+        return FindCommissionable();
+    }
+
+    CHIP_ERROR TestRebootTargetDevice_20()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Reboot(mDiscriminator.HasValue() ? mDiscriminator.Value() : GetUniqueDiscriminator());
+    }
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_21()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+    }
+
+    CHIP_ERROR TestOpenCommissioningWindow_22()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        using RequestType = chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type;
+
+        RequestType request;
+        request.commissioningTimeout = 120U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestDiscovery *>(context))->OnSuccessResponse_22();
+        };
+
+        auto failure = [](void * context, CHIP_ERROR error) {
+            (static_cast<TestDiscovery *>(context))->OnFailureResponse_22(error);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_22(CHIP_ERROR error)
+    {
+        chip::app::StatusIB status(error);
+        ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_22() { NextTest(); }
+
+    CHIP_ERROR TestWaitCommissionableAdvertisement_23()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionableAdvertisement();
+    }
+
+    CHIP_ERROR TestCheckInstanceName_24()
+    {
+        SetIdentity(kIdentityAlpha);
+        return FindCommissionable();
+    }
+};
+
 class Test_TC_DD_1_5 : public TestCommand
 {
 public:
@@ -90885,8 +91026,8 @@ private:
     CHIP_ERROR TestStep1_0()
     {
         SetIdentity(kIdentityAlpha);
-        return Log("          Verify that the onboarding payload for NFC tags SHALL use NDEF URI Record Type Definition as defined "
-                   "by NFC Forum in URI Record Type Definition RTD URI");
+        return Log("Verify that the onboarding payload for NFC tags SHALL use NDEF URI Record Type Definition as defined by NFC "
+                   "Forum in URI Record Type Definition RTD URI");
     }
 };
 
@@ -90971,21 +91112,21 @@ private:
     CHIP_ERROR TestStep1_0()
     {
         SetIdentity(kIdentityAlpha);
-        return Log("          Scan the DUTs QR code using a QR code reader");
+        return Log("Scan the DUTs QR code using a QR code reader");
     }
 
     CHIP_ERROR TestStep1Verification_1()
     {
         SetIdentity(kIdentityAlpha);
-        return Log("          Verify the QR code gets scanned successfully and the QR code must be of sufficient size and contrast "
-                   "respective to surface material as to be readable with standard readers such as smartphones in normal lighting "
-                   "conditions");
+        return Log(
+            "Verify the QR code gets scanned successfully and the QR code must be of sufficient size and contrast respective to "
+            "surface material as to be readable with standard readers such as smartphones in normal lighting conditions");
     }
 
     CHIP_ERROR TestStep2Verificaiton_2()
     {
         SetIdentity(kIdentityAlpha);
-        return Log("          Verify QR code version is 1 or higher");
+        return Log("Verify QR code version is 1 or higher");
     }
 };
 
@@ -91066,14 +91207,14 @@ private:
     CHIP_ERROR TestPrecondition_0()
     {
         SetIdentity(kIdentityAlpha);
-        return Log("          Verify manual pairing code is printed on the device or in additional provided materials");
+        return Log("Verify manual pairing code is printed on the device or in additional provided materials");
     }
 
     CHIP_ERROR TestStep1_1()
     {
         SetIdentity(kIdentityAlpha);
-        return Log("          Verify that the Manual Pairing Code should be printed using a minimum font size of 6 points "
-                   "typically producing a typeface height of 2.1 mm");
+        return Log("Verify that the Manual Pairing Code should be printed using a minimum font size of 6 points typically "
+                   "producing a typeface height of 2.1 mm");
     }
 };
 
@@ -91154,14 +91295,13 @@ private:
     CHIP_ERROR TestStep1_0()
     {
         SetIdentity(kIdentityAlpha);
-        return Log("          Scan the device QR code using DUT");
+        return Log("Scan the device QR code using DUT");
     }
 
     CHIP_ERROR TestStep1Verification_1()
     {
         SetIdentity(kIdentityAlpha);
-        return Log("          Verify the DUT is able to scan and parse the QR code successfully to onboard the device onto the "
-                   "CHIP network");
+        return Log("Verify the DUT is able to scan and parse the QR code successfully to onboard the device onto the CHIP network");
     }
 };
 
@@ -91246,21 +91386,20 @@ private:
     CHIP_ERROR TestPrecondition_0()
     {
         SetIdentity(kIdentityAlpha);
-        return Log("          Verify that the manual pairing code is printed on the device or in additional provided materials");
+        return Log("Verify that the manual pairing code is printed on the device or in additional provided materials");
     }
 
     CHIP_ERROR TestStep1_1()
     {
         SetIdentity(kIdentityAlpha);
-        return Log("          Provide the 11 digit or 21 digit pairing code from the Device in text speech or any format supported "
-                   "by DUT");
+        return Log("Provide the 11 digit or 21 digit pairing code from the Device in text speech or any format supported by DUT");
     }
 
     CHIP_ERROR TestStep1Verification_2()
     {
         SetIdentity(kIdentityAlpha);
-        return Log("          Verify that the manual pairing code can be provided to DUT and parsed to onboard the device onto the "
-                   "CHIP network");
+        return Log(
+            "Verify that the manual pairing code can be provided to DUT and parsed to onboard the device onto the CHIP network");
     }
 };
 
@@ -92484,7 +92623,6 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<TestClusterComplexTypes>(credsIssuerConfig),
         make_unique<TestConstraints>(credsIssuerConfig),
         make_unique<TestDelayCommands>(credsIssuerConfig),
-        make_unique<TestDiscovery>(credsIssuerConfig),
         make_unique<TestLogCommands>(credsIssuerConfig),
         make_unique<TestSaveAs>(credsIssuerConfig),
         make_unique<TestConfigVariables>(credsIssuerConfig),
@@ -92504,6 +92642,7 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<TestGroupMessaging>(credsIssuerConfig),
         make_unique<TestGroupsCluster>(credsIssuerConfig),
         make_unique<TestGroupKeyManagementCluster>(credsIssuerConfig),
+        make_unique<TestDiscovery>(credsIssuerConfig),
         make_unique<Test_TC_DD_1_5>(credsIssuerConfig),
         make_unique<Test_TC_DD_1_6>(credsIssuerConfig),
         make_unique<Test_TC_DD_1_7>(credsIssuerConfig),
