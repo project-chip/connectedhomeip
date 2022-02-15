@@ -31,7 +31,12 @@ NODE_ID = 1
 LIGHTING_ENDPOINT_ID = 1
 
 # Ignore failures decoding these attributes (e.g. not yet implemented)
-ignoreAttributeDecodeFailureList = []
+ignoreAttributeDecodeFailureList = [
+    (1, Clusters.Objects.TestCluster,
+     Clusters.Objects.TestCluster.Attributes.GeneralErrorBoolean),
+    (1, Clusters.Objects.TestCluster,
+     Clusters.Objects.TestCluster.Attributes.ClusterErrorBoolean),
+]
 
 
 def _IgnoreAttributeDecodeFailure(path):
@@ -224,19 +229,18 @@ class ClusterObjectTests:
         ]
         VerifyDecodeSuccess(await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req))
 
-        # TODO: #13750 Reading OperationalCredentials::FabricLists attribute may crash the server, skip this test temporarily.
-        # logger.info("6: Reading E* C* A*")
-        # req = [
-        #     '*'
-        # ]
-        # VerifyDecodeSuccess(await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req))
+        logger.info("6: Reading E* C* A*")
+        req = [
+            '*'
+        ]
+        VerifyDecodeSuccess(await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req))
 
-        # res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req, returnClusterObject=True)
-        # logger.info(
-        #     f"Basic Cluster - Label: {res[0][Clusters.Basic].productLabel}")
-        # logger.info(
-        #     f"Test Cluster - Struct: {res[1][Clusters.TestCluster].structAttr}")
-        # logger.info(f"Test Cluster: {res[1][Clusters.TestCluster]}")
+        res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req, returnClusterObject=True)
+        logger.info(
+            f"Basic Cluster - Label: {res[0][0][Clusters.Basic].productLabel}")
+        logger.info(
+            f"Test Cluster - Struct: {res[0][1][Clusters.TestCluster].structAttr}")
+        logger.info(f"Test Cluster: {res[0][1][Clusters.TestCluster]}")
 
         logger.info("7: Reading Chunked List")
         res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.TestCluster.Attributes.ListLongOctetString)])
