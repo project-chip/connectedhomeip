@@ -122,6 +122,11 @@ protected:
         params.mpAttributePathParamsList    = attributePathParams;
         params.mAttributePathParamsListSize = 1;
 
+        if (mFabricFiltered.HasValue())
+        {
+            params.mIsFabricFiltered = mFabricFiltered.Value();
+        }
+
         chip::Optional<chip::app::DataVersionFilter> dataVersionFilter;
         if (aDataVersion.HasValue())
         {
@@ -168,6 +173,10 @@ protected:
 
     std::unique_ptr<chip::app::ReadClient> mReadClient;
     chip::app::BufferedReadCallback mBufferedReadAdapter;
+
+    // mFabricFiltered is really only used by the attribute commands, but we end
+    // up needing it in our class's shared code.
+    chip::Optional<bool> mFabricFiltered;
 };
 
 class ReadAttribute : public ReportCommand
@@ -178,6 +187,7 @@ public:
         AddArgument("cluster-id", 0, UINT32_MAX, &mClusterId);
         AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
         AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
+        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         ReportCommand::AddArguments();
     }
 
@@ -186,6 +196,7 @@ public:
     {
         AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
         AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
+        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         ReportCommand::AddArguments();
     }
 
@@ -196,6 +207,7 @@ public:
     {
         AddArgument("attr-name", attributeName);
         AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
+        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         ReportCommand::AddArguments();
     }
 
@@ -226,6 +238,7 @@ public:
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
         AddArgument("wait", 0, 1, &mWait);
+        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         ReportCommand::AddArguments();
     }
 
@@ -237,6 +250,7 @@ public:
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
         AddArgument("wait", 0, 1, &mWait);
+        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         ReportCommand::AddArguments();
     }
 
@@ -250,6 +264,7 @@ public:
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
         AddArgument("wait", 0, 1, &mWait);
+        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         ReportCommand::AddArguments();
     }
 

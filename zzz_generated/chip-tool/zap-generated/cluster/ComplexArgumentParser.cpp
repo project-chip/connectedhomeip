@@ -1132,8 +1132,8 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NetworkInterfaceType.name", "name", value.isMember("name")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NetworkInterfaceType.fabricConnected", "fabricConnected",
-                                                                  value.isMember("fabricConnected")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NetworkInterfaceType.isOperational", "isOperational",
+                                                                  value.isMember("isOperational")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NetworkInterfaceType.offPremiseServicesReachableIPv4",
                                                                   "offPremiseServicesReachableIPv4",
                                                                   value.isMember("offPremiseServicesReachableIPv4")));
@@ -1142,14 +1142,18 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                                                   value.isMember("offPremiseServicesReachableIPv6")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NetworkInterfaceType.hardwareAddress", "hardwareAddress",
                                                                   value.isMember("hardwareAddress")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NetworkInterfaceType.IPv4Addresses", "IPv4Addresses",
+                                                                  value.isMember("IPv4Addresses")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NetworkInterfaceType.IPv6Addresses", "IPv6Addresses",
+                                                                  value.isMember("IPv6Addresses")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NetworkInterfaceType.type", "type", value.isMember("type")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "name");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.name, value["name"]));
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricConnected");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricConnected, value["fabricConnected"]));
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "isOperational");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.isOperational, value["isOperational"]));
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "offPremiseServicesReachableIPv4");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.offPremiseServicesReachableIPv4,
@@ -1162,6 +1166,12 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "hardwareAddress");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.hardwareAddress, value["hardwareAddress"]));
 
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "IPv4Addresses");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.IPv4Addresses, value["IPv4Addresses"]));
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "IPv6Addresses");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.IPv6Addresses, value["IPv6Addresses"]));
+
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "type");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.type, value["type"]));
 
@@ -1171,10 +1181,12 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 void ComplexArgumentParser::Finalize(chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::Type & request)
 {
     ComplexArgumentParser::Finalize(request.name);
-    ComplexArgumentParser::Finalize(request.fabricConnected);
+    ComplexArgumentParser::Finalize(request.isOperational);
     ComplexArgumentParser::Finalize(request.offPremiseServicesReachableIPv4);
     ComplexArgumentParser::Finalize(request.offPremiseServicesReachableIPv6);
     ComplexArgumentParser::Finalize(request.hardwareAddress);
+    ComplexArgumentParser::Finalize(request.IPv4Addresses);
+    ComplexArgumentParser::Finalize(request.IPv6Addresses);
     ComplexArgumentParser::Finalize(request.type);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,

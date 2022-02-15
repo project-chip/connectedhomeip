@@ -239,6 +239,8 @@ AttributeWriteResult = AttributeStatus
 class AttributeDescriptorWithEndpoint:
     EndpointId: int
     Attribute: ClusterAttributeDescriptor
+    DataVersion: int
+    HasDataVersion: int
 
 
 @dataclass
@@ -821,6 +823,8 @@ def WriteAttributes(future: Future, eventLoop, device, attributes: List[Attribut
         path.EndpointId = attr.EndpointId
         path.ClusterId = attr.Attribute.cluster_id
         path.AttributeId = attr.Attribute.attribute_id
+        path.DataVersion = attr.DataVersion
+        path.HasDataVersion = attr.HasDataVersion
         path = chip.interaction_model.AttributePathIBstruct.build(path)
         tlv = attr.Attribute.ToTLV(None, attr.Data)
         writeargs.append(ctypes.c_char_p(path))

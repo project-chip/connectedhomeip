@@ -911,7 +911,8 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER
 #define CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER                                                                               \
-    "q6YMMEFrj0F39eFq1RTP2Vd1E/Av1gUGsQSdDyxzEAEOXkC/2GtO9oGoi3Hp4qhTmFp975Fuow4BuHIvv30OOIVsEs1kwiW7JO8hQX4OROU="
+    "uWFwqugDNGiEck/po7KHwwMwwqZgN10XuyBajPGuyzUEV/iree4lOrao5GuwnlQ65CJzbeUB49s31EH+NEkg0JVI5MGCQGMMT/SRPFNRODm3wH/MBiehuFc6FJ/"  \
+    "NH6Rmzw=="
 #endif
 
 #else

@@ -24,6 +24,7 @@
 #include <access/AccessControl.h>
 #include <app/ClusterInfo.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/GlobalAttributes.h>
 #include <app/InteractionModelEngine.h>
 #include <app/RequiredPrivilege.h>
 #include <app/reporting/Engine.h>
@@ -41,6 +42,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/TypeTraits.h>
+#include <platform/LockTracker.h>
 #include <protocols/interaction_model/Constants.h>
 
 #include <app-common/zap-generated/att-storage.h>
@@ -346,29 +348,39 @@ public:
 CHIP_ERROR GlobalAttributeReader::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     using namespace Clusters::Globals::Attributes;
-    // The id of the attributes below is not in the attribute metadata.
-    // TODO: This does not play nicely with wildcard reads.  Need to fix ZAP to
-    // put it in the metadata, or fix wildcard expansion to add it.
     switch (aPath.mAttributeId)
     {
     case AttributeList::Id:
         return aEncoder.EncodeList([this](const auto & encoder) {
-            constexpr AttributeId ourId = Clusters::Globals::Attributes::AttributeList::Id;
-            const size_t count          = mCluster->attributeCount;
-            bool addedOurId             = false;
+            const size_t count     = mCluster->attributeCount;
+            bool addedExtraGlobals = false;
             for (size_t i = 0; i < count; ++i)
             {
-                AttributeId id = mCluster->attributes[i].attributeId;
-                if (!addedOurId && id > ourId)
+                AttributeId id              = mCluster->attributes[i].attributeId;
+                constexpr auto lastGlobalId = GlobalAttributesNotInMetadata[ArraySize(GlobalAttributesNotInMetadata) - 1];
+                // We are relying on GlobalAttributesNotInMetadata not having
+                // any gaps in their ids here, but for now they do because we
+                // have no EventList support.  So this assert is not quite
+                // right.  There should be a "- 1" on the right-hand side of the
+                // equals sign.
+                static_assert(lastGlobalId - GlobalAttributesNotInMetadata[0] == ArraySize(GlobalAttributesNotInMetadata),
+                              "Ids in GlobalAttributesNotInMetadata not consecutive (except EventList)");
+                if (!addedExtraGlobals && id > lastGlobalId)
                 {
-                    ReturnErrorOnFailure(encoder.Encode(ourId));
-                    addedOurId = true;
+                    for (const auto & globalId : GlobalAttributesNotInMetadata)
+                    {
+                        ReturnErrorOnFailure(encoder.Encode(globalId));
+                    }
+                    addedExtraGlobals = true;
                 }
                 ReturnErrorOnFailure(encoder.Encode(id));
             }
-            if (!addedOurId)
+            if (!addedExtraGlobals)
             {
-                ReturnErrorOnFailure(encoder.Encode(ourId));
+                for (const auto & globalId : GlobalAttributesNotInMetadata)
+                {
+                    ReturnErrorOnFailure(encoder.Encode(globalId));
+                }
             }
             return CHIP_NO_ERROR;
         });
@@ -948,6 +960,14 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
         return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::NeedsTimedInteraction);
     }
 
+    if (aPath.mDataVersion.HasValue() &&
+        !IsClusterDataVersionEqual(aPath.mEndpointId, aPath.mClusterId, aPath.mDataVersion.Value()))
+    {
+        ChipLogError(DataManagement, "Write Version mismatch for Endpoint %" PRIx16 ", Cluster " ChipLogFormatMEI,
+                     aPath.mEndpointId, ChipLogValueMEI(aPath.mClusterId));
+        return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::DataVersionMismatch);
+    }
+
     if (auto * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId))
     {
         AttributeValueDecoder valueDecoder(aReader, aSubjectDescriptor);
@@ -1010,6 +1030,10 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clust
 
 void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
 {
+    // Attribute writes have asserted this already, but this assert should catch
+    // applications notifying about changes from their end.
+    assertChipStackLockedByCurrentThread();
+
     ClusterInfo info;
     info.mClusterId   = clusterId;
     info.mAttributeId = attributeId;

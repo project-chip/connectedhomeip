@@ -53,7 +53,7 @@ struct ReadPrepareParams
     uint16_t mMinIntervalFloorSeconds               = 0;
     uint16_t mMaxIntervalCeilingSeconds             = 0;
     bool mKeepSubscriptions                         = true;
-    bool mIsFabricFiltered                          = false;
+    bool mIsFabricFiltered                          = true;
     OnResubscribePolicyCB mResubscribePolicy        = nullptr;
 
     ReadPrepareParams() {}

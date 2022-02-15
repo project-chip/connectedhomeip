@@ -36,7 +36,7 @@
 const uint16_t kPairingTimeoutInSeconds = 10;
 const uint16_t kAddressResolveTimeoutInSeconds = 10;
 const uint16_t kCASESetupTimeoutInSeconds = 30;
-const uint16_t kTimeoutInSeconds = 5;
+const uint16_t kTimeoutInSeconds = 20;
 const uint64_t nodeId = 0x12344321;
 const uint16_t kDiscriminator = 3840;
 const uint32_t kSetupPINCode = 20202021;
@@ -174,10 +174,6 @@ CHIPDevice * GetConnectedDevice(void)
 {
     CHIPDeviceController * controller = [CHIPDeviceController sharedController];
     XCTAssertNotNil(controller);
-
-    NSError * error;
-    [controller unpairDevice:nodeId error:&error];
-    XCTAssertEqual(error.code, 0);
 
     BOOL stopped = [controller shutdown];
     XCTAssertTrue(stopped);
@@ -14436,7 +14432,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     CHIPTestMediaPlayback * cluster = [[CHIPTestMediaPlayback alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributePlaybackStateWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+    [cluster readAttributeCurrentStateWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads the playback state attribute Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
@@ -14501,7 +14497,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     CHIPTestMediaPlayback * cluster = [[CHIPTestMediaPlayback alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributePlaybackStateWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+    [cluster readAttributeCurrentStateWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads the CurrentState attribute Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
@@ -14647,7 +14643,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     CHIPTestMediaPlayback * cluster = [[CHIPTestMediaPlayback alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributePlaybackStateWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+    [cluster readAttributeCurrentStateWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads the CurrentState attribute Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
@@ -14687,7 +14683,7 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     CHIPTestMediaPlayback * cluster = [[CHIPTestMediaPlayback alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributePlaybackStateWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+    [cluster readAttributeCurrentStateWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads the CurrentState attribute Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
@@ -14745,7 +14741,6 @@ NSNumber * _Nonnull ColorLoopStoredEnhancedHueValue;
     WaitForCommissionee(expectation, queue, nodeId);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-NSNumber * _Nonnull currentTarget;
 - (void)testSendClusterTest_TC_MC_8_1_000001_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Reads the CurrentTarget attribute"];
@@ -14755,15 +14750,10 @@ NSNumber * _Nonnull currentTarget;
     CHIPTestTargetNavigator * cluster = [[CHIPTestTargetNavigator alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeCurrentNavigatorTargetWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+    [cluster readAttributeCurrentTargetWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads the CurrentTarget attribute Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            currentTarget = actualValue;
-        }
 
         [expectation fulfill];
     }];
@@ -14779,7 +14769,7 @@ NSNumber * _Nonnull currentTarget;
     CHIPTestTargetNavigator * cluster = [[CHIPTestTargetNavigator alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeTargetNavigatorListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+    [cluster readAttributeTargetListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads the TargetList attribute Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
@@ -14834,7 +14824,7 @@ NSNumber * _Nonnull currentTarget;
     CHIPTestApplicationBasic * cluster = [[CHIPTestApplicationBasic alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeVendorIdWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+    [cluster readAttributeVendorIDWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads the VendorID attribute Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
@@ -14882,7 +14872,7 @@ NSNumber * _Nonnull currentTarget;
     CHIPTestApplicationBasic * cluster = [[CHIPTestApplicationBasic alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeProductIdWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+    [cluster readAttributeProductIDWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads the ProductID attribute Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
@@ -14901,7 +14891,7 @@ NSNumber * _Nonnull currentTarget;
     CHIPTestApplicationBasic * cluster = [[CHIPTestApplicationBasic alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeApplicationStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+    [cluster readAttributeStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Reads the Status attribute Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
@@ -36980,7 +36970,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
     XCTAssertNotNil(cluster);
 
     uint16_t minIntervalArgument = 2U;
-    uint16_t maxIntervalArgument = 10U;
+    uint16_t maxIntervalArgument = 5U;
     [cluster subscribeAttributeListInt8uWithMinInterval:@(minIntervalArgument)
         maxInterval:@(maxIntervalArgument)
         subscriptionEstablished:^{
@@ -43368,7 +43358,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue count], 21);
+            XCTAssertEqual([actualValue count], 23);
             XCTAssertEqual([actualValue[0] unsignedIntValue], 0UL);
             XCTAssertEqual([actualValue[1] unsignedIntValue], 1UL);
             XCTAssertEqual([actualValue[2] unsignedIntValue], 2UL);
@@ -43388,8 +43378,10 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
             XCTAssertEqual([actualValue[16] unsignedIntValue], 16UL);
             XCTAssertEqual([actualValue[17] unsignedIntValue], 17UL);
             XCTAssertEqual([actualValue[18] unsignedIntValue], 18UL);
-            XCTAssertEqual([actualValue[19] unsignedIntValue], 65531UL);
-            XCTAssertEqual([actualValue[20] unsignedIntValue], 65533UL);
+            XCTAssertEqual([actualValue[19] unsignedIntValue], 65528UL);
+            XCTAssertEqual([actualValue[20] unsignedIntValue], 65529UL);
+            XCTAssertEqual([actualValue[21] unsignedIntValue], 65531UL);
+            XCTAssertEqual([actualValue[22] unsignedIntValue], 65533UL);
         }
 
         [expectation fulfill];
@@ -44608,6 +44600,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
+NSNumber * _Nonnull ourFabricIndex;
 - (void)testSendClusterTestOperationalCredentialsCluster_000003_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read current fabric index"];
@@ -44629,6 +44622,10 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
             if (actualValue != nil) {
                 XCTAssertGreaterThanOrEqual([actualValue unsignedCharValue], 1);
             }
+        }
+        {
+            id actualValue = value;
+            ourFabricIndex = actualValue;
         }
 
         [expectation fulfill];
@@ -44663,6 +44660,99 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
 
                  [expectation fulfill];
              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestOperationalCredentialsCluster_000005_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read fabric list before setting label"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestOperationalCredentials * cluster = [[CHIPTestOperationalCredentials alloc] initWithDevice:device
+                                                                                             endpoint:0
+                                                                                                queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeFabricsWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read fabric list before setting label Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue count], 1);
+            XCTAssertEqualObjects(
+                ((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).fabricIndex, ourFabricIndex);
+            XCTAssertTrue([((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).label isEqualToString:@""]);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestOperationalCredentialsCluster_000006_UpdateFabricLabel
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Set the fabric label"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestOperationalCredentials * cluster = [[CHIPTestOperationalCredentials alloc] initWithDevice:device
+                                                                                             endpoint:0
+                                                                                                queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPOperationalCredentialsClusterUpdateFabricLabelParams alloc] init];
+    params.label = @"Batcave";
+    [cluster updateFabricLabelWithParams:params
+                       completionHandler:^(
+                           CHIPOperationalCredentialsClusterNOCResponseParams * _Nullable values, NSError * _Nullable err) {
+                           NSLog(@"Set the fabric label Error: %@", err);
+
+                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                           {
+                               id actualValue = values.statusCode;
+                               XCTAssertEqual([actualValue unsignedCharValue], 0);
+                           }
+                           {
+                               id actualValue = values.fabricIndex;
+                               XCTAssertEqualObjects(actualValue, ourFabricIndex);
+                           }
+
+                           [expectation fulfill];
+                       }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestOperationalCredentialsCluster_000007_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read fabric list after setting label"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestOperationalCredentials * cluster = [[CHIPTestOperationalCredentials alloc] initWithDevice:device
+                                                                                             endpoint:0
+                                                                                                queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeFabricsWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read fabric list after setting label Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue count], 1);
+            XCTAssertEqualObjects(
+                ((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).fabricIndex, ourFabricIndex);
+            XCTAssertTrue(
+                [((CHIPOperationalCredentialsClusterFabricDescriptor *) actualValue[0]).label isEqualToString:@"Batcave"]);
+        }
+
+        [expectation fulfill];
+    }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -45122,7 +45212,7 @@ ResponseHandler test_TestSubscribe_OnOff_OnOff_Reported = nil;
     XCTAssertNotNil(cluster);
 
     uint16_t minIntervalArgument = 2U;
-    uint16_t maxIntervalArgument = 10U;
+    uint16_t maxIntervalArgument = 5U;
     [cluster subscribeAttributeOnOffWithMinInterval:@(minIntervalArgument)
         maxInterval:@(maxIntervalArgument)
         subscriptionEstablished:^{

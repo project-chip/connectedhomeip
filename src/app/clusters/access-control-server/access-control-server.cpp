@@ -37,6 +37,12 @@ namespace AccessControlCluster = chip::app::Clusters::AccessControl;
 
 namespace {
 
+struct Subject
+{
+    NodeId nodeId;
+    AccessControlCluster::AuthMode authMode;
+};
+
 struct AccessControlEntryCodec
 {
     static CHIP_ERROR Convert(AuthMode from, AccessControlCluster::AuthMode & to)
@@ -127,6 +133,48 @@ struct AccessControlEntryCodec
         return CHIP_NO_ERROR;
     }
 
+    static CHIP_ERROR Convert(NodeId from, Subject & to)
+    {
+        if (IsOperationalNodeId(from) || IsCASEAuthTag(from))
+        {
+            to = { .nodeId = from, .authMode = AccessControlCluster::AuthMode::kCase };
+        }
+        else if (IsGroupId(from))
+        {
+            to = { .nodeId = GroupIdFromNodeId(from), .authMode = AccessControlCluster::AuthMode::kGroup };
+        }
+        else if (IsPAKEKeyId(from))
+        {
+            to = { .nodeId = PAKEKeyIdFromNodeId(from), .authMode = AccessControlCluster::AuthMode::kPase };
+        }
+        else
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    static CHIP_ERROR Convert(Subject from, NodeId & to)
+    {
+        switch (from.authMode)
+        {
+        case AccessControlCluster::AuthMode::kPase:
+            ReturnErrorCodeIf(from.nodeId & ~kMaskPAKEKeyId, CHIP_ERROR_INVALID_ARGUMENT);
+            to = NodeIdFromPAKEKeyId(static_cast<PasscodeId>(from.nodeId));
+            break;
+        case AccessControlCluster::AuthMode::kCase:
+            to = from.nodeId;
+            break;
+        case AccessControlCluster::AuthMode::kGroup:
+            ReturnErrorCodeIf(from.nodeId & ~kMaskGroupId, CHIP_ERROR_INVALID_ARGUMENT);
+            to = NodeIdFromGroupId(static_cast<GroupId>(from.nodeId));
+            break;
+        default:
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        return CHIP_NO_ERROR;
+    }
+
     static CHIP_ERROR Convert(const AccessControl::Entry::Target & from, AccessControlCluster::Structs::Target::Type & to)
     {
         if (from.flags & AccessControl::Entry::Target::kCluster)
@@ -202,7 +250,10 @@ struct AccessControlEntryCodec
         {
             for (size_t i = 0; i < subjectCount; ++i)
             {
-                ReturnErrorOnFailure(entry.GetSubject(i, subjectBuffer[i]));
+                Subject subject;
+                ReturnErrorOnFailure(entry.GetSubject(i, subject.nodeId));
+                ReturnErrorOnFailure(Convert(subject.nodeId, subject));
+                subjectBuffer[i] = subject.nodeId;
             }
             staging.subjects.SetNonNull(subjectBuffer, subjectCount);
         }
@@ -251,7 +302,9 @@ struct AccessControlEntryCodec
             auto iterator = staging.subjects.Value().begin();
             while (iterator.Next())
             {
-                ReturnErrorOnFailure(entry.AddSubject(nullptr, iterator.GetValue()));
+                Subject subject = { .nodeId = iterator.GetValue(), .authMode = staging.authMode };
+                ReturnErrorOnFailure(Convert(subject, subject.nodeId));
+                ReturnErrorOnFailure(entry.AddSubject(nullptr, subject.nodeId));
             }
             ReturnErrorOnFailure(iterator.GetStatus());
         }
@@ -486,10 +539,13 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
 
         while (i < oldCount)
         {
+            AccessControl::Entry entry;
+
             --oldCount;
+            ReturnErrorOnFailure(GetAccessControl().ReadEntry(oldCount, entry, &accessingFabricIndex));
+            ReturnErrorOnFailure(
+                LogAccessControlEvent(entry, aDecoder.GetSubjectDescriptor(), AccessControlCluster::ChangeTypeEnum::kRemoved));
             ReturnErrorOnFailure(GetAccessControl().DeleteEntry(oldCount, &accessingFabricIndex));
-            ReturnErrorOnFailure(LogAccessControlEvent(iterator.GetValue().entry, aDecoder.GetSubjectDescriptor(),
-                                                       AccessControlCluster::ChangeTypeEnum::kRemoved));
         }
     }
     else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)

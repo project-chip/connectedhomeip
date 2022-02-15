@@ -76,11 +76,11 @@ client cluster AccountLogin = 1294 {
   readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute int16u clusterRevision = 65533;
 
-  request struct GetSetupPINRequestRequest {
+  request struct GetSetupPINRequest {
     CHAR_STRING tempAccountIdentifier = 0;
   }
 
-  request struct LoginRequestRequest {
+  request struct LoginRequest {
     CHAR_STRING tempAccountIdentifier = 0;
     CHAR_STRING setupPIN = 1;
   }
@@ -89,9 +89,9 @@ client cluster AccountLogin = 1294 {
     CHAR_STRING setupPIN = 0;
   }
 
-  timed command GetSetupPINRequest(GetSetupPINRequestRequest): GetSetupPINResponse = 0;
-  timed command LoginRequest(LoginRequestRequest): DefaultSuccess = 2;
-  timed command LogoutRequest(): DefaultSuccess = 3;
+  timed command GetSetupPIN(GetSetupPINRequest): GetSetupPINResponse = 0;
+  timed command Login(LoginRequest): DefaultSuccess = 2;
+  timed command Logout(): DefaultSuccess = 3;
 }
 
 client cluster AdministratorCommissioning = 60 {
@@ -147,11 +147,11 @@ client cluster ApplicationBasic = 1293 {
   }
 
   readonly attribute char_string<32> vendorName = 0;
-  readonly attribute int16u vendorId = 1;
+  readonly attribute int16u vendorID = 1;
   readonly attribute char_string<32> applicationName = 2;
-  readonly attribute int16u productId = 3;
-  readonly attribute ApplicationBasicApplication applicationApp = 4;
-  readonly attribute ApplicationStatusEnum applicationStatus = 5;
+  readonly attribute int16u productID = 3;
+  readonly attribute ApplicationBasicApplication application = 4;
+  readonly attribute ApplicationStatusEnum status = 5;
   readonly attribute char_string<32> applicationVersion = 6;
   readonly attribute vendor_id allowedVendorList[] = 7;
   readonly global attribute command_id serverGeneratedCommandList[] = 65528;
@@ -186,23 +186,23 @@ client cluster ApplicationLauncher = 1292 {
     CHAR_STRING applicationId = 1;
   }
 
-  readonly attribute INT16U applicationLauncherList[] = 0;
-  attribute nullable ApplicationEP applicationLauncherApp = 1;
+  readonly attribute INT16U catalogList[] = 0;
+  attribute nullable ApplicationEP currentApp = 1;
   readonly global attribute command_id serverGeneratedCommandList[] = 65528;
   readonly global attribute command_id clientGeneratedCommandList[] = 65529;
   readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute int16u clusterRevision = 65533;
 
-  request struct HideAppRequestRequest {
+  request struct HideAppRequest {
     Application application = 0;
   }
 
-  request struct LaunchAppRequestRequest {
+  request struct LaunchAppRequest {
     Application application = 0;
     optional OCTET_STRING data = 1;
   }
 
-  request struct StopAppRequestRequest {
+  request struct StopAppRequest {
     Application application = 0;
   }
 
@@ -211,9 +211,9 @@ client cluster ApplicationLauncher = 1292 {
     OCTET_STRING data = 1;
   }
 
-  command HideAppRequest(HideAppRequestRequest): LauncherResponse = 2;
-  command LaunchAppRequest(LaunchAppRequestRequest): LauncherResponse = 0;
-  command StopAppRequest(StopAppRequestRequest): LauncherResponse = 1;
+  command HideApp(HideAppRequest): LauncherResponse = 2;
+  command LaunchApp(LaunchAppRequest): LauncherResponse = 0;
+  command StopApp(StopAppRequest): LauncherResponse = 1;
 }
 
 client cluster AudioOutput = 1291 {
@@ -236,24 +236,24 @@ client cluster AudioOutput = 1291 {
     CHAR_STRING<32> name = 2;
   }
 
-  readonly attribute OutputInfo audioOutputList[] = 0;
-  readonly attribute int8u currentAudioOutput = 1;
+  readonly attribute OutputInfo outputList[] = 0;
+  readonly attribute int8u currentOutput = 1;
   readonly global attribute command_id serverGeneratedCommandList[] = 65528;
   readonly global attribute command_id clientGeneratedCommandList[] = 65529;
   readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute int16u clusterRevision = 65533;
 
-  request struct RenameOutputRequestRequest {
+  request struct RenameOutputRequest {
     INT8U index = 0;
     CHAR_STRING name = 1;
   }
 
-  request struct SelectOutputRequestRequest {
+  request struct SelectOutputRequest {
     INT8U index = 0;
   }
 
-  command RenameOutputRequest(RenameOutputRequestRequest): DefaultSuccess = 1;
-  command SelectOutputRequest(SelectOutputRequestRequest): DefaultSuccess = 0;
+  command RenameOutput(RenameOutputRequest): DefaultSuccess = 1;
+  command SelectOutput(SelectOutputRequest): DefaultSuccess = 0;
 }
 
 client cluster BarrierControl = 259 {
@@ -581,23 +581,23 @@ client cluster Channel = 1284 {
   }
 
   readonly attribute ChannelInfo channelList[] = 0;
-  readonly attribute nullable LineupInfo channelLineup = 1;
+  readonly attribute nullable LineupInfo lineup = 1;
   readonly attribute nullable ChannelInfo currentChannel = 2;
   readonly global attribute command_id serverGeneratedCommandList[] = 65528;
   readonly global attribute command_id clientGeneratedCommandList[] = 65529;
   readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute int16u clusterRevision = 65533;
 
-  request struct ChangeChannelByNumberRequestRequest {
+  request struct ChangeChannelRequest {
+    CHAR_STRING match = 0;
+  }
+
+  request struct ChangeChannelByNumberRequest {
     INT16U majorNumber = 0;
     INT16U minorNumber = 1;
   }
 
-  request struct ChangeChannelRequestRequest {
-    CHAR_STRING match = 0;
-  }
-
-  request struct SkipChannelRequestRequest {
+  request struct SkipChannelRequest {
     INT16U count = 0;
   }
 
@@ -606,9 +606,9 @@ client cluster Channel = 1284 {
     ErrorTypeEnum errorType = 1;
   }
 
-  command ChangeChannelByNumberRequest(ChangeChannelByNumberRequestRequest): DefaultSuccess = 2;
-  command ChangeChannelRequest(ChangeChannelRequestRequest): ChangeChannelResponse = 0;
-  command SkipChannelRequest(SkipChannelRequestRequest): DefaultSuccess = 3;
+  command ChangeChannel(ChangeChannelRequest): ChangeChannelResponse = 0;
+  command ChangeChannelByNumber(ChangeChannelByNumberRequest): DefaultSuccess = 2;
+  command SkipChannel(SkipChannelRequest): DefaultSuccess = 3;
 }
 
 client cluster ColorControl = 768 {
@@ -973,20 +973,20 @@ client cluster ContentLauncher = 1290 {
     MetricTypeEnum metric = 2;
   }
 
-  readonly attribute CHAR_STRING acceptHeaderList[] = 0;
+  readonly attribute CHAR_STRING acceptHeader[] = 0;
   attribute bitmap32 supportedStreamingProtocols = 1;
   readonly global attribute command_id serverGeneratedCommandList[] = 65528;
   readonly global attribute command_id clientGeneratedCommandList[] = 65529;
   readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute int16u clusterRevision = 65533;
 
-  request struct LaunchContentRequestRequest {
+  request struct LaunchContentRequest {
     ContentSearch search = 0;
     BOOLEAN autoPlay = 1;
     optional CHAR_STRING data = 2;
   }
 
-  request struct LaunchURLRequestRequest {
+  request struct LaunchURLRequest {
     CHAR_STRING contentURL = 0;
     optional CHAR_STRING displayString = 1;
     optional BrandingInformation brandingInformation = 2;
@@ -997,8 +997,8 @@ client cluster ContentLauncher = 1290 {
     optional CHAR_STRING data = 1;
   }
 
-  command LaunchContentRequest(LaunchContentRequestRequest): LaunchResponse = 0;
-  command LaunchURLRequest(LaunchURLRequestRequest): LaunchResponse = 1;
+  command LaunchContent(LaunchContentRequest): LaunchResponse = 0;
+  command LaunchURL(LaunchURLRequest): LaunchResponse = 1;
 }
 
 client cluster Descriptor = 29 {
@@ -1783,11 +1783,13 @@ client cluster GeneralDiagnostics = 51 {
 
   struct NetworkInterfaceType {
     CHAR_STRING<32> name = 0;
-    BOOLEAN fabricConnected = 1;
+    BOOLEAN isOperational = 1;
     nullable BOOLEAN offPremiseServicesReachableIPv4 = 2;
     nullable BOOLEAN offPremiseServicesReachableIPv6 = 3;
     OCTET_STRING<8> hardwareAddress = 4;
-    InterfaceType type = 5;
+    OCTET_STRING IPv4Addresses[] = 5;
+    OCTET_STRING IPv6Addresses[] = 6;
+    InterfaceType type = 7;
   }
 
   critical event HardwareFaultChange = 0 {
@@ -2122,7 +2124,7 @@ client cluster KeypadInput = 1289 {
   readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute int16u clusterRevision = 65533;
 
-  request struct SendKeyRequestRequest {
+  request struct SendKeyRequest {
     CecKeyCode keyCode = 0;
   }
 
@@ -2130,7 +2132,7 @@ client cluster KeypadInput = 1289 {
     StatusEnum status = 0;
   }
 
-  command SendKeyRequest(SendKeyRequestRequest): SendKeyResponse = 0;
+  command SendKey(SendKeyRequest): SendKeyResponse = 0;
 }
 
 client cluster LevelControl = 8 {
@@ -2267,26 +2269,26 @@ client cluster MediaInput = 1287 {
     CHAR_STRING<32> description = 3;
   }
 
-  readonly attribute InputInfo mediaInputList[] = 0;
-  readonly attribute int8u currentMediaInput = 1;
+  readonly attribute InputInfo inputList[] = 0;
+  readonly attribute int8u currentInput = 1;
   readonly global attribute command_id serverGeneratedCommandList[] = 65528;
   readonly global attribute command_id clientGeneratedCommandList[] = 65529;
   readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute int16u clusterRevision = 65533;
 
-  request struct RenameInputRequestRequest {
+  request struct RenameInputRequest {
     INT8U index = 0;
     CHAR_STRING name = 1;
   }
 
-  request struct SelectInputRequestRequest {
+  request struct SelectInputRequest {
     INT8U index = 0;
   }
 
-  command HideInputStatusRequest(): DefaultSuccess = 2;
-  command RenameInputRequest(RenameInputRequestRequest): DefaultSuccess = 3;
-  command SelectInputRequest(SelectInputRequestRequest): DefaultSuccess = 0;
-  command ShowInputStatusRequest(): DefaultSuccess = 1;
+  command HideInputStatus(): DefaultSuccess = 2;
+  command RenameInput(RenameInputRequest): DefaultSuccess = 3;
+  command SelectInput(SelectInputRequest): DefaultSuccess = 0;
+  command ShowInputStatus(): DefaultSuccess = 1;
 }
 
 client cluster MediaPlayback = 1286 {
@@ -2311,10 +2313,10 @@ client cluster MediaPlayback = 1286 {
     nullable INT64U position = 1;
   }
 
-  readonly attribute PlaybackStateEnum playbackState = 0;
+  readonly attribute PlaybackStateEnum currentState = 0;
   readonly attribute nullable epoch_us startTime = 1;
   readonly attribute nullable int64u duration = 2;
-  readonly attribute PlaybackPosition position = 3;
+  readonly attribute nullable PlaybackPosition sampledPosition = 3;
   readonly attribute single playbackSpeed = 4;
   readonly attribute nullable int64u seekRangeEnd = 5;
   readonly attribute nullable int64u seekRangeStart = 6;
@@ -2323,15 +2325,15 @@ client cluster MediaPlayback = 1286 {
   readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute int16u clusterRevision = 65533;
 
-  request struct SeekRequestRequest {
+  request struct SeekRequest {
     INT64U position = 0;
   }
 
-  request struct SkipBackwardRequestRequest {
+  request struct SkipBackwardRequest {
     INT64U deltaPositionMilliseconds = 0;
   }
 
-  request struct SkipForwardRequestRequest {
+  request struct SkipForwardRequest {
     INT64U deltaPositionMilliseconds = 0;
   }
 
@@ -2339,17 +2341,17 @@ client cluster MediaPlayback = 1286 {
     StatusEnum status = 0;
   }
 
-  command FastForwardRequest(): PlaybackResponse = 7;
-  command NextRequest(): PlaybackResponse = 5;
-  command PauseRequest(): PlaybackResponse = 1;
-  command PlayRequest(): PlaybackResponse = 0;
-  command PreviousRequest(): PlaybackResponse = 4;
-  command RewindRequest(): PlaybackResponse = 6;
-  command SeekRequest(SeekRequestRequest): PlaybackResponse = 11;
-  command SkipBackwardRequest(SkipBackwardRequestRequest): PlaybackResponse = 9;
-  command SkipForwardRequest(SkipForwardRequestRequest): PlaybackResponse = 8;
-  command StartOverRequest(): PlaybackResponse = 3;
-  command StopRequest(): PlaybackResponse = 2;
+  command FastForward(): PlaybackResponse = 7;
+  command Next(): PlaybackResponse = 5;
+  command Pause(): PlaybackResponse = 1;
+  command Play(): PlaybackResponse = 0;
+  command Previous(): PlaybackResponse = 4;
+  command Rewind(): PlaybackResponse = 6;
+  command Seek(SeekRequest): PlaybackResponse = 11;
+  command SkipBackward(SkipBackwardRequest): PlaybackResponse = 9;
+  command SkipForward(SkipForwardRequest): PlaybackResponse = 8;
+  command StartOver(): PlaybackResponse = 3;
+  command StopPlayback(): PlaybackResponse = 2;
 }
 
 client cluster ModeSelect = 80 {
@@ -2437,9 +2439,9 @@ client cluster NetworkCommissioning = 49 {
   readonly attribute int8u scanMaxTimeSeconds = 2;
   readonly attribute int8u connectMaxTimeSeconds = 3;
   attribute boolean interfaceEnabled = 4;
-  readonly attribute NetworkCommissioningStatus lastNetworkingStatus = 5;
-  readonly attribute octet_string<32> lastNetworkID = 6;
-  readonly attribute int32u lastConnectErrorValue = 7;
+  readonly attribute nullable NetworkCommissioningStatus lastNetworkingStatus = 5;
+  readonly attribute nullable octet_string<32> lastNetworkID = 6;
+  readonly attribute nullable int32s lastConnectErrorValue = 7;
   readonly global attribute command_id serverGeneratedCommandList[] = 65528;
   readonly global attribute command_id clientGeneratedCommandList[] = 65529;
   readonly global attribute bitmap32 featureMap = 65532;
@@ -2738,7 +2740,7 @@ client cluster OperationalCredentials = 62 {
   }
 
   readonly attribute NOCStruct NOCs[] = 0;
-  readonly attribute FabricDescriptor fabricsList[] = 1;
+  readonly attribute FabricDescriptor fabrics[] = 1;
   readonly attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
   readonly attribute OCTET_STRING trustedRootCertificates[] = 4;
@@ -3226,14 +3228,14 @@ client cluster TargetNavigator = 1285 {
     CHAR_STRING<32> name = 1;
   }
 
-  readonly attribute TargetInfo targetNavigatorList[] = 0;
-  readonly attribute int8u currentNavigatorTarget = 1;
+  readonly attribute TargetInfo targetList[] = 0;
+  readonly attribute int8u currentTarget = 1;
   readonly global attribute command_id serverGeneratedCommandList[] = 65528;
   readonly global attribute command_id clientGeneratedCommandList[] = 65529;
   readonly global attribute attrib_id attributeList[] = 65531;
   readonly global attribute int16u clusterRevision = 65533;
 
-  request struct NavigateTargetRequestRequest {
+  request struct NavigateTargetRequest {
     INT8U target = 0;
     optional CHAR_STRING data = 1;
   }
@@ -3243,7 +3245,7 @@ client cluster TargetNavigator = 1285 {
     optional CHAR_STRING data = 1;
   }
 
-  command NavigateTargetRequest(NavigateTargetRequestRequest): NavigateTargetResponse = 0;
+  command NavigateTarget(NavigateTargetRequest): NavigateTargetResponse = 0;
 }
 
 client cluster TemperatureMeasurement = 1026 {
@@ -3839,7 +3841,7 @@ client cluster UserLabel = 65 {
 }
 
 client cluster WakeOnLan = 1283 {
-  readonly attribute char_string<32> wakeOnLanMacAddress = 0;
+  readonly attribute char_string<32> MACAddress = 0;
   readonly global attribute command_id serverGeneratedCommandList[] = 65528;
   readonly global attribute command_id clientGeneratedCommandList[] = 65529;
   readonly global attribute attrib_id attributeList[] = 65531;

@@ -74,7 +74,6 @@ enum
 };
 
 typedef int8_t count_t;
-#define PRI_CHIP_SYS_STATS_COUNT PRId8
 #define CHIP_SYS_STATS_COUNT_MAX INT8_MAX
 
 extern count_t ResourcesInUse[kNumEntries];

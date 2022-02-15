@@ -145,6 +145,8 @@ def HostTargets():
         targets[0].Extend('rpc-console', app=HostApp.RPC_CONSOLE))
     app_targets.append(
         targets[0].Extend('tv-app', app=HostApp.TV_APP))
+    app_targets.append(
+        targets[0].Extend('chip-cert', app=HostApp.CERT_TOOL))
 
     for target in targets:
         app_targets.append(target.Extend(

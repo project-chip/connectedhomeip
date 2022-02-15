@@ -793,6 +793,8 @@
 					Foundation,
 					"-framework",
 					CoreBluetooth,
+					"-framework",
+					CoreData,
 					"-Wl,-unexported_symbol,\"__Z*\"",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIP;

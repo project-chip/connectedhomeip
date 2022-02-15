@@ -14,13 +14,14 @@
       Similarly, forceNotOptional=true and forceNotNullable=true because we
       have accounted for those already. }}
   {{#if definedValue.length}}
-  {{! This should really do heap-allocation with a function-scope-wide
-      auto-free setup, so we could guarantee no name collisions. }}
-  {{zapTypeToEncodableClusterObjectType type ns=ns forceNotList=true forceNotNullable=true forceNotOptional=true}} {{asLowerCamelCase label}}List_{{depth}}[{{definedValue.length}}];
-  {{#each definedValue}}
-  {{>commandValue ns=../ns container=(concat (asLowerCamelCase ../label) "List_" ../depth "[" @index "]") definedValue=. type=../type depth=(incrementDepth ../depth)}}
-  {{/each}}
-  {{container}} = {{asLowerCamelCase label}}List_{{depth}};
+  {
+    auto * listHolder_{{depth}} = new ListHolder<{{zapTypeToEncodableClusterObjectType type ns=ns forceNotList=true forceNotNullable=true forceNotOptional=true}}>({{definedValue.length}});
+    listFreer.add(listHolder_{{depth}});
+    {{#each definedValue}}
+    {{>commandValue ns=../ns container=(concat "listHolder_" ../depth "->mList[" @index "]") definedValue=. type=../type depth=(incrementDepth ../depth) parent=../parent}}
+    {{/each}}
+    {{container}} = chip::app::DataModel::List<{{zapTypeToEncodableClusterObjectType type ns=ns forceNotList=true forceNotNullable=true forceNotOptional=true}}>(listHolder_{{depth}}->mList, {{definedValue.length}});
+  }
   {{else}}
   {{container}} = chip::app::DataModel::List<{{zapTypeToEncodableClusterObjectType type ns=ns forceNotList=true forceNotNullable=true forceNotOptional=true}}>();
   {{/if}}

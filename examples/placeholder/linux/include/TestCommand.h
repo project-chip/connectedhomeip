@@ -62,9 +62,16 @@ public:
         return 0;
     }
 
-    CHIP_ERROR ContinueOnChipMainThread() override
+    CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err) override
     {
-        NextTest();
+        if (CHIP_NO_ERROR == err)
+        {
+            NextTest();
+        }
+        else
+        {
+            Exit(chip::ErrorStr(err));
+        }
         return CHIP_NO_ERROR;
     }
 

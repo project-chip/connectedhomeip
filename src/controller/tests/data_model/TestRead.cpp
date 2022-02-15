@@ -175,7 +175,7 @@ void TestReadInteraction::TestReadAttributeResponse(nlTestSuite * apSuite, void 
     auto onSuccessCb = [apSuite, &onSuccessCbInvoked](const app::ConcreteDataAttributePath & attributePath,
                                                       const auto & dataResponse) {
         uint8_t i = 0;
-        NL_TEST_ASSERT(apSuite, attributePath.mDataVersion == kDataVersion);
+        NL_TEST_ASSERT(apSuite, attributePath.mDataVersion.HasValue() && attributePath.mDataVersion.Value() == kDataVersion);
         auto iter = dataResponse.begin();
         while (iter.Next())
         {
@@ -353,10 +353,7 @@ void TestReadInteraction::TestReadAttributeTimeout(nlTestSuite * apSuite, void *
 
     NL_TEST_ASSERT(apSuite, !onSuccessCbInvoked && onFailureCbInvoked);
 
-    //
-    // TODO: Figure out why I cannot enable this line below.
-    //
-    // NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 1);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 1);
 
     ctx.DrainAndServiceIO();
     app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
@@ -434,10 +431,7 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptions(nlTestSuite * ap
 
     app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
 
-    //
-    // TODO: Figure out why I cannot enable this line below.
-    //
-    // NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
 void TestReadInteraction::TestReadHandler_MultipleSubscriptionsWithDataVersionFilter(nlTestSuite * apSuite, void * apContext)
@@ -453,7 +447,7 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptionsWithDataVersionFi
     // not safe to do so.
     auto onSuccessCb = [apSuite, &numSuccessCalls](const app::ConcreteDataAttributePath & attributePath,
                                                    const auto & dataResponse) {
-        NL_TEST_ASSERT(apSuite, attributePath.mDataVersion == kDataVersion);
+        NL_TEST_ASSERT(apSuite, attributePath.mDataVersion.HasValue() && attributePath.mDataVersion.Value() == kDataVersion);
         numSuccessCalls++;
     };
 
@@ -498,10 +492,7 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptionsWithDataVersionFi
 
     app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
 
-    //
-    // TODO: Figure out why I cannot enable this line below.
-    //
-    // NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
 void TestReadInteraction::TestReadHandlerResourceExhaustion_MultipleSubscriptions(nlTestSuite * apSuite, void * apContext)
@@ -565,10 +556,7 @@ void TestReadInteraction::TestReadHandlerResourceExhaustion_MultipleSubscription
     app::InteractionModelEngine::GetInstance()->SetHandlerCapacity(-1);
     app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
 
-    //
-    // TODO: Figure out why I cannot enable this line below.
-    //
-    // NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
 void TestReadInteraction::TestReadHandlerResourceExhaustion_MultipleReads(nlTestSuite * apSuite, void * apContext)
@@ -618,10 +606,7 @@ void TestReadInteraction::TestReadHandlerResourceExhaustion_MultipleReads(nlTest
     NL_TEST_ASSERT(apSuite, numSuccessCalls == 0);
     NL_TEST_ASSERT(apSuite, numFailureCalls == 1);
 
-    //
-    // TODO: Figure out why I cannot enable this line below.
-    //
-    // NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
 void TestReadInteraction::TestReadFabricScopedWithoutFabricFilter(nlTestSuite * apSuite, void * apContext)
@@ -740,11 +725,11 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestReadAttributeError", TestReadInteraction::TestReadAttributeError),
     NL_TEST_DEF("TestReadFabricScopedWithoutFabricFilter", TestReadInteraction::TestReadFabricScopedWithoutFabricFilter),
     NL_TEST_DEF("TestReadFabricScopedWithFabricFilter", TestReadInteraction::TestReadFabricScopedWithFabricFilter),
-    NL_TEST_DEF("TestReadAttributeTimeout", TestReadInteraction::TestReadAttributeTimeout),
     NL_TEST_DEF("TestReadHandler_MultipleSubscriptions", TestReadInteraction::TestReadHandler_MultipleSubscriptions),
     NL_TEST_DEF("TestReadHandler_MultipleSubscriptionsWithDataVersionFilter", TestReadInteraction::TestReadHandler_MultipleSubscriptionsWithDataVersionFilter),
     NL_TEST_DEF("TestReadHandlerResourceExhaustion_MultipleSubscriptions", TestReadInteraction::TestReadHandlerResourceExhaustion_MultipleSubscriptions),
     NL_TEST_DEF("TestReadHandlerResourceExhaustion_MultipleReads", TestReadInteraction::TestReadHandlerResourceExhaustion_MultipleReads),
+    NL_TEST_DEF("TestReadAttributeTimeout", TestReadInteraction::TestReadAttributeTimeout),
     NL_TEST_SENTINEL()
 };
 // clang-format on

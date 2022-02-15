@@ -611,13 +611,13 @@ tests:
       command: "writeAttribute"
       attribute: "float_double"
       arguments:
-          value: 1.7e200
+          value: "1.7e+200"
 
     - label: "Read attribute DOUBLE large Value"
       command: "readAttribute"
       attribute: "float_double"
       response:
-          value: 1.7e200
+          value: "1.7e+200"
 
     - label: "Write attribute DOUBLE small Value"
       command: "writeAttribute"
@@ -2894,7 +2894,7 @@ tests:
       command: "subscribeAttribute"
       attribute: "list_int8u"
       minInterval: 2
-      maxInterval: 10
+      maxInterval: 5
       response:
           value: [1, 2, 3, 4]
 

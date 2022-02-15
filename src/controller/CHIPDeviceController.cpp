@@ -443,37 +443,33 @@ CHIP_ERROR DeviceController::ComputePASEVerifier(uint32_t iterations, uint32_t s
 }
 
 CHIP_ERROR DeviceController::OpenCommissioningWindowWithCallback(NodeId deviceId, uint16_t timeout, uint32_t iteration,
-                                                                 uint16_t discriminator, uint8_t option,
+                                                                 uint16_t discriminator, CommissioningWindowOption option,
                                                                  chip::Callback::Callback<OnOpenCommissioningWindow> * callback,
                                                                  bool readVIDPIDAttributes)
 {
     mSetupPayload = SetupPayload();
 
+    switch (option)
+    {
+    case CommissioningWindowOption::kOriginalSetupCode:
+    case CommissioningWindowOption::kTokenWithRandomPIN:
+        break;
+    case CommissioningWindowOption::kTokenWithProvidedPIN:
+        mSetupPayload.setUpPINCode = mSuggestedSetUpPINCode;
+        break;
+    default:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     mSetupPayload.version               = 0;
     mSetupPayload.discriminator         = discriminator;
     mSetupPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kOnNetwork);
 
+    mCommissioningWindowOption         = option;
     mCommissioningWindowCallback       = callback;
     mDeviceWithCommissioningWindowOpen = deviceId;
     mCommissioningWindowTimeout        = timeout;
     mCommissioningWindowIteration      = iteration;
-
-    switch (option)
-    {
-    case 0:
-        mCommissioningWindowOption = CommissioningWindowOption::kOriginalSetupCode;
-        break;
-    case 1:
-        mCommissioningWindowOption = CommissioningWindowOption::kTokenWithRandomPIN;
-        break;
-    case 2:
-        mCommissioningWindowOption = CommissioningWindowOption::kTokenWithProvidedPIN;
-        mSetupPayload.setUpPINCode = mSuggestedSetUpPINCode;
-        break;
-    default:
-        ChipLogError(Controller, "Invalid Pairing Window option");
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
 
     if (callback != nullptr && mCommissioningWindowOption != CommissioningWindowOption::kOriginalSetupCode && readVIDPIDAttributes)
     {

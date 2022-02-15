@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
+#include <app/data-model/Nullable.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <lib/support/Variant.h>
 #include <platform/NetworkCommissioning.h>
@@ -79,6 +80,16 @@ private:
     app::CommandHandler::Handle mAsyncCommandHandle;
 
     ConcreteCommandPath mPath = ConcreteCommandPath(0, 0, 0);
+
+    // Last* attributes
+    // Setting these values don't have to care about parallel requests, since we will reject other requests when there is another
+    // request ongoing.
+    DataModel::Nullable<NetworkCommissioningStatus> mLastNetworkingStatusValue;
+    DataModel::Nullable<Attributes::LastConnectErrorValue::TypeInfo::Type> mLastConnectErrorValue;
+    uint8_t mConnectingNetworkID[DeviceLayer::NetworkCommissioning::kMaxNetworkIDLen];
+    uint8_t mConnectingNetworkIDLen = 0;
+    uint8_t mLastNetworkID[DeviceLayer::NetworkCommissioning::kMaxNetworkIDLen];
+    uint8_t mLastNetworkIDLen = 0;
 
     // Actual handlers of the commands
     void HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetworks::DecodableType & req);
