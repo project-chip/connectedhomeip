@@ -4443,11 +4443,11 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricIdx)), fabricIdx));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNodeId)), nodeId));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupId)), groupId));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kEndpointId)), endpointId));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kClusterId)), clusterId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricIndex)), fabricIndex));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNode)), node));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroup)), group));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kEndpoint)), endpoint));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kCluster)), cluster));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -4464,20 +4464,20 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kFabricIdx):
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIdx));
+        case to_underlying(Fields::kFabricIndex):
+            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
             break;
-        case to_underlying(Fields::kNodeId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, nodeId));
+        case to_underlying(Fields::kNode):
+            ReturnErrorOnFailure(DataModel::Decode(reader, node));
             break;
-        case to_underlying(Fields::kGroupId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupId));
+        case to_underlying(Fields::kGroup):
+            ReturnErrorOnFailure(DataModel::Decode(reader, group));
             break;
-        case to_underlying(Fields::kEndpointId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, endpointId));
+        case to_underlying(Fields::kEndpoint):
+            ReturnErrorOnFailure(DataModel::Decode(reader, endpoint));
             break;
-        case to_underlying(Fields::kClusterId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, clusterId));
+        case to_underlying(Fields::kCluster):
+            ReturnErrorOnFailure(DataModel::Decode(reader, cluster));
             break;
         default:
             break;
@@ -4501,8 +4501,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::BindingList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, bindingList));
+    case Attributes::Binding::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, binding));
         break;
     case Attributes::ServerGeneratedCommandList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, serverGeneratedCommandList));

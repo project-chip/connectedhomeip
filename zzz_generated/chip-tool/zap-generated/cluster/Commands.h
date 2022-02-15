@@ -3509,7 +3509,7 @@ private:
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * BindingList                                                       | 0x0000 |
+| * Binding                                                           | 0x0000 |
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -3519,18 +3519,18 @@ private:
 | Events:                                                             |        |
 \*----------------------------------------------------------------------------*/
 
-class WriteBindingBindingList : public WriteAttribute
+class WriteBindingBinding : public WriteAttribute
 {
 public:
-    WriteBindingBindingList(CredentialIssuerCommands * credsIssuerConfig) :
-        WriteAttribute("BindingList", credsIssuerConfig), mComplex(&mValue)
+    WriteBindingBinding(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("Binding", credsIssuerConfig), mComplex(&mValue)
     {
-        AddArgument("attr-name", "binding-list");
+        AddArgument("attr-name", "binding");
         AddArgument("attr-value", &mComplex);
         WriteAttribute::AddArguments();
     }
 
-    ~WriteBindingBindingList() {}
+    ~WriteBindingBinding() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -16833,8 +16833,8 @@ void registerClusterBinding(Commands & commands, CredentialIssuerCommands * cred
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                              //
-        make_unique<ReadAttribute>(Id, "binding-list", Attributes::BindingList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                     //
+        make_unique<ReadAttribute>(Id, "binding", Attributes::Binding::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
@@ -16843,9 +16843,9 @@ void registerClusterBinding(Commands & commands, CredentialIssuerCommands * cred
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),           //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                     //
-        make_unique<WriteBindingBindingList>(credsIssuerConfig),                                                //
+        make_unique<WriteBindingBinding>(credsIssuerConfig),                                                    //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                 //
-        make_unique<SubscribeAttribute>(Id, "binding-list", Attributes::BindingList::Id, credsIssuerConfig),    //
+        make_unique<SubscribeAttribute>(Id, "binding", Attributes::Binding::Id, credsIssuerConfig),             //
         make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,

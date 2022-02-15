@@ -1052,9 +1052,8 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedBindingClusterBindingListAttributeCallback
-      implements ChipClusters.BindingCluster.BindingListAttributeCallback,
-          DelegatedClusterCallback {
+  public static class DelegatedBindingClusterBindingAttributeCallback
+      implements ChipClusters.BindingCluster.BindingAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
     @Override

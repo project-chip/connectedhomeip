@@ -37,6 +37,15 @@ static_library("helpers") {
   ]
 }
 
+source_set("binding-table") {
+  sources = [ "${chip_root}/src/app/util/binding-table.cpp" ]
+
+  public_deps = [
+    "${chip_root}/src/app/util/mock:mock_ember",
+    "${chip_root}/src/lib/core",
+  ]
+}
+
 chip_test_suite("tests") {
   output_name = "libAppTests"
 
@@ -44,6 +53,7 @@ chip_test_suite("tests") {
     "TestAttributePathExpandIterator.cpp",
     "TestAttributeValueDecoder.cpp",
     "TestAttributeValueEncoder.cpp",
+    "TestBindingTable.cpp",
     "TestBuilderParser.cpp",
     "TestClusterInfo.cpp",
     "TestCommandInteraction.cpp",
@@ -74,6 +84,7 @@ chip_test_suite("tests") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    ":binding-table",
     "${chip_root}/src/app",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/tests:helpers",

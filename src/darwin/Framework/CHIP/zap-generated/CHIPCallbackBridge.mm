@@ -2123,7 +2123,7 @@ void CHIPBinaryInputBasicAttributeListListAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void CHIPBindingBindingListListAttributeCallbackBridge::OnSuccessFn(void * context,
+void CHIPBindingBindingListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -2134,26 +2134,26 @@ void CHIPBindingBindingListListAttributeCallbackBridge::OnSuccessFn(void * conte
             auto & entry_0 = iter_0.GetValue();
             CHIPBindingClusterTargetStruct * newElement_0;
             newElement_0 = [CHIPBindingClusterTargetStruct new];
-            newElement_0.fabricIdx = [NSNumber numberWithUnsignedChar:entry_0.fabricIdx];
-            if (entry_0.nodeId.HasValue()) {
-                newElement_0.nodeId = [NSNumber numberWithUnsignedLongLong:entry_0.nodeId.Value()];
+            newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+            if (entry_0.node.HasValue()) {
+                newElement_0.node = [NSNumber numberWithUnsignedLongLong:entry_0.node.Value()];
             } else {
-                newElement_0.nodeId = nil;
+                newElement_0.node = nil;
             }
-            if (entry_0.groupId.HasValue()) {
-                newElement_0.groupId = [NSNumber numberWithUnsignedShort:entry_0.groupId.Value()];
+            if (entry_0.group.HasValue()) {
+                newElement_0.group = [NSNumber numberWithUnsignedShort:entry_0.group.Value()];
             } else {
-                newElement_0.groupId = nil;
+                newElement_0.group = nil;
             }
-            if (entry_0.endpointId.HasValue()) {
-                newElement_0.endpointId = [NSNumber numberWithUnsignedShort:entry_0.endpointId.Value()];
+            if (entry_0.endpoint.HasValue()) {
+                newElement_0.endpoint = [NSNumber numberWithUnsignedShort:entry_0.endpoint.Value()];
             } else {
-                newElement_0.endpointId = nil;
+                newElement_0.endpoint = nil;
             }
-            if (entry_0.clusterId.HasValue()) {
-                newElement_0.clusterId = [NSNumber numberWithUnsignedInt:entry_0.clusterId.Value()];
+            if (entry_0.cluster.HasValue()) {
+                newElement_0.cluster = [NSNumber numberWithUnsignedInt:entry_0.cluster.Value()];
             } else {
-                newElement_0.clusterId = nil;
+                newElement_0.cluster = nil;
             }
             [array_0 addObject:newElement_0];
         }
@@ -2167,9 +2167,9 @@ void CHIPBindingBindingListListAttributeCallbackBridge::OnSuccessFn(void * conte
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPBindingBindingListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPBindingBindingListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPBindingBindingListListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPBindingBindingListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }

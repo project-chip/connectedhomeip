@@ -143,14 +143,14 @@ server cluster Basic = 40 {
 
 server cluster Binding = 30 {
   struct TargetStruct {
-    FABRIC_IDX fabricIdx = 0;
-    optional NODE_ID nodeId = 1;
-    optional GROUP_ID groupId = 2;
-    optional ENDPOINT_NO endpointId = 3;
-    optional CLUSTER_ID clusterId = 4;
+    FABRIC_IDX fabricIndex = 0;
+    optional NODE_ID node = 1;
+    optional GROUP_ID group = 2;
+    optional ENDPOINT_NO endpoint = 3;
+    optional CLUSTER_ID cluster = 4;
   }
 
-  attribute TargetStruct bindingList[] = 0;
+  attribute TargetStruct binding[] = 0;
   readonly global attribute int16u clusterRevision = 65533;
 }
 
