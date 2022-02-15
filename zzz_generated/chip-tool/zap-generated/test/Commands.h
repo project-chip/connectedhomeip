@@ -91698,7 +91698,7 @@ private:
 
         request.groupKeySet.groupKeySetID = 417U;
         request.groupKeySet.groupKeySecurityPolicy =
-            static_cast<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy>(0);
+            static_cast<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy>(1);
         request.groupKeySet.epochKey0.SetNonNull();
         request.groupKeySet.epochKey0.Value() =
             chip::ByteSpan(chip::Uint8::from_const_char(
@@ -91751,7 +91751,7 @@ private:
 
         request.groupKeySet.groupKeySetID = 418U;
         request.groupKeySet.groupKeySecurityPolicy =
-            static_cast<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy>(0);
+            static_cast<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy>(1);
         request.groupKeySet.epochKey0.SetNonNull();
         request.groupKeySet.epochKey0.Value() =
             chip::ByteSpan(chip::Uint8::from_const_char(
