@@ -84,7 +84,8 @@ CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::ReadDefaultOtaProviders(Attribu
     chip::OTARequestorInterface * requestor = chip::GetRequestorInstance();
     if (requestor == nullptr)
     {
-        return aEncoder.EncodeEmptyList();;
+        return aEncoder.EncodeEmptyList();
+        ;
     }
 
     return requestor->GetDefaultOtaProviderList(aEncoder);
