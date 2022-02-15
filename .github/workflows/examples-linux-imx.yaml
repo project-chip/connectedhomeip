@@ -40,12 +40,12 @@ jobs:
                   submodules: true
 
             - name: Build App
-              timeout-minutes: 10
+              timeout-minutes: 30
               run: |
                   ./scripts/examples/imxlinux_example.sh \
                   examples/lighting-app/linux/ examples/lighting-app/linux/out/aarch64
             - name: Build chip-tool
-              timeout-minutes: 10
+              timeout-minutes: 30
               run: |
                    ./scripts/examples/imxlinux_example.sh \
                    examples/chip-tool examples/chip-tool/out/aarch64
