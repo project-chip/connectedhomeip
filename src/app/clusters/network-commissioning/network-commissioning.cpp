@@ -279,6 +279,7 @@ void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::Connec
     if (req.networkID.size() > DeviceLayer::NetworkCommissioning::kMaxNetworkIDLen)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidValue);
+        return;
     }
 
     mConnectingNetworkIDLen = static_cast<uint8_t>(req.networkID.size());
