@@ -88,7 +88,7 @@ public:
     System::Clock::Milliseconds32 GetMinLookupTime() const { return mMinLookupTimeMs; }
     System::Clock::Milliseconds32 GetMaxLookupTime() const { return mMaxLookupTimeMs; }
 
-    /// The mimimum lookup time is how much to wait for additional DNSSD
+    /// The minimum lookup time is how much to wait for additional DNSSD
     /// queries even if a reply has already been received or to allow for
     /// additional heuristics regarding node choice to succeed (e.g. for a
     /// ping6 response to be received, if an implementation goes that route)
