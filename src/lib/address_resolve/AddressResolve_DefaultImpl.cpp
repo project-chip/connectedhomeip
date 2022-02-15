@@ -40,7 +40,8 @@ enum class IpScore : unsigned
     kLinkLocal                     = 3, // Valid only on an interface
     kUniqueLocal                   = 4, // ULA. Thread devices use this
     kGlobalUnicast                 = 5, // Maybe routable, not local subnet
-    kGlobalUnicastWithSharedPrefix = 6, // Prefix seems to match a local interface
+    kUniqueLocalWithSharedPrefix   = 6, // Prefix seems to match a local interface
+    kGlobalUnicastWithSharedPrefix = 7, // Prefix seems to match a local interface
 };
 
 constexpr unsigned ScoreValue(IpScore score)
@@ -56,13 +57,19 @@ IpScore ScoreIpAddress(const Inet::IPAddress & ip, Inet::InterfaceId interfaceId
 {
     if (ip.IsIPv6())
     {
-        if (ip.IsIPv6GlobalUnicast())
+        if (interfaceId.MatchLocalIPv6Subnet(ip))
         {
-            if (interfaceId.MatchLocalIPv6Subnet(ip))
+            if (ip.IsIPv6GlobalUnicast())
             {
                 return IpScore::kGlobalUnicastWithSharedPrefix;
             }
-
+            else if (ip.IsIPv6ULA())
+            {
+                return IpScore::kUniqueLocalWithSharedPrefix;
+            }
+        }
+        if (ip.IsIPv6GlobalUnicast())
+        {
             return IpScore::kGlobalUnicast;
         }
 
