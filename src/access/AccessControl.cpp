@@ -317,6 +317,10 @@ bool AccessControl::IsValid(const Entry & entry)
     SuccessOrExit(entry.GetSubjectCount(subjectCount));
     SuccessOrExit(entry.GetTargetCount(targetCount));
 
+    ChipLogDetail(DataManagement, "AccessControl: validating f=%u p=%c a=%c s=%d t=%d", fabricIndex,
+                  GetPrivilegeStringForLogging(privilege), GetAuthModeStringForLogging(authMode), static_cast<int>(subjectCount),
+                  static_cast<int>(targetCount));
+
     // Fabric index must be defined.
     VerifyOrExit(fabricIndex != kUndefinedFabricIndex, log = "invalid fabric index");
 
@@ -338,6 +342,7 @@ bool AccessControl::IsValid(const Entry & entry)
         SuccessOrExit(entry.GetSubject(i, subject));
         const bool kIsCase  = authMode == AuthMode::kCase;
         const bool kIsGroup = authMode == AuthMode::kGroup;
+        ChipLogDetail(DataManagement, "  validating subject 0x" ChipLogFormatX64, ChipLogValueX64(subject));
         VerifyOrExit((kIsCase && IsValidCaseNodeId(subject)) || (kIsGroup && IsValidGroupNodeId(subject)), log = "invalid subject");
     }
 

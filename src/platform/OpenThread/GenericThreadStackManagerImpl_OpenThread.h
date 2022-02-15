@@ -26,6 +26,7 @@
 #pragma once
 
 #include <openthread/instance.h>
+#include <openthread/link.h>
 #include <openthread/netdata.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
@@ -89,6 +90,8 @@ protected:
     ConnectivityManager::ThreadDeviceType _GetThreadDeviceType(void);
     CHIP_ERROR _SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType);
     CHIP_ERROR _StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback);
+    static void _OnNetworkScanFinished(otActiveScanResult * aResult, void * aContext);
+    void _OnNetworkScanFinished(otActiveScanResult * aResult);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
     CHIP_ERROR _GetSEDPollingConfig(ConnectivityManager::SEDPollingConfig & pollingConfig);

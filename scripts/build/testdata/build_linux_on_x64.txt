@@ -70,6 +70,12 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 # Generating linux-x64-all-clusters-ipv6only
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux --args=chip_inet_config_enable_ipv4=false {out}/linux-x64-all-clusters-ipv6only
 
+# Generating linux-x64-chip-cert
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root} '--args=chip_crypto="openssl"' {out}/linux-x64-chip-cert
+
+# Generating linux-x64-chip-cert-ipv6only
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root} '--args=chip_inet_config_enable_ipv4=false chip_crypto="openssl"' {out}/linux-x64-chip-cert-ipv6only
+
 # Generating linux-x64-chip-tool
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool {out}/linux-x64-chip-tool
 
@@ -156,6 +162,12 @@ ninja -C {out}/linux-x64-all-clusters
 
 # Building linux-x64-all-clusters-ipv6only
 ninja -C {out}/linux-x64-all-clusters-ipv6only
+
+# Building linux-x64-chip-cert
+ninja -C {out}/linux-x64-chip-cert src/tools/chip-cert
+
+# Building linux-x64-chip-cert-ipv6only
+ninja -C {out}/linux-x64-chip-cert-ipv6only src/tools/chip-cert
 
 # Building linux-x64-chip-tool
 ninja -C {out}/linux-x64-chip-tool

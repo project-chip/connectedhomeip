@@ -36,7 +36,7 @@
 const uint16_t kPairingTimeoutInSeconds = 10;
 const uint16_t kAddressResolveTimeoutInSeconds = 10;
 const uint16_t kCASESetupTimeoutInSeconds = 30;
-const uint16_t kTimeoutInSeconds = 5;
+const uint16_t kTimeoutInSeconds = 20;
 const uint64_t nodeId = 0x12344321;
 const uint16_t kDiscriminator = 3840;
 const uint32_t kSetupPINCode = 20202021;
@@ -36970,7 +36970,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
     XCTAssertNotNil(cluster);
 
     uint16_t minIntervalArgument = 2U;
-    uint16_t maxIntervalArgument = 10U;
+    uint16_t maxIntervalArgument = 5U;
     [cluster subscribeAttributeListInt8uWithMinInterval:@(minIntervalArgument)
         maxInterval:@(maxIntervalArgument)
         subscriptionEstablished:^{
@@ -43358,7 +43358,7 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue count], 21);
+            XCTAssertEqual([actualValue count], 23);
             XCTAssertEqual([actualValue[0] unsignedIntValue], 0UL);
             XCTAssertEqual([actualValue[1] unsignedIntValue], 1UL);
             XCTAssertEqual([actualValue[2] unsignedIntValue], 2UL);
@@ -43378,8 +43378,10 @@ NSData * _Nonnull readAttributeOctetStringNotDefaultValue;
             XCTAssertEqual([actualValue[16] unsignedIntValue], 16UL);
             XCTAssertEqual([actualValue[17] unsignedIntValue], 17UL);
             XCTAssertEqual([actualValue[18] unsignedIntValue], 18UL);
-            XCTAssertEqual([actualValue[19] unsignedIntValue], 65531UL);
-            XCTAssertEqual([actualValue[20] unsignedIntValue], 65533UL);
+            XCTAssertEqual([actualValue[19] unsignedIntValue], 65528UL);
+            XCTAssertEqual([actualValue[20] unsignedIntValue], 65529UL);
+            XCTAssertEqual([actualValue[21] unsignedIntValue], 65531UL);
+            XCTAssertEqual([actualValue[22] unsignedIntValue], 65533UL);
         }
 
         [expectation fulfill];
@@ -45210,7 +45212,7 @@ ResponseHandler test_TestSubscribe_OnOff_OnOff_Reported = nil;
     XCTAssertNotNil(cluster);
 
     uint16_t minIntervalArgument = 2U;
-    uint16_t maxIntervalArgument = 10U;
+    uint16_t maxIntervalArgument = 5U;
     [cluster subscribeAttributeOnOffWithMinInterval:@(minIntervalArgument)
         maxInterval:@(maxIntervalArgument)
         subscriptionEstablished:^{
