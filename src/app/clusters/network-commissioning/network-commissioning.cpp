@@ -468,3 +468,47 @@ void Instance::OnCommissioningComplete(CHIP_ERROR err)
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+bool emberAfNetworkCommissioningClusterAddOrUpdateThreadNetworkCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::DecodableType & commandData)
+{
+    return false;
+}
+
+bool emberAfNetworkCommissioningClusterAddOrUpdateWiFiNetworkCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::DecodableType & commandData)
+{
+    return false;
+}
+
+bool emberAfNetworkCommissioningClusterConnectNetworkCallback(
+    chip::app::CommandHandler * commandObj, const chip ::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetwork::DecodableType & commandData)
+{
+    return false;
+}
+
+bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetwork::DecodableType & commandData)
+{
+    return false;
+}
+
+bool emberAfNetworkCommissioningClusterScanNetworksCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworks::DecodableType & commandData)
+{
+    return false;
+}
+
+bool emberAfNetworkCommissioningClusterReorderNetworkCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::NetworkCommissioning::Commands::ReorderNetwork::DecodableType & commandData)
+{
+    return false;
+}
+
+void MatterNetworkCommissioningPluginServerInitCallback() {}
