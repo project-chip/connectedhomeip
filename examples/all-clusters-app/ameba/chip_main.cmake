@@ -223,6 +223,7 @@ list(
     -DCHIP_HAVE_CONFIG_H
     -DMBEDTLS_CONFIG_FILE=<mbedtls_config.h>
     -DCONFIG_ENABLE_ROTATING_DEVICE_ID=1
+    -DMATTER_ALL_CLUSTERS_APP=1
 )
 
 if (matter_enable_rpc)
