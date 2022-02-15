@@ -208,13 +208,13 @@ public:
             mPaiDerBuffer(paiDerBuffer), mDacDerBuffer(dacDerBuffer), mAttestationNonce(attestationNonce), mVendorId(vendorId),
             mProductId(productId)
         {}
-        const ByteSpan &
+        const ByteSpan
             mAttestationElementsBuffer; // Buffer containing attestation elements portion of Attestation Response (raw TLV)
-        const ByteSpan & mAttestationChallengeBuffer; // Buffer containing the attestation challenge from the secure session
-        const ByteSpan & mAttestationSignatureBuffer; // Buffer the signature portion of Attestation Response
-        const ByteSpan & mPaiDerBuffer;               // Buffer containing the PAI certificate from device in DER format.
-        const ByteSpan & mDacDerBuffer;               // Buffer containing the DAC certificate from device in DER format.
-        const ByteSpan & mAttestationNonce;           // Buffer containing attestation nonce.
+        const ByteSpan mAttestationChallengeBuffer; // Buffer containing the attestation challenge from the secure session
+        const ByteSpan mAttestationSignatureBuffer; // Buffer the signature portion of Attestation Response
+        const ByteSpan mPaiDerBuffer;               // Buffer containing the PAI certificate from device in DER format.
+        const ByteSpan mDacDerBuffer;               // Buffer containing the DAC certificate from device in DER format.
+        const ByteSpan mAttestationNonce;           // Buffer containing attestation nonce.
         VendorId mVendorId;
         uint16_t mProductId;
     };
