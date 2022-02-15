@@ -510,5 +510,3 @@ bool emberAfNetworkCommissioningClusterReorderNetworkCallback(
 {
     return false;
 }
-
-void MatterNetworkCommissioningPluginServerInitCallback() {}

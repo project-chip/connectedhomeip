@@ -247,6 +247,7 @@ void MatterThermostatUserInterfaceConfigurationPluginServerInitCallback() {}
 void MatterBridgedDeviceBasicInformationPluginServerInitCallback() {}
 void MatterPowerConfigurationPluginServerInitCallback() {}
 void MatterPowerProfilePluginServerInitCallback() {}
+void MatterNetworkCommissioningPluginServerInitCallback() {}
 void MatterPulseWidthModulationPluginServerInitCallback() {}
 void MatterAlarmsPluginServerInitCallback() {}
 void MatterTimePluginServerInitCallback() {}
