@@ -233,8 +233,7 @@ public:
         return mInteractionType == InteractionType::Subscribe ? returnType(mSubscriptionId) : returnType::Missing();
     }
 
-    FabricIndex GetFabricIndex() const { return mFabricIndex; }
-    NodeId GetPeerNodeId() const { return mPeerNodeId; }
+    OperationalId GetPeerOperationalId() const { return mPeerOperationalId; }
     bool IsReadType() { return mInteractionType == InteractionType::Read; }
     bool IsSubscriptionType() const { return mInteractionType == InteractionType::Subscribe; };
 
@@ -335,8 +334,7 @@ private:
     uint16_t mMinIntervalFloorSeconds   = 0;
     uint16_t mMaxIntervalCeilingSeconds = 0;
     uint64_t mSubscriptionId            = 0;
-    NodeId mPeerNodeId                  = kUndefinedNodeId;
-    FabricIndex mFabricIndex            = kUndefinedFabricIndex;
+    OperationalId mPeerOperationalId    = OperationalId::UndefinedOperationalId();
     InteractionType mInteractionType    = InteractionType::Read;
     Timestamp mEventTimestamp;
     EventNumber mEventMin = 0;

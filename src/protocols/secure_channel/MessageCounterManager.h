@@ -74,7 +74,7 @@ public:
      *  @retval  #CHIP_ERROR_NO_MEMORY If there is no empty slot left in the table for addition.
      *  @retval  #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR AddToReceiveTable(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+    CHIP_ERROR AddToReceiveTable(FabricIndex fabricIndex, const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                  System::PacketBufferHandle && msgBuf);
 
 private:
@@ -91,6 +91,7 @@ private:
     struct ReceiveTableEntry
     {
         Transport::PeerAddress peerAddress; /**< The peer address for the message*/
+        FabricIndex fabricIndex;
         System::PacketBufferHandle msgBuf;  /**< A handle to the PacketBuffer object holding the message data. */
     };
 
@@ -99,7 +100,7 @@ private:
     // MessageCounterManager cache table to queue the incoming messages that trigger message counter synchronization protocol.
     ReceiveTableEntry mReceiveTable[CHIP_CONFIG_MCSP_RECEIVE_TABLE_SIZE];
 
-    void ProcessPendingMessages(NodeId peerNodeId);
+    void ProcessPendingMessages(OperationalId operationalId);
 
     CHIP_ERROR SendMsgCounterSyncResp(Messaging::ExchangeContext * exchangeContext, FixedByteSpan<kChallengeSize> challenge);
     CHIP_ERROR HandleMsgCounterSyncReq(Messaging::ExchangeContext * exchangeContext, System::PacketBufferHandle && msgBuf);

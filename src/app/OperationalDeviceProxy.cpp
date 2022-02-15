@@ -299,7 +299,7 @@ void OperationalDeviceProxy::OnSessionReleased()
 
 CHIP_ERROR OperationalDeviceProxy::ShutdownSubscriptions()
 {
-    return app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(mFabricInfo->GetFabricIndex(), GetDeviceId());
+    return app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(OperationalId(GetDeviceId(), mFabricInfo->GetFabricIndex()));
 }
 
 OperationalDeviceProxy::~OperationalDeviceProxy() {}

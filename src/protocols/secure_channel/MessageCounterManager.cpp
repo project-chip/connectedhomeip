@@ -78,7 +78,7 @@ CHIP_ERROR MessageCounterManager::QueueReceivedMessageAndStartSync(const PacketH
                                                                    System::PacketBufferHandle && msgBuf)
 {
     // Queue the message to be reprocessed when sync completes.
-    ReturnErrorOnFailure(AddToReceiveTable(packetHeader, peerAddress, std::move(msgBuf)));
+    ReturnErrorOnFailure(AddToReceiveTable(session->GetPeerOperationalId().GetFabricIndex(), packetHeader, peerAddress, std::move(msgBuf)));
     ReturnErrorOnFailure(StartSync(session, state));
 
     // After the message that triggers message counter synchronization is stored, and a message counter
@@ -114,7 +114,7 @@ void MessageCounterManager::OnResponseTimeout(Messaging::ExchangeContext * excha
     }
 }
 
-CHIP_ERROR MessageCounterManager::AddToReceiveTable(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+CHIP_ERROR MessageCounterManager::AddToReceiveTable(FabricIndex fabricIndex, const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                                     System::PacketBufferHandle && msgBuf)
 {
     ReturnErrorOnFailure(packetHeader.EncodeBeforeData(msgBuf));
@@ -124,6 +124,7 @@ CHIP_ERROR MessageCounterManager::AddToReceiveTable(const PacketHeader & packetH
         if (entry.msgBuf.IsNull())
         {
             entry.peerAddress = peerAddress;
+            entry.fabricIndex = fabricIndex;
             entry.msgBuf      = std::move(msgBuf);
 
             return CHIP_NO_ERROR;
@@ -141,7 +142,7 @@ CHIP_ERROR MessageCounterManager::AddToReceiveTable(const PacketHeader & packetH
  *  @param[in] peerNodeId    Node ID of the destination node.
  *
  */
-void MessageCounterManager::ProcessPendingMessages(NodeId peerNodeId)
+void MessageCounterManager::ProcessPendingMessages(OperationalId operationalId)
 {
     auto * sessionManager = mExchangeMgr->GetSessionManager();
 
@@ -161,7 +162,7 @@ void MessageCounterManager::ProcessPendingMessages(NodeId peerNodeId)
                 continue;
             }
 
-            if (packetHeader.GetSourceNodeId().HasValue() && packetHeader.GetSourceNodeId().Value() == peerNodeId)
+            if (packetHeader.GetSourceNodeId().HasValue() && OperationalId(packetHeader.GetSourceNodeId().Value(), entry.fabricIndex) == operationalId)
             {
                 // Reprocess message.
                 sessionManager->OnMessageReceived(entry.peerAddress, std::move(entry.msgBuf));
@@ -292,7 +293,7 @@ CHIP_ERROR MessageCounterManager::HandleMsgCounterSyncResp(Messaging::ExchangeCo
     SuccessOrExit(err);
 
     // Process all queued incoming messages after message counter synchronization is completed.
-    ProcessPendingMessages(exchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId());
+    ProcessPendingMessages(exchangeContext->GetSessionHandle()->GetPeerOperationalId());
 
 exit:
     if (err != CHIP_NO_ERROR)
