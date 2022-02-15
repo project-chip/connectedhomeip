@@ -58,9 +58,10 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
     // Allow the ConnectivityManager interface class to delegate method calls to
     // the implementation methods provided by this class.
     friend class ConnectivityManager;
+
 public:
     CHIP_ERROR ProvisionWiFiNetwork(const char * ssid, const char * key);
-    
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     void StartWiFiManagement();
 #endif
@@ -77,7 +78,7 @@ private:
     WiFiStationMode _GetWiFiStationMode();
     CHIP_ERROR _SetWiFiStationMode(ConnectivityManager::WiFiStationMode val);
     CHIP_ERROR _SetWiFiAPMode(WiFiAPMode val);
-    
+
     bool _IsWiFiStationEnabled();
     bool _IsWiFiStationConnected();
     bool _IsWiFiStationApplicationControlled();
@@ -89,7 +90,7 @@ private:
     friend ConnectivityManagerImpl & ConnectivityMgrImpl(void);
 
     static ConnectivityManagerImpl sInstance;
-    
+
     // ===== Private members reserved for use by this class only.
     ConnectivityManager::WiFiStationMode mWiFiStationMode;
     ConnectivityManager::WiFiAPMode mWiFiAPMode;

@@ -47,7 +47,8 @@ declare_args() {
   # Enable wifi support.
   chip_enable_wifi =
       chip_device_platform == "linux" || chip_device_platform == "esp32" ||
-      chip_device_platform == "mbed" || chip_device_platform == "tizen" || chip_device_platform == "mw320"
+      chip_device_platform == "mbed" || chip_device_platform == "tizen" ||
+      chip_device_platform == "mw320"
 
   # Enable ble support.
   if (chip_device_platform == "fake") {
@@ -144,5 +145,5 @@ assert(
         chip_device_platform == "nrfconnect" ||
         chip_device_platform == "k32w" || chip_device_platform == "qpg" ||
         chip_device_platform == "telink" || chip_device_platform == "mbed" ||
-        chip_device_platform == "p6" || chip_device_platform == "mw320" ,
+        chip_device_platform == "p6" || chip_device_platform == "mw320",
     "Please select a valid value for chip_device_platform")

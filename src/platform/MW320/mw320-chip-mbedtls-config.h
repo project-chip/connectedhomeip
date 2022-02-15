@@ -22,8 +22,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
-
 #if defined(MBEDTLS_ECP_WINDOW_SIZE)
 #undef MBEDTLS_ECP_WINDOW_SIZE
 #define MBEDTLS_ECP_WINDOW_SIZE 4 /**< Maximum window size used */
@@ -41,8 +39,5 @@
  *
  * See MBEDTLS_AES_C for more information.
  */
-
-
-
 
 #endif // MW320_MBEDTLS_CONFIG_H

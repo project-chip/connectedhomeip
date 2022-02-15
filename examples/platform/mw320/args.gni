@@ -16,19 +16,11 @@ import("//build_overrides/chip.gni")
 
 import("${chip_root}/src/platform/MW320/args.gni")
 
-
 arm_cpu = "cortex-m4"
 arm_float_abi = "hard"
 arm_fpu = "fpv4-sp-d16"
-
-
-
 
 chip_device_project_config_include = "<CHIPProjectConfig.h>"
 chip_project_config_include = "<CHIPProjectConfig.h>"
 chip_inet_project_config_include = "<CHIPProjectConfig.h>"
 chip_system_project_config_include = "<CHIPProjectConfig.h>"
-
-
-
-

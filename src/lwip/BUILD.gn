@@ -31,7 +31,8 @@ if (lwip_platform == "") {
 assert(lwip_platform == "external" || lwip_platform == "standalone" ||
            lwip_platform == "cc13x2_26x2" || lwip_platform == "efr32" ||
            lwip_platform == "k32w" || lwip_platform == "qpg" ||
-           lwip_platform == "mbed" || lwip_platform == "p6" || lwip_platform == "mw320",
+           lwip_platform == "mbed" || lwip_platform == "p6" ||
+           lwip_platform == "mw320",
        "Unsupported lwIP platform: ${lwip_platform}")
 
 if (lwip_platform != "external") {

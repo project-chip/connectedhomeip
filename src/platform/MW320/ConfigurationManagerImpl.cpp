@@ -100,8 +100,8 @@ CHIP_ERROR ConfigurationManagerImpl::_WritePersistedStorageValue(::chip::Platfor
     // (where persistedStorageKey represents an index to the counter).
     CHIP_ERROR err;
 
-    //err = WriteConfigValueCounter(persistedStorageKey, value);
-    err=CHIP_NO_ERROR;
+    // err = WriteConfigValueCounter(persistedStorageKey, value);
+    err = CHIP_NO_ERROR;
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
@@ -123,8 +123,6 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     {
         ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", ErrorStr(err));
     }
-
-
 
     // Restart the system.
     ChipLogProgress(DeviceLayer, "System restarting");
