@@ -14,16 +14,17 @@
 # limitations under the License.
 
 from idl.generators import CodeGenerator, GeneratorStorage
-from idl.matter_idl_types import Idl, ClusterSide, Field, Attribute, Cluster, FieldAttribute
+from idl.matter_idl_types import Idl, ClusterSide, Field, Attribute, Cluster, FieldAttribute, Command, DataType
 from idl import matter_idl_types
-from idl.generators.types import ParseDataType, BasicString, BasicInteger, FundamentalType, IdlType, IdlEnumType
-from typing import Union, List
+from idl.generators.types import ParseDataType, BasicString, BasicInteger, FundamentalType, IdlType, IdlEnumType, IdlBitmapType, TypeLookupContext
+from typing import Union, List, Set
 from stringcase import capitalcase
 
+import enum
 import logging
 
 
-def FieldToGlobalName(field: Field, known_enum_types: List[matter_idl_types.Enum]) -> Union[str, None]:
+def FieldToGlobalName(field: Field, context: TypeLookupContext) -> Union[str, None]:
     """Global names are used for generic callbacks shared across
     all clusters (e.g. for bool/float/uint32 and similar)
     """
@@ -33,8 +34,13 @@ def FieldToGlobalName(field: Field, known_enum_types: List[matter_idl_types.Enum
     if FieldAttribute.NULLABLE in field.attributes:
         return None
 
-    actual = ParseDataType(field.data_type, known_enum_types)
+    if FieldAttribute.OPTIONAL in field.attributes:
+        return None
+
+    actual = ParseDataType(field.data_type, context)
     if type(actual) == IdlEnumType:
+        actual = actual.base_type
+    elif type(actual) == IdlBitmapType:
         actual = actual.base_type
 
     if type(actual) == BasicString:
@@ -64,8 +70,8 @@ def FieldToGlobalName(field: Field, known_enum_types: List[matter_idl_types.Enum
     return None
 
 
-def CallbackName(attr: Attribute, cluster: Cluster, known_enum_types: List[matter_idl_types.Enum]) -> str:
-    global_name = FieldToGlobalName(attr.definition, known_enum_types)
+def CallbackName(attr: Attribute, cluster: Cluster, context: TypeLookupContext) -> str:
+    global_name = FieldToGlobalName(attr.definition, context)
 
     if global_name:
         return 'CHIP{}AttributeCallback'.format(capitalcase(global_name))
@@ -76,17 +82,229 @@ def CallbackName(attr: Attribute, cluster: Cluster, known_enum_types: List[matte
     )
 
 
-def attributesWithSupportedCallback(attrs, known_enum_types: List[matter_idl_types.Enum]):
+def CommandCallbackName(command: Command, cluster: Cluster):
+    if command.output_param.lower() == 'defaultsuccess':
+        return 'DefaultSuccess'
+    return '{}Cluster{}'.format(cluster.name, command.output_param)
+
+
+def attributesWithSupportedCallback(attrs, context: TypeLookupContext):
     for attr in attrs:
         # Attributes will be generated for all types
         # except non-list structures
         if not attr.definition.is_list:
-            underlying = ParseDataType(
-                attr.definition.data_type, known_enum_types)
+            underlying = ParseDataType(attr.definition.data_type, context)
             if type(underlying) == IdlType:
                 continue
 
         yield attr
+
+
+def ClientClustersOnly(clusters: List[Cluster]):
+    for cluster in clusters:
+        if cluster.side == ClusterSide.CLIENT:
+            yield cluster
+
+
+def NamedFilter(choices: List, name: str):
+    for choice in choices:
+        if choice.name == name:
+            return choice
+    raise Exception("No item named %s in %r" % (name, choices))
+
+
+def ToBoxedJavaType(field: Field):
+    if field.is_optional:
+        return 'jobject'
+    elif field.data_type.name.lower() in ['octet_string', 'long_octet_string']:
+        return 'jbyteArray'
+    elif field.data_type.name.lower() in ['char_string', 'long_char_string']:
+        return 'jstring'
+    else:
+        return 'jobject'
+
+
+def LowercaseFirst(name: str):
+    if len(name) > 1 and name[1].lower() != name[1]:
+        # Odd workaround: PAKEVerifier should not become pAKEVerifier
+        return name
+    return name[0].lower() + name[1:]
+
+
+class EncodableValueAttr(enum.Enum):
+    LIST = enum.auto()
+    NULLABLE = enum.auto()
+    OPTIONAL = enum.auto()
+
+
+class EncodableValue:
+    """
+    Contains helpers for encoding values, specifically lookups
+    for optionality, lists and recursive data type lookups within
+    the IDL and cluster
+    """
+
+    def __init__(self, context: TypeLookupContext, data_type: DataType, attrs: Set[EncodableValueAttr]):
+        self.context = context
+        self.data_type = data_type
+        self.attrs = attrs
+
+    @property
+    def is_nullable(self):
+        return EncodableValueAttr.NULLABLE in self.attrs
+
+    @property
+    def is_optional(self):
+        return EncodableValueAttr.OPTIONAL in self.attrs
+
+    @property
+    def is_list(self):
+        return EncodableValueAttr.LIST in self.attrs
+
+    @property
+    def is_octet_string(self):
+        return self.data_type.name.lower() in ['octet_string', 'long_octet_string']
+
+    @property
+    def is_char_string(self):
+        return self.data_type.name.lower() in ['char_string', 'long_char_string']
+
+    @property
+    def is_struct(self):
+        return self.context.is_struct_type(self.data_type.name)
+
+    @property
+    def is_enum(self):
+        return self.context.is_enum_type(self.data_type.name)
+
+    @property
+    def is_bitmap(self):
+        self.context.is_bitmap_type(self.data_type.name)
+
+    def clone(self):
+        return EncodableValue(self.context, self.data_type, self.attrs)
+
+    def without_nullable(self):
+        result = self.clone()
+        result.attrs.remove(EncodableValueAttr.NULLABLE)
+        return result
+
+    def without_optional(self):
+        result = self.clone()
+        result.attrs.remove(EncodableValueAttr.OPTIONAL)
+        return result
+
+    def without_list(self):
+        result = self.clone()
+        result.attrs.remove(EncodableValueAttr.LIST)
+        return result
+
+    def get_underlying_struct(self):
+        s = self.context.find_struct(self.data_type.name)
+        if not s:
+            raise Exception("Struct %s not found" % self.data_type.name)
+        return s
+
+    def get_underlying_enum(self):
+        e = self.context.find_enum(self.data_type.name)
+        if not e:
+            raise Exception("Enum %s not found" % self.data_type.name)
+        return e
+
+    @property
+    def boxed_java_type(self):
+        t = ParseDataType(self.data_type, self.context)
+
+        if type(t) == FundamentalType:
+            if t == FundamentalType.BOOL:
+                return "Boolean"
+            elif t == FundamentalType.FLOAT:
+                return "Float"
+            elif t == FundamentalType.DOUBLE:
+                return "Double"
+            else:
+                raise Error("Unknown fundamental type")
+        elif type(t) == BasicInteger:
+            if t.byte_count >= 4:
+                return "Long"
+            else:
+                return "Integer"
+        elif type(t) == BasicString:
+            if t.is_binary:
+                return "byte[]"
+            else:
+                return "String"
+        elif type(t) == IdlEnumType:
+            return "Integer"
+        elif type(t) == IdlBitmapType:
+            return "Integer"
+        else:
+            return "Object"
+
+    @property
+    def boxed_java_signature(self):
+        # Optional takes precedence over list - Optional<ArrayList> compiles down to just java.util.Optional.
+        if self.is_optional:
+            return "Ljava/util/Optional;"
+
+        if self.is_list:
+            return "Ljava/util/ArrayList;"
+
+        t = ParseDataType(self.data_type, self.context)
+
+        if type(t) == FundamentalType:
+            if t == FundamentalType.BOOL:
+                return "Ljava/lang/Boolean;"
+            elif t == FundamentalType.FLOAT:
+                return "Ljava/lang/Float;"
+            elif t == FundamentalType.DOUBLE:
+                return "Ljava/lang/Double;"
+            else:
+                raise Error("Unknown fundamental type")
+        elif type(t) == BasicInteger:
+            if t.byte_count >= 4:
+                return "Ljava/lang/Long;"
+            else:
+                return "Ljava/lang/Integer;"
+        elif type(t) == BasicString:
+            if t.is_binary:
+                return "[B"
+            else:
+                return "Ljava/lang/String;"
+        elif type(t) == IdlEnumType:
+            return "Ljava/lang/Integer;"
+        elif type(t) == IdlBitmapType:
+            return "Ljava/lang/Integer;"
+        else:
+            return "Lchip/devicecontroller/ChipStructs${}Cluster{};".format(self.context.cluster.name, self.data_type.name)
+
+
+def EncodableValueFrom(field: Field, context: TypeLookupContext) -> EncodableValue:
+    attrs = set()
+
+    if field.is_optional:
+        attrs.add(EncodableValueAttr.OPTIONAL)
+
+    if field.is_nullable:
+        attrs.add(EncodableValueAttr.NULLABLE)
+
+    if field.is_list:
+        attrs.add(EncodableValueAttr.LIST)
+
+    return EncodableValue(context, field.data_type, attrs)
+
+
+def CreateLookupContext(idl: Idl, cluster: Cluster):
+    return TypeLookupContext(idl, cluster)
+
+
+def CanGenerateSubscribe(attr: Attribute, lookup: TypeLookupContext):
+    # For backwards compatibility, we do not subscribe to structs
+    # (although list of structs is ok ...)
+    if attr.definition.is_list:
+        return True
+
+    return not lookup.is_struct_type(attr.definition.data_type.name)
 
 
 class JavaGenerator(CodeGenerator):
@@ -99,12 +317,16 @@ class JavaGenerator(CodeGenerator):
 
         self.jinja_env.filters['attributesWithCallback'] = attributesWithSupportedCallback
         self.jinja_env.filters['callbackName'] = CallbackName
+        self.jinja_env.filters['commandCallbackName'] = CommandCallbackName
+        self.jinja_env.filters['clientClustersOnly'] = ClientClustersOnly
+        self.jinja_env.filters['named'] = NamedFilter
+        self.jinja_env.filters['toBoxedJavaType'] = ToBoxedJavaType
+        self.jinja_env.filters['lowercaseFirst'] = LowercaseFirst
+        self.jinja_env.filters['asEncodable'] = EncodableValueFrom
+        self.jinja_env.filters['createLookupContext'] = CreateLookupContext
+        self.jinja_env.filters['canGenerateSubscribe'] = CanGenerateSubscribe
 
     def internal_render_all(self):
-        known_enums = self.idl.enums[:]
-        for cluster in self.idl.clusters:
-            known_enums.extend(cluster.enums)
-
         # Every cluster has its own impl, to avoid
         # very large compilations (running out of RAM)
         for cluster in self.idl.clusters:
@@ -116,6 +338,15 @@ class JavaGenerator(CodeGenerator):
                 output_file_name="jni/%sClient-ReadImpl.cpp" % cluster.name,
                 vars={
                     'cluster': cluster,
-                    'known_enums': known_enums,
+                    'typeLookup': TypeLookupContext(self.idl, cluster),
+                }
+            )
+
+            self.internal_render_one_output(
+                template_path="java/ChipClustersCpp.jinja",
+                output_file_name="jni/%sClient-InvokeSubscribeImpl.cpp" % cluster.name,
+                vars={
+                    'cluster': cluster,
+                    'typeLookup': TypeLookupContext(self.idl, cluster),
                 }
             )

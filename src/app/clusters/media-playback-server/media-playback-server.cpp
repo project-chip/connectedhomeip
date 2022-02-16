@@ -42,8 +42,8 @@ using namespace chip::app::Clusters::MediaPlayback;
 using namespace chip::AppPlatform;
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
-#define MEDIA_PLAYBACK_DELEGATE_TABLE_SIZE                                                                                         \
-    (EMBER_AF_MEDIA_PLAYBACK_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
+static constexpr size_t kMediaPlaybackDelegateTableSize =
+    EMBER_AF_MEDIA_PLAYBACK_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -52,7 +52,7 @@ using chip::app::Clusters::MediaPlayback::Delegate;
 
 namespace {
 
-Delegate * gDelegateTable[MEDIA_PLAYBACK_DELEGATE_TABLE_SIZE] = { nullptr };
+Delegate * gDelegateTable[kMediaPlaybackDelegateTableSize] = { nullptr };
 
 Delegate * GetDelegate(EndpointId endpoint)
 {

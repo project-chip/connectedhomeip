@@ -32,6 +32,8 @@
 #include <lib/support/ErrorStr.h>
 #include <setup_payload/SetupPayload.h>
 
+#include "esp_log.h"
+
 using namespace ::chip;
 
 namespace chip {
@@ -101,7 +103,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 {
     TaskHandle_t task = xTaskGetCurrentTaskHandle();
     const char * name = pcTaskGetName(task);
-    if (!strcmp(name, "CHIP"))
+    if (strcmp(name, "CHIP"))
     {
         ESP_LOGE("all-clusters-app", "Attribute changed on non-Matter task '%s'\n", name);
     }
