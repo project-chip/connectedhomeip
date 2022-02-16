@@ -39,7 +39,7 @@ declare_args() {
   chip_print_memory_usage = false
 
   # PIN code for PASE session establishment.
-  setupPinCode = 73141520
+  setupPinCode = 20202021
   setupDiscriminator = 3840
 
   # Monitor & log memory usage at runtime.

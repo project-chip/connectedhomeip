@@ -22,6 +22,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/BLEManager.h>
+#include <platform/EFR32/NetworkCommissioningWiFiDriver.h>
 
 #include <lwip/dns.h>
 #include <lwip/ip_addr.h>
@@ -351,9 +352,9 @@ exit:
 void ConnectivityManagerImpl::OnStationConnected()
 {
     ChipDeviceEvent event;
-
     wfx_setup_ip6_link_local(SL_WFX_STA_INTERFACE);
 
+    NetworkCommissioning::SlWiFiDriver::GetInstance().OnConnectWiFiNetwork();
     // Alert other components of the new state.
     event.Type                          = DeviceEventType::kWiFiConnectivityChange;
     event.WiFiConnectivityChange.Result = kConnectivity_Established;
