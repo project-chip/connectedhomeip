@@ -1035,7 +1035,7 @@ void BLEManagerImpl::HandleC3CharRead(TBTCONFIG_CALLBACK_DATA * p_data)
     CHIP_ERROR err = CHIP_NO_ERROR;
     PacketBufferHandle bufferHandle;
     uint8_t rotatingDeviceIdUniqueId[ConfigurationManager::kRotatingDeviceIDUniqueIDLength] = {};
-    MutableByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId, sizeof(rotatingDeviceIdUniqueId));
+    MutableByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId);
     uint16_t lifetimeCounter = 0;
     BitFlags<AdditionalDataFields> additionalDataFields;
 
