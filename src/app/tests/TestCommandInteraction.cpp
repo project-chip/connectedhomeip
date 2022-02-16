@@ -603,6 +603,8 @@ void TestCommandInteraction::TestCommandHandlerWithProcessReceivedEmptyDataMsg(n
             GenerateInvokeRequest(apSuite, apContext, commandDatabuf, false /*aNeedCommandData*/, messageIsTimed);
             err = commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), transactionIsTimed);
             NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+            ChipLogError(DataManagement, "mlepage assert breakdown %d == (%d == %d)", chip::isCommandDispatched, messageIsTimed,
+                         transactionIsTimed);
             NL_TEST_ASSERT(apSuite, chip::isCommandDispatched == (messageIsTimed == transactionIsTimed));
         }
     }

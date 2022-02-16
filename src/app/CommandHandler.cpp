@@ -87,7 +87,7 @@ CHIP_ERROR CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * e
 
 CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payload, bool isTimedInvoke)
 {
-    ChipLogDetail(DataManagement, "mlepage A");
+    ChipLogError(DataManagement, "mlepage ProcessInvokeRequest");
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVReader reader;
     TLV::TLVReader invokeRequestsReader;
@@ -95,69 +95,69 @@ CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && pa
     InvokeRequests::Parser invokeRequests;
     reader.Init(std::move(payload));
     ReturnErrorOnFailure(reader.Next());
-    ChipLogDetail(DataManagement, "mlepage A");
+    ChipLogError(DataManagement, "mlepage A");
     ReturnErrorOnFailure(invokeRequestMessage.Init(reader));
-    ChipLogDetail(DataManagement, "mlepage B");
+    ChipLogError(DataManagement, "mlepage B");
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     ReturnErrorOnFailure(invokeRequestMessage.CheckSchemaValidity());
 #endif
-    ChipLogDetail(DataManagement, "mlepage C");
+    ChipLogError(DataManagement, "mlepage C");
     ReturnErrorOnFailure(invokeRequestMessage.GetSuppressResponse(&mSuppressResponse));
-    ChipLogDetail(DataManagement, "mlepage D");
+    ChipLogError(DataManagement, "mlepage D");
     ReturnErrorOnFailure(invokeRequestMessage.GetTimedRequest(&mTimedRequest));
-    ChipLogDetail(DataManagement, "mlepage E");
+    ChipLogError(DataManagement, "mlepage E");
     ReturnErrorOnFailure(invokeRequestMessage.GetInvokeRequests(&invokeRequests));
 
     VerifyOrReturnError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ChipLogDetail(DataManagement, "mlepage F");
+    ChipLogError(DataManagement, "mlepage F");
 
     if (mTimedRequest != isTimedInvoke)
     {
-        ChipLogDetail(DataManagement, "mlepage G");
+        ChipLogError(DataManagement, "mlepage G");
         // The message thinks it should be part of a timed interaction but it's
         // not, or vice versa.  Spec says to Respond with UNSUPPORTED_ACCESS.
         err = StatusResponse::Send(Protocols::InteractionModel::Status::UnsupportedAccess, mpExchangeCtx,
                                    /* aExpectResponse = */ false);
-        ChipLogDetail(DataManagement, "mlepage H");
+        ChipLogError(DataManagement, "mlepage H");
 
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogDetail(DataManagement, "mlepage I");
+            ChipLogError(DataManagement, "mlepage I");
             // We have to manually close the exchange, because we called
             // WillSendMessage already.
             mpExchangeCtx->Close();
         }
 
-        ChipLogDetail(DataManagement, "mlepage J");
+        ChipLogError(DataManagement, "mlepage J");
         // Null out the (now-closed) exchange, so that when we try to
         // SendCommandResponse() later (when our holdoff count drops to 0) it
         // just fails and we don't double-respond.
         mpExchangeCtx = nullptr;
         return err;
     }
-    ChipLogDetail(DataManagement, "mlepage K");
+    ChipLogError(DataManagement, "mlepage K");
 
     invokeRequests.GetReader(&invokeRequestsReader);
     while (CHIP_NO_ERROR == (err = invokeRequestsReader.Next()))
     {
-        ChipLogDetail(DataManagement, "mlepage L");
+        ChipLogError(DataManagement, "mlepage L");
         VerifyOrReturnError(TLV::AnonymousTag() == invokeRequestsReader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
         CommandDataIB::Parser commandData;
         ReturnErrorOnFailure(commandData.Init(invokeRequestsReader));
-        ChipLogDetail(DataManagement, "mlepage M");
+        ChipLogError(DataManagement, "mlepage M");
 
         if (mpExchangeCtx->IsGroupExchangeContext())
         {
-            ChipLogDetail(DataManagement, "mlepage N");
+            ChipLogError(DataManagement, "mlepage N");
             ReturnErrorOnFailure(ProcessGroupCommandDataIB(commandData));
         }
         else
         {
-            ChipLogDetail(DataManagement, "mlepage O");
+            ChipLogError(DataManagement, "mlepage O");
             ReturnErrorOnFailure(ProcessCommandDataIB(commandData));
         }
     }
-    ChipLogDetail(DataManagement, "mlepage P");
+    ChipLogError(DataManagement, "mlepage P");
 
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
@@ -204,7 +204,7 @@ void CommandHandler::IncrementHoldOff()
 void CommandHandler::DecrementHoldOff()
 {
     mPendingWork--;
-    ChipLogDetail(DataManagement, "Decreasing reference count for CommandHandler, remaining %zu", mPendingWork);
+    ChipLogError(DataManagement, "Decreasing reference count for CommandHandler, remaining %zu", mPendingWork);
     if (mPendingWork != 0)
     {
         return;
@@ -276,70 +276,70 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
         Status commandExists = mpCallback->CommandExists(concretePath);
         if (commandExists != Status::Success)
         {
-            ChipLogDetail(DataManagement, "No command " ChipLogFormatMEI " in Cluster " ChipLogFormatMEI " on Endpoint 0x%" PRIx16,
-                          ChipLogValueMEI(concretePath.mCommandId), ChipLogValueMEI(concretePath.mClusterId),
-                          concretePath.mEndpointId);
+            ChipLogError(DataManagement, "No command " ChipLogFormatMEI " in Cluster " ChipLogFormatMEI " on Endpoint 0x%" PRIx16,
+                         ChipLogValueMEI(concretePath.mCommandId), ChipLogValueMEI(concretePath.mClusterId),
+                         concretePath.mEndpointId);
             return AddStatus(concretePath, commandExists);
         }
     }
 
-    ChipLogDetail(DataManagement, "mlepage 1");
+    ChipLogError(DataManagement, "mlepage 1");
     VerifyOrExit(mpExchangeCtx != nullptr && mpExchangeCtx->HasSessionHandle(), err = CHIP_ERROR_INCORRECT_STATE);
-    ChipLogDetail(DataManagement, "mlepage 2");
+    ChipLogError(DataManagement, "mlepage 2");
 
     {
         Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
         Access::RequestPath requestPath{ .cluster = concretePath.mClusterId, .endpoint = concretePath.mEndpointId };
         Access::Privilege requestPrivilege = RequiredPrivilege::ForInvokeCommand(concretePath);
         err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
-        ChipLogDetail(DataManagement, "mlepage 3");
+        ChipLogError(DataManagement, "mlepage 3");
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogDetail(DataManagement, "mlepage 4");
+            ChipLogError(DataManagement, "mlepage 4");
             if (err != CHIP_ERROR_ACCESS_DENIED)
             {
-                ChipLogDetail(DataManagement, "mlepage 5");
+                ChipLogError(DataManagement, "mlepage 5");
                 return AddStatus(concretePath, Status::Failure);
             }
             // TODO: when wildcard invokes are supported, handle them to discard rather than fail with status
             return AddStatus(concretePath, Status::UnsupportedAccess);
         }
     }
-    ChipLogDetail(DataManagement, "mlepage 6");
+    ChipLogError(DataManagement, "mlepage 6");
 
     if (CommandNeedsTimedInvoke(concretePath.mClusterId, concretePath.mCommandId) && !IsTimedInvoke())
     {
-        ChipLogDetail(DataManagement, "mlepage 7");
+        ChipLogError(DataManagement, "mlepage 7");
         // TODO: when wildcard invokes are supported, discard a
         // wildcard-expanded path instead of returning a status.
         return AddStatus(concretePath, Protocols::InteractionModel::Status::NeedsTimedInteraction);
     }
-    ChipLogDetail(DataManagement, "mlepage 8");
+    ChipLogError(DataManagement, "mlepage 8");
 
     err = aCommandElement.GetData(&commandDataReader);
     if (CHIP_END_OF_TLV == err)
     {
-        ChipLogDetail(DataManagement,
-                      "Received command without data for Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI
-                      " Command=" ChipLogFormatMEI,
-                      concretePath.mEndpointId, ChipLogValueMEI(concretePath.mClusterId), ChipLogValueMEI(concretePath.mCommandId));
+        ChipLogError(DataManagement,
+                     "Received command without data for Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI
+                     " Command=" ChipLogFormatMEI,
+                     concretePath.mEndpointId, ChipLogValueMEI(concretePath.mClusterId), ChipLogValueMEI(concretePath.mCommandId));
         err = CHIP_NO_ERROR;
     }
     if (CHIP_NO_ERROR == err)
     {
-        ChipLogDetail(DataManagement,
-                      "Received command for Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
-                      concretePath.mEndpointId, ChipLogValueMEI(concretePath.mClusterId), ChipLogValueMEI(concretePath.mCommandId));
+        ChipLogError(DataManagement,
+                     "Received command for Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
+                     concretePath.mEndpointId, ChipLogValueMEI(concretePath.mClusterId), ChipLogValueMEI(concretePath.mCommandId));
         SuccessOrExit(MatterPreCommandReceivedCallback(concretePath));
         mpCallback->DispatchCommand(*this, concretePath, commandDataReader);
         MatterPostCommandReceivedCallback(concretePath);
     }
-    ChipLogDetail(DataManagement, "mlepage 9");
+    ChipLogError(DataManagement, "mlepage 9");
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogDetail(DataManagement, "mlepage X");
+        ChipLogError(DataManagement, "mlepage X");
         return AddStatus(concretePath, Status::InvalidCommand);
     }
 
@@ -374,16 +374,16 @@ CHIP_ERROR CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
     groupId = mpExchangeCtx->GetSessionHandle()->AsGroupSession()->GetGroupId();
     fabric  = GetAccessingFabricIndex();
 
-    ChipLogDetail(DataManagement,
-                  "Received group command for Group=%" PRIu16 " Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI, groupId,
-                  ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId));
+    ChipLogError(DataManagement,
+                 "Received group command for Group=%" PRIu16 " Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI, groupId,
+                 ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId));
 
     err = aCommandElement.GetData(&commandDataReader);
     if (CHIP_END_OF_TLV == err)
     {
-        ChipLogDetail(DataManagement,
-                      "Received command without data for Group=%" PRIu16 " Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
-                      groupId, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId));
+        ChipLogError(DataManagement,
+                     "Received command without data for Group=%" PRIu16 " Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
+                     groupId, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId));
         err = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
@@ -409,16 +409,16 @@ CHIP_ERROR CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
             continue;
         }
 
-        ChipLogDetail(DataManagement,
-                      "Processing group command for Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
-                      mapping.endpoint_id, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId));
+        ChipLogError(DataManagement,
+                     "Processing group command for Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
+                     mapping.endpoint_id, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId));
 
         const ConcreteCommandPath concretePath(mapping.endpoint_id, clusterId, commandId);
 
         if (mpCallback->CommandExists(concretePath) != Protocols::InteractionModel::Status::Success)
         {
-            ChipLogDetail(DataManagement, "No command " ChipLogFormatMEI " in Cluster " ChipLogFormatMEI " on Endpoint 0x%" PRIx16,
-                          ChipLogValueMEI(mapping.endpoint_id), ChipLogValueMEI(clusterId), mapping.endpoint_id);
+            ChipLogError(DataManagement, "No command " ChipLogFormatMEI " in Cluster " ChipLogFormatMEI " on Endpoint 0x%" PRIx16,
+                         ChipLogValueMEI(mapping.endpoint_id), ChipLogValueMEI(clusterId), mapping.endpoint_id);
 
             continue;
         }
@@ -645,7 +645,7 @@ const char * CommandHandler::GetStateStr() const
 void CommandHandler::MoveToState(const State aTargetState)
 {
     mState = aTargetState;
-    ChipLogDetail(DataManagement, "ICR moving to [%10.10s]", GetStateStr());
+    ChipLogError(DataManagement, "ICR moving to [%10.10s]", GetStateStr());
 }
 
 void CommandHandler::Abort()
