@@ -117,7 +117,8 @@ public:
     void Shutdown() override
     {
         VerifyOrReturn(mDelegate != nullptr);
-        mDelegate->SetDelegate(nullptr);
+        mDelegate->SetOperationalDelegate(nullptr);
+        mDelegate->SetCommissioningDelegate(nullptr);
         mDelegate->Release();
         mDelegate = nullptr;
     }
