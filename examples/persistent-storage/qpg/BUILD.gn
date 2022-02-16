@@ -31,15 +31,10 @@ qpg_sdk("sdk") {
     "${chip_root}/src/platform/qpg",
     "${qpg_project_dir}/include",
   ]
-
-  sources = [ "${examples_plat_dir}/project_include/CHIPProjectConfig.h" ]
-
-  defines = []
 }
 
 qpg_executable("persistent_storage") {
   include_dirs = [ "${qpg_project_dir}/.." ]
-  defines = []
   output_name = "chip-${qpg_target_ic}-persistent_storage-example.out"
 
   deps = []
