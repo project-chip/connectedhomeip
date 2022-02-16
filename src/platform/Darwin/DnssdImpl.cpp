@@ -248,12 +248,12 @@ bool CheckForSuccess(GenericContext * context, const char * name, DNSServiceErro
             }
             case ContextType::Resolve: {
                 ResolveContext * resolveContext = reinterpret_cast<ResolveContext *>(context);
-                resolveContext->callback(resolveContext->context, nullptr, CHIP_ERROR_INTERNAL);
+                resolveContext->callback(resolveContext->context, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_INTERNAL);
                 break;
             }
             case ContextType::GetAddrInfo: {
                 GetAddrInfoContext * resolveContext = reinterpret_cast<GetAddrInfoContext *>(context);
-                resolveContext->callback(resolveContext->context, nullptr, CHIP_ERROR_INTERNAL);
+                resolveContext->callback(resolveContext->context, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_INTERNAL);
                 break;
             }
             }
@@ -414,7 +414,7 @@ static void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t i
     Platform::CopyString(service.mHostName, hostname);
     service.mInterface = Inet::InterfaceId(sdCtx->interfaceId);
 
-    sdCtx->callback(sdCtx->context, &service, status);
+    sdCtx->callback(sdCtx->context, &service, Span<Inet::IPAddress>(), status);
     MdnsContexts::GetInstance().Remove(sdCtx);
 }
 
